@@ -13,7 +13,7 @@ import (
 
 func TestGetEbookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetEbookByID(t *testing.T) {
 
 func TestGetEbookByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetEbookByID_NotFound(t *testing.T) {
 
 func TestCreateEbookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateEbookByID(t *testing.T) {
 
 func TestUpdateEbookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateEbookByID(t *testing.T) {
 
 func TestDeleteEbookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteEbookByID(t *testing.T) {
 
 func TestGetEbookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetEbookByName(t *testing.T) {
 
 func TestGetEbookByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetEbookByName_NotFound(t *testing.T) {
 
 func TestUpdateEbookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateEbookByName(t *testing.T) {
 
 func TestDeleteEbookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteEbookByName(t *testing.T) {
 
 func TestListEbooks(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListEbooks(t *testing.T) {
 
 func TestListEbooks_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListEbooks_NotFound(t *testing.T) {
 
 func TestGetEbookByIDSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -199,7 +199,7 @@ func TestGetEbookByIDSubset(t *testing.T) {
 
 func TestGetEbookByIDSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -211,7 +211,7 @@ func TestGetEbookByIDSubset_NotFound(t *testing.T) {
 
 func TestCreateEbookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -226,7 +226,7 @@ func TestCreateEbookByName(t *testing.T) {
 
 func TestResolveEbookIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -244,7 +244,7 @@ func TestResolveEbookIDByName(t *testing.T) {
 
 func TestResolveEbookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -263,13 +263,13 @@ func TestResolveEbookByName(t *testing.T) {
 func TestApplyEbook_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -291,13 +291,13 @@ func TestApplyEbook_Create(t *testing.T) {
 func TestApplyEbook_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<ebook><general><id>42</id></general></ebook>")
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/ebooks/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/ebooks/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

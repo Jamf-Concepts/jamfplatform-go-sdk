@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:activation-code.
 func (c *Client) GetActivationCode(ctx context.Context) (*ActivationCode, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ActivationCode
 	endpoint := prefix + "/activationcode"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetActivationCode(ctx context.Context) (*ActivationCode, error)
 //
 // Required privileges: update:pro:activation-code.
 func (c *Client) UpdateActivationCode(ctx context.Context, request *ActivationCode) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/activationcode"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateActivationCode: %w", err)

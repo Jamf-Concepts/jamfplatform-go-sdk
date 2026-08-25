@@ -21,7 +21,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListDeviceGroupsV1(ctx context.Context) (*GroupListResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result GroupListResponse
 	endpoint := prefix + "/groups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -34,7 +34,7 @@ func (c *Client) ListDeviceGroupsV1(ctx context.Context) (*GroupListResponse, er
 //
 // Required privileges: create:jsc:all.
 func (c *Client) CreateDeviceGroupV1(ctx context.Context, request *CreateGroupRequest) (*Group, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result Group
 	endpoint := prefix + "/groups"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -47,7 +47,7 @@ func (c *Client) CreateDeviceGroupV1(ctx context.Context, request *CreateGroupRe
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListDeviceGroupsV2(ctx context.Context) (*GroupListResponseV2, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v2")
+	prefix := c.transport.APIPrefix("securitycloud", "v2")
 	var result GroupListResponseV2
 	endpoint := prefix + "/groups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -63,7 +63,7 @@ func (c *Client) ListDeviceGroupsV2(ctx context.Context) (*GroupListResponseV2, 
 // Parameters:
 //   - groupID: Unique identifier of the group to retrieve.
 func (c *Client) GetDeviceGroupV1(ctx context.Context, groupID string) (*Group, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result Group
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(groupID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -79,7 +79,7 @@ func (c *Client) GetDeviceGroupV1(ctx context.Context, groupID string) (*Group, 
 // Parameters:
 //   - groupID: Unique identifier of the group to update.
 func (c *Client) UpdateDeviceGroupV1(ctx context.Context, groupID string, request *UpdateGroupRequest) (*Group, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result Group
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(groupID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -95,7 +95,7 @@ func (c *Client) UpdateDeviceGroupV1(ctx context.Context, groupID string, reques
 // Parameters:
 //   - groupID: Unique identifier of the group to delete.
 func (c *Client) DeleteDeviceGroupV1(ctx context.Context, groupID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(groupID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDeviceGroupV1(%s): %w", groupID, err)
@@ -105,7 +105,7 @@ func (c *Client) DeleteDeviceGroupV1(ctx context.Context, groupID string) error 
 
 // ResolveDeviceGroupV1IDByName looks up a DeviceGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/groups"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -116,7 +116,7 @@ func (c *Client) ResolveDeviceGroupV1IDByName(ctx context.Context, name string) 
 
 // ResolveDeviceGroupV1ByName looks up a DeviceGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDeviceGroupV1ByName(ctx context.Context, name string) (*Group, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/groups"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -131,7 +131,7 @@ func (c *Client) ResolveDeviceGroupV1ByName(ctx context.Context, name string) (*
 
 // ResolveDeviceGroupV2IDByName looks up a DeviceGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v2")
+	prefix := c.transport.APIPrefix("securitycloud", "v2")
 	listPath := prefix + "/groups"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "groups", "name", "id", name)
 	if err != nil {
@@ -142,7 +142,7 @@ func (c *Client) ResolveDeviceGroupV2IDByName(ctx context.Context, name string) 
 
 // ResolveDeviceGroupV2ByName looks up a DeviceGroupV2 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDeviceGroupV2ByName(ctx context.Context, name string) (*Group, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v2")
+	prefix := c.transport.APIPrefix("securitycloud", "v2")
 	listPath := prefix + "/groups"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "groups", "name", "id", name)
 	if err != nil {

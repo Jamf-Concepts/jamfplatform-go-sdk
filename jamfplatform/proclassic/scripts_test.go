@@ -13,7 +13,7 @@ import (
 
 func TestGetScriptByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetScriptByID(t *testing.T) {
 
 func TestGetScriptByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetScriptByID_NotFound(t *testing.T) {
 
 func TestCreateScriptByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateScriptByID(t *testing.T) {
 
 func TestUpdateScriptByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateScriptByID(t *testing.T) {
 
 func TestDeleteScriptByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteScriptByID(t *testing.T) {
 
 func TestGetScriptByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetScriptByName(t *testing.T) {
 
 func TestGetScriptByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetScriptByName_NotFound(t *testing.T) {
 
 func TestUpdateScriptByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateScriptByName(t *testing.T) {
 
 func TestDeleteScriptByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteScriptByName(t *testing.T) {
 
 func TestListScripts(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListScripts(t *testing.T) {
 
 func TestListScripts_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListScripts_NotFound(t *testing.T) {
 
 func TestCreateScriptByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -196,7 +196,7 @@ func TestCreateScriptByName(t *testing.T) {
 
 func TestResolveScriptIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -214,7 +214,7 @@ func TestResolveScriptIDByName(t *testing.T) {
 
 func TestResolveScriptByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -233,13 +233,13 @@ func TestResolveScriptByName(t *testing.T) {
 func TestApplyScript_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -261,13 +261,13 @@ func TestApplyScript_Create(t *testing.T) {
 func TestApplyScript_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<script><id>42</id></script>")
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/scripts/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/scripts/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

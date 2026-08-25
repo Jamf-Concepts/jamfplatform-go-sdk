@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetPatchPolicyByID(ctx context.Context, id string) (*PatchPolicy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchPolicy
 	endpoint := fmt.Sprintf("%s/patchpolicies/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetPatchPolicyByID(ctx context.Context, id string) (*PatchPolic
 // Parameters:
 //   - softwareTitleConfigID: Patch software title config ID value to filter by.
 func (c *Client) CreatePatchPolicyBySoftwareTitleConfigID(ctx context.Context, softwareTitleConfigID string, request *PatchPolicy) (*PatchPolicy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchPolicy
 	endpoint := fmt.Sprintf("%s/patchpolicies/softwaretitleconfig/id/%s", prefix, url.PathEscape(softwareTitleConfigID))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreatePatchPolicyBySoftwareTitleConfigID(ctx context.Context, s
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdatePatchPolicyByID(ctx context.Context, id string, request *PatchPolicy) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchpolicies/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePatchPolicyByID(%s): %w", id, err)
@@ -66,7 +66,7 @@ func (c *Client) UpdatePatchPolicyByID(ctx context.Context, id string, request *
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeletePatchPolicyByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchpolicies/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePatchPolicyByID(%s): %w", id, err)
@@ -83,7 +83,7 @@ func (c *Client) DeletePatchPolicyByID(ctx context.Context, id string) error {
 // Parameters:
 //   - softwareTitleConfigID: Patch software title config ID value to filter by.
 func (c *Client) ListPatchPoliciesBySoftwareTitleConfigID(ctx context.Context, softwareTitleConfigID string) (*PatchPolicy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchPolicy
 	endpoint := fmt.Sprintf("%s/patchpolicies/softwaretitleconfig/id/%s", prefix, url.PathEscape(softwareTitleConfigID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -98,7 +98,7 @@ func (c *Client) ListPatchPoliciesBySoftwareTitleConfigID(ctx context.Context, s
 //
 // Required privileges: read:pro:patch-policies.
 func (c *Client) ListPatchPolicies(ctx context.Context) (*PatchPolicies, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchPolicies
 	endpoint := prefix + "/patchpolicies"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -116,7 +116,7 @@ func (c *Client) ListPatchPolicies(ctx context.Context) (*PatchPolicies, error) 
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "UserInteraction".
 func (c *Client) GetPatchPolicyByIDSubset(ctx context.Context, id string, subset string) (*PatchPolicy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchPolicy
 	endpoint := fmt.Sprintf("%s/patchpolicies/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

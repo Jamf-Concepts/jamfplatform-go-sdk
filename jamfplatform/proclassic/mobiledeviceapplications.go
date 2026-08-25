@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceApplicationByID(ctx context.Context, id string) (*MobileDeviceApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplication
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetMobileDeviceApplicationByID(ctx context.Context, id string) 
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceApplicationByID(ctx context.Context, id string, request *MobileDeviceApplication) (*MobileDeviceApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplication
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateMobileDeviceApplicationByID(ctx context.Context, id strin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByID(ctx context.Context, id string, request *MobileDeviceApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceApplicationByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateMobileDeviceApplicationByID(ctx context.Context, id strin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceApplicationByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteMobileDeviceApplicationByID(ctx context.Context, id strin
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMobileDeviceApplicationByName(ctx context.Context, name string) (*MobileDeviceApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplication
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetMobileDeviceApplicationByName(ctx context.Context, name stri
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByName(ctx context.Context, name string, request *MobileDeviceApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceApplicationByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateMobileDeviceApplicationByName(ctx context.Context, name s
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceApplicationByName(%s): %w", name, err)
@@ -130,7 +130,7 @@ func (c *Client) DeleteMobileDeviceApplicationByName(ctx context.Context, name s
 // Parameters:
 //   - bundleID: Bundle ID to filter by.
 func (c *Client) GetMobileDeviceApplicationByBundleID(ctx context.Context, bundleID string) (*MobileDeviceApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplication
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) GetMobileDeviceApplicationByBundleID(ctx context.Context, bundl
 //
 // Required privileges: read:pro:mobile-device-applications.
 func (c *Client) ListMobileDeviceApplications(ctx context.Context) (*MobileDeviceApplications, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplications
 	endpoint := prefix + "/mobiledeviceapplications"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -159,7 +159,7 @@ func (c *Client) ListMobileDeviceApplications(ctx context.Context) (*MobileDevic
 // Parameters:
 //   - bundleid: Bundle ID value to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByBundleID(ctx context.Context, bundleid string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleid))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceApplicationByBundleID(%s): %w", bundleid, err)
@@ -174,7 +174,7 @@ func (c *Client) DeleteMobileDeviceApplicationByBundleID(ctx context.Context, bu
 // Parameters:
 //   - bundleid: Bundle ID value to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByBundleID(ctx context.Context, bundleid string, request *MobileDeviceApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s", prefix, url.PathEscape(bundleid))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceApplicationByBundleID(%s): %w", bundleid, err)
@@ -190,7 +190,7 @@ func (c *Client) UpdateMobileDeviceApplicationByBundleID(ctx context.Context, bu
 //   - bundleid: Bundle ID value to filter by.
 //   - version: Version to filter by.
 func (c *Client) DeleteMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceApplicationByBundleIDVersion(%s): %w", bundleid, err)
@@ -206,7 +206,7 @@ func (c *Client) DeleteMobileDeviceApplicationByBundleIDVersion(ctx context.Cont
 //   - bundleid: Bundle ID to filter by.
 //   - version: Version to filter by.
 func (c *Client) GetMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string) (*MobileDeviceApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplication
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -223,7 +223,7 @@ func (c *Client) GetMobileDeviceApplicationByBundleIDVersion(ctx context.Context
 //   - bundleid: Bundle ID value to filter by.
 //   - version: Version to filter by.
 func (c *Client) UpdateMobileDeviceApplicationByBundleIDVersion(ctx context.Context, bundleid string, version string, request *MobileDeviceApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/bundleid/%s/version/%s", prefix, url.PathEscape(bundleid), url.PathEscape(version))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceApplicationByBundleIDVersion(%s): %w", bundleid, err)
@@ -240,7 +240,7 @@ func (c *Client) UpdateMobileDeviceApplicationByBundleIDVersion(ctx context.Cont
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP", "AppConfiguration".
 func (c *Client) GetMobileDeviceApplicationByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplication
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -258,7 +258,7 @@ func (c *Client) GetMobileDeviceApplicationByIDSubset(ctx context.Context, id st
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "SelfService", "VPPCodes", "VPP", "AppConfiguration".
 func (c *Client) GetMobileDeviceApplicationByNameSubset(ctx context.Context, name string, subset string) (*MobileDeviceApplication, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceApplication
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -274,7 +274,7 @@ func (c *Client) GetMobileDeviceApplicationByNameSubset(ctx context.Context, nam
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceApplicationByName(ctx context.Context, name string, request *MobileDeviceApplication) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceapplications/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceApplicationByName(%s): %w", name, err)

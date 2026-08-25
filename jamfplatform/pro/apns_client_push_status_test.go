@@ -13,7 +13,7 @@ import (
 
 func TestListApnsClientPushStatusesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/apns-client-push-status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/apns-client-push-status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListApnsClientPushStatusesV1(t *testing.T) {
 
 func TestEnableAllApnsClientsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/apns-client-push-status/enable-all-clients", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/apns-client-push-status/enable-all-clients", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -50,7 +50,7 @@ func TestEnableAllApnsClientsV1(t *testing.T) {
 
 func TestGetEnableAllApnsClientsStatusV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/apns-client-push-status/enable-all-clients/status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/apns-client-push-status/enable-all-clients/status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -68,7 +68,7 @@ func TestGetEnableAllApnsClientsStatusV1(t *testing.T) {
 
 func TestGetEnableAllApnsClientsStatusV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/apns-client-push-status/enable-all-clients/status", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/apns-client-push-status/enable-all-clients/status", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -84,7 +84,7 @@ func TestGetEnableAllApnsClientsStatusV1_NotFound(t *testing.T) {
 
 func TestEnableApnsClientV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/apns-client-push-status/enable-client", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/apns-client-push-status/enable-client", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

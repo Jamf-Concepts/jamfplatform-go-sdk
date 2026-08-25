@@ -13,7 +13,7 @@ import (
 
 func TestEnableUemConnectorV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id/enablement", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id/enablement", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestEnableUemConnectorV1(t *testing.T) {
 
 func TestDisableUemConnectorV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id/enablement", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id/enablement", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

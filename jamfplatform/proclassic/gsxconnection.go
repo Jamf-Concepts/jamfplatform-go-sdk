@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:gsx-connection.
 func (c *Client) GetGSXConnection(ctx context.Context) (*GsxConnection, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result GsxConnection
 	endpoint := prefix + "/gsxconnection"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetGSXConnection(ctx context.Context) (*GsxConnection, error) {
 //
 // Required privileges: update:pro:gsx-connection.
 func (c *Client) UpdateGSXConnection(ctx context.Context, request *GsxConnection) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/gsxconnection"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateGSXConnection: %w", err)

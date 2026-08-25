@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: Computer Report ID to filter by.
 func (c *Client) GetComputerReportByID(ctx context.Context, id string) (*ComputerReport, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerReport
 	endpoint := fmt.Sprintf("%s/computerreports/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetComputerReportByID(ctx context.Context, id string) (*Compute
 // Parameters:
 //   - name: Computer Report name to filter by.
 func (c *Client) GetComputerReportByName(ctx context.Context, name string) (*ComputerReport, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerReport
 	endpoint := fmt.Sprintf("%s/computerreports/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -48,7 +48,7 @@ func (c *Client) GetComputerReportByName(ctx context.Context, name string) (*Com
 //
 // Required privileges: read:pro:computers.
 func (c *Client) ListComputerReports(ctx context.Context) (*ComputerReports, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerReports
 	endpoint := prefix + "/computerreports"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

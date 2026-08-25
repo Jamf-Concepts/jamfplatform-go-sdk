@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID of the internal or external patch source to filter by.
 func (c *Client) ListPatchAvailableTitlesBySourceID(ctx context.Context, id string) (*PatchAvailableTitles, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchAvailableTitles
 	endpoint := fmt.Sprintf("%s/patchavailabletitles/sourceid/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

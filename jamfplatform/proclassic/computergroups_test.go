@@ -13,7 +13,7 @@ import (
 
 func TestGetComputerGroupByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetComputerGroupByID(t *testing.T) {
 
 func TestGetComputerGroupByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetComputerGroupByID_NotFound(t *testing.T) {
 
 func TestCreateComputerGroupByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateComputerGroupByID(t *testing.T) {
 
 func TestUpdateComputerGroupByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateComputerGroupByID(t *testing.T) {
 
 func TestDeleteComputerGroupByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteComputerGroupByID(t *testing.T) {
 
 func TestGetComputerGroupByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetComputerGroupByName(t *testing.T) {
 
 func TestGetComputerGroupByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetComputerGroupByName_NotFound(t *testing.T) {
 
 func TestUpdateComputerGroupByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateComputerGroupByName(t *testing.T) {
 
 func TestDeleteComputerGroupByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteComputerGroupByName(t *testing.T) {
 
 func TestListComputerGroups(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListComputerGroups(t *testing.T) {
 
 func TestListComputerGroups_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListComputerGroups_NotFound(t *testing.T) {
 
 func TestCreateComputerGroupByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -196,7 +196,7 @@ func TestCreateComputerGroupByName(t *testing.T) {
 
 func TestResolveComputerGroupIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -214,7 +214,7 @@ func TestResolveComputerGroupIDByName(t *testing.T) {
 
 func TestResolveComputerGroupByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -233,13 +233,13 @@ func TestResolveComputerGroupByName(t *testing.T) {
 func TestApplyComputerGroup_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -261,13 +261,13 @@ func TestApplyComputerGroup_Create(t *testing.T) {
 func TestApplyComputerGroup_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<computer_group><id>42</id></computer_group>")
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/computergroups/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/computergroups/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

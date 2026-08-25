@@ -14,9 +14,9 @@ import (
 
 // ListUemConnectorsV1 list connectors.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: uem-connect:read.
 func (c *Client) ListUemConnectorsV1(ctx context.Context) (*ConnectorPage, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	var result ConnectorPage
 	endpoint := prefix + "/uem-connect/v1/connectors"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -27,9 +27,9 @@ func (c *Client) ListUemConnectorsV1(ctx context.Context) (*ConnectorPage, error
 
 // CreateUemConnectorV1 create connector.
 //
-// Required privileges: create:jsc:all.
+// Required privileges: uem-connect:create.
 func (c *Client) CreateUemConnectorV1(ctx context.Context, request *ConnectorCreateRequest) (*CreatedResource, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	var result CreatedResource
 	endpoint := prefix + "/uem-connect/v1/connectors"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -40,12 +40,12 @@ func (c *Client) CreateUemConnectorV1(ctx context.Context, request *ConnectorCre
 
 // GetUemConnectorV1 get connector.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: uem-connect:read.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) GetUemConnectorV1(ctx context.Context, configID string) (*ConnectorConfig, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	var result ConnectorConfig
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s", prefix, url.PathEscape(configID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -56,12 +56,12 @@ func (c *Client) GetUemConnectorV1(ctx context.Context, configID string) (*Conne
 
 // DeleteUemConnectorV1 delete connector.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: uem-connect:delete.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) DeleteUemConnectorV1(ctx context.Context, configID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s", prefix, url.PathEscape(configID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteUemConnectorV1(%s): %w", configID, err)

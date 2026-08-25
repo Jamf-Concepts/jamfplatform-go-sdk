@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceExtensionAttributeByID(ctx context.Context, id string) (*MobileDeviceExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttribute
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetMobileDeviceExtensionAttributeByID(ctx context.Context, id s
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceExtensionAttributeByID(ctx context.Context, id string, request *MobileDeviceExtensionAttribute) (*MobileDeviceExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttribute
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateMobileDeviceExtensionAttributeByID(ctx context.Context, i
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceExtensionAttributeByID(ctx context.Context, id string, request *MobileDeviceExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceExtensionAttributeByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeByID(ctx context.Context, i
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceExtensionAttributeByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceExtensionAttributeByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeByID(ctx context.Context, i
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMobileDeviceExtensionAttributeByName(ctx context.Context, name string) (*MobileDeviceExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttribute
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetMobileDeviceExtensionAttributeByName(ctx context.Context, na
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceExtensionAttributeByName(ctx context.Context, name string, request *MobileDeviceExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceExtensionAttributeByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeByName(ctx context.Context,
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceExtensionAttributeByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceExtensionAttributeByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeByName(ctx context.Context,
 //
 // Required privileges: read:pro:mobile-device-extension-attributes.
 func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*MobileDeviceExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttributes
 	endpoint := prefix + "/mobiledeviceextensionattributes"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*Mobi
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceExtensionAttributeByName(ctx context.Context, name string, request *MobileDeviceExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceExtensionAttributeByName(%s): %w", name, err)

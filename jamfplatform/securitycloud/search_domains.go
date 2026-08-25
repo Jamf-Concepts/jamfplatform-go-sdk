@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) GetDnsSearchDomainV1(ctx context.Context) (*SearchDomain, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result SearchDomain
 	endpoint := prefix + "/dns/search-domains"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetDnsSearchDomainV1(ctx context.Context) (*SearchDomain, error
 //
 // Required privileges: update:jsc:all.
 func (c *Client) SetDnsSearchDomainV1(ctx context.Context, request *SearchDomain) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/search-domains"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("SetDnsSearchDomainV1: %w", err)
@@ -40,7 +40,7 @@ func (c *Client) SetDnsSearchDomainV1(ctx context.Context, request *SearchDomain
 //
 // Required privileges: delete:jsc:all.
 func (c *Client) ClearDnsSearchDomainV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/search-domains"
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("ClearDnsSearchDomainV1: %w", err)

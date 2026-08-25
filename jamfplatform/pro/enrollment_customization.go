@@ -22,7 +22,7 @@ import (
 //
 // Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) ParseEnrollmentCustomizationMarkdownV1(ctx context.Context, request *Markdown) (*Markdown, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Markdown
 	endpoint := prefix + "/enrollment-customization/parse-markdown"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) ParseEnrollmentCustomizationMarkdownV1(ctx context.Context, req
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) ListEnrollmentCustomizationPanelsV1(ctx context.Context, id string) (*EnrollmentCustomizationPanelList, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result EnrollmentCustomizationPanelList
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/all", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -55,7 +55,7 @@ func (c *Client) ListEnrollmentCustomizationPanelsV1(ctx context.Context, id str
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) GetEnrollmentCustomizationPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanel, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanel
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/all/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -72,7 +72,7 @@ func (c *Client) GetEnrollmentCustomizationPanelV1(ctx context.Context, id strin
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) DeleteEnrollmentCustomizationPanelV1(ctx context.Context, id string, panelID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/all/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteEnrollmentCustomizationPanelV1(%s): %w", id, err)
@@ -87,7 +87,7 @@ func (c *Client) DeleteEnrollmentCustomizationPanelV1(ctx context.Context, id st
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) CreateEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelLdapAuth) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelLdapAuth
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -104,7 +104,7 @@ func (c *Client) CreateEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) GetEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelLdapAuth
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -121,7 +121,7 @@ func (c *Client) GetEnrollmentCustomizationLdapPanelV1(ctx context.Context, id s
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) UpdateEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelLdapAuth) (*GetEnrollmentCustomizationPanelLdapAuth, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelLdapAuth
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -138,7 +138,7 @@ func (c *Client) UpdateEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) DeleteEnrollmentCustomizationLdapPanelV1(ctx context.Context, id string, panelID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/ldap/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteEnrollmentCustomizationLdapPanelV1(%s): %w", id, err)
@@ -153,7 +153,7 @@ func (c *Client) DeleteEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) CreateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelSsoAuth) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelSsoAuth
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -170,7 +170,7 @@ func (c *Client) CreateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) GetEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelSsoAuth
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -187,7 +187,7 @@ func (c *Client) GetEnrollmentCustomizationSsoPanelV1(ctx context.Context, id st
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) UpdateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelSsoAuth) (*GetEnrollmentCustomizationPanelSsoAuth, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelSsoAuth
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -204,7 +204,7 @@ func (c *Client) UpdateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) DeleteEnrollmentCustomizationSsoPanelV1(ctx context.Context, id string, panelID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/sso/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteEnrollmentCustomizationSsoPanelV1(%s): %w", id, err)
@@ -219,7 +219,7 @@ func (c *Client) DeleteEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) CreateEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, request *EnrollmentCustomizationPanelText) (*GetEnrollmentCustomizationPanelText, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelText
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -236,7 +236,7 @@ func (c *Client) CreateEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) GetEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string) (*GetEnrollmentCustomizationPanelText, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelText
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -253,7 +253,7 @@ func (c *Client) GetEnrollmentCustomizationTextPanelV1(ctx context.Context, id s
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) UpdateEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string, request *EnrollmentCustomizationPanelText) (*GetEnrollmentCustomizationPanelText, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GetEnrollmentCustomizationPanelText
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -270,7 +270,7 @@ func (c *Client) UpdateEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) DeleteEnrollmentCustomizationTextPanelV1(ctx context.Context, id string, panelID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteEnrollmentCustomizationTextPanelV1(%s): %w", id, err)
@@ -286,7 +286,7 @@ func (c *Client) DeleteEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 //   - id: Enrollment Customization identifier.
 //   - panelID: Panel object identifier.
 func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Context, id string, panelID string) (*Markdown, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Markdown
 	endpoint := fmt.Sprintf("%s/enrollment-customization/%s/text/%s/markdown", prefix, url.PathEscape(id), url.PathEscape(panelID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -303,7 +303,7 @@ func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Conte
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []string) ([]EnrollmentCustomizationV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]EnrollmentCustomizationV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -332,7 +332,7 @@ func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []stri
 //
 // Required privileges: create:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Create Enrollment Customizations.
 func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *EnrollmentCustomizationV2) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/enrollment-customizations"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -351,7 +351,7 @@ func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *E
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadEnrollmentCustomizationImageV2(ctx context.Context, fileFilename string, file io.Reader) (*BrandingImageURL, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result BrandingImageURL
 	endpoint := prefix + "/enrollment-customizations/images"
 	parts := []client.MultipartField{
@@ -370,7 +370,7 @@ func (c *Client) UploadEnrollmentCustomizationImageV2(ctx context.Context, fileF
 // Parameters:
 //   - id: id of the enrollment customization image.
 func (c *Client) DownloadEnrollmentCustomizationImageV2(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/enrollment-customizations/images/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -386,7 +386,7 @@ func (c *Client) DownloadEnrollmentCustomizationImageV2(ctx context.Context, id 
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) GetEnrollmentCustomizationV2(ctx context.Context, id string) (*EnrollmentCustomizationV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result EnrollmentCustomizationV2
 	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -402,7 +402,7 @@ func (c *Client) GetEnrollmentCustomizationV2(ctx context.Context, id string) (*
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string, request *EnrollmentCustomizationV2) (*EnrollmentCustomizationV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result EnrollmentCustomizationV2
 	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -419,7 +419,7 @@ func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string,
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteEnrollmentCustomizationV2(%s): %w", id, err)
@@ -437,7 +437,7 @@ func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string)
 //     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
 //     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -469,7 +469,7 @@ func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id st
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) CreateEnrollmentCustomizationHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -485,7 +485,7 @@ func (c *Client) CreateEnrollmentCustomizationHistoryNoteV2(ctx context.Context,
 // Parameters:
 //   - id: Enrollment Customization identifier.
 func (c *Client) ListEnrollmentCustomizationPrestagesV2(ctx context.Context, id string) (*PrestageDependencies, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageDependencies
 	endpoint := fmt.Sprintf("%s/enrollment-customizations/%s/prestages", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -496,7 +496,7 @@ func (c *Client) ListEnrollmentCustomizationPrestagesV2(ctx context.Context, id 
 
 // ResolveEnrollmentCustomizationV2IDByName looks up a EnrollmentCustomizationV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveEnrollmentCustomizationV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/enrollment-customizations"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -507,7 +507,7 @@ func (c *Client) ResolveEnrollmentCustomizationV2IDByName(ctx context.Context, n
 
 // ResolveEnrollmentCustomizationV2ByName looks up a EnrollmentCustomizationV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveEnrollmentCustomizationV2ByName(ctx context.Context, name string) (*EnrollmentCustomizationV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/enrollment-customizations"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

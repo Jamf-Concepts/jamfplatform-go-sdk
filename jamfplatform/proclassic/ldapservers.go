@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetLDAPServerByID(ctx context.Context, id string) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServer
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetLDAPServerByID(ctx context.Context, id string) (*LdapServer,
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateLDAPServerByID(ctx context.Context, id string, request *LdapServerPost) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServer
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateLDAPServerByID(ctx context.Context, id string, request *L
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateLDAPServerByID(ctx context.Context, id string, request *LdapServerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateLDAPServerByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateLDAPServerByID(ctx context.Context, id string, request *L
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteLDAPServerByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteLDAPServerByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteLDAPServerByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetLDAPServerByName(ctx context.Context, name string) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServer
 	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetLDAPServerByName(ctx context.Context, name string) (*LdapSer
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateLDAPServerByName(ctx context.Context, name string, request *LdapServerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateLDAPServerByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateLDAPServerByName(ctx context.Context, name string, reques
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteLDAPServerByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteLDAPServerByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteLDAPServerByName(ctx context.Context, name string) error 
 //
 // Required privileges: read:pro:ldap-servers.
 func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServers
 	endpoint := prefix + "/ldapservers"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -144,7 +144,7 @@ func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
 //   - id: Server ID to filter by.
 //   - group: Group to filter by.
 func (c *Client) GetLDAPServerByIDGroup(ctx context.Context, id string, group string) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServer
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s/group/%s", prefix, url.PathEscape(id), url.PathEscape(group))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -162,7 +162,7 @@ func (c *Client) GetLDAPServerByIDGroup(ctx context.Context, id string, group st
 //   - group: Group to filter by.
 //   - user: User to filter by.
 func (c *Client) GetLDAPServerByIDGroupUser(ctx context.Context, id string, group string, user string) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServer
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s/group/%s/user/%s", prefix, url.PathEscape(id), url.PathEscape(group), url.PathEscape(user))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -179,7 +179,7 @@ func (c *Client) GetLDAPServerByIDGroupUser(ctx context.Context, id string, grou
 //   - id: Server ID to filter by.
 //   - user: User to filter by.
 func (c *Client) GetLDAPServerByIDUser(ctx context.Context, id string, user string) (*LdapServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServer
 	endpoint := fmt.Sprintf("%s/ldapservers/id/%s/user/%s", prefix, url.PathEscape(id), url.PathEscape(user))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -195,7 +195,7 @@ func (c *Client) GetLDAPServerByIDUser(ctx context.Context, id string, user stri
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateLDAPServerByName(ctx context.Context, name string, request *LdapServerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ldapservers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateLDAPServerByName(%s): %w", name, err)

@@ -13,7 +13,7 @@ import (
 
 func TestListUemConnectorsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListUemConnectorsV1(t *testing.T) {
 
 func TestListUemConnectorsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListUemConnectorsV1_NotFound(t *testing.T) {
 
 func TestCreateUemConnectorV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestCreateUemConnectorV1(t *testing.T) {
 
 func TestGetUemConnectorV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestGetUemConnectorV1(t *testing.T) {
 
 func TestGetUemConnectorV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestGetUemConnectorV1_NotFound(t *testing.T) {
 
 func TestDeleteUemConnectorV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

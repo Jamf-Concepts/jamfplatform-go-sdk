@@ -22,7 +22,7 @@ import (
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 func (c *Client) GetAllMobileDevicePrestageScopeV2(ctx context.Context) (*PrestageScopeV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeV2
 	endpoint := prefix + "/mobile-device-prestages/scope"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetAllMobileDevicePrestageScopeV2(ctx context.Context) (*Presta
 //
 // Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 func (c *Client) ListAllMobileDevicePrestageSyncsV2(ctx context.Context) ([]PrestageSyncStatusV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []PrestageSyncStatusV2
 	endpoint := prefix + "/mobile-device-prestages/syncs"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) ListAllMobileDevicePrestageSyncsV2(ctx context.Context) ([]Pres
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) GetMobileDevicePrestageScopeV2(ctx context.Context, id string) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/scope", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) GetMobileDevicePrestageScopeV2(ctx context.Context, id string) 
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) ReplaceMobileDevicePrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/scope", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -83,7 +83,7 @@ func (c *Client) ReplaceMobileDevicePrestageScopeV2(ctx context.Context, id stri
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) AddToMobileDevicePrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/scope", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -99,7 +99,7 @@ func (c *Client) AddToMobileDevicePrestageScopeV2(ctx context.Context, id string
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) RemoveFromMobileDevicePrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/scope/delete-multiple", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -115,7 +115,7 @@ func (c *Client) RemoveFromMobileDevicePrestageScopeV2(ctx context.Context, id s
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) ListMobileDevicePrestageSyncsV2(ctx context.Context, id string) ([]PrestageSyncStatusV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []PrestageSyncStatusV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/syncs", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -131,7 +131,7 @@ func (c *Client) ListMobileDevicePrestageSyncsV2(ctx context.Context, id string)
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) GetLatestMobileDevicePrestageSyncV2(ctx context.Context, id string) (*PrestageSyncStatusV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageSyncStatusV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/syncs/latest", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -150,7 +150,7 @@ func (c *Client) GetLatestMobileDevicePrestageSyncV2(ctx context.Context, id str
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string) ([]GetMobileDevicePrestageV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GetMobileDevicePrestageV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -183,7 +183,7 @@ func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string)
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListMobileDevicePrestagesV3(ctx context.Context, sort []string) ([]GetMobileDevicePrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GetMobileDevicePrestageV3, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -214,7 +214,7 @@ func (c *Client) ListMobileDevicePrestagesV3(ctx context.Context, sort []string)
 //
 // Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 func (c *Client) CreateMobileDevicePrestageV2(ctx context.Context, request *MobileDevicePrestageV2) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/mobile-device-prestages"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -227,7 +227,7 @@ func (c *Client) CreateMobileDevicePrestageV2(ctx context.Context, request *Mobi
 //
 // Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 func (c *Client) CreateMobileDevicePrestageV3(ctx context.Context, request *MobileDevicePrestageV3) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := prefix + "/mobile-device-prestages"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -245,7 +245,7 @@ func (c *Client) CreateMobileDevicePrestageV3(ctx context.Context, request *Mobi
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) GetMobileDevicePrestageV2(ctx context.Context, id string) (*GetMobileDevicePrestageV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result GetMobileDevicePrestageV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -261,7 +261,7 @@ func (c *Client) GetMobileDevicePrestageV2(ctx context.Context, id string) (*Get
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) GetMobileDevicePrestageV3(ctx context.Context, id string) (*GetMobileDevicePrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result GetMobileDevicePrestageV3
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -279,7 +279,7 @@ func (c *Client) GetMobileDevicePrestageV3(ctx context.Context, id string) (*Get
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) UpdateMobileDevicePrestageV2(ctx context.Context, id string, request *PutMobileDevicePrestageV2) (*GetMobileDevicePrestageV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result GetMobileDevicePrestageV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -297,7 +297,7 @@ func (c *Client) UpdateMobileDevicePrestageV2(ctx context.Context, id string, re
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) UpdateMobileDevicePrestageV3(ctx context.Context, id string, request *PutMobileDevicePrestageV3) (*GetMobileDevicePrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result GetMobileDevicePrestageV3
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentTypeNoRetry(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -315,7 +315,7 @@ func (c *Client) UpdateMobileDevicePrestageV3(ctx context.Context, id string, re
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMobileDevicePrestageV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDevicePrestageV2(%s): %w", id, err)
@@ -330,7 +330,7 @@ func (c *Client) DeleteMobileDevicePrestageV2(ctx context.Context, id string) er
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMobileDevicePrestageV3(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDevicePrestageV3(%s): %w", id, err)
@@ -347,7 +347,7 @@ func (c *Client) DeleteMobileDevicePrestageV3(ctx context.Context, id string) er
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) ListMobileDevicePrestageAttachmentsV2(ctx context.Context, id string) ([]FileAttachmentV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []FileAttachmentV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -363,7 +363,7 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV2(ctx context.Context, id s
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id string) ([]FileAttachmentV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []FileAttachmentV3
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -387,7 +387,7 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id s
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadMobileDevicePrestageAttachmentV2(ctx context.Context, id string, fileFilename string, file io.Reader) (*PrestageFileAttachmentV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageFileAttachmentV2
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -412,7 +412,7 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV2(ctx context.Context, id 
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadMobileDevicePrestageAttachmentV3(ctx context.Context, id string, fileFilename string, file io.Reader) (*PrestageFileAttachmentV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result PrestageFileAttachmentV3
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -433,7 +433,7 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV3(ctx context.Context, id 
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV2(ctx context.Context, id string, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments/delete-multiple", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleMobileDevicePrestageAttachmentsV2(%s): %w", id, err)
@@ -448,7 +448,7 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV2(ctx context.Con
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV3(ctx context.Context, id string, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments/delete-multiple", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleMobileDevicePrestageAttachmentsV3(%s): %w", id, err)
@@ -468,7 +468,7 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV3(ctx context.Con
 //     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
 //     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -503,7 +503,7 @@ func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id strin
 //     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
 //     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
 func (c *Client) ListMobileDevicePrestageHistoryV3(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -537,7 +537,7 @@ func (c *Client) ListMobileDevicePrestageHistoryV3(ctx context.Context, id strin
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) CreateMobileDevicePrestageHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -553,7 +553,7 @@ func (c *Client) CreateMobileDevicePrestageHistoryNoteV2(ctx context.Context, id
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
 func (c *Client) CreateMobileDevicePrestageHistoryNoteV3(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -564,7 +564,7 @@ func (c *Client) CreateMobileDevicePrestageHistoryNoteV3(ctx context.Context, id
 
 // ResolveMobileDevicePrestageV2IDByName looks up a MobileDevicePrestageV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMobileDevicePrestageV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-prestages"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -575,7 +575,7 @@ func (c *Client) ResolveMobileDevicePrestageV2IDByName(ctx context.Context, name
 
 // ResolveMobileDevicePrestageV2ByName looks up a MobileDevicePrestageV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMobileDevicePrestageV2ByName(ctx context.Context, name string) (*MobileDevicePrestageV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-prestages"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -590,7 +590,7 @@ func (c *Client) ResolveMobileDevicePrestageV2ByName(ctx context.Context, name s
 
 // ResolveMobileDevicePrestageV3IDByName looks up a MobileDevicePrestageV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMobileDevicePrestageV3IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/mobile-device-prestages"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -601,7 +601,7 @@ func (c *Client) ResolveMobileDevicePrestageV3IDByName(ctx context.Context, name
 
 // ResolveMobileDevicePrestageV3ByName looks up a MobileDevicePrestageV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMobileDevicePrestageV3ByName(ctx context.Context, name string) (*MobileDevicePrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/mobile-device-prestages"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

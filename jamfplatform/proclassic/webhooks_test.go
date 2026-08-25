@@ -13,7 +13,7 @@ import (
 
 func TestGetWebhookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetWebhookByID(t *testing.T) {
 
 func TestGetWebhookByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetWebhookByID_NotFound(t *testing.T) {
 
 func TestCreateWebhookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateWebhookByID(t *testing.T) {
 
 func TestUpdateWebhookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateWebhookByID(t *testing.T) {
 
 func TestDeleteWebhookByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteWebhookByID(t *testing.T) {
 
 func TestGetWebhookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetWebhookByName(t *testing.T) {
 
 func TestGetWebhookByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetWebhookByName_NotFound(t *testing.T) {
 
 func TestUpdateWebhookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateWebhookByName(t *testing.T) {
 
 func TestDeleteWebhookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteWebhookByName(t *testing.T) {
 
 func TestListWebhooks(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListWebhooks(t *testing.T) {
 
 func TestListWebhooks_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListWebhooks_NotFound(t *testing.T) {
 
 func TestCreateWebhookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -196,7 +196,7 @@ func TestCreateWebhookByName(t *testing.T) {
 
 func TestResolveWebhookIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -214,7 +214,7 @@ func TestResolveWebhookIDByName(t *testing.T) {
 
 func TestResolveWebhookByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -233,13 +233,13 @@ func TestResolveWebhookByName(t *testing.T) {
 func TestApplyWebhook_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -261,13 +261,13 @@ func TestApplyWebhook_Create(t *testing.T) {
 func TestApplyWebhook_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<webhook><id>42</id></webhook>")
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/webhooks/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/webhooks/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

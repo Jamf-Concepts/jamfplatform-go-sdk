@@ -24,10 +24,10 @@
       }
     },
     "parameters": {
-      "tenantId": {
-        "description": "The tenant UUID identifier",
-        "in": "path",
-        "name": "tenantId",
+      "X-Tenant-Id": {
+        "description": "The tenant UUID identifier.",
+        "in": "header",
+        "name": "X-Tenant-Id",
         "required": true,
         "schema": {
           "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
@@ -597,13 +597,13 @@
   },
   "openapi": "3.0.3",
   "paths": {
-    "/v1/tenant/{tenantId}/dns/custom-hostname-mappings": {
+    "/v1/dns/custom-hostname-mappings": {
       "delete": {
         "description": "Clears all tenant Custom Hostname Mappings.\n\n**Required Permissions:** `delete:jsc:all`",
         "operationId": "clearCustomHostnameMappings",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -640,7 +640,7 @@
         "operationId": "getCustomHostnameMappings",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -711,7 +711,7 @@
         "operationId": "replaceCustomHostnameMappings",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -836,13 +836,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/dns/search-domains": {
+    "/v1/dns/search-domains": {
       "delete": {
         "description": "Clears the tenant Search Domain, removing the configured suffix.\n\n**Required Permissions:** `delete:jsc:all`",
         "operationId": "clearSearchDomain",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -879,7 +879,7 @@
         "operationId": "getSearchDomain",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -940,7 +940,7 @@
         "operationId": "setSearchDomain",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -1008,13 +1008,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/dns/zones": {
+    "/v1/dns/zones": {
       "get": {
         "description": "Returns the full list of DNS Zones configured for the tenant. The list is not paginated and is bounded by a per-customer maximum zone cap. The full bounded set is returned in a single response and `totalCount` reflects the complete set. Pagination is currently not supported.\n\n**Required Permissions:** `read:jsc:all`",
         "operationId": "listDnsZones",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
             "description": "Sort expression in the form `field:direction`, where direction is `asc` or `desc`. Defaults to ascending order when direction is omitted. The only supported sort field is `name`.",
@@ -1137,7 +1137,7 @@
         "operationId": "createDnsZone",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -1308,13 +1308,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/dns/zones/{id}": {
+    "/v1/dns/zones/{id}": {
       "delete": {
         "description": "Deletes the DNS Zone identified by its UUID.\n\n**Required Permissions:** `delete:jsc:all`",
         "operationId": "deleteDnsZone",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -1354,7 +1354,7 @@
         "operationId": "getDnsZone",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -1438,7 +1438,7 @@
         "operationId": "updateDnsZone",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -1612,5 +1612,8 @@
       "description": "Operations for managing tenant Custom Hostname Mappings.",
       "name": "custom-hostname-mappings"
     }
+  ],
+  "x-scope-types": [
+    "tenant"
   ]
 }

@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetCategoryByID(ctx context.Context, id string) (*Category, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Category
 	endpoint := fmt.Sprintf("%s/categories/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetCategoryByID(ctx context.Context, id string) (*Category, err
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateCategoryByID(ctx context.Context, id string, request *Category) (*Category, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Category
 	endpoint := fmt.Sprintf("%s/categories/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateCategoryByID(ctx context.Context, id string, request *Cat
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateCategoryByID(ctx context.Context, id string, request *Category) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/categories/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateCategoryByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateCategoryByID(ctx context.Context, id string, request *Cat
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteCategoryByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/categories/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteCategoryByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteCategoryByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetCategoryByName(ctx context.Context, name string) (*Category, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Category
 	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetCategoryByName(ctx context.Context, name string) (*Category,
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) UpdateCategoryByName(ctx context.Context, name string, request *Category) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateCategoryByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateCategoryByName(ctx context.Context, name string, request 
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) DeleteCategoryByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteCategoryByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteCategoryByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:categories.
 func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Categories
 	endpoint := prefix + "/categories"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateCategoryByName(ctx context.Context, name string, request *Category) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/categories/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateCategoryByName(%s): %w", name, err)

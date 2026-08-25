@@ -13,7 +13,7 @@ import (
 
 func TestGetReenrollmentSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/reenrollment", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/reenrollment", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetReenrollmentSettingsV1(t *testing.T) {
 
 func TestGetReenrollmentSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/reenrollment", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/reenrollment", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetReenrollmentSettingsV1_NotFound(t *testing.T) {
 
 func TestUpdateReenrollmentSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/reenrollment", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/reenrollment", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateReenrollmentSettingsV1(t *testing.T) {
 
 func TestListReenrollmentHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/reenrollment/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/reenrollment/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestListReenrollmentHistoryV1(t *testing.T) {
 
 func TestCreateReenrollmentHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/reenrollment/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/reenrollment/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestCreateReenrollmentHistoryNoteV1(t *testing.T) {
 
 func TestExportReenrollmentHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/reenrollment/history/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/reenrollment/history/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

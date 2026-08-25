@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetDockItemByID(ctx context.Context, id string) (*DockItem, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DockItem
 	endpoint := fmt.Sprintf("%s/dockitems/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetDockItemByID(ctx context.Context, id string) (*DockItem, err
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateDockItemByID(ctx context.Context, id string, request *DockItem) (*DockItem, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DockItem
 	endpoint := fmt.Sprintf("%s/dockitems/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateDockItemByID(ctx context.Context, id string, request *Doc
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateDockItemByID(ctx context.Context, id string, request *DockItem) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDockItemByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateDockItemByID(ctx context.Context, id string, request *Doc
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteDockItemByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDockItemByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteDockItemByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetDockItemByName(ctx context.Context, name string) (*DockItem, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DockItem
 	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetDockItemByName(ctx context.Context, name string) (*DockItem,
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateDockItemByName(ctx context.Context, name string, request *DockItem) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDockItemByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateDockItemByName(ctx context.Context, name string, request 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteDockItemByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDockItemByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteDockItemByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:dock-items.
 func (c *Client) ListDockItems(ctx context.Context) (*DockItems, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DockItems
 	endpoint := prefix + "/dockitems"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListDockItems(ctx context.Context) (*DockItems, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateDockItemByName(ctx context.Context, name string, request *DockItem) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/dockitems/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateDockItemByName(%s): %w", name, err)

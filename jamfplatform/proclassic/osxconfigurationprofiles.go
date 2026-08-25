@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetOSXConfigurationProfileByID(ctx context.Context, id string) (*OsXConfigurationProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result OsXConfigurationProfile
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetOSXConfigurationProfileByID(ctx context.Context, id string) 
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateOSXConfigurationProfileByID(ctx context.Context, id string, request *OsXConfigurationProfile) (*OsXConfigurationProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result OsXConfigurationProfile
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateOSXConfigurationProfileByID(ctx context.Context, id strin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateOSXConfigurationProfileByID(ctx context.Context, id string, request *OsXConfigurationProfile) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateOSXConfigurationProfileByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateOSXConfigurationProfileByID(ctx context.Context, id strin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteOSXConfigurationProfileByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteOSXConfigurationProfileByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteOSXConfigurationProfileByID(ctx context.Context, id strin
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetOSXConfigurationProfileByName(ctx context.Context, name string) (*OsXConfigurationProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result OsXConfigurationProfile
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetOSXConfigurationProfileByName(ctx context.Context, name stri
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfile) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateOSXConfigurationProfileByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateOSXConfigurationProfileByName(ctx context.Context, name s
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteOSXConfigurationProfileByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteOSXConfigurationProfileByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteOSXConfigurationProfileByName(ctx context.Context, name s
 //
 // Required privileges: read:pro:macos-configuration-profiles.
 func (c *Client) ListOSXConfigurationProfiles(ctx context.Context) (*OsXConfigurationProfiles, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result OsXConfigurationProfiles
 	endpoint := prefix + "/osxconfigurationprofiles"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -145,7 +145,7 @@ func (c *Client) ListOSXConfigurationProfiles(ctx context.Context) (*OsXConfigur
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "SelfService".
 func (c *Client) GetOsxConfigurationProfileByIDSubset(ctx context.Context, id string, subset string) (*OsXConfigurationProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result OsXConfigurationProfile
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -163,7 +163,7 @@ func (c *Client) GetOsxConfigurationProfileByIDSubset(ctx context.Context, id st
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "SelfService".
 func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, name string, subset string) (*OsXConfigurationProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result OsXConfigurationProfile
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s/subset/%s", prefix, url.PathEscape(name), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -179,7 +179,7 @@ func (c *Client) GetOsxConfigurationProfileByNameSubset(ctx context.Context, nam
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateOSXConfigurationProfileByName(ctx context.Context, name string, request *OsXConfigurationProfile) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/osxconfigurationprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateOSXConfigurationProfileByName(%s): %w", name, err)

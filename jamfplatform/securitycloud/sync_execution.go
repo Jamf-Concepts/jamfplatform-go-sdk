@@ -17,12 +17,12 @@ import (
 
 // ListUemConnectorSyncRunsV1 list sync run history.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: uem-connect:read.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) ListUemConnectorSyncRunsV1(ctx context.Context, configID string) ([]SyncRun, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]SyncRun, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -46,12 +46,12 @@ func (c *Client) ListUemConnectorSyncRunsV1(ctx context.Context, configID string
 
 // TriggerUemConnectorSyncV1 trigger sync run.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: uem-connect:update.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) TriggerUemConnectorSyncV1(ctx context.Context, configID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s/sync/runs", prefix, url.PathEscape(configID))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("TriggerUemConnectorSyncV1(%s): %w", configID, err)
@@ -61,12 +61,12 @@ func (c *Client) TriggerUemConnectorSyncV1(ctx context.Context, configID string)
 
 // CancelUemConnectorSyncV1 cancel current sync run.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: uem-connect:update.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) CancelUemConnectorSyncV1(ctx context.Context, configID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s/sync/runs/current", prefix, url.PathEscape(configID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("CancelUemConnectorSyncV1(%s): %w", configID, err)

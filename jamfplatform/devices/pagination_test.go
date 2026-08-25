@@ -12,7 +12,7 @@ import (
 func TestListDevices_MultiPage(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	callCount := 0
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
 		callCount++
 		page := r.URL.Query().Get("page")
 		switch page {

@@ -26,7 +26,7 @@ import (
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListDeviceEnrollmentsV1(ctx context.Context, sort []string) ([]DeviceEnrollmentInstance, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]DeviceEnrollmentInstance, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -55,7 +55,7 @@ func (c *Client) ListDeviceEnrollmentsV1(ctx context.Context, sort []string) ([]
 //
 // Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 func (c *Client) GetDeviceEnrollmentPublicKeyV1(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/device-enrollments/public-key"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -68,7 +68,7 @@ func (c *Client) GetDeviceEnrollmentPublicKeyV1(ctx context.Context) ([]byte, er
 //
 // Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 func (c *Client) ListAllDeviceEnrollmentSyncsV1(ctx context.Context) ([]DeviceEnrollmentInstanceSyncStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []DeviceEnrollmentInstanceSyncStatus
 	endpoint := prefix + "/device-enrollments/syncs"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -81,7 +81,7 @@ func (c *Client) ListAllDeviceEnrollmentSyncsV1(ctx context.Context) ([]DeviceEn
 //
 // Required privileges: create:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Create Device Enrollment Program Instances.
 func (c *Client) UploadDeviceEnrollmentTokenV1(ctx context.Context, request *DeviceEnrollmentToken) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/device-enrollments/upload-token"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -97,7 +97,7 @@ func (c *Client) UploadDeviceEnrollmentTokenV1(ctx context.Context, request *Dev
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) GetDeviceEnrollmentV1(ctx context.Context, id string) (*DeviceEnrollmentInstance, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceEnrollmentInstance
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -113,7 +113,7 @@ func (c *Client) GetDeviceEnrollmentV1(ctx context.Context, id string) (*DeviceE
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) UpdateDeviceEnrollmentV1(ctx context.Context, id string, request *DeviceEnrollmentInstance) (*DeviceEnrollmentInstance, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceEnrollmentInstance
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -129,7 +129,7 @@ func (c *Client) UpdateDeviceEnrollmentV1(ctx context.Context, id string, reques
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) DeleteDeviceEnrollmentV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDeviceEnrollmentV1(%s): %w", id, err)
@@ -144,7 +144,7 @@ func (c *Client) DeleteDeviceEnrollmentV1(ctx context.Context, id string) error 
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) DisownDeviceEnrollmentDevicesV1(ctx context.Context, id string, request *DeviceEnrollmentDisownBody) (*DeviceEnrollmentDisownResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceEnrollmentDisownResponse
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s/disown", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -167,7 +167,7 @@ func (c *Client) DisownDeviceEnrollmentDevicesV1(ctx context.Context, id string,
 //     details. This param can be combined with paging and sorting. Example: search=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListDeviceEnrollmentHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -202,7 +202,7 @@ func (c *Client) ListDeviceEnrollmentHistoryV1(ctx context.Context, id string, s
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) CreateDeviceEnrollmentHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -218,7 +218,7 @@ func (c *Client) CreateDeviceEnrollmentHistoryNoteV1(ctx context.Context, id str
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) ListDeviceEnrollmentSyncsV1(ctx context.Context, id string) ([]DeviceEnrollmentInstanceSyncStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []DeviceEnrollmentInstanceSyncStatus
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s/syncs", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -234,7 +234,7 @@ func (c *Client) ListDeviceEnrollmentSyncsV1(ctx context.Context, id string) ([]
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) GetLatestDeviceEnrollmentSyncV1(ctx context.Context, id string) (*DeviceEnrollmentInstanceSyncStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceEnrollmentInstanceSyncStatus
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s/syncs/latest", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -250,7 +250,7 @@ func (c *Client) GetLatestDeviceEnrollmentSyncV1(ctx context.Context, id string)
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) ReplaceDeviceEnrollmentTokenV1(ctx context.Context, id string, request *DeviceEnrollmentToken) (*DeviceEnrollmentInstance, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceEnrollmentInstance
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s/upload-token", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -261,7 +261,7 @@ func (c *Client) ReplaceDeviceEnrollmentTokenV1(ctx context.Context, id string, 
 
 // ResolveDeviceEnrollmentV1IDByName looks up a DeviceEnrollmentV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDeviceEnrollmentV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/device-enrollments"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -272,7 +272,7 @@ func (c *Client) ResolveDeviceEnrollmentV1IDByName(ctx context.Context, name str
 
 // ResolveDeviceEnrollmentV1ByName looks up a DeviceEnrollmentV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDeviceEnrollmentV1ByName(ctx context.Context, name string) (*DeviceEnrollmentInstance, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/device-enrollments"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

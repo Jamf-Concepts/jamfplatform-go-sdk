@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetPeripheralTypeByID(ctx context.Context, id string) (*PeripheralType, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PeripheralType
 	endpoint := fmt.Sprintf("%s/peripheraltypes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetPeripheralTypeByID(ctx context.Context, id string) (*Periphe
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreatePeripheralTypeByID(ctx context.Context, id string, request *PeripheralType) (*PeripheralType, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PeripheralType
 	endpoint := fmt.Sprintf("%s/peripheraltypes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreatePeripheralTypeByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdatePeripheralTypeByID(ctx context.Context, id string, request *PeripheralType) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/peripheraltypes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePeripheralTypeByID(%s): %w", id, err)
@@ -66,7 +66,7 @@ func (c *Client) UpdatePeripheralTypeByID(ctx context.Context, id string, reques
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeletePeripheralTypeByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/peripheraltypes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePeripheralTypeByID(%s): %w", id, err)
@@ -78,7 +78,7 @@ func (c *Client) DeletePeripheralTypeByID(ctx context.Context, id string) error 
 //
 // Required privileges: read:pro:peripheral-types.
 func (c *Client) ListPeripheralTypes(ctx context.Context) (*PeripheralTypes, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PeripheralTypes
 	endpoint := prefix + "/peripheraltypes"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

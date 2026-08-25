@@ -14,12 +14,12 @@ import (
 
 // GetUemConnectorSyncSettingsV1 get connector sync settings.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: uem-connect:read.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) GetUemConnectorSyncSettingsV1(ctx context.Context, configID string) (*ConnectorConfig, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	var result ConnectorConfig
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s/sync-settings", prefix, url.PathEscape(configID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -30,12 +30,12 @@ func (c *Client) GetUemConnectorSyncSettingsV1(ctx context.Context, configID str
 
 // UpdateUemConnectorSyncSettingsV1 update connector sync settings.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: uem-connect:update.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) UpdateUemConnectorSyncSettingsV1(ctx context.Context, configID string, request *SyncSettings) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s/sync-settings", prefix, url.PathEscape(configID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateUemConnectorSyncSettingsV1(%s): %w", configID, err)

@@ -13,7 +13,7 @@ import (
 
 func TestGetDnsSearchDomainV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/search-domains", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/dns/search-domains", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetDnsSearchDomainV1(t *testing.T) {
 
 func TestGetDnsSearchDomainV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/search-domains", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/dns/search-domains", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetDnsSearchDomainV1_NotFound(t *testing.T) {
 
 func TestSetDnsSearchDomainV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/search-domains", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/dns/search-domains", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -62,7 +62,7 @@ func TestSetDnsSearchDomainV1(t *testing.T) {
 
 func TestClearDnsSearchDomainV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/dns/search-domains", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/dns/search-domains", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

@@ -19,7 +19,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListZtnaGroupedGatewaysV1(ctx context.Context) (*GroupedGatewayListResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result GroupedGatewayListResponse
 	endpoint := prefix + "/ztna/grouped-gateways"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) ListZtnaGroupedGatewaysV1(ctx context.Context) (*GroupedGateway
 //
 // Required privileges: create:jsc:all.
 func (c *Client) CreateZtnaGroupedGatewayV1(ctx context.Context, request *GroupedGatewayCreateRequest) (*CreateResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CreateResponse
 	endpoint := prefix + "/ztna/grouped-gateways"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -48,7 +48,7 @@ func (c *Client) CreateZtnaGroupedGatewayV1(ctx context.Context, request *Groupe
 // Parameters:
 //   - groupedGatewayID: ID of the Grouped Gateway. Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 func (c *Client) GetZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayID string) (*GroupedGateway, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result GroupedGateway
 	endpoint := fmt.Sprintf("%s/ztna/grouped-gateways/%s", prefix, url.PathEscape(groupedGatewayID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -64,7 +64,7 @@ func (c *Client) GetZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayID s
 // Parameters:
 //   - groupedGatewayID: ID of the Grouped Gateway. Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 func (c *Client) UpdateZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayID string, request *GroupedGatewayPatchRequest) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/ztna/grouped-gateways/%s", prefix, url.PathEscape(groupedGatewayID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateZtnaGroupedGatewayV1(%s): %w", groupedGatewayID, err)
@@ -79,7 +79,7 @@ func (c *Client) UpdateZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayI
 // Parameters:
 //   - groupedGatewayID: ID of the Grouped Gateway. Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 func (c *Client) DeleteZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/ztna/grouped-gateways/%s", prefix, url.PathEscape(groupedGatewayID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteZtnaGroupedGatewayV1(%s): %w", groupedGatewayID, err)
@@ -89,7 +89,7 @@ func (c *Client) DeleteZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayI
 
 // ResolveZtnaGroupedGatewayV1IDByName looks up a ZtnaGroupedGatewayV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveZtnaGroupedGatewayV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/grouped-gateways"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -100,7 +100,7 @@ func (c *Client) ResolveZtnaGroupedGatewayV1IDByName(ctx context.Context, name s
 
 // ResolveZtnaGroupedGatewayV1ByName looks up a ZtnaGroupedGatewayV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveZtnaGroupedGatewayV1ByName(ctx context.Context, name string) (*GroupedGateway, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/grouped-gateways"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

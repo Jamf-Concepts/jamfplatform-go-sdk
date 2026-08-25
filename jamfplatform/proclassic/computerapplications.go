@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - application: Application name to filter by.
 func (c *Client) GetComputerApplicationByApplication(ctx context.Context, application string) (*ComputerApplications, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplications
 	endpoint := fmt.Sprintf("%s/computerapplications/application/%s", prefix, url.PathEscape(application))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -36,7 +36,7 @@ func (c *Client) GetComputerApplicationByApplication(ctx context.Context, applic
 //   - application: Application name to filter by.
 //   - inventory: Inventory options.
 func (c *Client) GetComputerApplicationByApplicationInventory(ctx context.Context, application string, inventory string) (*ComputerApplications, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplications
 	endpoint := fmt.Sprintf("%s/computerapplications/application/%s/inventory/%s", prefix, url.PathEscape(application), url.PathEscape(inventory))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -53,7 +53,7 @@ func (c *Client) GetComputerApplicationByApplicationInventory(ctx context.Contex
 //   - application: Application name to filter by.
 //   - version: Version to filter by.
 func (c *Client) GetComputerApplicationByApplicationVersion(ctx context.Context, application string, version string) (*ComputerApplications, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplications
 	endpoint := fmt.Sprintf("%s/computerapplications/application/%s/version/%s", prefix, url.PathEscape(application), url.PathEscape(version))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -71,7 +71,7 @@ func (c *Client) GetComputerApplicationByApplicationVersion(ctx context.Context,
 //   - version: Version to filter by.
 //   - inventory: Inventory options.
 func (c *Client) GetComputerApplicationByApplicationVersionInventory(ctx context.Context, application string, version string, inventory string) (*ComputerApplications, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplications
 	endpoint := fmt.Sprintf("%s/computerapplications/application/%s/version/%s/inventory/%s", prefix, url.PathEscape(application), url.PathEscape(version), url.PathEscape(inventory))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: update:pro:apache-tomcat-settings. Legacy Jamf Pro privilege name(s): Update Apache Tomcat Settings.
 func (c *Client) IssueTomcatSslCertificate(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	endpoint := prefix + "/settings/issueTomcatSslCertificate"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("IssueTomcatSslCertificate: %w", err)

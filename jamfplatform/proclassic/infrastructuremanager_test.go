@@ -13,7 +13,7 @@ import (
 
 func TestGetInfrastructureManagerByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/infrastructuremanager/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/infrastructuremanager/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetInfrastructureManagerByID(t *testing.T) {
 
 func TestGetInfrastructureManagerByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/infrastructuremanager/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/infrastructuremanager/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetInfrastructureManagerByID_NotFound(t *testing.T) {
 
 func TestUpdateInfrastructureManagerByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/infrastructuremanager/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/infrastructuremanager/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -58,7 +58,7 @@ func TestUpdateInfrastructureManagerByID(t *testing.T) {
 
 func TestListInfrastructureManagers(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/infrastructuremanager", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/infrastructuremanager", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestListInfrastructureManagers(t *testing.T) {
 
 func TestListInfrastructureManagers_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/infrastructuremanager", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/infrastructuremanager", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -88,7 +88,7 @@ func TestListInfrastructureManagers_NotFound(t *testing.T) {
 
 func TestDeleteInfrastructureManagerByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/infrastructuremanager/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/infrastructuremanager/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

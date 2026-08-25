@@ -28,7 +28,7 @@ import (
 //   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort
 //     criteria are supported.
 func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	prefix := c.transport.APIPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -65,7 +65,7 @@ func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationId
 //   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort
 //     criteria are supported.
 func (c *Client) ListDeclarationReportClientsFiltered(ctx context.Context, declarationIdentifier string, filter string, sort []string) ([]FilteredResultDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	prefix := c.transport.APIPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))

@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetAdvancedComputerSearchByID(ctx context.Context, id string) (*AdvancedComputerSearch, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedComputerSearch
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetAdvancedComputerSearchByID(ctx context.Context, id string) (
 // Parameters:
 //   - id: ID to filter by.
 func (c *Client) CreateAdvancedComputerSearchByID(ctx context.Context, id string, request *AdvancedComputerSearch) (*AdvancedComputerSearch, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedComputerSearch
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateAdvancedComputerSearchByID(ctx context.Context, id string
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateAdvancedComputerSearchByID(ctx context.Context, id string, request *AdvancedComputerSearch) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateAdvancedComputerSearchByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateAdvancedComputerSearchByID(ctx context.Context, id string
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteAdvancedComputerSearchByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteAdvancedComputerSearchByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteAdvancedComputerSearchByID(ctx context.Context, id string
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetAdvancedComputerSearchByName(ctx context.Context, name string) (*AdvancedComputerSearch, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedComputerSearch
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetAdvancedComputerSearchByName(ctx context.Context, name strin
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) DeleteAdvancedComputerSearchByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteAdvancedComputerSearchByName(%s): %w", name, err)
@@ -112,7 +112,7 @@ func (c *Client) DeleteAdvancedComputerSearchByName(ctx context.Context, name st
 //
 // Required privileges: read:pro:advanced-computer-searches.
 func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedComputerSearches, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedComputerSearches
 	endpoint := prefix + "/advancedcomputersearches"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -128,7 +128,7 @@ func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedCom
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name string, request *AdvancedComputerSearch) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateAdvancedComputerSearchByName(%s): %w", name, err)
@@ -143,7 +143,7 @@ func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name st
 // Parameters:
 //   - name: ID to filter by.
 func (c *Client) CreateAdvancedComputerSearchByName(ctx context.Context, name string, request *AdvancedComputerSearch) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/advancedcomputersearches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateAdvancedComputerSearchByName(%s): %w", name, err)

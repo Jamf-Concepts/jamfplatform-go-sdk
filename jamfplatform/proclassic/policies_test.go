@@ -13,7 +13,7 @@ import (
 
 func TestGetPolicyByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetPolicyByID(t *testing.T) {
 
 func TestGetPolicyByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetPolicyByID_NotFound(t *testing.T) {
 
 func TestGetPolicyByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestGetPolicyByName(t *testing.T) {
 
 func TestGetPolicyByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -73,7 +73,7 @@ func TestGetPolicyByName_NotFound(t *testing.T) {
 
 func TestCreatePolicyByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestCreatePolicyByID(t *testing.T) {
 
 func TestUpdatePolicyByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -106,7 +106,7 @@ func TestUpdatePolicyByID(t *testing.T) {
 
 func TestUpdatePolicyByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -121,7 +121,7 @@ func TestUpdatePolicyByName(t *testing.T) {
 
 func TestDeletePolicyByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestDeletePolicyByID(t *testing.T) {
 
 func TestDeletePolicyByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeletePolicyByName(t *testing.T) {
 
 func TestListPolicies(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListPolicies(t *testing.T) {
 
 func TestListPolicies_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListPolicies_NotFound(t *testing.T) {
 
 func TestGetPolicyByCategory(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/category/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/category/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -199,7 +199,7 @@ func TestGetPolicyByCategory(t *testing.T) {
 
 func TestGetPolicyByCategory_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/category/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/category/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -211,7 +211,7 @@ func TestGetPolicyByCategory_NotFound(t *testing.T) {
 
 func TestGetPolicyByCreatedBy(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/createdBy/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/createdBy/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -229,7 +229,7 @@ func TestGetPolicyByCreatedBy(t *testing.T) {
 
 func TestGetPolicyByCreatedBy_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/createdBy/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/createdBy/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -241,7 +241,7 @@ func TestGetPolicyByCreatedBy_NotFound(t *testing.T) {
 
 func TestGetPolicyByIDSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -259,7 +259,7 @@ func TestGetPolicyByIDSubset(t *testing.T) {
 
 func TestGetPolicyByIDSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -271,7 +271,7 @@ func TestGetPolicyByIDSubset_NotFound(t *testing.T) {
 
 func TestCreatePolicyByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -286,7 +286,7 @@ func TestCreatePolicyByName(t *testing.T) {
 
 func TestResolvePolicyIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -304,7 +304,7 @@ func TestResolvePolicyIDByName(t *testing.T) {
 
 func TestResolvePolicyByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -323,13 +323,13 @@ func TestResolvePolicyByName(t *testing.T) {
 func TestApplyPolicy_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -351,13 +351,13 @@ func TestApplyPolicy_Create(t *testing.T) {
 func TestApplyPolicy_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<policy><general><id>42</id></general></policy>")
 	})
-	mux.HandleFunc("/api/proclassic/tenant/t-test/policies/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/policies/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

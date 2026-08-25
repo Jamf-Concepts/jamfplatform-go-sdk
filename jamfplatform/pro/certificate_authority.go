@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetActiveCertificateAuthorityV1(ctx context.Context) (*CertificateRecord, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CertificateRecord
 	endpoint := prefix + "/pki/certificate-authority/active"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -29,7 +29,7 @@ func (c *Client) GetActiveCertificateAuthorityV1(ctx context.Context) (*Certific
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) DownloadActiveCertificateAuthorityDerV1(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/pki/certificate-authority/active/der"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -42,7 +42,7 @@ func (c *Client) DownloadActiveCertificateAuthorityDerV1(ctx context.Context) ([
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) DownloadActiveCertificateAuthorityPemV1(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/pki/certificate-authority/active/pem"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -58,7 +58,7 @@ func (c *Client) DownloadActiveCertificateAuthorityPemV1(ctx context.Context) ([
 // Parameters:
 //   - id: UUID of the Certificate Authority (CA).
 func (c *Client) GetCertificateAuthorityV1(ctx context.Context, id string) (*CertificateRecord, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CertificateRecord
 	endpoint := fmt.Sprintf("%s/pki/certificate-authority/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -74,7 +74,7 @@ func (c *Client) GetCertificateAuthorityV1(ctx context.Context, id string) (*Cer
 // Parameters:
 //   - id: UUID of the Certificate Authority (CA).
 func (c *Client) DownloadCertificateAuthorityDerV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/pki/certificate-authority/%s/der", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -90,7 +90,7 @@ func (c *Client) DownloadCertificateAuthorityDerV1(ctx context.Context, id strin
 // Parameters:
 //   - id: UUID of the Certificate Authority (CA).
 func (c *Client) DownloadCertificateAuthorityPemV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/pki/certificate-authority/%s/pem", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

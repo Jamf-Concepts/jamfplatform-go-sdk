@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetInfrastructureManagerByID(ctx context.Context, id string) (*InfrastructureManager, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result InfrastructureManager
 	endpoint := fmt.Sprintf("%s/infrastructuremanager/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetInfrastructureManagerByID(ctx context.Context, id string) (*
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateInfrastructureManagerByID(ctx context.Context, id string, request *InfrastructureManager) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/infrastructuremanager/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateInfrastructureManagerByID(%s): %w", id, err)
@@ -47,7 +47,7 @@ func (c *Client) UpdateInfrastructureManagerByID(ctx context.Context, id string,
 //
 // Required privileges: read:pro:infrastructure-managers.
 func (c *Client) ListInfrastructureManagers(ctx context.Context) (*InfrastructureManagers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result InfrastructureManagers
 	endpoint := prefix + "/infrastructuremanager"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -63,7 +63,7 @@ func (c *Client) ListInfrastructureManagers(ctx context.Context) (*Infrastructur
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteInfrastructureManagerByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/infrastructuremanager/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("DeleteInfrastructureManagerByID(%s): %w", id, err)

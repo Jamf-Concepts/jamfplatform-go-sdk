@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Self Service.
 func (c *Client) GetSelfServiceSettingsV1(ctx context.Context) (*SelfServiceSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SelfServiceSettings
 	endpoint := prefix + "/self-service/settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetSelfServiceSettingsV1(ctx context.Context) (*SelfServiceSett
 //
 // Required privileges: update:pro:self-service. Legacy Jamf Pro privilege name(s): Update Self Service.
 func (c *Client) UpdateSelfServiceSettingsV1(ctx context.Context, request *SelfServiceSettings) (*SelfServiceSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SelfServiceSettings
 	endpoint := prefix + "/self-service/settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -56,7 +56,7 @@ func (c *Client) UpdateSelfServiceSettingsV1(ctx context.Context, request *SelfS
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListSelfServiceSettingsHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -88,7 +88,7 @@ func (c *Client) ListSelfServiceSettingsHistoryV1(ctx context.Context, sort []st
 //
 // Required privileges: update:pro:self-service. Legacy Jamf Pro privilege name(s): Update Self Service.
 func (c *Client) CreateSelfServiceSettingsHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/self-service/settings/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {

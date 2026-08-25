@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
 func (c *Client) GetCloudDistributionPointV1(ctx context.Context) (*CloudDistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudDistributionPoint
 	endpoint := prefix + "/cloud-distribution-point"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetCloudDistributionPointV1(ctx context.Context) (*CloudDistrib
 //
 // Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) CreateCloudDistributionPointV1(ctx context.Context, request *CloudDistributionPoint) (*CloudDistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudDistributionPoint
 	endpoint := prefix + "/cloud-distribution-point"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -46,7 +46,7 @@ func (c *Client) CreateCloudDistributionPointV1(ctx context.Context, request *Cl
 //
 // Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) DeleteCloudDistributionPointV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/cloud-distribution-point"
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteCloudDistributionPointV1: %w", err)
@@ -58,7 +58,7 @@ func (c *Client) DeleteCloudDistributionPointV1(ctx context.Context) error {
 //
 // Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) UpdateCloudDistributionPointV1(ctx context.Context, request *CloudDistributionPoint) (*CloudDistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudDistributionPoint
 	endpoint := prefix + "/cloud-distribution-point"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) UpdateCloudDistributionPointV1(ctx context.Context, request *Cl
 //   - fileName: Name of the file to mark failure for.
 //   - uploadType: Type of file to mark failure for. Possible values are PACKAGE, EBOOK, MOBILE_DEVICE_APP.
 func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id string, fileName string, uploadType string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/cloud-distribution-point/fail-upload/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
 	if fileName != "" {
@@ -107,7 +107,7 @@ func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id stri
 //     be combined with paging and sorting. Fields allowed in the query: fileName, inventoryId and type
 //     Default filter is an empty query and returns all results from the requested page.
 func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []string, filter string) ([]CloudDistributionPointInventoryFileInfo, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]CloudDistributionPointInventoryFileInfo, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -146,7 +146,7 @@ func (c *Client) ListCloudDistributionPointFilesV1(ctx context.Context, sort []s
 //     combined with paging and sorting. Default filter is an empty query and returns all results from the
 //     requested page.
 func (c *Client) ListCloudDistributionPointHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -178,7 +178,7 @@ func (c *Client) ListCloudDistributionPointHistoryV1(ctx context.Context, sort [
 //
 // Required privileges: update:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Update Cloud Distribution Point.
 func (c *Client) CreateCloudDistributionPointHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/cloud-distribution-point/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -196,7 +196,7 @@ func (c *Client) CreateCloudDistributionPointHistoryNoteV1(ctx context.Context, 
 //     updated in Jamf Pro. If no file is specified, it will force an immediate inventory refresh at a
 //     rate-limit of once every 15 seconds.
 func (c *Client) RefreshCloudDistributionPointInventoryV1(ctx context.Context, fileName string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/cloud-distribution-point/refresh-inventory"
 	params := url.Values{}
 	if fileName != "" {
@@ -215,7 +215,7 @@ func (c *Client) RefreshCloudDistributionPointInventoryV1(ctx context.Context, f
 //
 // Required privileges: read:pro:cloud-distribution-point. Legacy Jamf Pro privilege name(s): Read Cloud Distribution Point.
 func (c *Client) TestCloudDistributionPointConnectionV1(ctx context.Context) (*CloudDistributionPointTestConnection, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudDistributionPointTestConnection
 	endpoint := prefix + "/cloud-distribution-point/test-connection"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -228,7 +228,7 @@ func (c *Client) TestCloudDistributionPointConnectionV1(ctx context.Context) (*C
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetCloudDistributionPointUploadCapabilityV1(ctx context.Context) (*CloudDistributionPointUploadCapability, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudDistributionPointUploadCapability
 	endpoint := prefix + "/cloud-distribution-point/upload-capability"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

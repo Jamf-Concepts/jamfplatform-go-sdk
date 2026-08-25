@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetComputerExtensionAttributeByID(ctx context.Context, id string) (*ComputerExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerExtensionAttribute
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetComputerExtensionAttributeByID(ctx context.Context, id strin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateComputerExtensionAttributeByID(ctx context.Context, id string, request *ComputerExtensionAttribute) (*ComputerExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerExtensionAttribute
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateComputerExtensionAttributeByID(ctx context.Context, id st
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateComputerExtensionAttributeByID(ctx context.Context, id string, request *ComputerExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerExtensionAttributeByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateComputerExtensionAttributeByID(ctx context.Context, id st
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteComputerExtensionAttributeByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerExtensionAttributeByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteComputerExtensionAttributeByID(ctx context.Context, id st
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetComputerExtensionAttributeByName(ctx context.Context, name string) (*ComputerExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerExtensionAttribute
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetComputerExtensionAttributeByName(ctx context.Context, name s
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateComputerExtensionAttributeByName(ctx context.Context, name string, request *ComputerExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerExtensionAttributeByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateComputerExtensionAttributeByName(ctx context.Context, nam
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteComputerExtensionAttributeByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerExtensionAttributeByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteComputerExtensionAttributeByName(ctx context.Context, nam
 //
 // Required privileges: read:pro:computer-extension-attributes.
 func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*ComputerExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerExtensionAttributes
 	endpoint := prefix + "/computerextensionattributes"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*Computer
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateComputerExtensionAttributeByName(ctx context.Context, name string, request *ComputerExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computerextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerExtensionAttributeByName(%s): %w", name, err)

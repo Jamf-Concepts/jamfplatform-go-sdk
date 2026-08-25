@@ -14,12 +14,12 @@ import (
 
 // EnableUemConnectorV1 enable connector synchronization.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: uem-connect:update.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) EnableUemConnectorV1(ctx context.Context, configID string, request *EnablementRequest) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s/enablement", prefix, url.PathEscape(configID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("EnableUemConnectorV1(%s): %w", configID, err)
@@ -29,12 +29,12 @@ func (c *Client) EnableUemConnectorV1(ctx context.Context, configID string, requ
 
 // DisableUemConnectorV1 disable connector synchronization.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: uem-connect:delete.
 //
 // Parameters:
 //   - configID: The connector configuration identifier.
 func (c *Client) DisableUemConnectorV1(ctx context.Context, configID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/connectors/%s/enablement", prefix, url.PathEscape(configID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DisableUemConnectorV1(%s): %w", configID, err)

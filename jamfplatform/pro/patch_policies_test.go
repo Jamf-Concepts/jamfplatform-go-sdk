@@ -13,7 +13,7 @@ import (
 
 func TestListPatchPoliciesV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListPatchPoliciesV2(t *testing.T) {
 
 func TestListPatchPolicyDetailsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies/policy-details", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies/policy-details", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -57,7 +57,7 @@ func TestListPatchPolicyDetailsV2(t *testing.T) {
 
 func TestGetPatchPolicyDashboardStatusV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -75,7 +75,7 @@ func TestGetPatchPolicyDashboardStatusV2(t *testing.T) {
 
 func TestGetPatchPolicyDashboardStatusV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies/test-id/dashboard", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/dashboard", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -91,7 +91,7 @@ func TestGetPatchPolicyDashboardStatusV2_NotFound(t *testing.T) {
 
 func TestAddPatchPolicyToDashboardV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -106,7 +106,7 @@ func TestAddPatchPolicyToDashboardV2(t *testing.T) {
 
 func TestRemovePatchPolicyFromDashboardV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -121,7 +121,7 @@ func TestRemovePatchPolicyFromDashboardV2(t *testing.T) {
 
 func TestResolvePatchPolicyV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -144,7 +144,7 @@ func TestResolvePatchPolicyV2IDByName(t *testing.T) {
 
 func TestResolvePatchPolicyV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/patch-policies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/patch-policies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

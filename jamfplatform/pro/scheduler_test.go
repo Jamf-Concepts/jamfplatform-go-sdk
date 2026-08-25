@@ -13,7 +13,7 @@ import (
 
 func TestGetSchedulerJobsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/scheduler/jobs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/scheduler/jobs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetSchedulerJobsV1(t *testing.T) {
 
 func TestGetSchedulerJobsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/scheduler/jobs", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/scheduler/jobs", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetSchedulerJobsV1_NotFound(t *testing.T) {
 
 func TestGetSchedulerJobTriggersV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/scheduler/jobs/test-id/triggers", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/scheduler/jobs/test-id/triggers", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestGetSchedulerJobTriggersV1(t *testing.T) {
 
 func TestGetSchedulerJobTriggersV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/scheduler/jobs/test-id/triggers", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/scheduler/jobs/test-id/triggers", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestGetSchedulerJobTriggersV1_NotFound(t *testing.T) {
 
 func TestGetSchedulerSummaryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/scheduler/summary", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/scheduler/summary", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestGetSchedulerSummaryV1(t *testing.T) {
 
 func TestGetSchedulerSummaryV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/scheduler/summary", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/scheduler/summary", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

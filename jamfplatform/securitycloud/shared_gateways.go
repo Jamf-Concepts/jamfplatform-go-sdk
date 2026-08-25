@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListZtnaSharedGatewaysV1(ctx context.Context) (*SharedGatewayListResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result SharedGatewayListResponse
 	endpoint := prefix + "/ztna/shared-gateways"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

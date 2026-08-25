@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetVPPAccountByID(ctx context.Context, id string) (*VppAccount, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAccount
 	endpoint := fmt.Sprintf("%s/vppaccounts/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetVPPAccountByID(ctx context.Context, id string) (*VppAccount,
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateVPPAccountByID(ctx context.Context, id string, request *VppAccount) (*VppAccount, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAccount
 	endpoint := fmt.Sprintf("%s/vppaccounts/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateVPPAccountByID(ctx context.Context, id string, request *V
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateVPPAccountByID(ctx context.Context, id string, request *VppAccount) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppaccounts/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateVPPAccountByID(%s): %w", id, err)
@@ -66,7 +66,7 @@ func (c *Client) UpdateVPPAccountByID(ctx context.Context, id string, request *V
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteVPPAccountByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppaccounts/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteVPPAccountByID(%s): %w", id, err)
@@ -78,7 +78,7 @@ func (c *Client) DeleteVPPAccountByID(ctx context.Context, id string) error {
 //
 // Required privileges: read:pro:volume-purchasing-locations.
 func (c *Client) ListVPPAccounts(ctx context.Context) (*VppAccounts, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAccounts
 	endpoint := prefix + "/vppaccounts"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

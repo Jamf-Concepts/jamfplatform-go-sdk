@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetStartupStatus(ctx context.Context) (*StartupStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "")
+	prefix := c.transport.APIPrefix("pro", "")
 	var result StartupStatus
 	endpoint := prefix + "/startup-status"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

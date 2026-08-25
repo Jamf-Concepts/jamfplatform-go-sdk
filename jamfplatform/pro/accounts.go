@@ -34,7 +34,7 @@ import (
 //     operators. This parameter can be used with paging and sorting parameters. Example: username=="admin"
 //     and accountStatus==Enabled and failedLoginAttempts==0.
 func (c *Client) ListAccountsV1(ctx context.Context, sort []string, filter string) ([]UserAccount, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]UserAccount, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -66,7 +66,7 @@ func (c *Client) ListAccountsV1(ctx context.Context, sort []string, filter strin
 //
 // Required privileges: create:pro:accounts. Legacy Jamf Pro privilege name(s): Create Accounts.
 func (c *Client) CreateAccountV1(ctx context.Context, request *UserAccount) (*UserAccount, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result UserAccount
 	endpoint := prefix + "/accounts"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -82,7 +82,7 @@ func (c *Client) CreateAccountV1(ctx context.Context, request *UserAccount) (*Us
 // Parameters:
 //   - id: id of target account.
 func (c *Client) GetAccountV1(ctx context.Context, id string) (*UserAccount, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result UserAccount
 	endpoint := fmt.Sprintf("%s/accounts/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -98,7 +98,7 @@ func (c *Client) GetAccountV1(ctx context.Context, id string) (*UserAccount, err
 // Parameters:
 //   - id: id of target account.
 func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/accounts/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteAccountV1(%s): %w", id, err)
@@ -113,7 +113,7 @@ func (c *Client) DeleteAccountV1(ctx context.Context, id string) error {
 // Parameters:
 //   - id: id of target account.
 func (c *Client) UpdateAccountV1(ctx context.Context, id string, request *UserAccount) (*UserAccount, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result UserAccount
 	endpoint := fmt.Sprintf("%s/accounts/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -124,7 +124,7 @@ func (c *Client) UpdateAccountV1(ctx context.Context, id string, request *UserAc
 
 // ResolveAccountV1IDByName looks up a AccountV1 by its username field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/accounts"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {
@@ -135,7 +135,7 @@ func (c *Client) ResolveAccountV1IDByName(ctx context.Context, name string) (str
 
 // ResolveAccountV1ByName looks up a AccountV1 by its username field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveAccountV1ByName(ctx context.Context, name string) (*UserAccount, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/accounts"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "username", "username", "id", name)
 	if err != nil {

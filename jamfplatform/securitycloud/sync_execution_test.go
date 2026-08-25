@@ -13,7 +13,7 @@ import (
 
 func TestListUemConnectorSyncRunsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id/sync/runs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id/sync/runs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListUemConnectorSyncRunsV1(t *testing.T) {
 
 func TestTriggerUemConnectorSyncV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id/sync/runs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id/sync/runs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -50,7 +50,7 @@ func TestTriggerUemConnectorSyncV1(t *testing.T) {
 
 func TestCancelUemConnectorSyncV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/uem-connect/v1/connectors/test-id/sync/runs/current", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/uem-connect/v1/connectors/test-id/sync/runs/current", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

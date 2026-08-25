@@ -13,7 +13,7 @@ import (
 
 func TestGetSelfServiceSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetSelfServiceSettingsV1(t *testing.T) {
 
 func TestGetSelfServiceSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetSelfServiceSettingsV1_NotFound(t *testing.T) {
 
 func TestUpdateSelfServiceSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateSelfServiceSettingsV1(t *testing.T) {
 
 func TestListSelfServiceSettingsHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/settings/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/settings/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestListSelfServiceSettingsHistoryV1(t *testing.T) {
 
 func TestCreateSelfServiceSettingsHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/self-service/settings/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/self-service/settings/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

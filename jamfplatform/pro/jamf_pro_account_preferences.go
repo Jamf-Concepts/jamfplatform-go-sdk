@@ -17,7 +17,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetAccountPreferencesV2(ctx context.Context) (*AccountPreferencesV5, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result AccountPreferencesV5
 	endpoint := prefix + "/account-preferences"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -30,7 +30,7 @@ func (c *Client) GetAccountPreferencesV2(ctx context.Context) (*AccountPreferenc
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferencesV6, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result AccountPreferencesV6
 	endpoint := prefix + "/account-preferences"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -45,7 +45,7 @@ func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferenc
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) UpdateAccountPreferencesV2(ctx context.Context, request *AccountPreferencesV5) (*AccountPreferencesV5, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result AccountPreferencesV5
 	endpoint := prefix + "/account-preferences"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -58,7 +58,7 @@ func (c *Client) UpdateAccountPreferencesV2(ctx context.Context, request *Accoun
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) UpdateAccountPreferencesV3(ctx context.Context, request *AccountPreferencesV6) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := prefix + "/account-preferences"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateAccountPreferencesV3: %w", err)

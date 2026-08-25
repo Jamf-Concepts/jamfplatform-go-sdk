@@ -13,7 +13,7 @@ import (
 
 func TestListGroupsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListGroupsV2(t *testing.T) {
 
 func TestListGroupsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -57,7 +57,7 @@ func TestListGroupsV1(t *testing.T) {
 
 func TestGetGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -75,7 +75,7 @@ func TestGetGroupV2(t *testing.T) {
 
 func TestGetGroupV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -91,7 +91,7 @@ func TestGetGroupV2_NotFound(t *testing.T) {
 
 func TestGetGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetGroupV1(t *testing.T) {
 
 func TestGetGroupV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -125,7 +125,7 @@ func TestGetGroupV1_NotFound(t *testing.T) {
 
 func TestDeleteGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -140,7 +140,7 @@ func TestDeleteGroupV2(t *testing.T) {
 
 func TestDeleteGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -155,7 +155,7 @@ func TestDeleteGroupV1(t *testing.T) {
 
 func TestPatchGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -170,7 +170,7 @@ func TestPatchGroupV2(t *testing.T) {
 
 func TestPatchGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -185,7 +185,7 @@ func TestPatchGroupV1(t *testing.T) {
 
 func TestResolveGroupV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -208,7 +208,7 @@ func TestResolveGroupV2IDByName(t *testing.T) {
 
 func TestResolveGroupV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -231,7 +231,7 @@ func TestResolveGroupV2ByName(t *testing.T) {
 
 func TestResolveGroupV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -254,7 +254,7 @@ func TestResolveGroupV1IDByName(t *testing.T) {
 
 func TestResolveGroupV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

@@ -13,7 +13,7 @@ import (
 
 func TestGetOidcDirectIdpLoginUrlV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/direct-idp-login-url", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/direct-idp-login-url", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetOidcDirectIdpLoginUrlV1(t *testing.T) {
 
 func TestGetOidcDirectIdpLoginUrlV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/direct-idp-login-url", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/direct-idp-login-url", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetOidcDirectIdpLoginUrlV1_NotFound(t *testing.T) {
 
 func TestGenerateOidcCertificateV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/generate-certificate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/generate-certificate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -62,7 +62,7 @@ func TestGenerateOidcCertificateV1(t *testing.T) {
 
 func TestGetOidcPublicFeaturesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/public-features", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/public-features", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -80,7 +80,7 @@ func TestGetOidcPublicFeaturesV1(t *testing.T) {
 
 func TestGetOidcPublicFeaturesV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/public-features", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/public-features", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -96,7 +96,7 @@ func TestGetOidcPublicFeaturesV1_NotFound(t *testing.T) {
 
 func TestGetOidcPublicKeyV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/public-key", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/public-key", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -114,7 +114,7 @@ func TestGetOidcPublicKeyV1(t *testing.T) {
 
 func TestGetOidcPublicKeyV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/public-key", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/public-key", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -130,7 +130,7 @@ func TestGetOidcPublicKeyV1_NotFound(t *testing.T) {
 
 func TestDispatchOidcLoginV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/oidc/dispatch", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/oidc/dispatch", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -148,7 +148,7 @@ func TestDispatchOidcLoginV2(t *testing.T) {
 
 func TestDispatchOidcV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/oidc/dispatch", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/oidc/dispatch", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

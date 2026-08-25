@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 func (c *Client) GetSmtpServerV2(ctx context.Context) (*SmtpServerV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SmtpServerV2
 	endpoint := prefix + "/smtp-server"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetSmtpServerV2(ctx context.Context) (*SmtpServerV2, error) {
 //
 // Required privileges: update:pro:smtp-server. Legacy Jamf Pro privilege name(s): Update SMTP Server.
 func (c *Client) UpdateSmtpServerV2(ctx context.Context, request *SmtpServerV2) (*SmtpServerV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SmtpServerV2
 	endpoint := prefix + "/smtp-server"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
@@ -46,7 +46,7 @@ func (c *Client) UpdateSmtpServerV2(ctx context.Context, request *SmtpServerV2) 
 //
 // Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 func (c *Client) ListSmtpServerAllowedAuthTypesV2(ctx context.Context) (*SmtpAuthenticationTypeList, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SmtpAuthenticationTypeList
 	endpoint := prefix + "/smtp-server/allowed-auth-types"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) ListSmtpServerAllowedAuthTypesV2(ctx context.Context) (*SmtpAut
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListSmtpServerHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistoryV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistoryV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -99,7 +99,7 @@ func (c *Client) ListSmtpServerHistoryV1(ctx context.Context, sort []string, fil
 //
 // Required privileges: update:pro:smtp-server. Legacy Jamf Pro privilege name(s): Update SMTP Server.
 func (c *Client) CreateSmtpServerHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/smtp-server/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -112,7 +112,7 @@ func (c *Client) CreateSmtpServerHistoryNoteV1(ctx context.Context, request *Obj
 //
 // Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 func (c *Client) TestSmtpServerV1(ctx context.Context, request *SmtpServerTest) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/smtp-server/test"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("TestSmtpServerV1: %w", err)

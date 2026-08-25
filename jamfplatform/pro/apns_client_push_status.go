@@ -29,7 +29,7 @@ import (
 //     Example: filter=deviceType=="MOBILE_DEVICE" Example: filter=disabledAt>2024-11-01T00:00:00Z Example:
 //     filter=deviceType=="COMPUTER";disabledAt>2024-01-01T00:00:00Z.
 func (c *Client) ListApnsClientPushStatusesV1(ctx context.Context, sort []string, filter string) ([]ApnsClientPushStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ApnsClientPushStatus, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -62,7 +62,7 @@ func (c *Client) ListApnsClientPushStatusesV1(ctx context.Context, sort []string
 // Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) EnableAllApnsClientsV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/apns-client-push-status/enable-all-clients"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("EnableAllApnsClientsV1: %w", err)
@@ -75,7 +75,7 @@ func (c *Client) EnableAllApnsClientsV1(ctx context.Context) error {
 // Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetEnableAllApnsClientsStatusV1(ctx context.Context) (*ApnsPushEnableRequest, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ApnsPushEnableRequest
 	endpoint := prefix + "/apns-client-push-status/enable-all-clients/status"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -89,7 +89,7 @@ func (c *Client) GetEnableAllApnsClientsStatusV1(ctx context.Context) (*ApnsPush
 // Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) EnableApnsClientV1(ctx context.Context, request *EnablePushRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/apns-client-push-status/enable-client"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("EnableApnsClientV1: %w", err)

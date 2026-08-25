@@ -13,7 +13,7 @@ import (
 
 func TestListDevices(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListDevices(t *testing.T) {
 
 func TestGetDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestGetDevice(t *testing.T) {
 
 func TestGetDevice_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -69,7 +69,7 @@ func TestGetDevice_NotFound(t *testing.T) {
 
 func TestUpdateDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -84,7 +84,7 @@ func TestUpdateDevice(t *testing.T) {
 
 func TestDeleteDevice(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestDeleteDevice(t *testing.T) {
 
 func TestListDeviceApplications(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices/test-id/applications", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices/test-id/applications", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -121,7 +121,7 @@ func TestListDeviceApplications(t *testing.T) {
 
 func TestResolveDeviceIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -144,7 +144,7 @@ func TestResolveDeviceIDByName(t *testing.T) {
 
 func TestResolveDeviceByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -167,7 +167,7 @@ func TestResolveDeviceByName(t *testing.T) {
 
 func TestResolveDeviceIDBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -190,7 +190,7 @@ func TestResolveDeviceIDBySerialNumber(t *testing.T) {
 
 func TestResolveDeviceBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

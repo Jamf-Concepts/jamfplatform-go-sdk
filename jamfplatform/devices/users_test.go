@@ -13,7 +13,7 @@ import (
 
 func TestListDevicesForUser(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/devices/v1/tenant/t-test/users/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/devices/v1/users/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

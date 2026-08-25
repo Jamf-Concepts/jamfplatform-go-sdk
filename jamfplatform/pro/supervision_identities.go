@@ -25,7 +25,7 @@ import (
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListSupervisionIdentitiesV1(ctx context.Context, sort []string) ([]SupervisionIdentity, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SupervisionIdentity, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -54,7 +54,7 @@ func (c *Client) ListSupervisionIdentitiesV1(ctx context.Context, sort []string)
 //
 // Required privileges: update:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Update Apple Configurator Enrollment.
 func (c *Client) CreateSupervisionIdentityV1(ctx context.Context, request *SupervisionIdentityCreate) (*SupervisionIdentity, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SupervisionIdentity
 	endpoint := prefix + "/supervision-identities"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -70,7 +70,7 @@ func (c *Client) CreateSupervisionIdentityV1(ctx context.Context, request *Super
 // Parameters:
 //   - id: Supervision Identity identifier.
 func (c *Client) GetSupervisionIdentityV1(ctx context.Context, id string) (*SupervisionIdentity, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SupervisionIdentity
 	endpoint := fmt.Sprintf("%s/supervision-identities/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -86,7 +86,7 @@ func (c *Client) GetSupervisionIdentityV1(ctx context.Context, id string) (*Supe
 // Parameters:
 //   - id: Supervision Identity identifier.
 func (c *Client) UpdateSupervisionIdentityV1(ctx context.Context, id string, request *SupervisionIdentityUpdate) (*SupervisionIdentity, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SupervisionIdentity
 	endpoint := fmt.Sprintf("%s/supervision-identities/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -102,7 +102,7 @@ func (c *Client) UpdateSupervisionIdentityV1(ctx context.Context, id string, req
 // Parameters:
 //   - id: Supervision Identity identifier.
 func (c *Client) DeleteSupervisionIdentityV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/supervision-identities/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteSupervisionIdentityV1(%s): %w", id, err)
@@ -117,7 +117,7 @@ func (c *Client) DeleteSupervisionIdentityV1(ctx context.Context, id string) err
 // Parameters:
 //   - id: Supervision Identity identifier.
 func (c *Client) DownloadSupervisionIdentityV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/supervision-identities/%s/download", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -130,7 +130,7 @@ func (c *Client) DownloadSupervisionIdentityV1(ctx context.Context, id string) (
 //
 // Required privileges: update:pro:apple-configurator-enrollment. Legacy Jamf Pro privilege name(s): Update Apple Configurator Enrollment.
 func (c *Client) UploadSupervisionIdentityV1(ctx context.Context, request *SupervisionIdentityCertificateUpload) (*SupervisionIdentity, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SupervisionIdentity
 	endpoint := prefix + "/supervision-identities/upload"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -141,7 +141,7 @@ func (c *Client) UploadSupervisionIdentityV1(ctx context.Context, request *Super
 
 // ResolveSupervisionIdentityV1IDByName looks up a SupervisionIdentityV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveSupervisionIdentityV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/supervision-identities"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -152,7 +152,7 @@ func (c *Client) ResolveSupervisionIdentityV1IDByName(ctx context.Context, name 
 
 // ResolveSupervisionIdentityV1ByName looks up a SupervisionIdentityV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveSupervisionIdentityV1ByName(ctx context.Context, name string) (*SupervisionIdentity, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/supervision-identities"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

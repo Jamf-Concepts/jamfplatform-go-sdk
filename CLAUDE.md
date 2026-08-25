@@ -123,7 +123,15 @@ Spec prose is wrapped at 100 columns, paragraph by paragraph (blank-line separat
 
 ### URL path construction
 
-All API paths use `/api/{namespace}/{version}/tenant/{tenantId}/{resource}`. The `tenantPrefix(namespace, version)` method builds this prefix. Namespace and version are derived from the spec path in config.
+All API paths use `/api/{namespace}/{version}/{resource}`, built by `Transport.APIPrefix(namespace, version)`. Namespace and version are derived from the spec path in config; an empty version collapses that segment (proclassic, Pro preview paths).
+
+**The tenant is a request header, not a path segment.** `WithTenantID` records a scope on the transport and `setScopeHeader` stamps `X-Tenant-Id` on every request, including the multipart path. Until 2026-08-25 the tenant sat in the URL as `/tenant/{tenantId}` and the gateway resolved the request context from `path`; `header` became an allowed source in prod that day (`tyk-gateway-management` `0793131b`, "JSC-73421 Enable header context support - Prod"), and the published specs had already dropped the segment in GitOps build v1495.
+
+Both forms answered 200 during the transition — wire-verified across EU securitycloud and US pro/blueprints/compliance-benchmarks/devices/device-groups — so the path form was **deleted** rather than kept behind a flag. A second code path that nothing exercises is how URL-shape bugs survive unnoticed; the generated httptest handlers now assert the header-form path, and `TestTransportAPIPrefix` asserts a tenant ID can never reach the URL.
+
+`ScopeKind` carries which header a scope travels in: `ScopeTenant` → `X-Tenant-Id`, `ScopeEnvironment` → `X-Environment-Id`. Environment scope is declared because the gateway accepts it on several namespaces (`request-context-types: [tenant, environment]` on securitycloud and compliance-benchmarks) and environment-scoped APIs exist (`ai-governance`, `audit`), but nothing this SDK generates is environment-scoped yet, so no option sets it. **Organization scope has no header at all** — the gateway resolves it from the access token (`request-context-allowed-sources: [token]` for the account api-products, in every environment), so an org-scoped consumer just uses an org-scoped credential.
+
+One credential set reaches one product: a Security Cloud client answers 403 on `/api/pro` and a Jamf Pro client answers 403 on `/api/securitycloud`. A single `Client` therefore cannot span products no matter how many tenant IDs it holds, which is why there is no per-namespace tenant override — a consumer needing two products builds two Clients, and in Terraform that is a provider alias per credential.
 
 The tenant ID is the client-wide `WithTenantID` value unless a namespace registered its own via `WithNamespaceTenantID` (internal) / `WithSecurityCloudTenantID` (exported). An override matches the namespace exactly or on its first path segment, so one registered for `securitycloud` also covers a future `securitycloud/<sub>`. This exists because Jamf Security Cloud is a separate product with its own tenant identifier — see below.
 

@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Read Computer Check-In.
 func (c *Client) GetCheckInSettingsV3(ctx context.Context) (*ClientCheckInV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ClientCheckInV3
 	endpoint := prefix + "/check-in"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetCheckInSettingsV3(ctx context.Context) (*ClientCheckInV3, er
 //
 // Required privileges: update:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
 func (c *Client) UpdateCheckInSettingsV3(ctx context.Context, request *ClientCheckInV3) (*ClientCheckInV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ClientCheckInV3
 	endpoint := prefix + "/check-in"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) UpdateCheckInSettingsV3(ctx context.Context, request *ClientChe
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListCheckInHistoryV3(ctx context.Context, sort []string, filter string) ([]ObjectHistoryV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistoryV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -86,7 +86,7 @@ func (c *Client) ListCheckInHistoryV3(ctx context.Context, sort []string, filter
 //
 // Required privileges: update:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
 func (c *Client) CreateCheckInHistoryNoteV3(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := prefix + "/check-in/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {

@@ -129,6 +129,7 @@ func (c *Transport) sendMultipart(ctx context.Context, method, fullURL string, f
 		_ = pr.Close()
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
+	c.setScopeHeader(req)
 	req.Header.Set("Content-Type", "multipart/form-data; boundary="+boundary)
 	if canPrecompute {
 		req.ContentLength = contentLen

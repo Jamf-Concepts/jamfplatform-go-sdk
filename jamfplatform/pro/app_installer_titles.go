@@ -22,7 +22,7 @@ import (
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ListAppInstallerTitlesV1(ctx context.Context) ([]AppInstallerTitle, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]AppInstallerTitle, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -53,7 +53,7 @@ func (c *Client) ListAppInstallerTitlesV1(ctx context.Context) ([]AppInstallerTi
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) GetAppInstallerTitleV1(ctx context.Context, id string) (*AppInstallerTitle, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppInstallerTitle
 	endpoint := fmt.Sprintf("%s/app-installers/titles/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -66,7 +66,7 @@ func (c *Client) GetAppInstallerTitleV1(ctx context.Context, id string) (*AppIns
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerTitleV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/titles"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "titleName", "id", name)
 	if err != nil {
@@ -79,7 +79,7 @@ func (c *Client) ResolveAppInstallerTitleV1IDByName(ctx context.Context, name st
 //
 // Unofficial: this endpoint is not part of Jamf's published API specification. It was reverse-engineered from live API traffic and may change or be removed without notice.
 func (c *Client) ResolveAppInstallerTitleV1ByName(ctx context.Context, name string) (*AppInstallerTitle, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/app-installers/titles"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "titleName", "id", name)
 	if err != nil {

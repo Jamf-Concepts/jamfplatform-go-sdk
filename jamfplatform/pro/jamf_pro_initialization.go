@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) InitializeSystemV1(ctx context.Context, request *InitializeV1) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/system/initialize"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("InitializeSystemV1: %w", err)
@@ -27,7 +27,7 @@ func (c *Client) InitializeSystemV1(ctx context.Context, request *InitializeV1) 
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) PlatformInitializeSystemV1(ctx context.Context, request *PlatformInitializeV1) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/system/platform-initialize"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("PlatformInitializeSystemV1: %w", err)

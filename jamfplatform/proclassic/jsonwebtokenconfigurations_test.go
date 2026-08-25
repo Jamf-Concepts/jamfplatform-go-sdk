@@ -13,7 +13,7 @@ import (
 
 func TestGetJsonWebTokenConfigurationByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetJsonWebTokenConfigurationByID(t *testing.T) {
 
 func TestGetJsonWebTokenConfigurationByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetJsonWebTokenConfigurationByID_NotFound(t *testing.T) {
 
 func TestCreateJsonWebTokenConfigurationByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateJsonWebTokenConfigurationByID(t *testing.T) {
 
 func TestUpdateJsonWebTokenConfigurationByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateJsonWebTokenConfigurationByID(t *testing.T) {
 
 func TestDeleteJsonWebTokenConfigurationByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/jsonwebtokenconfigurations/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteJsonWebTokenConfigurationByID(t *testing.T) {
 
 func TestListJsonWebTokenConfigurations(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/jsonwebtokenconfigurations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/jsonwebtokenconfigurations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestListJsonWebTokenConfigurations(t *testing.T) {
 
 func TestListJsonWebTokenConfigurations_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/jsonwebtokenconfigurations", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/jsonwebtokenconfigurations", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 

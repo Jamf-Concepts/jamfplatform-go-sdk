@@ -15,7 +15,7 @@ import (
 
 func TestEraseComputerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computer-inventory/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -33,7 +33,7 @@ func TestEraseComputerV1(t *testing.T) {
 
 func TestRemoveMdmProfileFromComputerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computer-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -51,7 +51,7 @@ func TestRemoveMdmProfileFromComputerV1(t *testing.T) {
 
 func TestRemoveMdmProfileFromComputerV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computer-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computer-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -67,7 +67,7 @@ func TestRemoveMdmProfileFromComputerV1_NotFound(t *testing.T) {
 
 func TestEraseComputerV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -85,7 +85,7 @@ func TestEraseComputerV4(t *testing.T) {
 
 func TestRemoveMdmProfileFromComputerV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -103,7 +103,7 @@ func TestRemoveMdmProfileFromComputerV4(t *testing.T) {
 
 func TestRemoveMdmProfileFromComputerV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/remove-mdm-profile", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -119,7 +119,7 @@ func TestRemoveMdmProfileFromComputerV4_NotFound(t *testing.T) {
 
 func TestListComputersInventoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -141,7 +141,7 @@ func TestListComputersInventoryV1(t *testing.T) {
 
 func TestListComputersInventoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -163,7 +163,7 @@ func TestListComputersInventoryV2(t *testing.T) {
 
 func TestListComputersInventoryV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -185,7 +185,7 @@ func TestListComputersInventoryV4(t *testing.T) {
 
 func TestListComputersInventoryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -207,7 +207,7 @@ func TestListComputersInventoryV3(t *testing.T) {
 
 func TestCreateComputerInventoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -225,7 +225,7 @@ func TestCreateComputerInventoryV1(t *testing.T) {
 
 func TestCreateComputerInventoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -243,7 +243,7 @@ func TestCreateComputerInventoryV2(t *testing.T) {
 
 func TestCreateComputerInventoryV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -261,7 +261,7 @@ func TestCreateComputerInventoryV4(t *testing.T) {
 
 func TestCreateComputerInventoryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -279,7 +279,7 @@ func TestCreateComputerInventoryV3(t *testing.T) {
 
 func TestListComputerInventoryFileVaultsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -301,7 +301,7 @@ func TestListComputerInventoryFileVaultsV1(t *testing.T) {
 
 func TestListComputerInventoryFileVaultsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -323,7 +323,7 @@ func TestListComputerInventoryFileVaultsV2(t *testing.T) {
 
 func TestListComputerInventoryFileVaultsV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -345,7 +345,7 @@ func TestListComputerInventoryFileVaultsV4(t *testing.T) {
 
 func TestListComputerInventoryFileVaultsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -367,7 +367,7 @@ func TestListComputerInventoryFileVaultsV3(t *testing.T) {
 
 func TestGetComputerInventoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -385,7 +385,7 @@ func TestGetComputerInventoryV1(t *testing.T) {
 
 func TestGetComputerInventoryV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -401,7 +401,7 @@ func TestGetComputerInventoryV1_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -419,7 +419,7 @@ func TestGetComputerInventoryV2(t *testing.T) {
 
 func TestGetComputerInventoryV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -435,7 +435,7 @@ func TestGetComputerInventoryV2_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -453,7 +453,7 @@ func TestGetComputerInventoryV4(t *testing.T) {
 
 func TestGetComputerInventoryV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -469,7 +469,7 @@ func TestGetComputerInventoryV4_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -487,7 +487,7 @@ func TestGetComputerInventoryV3(t *testing.T) {
 
 func TestGetComputerInventoryV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -503,7 +503,7 @@ func TestGetComputerInventoryV3_NotFound(t *testing.T) {
 
 func TestDeleteComputerInventoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -518,7 +518,7 @@ func TestDeleteComputerInventoryV1(t *testing.T) {
 
 func TestDeleteComputerInventoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -533,7 +533,7 @@ func TestDeleteComputerInventoryV2(t *testing.T) {
 
 func TestDeleteComputerInventoryV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -548,7 +548,7 @@ func TestDeleteComputerInventoryV4(t *testing.T) {
 
 func TestDeleteComputerInventoryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -563,7 +563,7 @@ func TestDeleteComputerInventoryV3(t *testing.T) {
 
 func TestGetComputerInventoryDetailV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -581,7 +581,7 @@ func TestGetComputerInventoryDetailV1(t *testing.T) {
 
 func TestGetComputerInventoryDetailV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -597,7 +597,7 @@ func TestGetComputerInventoryDetailV1_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryDetailV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -615,7 +615,7 @@ func TestGetComputerInventoryDetailV2(t *testing.T) {
 
 func TestGetComputerInventoryDetailV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -631,7 +631,7 @@ func TestGetComputerInventoryDetailV2_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryDetailV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -649,7 +649,7 @@ func TestGetComputerInventoryDetailV4(t *testing.T) {
 
 func TestGetComputerInventoryDetailV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -665,7 +665,7 @@ func TestGetComputerInventoryDetailV4_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryDetailV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -683,7 +683,7 @@ func TestGetComputerInventoryDetailV3(t *testing.T) {
 
 func TestGetComputerInventoryDetailV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -699,7 +699,7 @@ func TestGetComputerInventoryDetailV3_NotFound(t *testing.T) {
 
 func TestUpdateComputerInventoryDetailV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -717,7 +717,7 @@ func TestUpdateComputerInventoryDetailV1(t *testing.T) {
 
 func TestUpdateComputerInventoryDetailV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -732,7 +732,7 @@ func TestUpdateComputerInventoryDetailV2(t *testing.T) {
 
 func TestUpdateComputerInventoryDetailV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -747,7 +747,7 @@ func TestUpdateComputerInventoryDetailV4(t *testing.T) {
 
 func TestUpdateComputerInventoryDetailV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -762,7 +762,7 @@ func TestUpdateComputerInventoryDetailV3(t *testing.T) {
 
 func TestUploadComputerInventoryAttachmentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -782,7 +782,7 @@ func TestUploadComputerInventoryAttachmentV1(t *testing.T) {
 
 func TestUploadComputerInventoryAttachmentV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -802,7 +802,7 @@ func TestUploadComputerInventoryAttachmentV2(t *testing.T) {
 
 func TestUploadComputerInventoryAttachmentV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -822,7 +822,7 @@ func TestUploadComputerInventoryAttachmentV4(t *testing.T) {
 
 func TestUploadComputerInventoryAttachmentV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -842,7 +842,7 @@ func TestUploadComputerInventoryAttachmentV3(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -860,7 +860,7 @@ func TestDownloadComputerInventoryAttachmentV1(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -876,7 +876,7 @@ func TestDownloadComputerInventoryAttachmentV1_NotFound(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -894,7 +894,7 @@ func TestDownloadComputerInventoryAttachmentV2(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -910,7 +910,7 @@ func TestDownloadComputerInventoryAttachmentV2_NotFound(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -928,7 +928,7 @@ func TestDownloadComputerInventoryAttachmentV4(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -944,7 +944,7 @@ func TestDownloadComputerInventoryAttachmentV4_NotFound(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -962,7 +962,7 @@ func TestDownloadComputerInventoryAttachmentV3(t *testing.T) {
 
 func TestDownloadComputerInventoryAttachmentV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -978,7 +978,7 @@ func TestDownloadComputerInventoryAttachmentV3_NotFound(t *testing.T) {
 
 func TestDeleteComputerInventoryAttachmentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -993,7 +993,7 @@ func TestDeleteComputerInventoryAttachmentV1(t *testing.T) {
 
 func TestDeleteComputerInventoryAttachmentV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -1008,7 +1008,7 @@ func TestDeleteComputerInventoryAttachmentV2(t *testing.T) {
 
 func TestDeleteComputerInventoryAttachmentV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -1023,7 +1023,7 @@ func TestDeleteComputerInventoryAttachmentV4(t *testing.T) {
 
 func TestDeleteComputerInventoryAttachmentV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -1038,7 +1038,7 @@ func TestDeleteComputerInventoryAttachmentV3(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1056,7 +1056,7 @@ func TestGetComputerInventoryFileVaultV1(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1072,7 +1072,7 @@ func TestGetComputerInventoryFileVaultV1_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1090,7 +1090,7 @@ func TestGetComputerInventoryFileVaultV2(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1106,7 +1106,7 @@ func TestGetComputerInventoryFileVaultV2_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1124,7 +1124,7 @@ func TestGetComputerInventoryFileVaultV4(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1140,7 +1140,7 @@ func TestGetComputerInventoryFileVaultV4_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1158,7 +1158,7 @@ func TestGetComputerInventoryFileVaultV3(t *testing.T) {
 
 func TestGetComputerInventoryFileVaultV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1174,7 +1174,7 @@ func TestGetComputerInventoryFileVaultV3_NotFound(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1192,7 +1192,7 @@ func TestGetComputerDeviceLockPinV1(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1208,7 +1208,7 @@ func TestGetComputerDeviceLockPinV1_NotFound(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1226,7 +1226,7 @@ func TestGetComputerDeviceLockPinV2(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1242,7 +1242,7 @@ func TestGetComputerDeviceLockPinV2_NotFound(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1260,7 +1260,7 @@ func TestGetComputerDeviceLockPinV4(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1276,7 +1276,7 @@ func TestGetComputerDeviceLockPinV4_NotFound(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1294,7 +1294,7 @@ func TestGetComputerDeviceLockPinV3(t *testing.T) {
 
 func TestGetComputerDeviceLockPinV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1310,7 +1310,7 @@ func TestGetComputerDeviceLockPinV3_NotFound(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1328,7 +1328,7 @@ func TestGetComputerRecoveryLockPasswordV1(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1344,7 +1344,7 @@ func TestGetComputerRecoveryLockPasswordV1_NotFound(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1362,7 +1362,7 @@ func TestGetComputerRecoveryLockPasswordV2(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1378,7 +1378,7 @@ func TestGetComputerRecoveryLockPasswordV2_NotFound(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1396,7 +1396,7 @@ func TestGetComputerRecoveryLockPasswordV4(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1412,7 +1412,7 @@ func TestGetComputerRecoveryLockPasswordV4_NotFound(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1430,7 +1430,7 @@ func TestGetComputerRecoveryLockPasswordV3(t *testing.T) {
 
 func TestGetComputerRecoveryLockPasswordV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -1446,7 +1446,7 @@ func TestGetComputerRecoveryLockPasswordV3_NotFound(t *testing.T) {
 
 func TestResolveComputerInventoryV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1469,7 +1469,7 @@ func TestResolveComputerInventoryV1IDByName(t *testing.T) {
 
 func TestResolveComputerInventoryV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1492,7 +1492,7 @@ func TestResolveComputerInventoryV1ByName(t *testing.T) {
 
 func TestResolveComputerInventoryV1IDBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1515,7 +1515,7 @@ func TestResolveComputerInventoryV1IDBySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV1BySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1538,7 +1538,7 @@ func TestResolveComputerInventoryV1BySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV1IDByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1561,7 +1561,7 @@ func TestResolveComputerInventoryV1IDByUDID(t *testing.T) {
 
 func TestResolveComputerInventoryV1ByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1584,7 +1584,7 @@ func TestResolveComputerInventoryV1ByUDID(t *testing.T) {
 
 func TestResolveComputerInventoryV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1607,7 +1607,7 @@ func TestResolveComputerInventoryV2IDByName(t *testing.T) {
 
 func TestResolveComputerInventoryV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1630,7 +1630,7 @@ func TestResolveComputerInventoryV2ByName(t *testing.T) {
 
 func TestResolveComputerInventoryV2IDBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1653,7 +1653,7 @@ func TestResolveComputerInventoryV2IDBySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV2BySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1676,7 +1676,7 @@ func TestResolveComputerInventoryV2BySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV2IDByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1699,7 +1699,7 @@ func TestResolveComputerInventoryV2IDByUDID(t *testing.T) {
 
 func TestResolveComputerInventoryV2ByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1722,7 +1722,7 @@ func TestResolveComputerInventoryV2ByUDID(t *testing.T) {
 
 func TestResolveComputerInventoryV4IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1745,7 +1745,7 @@ func TestResolveComputerInventoryV4IDByName(t *testing.T) {
 
 func TestResolveComputerInventoryV4ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1768,7 +1768,7 @@ func TestResolveComputerInventoryV4ByName(t *testing.T) {
 
 func TestResolveComputerInventoryV4IDBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1791,7 +1791,7 @@ func TestResolveComputerInventoryV4IDBySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV4BySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1814,7 +1814,7 @@ func TestResolveComputerInventoryV4BySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV4IDByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1837,7 +1837,7 @@ func TestResolveComputerInventoryV4IDByUDID(t *testing.T) {
 
 func TestResolveComputerInventoryV4ByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1860,7 +1860,7 @@ func TestResolveComputerInventoryV4ByUDID(t *testing.T) {
 
 func TestResolveComputerInventoryV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1883,7 +1883,7 @@ func TestResolveComputerInventoryV3IDByName(t *testing.T) {
 
 func TestResolveComputerInventoryV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1906,7 +1906,7 @@ func TestResolveComputerInventoryV3ByName(t *testing.T) {
 
 func TestResolveComputerInventoryV3IDBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1929,7 +1929,7 @@ func TestResolveComputerInventoryV3IDBySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV3BySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1952,7 +1952,7 @@ func TestResolveComputerInventoryV3BySerialNumber(t *testing.T) {
 
 func TestResolveComputerInventoryV3IDByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1975,7 +1975,7 @@ func TestResolveComputerInventoryV3IDByUDID(t *testing.T) {
 
 func TestResolveComputerInventoryV3ByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

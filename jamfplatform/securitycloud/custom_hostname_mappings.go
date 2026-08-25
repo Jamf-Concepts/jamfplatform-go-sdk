@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) GetDnsCustomHostnameMappingsV1(ctx context.Context) (*MappingList, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result MappingList
 	endpoint := prefix + "/dns/custom-hostname-mappings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetDnsCustomHostnameMappingsV1(ctx context.Context) (*MappingLi
 //
 // Required privileges: update:jsc:all.
 func (c *Client) ReplaceDnsCustomHostnameMappingsV1(ctx context.Context, request *[]Mapping) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/custom-hostname-mappings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("ReplaceDnsCustomHostnameMappingsV1: %w", err)
@@ -40,7 +40,7 @@ func (c *Client) ReplaceDnsCustomHostnameMappingsV1(ctx context.Context, request
 //
 // Required privileges: delete:jsc:all.
 func (c *Client) ClearDnsCustomHostnameMappingsV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/custom-hostname-mappings"
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("ClearDnsCustomHostnameMappingsV1: %w", err)

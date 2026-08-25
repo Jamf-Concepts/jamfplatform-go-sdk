@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: MDM Enrollment Profile identifier.
 func (c *Client) DownloadMobileDeviceEnrollmentProfileV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/mobile-device-enrollment-profile/%s/download-profile", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

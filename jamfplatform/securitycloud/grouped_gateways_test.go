@@ -13,7 +13,7 @@ import (
 
 func TestListZtnaGroupedGatewaysV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListZtnaGroupedGatewaysV1(t *testing.T) {
 
 func TestListZtnaGroupedGatewaysV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListZtnaGroupedGatewaysV1_NotFound(t *testing.T) {
 
 func TestCreateZtnaGroupedGatewayV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestCreateZtnaGroupedGatewayV1(t *testing.T) {
 
 func TestGetZtnaGroupedGatewayV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestGetZtnaGroupedGatewayV1(t *testing.T) {
 
 func TestGetZtnaGroupedGatewayV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestGetZtnaGroupedGatewayV1_NotFound(t *testing.T) {
 
 func TestUpdateZtnaGroupedGatewayV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -114,7 +114,7 @@ func TestUpdateZtnaGroupedGatewayV1(t *testing.T) {
 
 func TestDeleteZtnaGroupedGatewayV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -129,7 +129,7 @@ func TestDeleteZtnaGroupedGatewayV1(t *testing.T) {
 
 func TestResolveZtnaGroupedGatewayV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -152,7 +152,7 @@ func TestResolveZtnaGroupedGatewayV1IDByName(t *testing.T) {
 
 func TestResolveZtnaGroupedGatewayV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -176,7 +176,7 @@ func TestResolveZtnaGroupedGatewayV1ByName(t *testing.T) {
 func TestApplyZtnaGroupedGatewayV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -208,7 +208,7 @@ func TestApplyZtnaGroupedGatewayV1_Create(t *testing.T) {
 func TestApplyZtnaGroupedGatewayV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -219,7 +219,7 @@ func TestApplyZtnaGroupedGatewayV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/securitycloud/tenant/t-test/v1/ztna/grouped-gateways/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/securitycloud/v1/ztna/grouped-gateways/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(204)
 	})
 

@@ -24,7 +24,7 @@ import (
 //     ascending order when direction is omitted. The only supported sort field is `name`.
 //     Allowed values: "name:asc", "name:desc", "name".
 func (c *Client) ListDnsZonesV1(ctx context.Context, sort string) (*ZoneList, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result ZoneList
 	endpoint := prefix + "/dns/zones"
 	params := url.Values{}
@@ -44,7 +44,7 @@ func (c *Client) ListDnsZonesV1(ctx context.Context, sort string) (*ZoneList, er
 //
 // Required privileges: create:jsc:all.
 func (c *Client) CreateDnsZoneV1(ctx context.Context, request *ZoneWrite) (*ZoneRef, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result ZoneRef
 	endpoint := prefix + "/dns/zones"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -60,7 +60,7 @@ func (c *Client) CreateDnsZoneV1(ctx context.Context, request *ZoneWrite) (*Zone
 // Parameters:
 //   - id: Identifier of the DNS Zone to operate on.
 func (c *Client) GetDnsZoneV1(ctx context.Context, id string) (*Zone, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result Zone
 	endpoint := fmt.Sprintf("%s/dns/zones/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -76,7 +76,7 @@ func (c *Client) GetDnsZoneV1(ctx context.Context, id string) (*Zone, error) {
 // Parameters:
 //   - id: Identifier of the DNS Zone to operate on.
 func (c *Client) UpdateDnsZoneV1(ctx context.Context, id string, request *ZonePatch) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/dns/zones/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDnsZoneV1(%s): %w", id, err)
@@ -91,7 +91,7 @@ func (c *Client) UpdateDnsZoneV1(ctx context.Context, id string, request *ZonePa
 // Parameters:
 //   - id: Identifier of the DNS Zone to operate on.
 func (c *Client) DeleteDnsZoneV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/dns/zones/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDnsZoneV1(%s): %w", id, err)
@@ -101,7 +101,7 @@ func (c *Client) DeleteDnsZoneV1(ctx context.Context, id string) error {
 
 // ResolveDnsZoneV1IDByName looks up a DnsZoneV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDnsZoneV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/dns/zones"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -112,7 +112,7 @@ func (c *Client) ResolveDnsZoneV1IDByName(ctx context.Context, name string) (str
 
 // ResolveDnsZoneV1ByName looks up a DnsZoneV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDnsZoneV1ByName(ctx context.Context, name string) (*Zone, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/dns/zones"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

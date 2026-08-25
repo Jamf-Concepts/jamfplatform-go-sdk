@@ -18,7 +18,7 @@ import (
 //
 // Required privileges: read:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
 func (c *Client) ListJCDSFilesV1(ctx context.Context) ([]FileData, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []FileData
 	endpoint := prefix + "/jcds/files"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) ListJCDSFilesV1(ctx context.Context) ([]FileData, error) {
 //
 // Required privileges: create:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Create Jamf Cloud Distribution Service Files.
 func (c *Client) InitiateJCDSUploadV1(ctx context.Context) (*Credentials, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Credentials
 	endpoint := prefix + "/jcds/files"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) InitiateJCDSUploadV1(ctx context.Context) (*Credentials, error)
 // Parameters:
 //   - fileName: Name of the file stored in the Jamf Cloud Distribution Service.
 func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) (*DownloadURL, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DownloadURL
 	endpoint := fmt.Sprintf("%s/jcds/files/%s", prefix, url.PathEscape(fileName))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -69,7 +69,7 @@ func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) 
 // Parameters:
 //   - fileName: Name of the file that will be deleted from the Jamf Cloud Distribution Service.
 func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jcds/files/%s", prefix, url.PathEscape(fileName))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteJCDSFileV1(%s): %w", fileName, err)
@@ -88,7 +88,7 @@ func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 //     be updated in Jamf Pro. If no file is specified, it will force an immediate inventory refresh at a
 //     rate-limit of once every 15 seconds.
 func (c *Client) RefreshJCDSInventoryV1(ctx context.Context, fileName string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/jcds/refresh-inventory"
 	params := url.Values{}
 	if fileName != "" {
@@ -109,7 +109,7 @@ func (c *Client) RefreshJCDSInventoryV1(ctx context.Context, fileName string) er
 //
 // Required privileges: create:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Create Jamf Cloud Distribution Service Files.
 func (c *Client) RenewJCDSCredentialsV1(ctx context.Context) (*Credentials, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Credentials
 	endpoint := prefix + "/jcds/renew-credentials"
 	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {

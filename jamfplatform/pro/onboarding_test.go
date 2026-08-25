@@ -13,7 +13,7 @@ import (
 
 func TestGetOnboardingV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetOnboardingV1(t *testing.T) {
 
 func TestGetOnboardingV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetOnboardingV1_NotFound(t *testing.T) {
 
 func TestUpdateOnboardingV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateOnboardingV1(t *testing.T) {
 
 func TestListOnboardingEligibleAppsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding/eligible-apps", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding/eligible-apps", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestListOnboardingEligibleAppsV1(t *testing.T) {
 
 func TestListOnboardingEligibleConfigurationProfilesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding/eligible-configuration-profiles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding/eligible-configuration-profiles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestListOnboardingEligibleConfigurationProfilesV1(t *testing.T) {
 
 func TestListOnboardingEligiblePoliciesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding/eligible-policies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding/eligible-policies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -131,7 +131,7 @@ func TestListOnboardingEligiblePoliciesV1(t *testing.T) {
 
 func TestListOnboardingHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -153,7 +153,7 @@ func TestListOnboardingHistoryV1(t *testing.T) {
 
 func TestCreateOnboardingHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -171,7 +171,7 @@ func TestCreateOnboardingHistoryNoteV1(t *testing.T) {
 
 func TestExportOnboardingHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/onboarding/history/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/onboarding/history/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListContentCategoriesV1(ctx context.Context) (*CategoryListResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CategoryListResponse
 	endpoint := prefix + "/categories"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -27,7 +27,7 @@ func (c *Client) ListContentCategoriesV1(ctx context.Context) (*CategoryListResp
 
 // ResolveContentCategoryV1IDByName looks up a ContentCategoryV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveContentCategoryV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/categories"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -38,7 +38,7 @@ func (c *Client) ResolveContentCategoryV1IDByName(ctx context.Context, name stri
 
 // ResolveContentCategoryV1ByName looks up a ContentCategoryV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveContentCategoryV1ByName(ctx context.Context, name string) (*Category, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/categories"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

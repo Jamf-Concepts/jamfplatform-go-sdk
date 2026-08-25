@@ -24,7 +24,7 @@ import (
 //   - verbose: Enables the 'verbose' response, which includes information about the commands queued as well as
 //     information about commands that failed to queue.
 func (c *Client) DeployPackageV1(ctx context.Context, request *InstallPackage, verbose bool) (*VerbosePackageDeploymentResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VerbosePackageDeploymentResponse
 	endpoint := prefix + "/deploy-package"
 	params := url.Values{}
@@ -45,7 +45,7 @@ func (c *Client) DeployPackageV1(ctx context.Context, request *InstallPackage, v
 // Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) RenewMdmProfileV1(ctx context.Context, request *Udids) (*RenewMDMProfileResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result RenewMDMProfileResponse
 	endpoint := prefix + "/mdm/renew-profile"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
@@ -59,7 +59,7 @@ func (c *Client) RenewMdmProfileV1(ctx context.Context, request *Udids) (*RenewM
 // Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) SendMdmBlankPushV2(ctx context.Context, request *BlankPushRequest) (*BlankPushResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result BlankPushResponse
 	endpoint := prefix + "/mdm/blank-push"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -81,7 +81,7 @@ func (c *Client) SendMdmBlankPushV2(ctx context.Context, request *BlankPushReque
 //   - clientManagementID: The client management id used to search for a list of commands. Choose one of two parameters, but
 //     not both.
 func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientManagementID string) ([]MDMCommand, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []MDMCommand
 	endpoint := prefix + "/mdm/commands"
 	params := url.Values{}
@@ -115,7 +115,7 @@ func (c *Client) ListMdmCommandsV1(ctx context.Context, uuids []string, clientMa
 //     le Example:
 //     clientManagementId==fb511aae-c557-474f-a9c1-5dc845b90d0f;status==Pending;command==INSTALL_PROFILE;uuid==9e18f849-e689-4f2d-b616-a99d3da7db42;clientType==COMPUTER_USER;profileId==1;profileIdentifier==18cc61c2-01fc-11ed-b939-0242ac120002;dateCompleted=ge=2021-08-04T14:25:18.26Z;dateCompleted=le=2021-08-04T14:25:18.26Z;validAfter=ge=2021-08-05T14:25:18.26Z;active==true.
 func (c *Client) ListMdmCommandsV2(ctx context.Context, sort []string, filter string) ([]MDMCommand, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]MDMCommand, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -148,7 +148,7 @@ func (c *Client) ListMdmCommandsV2(ctx context.Context, sort []string, filter st
 // Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) SendMdmCommandV2(ctx context.Context, request *MDMCommandRequest) ([]HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []HrefResponse
 	endpoint := prefix + "/mdm/commands"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {

@@ -22,7 +22,7 @@ import (
 // Required privileges: read:pro:jamf-connect-deployments, read:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings, Read Jamf Connect Deployments.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-connect"
 	if err := c.transport.DoExpect(ctx, http.MethodGet, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("GetJamfConnectSettingsV1: %w", err)
@@ -44,7 +44,7 @@ func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []string, filter string) ([]LinkedConnectProfile, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]LinkedConnectProfile, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -79,7 +79,7 @@ func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []str
 // Parameters:
 //   - id: the UUID of the profile to update.
 func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string, request *LinkedConnectProfile) (*LinkedConnectProfile, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LinkedConnectProfile
 	endpoint := fmt.Sprintf("%s/jamf-connect/config-profiles/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -103,7 +103,7 @@ func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -138,7 +138,7 @@ func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string
 // Parameters:
 //   - id: the UUID of the deployment associated with the retry.
 func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id string, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jamf-connect/deployments/%s/tasks/retry", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("RetryJamfConnectDeploymentTasksV1(%s): %w", id, err)
@@ -160,7 +160,7 @@ func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id strin
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListJamfConnectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -192,7 +192,7 @@ func (c *Client) ListJamfConnectHistoryV1(ctx context.Context, sort []string, fi
 //
 // Required privileges: update:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Connect Settings.
 func (c *Client) CreateJamfConnectHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/jamf-connect/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -203,7 +203,7 @@ func (c *Client) CreateJamfConnectHistoryNoteV1(ctx context.Context, request *Ob
 
 // ResolveJamfConnectConfigProfileV1IDByName looks up a JamfConnectConfigProfileV1 by its profileName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveJamfConnectConfigProfileV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/jamf-connect/config-profiles"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "profileName", "profileId", name)
 	if err != nil {
@@ -214,7 +214,7 @@ func (c *Client) ResolveJamfConnectConfigProfileV1IDByName(ctx context.Context, 
 
 // ResolveJamfConnectConfigProfileV1ByName looks up a JamfConnectConfigProfileV1 by its profileName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveJamfConnectConfigProfileV1ByName(ctx context.Context, name string) (*LinkedConnectProfile, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/jamf-connect/config-profiles"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "profileName", "profileId", name)
 	if err != nil {

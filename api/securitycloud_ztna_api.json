@@ -1,6 +1,18 @@
 {
   "components": {
     "parameters": {
+      "X-Tenant-Id": {
+        "description": "The tenant UUID identifier.",
+        "in": "header",
+        "name": "X-Tenant-Id",
+        "required": true,
+        "schema": {
+          "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "type": "string"
+        }
+      },
       "appId": {
         "description": "ID of the App (Access Policy). Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).\n",
         "in": "path",
@@ -49,18 +61,6 @@
           "default": 100,
           "minimum": 1,
           "type": "integer"
-        }
-      },
-      "tenantId": {
-        "description": "The tenant UUID identifier",
-        "in": "path",
-        "name": "tenantId",
-        "required": true,
-        "schema": {
-          "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
-          "format": "uuid",
-          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-          "type": "string"
         }
       }
     },
@@ -1884,13 +1884,13 @@
   },
   "openapi": "3.0.3",
   "paths": {
-    "/v1/tenant/{tenantId}/ztna/apps": {
+    "/v1/ztna/apps": {
       "get": {
         "description": "List all Apps (Access Policies) for the tenant, paginated.\n\n\n**Required Permissions:** `read:jsc:all`",
         "operationId": "listApps",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
             "$ref": "#/components/parameters/page"
@@ -1934,7 +1934,7 @@
         "operationId": "createApp",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -2030,13 +2030,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/ztna/apps/{appId}": {
+    "/v1/ztna/apps/{appId}": {
       "delete": {
         "description": "Delete an App (Access Policy). Returns `204` on success. Returns `404` if the App does not exist or is not owned by this customer. Returns `409` if deletion cannot complete due to a conflict.\n\n\n**Required Permissions:** `delete:jsc:all`",
         "operationId": "deleteApp",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -2073,7 +2073,7 @@
         "operationId": "getApp",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -2170,7 +2170,7 @@
         "operationId": "patchApp",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -2226,13 +2226,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/ztna/gateways": {
+    "/v1/ztna/gateways": {
       "get": {
         "description": "List dedicated Gateways for the tenant, paginated. Returns only customer-owned gateways. Each item includes datacenter, availability zones, IPSec configuration, and operational status.\n\n\n**Required Permissions:** `read:jsc:all`",
         "operationId": "listGateways",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
             "$ref": "#/components/parameters/page"
@@ -2398,7 +2398,7 @@
         "operationId": "createGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -2529,13 +2529,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/ztna/gateways/{gatewayId}": {
+    "/v1/ztna/gateways/{gatewayId}": {
       "delete": {
         "description": "Delete a dedicated Gateway. Returns `204` on success. Returns `404` if the gateway does not exist or belongs to a different tenant — never `403`. Returns `409` if the gateway is still referenced by an App, a Grouped Gateway, or a DNS Zone — disassociate it first, then retry.\n\n\n**Required Permissions:** `delete:jsc:all`",
         "operationId": "deleteGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -2572,7 +2572,7 @@
         "operationId": "getGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -2746,7 +2746,7 @@
         "operationId": "patchGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -2899,13 +2899,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/ztna/grouped-gateways": {
+    "/v1/ztna/grouped-gateways": {
       "get": {
         "description": "List all Grouped Gateways for the tenant. Not paginated — the full list is returned in a single response.\n\n\n**Required Permissions:** `read:jsc:all`",
         "operationId": "listGroupedGateways",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -2963,7 +2963,7 @@
         "operationId": "createGroupedGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -3024,13 +3024,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}": {
+    "/v1/ztna/grouped-gateways/{groupedGatewayId}": {
       "delete": {
         "description": "Delete a Grouped Gateway. Returns `204` on success. Returns `404` if the grouped gateway does not exist or belongs to a different tenant — never `403`. Returns `409` if the grouped gateway is still referenced by an App or a DNS Zone — disassociate it first.\n\n\n**Required Permissions:** `delete:jsc:all`",
         "operationId": "deleteGroupedGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -3067,7 +3067,7 @@
         "operationId": "getGroupedGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -3113,7 +3113,7 @@
         "operationId": "patchGroupedGateway",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "requestBody": {
@@ -3177,13 +3177,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/ztna/predefined-apps": {
+    "/v1/ztna/predefined-apps": {
       "get": {
         "description": "List the catalog of predefined SaaS application definitions. Not paginated. Pass the `id` as `predefinedAppId` when creating an App.\n\n\n**Required Permissions:** `read:jsc:all`",
         "operationId": "listPredefinedApps",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -3217,13 +3217,13 @@
         ]
       }
     },
-    "/v1/tenant/{tenantId}/ztna/shared-gateways": {
+    "/v1/ztna/shared-gateways": {
       "get": {
         "description": "List Jamf-managed Shared Gateways available to this tenant. Not paginated — the full list is returned in a single response. Returns `id` and `name` only — no deployment details. These gateways are maintained by Jamf infrastructure and cannot be modified.\n\n\n**Required Permissions:** `read:jsc:all`",
         "operationId": "listSharedGateways",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tenantId"
+            "$ref": "#/components/parameters/X-Tenant-Id"
           }
         ],
         "responses": {
@@ -3312,5 +3312,8 @@
       "description": "Read-only catalog of predefined SaaS application definitions. Reference an `id` as `predefinedAppId` when creating an App based on a known SaaS app.\n",
       "name": "predefined-apps"
     }
+  ],
+  "x-scope-types": [
+    "tenant"
   ]
 }

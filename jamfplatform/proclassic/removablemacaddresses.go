@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetRemovableMacAddressByID(ctx context.Context, id string) (*RemovableMacAddress, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RemovableMacAddress
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetRemovableMacAddressByID(ctx context.Context, id string) (*Re
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateRemovableMacAddressByID(ctx context.Context, id string, request *RemovableMacAddress) (*RemovableMacAddress, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RemovableMacAddress
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateRemovableMacAddressByID(ctx context.Context, id string, r
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateRemovableMacAddressByID(ctx context.Context, id string, request *RemovableMacAddress) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateRemovableMacAddressByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateRemovableMacAddressByID(ctx context.Context, id string, r
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteRemovableMacAddressByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteRemovableMacAddressByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteRemovableMacAddressByID(ctx context.Context, id string) e
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetRemovableMacAddressByName(ctx context.Context, name string) (*RemovableMacAddress, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RemovableMacAddress
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetRemovableMacAddressByName(ctx context.Context, name string) 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateRemovableMacAddressByName(ctx context.Context, name string, request *RemovableMacAddress) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateRemovableMacAddressByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateRemovableMacAddressByName(ctx context.Context, name strin
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteRemovableMacAddressByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteRemovableMacAddressByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteRemovableMacAddressByName(ctx context.Context, name strin
 //
 // Required privileges: read:pro:removable-mac-address.
 func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAddresses, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RemovableMacAddresses
 	endpoint := prefix + "/removablemacaddresses"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAd
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateRemovableMacAddressByName(ctx context.Context, name string, request *RemovableMacAddress) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/removablemacaddresses/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateRemovableMacAddressByName(%s): %w", name, err)

@@ -13,7 +13,7 @@ import (
 
 func TestGetSsoCertificateV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetSsoCertificateV2(t *testing.T) {
 
 func TestGetSsoCertificateV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetSsoCertificateV2_NotFound(t *testing.T) {
 
 func TestUpdateSsoCertificateV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateSsoCertificateV2(t *testing.T) {
 
 func TestGenerateSsoCertificateV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestGenerateSsoCertificateV2(t *testing.T) {
 
 func TestGenerateSsoCertificateV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestGenerateSsoCertificateV2_NotFound(t *testing.T) {
 
 func TestDeleteSsoCertificateV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -114,7 +114,7 @@ func TestDeleteSsoCertificateV2(t *testing.T) {
 
 func TestDownloadSsoCertificateV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert/download", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert/download", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -132,7 +132,7 @@ func TestDownloadSsoCertificateV2(t *testing.T) {
 
 func TestDownloadSsoCertificateV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert/download", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert/download", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -148,7 +148,7 @@ func TestDownloadSsoCertificateV2_NotFound(t *testing.T) {
 
 func TestParseSsoCertificateV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/sso/cert/parse", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/sso/cert/parse", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

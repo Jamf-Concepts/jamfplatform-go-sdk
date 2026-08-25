@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - keyID: user setting to be retrieved.
 func (c *Client) GetUserPreferencesSettingsV1(ctx context.Context, keyID string) (*UserPreferencesSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result UserPreferencesSettings
 	endpoint := fmt.Sprintf("%s/user/preferences/settings/%s", prefix, url.PathEscape(keyID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetUserPreferencesSettingsV1(ctx context.Context, keyID string)
 // Parameters:
 //   - keyID: user setting to be retrieved.
 func (c *Client) GetUserPreferenceV1(ctx context.Context, keyID string) (*UserPreferencesJson, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result UserPreferencesJson
 	endpoint := fmt.Sprintf("%s/user/preferences/%s", prefix, url.PathEscape(keyID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) GetUserPreferenceV1(ctx context.Context, keyID string) (*UserPr
 // Parameters:
 //   - keyID: unique key of user setting to be persisted.
 func (c *Client) UpdateUserPreferenceV1(ctx context.Context, keyID string, request *map[string]any) (*UserPreferencesJson, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result UserPreferencesJson
 	endpoint := fmt.Sprintf("%s/user/preferences/%s", prefix, url.PathEscape(keyID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) UpdateUserPreferenceV1(ctx context.Context, keyID string, reque
 // Parameters:
 //   - keyID: unique key of user setting to be persisted.
 func (c *Client) DeleteUserPreferenceV1(ctx context.Context, keyID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/user/preferences/%s", prefix, url.PathEscape(keyID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteUserPreferenceV1(%s): %w", keyID, err)

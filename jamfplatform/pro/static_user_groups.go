@@ -17,7 +17,7 @@ import (
 //
 // Required privileges: read:pro:user-groups. Legacy Jamf Pro privilege name(s): Read Static User Groups.
 func (c *Client) ListStaticUserGroupsV1(ctx context.Context) ([]StaticUserGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []StaticUserGroup
 	endpoint := prefix + "/static-user-groups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) ListStaticUserGroupsV1(ctx context.Context) ([]StaticUserGroup,
 // Parameters:
 //   - id: Instance id of static user group record.
 func (c *Client) GetStaticUserGroupV1(ctx context.Context, id string) (*StaticUserGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result StaticUserGroup
 	endpoint := fmt.Sprintf("%s/static-user-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -44,7 +44,7 @@ func (c *Client) GetStaticUserGroupV1(ctx context.Context, id string) (*StaticUs
 
 // ResolveStaticUserGroupV1IDByName looks up a StaticUserGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveStaticUserGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/static-user-groups"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *Client) ResolveStaticUserGroupV1IDByName(ctx context.Context, name stri
 
 // ResolveStaticUserGroupV1ByName looks up a StaticUserGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveStaticUserGroupV1ByName(ctx context.Context, name string) (*StaticUserGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/static-user-groups"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

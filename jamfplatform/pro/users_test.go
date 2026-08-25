@@ -13,7 +13,7 @@ import (
 
 func TestListUsersV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListUsersV1(t *testing.T) {
 
 func TestCreateUserV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateUserV1(t *testing.T) {
 
 func TestGetUserV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetUserV1(t *testing.T) {
 
 func TestGetUserV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetUserV1_NotFound(t *testing.T) {
 
 func TestUpdateUserV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -102,7 +102,7 @@ func TestUpdateUserV1(t *testing.T) {
 
 func TestDeleteUserV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestDeleteUserV1(t *testing.T) {
 
 func TestResolveUserV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -140,7 +140,7 @@ func TestResolveUserV1IDByName(t *testing.T) {
 
 func TestResolveUserV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -164,7 +164,7 @@ func TestResolveUserV1ByName(t *testing.T) {
 func TestApplyUserV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -196,7 +196,7 @@ func TestApplyUserV1_Create(t *testing.T) {
 func TestApplyUserV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -207,7 +207,7 @@ func TestApplyUserV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/users/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/users/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(204)
 	})
 

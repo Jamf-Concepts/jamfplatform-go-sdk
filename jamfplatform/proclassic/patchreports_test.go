@@ -13,7 +13,7 @@ import (
 
 func TestGetPatchReportByPatchSoftwareTitleID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/patchreports/patchsoftwaretitleid/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/patchreports/patchsoftwaretitleid/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetPatchReportByPatchSoftwareTitleID(t *testing.T) {
 
 func TestGetPatchReportByPatchSoftwareTitleID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/patchreports/patchsoftwaretitleid/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/patchreports/patchsoftwaretitleid/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetPatchReportByPatchSoftwareTitleID_NotFound(t *testing.T) {
 
 func TestGetPatchReportByTitleIDVersion(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/patchreports/patchsoftwaretitleid/test-id/version/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/proclassic/patchreports/patchsoftwaretitleid/test-id/version/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestGetPatchReportByTitleIDVersion(t *testing.T) {
 
 func TestGetPatchReportByTitleIDVersion_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/tenant/t-test/patchreports/patchsoftwaretitleid/test-id/version/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/proclassic/patchreports/patchsoftwaretitleid/test-id/version/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 

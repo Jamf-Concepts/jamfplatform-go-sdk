@@ -46,10 +46,10 @@ type Logger interface {
 // Sub-packages in jamfplatform/ construct service clients that wrap a Transport.
 type Transport struct {
 	baseURL         string
-	tenantID        string
-	nsTenantIDs     map[string]string // namespace -> tenant ID, for API families that scope a tenant differently from Jamf Pro
-	httpClient      *http.Client      // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
-	uploadClient    *http.Client      // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
+	scopeKind       ScopeKind    // which request-context header carries the scope
+	scopeID         string       // the tenant (or environment) ID that header sends
+	httpClient      *http.Client // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
+	uploadClient    *http.Client // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
 	baseClient      *http.Client
 	oauthConfig     *clientcredentials.Config
 	logger          Logger
@@ -99,36 +99,12 @@ func WithTokenCache(cache TokenCache, cacheKey string) Option {
 	}
 }
 
-// WithTenantID sets the tenant ID used by TenantPrefix when building URLs.
+// WithTenantID sets the tenant this client is scoped to. It is sent as the
+// X-Tenant-Id request header on every API call; see ScopeHeader.
 func WithTenantID(id string) Option {
 	return func(c *Transport) {
-		c.tenantID = id
-	}
-}
-
-// WithNamespaceTenantID overrides the tenant ID TenantPrefix injects for one
-// API namespace, leaving every other namespace on the WithTenantID value.
-//
-// Jamf Security Cloud is a separate product with its own tenant identifier: a
-// customer holding both products has one tenant ID for Jamf Pro and a
-// different one for Security Cloud, and a single Client is expected to reach
-// both. Without this, calling the securitycloud package would need a second
-// Client constructed with the other tenant — which also duplicates the token
-// cache, cookie jar and request throttle, so the two clients would pace and
-// authenticate independently against the same gateway.
-//
-// A namespace carrying a slash (e.g. "ddm/report") matches either in full or
-// on its first segment, so an override registered for "securitycloud" also
-// applies to a future "securitycloud/<sub>" namespace.
-func WithNamespaceTenantID(namespace, id string) Option {
-	return func(c *Transport) {
-		if namespace == "" || id == "" {
-			return
-		}
-		if c.nsTenantIDs == nil {
-			c.nsTenantIDs = make(map[string]string)
-		}
-		c.nsTenantIDs[namespace] = id
+		c.scopeKind = ScopeTenant
+		c.scopeID = id
 	}
 }
 
@@ -215,95 +191,80 @@ func (c *Transport) BaseURL() string {
 	return c.baseURL
 }
 
-// TenantID returns the tenant ID configured on the transport.
+// ScopeKind identifies which kind of Jamf scope a client is bound to. The
+// gateway calls this the request context, and each kind travels in its own
+// request header.
+type ScopeKind int
+
+const (
+	// ScopeTenant scopes requests to a single product tenant, sent as
+	// X-Tenant-Id. This is what every API surface in this SDK uses today.
+	ScopeTenant ScopeKind = iota + 1
+	// ScopeEnvironment scopes requests to a platform environment — a grouping
+	// of tenants — sent as X-Environment-Id. Declared because the gateway
+	// accepts it on several namespaces and environment-scoped APIs exist
+	// (ai-governance, audit); no operation this SDK generates is
+	// environment-scoped yet, so no option sets it.
+	ScopeEnvironment
+)
+
+// ScopeHeader returns the request header that carries this scope kind, or ""
+// when the kind is unset.
+//
+// Organization scope deliberately has no entry: the gateway resolves it from
+// the access token alone (request-context-allowed-sources is `token` for the
+// account api-products, in every environment), so there is no header to send.
+func (k ScopeKind) ScopeHeader() string {
+	switch k {
+	case ScopeTenant:
+		return "X-Tenant-Id"
+	case ScopeEnvironment:
+		return "X-Environment-Id"
+	default:
+		return ""
+	}
+}
+
+// setScopeHeader stamps the scope header on a request. It is applied before
+// extraHeaders so an operation that needs to override the scope for one call
+// still can, and it is a no-op when no scope was configured — the gateway then
+// resolves the context from the access token, which is how organization-scoped
+// products work.
+func (c *Transport) setScopeHeader(req *http.Request) {
+	if h := c.scopeKind.ScopeHeader(); h != "" && c.scopeID != "" {
+		req.Header.Set(h, c.scopeID)
+	}
+}
+
+// TenantID returns the tenant ID configured on the transport, or "" when this
+// client is scoped to something other than a tenant.
 func (c *Transport) TenantID() string {
-	return c.tenantID
+	if c.scopeKind != ScopeTenant {
+		return ""
+	}
+	return c.scopeID
 }
 
-// TenantIDFor returns the tenant ID that applies to one API namespace: the
-// namespace's own override when one was registered via WithNamespaceTenantID,
-// otherwise the client-wide value.
+// APIPrefix returns the /api/{namespace}/{version} URL prefix for a namespace.
+// An empty version collapses that segment, for the APIs that carry no version
+// in the URL (proclassic, Pro preview paths).
 //
-// Callers building tenant-scoped URLs themselves — rather than through
-// TenantPrefix — need this to stay namespace-correct. A customer holding both
-// Jamf Pro and Jamf Security Cloud has a different tenant ID for each, so
-// resolving the client-wide value for a Security Cloud path sends the Pro
-// tenant and the gateway answers 403 OWNERSHIP_FORBIDDEN.
-func (c *Transport) TenantIDFor(namespace string) string {
-	return c.tenantIDFor(namespace)
-}
-
-// TenantPrefix returns the /api/{namespace}/{version}/tenant/{tenantID} URL
-// prefix used by tenant-scoped resources. An empty version collapses the
-// segment for APIs that don't use a version in the URL (proclassic, Pro
-// preview paths). The tenant ID is the namespace's own override when one was
-// registered via WithNamespaceTenantID, otherwise the client-wide value.
-//
-// Namespaces listed in tenantFirstNamespaces get the two segments the other
-// way round — /api/{namespace}/tenant/{tenantID}/{version} — see that variable
-// for why.
-func (c *Transport) TenantPrefix(namespace, version string) string {
-	tenantID := c.tenantIDFor(namespace)
+// The scope is NOT in the path. Until 2026-08-25 every Jamf URL embedded it —
+// /api/{namespace}/{version}/tenant/{tenantID} — and the gateway's Tyk config
+// resolved the request context from `path`. `header` was added as an allowed
+// source in prod on that date (tyk-gateway-management 0793131b, "JSC-73421
+// Enable header context support - Prod"), and the published specs dropped the
+// path segment in GitOps build v1495 in favour of a required X-Tenant-Id
+// header. Both forms answered 200 during the transition, wire-verified across
+// EU securitycloud and US pro/blueprints/compliance-benchmarks/devices, so
+// this moved to headers only rather than carrying a selectable mode: a second
+// code path nothing exercises is how an earlier URL-shape bug went unnoticed
+// for weeks.
+func (c *Transport) APIPrefix(namespace, version string) string {
 	if version == "" {
-		return "/api/" + namespace + "/tenant/" + tenantID
+		return "/api/" + namespace
 	}
-	if TenantFirstNamespace(namespace) {
-		return "/api/" + namespace + "/tenant/" + tenantID + "/" + version
-	}
-	return "/api/" + namespace + "/" + version + "/tenant/" + tenantID
-}
-
-// tenantFirstNamespaces lists the namespaces whose URLs place the tenant
-// segment *before* the version. Everything else in the Jamf estate is
-// version-first, so this is an explicit allowlist rather than a default.
-//
-// Only Security Cloud is in it, and the reason is auditing, not routing: its
-// Tyk definition is a catch-all proxy that routes both orderings identically
-// (both wire-verified 200, 2026-08-21), but the audit rules that decide which
-// mutating requests get recorded are path globs of the form
-// `/**/v1/<service>/…`. Those match a stripped path only when the version
-// follows the tenant — `/tenant/{id}/v1/dns/zones` matches, and the
-// version-first `/v1/tenant/{id}/dns/zones` matches nothing. Under the old
-// ordering 19 of the SDK's 27 Security Cloud mutating operations were
-// executed but never audited. Tenant-first brings all 27 under a rule with no
-// gateway-side change.
-//
-// A namespace matches exactly or on its first path segment, mirroring
-// tenantIDFor, so a future `securitycloud/<sub>` inherits the ordering rather
-// than silently reverting to version-first.
-var tenantFirstNamespaces = map[string]bool{
-	"securitycloud": true,
-}
-
-// TenantFirstNamespace reports whether a namespace's URLs put the tenant
-// segment before the version. Exported so the code generator emits test
-// expectations against the same rule the transport applies at runtime — two
-// copies of this decision would drift, and the generated tests are the only
-// thing checking the shape offline.
-func TenantFirstNamespace(namespace string) bool {
-	if tenantFirstNamespaces[namespace] {
-		return true
-	}
-	root, _, found := strings.Cut(namespace, "/")
-	return found && tenantFirstNamespaces[root]
-}
-
-// tenantIDFor resolves the tenant ID for one namespace: an exact override
-// first, then an override on the namespace's first path segment, then the
-// client-wide tenant ID.
-func (c *Transport) tenantIDFor(namespace string) string {
-	if len(c.nsTenantIDs) == 0 {
-		return c.tenantID
-	}
-	if id, ok := c.nsTenantIDs[namespace]; ok {
-		return id
-	}
-	if root, _, found := strings.Cut(namespace, "/"); found {
-		if id, ok := c.nsTenantIDs[root]; ok {
-			return id
-		}
-	}
-	return c.tenantID
+	return "/api/" + namespace + "/" + version
 }
 
 // ValidateCredentials tests authentication by requesting an OAuth token.
@@ -475,6 +436,8 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to create request: %w", err)
 	}
+
+	c.setScopeHeader(req)
 
 	for key, values := range extraHeaders {
 		for _, v := range values {

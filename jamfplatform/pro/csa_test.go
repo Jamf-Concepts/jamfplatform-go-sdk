@@ -13,7 +13,7 @@ import (
 
 func TestGetCsaTenantIdV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/csa/tenant-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/csa/tenant-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetCsaTenantIdV1(t *testing.T) {
 
 func TestGetCsaTenantIdV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/csa/tenant-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/csa/tenant-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetCsaTenantIdV1_NotFound(t *testing.T) {
 
 func TestGetCsaTokenV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/csa/token", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/csa/token", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestGetCsaTokenV1(t *testing.T) {
 
 func TestGetCsaTokenV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/csa/token", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/csa/token", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestGetCsaTokenV1_NotFound(t *testing.T) {
 
 func TestDeleteCsaTokenV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/csa/token", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/csa/token", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

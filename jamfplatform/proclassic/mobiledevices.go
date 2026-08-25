@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceByID(ctx context.Context, id string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetMobileDeviceByID(ctx context.Context, id string) (*MobileDev
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMobileDeviceByName(ctx context.Context, name string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) GetMobileDeviceByName(ctx context.Context, name string) (*Mobil
 // Parameters:
 //   - serialNumber: Serial number to filter by.
 func (c *Client) GetMobileDeviceBySerialNumber(ctx context.Context, serialNumber string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) GetMobileDeviceBySerialNumber(ctx context.Context, serialNumber
 // Parameters:
 //   - udid: UDID to filter by.
 func (c *Client) GetMobileDeviceByUDID(ctx context.Context, udid string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -83,7 +83,7 @@ func (c *Client) GetMobileDeviceByUDID(ctx context.Context, udid string) (*Mobil
 // Parameters:
 //   - macAddress: Mac address to filter by.
 func (c *Client) GetMobileDeviceByMacAddress(ctx context.Context, macAddress string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macAddress))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetMobileDeviceByMacAddress(ctx context.Context, macAddress str
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateMobileDeviceByID(ctx context.Context, id string, request *MobileDevicePost) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -117,7 +117,7 @@ func (c *Client) CreateMobileDeviceByID(ctx context.Context, id string, request 
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateMobileDeviceByID(ctx context.Context, id string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceByID(%s): %w", id, err)
@@ -133,7 +133,7 @@ func (c *Client) UpdateMobileDeviceByID(ctx context.Context, id string, request 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceByName(ctx context.Context, name string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceByName(%s): %w", name, err)
@@ -149,7 +149,7 @@ func (c *Client) UpdateMobileDeviceByName(ctx context.Context, name string, requ
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
 func (c *Client) UpdateMobileDeviceBySerialNumber(ctx context.Context, serialNumber string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceBySerialNumber(%s): %w", serialNumber, err)
@@ -165,7 +165,7 @@ func (c *Client) UpdateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 // Parameters:
 //   - udid: UDID value to filter by.
 func (c *Client) UpdateMobileDeviceByUDID(ctx context.Context, udid string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceByUDID(%s): %w", udid, err)
@@ -181,7 +181,7 @@ func (c *Client) UpdateMobileDeviceByUDID(ctx context.Context, udid string, requ
 // Parameters:
 //   - macAddress: Mac address value to filter by.
 func (c *Client) UpdateMobileDeviceByMacAddress(ctx context.Context, macAddress string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macAddress))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateMobileDeviceByMacAddress(%s): %w", macAddress, err)
@@ -196,7 +196,7 @@ func (c *Client) UpdateMobileDeviceByMacAddress(ctx context.Context, macAddress 
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteMobileDeviceByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceByID(%s): %w", id, err)
@@ -211,7 +211,7 @@ func (c *Client) DeleteMobileDeviceByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceByName(%s): %w", name, err)
@@ -226,7 +226,7 @@ func (c *Client) DeleteMobileDeviceByName(ctx context.Context, name string) erro
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
 func (c *Client) DeleteMobileDeviceBySerialNumber(ctx context.Context, serialNumber string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceBySerialNumber(%s): %w", serialNumber, err)
@@ -241,7 +241,7 @@ func (c *Client) DeleteMobileDeviceBySerialNumber(ctx context.Context, serialNum
 // Parameters:
 //   - udid: UDID value to filter by.
 func (c *Client) DeleteMobileDeviceByUDID(ctx context.Context, udid string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceByUDID(%s): %w", udid, err)
@@ -256,7 +256,7 @@ func (c *Client) DeleteMobileDeviceByUDID(ctx context.Context, udid string) erro
 // Parameters:
 //   - macAddress: Mac address value to filter by.
 func (c *Client) DeleteMobileDeviceByMacAddress(ctx context.Context, macAddress string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macAddress))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceByMacAddress(%s): %w", macAddress, err)
@@ -268,7 +268,7 @@ func (c *Client) DeleteMobileDeviceByMacAddress(ctx context.Context, macAddress 
 //
 // Required privileges: read:pro:mobile-devices.
 func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevices
 	endpoint := prefix + "/mobiledevices"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -288,7 +288,7 @@ func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) 
 //     "Certificates", "ConfigurationProfiles", "ProvisioningProfiles", "MobileDeviceGroups",
 //     "ExtensionAttributes".
 func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subset string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -304,7 +304,7 @@ func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subse
 // Parameters:
 //   - match: Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.
 func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*MobileDevice, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevice
 	endpoint := fmt.Sprintf("%s/mobiledevices/match/%s", prefix, url.PathEscape(match))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -321,7 +321,7 @@ func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*Mob
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateMobileDeviceByName(ctx context.Context, name string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceByName(%s): %w", name, err)
@@ -337,7 +337,7 @@ func (c *Client) CreateMobileDeviceByName(ctx context.Context, name string, requ
 // Parameters:
 //   - serialNumber: ID value to filter by.
 func (c *Client) CreateMobileDeviceBySerialNumber(ctx context.Context, serialNumber string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceBySerialNumber(%s): %w", serialNumber, err)
@@ -353,7 +353,7 @@ func (c *Client) CreateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 // Parameters:
 //   - macaddress: ID value to filter by.
 func (c *Client) CreateMobileDeviceByMacAddress(ctx context.Context, macaddress string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/macaddress/%s", prefix, url.PathEscape(macaddress))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceByMacAddress(%s): %w", macaddress, err)
@@ -369,7 +369,7 @@ func (c *Client) CreateMobileDeviceByMacAddress(ctx context.Context, macaddress 
 // Parameters:
 //   - udid: ID value to filter by.
 func (c *Client) CreateMobileDeviceByUDID(ctx context.Context, udid string, request *MobileDevicePost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledevices/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateMobileDeviceByUDID(%s): %w", udid, err)

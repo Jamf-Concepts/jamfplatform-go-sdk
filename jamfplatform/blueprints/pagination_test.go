@@ -13,7 +13,7 @@ import (
 func TestListBlueprints_MultiPage(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	callCount := 0
-	mux.HandleFunc("/api/blueprints/v1/tenant/t-test/blueprints", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
 		callCount++
 		page := r.URL.Query().Get("page")
 		switch page {

@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetUserGroupByID(ctx context.Context, id string) (*UserGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserGroup
 	endpoint := fmt.Sprintf("%s/usergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetUserGroupByID(ctx context.Context, id string) (*UserGroup, e
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateUserGroupByID(ctx context.Context, id string, request *UserGroup) (*UserGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserGroup
 	endpoint := fmt.Sprintf("%s/usergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateUserGroupByID(ctx context.Context, id string, request *Us
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateUserGroupByID(ctx context.Context, id string, request *UserGroup) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateUserGroupByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateUserGroupByID(ctx context.Context, id string, request *Us
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteUserGroupByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteUserGroupByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteUserGroupByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetUserGroupByName(ctx context.Context, name string) (*UserGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserGroup
 	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetUserGroupByName(ctx context.Context, name string) (*UserGrou
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateUserGroupByName(ctx context.Context, name string, request *UserGroup) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateUserGroupByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateUserGroupByName(ctx context.Context, name string, request
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteUserGroupByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteUserGroupByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteUserGroupByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:user-groups.
 func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserGroups
 	endpoint := prefix + "/usergroups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateUserGroupByName(ctx context.Context, name string, request *UserGroup) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/usergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateUserGroupByName(%s): %w", name, err)

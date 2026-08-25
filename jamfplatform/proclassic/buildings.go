@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetBuildingByID(ctx context.Context, id string) (*Building, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Building
 	endpoint := fmt.Sprintf("%s/buildings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetBuildingByID(ctx context.Context, id string) (*Building, err
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateBuildingByID(ctx context.Context, id string, request *Building) (*Building, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Building
 	endpoint := fmt.Sprintf("%s/buildings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateBuildingByID(ctx context.Context, id string, request *Bui
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateBuildingByID(ctx context.Context, id string, request *Building) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateBuildingByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateBuildingByID(ctx context.Context, id string, request *Bui
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteBuildingByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteBuildingByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteBuildingByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetBuildingByName(ctx context.Context, name string) (*Building, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Building
 	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetBuildingByName(ctx context.Context, name string) (*Building,
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) UpdateBuildingByName(ctx context.Context, name string, request *Building) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateBuildingByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateBuildingByName(ctx context.Context, name string, request 
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) DeleteBuildingByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteBuildingByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteBuildingByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:buildings.
 func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Buildings
 	endpoint := prefix + "/buildings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateBuildingByName(ctx context.Context, name string, request *Building) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/buildings/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateBuildingByName(%s): %w", name, err)

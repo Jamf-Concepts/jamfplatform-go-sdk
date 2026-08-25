@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) ReinstallMobileDeviceAppConfigV1(ctx context.Context, request *AppConfigReinstallCode) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/mobile-device-apps/reinstall-app-config"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("ReinstallMobileDeviceAppConfigV1: %w", err)

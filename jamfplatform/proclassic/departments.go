@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetDepartmentByID(ctx context.Context, id string) (*Department, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Department
 	endpoint := fmt.Sprintf("%s/departments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetDepartmentByID(ctx context.Context, id string) (*Department,
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateDepartmentByID(ctx context.Context, id string, request *Department) (*Department, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Department
 	endpoint := fmt.Sprintf("%s/departments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateDepartmentByID(ctx context.Context, id string, request *D
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateDepartmentByID(ctx context.Context, id string, request *Department) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDepartmentByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateDepartmentByID(ctx context.Context, id string, request *D
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteDepartmentByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDepartmentByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteDepartmentByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetDepartmentByName(ctx context.Context, name string) (*Department, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Department
 	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetDepartmentByName(ctx context.Context, name string) (*Departm
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateDepartmentByName(ctx context.Context, name string, request *Department) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDepartmentByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateDepartmentByName(ctx context.Context, name string, reques
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteDepartmentByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDepartmentByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteDepartmentByName(ctx context.Context, name string) error 
 //
 // Required privileges: read:pro:departments.
 func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Departments
 	endpoint := prefix + "/departments"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateDepartmentByName(ctx context.Context, name string, request *Department) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/departments/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateDepartmentByName(%s): %w", name, err)

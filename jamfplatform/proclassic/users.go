@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetUserByID(ctx context.Context, id string) (*User, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result User
 	endpoint := fmt.Sprintf("%s/users/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetUserByID(ctx context.Context, id string) (*User, error) {
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateUserByID(ctx context.Context, id string, request *UserPost) (*User, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result User
 	endpoint := fmt.Sprintf("%s/users/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateUserByID(ctx context.Context, id string, request *UserPos
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateUserByID(ctx context.Context, id string, request *UserPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateUserByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateUserByID(ctx context.Context, id string, request *UserPos
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteUserByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteUserByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteUserByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetUserByName(ctx context.Context, name string) (*User, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result User
 	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetUserByName(ctx context.Context, name string) (*User, error) 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateUserByName(ctx context.Context, name string, request *UserPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateUserByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateUserByName(ctx context.Context, name string, request *Use
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteUserByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteUserByName(%s): %w", name, err)
@@ -130,7 +130,7 @@ func (c *Client) DeleteUserByName(ctx context.Context, name string) error {
 // Parameters:
 //   - email: Email address to filter by.
 func (c *Client) GetUserByEmail(ctx context.Context, email string) (*User, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result User
 	endpoint := fmt.Sprintf("%s/users/email/%s", prefix, url.PathEscape(email))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) GetUserByEmail(ctx context.Context, email string) (*User, error
 //
 // Required privileges: read:pro:user.
 func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Users
 	endpoint := prefix + "/users"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -159,7 +159,7 @@ func (c *Client) ListUsers(ctx context.Context) (*Users, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateUserByName(ctx context.Context, name string, request *UserPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/users/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateUserByName(%s): %w", name, err)

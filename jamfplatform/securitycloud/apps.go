@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListZtnaAppsV1(ctx context.Context) ([]App, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]App, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -46,7 +46,7 @@ func (c *Client) ListZtnaAppsV1(ctx context.Context) ([]App, error) {
 //
 // Required privileges: create:jsc:all.
 func (c *Client) CreateZtnaAppV1(ctx context.Context, request *AppCreateRequest) (*CreateResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CreateResponse
 	endpoint := prefix + "/ztna/apps"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -62,7 +62,7 @@ func (c *Client) CreateZtnaAppV1(ctx context.Context, request *AppCreateRequest)
 // Parameters:
 //   - appID: ID of the App (Access Policy). Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 func (c *Client) GetZtnaAppV1(ctx context.Context, appID string) (*App, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result App
 	endpoint := fmt.Sprintf("%s/ztna/apps/%s", prefix, url.PathEscape(appID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -78,7 +78,7 @@ func (c *Client) GetZtnaAppV1(ctx context.Context, appID string) (*App, error) {
 // Parameters:
 //   - appID: ID of the App (Access Policy). Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 func (c *Client) UpdateZtnaAppV1(ctx context.Context, appID string, request *AppPatchRequest) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/ztna/apps/%s", prefix, url.PathEscape(appID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateZtnaAppV1(%s): %w", appID, err)
@@ -93,7 +93,7 @@ func (c *Client) UpdateZtnaAppV1(ctx context.Context, appID string, request *App
 // Parameters:
 //   - appID: ID of the App (Access Policy). Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 func (c *Client) DeleteZtnaAppV1(ctx context.Context, appID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/ztna/apps/%s", prefix, url.PathEscape(appID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteZtnaAppV1(%s): %w", appID, err)
@@ -103,7 +103,7 @@ func (c *Client) DeleteZtnaAppV1(ctx context.Context, appID string) error {
 
 // ResolveZtnaAppV1IDByName looks up a ZtnaAppV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveZtnaAppV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/apps"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -114,7 +114,7 @@ func (c *Client) ResolveZtnaAppV1IDByName(ctx context.Context, name string) (str
 
 // ResolveZtnaAppV1ByName looks up a ZtnaAppV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveZtnaAppV1ByName(ctx context.Context, name string) (*App, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/apps"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
 func (c *Client) GetReenrollmentSettingsV1(ctx context.Context) (*Reenrollment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Reenrollment
 	endpoint := prefix + "/reenrollment"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetReenrollmentSettingsV1(ctx context.Context) (*Reenrollment, 
 //
 // Required privileges: update:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Update Re-enrollment.
 func (c *Client) UpdateReenrollmentSettingsV1(ctx context.Context, request *Reenrollment) (*Reenrollment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Reenrollment
 	endpoint := prefix + "/reenrollment"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -50,7 +50,7 @@ func (c *Client) UpdateReenrollmentSettingsV1(ctx context.Context, request *Reen
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListReenrollmentHistoryV1(ctx context.Context, sort string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -79,7 +79,7 @@ func (c *Client) ListReenrollmentHistoryV1(ctx context.Context, sort string) ([]
 //
 // Required privileges: update:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Update Re-enrollment.
 func (c *Client) CreateReenrollmentHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/reenrollment/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -106,7 +106,7 @@ func (c *Client) CreateReenrollmentHistoryNoteV1(ctx context.Context, request *O
 //   - returning all results for the requested page. Fields allowed in the query: id, name. This param
 //     can be combined with paging and sorting. Example: name=="*script*".
 func (c *Client) ExportReenrollmentHistoryV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/reenrollment/history/export"
 	params := url.Values{}

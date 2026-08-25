@@ -29,7 +29,7 @@ import (
 //     supported and determine order of results that have equivalent values for previous sort parameters.
 //   - search: Search query to match against `name` and `description` properties.
 func (c *Client) ListBlueprints(ctx context.Context, sort []string, search string) ([]BlueprintOverview, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]BlueprintOverview, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -61,7 +61,7 @@ func (c *Client) ListBlueprints(ctx context.Context, sort []string, search strin
 // Required privileges: create:pro:blueprints, create:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRequest) (*CreateResponse, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	var result CreateResponse
 	endpoint := prefix + "/blueprints"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -78,7 +78,7 @@ func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRe
 // Parameters:
 //   - blueprintID: Blueprint ID.
 func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*BlueprintDetail, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	var result BlueprintDetail
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -95,7 +95,7 @@ func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*Bluepri
 // Parameters:
 //   - blueprintID: Blueprint ID.
 func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, request *UpdateBlueprintRequest) error {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateBlueprint(%s): %w", blueprintID, err)
@@ -111,7 +111,7 @@ func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, reques
 // Parameters:
 //   - blueprintID: Blueprint ID.
 func (c *Client) DeleteBlueprint(ctx context.Context, blueprintID string) error {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteBlueprint(%s): %w", blueprintID, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteBlueprint(ctx context.Context, blueprintID string) error 
 // Parameters:
 //   - blueprintID: Blueprint ID.
 func (c *Client) DeployBlueprint(ctx context.Context, blueprintID string) error {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s/deploy", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("DeployBlueprint(%s): %w", blueprintID, err)
@@ -143,7 +143,7 @@ func (c *Client) DeployBlueprint(ctx context.Context, blueprintID string) error 
 // Parameters:
 //   - blueprintID: Blueprint ID.
 func (c *Client) UndeployBlueprint(ctx context.Context, blueprintID string) error {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	endpoint := fmt.Sprintf("%s/blueprints/%s/undeploy", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("UndeployBlueprint(%s): %w", blueprintID, err)
@@ -159,7 +159,7 @@ func (c *Client) UndeployBlueprint(ctx context.Context, blueprintID string) erro
 // Parameters:
 //   - blueprintID: Blueprint ID.
 func (c *Client) GetBlueprintReport(ctx context.Context, blueprintID string) (*BlueprintStatusDetail, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	var result BlueprintStatusDetail
 	endpoint := fmt.Sprintf("%s/blueprints/%s/report", prefix, url.PathEscape(blueprintID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -173,7 +173,7 @@ func (c *Client) GetBlueprintReport(ctx context.Context, blueprintID string) (*B
 // Required privileges: read:pro:blueprints, read:school:blueprints.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescription, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]ComponentDescription, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -202,7 +202,7 @@ func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescri
 // Parameters:
 //   - identifier: Identifier of the component.
 func (c *Client) GetBlueprintComponent(ctx context.Context, identifier string) (*ComponentDescription, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	var result ComponentDescription
 	endpoint := fmt.Sprintf("%s/blueprint-components/%s", prefix, url.PathEscape(identifier))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -213,7 +213,7 @@ func (c *Client) GetBlueprintComponent(ctx context.Context, identifier string) (
 
 // ResolveBlueprintIDByName looks up a Blueprint by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveBlueprintIDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprints"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "search", "", "name", "id", name)
 	if err != nil {
@@ -224,7 +224,7 @@ func (c *Client) ResolveBlueprintIDByName(ctx context.Context, name string) (str
 
 // ResolveBlueprintByName looks up a Blueprint by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveBlueprintByName(ctx context.Context, name string) (*BlueprintOverview, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprints"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "search", "", "name", "id", name)
 	if err != nil {
@@ -239,7 +239,7 @@ func (c *Client) ResolveBlueprintByName(ctx context.Context, name string) (*Blue
 
 // ResolveBlueprintComponentIDByName looks up a BlueprintComponent by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveBlueprintComponentIDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprint-components"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "identifier", name)
 	if err != nil {
@@ -250,7 +250,7 @@ func (c *Client) ResolveBlueprintComponentIDByName(ctx context.Context, name str
 
 // ResolveBlueprintComponentByName looks up a BlueprintComponent by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveBlueprintComponentByName(ctx context.Context, name string) (*ComponentDescription, error) {
-	prefix := c.transport.TenantPrefix("blueprints", "v1")
+	prefix := c.transport.APIPrefix("blueprints", "v1")
 	listPath := prefix + "/blueprint-components"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "identifier", name)
 	if err != nil {

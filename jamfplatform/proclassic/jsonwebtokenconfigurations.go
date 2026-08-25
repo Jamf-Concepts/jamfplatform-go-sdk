@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetJsonWebTokenConfigurationByID(ctx context.Context, id string) (*JsonWebTokenConfiguration, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result JsonWebTokenConfiguration
 	endpoint := fmt.Sprintf("%s/jsonwebtokenconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetJsonWebTokenConfigurationByID(ctx context.Context, id string
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateJsonWebTokenConfigurationByID(ctx context.Context, id string, request *JsonWebTokenConfiguration) (*JsonWebTokenConfiguration, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result JsonWebTokenConfiguration
 	endpoint := fmt.Sprintf("%s/jsonwebtokenconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateJsonWebTokenConfigurationByID(ctx context.Context, id str
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateJsonWebTokenConfigurationByID(ctx context.Context, id string, request *JsonWebTokenConfiguration) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/jsonwebtokenconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateJsonWebTokenConfigurationByID(%s): %w", id, err)
@@ -66,7 +66,7 @@ func (c *Client) UpdateJsonWebTokenConfigurationByID(ctx context.Context, id str
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteJsonWebTokenConfigurationByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/jsonwebtokenconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteJsonWebTokenConfigurationByID(%s): %w", id, err)
@@ -78,7 +78,7 @@ func (c *Client) DeleteJsonWebTokenConfigurationByID(ctx context.Context, id str
 //
 // Required privileges: read:pro:json-web-token-configuration.
 func (c *Client) ListJsonWebTokenConfigurations(ctx context.Context) (*JsonWebTokenConfigurations, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result JsonWebTokenConfigurations
 	endpoint := prefix + "/jsonwebtokenconfigurations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

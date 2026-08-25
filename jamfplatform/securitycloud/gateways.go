@@ -19,7 +19,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListZtnaGatewaysV1(ctx context.Context) (*GatewayListResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result GatewayListResponse
 	endpoint := prefix + "/ztna/gateways"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) ListZtnaGatewaysV1(ctx context.Context) (*GatewayListResponse, 
 //
 // Required privileges: create:jsc:all.
 func (c *Client) CreateZtnaGatewayV1(ctx context.Context, request *GatewayCreateRequest) (*CreateResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CreateResponse
 	endpoint := prefix + "/ztna/gateways"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -49,7 +49,7 @@ func (c *Client) CreateZtnaGatewayV1(ctx context.Context, request *GatewayCreate
 //   - gatewayID: ID of the Gateway (obtained from `GET /gateways` or a create response). Format: 4-character
 //     lowercase hexadecimal string (e.g. `a1b2`).
 func (c *Client) GetZtnaGatewayV1(ctx context.Context, gatewayID string) (*Gateway, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result Gateway
 	endpoint := fmt.Sprintf("%s/ztna/gateways/%s", prefix, url.PathEscape(gatewayID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -66,7 +66,7 @@ func (c *Client) GetZtnaGatewayV1(ctx context.Context, gatewayID string) (*Gatew
 //   - gatewayID: ID of the Gateway (obtained from `GET /gateways` or a create response). Format: 4-character
 //     lowercase hexadecimal string (e.g. `a1b2`).
 func (c *Client) UpdateZtnaGatewayV1(ctx context.Context, gatewayID string, request *GatewayPatchRequest) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/ztna/gateways/%s", prefix, url.PathEscape(gatewayID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateZtnaGatewayV1(%s): %w", gatewayID, err)
@@ -82,7 +82,7 @@ func (c *Client) UpdateZtnaGatewayV1(ctx context.Context, gatewayID string, requ
 //   - gatewayID: ID of the Gateway (obtained from `GET /gateways` or a create response). Format: 4-character
 //     lowercase hexadecimal string (e.g. `a1b2`).
 func (c *Client) DeleteZtnaGatewayV1(ctx context.Context, gatewayID string) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := fmt.Sprintf("%s/ztna/gateways/%s", prefix, url.PathEscape(gatewayID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteZtnaGatewayV1(%s): %w", gatewayID, err)
@@ -92,7 +92,7 @@ func (c *Client) DeleteZtnaGatewayV1(ctx context.Context, gatewayID string) erro
 
 // ResolveZtnaGatewayV1IDByName looks up a ZtnaGatewayV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveZtnaGatewayV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/gateways"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -103,7 +103,7 @@ func (c *Client) ResolveZtnaGatewayV1IDByName(ctx context.Context, name string) 
 
 // ResolveZtnaGatewayV1ByName looks up a ZtnaGatewayV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveZtnaGatewayV1ByName(ctx context.Context, name string) (*Gateway, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/ztna/gateways"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

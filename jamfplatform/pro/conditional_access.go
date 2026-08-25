@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: read:pro:conditional-access. Legacy Jamf Pro privilege name(s): Read Conditional Access.
 func (c *Client) GetConditionalAccessFeatureToggleV1(ctx context.Context) (*SharedDeviceComplianceFeatureToggle, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SharedDeviceComplianceFeatureToggle
 	endpoint := prefix + "/conditional-access/device-compliance/feature-toggle"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) GetConditionalAccessFeatureToggleV1(ctx context.Context) (*Shar
 // Parameters:
 //   - deviceID: ID of the device the query pertains.
 func (c *Client) GetConditionalAccessComputerComplianceV1(ctx context.Context, deviceID string) ([]DeviceComplianceInformation, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []DeviceComplianceInformation
 	endpoint := fmt.Sprintf("%s/conditional-access/device-compliance-information/computer/%s", prefix, url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -48,7 +48,7 @@ func (c *Client) GetConditionalAccessComputerComplianceV1(ctx context.Context, d
 // Parameters:
 //   - deviceID: ID of the device the query pertains.
 func (c *Client) GetConditionalAccessMobileComplianceV1(ctx context.Context, deviceID string) ([]DeviceComplianceInformation, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []DeviceComplianceInformation
 	endpoint := fmt.Sprintf("%s/conditional-access/device-compliance-information/mobile/%s", prefix, url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

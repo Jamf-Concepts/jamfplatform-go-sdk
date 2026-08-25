@@ -10969,7 +10969,7 @@
       "splitByTag": true,
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/dns/zones",
+          "op": "GET /v1/dns/zones",
           "name": "ListDnsZonesV1",
           "params": [
             "sort"
@@ -10990,44 +10990,44 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/dns/zones",
+          "op": "POST /v1/dns/zones",
           "name": "CreateDnsZoneV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/dns/zones/{id}",
+          "op": "GET /v1/dns/zones/{id}",
           "name": "GetDnsZoneV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/dns/zones/{id}",
+          "op": "PATCH /v1/dns/zones/{id}",
           "name": "UpdateDnsZoneV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/dns/zones/{id}",
+          "op": "DELETE /v1/dns/zones/{id}",
           "name": "DeleteDnsZoneV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/dns/search-domains",
+          "op": "GET /v1/dns/search-domains",
           "name": "GetDnsSearchDomainV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/dns/search-domains",
+          "op": "PUT /v1/dns/search-domains",
           "name": "SetDnsSearchDomainV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/dns/search-domains",
+          "op": "DELETE /v1/dns/search-domains",
           "name": "ClearDnsSearchDomainV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/dns/custom-hostname-mappings",
+          "op": "GET /v1/dns/custom-hostname-mappings",
           "name": "GetDnsCustomHostnameMappingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/dns/custom-hostname-mappings",
+          "op": "PUT /v1/dns/custom-hostname-mappings",
           "name": "ReplaceDnsCustomHostnameMappingsV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/dns/custom-hostname-mappings",
+          "op": "DELETE /v1/dns/custom-hostname-mappings",
           "name": "ClearDnsCustomHostnameMappingsV1"
         }
       ]
@@ -11040,7 +11040,7 @@
       "splitByTag": true,
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/gateways",
+          "op": "GET /v1/ztna/gateways",
           "name": "ListZtnaGatewaysV1",
           "resolver": {
             "resourceType": "ZtnaGatewayV1",
@@ -11058,28 +11058,28 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/ztna/gateways",
+          "op": "POST /v1/ztna/gateways",
           "name": "CreateZtnaGatewayV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "op": "GET /v1/ztna/gateways/{gatewayId}",
           "name": "GetZtnaGatewayV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "op": "PATCH /v1/ztna/gateways/{gatewayId}",
           "name": "UpdateZtnaGatewayV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/ztna/gateways/{gatewayId}",
+          "op": "DELETE /v1/ztna/gateways/{gatewayId}",
           "name": "DeleteZtnaGatewayV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/shared-gateways",
+          "op": "GET /v1/ztna/shared-gateways",
           "name": "ListZtnaSharedGatewaysV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/grouped-gateways",
+          "op": "GET /v1/ztna/grouped-gateways",
           "name": "ListZtnaGroupedGatewaysV1",
           "resolver": {
             "resourceType": "ZtnaGroupedGatewayV1",
@@ -11097,24 +11097,24 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/ztna/grouped-gateways",
+          "op": "POST /v1/ztna/grouped-gateways",
           "name": "CreateZtnaGroupedGatewayV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "op": "GET /v1/ztna/grouped-gateways/{groupedGatewayId}",
           "name": "GetZtnaGroupedGatewayV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "op": "PATCH /v1/ztna/grouped-gateways/{groupedGatewayId}",
           "name": "UpdateZtnaGroupedGatewayV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/ztna/grouped-gateways/{groupedGatewayId}",
+          "op": "DELETE /v1/ztna/grouped-gateways/{groupedGatewayId}",
           "name": "DeleteZtnaGroupedGatewayV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/apps",
+          "op": "GET /v1/ztna/apps",
           "name": "ListZtnaAppsV1",
           "pagination": "totalCount",
           "resolver": {
@@ -11133,24 +11133,24 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/ztna/apps",
+          "op": "POST /v1/ztna/apps",
           "name": "CreateZtnaAppV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/apps/{appId}",
+          "op": "GET /v1/ztna/apps/{appId}",
           "name": "GetZtnaAppV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/ztna/apps/{appId}",
+          "op": "PATCH /v1/ztna/apps/{appId}",
           "name": "UpdateZtnaAppV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/ztna/apps/{appId}",
+          "op": "DELETE /v1/ztna/apps/{appId}",
           "name": "DeleteZtnaAppV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ztna/predefined-apps",
+          "op": "GET /v1/ztna/predefined-apps",
           "name": "ListZtnaPredefinedAppsV1"
         }
       ]
@@ -11163,7 +11163,7 @@
       "splitByTag": true,
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/categories",
+          "op": "GET /v1/categories",
           "name": "ListContentCategoriesV1",
           "resolver": {
             "resourceType": "ContentCategoryV1",
@@ -11183,7 +11183,7 @@
       "splitByTag": true,
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/groups",
+          "op": "GET /v1/groups",
           "name": "ListDeviceGroupsV1",
           "resolver": {
             "resourceType": "DeviceGroupV1",
@@ -11201,11 +11201,11 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/groups",
+          "op": "POST /v1/groups",
           "name": "CreateDeviceGroupV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/groups",
+          "op": "GET /v2/groups",
           "name": "ListDeviceGroupsV2",
           "resolver": {
             "resourceType": "DeviceGroupV2",
@@ -11224,17 +11224,17 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/groups/{groupId}",
+          "op": "GET /v1/groups/{groupId}",
           "name": "GetDeviceGroupV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/groups/{groupId}",
+          "op": "PUT /v1/groups/{groupId}",
           "name": "UpdateDeviceGroupV1",
           "expectedStatus": 200,
           "responseType": "Group"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/groups/{groupId}",
+          "op": "DELETE /v1/groups/{groupId}",
           "name": "DeleteDeviceGroupV1"
         }
       ]
@@ -11250,52 +11250,52 @@
       },
       "operations": [
         {
-          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors",
+          "op": "GET /uem-connect/v1/connectors",
           "name": "ListUemConnectorsV1"
         },
         {
-          "op": "POST /tenant/{tenantId}/uem-connect/v1/connectors",
+          "op": "POST /uem-connect/v1/connectors",
           "name": "CreateUemConnectorV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors/{configId}",
+          "op": "GET /uem-connect/v1/connectors/{configId}",
           "name": "GetUemConnectorV1"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/uem-connect/v1/connectors/{configId}",
+          "op": "DELETE /uem-connect/v1/connectors/{configId}",
           "name": "DeleteUemConnectorV1"
         },
         {
-          "op": "PUT /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/enablement",
+          "op": "PUT /uem-connect/v1/connectors/{configId}/enablement",
           "name": "EnableUemConnectorV1"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/enablement",
+          "op": "DELETE /uem-connect/v1/connectors/{configId}/enablement",
           "name": "DisableUemConnectorV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync-settings",
+          "op": "GET /uem-connect/v1/connectors/{configId}/sync-settings",
           "name": "GetUemConnectorSyncSettingsV1"
         },
         {
-          "op": "PUT /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync-settings",
+          "op": "PUT /uem-connect/v1/connectors/{configId}/sync-settings",
           "name": "UpdateUemConnectorSyncSettingsV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync/runs",
+          "op": "GET /uem-connect/v1/connectors/{configId}/sync/runs",
           "name": "ListUemConnectorSyncRunsV1",
           "pagination": "totalCount"
         },
         {
-          "op": "POST /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync/runs",
+          "op": "POST /uem-connect/v1/connectors/{configId}/sync/runs",
           "name": "TriggerUemConnectorSyncV1"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/uem-connect/v1/connectors/{configId}/sync/runs/current",
+          "op": "DELETE /uem-connect/v1/connectors/{configId}/sync/runs/current",
           "name": "CancelUemConnectorSyncV1"
         },
         {
-          "op": "POST /tenant/{tenantId}/uem-connect/v1/activation-profiles/{code}/deploy-to-uem",
+          "op": "POST /uem-connect/v1/activation-profiles/{code}/deploy-to-uem",
           "name": "DeployActivationProfileToUemV1"
         }
       ],

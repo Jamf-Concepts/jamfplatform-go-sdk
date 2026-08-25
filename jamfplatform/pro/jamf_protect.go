@@ -21,7 +21,7 @@ import (
 // Required privileges: read:pro:jamf-protect-deployments, read:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Protect Settings, Read Jamf Protect Deployments.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetJamfProtectSettingsV1(ctx context.Context) (*ProtectSettingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ProtectSettingsResponse
 	endpoint := prefix + "/jamf-protect"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -34,7 +34,7 @@ func (c *Client) GetJamfProtectSettingsV1(ctx context.Context) (*ProtectSettings
 //
 // Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) UpdateJamfProtectSettingsV1(ctx context.Context, request *ProtectUpdatableSettingsRequest) (*ProtectSettingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ProtectSettingsResponse
 	endpoint := prefix + "/jamf-protect"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -47,7 +47,7 @@ func (c *Client) UpdateJamfProtectSettingsV1(ctx context.Context, request *Prote
 //
 // Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) UnregisterJamfProtectV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-protect"
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UnregisterJamfProtectV1: %w", err)
@@ -70,7 +70,7 @@ func (c *Client) UnregisterJamfProtectV1(ctx context.Context) error {
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListJamfProtectDeploymentTasksV1(ctx context.Context, id string, sort []string, filter string) ([]DeploymentTask, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]DeploymentTask, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -105,7 +105,7 @@ func (c *Client) ListJamfProtectDeploymentTasksV1(ctx context.Context, id string
 // Parameters:
 //   - id: the UUID of the deployment associated with the retry.
 func (c *Client) RetryJamfProtectDeploymentTasksV1(ctx context.Context, id string, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/jamf-protect/deployments/%s/tasks/retry", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("RetryJamfProtectDeploymentTasksV1(%s): %w", id, err)
@@ -127,7 +127,7 @@ func (c *Client) RetryJamfProtectDeploymentTasksV1(ctx context.Context, id strin
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListJamfProtectHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -159,7 +159,7 @@ func (c *Client) ListJamfProtectHistoryV1(ctx context.Context, sort []string, fi
 //
 // Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) CreateJamfProtectHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/jamf-protect/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -182,7 +182,7 @@ func (c *Client) CreateJamfProtectHistoryNoteV1(ctx context.Context, request *Ob
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListJamfProtectPlansV1(ctx context.Context, sort []string, filter string) ([]JamfProtectPlan, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]JamfProtectPlan, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -214,7 +214,7 @@ func (c *Client) ListJamfProtectPlansV1(ctx context.Context, sort []string, filt
 //
 // Required privileges: read:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Protect Settings.
 func (c *Client) SyncJamfProtectPlansV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-protect/plans/sync"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("SyncJamfProtectPlansV1: %w", err)
@@ -226,7 +226,7 @@ func (c *Client) SyncJamfProtectPlansV1(ctx context.Context) error {
 //
 // Required privileges: update:pro:jamf-protect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Protect Settings.
 func (c *Client) RegisterJamfProtectV1(ctx context.Context, request *ProtectRegistrationRequest) (*ProtectSettingsResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ProtectSettingsResponse
 	endpoint := prefix + "/jamf-protect/register"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {

@@ -87,11 +87,14 @@ var initJSCAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, erro
 		return nil, fmt.Errorf("%w: set JAMFPLATFORM_JSC_CLIENT_ID, JAMFPLATFORM_JSC_CLIENT_SECRET, JAMFPLATFORM_JSC_TENANT_ID (and JAMFPLATFORM_JSC_BASE_URL when it differs from JAMFPLATFORM_BASE_URL)", errAccJSCCredsUnset)
 	}
 
-	// The tenant goes to WithSecurityCloudTenantID rather than WithTenantID so
-	// this exercises the same option a dual-product consumer uses — a bug in
-	// the per-namespace override would otherwise only ever surface downstream.
+	// Plain WithTenantID: this client is built from Security Cloud credentials
+	// and only ever reaches /api/securitycloud, so there is nothing to scope
+	// per-namespace. The per-namespace override this used to exercise went away
+	// with header scoping — one credential set reaches one product (a Security
+	// Cloud client answers 403 on /api/pro and vice versa), so a single Client
+	// could never have served both regardless of how many tenant IDs it held.
 	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
-		jamfplatform.WithSecurityCloudTenantID(tenantID))
+		jamfplatform.WithTenantID(tenantID))
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate Security Cloud credentials: %w", err)
 	}

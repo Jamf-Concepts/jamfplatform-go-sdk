@@ -21,7 +21,7 @@ import (
 //   - startDate: Start date (e.g. yyyy-mm-dd).
 //   - endDate: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerApplicationUsageByID(ctx context.Context, id string, startDate string, endDate string) (*ComputerApplicationUsage, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplicationUsage
 	endpoint := fmt.Sprintf("%s/computerapplicationusage/id/%s/%s_%s", prefix, url.PathEscape(id), url.PathEscape(startDate), url.PathEscape(endDate))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -39,7 +39,7 @@ func (c *Client) GetComputerApplicationUsageByID(ctx context.Context, id string,
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerApplicationUsageByMacAddressDateRange(ctx context.Context, macaddress string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplicationUsage
 	endpoint := fmt.Sprintf("%s/computerapplicationusage/macaddress/%s/%s_%s", prefix, url.PathEscape(macaddress), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -57,7 +57,7 @@ func (c *Client) GetComputerApplicationUsageByMacAddressDateRange(ctx context.Co
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerApplicationUsageByNameDateRange(ctx context.Context, name string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplicationUsage
 	endpoint := fmt.Sprintf("%s/computerapplicationusage/name/%s/%s_%s", prefix, url.PathEscape(name), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -75,7 +75,7 @@ func (c *Client) GetComputerApplicationUsageByNameDateRange(ctx context.Context,
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerApplicationUsageBySerialNumberDateRange(ctx context.Context, serialnumber string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplicationUsage
 	endpoint := fmt.Sprintf("%s/computerapplicationusage/serialnumber/%s/%s_%s", prefix, url.PathEscape(serialnumber), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -93,7 +93,7 @@ func (c *Client) GetComputerApplicationUsageBySerialNumberDateRange(ctx context.
 //   - start_date: Start date (e.g. yyyy-mm-dd).
 //   - end_date: End date (e.g. yyyy-mm-dd).
 func (c *Client) GetComputerApplicationUsageByUDIDDateRange(ctx context.Context, udid string, start_date string, end_date string) (*ComputerApplicationUsage, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerApplicationUsage
 	endpoint := fmt.Sprintf("%s/computerapplicationusage/udid/%s/%s_%s", prefix, url.PathEscape(udid), url.PathEscape(start_date), url.PathEscape(end_date))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

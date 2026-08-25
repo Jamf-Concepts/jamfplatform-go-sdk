@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetDiskEncryptionConfigurationByID(ctx context.Context, id string) (*DiskEncryptionConfiguration, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DiskEncryptionConfiguration
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetDiskEncryptionConfigurationByID(ctx context.Context, id stri
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateDiskEncryptionConfigurationByID(ctx context.Context, id string, request *DiskEncryptionConfiguration) (*DiskEncryptionConfiguration, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DiskEncryptionConfiguration
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateDiskEncryptionConfigurationByID(ctx context.Context, id s
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateDiskEncryptionConfigurationByID(ctx context.Context, id string, request *DiskEncryptionConfiguration) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDiskEncryptionConfigurationByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateDiskEncryptionConfigurationByID(ctx context.Context, id s
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteDiskEncryptionConfigurationByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDiskEncryptionConfigurationByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteDiskEncryptionConfigurationByID(ctx context.Context, id s
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetDiskEncryptionConfigurationByName(ctx context.Context, name string) (*DiskEncryptionConfiguration, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DiskEncryptionConfiguration
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetDiskEncryptionConfigurationByName(ctx context.Context, name 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateDiskEncryptionConfigurationByName(ctx context.Context, name string, request *DiskEncryptionConfiguration) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDiskEncryptionConfigurationByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateDiskEncryptionConfigurationByName(ctx context.Context, na
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteDiskEncryptionConfigurationByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDiskEncryptionConfigurationByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteDiskEncryptionConfigurationByName(ctx context.Context, na
 //
 // Required privileges: read:pro:disk-encryption-configurations.
 func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEncryptionConfigurations, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DiskEncryptionConfigurations
 	endpoint := prefix + "/diskencryptionconfigurations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEnc
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateDiskEncryptionConfigurationByName(ctx context.Context, name string, request *DiskEncryptionConfiguration) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/diskencryptionconfigurations/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateDiskEncryptionConfigurationByName(%s): %w", name, err)

@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:jsc:all.
 func (c *Client) ListZtnaPredefinedAppsV1(ctx context.Context) (*PredefinedAppListResponse, error) {
-	prefix := c.transport.TenantPrefix("securitycloud", "v1")
+	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result PredefinedAppListResponse
 	endpoint := prefix + "/ztna/predefined-apps"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

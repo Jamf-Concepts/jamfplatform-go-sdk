@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetEbookByID(ctx context.Context, id string) (*Ebook, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ebook
 	endpoint := fmt.Sprintf("%s/ebooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetEbookByID(ctx context.Context, id string) (*Ebook, error) {
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateEbookByID(ctx context.Context, id string, request *EbookPost) (*Ebook, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ebook
 	endpoint := fmt.Sprintf("%s/ebooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateEbookByID(ctx context.Context, id string, request *EbookP
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateEbookByID(ctx context.Context, id string, request *EbookPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateEbookByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateEbookByID(ctx context.Context, id string, request *EbookP
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteEbookByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteEbookByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteEbookByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetEbookByName(ctx context.Context, name string) (*Ebook, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ebook
 	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetEbookByName(ctx context.Context, name string) (*Ebook, error
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateEbookByName(ctx context.Context, name string, request *EbookPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateEbookByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateEbookByName(ctx context.Context, name string, request *Eb
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteEbookByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteEbookByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteEbookByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:ebooks.
 func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ebooks
 	endpoint := prefix + "/ebooks"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -145,7 +145,7 @@ func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "Scope", "SelfService".
 func (c *Client) GetEbookByIDSubset(ctx context.Context, id string, subset string) (*Ebook, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ebook
 	endpoint := fmt.Sprintf("%s/ebooks/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -161,7 +161,7 @@ func (c *Client) GetEbookByIDSubset(ctx context.Context, id string, subset strin
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateEbookByName(ctx context.Context, name string, request *EbookPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ebooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateEbookByName(%s): %w", name, err)

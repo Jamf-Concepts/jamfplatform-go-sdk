@@ -21,7 +21,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetComputerByID(ctx context.Context, id string) (*Computer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computer
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -39,7 +39,7 @@ func (c *Client) GetComputerByID(ctx context.Context, id string) (*Computer, err
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetComputerByName(ctx context.Context, name string) (*Computer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computer
 	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -57,7 +57,7 @@ func (c *Client) GetComputerByName(ctx context.Context, name string) (*Computer,
 // Parameters:
 //   - serialNumber: Serial number to filter by.
 func (c *Client) GetComputerBySerialNumber(ctx context.Context, serialNumber string) (*Computer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computer
 	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -74,7 +74,7 @@ func (c *Client) GetComputerBySerialNumber(ctx context.Context, serialNumber str
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateComputerByID(ctx context.Context, id string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerByID(%s): %w", id, err)
@@ -92,7 +92,7 @@ func (c *Client) CreateComputerByID(ctx context.Context, id string, request *Com
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateComputerByID(ctx context.Context, id string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerByID(%s): %w", id, err)
@@ -110,7 +110,7 @@ func (c *Client) UpdateComputerByID(ctx context.Context, id string, request *Com
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateComputerByName(ctx context.Context, name string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerByName(%s): %w", name, err)
@@ -125,7 +125,7 @@ func (c *Client) UpdateComputerByName(ctx context.Context, name string, request 
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteComputerByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerByID(%s): %w", id, err)
@@ -142,7 +142,7 @@ func (c *Client) DeleteComputerByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteComputerByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerByName(%s): %w", name, err)
@@ -159,7 +159,7 @@ func (c *Client) DeleteComputerByName(ctx context.Context, name string) error {
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
 func (c *Client) DeleteComputerBySerialNumber(ctx context.Context, serialNumber string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerBySerialNumber(%s): %w", serialNumber, err)
@@ -173,7 +173,7 @@ func (c *Client) DeleteComputerBySerialNumber(ctx context.Context, serialNumber 
 //
 // Required privileges: read:pro:computers.
 func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computers
 	endpoint := prefix + "/computers"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -194,7 +194,7 @@ func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
 //     Allowed values: "General", "Location", "Purchasing", "Peripherals", "Hardware", "Certificates",
 //     "Software", "ExtensionAttributes", "GroupsAccounts", "iphones", "ConfigurationProfiles".
 func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset string) (*Computer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computer
 	endpoint := fmt.Sprintf("%s/computers/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -212,7 +212,7 @@ func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset st
 // Parameters:
 //   - macaddress: Mac address to filter by.
 func (c *Client) GetComputerByMacAddress(ctx context.Context, macaddress string) (*Computer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computer
 	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -230,7 +230,7 @@ func (c *Client) GetComputerByMacAddress(ctx context.Context, macaddress string)
 // Parameters:
 //   - udid: UDID to filter by.
 func (c *Client) GetComputerByUDID(ctx context.Context, udid string) (*Computer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computer
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -245,7 +245,7 @@ func (c *Client) GetComputerByUDID(ctx context.Context, udid string) (*Computer,
 //
 // Required privileges: read:pro:computers.
 func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputersBasic
 	endpoint := prefix + "/computers/subset/basic"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -264,7 +264,7 @@ func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error)
 //   - match: Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.
 //     For instance, admin* can be used to match computer names that begin with admin.
 func (c *Client) MatchComputers(ctx context.Context, match string) (*Computers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computers
 	endpoint := fmt.Sprintf("%s/computers/match/%s", prefix, url.PathEscape(match))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -282,7 +282,7 @@ func (c *Client) MatchComputers(ctx context.Context, match string) (*Computers, 
 // Parameters:
 //   - matchName: Name to filter by.
 func (c *Client) MatchComputersByName(ctx context.Context, matchName string) (*Computers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computers
 	endpoint := fmt.Sprintf("%s/computers/match/name/%s", prefix, url.PathEscape(matchName))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -299,7 +299,7 @@ func (c *Client) MatchComputersByName(ctx context.Context, matchName string) (*C
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateComputerByName(ctx context.Context, name string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerByName(%s): %w", name, err)
@@ -315,7 +315,7 @@ func (c *Client) CreateComputerByName(ctx context.Context, name string, request 
 // Parameters:
 //   - serialNumber: ID value to filter by.
 func (c *Client) CreateComputerBySerialNumber(ctx context.Context, serialNumber string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerBySerialNumber(%s): %w", serialNumber, err)
@@ -331,7 +331,7 @@ func (c *Client) CreateComputerBySerialNumber(ctx context.Context, serialNumber 
 // Parameters:
 //   - macaddress: ID value to filter by.
 func (c *Client) CreateComputerByMacAddress(ctx context.Context, macaddress string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerByMacAddress(%s): %w", macaddress, err)
@@ -347,7 +347,7 @@ func (c *Client) CreateComputerByMacAddress(ctx context.Context, macaddress stri
 // Parameters:
 //   - udid: ID value to filter by.
 func (c *Client) CreateComputerByUDID(ctx context.Context, udid string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerByUDID(%s): %w", udid, err)
@@ -365,7 +365,7 @@ func (c *Client) CreateComputerByUDID(ctx context.Context, udid string, request 
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
 func (c *Client) UpdateComputerBySerialNumber(ctx context.Context, serialNumber string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerBySerialNumber(%s): %w", serialNumber, err)
@@ -383,7 +383,7 @@ func (c *Client) UpdateComputerBySerialNumber(ctx context.Context, serialNumber 
 // Parameters:
 //   - macaddress: MAC address value to filter by.
 func (c *Client) UpdateComputerByMacAddress(ctx context.Context, macaddress string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerByMacAddress(%s): %w", macaddress, err)
@@ -401,7 +401,7 @@ func (c *Client) UpdateComputerByMacAddress(ctx context.Context, macaddress stri
 // Parameters:
 //   - udid: UDID value to filter by.
 func (c *Client) UpdateComputerByUDID(ctx context.Context, udid string, request *ComputerPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerByUDID(%s): %w", udid, err)
@@ -418,7 +418,7 @@ func (c *Client) UpdateComputerByUDID(ctx context.Context, udid string, request 
 // Parameters:
 //   - macaddress: MAC address value to filter by.
 func (c *Client) DeleteComputerByMacAddress(ctx context.Context, macaddress string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/macaddress/%s", prefix, url.PathEscape(macaddress))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerByMacAddress(%s): %w", macaddress, err)
@@ -435,7 +435,7 @@ func (c *Client) DeleteComputerByMacAddress(ctx context.Context, macaddress stri
 // Parameters:
 //   - udid: UDID value to filter by.
 func (c *Client) DeleteComputerByUDID(ctx context.Context, udid string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerByUDID(%s): %w", udid, err)

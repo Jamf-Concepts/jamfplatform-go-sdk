@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: update:pro:pki. Legacy Jamf Pro privilege name(s): Update PKI.
 func (c *Client) CreateVenafiV1(ctx context.Context, request *VenafiCaRecord) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/pki/venafi"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -36,7 +36,7 @@ func (c *Client) CreateVenafiV1(ctx context.Context, request *VenafiCaRecord) (*
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) GetVenafiV1(ctx context.Context, id string) (*VenafiCaRecord, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VenafiCaRecord
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -52,7 +52,7 @@ func (c *Client) GetVenafiV1(ctx context.Context, id string) (*VenafiCaRecord, e
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) UpdateVenafiV1(ctx context.Context, id string, request *VenafiCaRecord) (*VenafiCaRecord, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VenafiCaRecord
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -68,7 +68,7 @@ func (c *Client) UpdateVenafiV1(ctx context.Context, id string, request *VenafiC
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) DeleteVenafiV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteVenafiV1(%s): %w", id, err)
@@ -83,7 +83,7 @@ func (c *Client) DeleteVenafiV1(ctx context.Context, id string) error {
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) GetVenafiConnectionStatusV1(ctx context.Context, id string) (*VenafiServiceStatus, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VenafiServiceStatus
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/connection-status", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -99,7 +99,7 @@ func (c *Client) GetVenafiConnectionStatusV1(ctx context.Context, id string) (*V
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) GetVenafiDependentProfilesV1(ctx context.Context, id string) (*VenafiPkiPayloadRecordSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VenafiPkiPayloadRecordSearchResults
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/dependent-profiles", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -121,7 +121,7 @@ func (c *Client) GetVenafiDependentProfilesV1(ctx context.Context, id string) (*
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListVenafiHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -156,7 +156,7 @@ func (c *Client) ListVenafiHistoryV1(ctx context.Context, id string, sort []stri
 // Parameters:
 //   - id: instance id of Venafi CA history record.
 func (c *Client) CreateVenafiHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -172,7 +172,7 @@ func (c *Client) CreateVenafiHistoryNoteV1(ctx context.Context, id string, reque
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) GetVenafiJamfPublicKeyV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/jamf-public-key", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -188,7 +188,7 @@ func (c *Client) GetVenafiJamfPublicKeyV1(ctx context.Context, id string) ([]byt
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) RegenerateVenafiJamfPublicKeyV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/jamf-public-key/regenerate", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("RegenerateVenafiJamfPublicKeyV1(%s): %w", id, err)
@@ -203,7 +203,7 @@ func (c *Client) RegenerateVenafiJamfPublicKeyV1(ctx context.Context, id string)
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) GetVenafiProxyTrustStoreV1(ctx context.Context, id string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/proxy-trust-store", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -219,7 +219,7 @@ func (c *Client) GetVenafiProxyTrustStoreV1(ctx context.Context, id string) ([]b
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) UploadVenafiProxyTrustStoreV1(ctx context.Context, id string, body []byte) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/proxy-trust-store", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, body, "application/pem-certificate-chain", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UploadVenafiProxyTrustStoreV1(%s): %w", id, err)
@@ -234,7 +234,7 @@ func (c *Client) UploadVenafiProxyTrustStoreV1(ctx context.Context, id string, b
 // Parameters:
 //   - id: ID of the Venafi configuration.
 func (c *Client) DeleteVenafiProxyTrustStoreV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/pki/venafi/%s/proxy-trust-store", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteVenafiProxyTrustStoreV1(%s): %w", id, err)

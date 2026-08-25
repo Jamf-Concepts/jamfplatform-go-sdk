@@ -14,12 +14,12 @@ import (
 
 // DeployActivationProfileToUemV1 deploy Jamf Security configuration profiles to UEM.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: uem-connect:update.
 //
 // Parameters:
 //   - code: The activation profile code obtained from the Jamf Security setup flow.
 func (c *Client) DeployActivationProfileToUemV1(ctx context.Context, code string, request *ActivationProfileDeployRequest) error {
-	prefix := c.transport.TenantPrefix("securitycloud", "")
+	prefix := c.transport.APIPrefix("securitycloud", "")
 	endpoint := fmt.Sprintf("%s/uem-connect/v1/activation-profiles/%s/deploy-to-uem", prefix, url.PathEscape(code))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeployActivationProfileToUemV1(%s): %w", code, err)

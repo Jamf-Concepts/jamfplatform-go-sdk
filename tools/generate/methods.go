@@ -1201,7 +1201,7 @@ func stripVersionPrefix(path string) string {
 // stripTenantPathSegment removes a leading /tenant/{param} segment left after
 // stripVersionPrefix when specs embed the tenant placeholder in the path
 // (e.g. /v1/tenant/{tenantId}/blueprints → /blueprints). The tenantId is
-// already injected by TenantPrefix, so it must not appear in ResourcePath.
+// already injected by APIPrefix, so it must not appear in ResourcePath.
 func stripTenantPathSegment(path string) string {
 	return tenantPathSegmentRe.ReplaceAllString(path, "")
 }

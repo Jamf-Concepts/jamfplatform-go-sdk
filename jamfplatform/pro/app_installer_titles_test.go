@@ -13,7 +13,7 @@ import (
 
 func TestListAppInstallerTitlesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/titles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/titles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListAppInstallerTitlesV1(t *testing.T) {
 
 func TestGetAppInstallerTitleV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/titles/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/titles/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestGetAppInstallerTitleV1(t *testing.T) {
 
 func TestGetAppInstallerTitleV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/titles/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/titles/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -69,7 +69,7 @@ func TestGetAppInstallerTitleV1_NotFound(t *testing.T) {
 
 func TestResolveAppInstallerTitleV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/titles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/titles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -92,7 +92,7 @@ func TestResolveAppInstallerTitleV1IDByName(t *testing.T) {
 
 func TestResolveAppInstallerTitleV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/titles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/titles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

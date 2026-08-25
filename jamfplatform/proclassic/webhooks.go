@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetWebhookByID(ctx context.Context, id string) (*Webhook, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Webhook
 	endpoint := fmt.Sprintf("%s/webhooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetWebhookByID(ctx context.Context, id string) (*Webhook, error
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateWebhookByID(ctx context.Context, id string, request *Webhook) (*Webhook, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Webhook
 	endpoint := fmt.Sprintf("%s/webhooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateWebhookByID(ctx context.Context, id string, request *Webh
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateWebhookByID(ctx context.Context, id string, request *Webhook) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateWebhookByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateWebhookByID(ctx context.Context, id string, request *Webh
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteWebhookByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteWebhookByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteWebhookByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetWebhookByName(ctx context.Context, name string) (*Webhook, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Webhook
 	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetWebhookByName(ctx context.Context, name string) (*Webhook, e
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateWebhookByName(ctx context.Context, name string, request *Webhook) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateWebhookByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateWebhookByName(ctx context.Context, name string, request *
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteWebhookByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteWebhookByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteWebhookByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:webhooks.
 func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Webhooks
 	endpoint := prefix + "/webhooks"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateWebhookByName(ctx context.Context, name string, request *Webhook) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/webhooks/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateWebhookByName(%s): %w", name, err)
