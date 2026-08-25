@@ -174,6 +174,9 @@ func WithFileCookieJar(dir string) Option {
 // product, and some surfaces are only reachable that way — but new integrations
 // should not choose it by default.
 //
+// Mutually exclusive with WithEnvironmentID. If both are set, environment wins
+// regardless of the order they are passed in; see WithEnvironmentID.
+//
 // The gateway used to take the tenant from the URL path
 // (/api/{namespace}/{version}/tenant/{tenantID}); it moved to a header at the
 // Platform API GA. When neither scope option is set, no scope header is sent
@@ -197,8 +200,15 @@ func WithTenantID(id string) Option {
 // The header must match the credential. An integration is minted against one
 // scope, and crossing over is refused with 403 OWNERSHIP_FORBIDDEN even when
 // both IDs belong to the same customer, so this is a choice between two
-// integrations rather than two IDs for one. Setting both options is not
-// meaningful — the last one wins, because a client carries exactly one scope.
+// integrations rather than two IDs for one.
+//
+// The two scopes are mutually exclusive: a client carries exactly one, and
+// exactly one scope header is ever sent. Setting both this and WithTenantID is
+// a configuration mistake rather than a combination — **environment takes
+// precedence**, whichever order the options are passed in, because a client
+// built from an environment-scoped credential cannot use a tenant header
+// anyway. Callers that can validate their own input should reject the pair up
+// front instead of relying on that precedence.
 func WithEnvironmentID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.environmentID = id
