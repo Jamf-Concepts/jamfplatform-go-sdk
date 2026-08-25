@@ -90,3 +90,34 @@ func TestWithTenantID(t *testing.T) {
 		t.Errorf("tenantID = %q, want tenant-uuid", got)
 	}
 }
+
+// TestScopeOptionsAreMutuallyExclusive pins the precedence the option godoc
+// promises. A client carries exactly one scope, so setting both WithTenantID
+// and WithEnvironmentID is a configuration mistake rather than a combination —
+// environment wins, and it wins regardless of the order the options are passed,
+// because NewClient applies them in a fixed order rather than the caller's.
+//
+// Worth pinning because the mechanism is invisible at the call site: a reader
+// would reasonably expect last-one-wins, and swapping the two blocks in
+// NewClient would silently invert the behaviour with no test failing.
+func TestScopeOptionsAreMutuallyExclusive(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		opts []Option
+		want string
+	}{
+		{"tenant only", []Option{WithTenantID("T-1")}, "T-1"},
+		{"environment only", []Option{WithEnvironmentID("E-1")}, ""},
+		{"tenant then environment", []Option{WithTenantID("T-1"), WithEnvironmentID("E-1")}, ""},
+		{"environment then tenant", []Option{WithEnvironmentID("E-1"), WithTenantID("T-1")}, ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := NewClient("https://example.invalid", "id", "secret", tc.opts...)
+			// TenantID() reports a value only when the scope really is a tenant,
+			// so an empty result means the client ended up environment-scoped.
+			if got := c.transport.TenantID(); got != tc.want {
+				t.Errorf("TenantID() = %q, want %q — scope precedence changed", got, tc.want)
+			}
+		})
+	}
+}

@@ -38,26 +38,105 @@ var runSuffix = sync.OnceValue(func() string {
 // having executed zero assertions against the tenant.
 var errAccCredsUnset = errors.New("acceptance credentials not configured")
 
-// initAcceptanceClient creates and validates the singleton acceptance client once.
+// initAcceptanceClient creates and validates the singleton acceptance client
+// once, preferring environment scope over tenant scope.
+//
+// Environment is becoming the predominant Jamf scope, with tenant the fallback,
+// so the suite follows the same order: when a complete environment credential
+// set is configured it is used, otherwise the tenant set is. A credential is
+// minted against one scope and the header must match it, so this is a choice
+// between two integrations rather than two IDs for one — see
+// WithEnvironmentID.
+//
+// The consequence worth knowing before configuring the environment secrets:
+// every test using accClient switches scope at that moment, and an environment
+// credential generally reaches a different Jamf Pro instance with different
+// data. Expect fixture-dependent tests to change behaviour, and read
+// accScopeInUse in the log before concluding that the secrets broke CI.
 var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
+	envBase, envID := os.Getenv("JAMFPLATFORM_ENV_BASE_URL"), os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID")
+	envClient, envSecret := os.Getenv("JAMFPLATFORM_ENV_CLIENT_ID"), os.Getenv("JAMFPLATFORM_ENV_CLIENT_SECRET")
+	if envBase == "" {
+		envBase = os.Getenv("JAMFPLATFORM_BASE_URL")
+	}
+	if envBase != "" && envClient != "" && envSecret != "" && envID != "" {
+		c := jamfplatform.NewClient(envBase, envClient, envSecret, jamfplatform.WithEnvironmentID(envID))
+		if err := c.ValidateCredentials(context.Background()); err != nil {
+			return nil, fmt.Errorf("failed to validate environment-scoped credentials: %w", err)
+		}
+		accScopeInUse = "environment " + envID
+		return c, nil
+	}
+
 	baseURL := os.Getenv("JAMFPLATFORM_BASE_URL")
 	clientID := os.Getenv("JAMFPLATFORM_CLIENT_ID")
 	clientSecret := os.Getenv("JAMFPLATFORM_CLIENT_SECRET")
 	tenantID := os.Getenv("JAMFPLATFORM_TENANT_ID")
 
 	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
-		return nil, fmt.Errorf("%w: set JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID", errAccCredsUnset)
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID (or the JAMFPLATFORM_ENV_* set for environment scope)", errAccCredsUnset)
 	}
 
-	opts := []jamfplatform.Option{jamfplatform.WithTenantID(tenantID)}
-
-	c := jamfplatform.NewClient(baseURL, clientID, clientSecret, opts...)
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret, jamfplatform.WithTenantID(tenantID))
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate credentials: %w", err)
 	}
-
+	accScopeInUse = "tenant " + tenantID
 	return c, nil
 })
+
+// accScopeInUse records which scope initAcceptanceClient settled on, so a run
+// says so out loud. A silent switch between scopes would be indistinguishable
+// from the tenant's data changing underneath the suite.
+var accScopeInUse = "(client not yet built)"
+
+// errAccEnvCredsUnset marks an absent environment-scoped credential set, the
+// same way errAccCredsUnset marks an absent tenant one.
+var errAccEnvCredsUnset = errors.New("environment-scoped acceptance credentials not configured")
+
+// initEnvAcceptanceClient creates and validates the singleton environment-scoped
+// acceptance client.
+//
+// This needs its own credential set, not just a second ID: a credential is
+// minted against one scope, and the gateway refuses a header that disagrees with
+// it — an environment-scoped integration sending X-Tenant-Id, or a tenant-scoped
+// one sending X-Environment-Id, gets 403 OWNERSHIP_FORBIDDEN even when both IDs
+// belong to the same customer. Wire-verified against securitycloud in prod on
+// 2026-08-25, which is what TestAcceptance_EnvironmentScope pins.
+var initEnvAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
+	baseURL := os.Getenv("JAMFPLATFORM_ENV_BASE_URL")
+	if baseURL == "" {
+		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+	}
+	clientID := os.Getenv("JAMFPLATFORM_ENV_CLIENT_ID")
+	clientSecret := os.Getenv("JAMFPLATFORM_ENV_CLIENT_SECRET")
+	environmentID := os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID")
+
+	if baseURL == "" || clientID == "" || clientSecret == "" || environmentID == "" {
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ENV_CLIENT_ID, JAMFPLATFORM_ENV_CLIENT_SECRET, JAMFPLATFORM_ENVIRONMENT_ID (and JAMFPLATFORM_ENV_BASE_URL when it differs from JAMFPLATFORM_BASE_URL)", errAccEnvCredsUnset)
+	}
+
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+		jamfplatform.WithEnvironmentID(environmentID))
+	if err := c.ValidateCredentials(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed to validate environment-scoped credentials: %w", err)
+	}
+	return c, nil
+})
+
+// accEnvClient returns a live environment-scoped client. Unset credentials skip;
+// supplied-but-rejected credentials fail, the same distinction accClient draws.
+func accEnvClient(t *testing.T) *jamfplatform.Client {
+	t.Helper()
+	c, err := initEnvAcceptanceClient()
+	switch {
+	case errors.Is(err, errAccEnvCredsUnset):
+		t.Skipf("Skipping environment-scope acceptance test: %v", err)
+	case err != nil:
+		t.Fatal(credentialRejectedMessage(err))
+	}
+	return c
+}
 
 // egressIP reports this host's public egress IP, resolved once per run because a
 // rejected credential fails every test in the suite and a per-test lookup would
@@ -124,8 +203,17 @@ func accClient(t *testing.T) *jamfplatform.Client {
 	case err != nil:
 		t.Fatal(credentialRejectedMessage(err))
 	}
+	logAccScopeOnce()
 	return c
 }
+
+// logAccScopeOnce announces the scope the suite is running under, once per run.
+// Which scope is active changes what data every accClient test sees, so a run
+// that does not say so leaves a scope switch looking like the tenant's data
+// having changed.
+var logAccScopeOnce = sync.OnceFunc(func() {
+	fmt.Fprintf(os.Stderr, "acceptance: running under %s scope\n", accScopeInUse)
+})
 
 // skipOnServerError skips the test if err is an API 5xx response.
 // Use instead of t.Fatalf for API calls that may hit transient server bugs.
