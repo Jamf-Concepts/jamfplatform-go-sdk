@@ -13,7 +13,7 @@ import (
 
 // ListZtnaPredefinedAppsV1 list Predefined Apps.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 func (c *Client) ListZtnaPredefinedAppsV1(ctx context.Context) (*PredefinedAppListResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result PredefinedAppListResponse

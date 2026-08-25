@@ -17,7 +17,7 @@ import (
 
 // ListZtnaGroupedGatewaysV1 list Grouped Gateways.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 func (c *Client) ListZtnaGroupedGatewaysV1(ctx context.Context) (*GroupedGatewayListResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result GroupedGatewayListResponse
@@ -30,7 +30,7 @@ func (c *Client) ListZtnaGroupedGatewaysV1(ctx context.Context) (*GroupedGateway
 
 // CreateZtnaGroupedGatewayV1 create a Grouped Gateway.
 //
-// Required privileges: create:jsc:all.
+// Required privileges: ztna:create.
 func (c *Client) CreateZtnaGroupedGatewayV1(ctx context.Context, request *GroupedGatewayCreateRequest) (*CreateResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CreateResponse
@@ -43,7 +43,7 @@ func (c *Client) CreateZtnaGroupedGatewayV1(ctx context.Context, request *Groupe
 
 // GetZtnaGroupedGatewayV1 get a Grouped Gateway.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 //
 // Parameters:
 //   - groupedGatewayID: ID of the Grouped Gateway. Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
@@ -59,7 +59,7 @@ func (c *Client) GetZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayID s
 
 // UpdateZtnaGroupedGatewayV1 partially update a Grouped Gateway.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: ztna:update.
 //
 // Parameters:
 //   - groupedGatewayID: ID of the Grouped Gateway. Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
@@ -74,7 +74,7 @@ func (c *Client) UpdateZtnaGroupedGatewayV1(ctx context.Context, groupedGatewayI
 
 // DeleteZtnaGroupedGatewayV1 delete a Grouped Gateway.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: ztna:delete.
 //
 // Parameters:
 //   - groupedGatewayID: ID of the Grouped Gateway. Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).

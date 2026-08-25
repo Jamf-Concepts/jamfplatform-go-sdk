@@ -17,7 +17,7 @@ import (
 
 // ListZtnaGatewaysV1 list Gateways.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 func (c *Client) ListZtnaGatewaysV1(ctx context.Context) (*GatewayListResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result GatewayListResponse
@@ -30,7 +30,7 @@ func (c *Client) ListZtnaGatewaysV1(ctx context.Context) (*GatewayListResponse, 
 
 // CreateZtnaGatewayV1 create a Gateway.
 //
-// Required privileges: create:jsc:all.
+// Required privileges: ztna:create.
 func (c *Client) CreateZtnaGatewayV1(ctx context.Context, request *GatewayCreateRequest) (*CreateResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CreateResponse
@@ -43,7 +43,7 @@ func (c *Client) CreateZtnaGatewayV1(ctx context.Context, request *GatewayCreate
 
 // GetZtnaGatewayV1 get a Gateway.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 //
 // Parameters:
 //   - gatewayID: ID of the Gateway (obtained from `GET /gateways` or a create response). Format: 4-character
@@ -60,7 +60,7 @@ func (c *Client) GetZtnaGatewayV1(ctx context.Context, gatewayID string) (*Gatew
 
 // UpdateZtnaGatewayV1 partially update a Gateway.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: ztna:update.
 //
 // Parameters:
 //   - gatewayID: ID of the Gateway (obtained from `GET /gateways` or a create response). Format: 4-character
@@ -76,7 +76,7 @@ func (c *Client) UpdateZtnaGatewayV1(ctx context.Context, gatewayID string, requ
 
 // DeleteZtnaGatewayV1 delete a Gateway.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: ztna:delete.
 //
 // Parameters:
 //   - gatewayID: ID of the Gateway (obtained from `GET /gateways` or a create response). Format: 4-character

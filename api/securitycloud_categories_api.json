@@ -139,7 +139,7 @@
         "flows": {
           "clientCredentials": {
             "scopes": {
-              "read:jsc:all": ""
+              "content-categories:read": ""
             },
             "tokenUrl": "https://{region}.api.stage.platform.jamflabs.com/auth/token"
           }
@@ -162,7 +162,7 @@
   "paths": {
     "/v1/categories": {
       "get": {
-        "description": "List all content categories. Not paginated.\n\n**Required Permissions:** `read:jsc:all`",
+        "description": "List all content categories. Not paginated.\n\n**Required Permissions:** `content-categories:read`",
         "operationId": "listCategories",
         "parameters": [
           {
@@ -282,7 +282,7 @@
         "security": [
           {
             "oauth2": [
-              "read:jsc:all"
+              "content-categories:read"
             ]
           }
         ],
@@ -291,7 +291,7 @@
           "categories"
         ],
         "x-required-privileges": [
-          "read:jsc:all"
+          "content-categories:read"
         ]
       }
     }

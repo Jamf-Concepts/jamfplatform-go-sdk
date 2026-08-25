@@ -13,7 +13,7 @@ import (
 
 // GetDnsSearchDomainV1 get the Search Domain.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: search-domains:read.
 func (c *Client) GetDnsSearchDomainV1(ctx context.Context) (*SearchDomain, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result SearchDomain
@@ -26,7 +26,7 @@ func (c *Client) GetDnsSearchDomainV1(ctx context.Context) (*SearchDomain, error
 
 // SetDnsSearchDomainV1 set the Search Domain.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: search-domains:update.
 func (c *Client) SetDnsSearchDomainV1(ctx context.Context, request *SearchDomain) error {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/search-domains"
@@ -38,7 +38,7 @@ func (c *Client) SetDnsSearchDomainV1(ctx context.Context, request *SearchDomain
 
 // ClearDnsSearchDomainV1 clear the Search Domain.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: search-domains:delete.
 func (c *Client) ClearDnsSearchDomainV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/search-domains"

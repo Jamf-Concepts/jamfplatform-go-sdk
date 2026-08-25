@@ -190,6 +190,22 @@ Do **not** fall back to the source specs in `public-apis-oas/redocly-implementat
 
 **Re-probed 2026-08-20 and now routed:** `GET /v2/…/groups` (200, `{groups: []}`) and `GET /v1/…/activation-profiles` (200). The `skipOnGatewayUnrouted` acceptance helper existed only for these two and has been deleted — both tests now fail on a 403 rather than skipping, which is the point: a 403 resurfacing means routing regressed or the region in use lags EU. Nothing else in the SDK needed it, so do not reintroduce a blanket-403 skip; name the endpoint and fail.
 
+**Build v1559 (2026-08-25) — the `*:jsc:all` privileges split into fine-grained ones.** Metadata only: no path, schema, type or URL change anywhere in the five specs, and uem-connect and device-groups are byte-identical to v1528. 29 operations swapped their `x-required-privileges`, which the SDK surfaces in `securitycloud/permissions.go` and in each method's godoc, so the generated diff is privilege strings and nothing else.
+
+| old | new | ops |
+|---|---|---|
+| `read:jsc:all` | `ztna:read` | 10 |
+| `create:jsc:all` | `ztna:create` | 4 |
+| `update:jsc:all` | `ztna:update` | 4 |
+| `delete:jsc:all` | `ztna:delete` | 4 |
+| `read/update/delete:jsc:all` | `search-domains:{read,update,delete}` | 3 |
+| `read/update/delete:jsc:all` | `custom-hostname-mappings:{read,update,delete}` | 3 |
+| `read:jsc:all` | `content-categories:read` | 1 |
+
+**Not enforced yet, and these are not gateway scopes.** Neither the old nor the new names appear anywhere in `tyk-gateway-management` — the gateway config carries a product-level `scopes: securitycloud-product`, so per-privilege checks live in the authorization plugin / Jamf Account permissions model rather than the api-product YAML. That means the tyk repo cannot answer "is this live" for a privilege rename, unlike the header migration. The wire can: on 2026-08-25 the existing sandbox credential still read every family and still created and deleted a gateway, so nothing is being refused under the new names.
+
+**Report upstream: the DNS zone operations were given `ztna:*`, not a DNS-specific privilege.** `search-domains` and `custom-hostname-mappings` — in the same spec — each got their own family, so `/v1/dns/zones` carrying `ztna:read`/`ztna:create`/`ztna:update`/`ztna:delete` reads like a copy-paste rather than a decision. It may be deliberate (DNS zones are part of the ZTNA capability) but nothing in the spec says so, and a customer granting `ztna:*` to manage DNS zones is surprising either way. The SDK reports what the spec says; do not "correct" it locally.
+
 **Build v1495 (2026-08-24) — the GA header migration lands in the specs, and must NOT be ingested yet.** Every spec in the bundle drops path scoping and declares a `required: true` header instead: `/v1/tenant/{tenantId}/dns/zones` becomes `/v1/dns/zones` + `X-Tenant-Id`, and uem-connect goes from `/tenant/{tenantId}/uem-connect/v1/…` to `/uem-connect/v1/…`. Bundle-wide there are 9040 `X-Tenant-Id` occurrences and 120 `X-Environment-Id` (the latter only on `ai-governance` and `audit` — blueprints and compliance-benchmarks are `X-Tenant-Id`, so the environment-scope change discussed in Slack is *not* in these specs).
 
 **The gateway does not accept it in production, and the authoritative source for that is `tyk-gateway-management`, not the OAS bundle** — the OAS repo publishes specs and does not control the API release process. The switch is `config_data.request-context-allowed-sources` per api-product per environment:

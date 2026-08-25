@@ -14,7 +14,7 @@ import (
 
 // ListContentCategoriesV1 list Categories.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: content-categories:read.
 func (c *Client) ListContentCategoriesV1(ctx context.Context) (*CategoryListResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CategoryListResponse

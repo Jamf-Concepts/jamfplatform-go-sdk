@@ -18,7 +18,7 @@ import (
 
 // ListZtnaAppsV1 list Apps.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 func (c *Client) ListZtnaAppsV1(ctx context.Context) ([]App, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]App, bool, error) {
@@ -44,7 +44,7 @@ func (c *Client) ListZtnaAppsV1(ctx context.Context) ([]App, error) {
 
 // CreateZtnaAppV1 create an App.
 //
-// Required privileges: create:jsc:all.
+// Required privileges: ztna:create.
 func (c *Client) CreateZtnaAppV1(ctx context.Context, request *AppCreateRequest) (*CreateResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result CreateResponse
@@ -57,7 +57,7 @@ func (c *Client) CreateZtnaAppV1(ctx context.Context, request *AppCreateRequest)
 
 // GetZtnaAppV1 get an App.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 //
 // Parameters:
 //   - appID: ID of the App (Access Policy). Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
@@ -73,7 +73,7 @@ func (c *Client) GetZtnaAppV1(ctx context.Context, appID string) (*App, error) {
 
 // UpdateZtnaAppV1 partially update an App.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: ztna:update.
 //
 // Parameters:
 //   - appID: ID of the App (Access Policy). Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
@@ -88,7 +88,7 @@ func (c *Client) UpdateZtnaAppV1(ctx context.Context, appID string, request *App
 
 // DeleteZtnaAppV1 delete an App.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: ztna:delete.
 //
 // Parameters:
 //   - appID: ID of the App (Access Policy). Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).

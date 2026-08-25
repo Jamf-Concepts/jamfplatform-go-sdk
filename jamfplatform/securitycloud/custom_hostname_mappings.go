@@ -13,7 +13,7 @@ import (
 
 // GetDnsCustomHostnameMappingsV1 get Custom Hostname Mappings.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: custom-hostname-mappings:read.
 func (c *Client) GetDnsCustomHostnameMappingsV1(ctx context.Context) (*MappingList, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result MappingList
@@ -26,7 +26,7 @@ func (c *Client) GetDnsCustomHostnameMappingsV1(ctx context.Context) (*MappingLi
 
 // ReplaceDnsCustomHostnameMappingsV1 replace Custom Hostname Mappings.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: custom-hostname-mappings:update.
 func (c *Client) ReplaceDnsCustomHostnameMappingsV1(ctx context.Context, request *[]Mapping) error {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/custom-hostname-mappings"
@@ -38,7 +38,7 @@ func (c *Client) ReplaceDnsCustomHostnameMappingsV1(ctx context.Context, request
 
 // ClearDnsCustomHostnameMappingsV1 clear Custom Hostname Mappings.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: custom-hostname-mappings:delete.
 func (c *Client) ClearDnsCustomHostnameMappingsV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	endpoint := prefix + "/dns/custom-hostname-mappings"

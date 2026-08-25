@@ -13,7 +13,7 @@ import (
 
 // ListZtnaSharedGatewaysV1 list Shared Gateways.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 func (c *Client) ListZtnaSharedGatewaysV1(ctx context.Context) (*SharedGatewayListResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result SharedGatewayListResponse

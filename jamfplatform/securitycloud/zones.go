@@ -17,7 +17,7 @@ import (
 
 // ListDnsZonesV1 list DNS Zones.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 //
 // Parameters:
 //   - sort: Sort expression in the form `field:direction`, where direction is `asc` or `desc`. Defaults to
@@ -42,7 +42,7 @@ func (c *Client) ListDnsZonesV1(ctx context.Context, sort string) (*ZoneList, er
 
 // CreateDnsZoneV1 create a DNS Zone.
 //
-// Required privileges: create:jsc:all.
+// Required privileges: ztna:create.
 func (c *Client) CreateDnsZoneV1(ctx context.Context, request *ZoneWrite) (*ZoneRef, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result ZoneRef
@@ -55,7 +55,7 @@ func (c *Client) CreateDnsZoneV1(ctx context.Context, request *ZoneWrite) (*Zone
 
 // GetDnsZoneV1 get a DNS Zone.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: ztna:read.
 //
 // Parameters:
 //   - id: Identifier of the DNS Zone to operate on.
@@ -71,7 +71,7 @@ func (c *Client) GetDnsZoneV1(ctx context.Context, id string) (*Zone, error) {
 
 // UpdateDnsZoneV1 update a DNS Zone.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: ztna:update.
 //
 // Parameters:
 //   - id: Identifier of the DNS Zone to operate on.
@@ -86,7 +86,7 @@ func (c *Client) UpdateDnsZoneV1(ctx context.Context, id string, request *ZonePa
 
 // DeleteDnsZoneV1 delete a DNS Zone.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: ztna:delete.
 //
 // Parameters:
 //   - id: Identifier of the DNS Zone to operate on.
