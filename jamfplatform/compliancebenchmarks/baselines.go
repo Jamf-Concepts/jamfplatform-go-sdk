@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: read:pro:compliance-benchmarks.
 func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result BaselinesResponse
 	endpoint := prefix + "/baselines"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -27,7 +27,7 @@ func (c *Client) ListBaselines(ctx context.Context) (*BaselinesResponse, error) 
 
 // ResolveBaselineIDByName looks up a Baseline by its title field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveBaselineIDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	listPath := prefix + "/baselines"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "baselines", "title", "id", name)
 	if err != nil {
@@ -38,7 +38,7 @@ func (c *Client) ResolveBaselineIDByName(ctx context.Context, name string) (stri
 
 // ResolveBaselineByName looks up a Baseline by its title field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveBaselineByName(ctx context.Context, name string) (*BaselineInfo, error) {
-	prefix := c.transport.TenantPrefix("compliance-benchmarks", "v1")
+	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	listPath := prefix + "/baselines"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "baselines", "title", "id", name)
 	if err != nil {

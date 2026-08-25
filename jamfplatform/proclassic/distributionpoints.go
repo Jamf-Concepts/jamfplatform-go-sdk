@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetDistributionPointByID(ctx context.Context, id string) (*DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DistributionPoint
 	endpoint := fmt.Sprintf("%s/distributionpoints/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetDistributionPointByID(ctx context.Context, id string) (*Dist
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateDistributionPointByID(ctx context.Context, id string, request *DistributionPointPost) (*DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DistributionPoint
 	endpoint := fmt.Sprintf("%s/distributionpoints/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateDistributionPointByID(ctx context.Context, id string, req
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateDistributionPointByID(ctx context.Context, id string, request *DistributionPointPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDistributionPointByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateDistributionPointByID(ctx context.Context, id string, req
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteDistributionPointByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDistributionPointByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteDistributionPointByID(ctx context.Context, id string) err
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetDistributionPointByName(ctx context.Context, name string) (*DistributionPoint, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DistributionPoint
 	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetDistributionPointByName(ctx context.Context, name string) (*
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateDistributionPointByName(ctx context.Context, name string, request *DistributionPointPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateDistributionPointByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateDistributionPointByName(ctx context.Context, name string,
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteDistributionPointByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteDistributionPointByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteDistributionPointByName(ctx context.Context, name string)
 //
 // Required privileges: read:pro:distribution-points.
 func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoints, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DistributionPoints
 	endpoint := prefix + "/distributionpoints"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoint
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateDistributionPointByName(ctx context.Context, name string, request *DistributionPointPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/distributionpoints/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateDistributionPointByName(%s): %w", name, err)

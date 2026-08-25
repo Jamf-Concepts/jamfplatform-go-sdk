@@ -161,9 +161,13 @@ func WithFileCookieJar(dir string) Option {
 	}
 }
 
-// WithTenantID configures the tenant ID used to build API URL paths.
-// When set, all API paths include /tenant/{tenantID} in the URL.
-// When not set, legacy internal paths are used.
+// WithTenantID configures the tenant this client is scoped to. It is sent as
+// the X-Tenant-Id request header on every API call.
+//
+// The gateway used to take the tenant from the URL path
+// (/api/{namespace}/{version}/tenant/{tenantID}); it moved to a header at the
+// Platform API GA. When this is unset no scope header is sent and the gateway
+// resolves the context from the access token instead.
 func WithTenantID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.tenantID = id

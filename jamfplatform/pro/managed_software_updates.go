@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) ListAvailableOsUpdatesV1(ctx context.Context) (*AvailableOsUpdates, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AvailableOsUpdates
 	endpoint := prefix + "/managed-software-updates/available-updates"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -42,7 +42,7 @@ func (c *Client) ListAvailableOsUpdatesV1(ctx context.Context) (*AvailableOsUpda
 //     device.deviceId, device.objectType, updateAction, versionType, specificVersion, maxDeferrals,
 //     recipeId, forceInstallLocalDateTime, state.
 func (c *Client) ListManagedSoftwareUpdatePlansV1(ctx context.Context, sort []string, filter string) ([]ManagedSoftwareUpdatePlan, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ManagedSoftwareUpdatePlan, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -77,7 +77,7 @@ func (c *Client) ListManagedSoftwareUpdatePlansV1(ctx context.Context, sort []st
 // Required privileges: create:pro:managed-software-updates, read:pro:computers, execute:pro:computer-commands, read:pro:mobile-devices, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Create Managed Software Updates, Read Computers, Read Mobile Devices, Send Computer Remote Command to Download and Install OS X Update, Send Mobile Device Remote Command to Download and Install iOS Update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateManagedSoftwareUpdatePlanV1(ctx context.Context, request *ManagedSoftwareUpdatePlanPost) (*ManagedSoftwareUpdatePlanPostResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlanPostResponse
 	endpoint := prefix + "/managed-software-updates/plans"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -90,7 +90,7 @@ func (c *Client) CreateManagedSoftwareUpdatePlanV1(ctx context.Context, request 
 //
 // Required privileges: read:pro:managed-software-updates. Legacy Jamf Pro privilege name(s): Read Managed Software Updates.
 func (c *Client) GetManagedSoftwareUpdateFeatureToggleV1(ctx context.Context) (*ManagedSoftwareUpdatePlanToggle, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlanToggle
 	endpoint := prefix + "/managed-software-updates/plans/feature-toggle"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -104,7 +104,7 @@ func (c *Client) GetManagedSoftwareUpdateFeatureToggleV1(ctx context.Context) (*
 // Required privileges: read:pro:managed-software-updates, create:pro:managed-software-updates, update:pro:managed-software-updates. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Create Managed Software Updates, Update Managed Software Updates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateManagedSoftwareUpdateFeatureToggleV1(ctx context.Context, request *ManagedSoftwareUpdatePlanToggle) (*ManagedSoftwareUpdatePlanToggle, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlanToggle
 	endpoint := prefix + "/managed-software-updates/plans/feature-toggle"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -118,7 +118,7 @@ func (c *Client) UpdateManagedSoftwareUpdateFeatureToggleV1(ctx context.Context,
 // Required privileges: read:pro:managed-software-updates, create:pro:managed-software-updates, update:pro:managed-software-updates. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Create Managed Software Updates, Update Managed Software Updates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) AbandonManagedSoftwareUpdateFeatureToggleV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/managed-software-updates/plans/feature-toggle/abandon"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("AbandonManagedSoftwareUpdateFeatureToggleV1: %w", err)
@@ -130,7 +130,7 @@ func (c *Client) AbandonManagedSoftwareUpdateFeatureToggleV1(ctx context.Context
 //
 // Required privileges: read:pro:managed-software-updates. Legacy Jamf Pro privilege name(s): Read Managed Software Updates.
 func (c *Client) GetManagedSoftwareUpdateFeatureToggleStatusV1(ctx context.Context) (*ManagedSoftwareUpdatePlanToggleStatusWrapper, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlanToggleStatusWrapper
 	endpoint := prefix + "/managed-software-updates/plans/feature-toggle/status"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -146,7 +146,7 @@ func (c *Client) GetManagedSoftwareUpdateFeatureToggleStatusV1(ctx context.Conte
 // Required privileges: create:pro:managed-software-updates, read:pro:computers, read:pro:computer-groups, execute:pro:computer-commands, read:pro:mobile-devices, read:pro:mobile-device-groups, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Create Managed Software Updates, Read Computers, Read Mobile Devices, Read Smart Computer Groups, Read Static Computer Groups, Read Smart Mobile Device Groups, Read Static Mobile Device Groups, Send Computer Remote Command to Download and Install OS X Update, Send Mobile Device Remote Command to Download and Install iOS Update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) CreateManagedSoftwareUpdateGroupPlanV1(ctx context.Context, request *ManagedSoftwareUpdatePlanGroupPost) (*ManagedSoftwareUpdatePlanPostResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlanPostResponse
 	endpoint := prefix + "/managed-software-updates/plans/group"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -165,7 +165,7 @@ func (c *Client) CreateManagedSoftwareUpdateGroupPlanV1(ctx context.Context, req
 //   - groupType: Managed Software Update Group Type, Available options are "COMPUTER_GROUP" or "MOBILE_DEVICE_GROUP".
 //     Allowed values: "COMPUTER_GROUP", "MOBILE_DEVICE_GROUP".
 func (c *Client) GetManagedSoftwareUpdateGroupPlansV1(ctx context.Context, id string, groupType string) (*ManagedSoftwareUpdatePlans, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlans
 	endpoint := fmt.Sprintf("%s/managed-software-updates/plans/group/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -189,7 +189,7 @@ func (c *Client) GetManagedSoftwareUpdateGroupPlansV1(ctx context.Context, id st
 // Parameters:
 //   - id: Managed Software Update Plan Uuid.
 func (c *Client) GetManagedSoftwareUpdatePlanV1(ctx context.Context, id string) (*ManagedSoftwareUpdatePlan, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlan
 	endpoint := fmt.Sprintf("%s/managed-software-updates/plans/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -206,7 +206,7 @@ func (c *Client) GetManagedSoftwareUpdatePlanV1(ctx context.Context, id string) 
 // Parameters:
 //   - id: Managed Software Update Plan Uuid.
 func (c *Client) GetManagedSoftwareUpdatePlanDeclarationsV1(ctx context.Context, id string) (*DssDeclarations, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DssDeclarations
 	endpoint := fmt.Sprintf("%s/managed-software-updates/plans/%s/declarations", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -223,7 +223,7 @@ func (c *Client) GetManagedSoftwareUpdatePlanDeclarationsV1(ctx context.Context,
 // Parameters:
 //   - id: Managed Software Update Plan Uuid.
 func (c *Client) GetManagedSoftwareUpdatePlanEventsV1(ctx context.Context, id string) (*ManagedSoftwareUpdatePlanEventStore, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdatePlanEventStore
 	endpoint := fmt.Sprintf("%s/managed-software-updates/plans/%s/events", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -243,7 +243,7 @@ func (c *Client) GetManagedSoftwareUpdatePlanEventsV1(ctx context.Context, id st
 //     osUpdatesStatusId, device.deviceId, device.objectType, downloaded, downloadPercentComplete,
 //     productKey, status, deferralsRemaining, maxDeferrals, nextScheduledInstall, created and updated.
 func (c *Client) ListManagedSoftwareUpdateStatusesV1(ctx context.Context, filter string) (*ManagedSoftwareUpdateStatuses, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
 	endpoint := prefix + "/managed-software-updates/update-statuses"
 	params := url.Values{}
@@ -267,7 +267,7 @@ func (c *Client) ListManagedSoftwareUpdateStatusesV1(ctx context.Context, filter
 // Parameters:
 //   - id: Computer Group identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForComputerGroupV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
 	endpoint := fmt.Sprintf("%s/managed-software-updates/update-statuses/computer-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -283,7 +283,7 @@ func (c *Client) GetManagedSoftwareUpdateStatusesForComputerGroupV1(ctx context.
 // Parameters:
 //   - id: Computer identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForComputerV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
 	endpoint := fmt.Sprintf("%s/managed-software-updates/update-statuses/computers/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -300,7 +300,7 @@ func (c *Client) GetManagedSoftwareUpdateStatusesForComputerV1(ctx context.Conte
 // Parameters:
 //   - id: Mobile Device Group identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
 	endpoint := fmt.Sprintf("%s/managed-software-updates/update-statuses/mobile-device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -316,7 +316,7 @@ func (c *Client) GetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1(ctx cont
 // Parameters:
 //   - id: Mobile Device identifier.
 func (c *Client) GetManagedSoftwareUpdateStatusesForMobileDeviceV1(ctx context.Context, id string) (*ManagedSoftwareUpdateStatuses, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ManagedSoftwareUpdateStatuses
 	endpoint := fmt.Sprintf("%s/managed-software-updates/update-statuses/mobile-devices/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

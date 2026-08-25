@@ -21,7 +21,7 @@ import (
 //
 // Required privileges: read:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
 func (c *Client) GetAllComputerPrestageScopeV2(ctx context.Context) (*PrestageScopeV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeV2
 	endpoint := prefix + "/computer-prestages/scope"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -37,7 +37,7 @@ func (c *Client) GetAllComputerPrestageScopeV2(ctx context.Context) (*PrestageSc
 // Parameters:
 //   - id: Computer Prestage identifier.
 func (c *Client) GetComputerPrestageScopeV2(ctx context.Context, id string) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/computer-prestages/%s/scope", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -53,7 +53,7 @@ func (c *Client) GetComputerPrestageScopeV2(ctx context.Context, id string) (*Pr
 // Parameters:
 //   - id: Computer Prestage identifier.
 func (c *Client) ReplaceComputerPrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/computer-prestages/%s/scope", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -69,7 +69,7 @@ func (c *Client) ReplaceComputerPrestageScopeV2(ctx context.Context, id string, 
 // Parameters:
 //   - id: Computer Prestage identifier.
 func (c *Client) AddToComputerPrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/computer-prestages/%s/scope", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -85,7 +85,7 @@ func (c *Client) AddToComputerPrestageScopeV2(ctx context.Context, id string, re
 // Parameters:
 //   - id: Computer Prestage identifier.
 func (c *Client) RemoveFromComputerPrestageScopeV2(ctx context.Context, id string, request *PrestageScopeUpdate) (*PrestageScopeResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeResponseV2
 	endpoint := fmt.Sprintf("%s/computer-prestages/%s/scope/delete-multiple", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -102,7 +102,7 @@ func (c *Client) RemoveFromComputerPrestageScopeV2(ctx context.Context, id strin
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
 //     separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListComputerPrestagesV3(ctx context.Context, sort []string) ([]GetComputerPrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GetComputerPrestageV3, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -131,7 +131,7 @@ func (c *Client) ListComputerPrestagesV3(ctx context.Context, sort []string) ([]
 //
 // Required privileges: create:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Computer PreStage Enrollments.
 func (c *Client) CreateComputerPrestageV3(ctx context.Context, request *PostComputerPrestageV3) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := prefix + "/computer-prestages"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -147,7 +147,7 @@ func (c *Client) CreateComputerPrestageV3(ctx context.Context, request *PostComp
 // Parameters:
 //   - id: Computer Prestage identifier.
 func (c *Client) GetComputerPrestageV3(ctx context.Context, id string) (*GetComputerPrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result GetComputerPrestageV3
 	endpoint := fmt.Sprintf("%s/computer-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -165,7 +165,7 @@ func (c *Client) GetComputerPrestageV3(ctx context.Context, id string) (*GetComp
 // Parameters:
 //   - id: Computer Prestage identifier.
 func (c *Client) UpdateComputerPrestageV3(ctx context.Context, id string, request *PutComputerPrestageV3) (*GetComputerPrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result GetComputerPrestageV3
 	endpoint := fmt.Sprintf("%s/computer-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentTypeNoRetry(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -181,7 +181,7 @@ func (c *Client) UpdateComputerPrestageV3(ctx context.Context, id string, reques
 // Parameters:
 //   - id: Computer Prestage identifier.
 func (c *Client) DeleteComputerPrestageV3(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computer-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerPrestageV3(%s): %w", id, err)
@@ -191,7 +191,7 @@ func (c *Client) DeleteComputerPrestageV3(ctx context.Context, id string) error 
 
 // ResolveComputerPrestageV3IDByName looks up a ComputerPrestageV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerPrestageV3IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computer-prestages"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -202,7 +202,7 @@ func (c *Client) ResolveComputerPrestageV3IDByName(ctx context.Context, name str
 
 // ResolveComputerPrestageV3ByName looks up a ComputerPrestageV3 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerPrestageV3ByName(ctx context.Context, name string) (*ComputerPrestageV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computer-prestages"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

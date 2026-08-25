@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: delete:pro:computer-commands.
 func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/commandflush"
 	if err := c.transport.DoWithContentType(ctx, http.MethodDelete, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("DeleteCommandFlush: %w", err)
@@ -35,7 +35,7 @@ func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) 
 //   - status: Command status to be flushed.
 //     Allowed values: "Pending", "Failed", "Pending+Failed".
 func (c *Client) DeleteCommandFlushByIDTypeIDStatus(ctx context.Context, idtype string, id string, status string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/commandflush/%s/id/%s/status/%s", prefix, url.PathEscape(idtype), url.PathEscape(id), url.PathEscape(status))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("DeleteCommandFlushByIDTypeIDStatus(%s): %w", idtype, err)

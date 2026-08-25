@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetIBeaconByID(ctx context.Context, id string) (*Ibeacon, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ibeacon
 	endpoint := fmt.Sprintf("%s/ibeacons/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetIBeaconByID(ctx context.Context, id string) (*Ibeacon, error
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateIBeaconByID(ctx context.Context, id string, request *Ibeacon) (*Ibeacon, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ibeacon
 	endpoint := fmt.Sprintf("%s/ibeacons/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateIBeaconByID(ctx context.Context, id string, request *Ibea
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateIBeaconByID(ctx context.Context, id string, request *Ibeacon) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateIBeaconByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateIBeaconByID(ctx context.Context, id string, request *Ibea
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteIBeaconByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteIBeaconByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteIBeaconByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetIBeaconByName(ctx context.Context, name string) (*Ibeacon, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ibeacon
 	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetIBeaconByName(ctx context.Context, name string) (*Ibeacon, e
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) UpdateIBeaconByName(ctx context.Context, name string, request *Ibeacon) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateIBeaconByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateIBeaconByName(ctx context.Context, name string, request *
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) DeleteIBeaconByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteIBeaconByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteIBeaconByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:ibeacon.
 func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ibeacons
 	endpoint := prefix + "/ibeacons"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateIBeaconByName(ctx context.Context, name string, request *Ibeacon) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/ibeacons/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateIBeaconByName(%s): %w", name, err)

@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
 func (c *Client) ListDeviceEnrollmentDevicesV1(ctx context.Context, id string) (*DeviceEnrollmentDeviceSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceEnrollmentDeviceSearchResults
 	endpoint := fmt.Sprintf("%s/device-enrollments/%s/devices", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update License Information.
 func (c *Client) UpdateActivationCodeV1(ctx context.Context, request *ActivationCode) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/activation-code"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("UpdateActivationCodeV1: %w", err)
@@ -41,7 +41,7 @@ func (c *Client) UpdateActivationCodeV1(ctx context.Context, request *Activation
 //     note, details. This param can be combined with paging and sorting. Example: filter=username!=admin
 //     and details==*disabled* and date<2019-12-15.
 func (c *Client) ListActivationCodeHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -73,7 +73,7 @@ func (c *Client) ListActivationCodeHistoryV1(ctx context.Context, sort []string,
 //
 // Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update License Information.
 func (c *Client) CreateActivationCodeHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/activation-code/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -86,7 +86,7 @@ func (c *Client) CreateActivationCodeHistoryNoteV1(ctx context.Context, request 
 //
 // Required privileges: read:pro:activation-code. Legacy Jamf Pro privilege name(s): Read License Information.
 func (c *Client) ExportActivationCodeHistoryV1(ctx context.Context, request *ExportParameters) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/activation-code/history/export"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -99,7 +99,7 @@ func (c *Client) ExportActivationCodeHistoryV1(ctx context.Context, request *Exp
 //
 // Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update License Information.
 func (c *Client) UpdateActivationCodeOrganizationNameV1(ctx context.Context, request *OrganizationName) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/activation-code/organization-name"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("UpdateActivationCodeOrganizationNameV1: %w", err)

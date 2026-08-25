@@ -13,7 +13,7 @@ import (
 
 func TestUpdateActivationCodeV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/activation-code", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/activation-code", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestUpdateActivationCodeV1(t *testing.T) {
 
 func TestListActivationCodeHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/activation-code/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/activation-code/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -50,7 +50,7 @@ func TestListActivationCodeHistoryV1(t *testing.T) {
 
 func TestCreateActivationCodeHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/activation-code/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/activation-code/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -68,7 +68,7 @@ func TestCreateActivationCodeHistoryNoteV1(t *testing.T) {
 
 func TestExportActivationCodeHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/activation-code/history/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/activation-code/history/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -86,7 +86,7 @@ func TestExportActivationCodeHistoryV1(t *testing.T) {
 
 func TestUpdateActivationCodeOrganizationNameV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/activation-code/organization-name", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/activation-code/organization-name", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}

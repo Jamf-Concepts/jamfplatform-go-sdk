@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:smtp-server.
 func (c *Client) GetSMTPServer(ctx context.Context) (*SmtpServer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SmtpServer
 	endpoint := prefix + "/smtpserver"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetSMTPServer(ctx context.Context) (*SmtpServer, error) {
 //
 // Required privileges: update:pro:smtp-server.
 func (c *Client) UpdateSMTPServer(ctx context.Context, request *SmtpServer) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/smtpserver"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateSMTPServer: %w", err)

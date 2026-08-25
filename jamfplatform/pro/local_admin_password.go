@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: update:pro:local-admin-password-settings. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment, Update Local Admin Password Settings.
 func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LapsSettingsResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsSettingsResponseV2
 	endpoint := prefix + "/local-admin-password/settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -29,7 +29,7 @@ func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LapsSett
 //
 // Required privileges: update:pro:local-admin-password-settings. Legacy Jamf Pro privilege name(s): Update Local Admin Password Settings.
 func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request *LapsSettingsRequestV2) (*LapsSettingsResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsSettingsResponseV2
 	endpoint := prefix + "/local-admin-password/settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -42,7 +42,7 @@ func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request
 //
 // Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
 func (c *Client) ListLocalAdminPasswordPendingRotationsV2(ctx context.Context) (*LapsPendingRotationResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsPendingRotationResponse
 	endpoint := prefix + "/local-admin-password/pending-rotations"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -58,7 +58,7 @@ func (c *Client) ListLocalAdminPasswordPendingRotationsV2(ctx context.Context) (
 // Parameters:
 //   - clientManagementID: client management id of target device.
 func (c *Client) ListLocalAdminPasswordAccountsV2(ctx context.Context, clientManagementID string) (*LapsUserResultsV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsUserResultsV2
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/accounts", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -74,7 +74,7 @@ func (c *Client) ListLocalAdminPasswordAccountsV2(ctx context.Context, clientMan
 // Parameters:
 //   - clientManagementID: client management id of target device.
 func (c *Client) ListLocalAdminPasswordHistoryV2(ctx context.Context, clientManagementID string) (*LapsAccountManagementHistoryResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsAccountManagementHistoryResponse
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/history", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -91,7 +91,7 @@ func (c *Client) ListLocalAdminPasswordHistoryV2(ctx context.Context, clientMana
 //   - clientManagementID: client management id of target device.
 //   - username: user name for the account.
 func (c *Client) GetLocalAdminPasswordV2(ctx context.Context, clientManagementID string, username string) (*LapsPasswordResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsPasswordResponseV2
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/password", prefix, url.PathEscape(clientManagementID), url.PathEscape(username))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -108,7 +108,7 @@ func (c *Client) GetLocalAdminPasswordV2(ctx context.Context, clientManagementID
 //   - clientManagementID: client management id of target device.
 //   - username: user name to view audit information for.
 func (c *Client) ListLocalAdminPasswordAuditsV2(ctx context.Context, clientManagementID string, username string) (*LapsPasswordAuditsResultsV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsPasswordAuditsResultsV2
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/audit", prefix, url.PathEscape(clientManagementID), url.PathEscape(username))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -125,7 +125,7 @@ func (c *Client) ListLocalAdminPasswordAuditsV2(ctx context.Context, clientManag
 //   - clientManagementID: client management id of target device.
 //   - username: user name to view history for.
 func (c *Client) ListLocalAdminPasswordAccountHistoryV2(ctx context.Context, clientManagementID string, username string) (*LapsHistoryResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsHistoryResponse
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/history", prefix, url.PathEscape(clientManagementID), url.PathEscape(username))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListLocalAdminPasswordAccountHistoryV2(ctx context.Context, cli
 //   - username: user name for the account.
 //   - guid: user guid for the account.
 func (c *Client) GetLocalAdminPasswordByGuidV2(ctx context.Context, clientManagementID string, username string, guid string) (*LapsPasswordResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsPasswordResponseV2
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/%s/password", prefix, url.PathEscape(clientManagementID), url.PathEscape(username), url.PathEscape(guid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -161,7 +161,7 @@ func (c *Client) GetLocalAdminPasswordByGuidV2(ctx context.Context, clientManage
 //   - username: user name to view audit information for.
 //   - guid: user guid to view audit information for.
 func (c *Client) ListLocalAdminPasswordAuditsByGuidV2(ctx context.Context, clientManagementID string, username string, guid string) (*LapsPasswordAuditsResultsV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsPasswordAuditsResultsV2
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/%s/audit", prefix, url.PathEscape(clientManagementID), url.PathEscape(username), url.PathEscape(guid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -179,7 +179,7 @@ func (c *Client) ListLocalAdminPasswordAuditsByGuidV2(ctx context.Context, clien
 //   - username: user name to view history for.
 //   - guid: user guid to view history for.
 func (c *Client) ListLocalAdminPasswordAccountHistoryByGuidV2(ctx context.Context, clientManagementID string, username string, guid string) (*LapsHistoryResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsHistoryResponse
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/account/%s/%s/history", prefix, url.PathEscape(clientManagementID), url.PathEscape(username), url.PathEscape(guid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -196,7 +196,7 @@ func (c *Client) ListLocalAdminPasswordAccountHistoryByGuidV2(ctx context.Contex
 // Parameters:
 //   - clientManagementID: client management id of target device.
 func (c *Client) SetLocalAdminPasswordV2(ctx context.Context, clientManagementID string, request *LapsUserPasswordRequestV2) (*LapsUserPasswordResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsUserPasswordResponseV2
 	endpoint := fmt.Sprintf("%s/local-admin-password/%s/set-password", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

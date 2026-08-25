@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: update:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
 func (c *Client) AcceptPatchManagementDisclaimerV2(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := prefix + "/patch-management-accept-disclaimer"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("AcceptPatchManagementDisclaimerV2: %w", err)

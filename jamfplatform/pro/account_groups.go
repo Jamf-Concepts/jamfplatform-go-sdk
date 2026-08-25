@@ -29,7 +29,7 @@ import (
 //     combined using logical operators. This parameter can be used with paging and sorting parameters.
 //     Example: name=="Admins" and siteId==-1.
 func (c *Client) ListAccountGroupsV1(ctx context.Context, sort []string, filter string) ([]AccountGroupV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]AccountGroupV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -64,7 +64,7 @@ func (c *Client) ListAccountGroupsV1(ctx context.Context, sort []string, filter 
 // Parameters:
 //   - id: id of target account group.
 func (c *Client) GetAccountGroupV1(ctx context.Context, id string) (*AccountGroupV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AccountGroupV1
 	endpoint := fmt.Sprintf("%s/account-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -75,7 +75,7 @@ func (c *Client) GetAccountGroupV1(ctx context.Context, id string) (*AccountGrou
 
 // ResolveAccountGroupV1IDByName looks up a AccountGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveAccountGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/account-groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -86,7 +86,7 @@ func (c *Client) ResolveAccountGroupV1IDByName(ctx context.Context, name string)
 
 // ResolveAccountGroupV1ByName looks up a AccountGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveAccountGroupV1ByName(ctx context.Context, name string) (*AccountGroupV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/account-groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

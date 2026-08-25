@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: create:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
 func (c *Client) CreateCloudAzureV1(ctx context.Context, request *AzureConfigurationRequest) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/cloud-azure"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -29,7 +29,7 @@ func (c *Client) CreateCloudAzureV1(ctx context.Context, request *AzureConfigura
 //
 // Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) GetCloudAzureDefaultServerConfigurationV1(ctx context.Context) (*AzureServerConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AzureServerConfiguration
 	endpoint := prefix + "/cloud-azure/defaults/server-configuration"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -45,7 +45,7 @@ func (c *Client) GetCloudAzureDefaultServerConfigurationV1(ctx context.Context) 
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) GetCloudAzureV1(ctx context.Context, id string) (*AzureConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AzureConfiguration
 	endpoint := fmt.Sprintf("%s/cloud-azure/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -61,7 +61,7 @@ func (c *Client) GetCloudAzureV1(ctx context.Context, id string) (*AzureConfigur
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) UpdateCloudAzureV1(ctx context.Context, id string, request *AzureConfigurationUpdate) (*AzureConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AzureConfiguration
 	endpoint := fmt.Sprintf("%s/cloud-azure/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) UpdateCloudAzureV1(ctx context.Context, id string, request *Azu
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
 func (c *Client) DeleteCloudAzureV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/cloud-azure/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteCloudAzureV1(%s): %w", id, err)

@@ -13,7 +13,7 @@ import (
 
 func TestListAppInstallerDeploymentsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListAppInstallerDeploymentsV1(t *testing.T) {
 
 func TestCreateAppInstallerDeploymentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateAppInstallerDeploymentV1(t *testing.T) {
 
 func TestGetAppInstallerDeploymentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetAppInstallerDeploymentV1(t *testing.T) {
 
 func TestGetAppInstallerDeploymentV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetAppInstallerDeploymentV1_NotFound(t *testing.T) {
 
 func TestUpdateAppInstallerDeploymentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestUpdateAppInstallerDeploymentV1(t *testing.T) {
 
 func TestDeleteAppInstallerDeploymentV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -120,7 +120,7 @@ func TestDeleteAppInstallerDeploymentV1(t *testing.T) {
 
 func TestResolveAppInstallerDeploymentV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -143,7 +143,7 @@ func TestResolveAppInstallerDeploymentV1IDByName(t *testing.T) {
 
 func TestResolveAppInstallerDeploymentV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -167,7 +167,7 @@ func TestResolveAppInstallerDeploymentV1ByName(t *testing.T) {
 func TestApplyAppInstallerDeploymentV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -199,7 +199,7 @@ func TestApplyAppInstallerDeploymentV1_Create(t *testing.T) {
 func TestApplyAppInstallerDeploymentV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -210,7 +210,7 @@ func TestApplyAppInstallerDeploymentV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/app-installers/deployments/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/app-installers/deployments/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

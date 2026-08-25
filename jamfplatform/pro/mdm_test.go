@@ -13,7 +13,7 @@ import (
 
 func TestDeployPackageV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/deploy-package", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/deploy-package", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestDeployPackageV1(t *testing.T) {
 
 func TestRenewMdmProfileV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mdm/renew-profile", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mdm/renew-profile", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -49,7 +49,7 @@ func TestRenewMdmProfileV1(t *testing.T) {
 
 func TestSendMdmBlankPushV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/mdm/blank-push", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/mdm/blank-push", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -67,7 +67,7 @@ func TestSendMdmBlankPushV2(t *testing.T) {
 
 func TestListMdmCommandsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mdm/commands", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mdm/commands", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -85,7 +85,7 @@ func TestListMdmCommandsV1(t *testing.T) {
 
 func TestListMdmCommandsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mdm/commands", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mdm/commands", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -101,7 +101,7 @@ func TestListMdmCommandsV1_NotFound(t *testing.T) {
 
 func TestListMdmCommandsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/mdm/commands", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/mdm/commands", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -123,7 +123,7 @@ func TestListMdmCommandsV2(t *testing.T) {
 
 func TestSendMdmCommandV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/tenant/t-test/mdm/commands", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v2/mdm/commands", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

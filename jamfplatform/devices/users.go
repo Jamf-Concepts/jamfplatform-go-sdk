@@ -30,7 +30,7 @@ import (
 //     `operatingSystemVersion`, `enrollmentType`, `lastEnrollmentTime`. Dates are specified in ISO 8601
 //     format. Example: `name=="*iPhone*" and lastInventoryUpdateTime>="2025-01-31T18:09:00.000Z"`.
 func (c *Client) ListDevicesForUser(ctx context.Context, userID string, sort []string, filter string) ([]DeviceListReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("devices", "v1")
+	prefix := c.transport.APIPrefix("devices", "v1")
 	return client.ListAllPages(ctx, 1000, func(ctx context.Context, page, pageSize int) ([]DeviceListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))

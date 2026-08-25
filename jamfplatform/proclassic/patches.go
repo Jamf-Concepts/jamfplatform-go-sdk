@@ -21,7 +21,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetPatchByID(ctx context.Context, id string) (*SoftwareTitle, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareTitle
 	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -36,7 +36,7 @@ func (c *Client) GetPatchByID(ctx context.Context, id string) (*SoftwareTitle, e
 //
 // Required privileges: create:pro:patch-management-software-titles.
 func (c *Client) CreatePatchByID(ctx context.Context, id string, request *SoftwareTitle) (*SoftwareTitle, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareTitle
 	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreatePatchByID(ctx context.Context, id string, request *Softwa
 // Parameters:
 //   - id: ID value to update by.
 func (c *Client) UpdatePatchByID(ctx context.Context, id string, request *SoftwareTitle) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePatchByID(%s): %w", id, err)
@@ -71,7 +71,7 @@ func (c *Client) UpdatePatchByID(ctx context.Context, id string, request *Softwa
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeletePatchByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePatchByID(%s): %w", id, err)
@@ -85,7 +85,7 @@ func (c *Client) DeletePatchByID(ctx context.Context, id string) error {
 //
 // Required privileges: read:pro:patch-management-software-titles.
 func (c *Client) ListPatches(ctx context.Context) (*PatchManagementSoftwareTitles, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchManagementSoftwareTitles
 	endpoint := prefix + "/patches"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -103,7 +103,7 @@ func (c *Client) ListPatches(ctx context.Context) (*PatchManagementSoftwareTitle
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetPatchByName(ctx context.Context, name string) (*SoftwareTitle, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareTitle
 	endpoint := fmt.Sprintf("%s/patches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -122,7 +122,7 @@ func (c *Client) GetPatchByName(ctx context.Context, name string) (*SoftwareTitl
 //   - id: ID to filter by.
 //   - version: Version number to filter by.
 func (c *Client) GetPatchComputersByIDVersion(ctx context.Context, id string, version string) (*Computers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computers
 	endpoint := fmt.Sprintf("%s/patches/id/%s/version/%s", prefix, url.PathEscape(id), url.PathEscape(version))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

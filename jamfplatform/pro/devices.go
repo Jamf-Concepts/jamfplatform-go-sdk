@@ -20,7 +20,7 @@ import (
 // Parameters:
 //   - id: Device Platform ID.
 func (c *Client) GetDeviceGroupsForDeviceV1(ctx context.Context, id string) ([]DeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []DeviceGroup
 	endpoint := fmt.Sprintf("%s/devices/%s/groups", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

@@ -30,7 +30,7 @@ import (
 //     automaticallyPopulatePurchasedContent, sendNotificationWhenNoLongerAssigned, siteId and siteName.
 //     This param can be combined with paging and sorting.
 func (c *Client) ListVolumePurchasingLocationsV1(ctx context.Context, sort []string, filter string) ([]VolumePurchasingLocationListView, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]VolumePurchasingLocationListView, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -62,7 +62,7 @@ func (c *Client) ListVolumePurchasingLocationsV1(ctx context.Context, sort []str
 //
 // Required privileges: create:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Create Volume Purchasing Locations.
 func (c *Client) CreateVolumePurchasingLocationV1(ctx context.Context, request *VolumePurchasingLocationPost) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/volume-purchasing-locations"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -78,7 +78,7 @@ func (c *Client) CreateVolumePurchasingLocationV1(ctx context.Context, request *
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
 func (c *Client) GetVolumePurchasingLocationV1(ctx context.Context, id string) (*VolumePurchasingLocation, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VolumePurchasingLocation
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -94,7 +94,7 @@ func (c *Client) GetVolumePurchasingLocationV1(ctx context.Context, id string) (
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
 func (c *Client) DeleteVolumePurchasingLocationV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteVolumePurchasingLocationV1(%s): %w", id, err)
@@ -109,7 +109,7 @@ func (c *Client) DeleteVolumePurchasingLocationV1(ctx context.Context, id string
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
 func (c *Client) UpdateVolumePurchasingLocationV1(ctx context.Context, id string, request *VolumePurchasingLocationPatch) (*VolumePurchasingLocation, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VolumePurchasingLocation
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
@@ -131,7 +131,7 @@ func (c *Client) UpdateVolumePurchasingLocationV1(ctx context.Context, id string
 //     licenseCountTotal, licenseCountInUse, licenseCountReported, contentType, and pricingParam. This
 //     param can be combined with paging and sorting.
 func (c *Client) ListVolumePurchasingLocationContentV1(ctx context.Context, id string, sort []string, filter string) ([]VolumePurchasingContent, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]VolumePurchasingContent, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -172,7 +172,7 @@ func (c *Client) ListVolumePurchasingLocationContentV1(ctx context.Context, id s
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListVolumePurchasingLocationHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -207,7 +207,7 @@ func (c *Client) ListVolumePurchasingLocationHistoryV1(ctx context.Context, id s
 // Parameters:
 //   - id: instance id of Volume Purchasing Location history record.
 func (c *Client) CreateVolumePurchasingLocationHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -223,7 +223,7 @@ func (c *Client) CreateVolumePurchasingLocationHistoryNoteV1(ctx context.Context
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
 func (c *Client) ReclaimVolumePurchasingLocationLicensesV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s/reclaim", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("ReclaimVolumePurchasingLocationLicensesV1(%s): %w", id, err)
@@ -238,7 +238,7 @@ func (c *Client) ReclaimVolumePurchasingLocationLicensesV1(ctx context.Context, 
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
 func (c *Client) RevokeVolumePurchasingLocationLicensesV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/volume-purchasing-locations/%s/revoke-licenses", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("RevokeVolumePurchasingLocationLicensesV1(%s): %w", id, err)
@@ -248,7 +248,7 @@ func (c *Client) RevokeVolumePurchasingLocationLicensesV1(ctx context.Context, i
 
 // ResolveVolumePurchasingLocationV1IDByName looks up a VolumePurchasingLocationV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveVolumePurchasingLocationV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/volume-purchasing-locations"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -259,7 +259,7 @@ func (c *Client) ResolveVolumePurchasingLocationV1IDByName(ctx context.Context, 
 
 // ResolveVolumePurchasingLocationV1ByName looks up a VolumePurchasingLocationV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveVolumePurchasingLocationV1ByName(ctx context.Context, name string) (*VolumePurchasingLocation, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/volume-purchasing-locations"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

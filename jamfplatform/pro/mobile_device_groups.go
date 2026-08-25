@@ -21,7 +21,7 @@ import (
 //
 // Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
 func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []MobileDeviceGroup
 	endpoint := prefix + "/mobile-device-groups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -36,7 +36,7 @@ func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGr
 //
 // Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
 func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []MobileDeviceGroup
 	endpoint := prefix + "/mobile-device-groups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -58,7 +58,7 @@ func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGr
 //     siteId filtered automatically. This param can be combined with paging and sorting. Example:
 //     groupName=="smartGroup1".
 func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -101,7 +101,7 @@ func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []strin
 //     siteId filtered automatically. This param can be combined with paging and sorting. Example:
 //     groupName=="smartGroup1".
 func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -136,7 +136,7 @@ func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []strin
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateSmartMobileDeviceGroupV2(ctx context.Context, request *SmartGroupAssignmentV2, platform bool) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/mobile-device-groups/smart-groups"
 	params := url.Values{}
@@ -161,7 +161,7 @@ func (c *Client) CreateSmartMobileDeviceGroupV2(ctx context.Context, request *Sm
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateSmartMobileDeviceGroupV1(ctx context.Context, request *SmartGroupAssignment, platform bool) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/mobile-device-groups/smart-groups"
 	params := url.Values{}
@@ -184,7 +184,7 @@ func (c *Client) CreateSmartMobileDeviceGroupV1(ctx context.Context, request *Sm
 // Parameters:
 //   - id: instance id of smart-group.
 func (c *Client) GetSmartMobileDeviceGroupV2(ctx context.Context, id string) (*SmartGroupDetailV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SmartGroupDetailV2
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -202,7 +202,7 @@ func (c *Client) GetSmartMobileDeviceGroupV2(ctx context.Context, id string) (*S
 // Parameters:
 //   - id: instance id of smart-group.
 func (c *Client) GetSmartMobileDeviceGroupV1(ctx context.Context, id string) (*SmartGroupDetail, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SmartGroupDetail
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -218,7 +218,7 @@ func (c *Client) GetSmartMobileDeviceGroupV1(ctx context.Context, id string) (*S
 // Parameters:
 //   - id: instance id of a smart group.
 func (c *Client) UpdateSmartMobileDeviceGroupV2(ctx context.Context, id string, request *SmartGroupAssignmentV2) (*SmartGroupAssignmentV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SmartGroupAssignmentV2
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -236,7 +236,7 @@ func (c *Client) UpdateSmartMobileDeviceGroupV2(ctx context.Context, id string, 
 // Parameters:
 //   - id: instance id of a smart group.
 func (c *Client) UpdateSmartMobileDeviceGroupV1(ctx context.Context, id string, request *SmartGroupAssignment) (*SmartGroupAssignment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SmartGroupAssignment
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -252,7 +252,7 @@ func (c *Client) UpdateSmartMobileDeviceGroupV1(ctx context.Context, id string, 
 // Parameters:
 //   - id: instance id of smart-group.
 func (c *Client) DeleteSmartMobileDeviceGroupV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteSmartMobileDeviceGroupV2(%s): %w", id, err)
@@ -269,7 +269,7 @@ func (c *Client) DeleteSmartMobileDeviceGroupV2(ctx context.Context, id string) 
 // Parameters:
 //   - id: instance id of smart-group.
 func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteSmartMobileDeviceGroupV1(%s): %w", id, err)
@@ -340,7 +340,7 @@ func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) 
 //     attribute, for example `EA+1!=null`.
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -433,7 +433,7 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id 
 //     attribute, for example `EA+1!=null`.
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -474,7 +474,7 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id 
 //     siteId filtered automatically. This param can be combined with paging and sorting. Example:
 //     groupName=="staticGroup1".
 func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -517,7 +517,7 @@ func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []stri
 //     siteId filtered automatically. This param can be combined with paging and sorting. Example:
 //     groupName=="staticGroup1".
 func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -552,7 +552,7 @@ func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []stri
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateStaticMobileDeviceGroupV2(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/mobile-device-groups/static-groups"
 	params := url.Values{}
@@ -577,7 +577,7 @@ func (c *Client) CreateStaticMobileDeviceGroupV2(ctx context.Context, request *S
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
 func (c *Client) CreateStaticMobileDeviceGroupV1(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/mobile-device-groups/static-groups"
 	params := url.Values{}
@@ -600,7 +600,7 @@ func (c *Client) CreateStaticMobileDeviceGroupV1(ctx context.Context, request *S
 // Parameters:
 //   - id: instance id of static-group.
 func (c *Client) GetStaticMobileDeviceGroupV2(ctx context.Context, id string) (*StaticGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result StaticGroup
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -618,7 +618,7 @@ func (c *Client) GetStaticMobileDeviceGroupV2(ctx context.Context, id string) (*
 // Parameters:
 //   - id: instance id of static-group.
 func (c *Client) GetStaticMobileDeviceGroupV1(ctx context.Context, id string) (*StaticGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result StaticGroup
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -634,7 +634,7 @@ func (c *Client) GetStaticMobileDeviceGroupV1(ctx context.Context, id string) (*
 // Parameters:
 //   - id: instance id of static-group.
 func (c *Client) DeleteStaticMobileDeviceGroupV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteStaticMobileDeviceGroupV2(%s): %w", id, err)
@@ -651,7 +651,7 @@ func (c *Client) DeleteStaticMobileDeviceGroupV2(ctx context.Context, id string)
 // Parameters:
 //   - id: instance id of static-group.
 func (c *Client) DeleteStaticMobileDeviceGroupV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteStaticMobileDeviceGroupV1(%s): %w", id, err)
@@ -666,7 +666,7 @@ func (c *Client) DeleteStaticMobileDeviceGroupV1(ctx context.Context, id string)
 // Parameters:
 //   - id: instance id of static-group.
 func (c *Client) PatchStaticMobileDeviceGroupV2(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result StaticGroupAssignment
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -684,7 +684,7 @@ func (c *Client) PatchStaticMobileDeviceGroupV2(ctx context.Context, id string, 
 // Parameters:
 //   - id: instance id of a static group.
 func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result StaticGroupAssignment
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -756,7 +756,7 @@ func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, 
 //     attribute, for example `EA+1!=null`.
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -849,7 +849,7 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id
 //     attribute, for example `EA+1!=null`.
 //     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
 func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -885,7 +885,7 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id
 // Parameters:
 //   - id: instance id of mobile-device-group.
 func (c *Client) EraseMobileDeviceGroupV2(ctx context.Context, id string, request *GroupResetRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("EraseMobileDeviceGroupV2(%s): %w", id, err)
@@ -903,7 +903,7 @@ func (c *Client) EraseMobileDeviceGroupV2(ctx context.Context, id string, reques
 // Parameters:
 //   - id: instance id of mobile-device-group.
 func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, request *GroupResetRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("EraseMobileDeviceGroupV1(%s): %w", id, err)
@@ -913,7 +913,7 @@ func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, reques
 
 // ResolveMobileDeviceGroupV2IDByName looks up a MobileDeviceGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMobileDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-groups"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -924,7 +924,7 @@ func (c *Client) ResolveMobileDeviceGroupV2IDByName(ctx context.Context, name st
 
 // ResolveMobileDeviceGroupV2ByName looks up a MobileDeviceGroupV2 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMobileDeviceGroupV2ByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-groups"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -939,7 +939,7 @@ func (c *Client) ResolveMobileDeviceGroupV2ByName(ctx context.Context, name stri
 
 // ResolveMobileDeviceGroupV1IDByName looks up a MobileDeviceGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -950,7 +950,7 @@ func (c *Client) ResolveMobileDeviceGroupV1IDByName(ctx context.Context, name st
 
 // ResolveMobileDeviceGroupV1ByName looks up a MobileDeviceGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveMobileDeviceGroupV1ByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -965,7 +965,7 @@ func (c *Client) ResolveMobileDeviceGroupV1ByName(ctx context.Context, name stri
 
 // ResolveSmartMobileDeviceGroupV2IDByName looks up a SmartMobileDeviceGroupV2 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveSmartMobileDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-groups/smart-groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
@@ -976,7 +976,7 @@ func (c *Client) ResolveSmartMobileDeviceGroupV2IDByName(ctx context.Context, na
 
 // ResolveSmartMobileDeviceGroupV2ByName looks up a SmartMobileDeviceGroupV2 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveSmartMobileDeviceGroupV2ByName(ctx context.Context, name string) (*SmartGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-groups/smart-groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
@@ -991,7 +991,7 @@ func (c *Client) ResolveSmartMobileDeviceGroupV2ByName(ctx context.Context, name
 
 // ResolveSmartMobileDeviceGroupV1IDByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveSmartMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/smart-groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
@@ -1002,7 +1002,7 @@ func (c *Client) ResolveSmartMobileDeviceGroupV1IDByName(ctx context.Context, na
 
 // ResolveSmartMobileDeviceGroupV1ByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name string) (*SmartGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/smart-groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
@@ -1017,7 +1017,7 @@ func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name
 
 // ResolveStaticMobileDeviceGroupV2IDByName looks up a StaticMobileDeviceGroupV2 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveStaticMobileDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-groups/static-groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
@@ -1028,7 +1028,7 @@ func (c *Client) ResolveStaticMobileDeviceGroupV2IDByName(ctx context.Context, n
 
 // ResolveStaticMobileDeviceGroupV2ByName looks up a StaticMobileDeviceGroupV2 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveStaticMobileDeviceGroupV2ByName(ctx context.Context, name string) (*StaticGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/mobile-device-groups/static-groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
@@ -1043,7 +1043,7 @@ func (c *Client) ResolveStaticMobileDeviceGroupV2ByName(ctx context.Context, nam
 
 // ResolveStaticMobileDeviceGroupV1IDByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/static-groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {
@@ -1054,7 +1054,7 @@ func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, n
 
 // ResolveStaticMobileDeviceGroupV1ByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveStaticMobileDeviceGroupV1ByName(ctx context.Context, name string) (*StaticGroup, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/mobile-device-groups/static-groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
 	if err != nil {

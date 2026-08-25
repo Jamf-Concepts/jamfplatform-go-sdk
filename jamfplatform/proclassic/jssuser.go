@@ -17,7 +17,7 @@ import (
 //
 // Required privileges: read:pro:accounts.
 func (c *Client) GetJSSUser(ctx context.Context) (*JssUser, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result JssUser
 	endpoint := prefix + "/jssuser"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

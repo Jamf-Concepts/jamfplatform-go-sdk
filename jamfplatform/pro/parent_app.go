@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Read Parent App Settings.
 func (c *Client) GetParentAppSettingsV1(ctx context.Context) (*ParentApp, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ParentApp
 	endpoint := prefix + "/parent-app"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetParentAppSettingsV1(ctx context.Context) (*ParentApp, error)
 //
 // Required privileges: update:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Update Parent App Settings.
 func (c *Client) UpdateParentAppSettingsV1(ctx context.Context, request *ParentApp) (*ParentApp, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ParentApp
 	endpoint := prefix + "/parent-app"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) UpdateParentAppSettingsV1(ctx context.Context, request *ParentA
 //     be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and
 //     date<2019-12-15.
 func (c *Client) ListParentAppHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -86,7 +86,7 @@ func (c *Client) ListParentAppHistoryV1(ctx context.Context, sort []string, filt
 //
 // Required privileges: update:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Update Parent App Settings.
 func (c *Client) CreateParentAppHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/parent-app/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

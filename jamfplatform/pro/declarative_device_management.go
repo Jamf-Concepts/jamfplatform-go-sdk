@@ -20,7 +20,7 @@ import (
 // Parameters:
 //   - clientManagementID: client management id of the target device.
 func (c *Client) ListDdmStatusItemsV1(ctx context.Context, clientManagementID string) (*StatusItems, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result StatusItems
 	endpoint := fmt.Sprintf("%s/ddm/%s/status-items", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) ListDdmStatusItemsV1(ctx context.Context, clientManagementID st
 //   - clientManagementID: client management id of the target device.
 //   - key: the status item key to retrieve.
 func (c *Client) GetDdmStatusItemV1(ctx context.Context, clientManagementID string, key string) (*StatusItem, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result StatusItem
 	endpoint := fmt.Sprintf("%s/ddm/%s/status-items/%s", prefix, url.PathEscape(clientManagementID), url.PathEscape(key))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -55,7 +55,7 @@ func (c *Client) GetDdmStatusItemV1(ctx context.Context, clientManagementID stri
 // Parameters:
 //   - clientManagementID: The client management id of the target device.
 func (c *Client) SyncDdmV1(ctx context.Context, clientManagementID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/ddm/%s/sync", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("SyncDdmV1(%s): %w", clientManagementID, err)

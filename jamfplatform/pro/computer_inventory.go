@@ -27,7 +27,7 @@ import (
 // Parameters:
 //   - id: Id of the computer to erase.
 func (c *Client) EraseComputerV1(ctx context.Context, id string, request *EraseDeviceComputerRequest) (*EraseDeviceComputerResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result EraseDeviceComputerResponse
 	endpoint := fmt.Sprintf("%s/computer-inventory/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -45,7 +45,7 @@ func (c *Client) EraseComputerV1(ctx context.Context, id string, request *EraseD
 // Parameters:
 //   - id: Id of the computer to remove the MDM profile from.
 func (c *Client) RemoveMdmProfileFromComputerV1(ctx context.Context, id string) (*RemoveComputerMDMProfileResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result RemoveComputerMDMProfileResponse
 	endpoint := fmt.Sprintf("%s/computer-inventory/%s/remove-mdm-profile", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
@@ -61,7 +61,7 @@ func (c *Client) RemoveMdmProfileFromComputerV1(ctx context.Context, id string) 
 // Parameters:
 //   - id: Id of the computer to erase.
 func (c *Client) EraseComputerV4(ctx context.Context, id string, request *EraseDeviceComputerRequest) (*EraseDeviceComputerResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result EraseDeviceComputerResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) EraseComputerV4(ctx context.Context, id string, request *EraseD
 // Parameters:
 //   - id: Id of the computer to remove the MDM profile from.
 func (c *Client) RemoveMdmProfileFromComputerV4(ctx context.Context, id string) (*RemoveComputerMDMProfileResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result RemoveComputerMDMProfileResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/remove-mdm-profile", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
@@ -140,7 +140,7 @@ func (c *Client) RemoveMdmProfileFromComputerV4(ctx context.Context, id string) 
 //     `purchasing.warrantyDate`,.
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -225,7 +225,7 @@ func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string,
 //     `purchasing.warrantyDate`,.
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -308,7 +308,7 @@ func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string,
 //     `purchasing.warrantyDate`,.
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV4(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV4, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -393,7 +393,7 @@ func (c *Client) ListComputersInventoryV4(ctx context.Context, section []string,
 //     `purchasing.warrantyDate`,.
 //     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
 func (c *Client) ListComputersInventoryV3(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV3, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -430,7 +430,7 @@ func (c *Client) ListComputersInventoryV3(ctx context.Context, section []string,
 //
 // Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV1(ctx context.Context, request *ComputerInventoryCreateRequest) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/computers-inventory"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -445,7 +445,7 @@ func (c *Client) CreateComputerInventoryV1(ctx context.Context, request *Compute
 //
 // Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV2(ctx context.Context, request *ComputerInventoryCreateRequestV2) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/computers-inventory"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -458,7 +458,7 @@ func (c *Client) CreateComputerInventoryV2(ctx context.Context, request *Compute
 //
 // Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV4(ctx context.Context, request *ComputerInventoryCreateRequestV4) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result HrefResponse
 	endpoint := prefix + "/computers-inventory"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -473,7 +473,7 @@ func (c *Client) CreateComputerInventoryV4(ctx context.Context, request *Compute
 //
 // Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV3(ctx context.Context, request *ComputerInventoryCreateRequestV2) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := prefix + "/computers-inventory"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -488,7 +488,7 @@ func (c *Client) CreateComputerInventoryV3(ctx context.Context, request *Compute
 //
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -516,7 +516,7 @@ func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]Compu
 //
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -542,7 +542,7 @@ func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]Compu
 //
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -570,7 +570,7 @@ func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]Compu
 //
 // Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -608,7 +608,7 @@ func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]Compu
 //     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
 //     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section []string) (*ComputerInventory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventory
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -640,7 +640,7 @@ func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section 
 //     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
 //     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section []string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ComputerInventoryV2
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -670,7 +670,7 @@ func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section 
 //     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
 //     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV4(ctx context.Context, id string, section []string) (*ComputerInventoryV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result ComputerInventoryV4
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -702,7 +702,7 @@ func (c *Client) GetComputerInventoryV4(ctx context.Context, id string, section 
 //     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
 //     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
 func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section []string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ComputerInventoryV3
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -727,7 +727,7 @@ func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section 
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) DeleteComputerInventoryV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryV1(%s): %w", id, err)
@@ -744,7 +744,7 @@ func (c *Client) DeleteComputerInventoryV1(ctx context.Context, id string) error
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) DeleteComputerInventoryV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryV2(%s): %w", id, err)
@@ -759,7 +759,7 @@ func (c *Client) DeleteComputerInventoryV2(ctx context.Context, id string) error
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) DeleteComputerInventoryV4(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryV4(%s): %w", id, err)
@@ -776,7 +776,7 @@ func (c *Client) DeleteComputerInventoryV4(ctx context.Context, id string) error
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) DeleteComputerInventoryV3(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryV3(%s): %w", id, err)
@@ -793,7 +793,7 @@ func (c *Client) DeleteComputerInventoryV3(ctx context.Context, id string) error
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryDetailV1(ctx context.Context, id string) (*ComputerInventory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventory
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -811,7 +811,7 @@ func (c *Client) GetComputerInventoryDetailV1(ctx context.Context, id string) (*
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryDetailV2(ctx context.Context, id string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ComputerInventoryV2
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -827,7 +827,7 @@ func (c *Client) GetComputerInventoryDetailV2(ctx context.Context, id string) (*
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryDetailV4(ctx context.Context, id string) (*ComputerInventoryV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result ComputerInventoryV4
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -845,7 +845,7 @@ func (c *Client) GetComputerInventoryDetailV4(ctx context.Context, id string) (*
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryDetailV3(ctx context.Context, id string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ComputerInventoryV3
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -863,7 +863,7 @@ func (c *Client) GetComputerInventoryDetailV3(ctx context.Context, id string) (*
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) UpdateComputerInventoryDetailV1(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) (*ComputerInventory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventory
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -881,7 +881,7 @@ func (c *Client) UpdateComputerInventoryDetailV1(ctx context.Context, id string,
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) UpdateComputerInventoryDetailV2(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateComputerInventoryDetailV2(%s): %w", id, err)
@@ -896,7 +896,7 @@ func (c *Client) UpdateComputerInventoryDetailV2(ctx context.Context, id string,
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) UpdateComputerInventoryDetailV4(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateComputerInventoryDetailV4(%s): %w", id, err)
@@ -913,7 +913,7 @@ func (c *Client) UpdateComputerInventoryDetailV4(ctx context.Context, id string,
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) UpdateComputerInventoryDetailV3(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateComputerInventoryDetailV3(%s): %w", id, err)
@@ -936,7 +936,7 @@ func (c *Client) UpdateComputerInventoryDetailV3(ctx context.Context, id string,
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadComputerInventoryAttachmentV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -963,7 +963,7 @@ func (c *Client) UploadComputerInventoryAttachmentV1(ctx context.Context, id str
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadComputerInventoryAttachmentV2(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -988,7 +988,7 @@ func (c *Client) UploadComputerInventoryAttachmentV2(ctx context.Context, id str
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadComputerInventoryAttachmentV4(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -1015,7 +1015,7 @@ func (c *Client) UploadComputerInventoryAttachmentV4(ctx context.Context, id str
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadComputerInventoryAttachmentV3(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -1037,7 +1037,7 @@ func (c *Client) UploadComputerInventoryAttachmentV3(ctx context.Context, id str
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DownloadComputerInventoryAttachmentV1(ctx context.Context, id string, attachmentID string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1056,7 +1056,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV1(ctx context.Context, id s
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DownloadComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1073,7 +1073,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV2(ctx context.Context, id s
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DownloadComputerInventoryAttachmentV4(ctx context.Context, id string, attachmentID string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1092,7 +1092,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV4(ctx context.Context, id s
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DownloadComputerInventoryAttachmentV3(ctx context.Context, id string, attachmentID string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1111,7 +1111,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV3(ctx context.Context, id s
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DeleteComputerInventoryAttachmentV1(ctx context.Context, id string, attachmentID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryAttachmentV1(%s): %w", id, err)
@@ -1129,7 +1129,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV1(ctx context.Context, id str
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DeleteComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryAttachmentV2(%s): %w", id, err)
@@ -1145,7 +1145,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV2(ctx context.Context, id str
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DeleteComputerInventoryAttachmentV4(ctx context.Context, id string, attachmentID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryAttachmentV4(%s): %w", id, err)
@@ -1163,7 +1163,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV4(ctx context.Context, id str
 //   - id: instance id of computer record.
 //   - attachmentID: instance id of attachment object.
 func (c *Client) DeleteComputerInventoryAttachmentV3(ctx context.Context, id string, attachmentID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryAttachmentV3(%s): %w", id, err)
@@ -1180,7 +1180,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV3(ctx context.Context, id str
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryFileVaultV1(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventoryFileVault
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/filevault", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1198,7 +1198,7 @@ func (c *Client) GetComputerInventoryFileVaultV1(ctx context.Context, id string)
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryFileVaultV2(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ComputerInventoryFileVault
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/filevault", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1214,7 +1214,7 @@ func (c *Client) GetComputerInventoryFileVaultV2(ctx context.Context, id string)
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryFileVaultV4(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result ComputerInventoryFileVault
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/filevault", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1232,7 +1232,7 @@ func (c *Client) GetComputerInventoryFileVaultV4(ctx context.Context, id string)
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerInventoryFileVaultV3(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ComputerInventoryFileVault
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/filevault", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1250,7 +1250,7 @@ func (c *Client) GetComputerInventoryFileVaultV3(ctx context.Context, id string)
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerDeviceLockPinV1(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventoryDeviceLockPinResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-device-lock-pin", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1268,7 +1268,7 @@ func (c *Client) GetComputerDeviceLockPinV1(ctx context.Context, id string) (*Co
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerDeviceLockPinV2(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ComputerInventoryDeviceLockPinResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-device-lock-pin", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1284,7 +1284,7 @@ func (c *Client) GetComputerDeviceLockPinV2(ctx context.Context, id string) (*Co
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerDeviceLockPinV4(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result ComputerInventoryDeviceLockPinResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-device-lock-pin", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1302,7 +1302,7 @@ func (c *Client) GetComputerDeviceLockPinV4(ctx context.Context, id string) (*Co
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerDeviceLockPinV3(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ComputerInventoryDeviceLockPinResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-device-lock-pin", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1320,7 +1320,7 @@ func (c *Client) GetComputerDeviceLockPinV3(ctx context.Context, id string) (*Co
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerRecoveryLockPasswordV1(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventoryRecoveryLockPasswordResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-recovery-lock-password", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1338,7 +1338,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV1(ctx context.Context, id strin
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerRecoveryLockPasswordV2(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ComputerInventoryRecoveryLockPasswordResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-recovery-lock-password", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1354,7 +1354,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV2(ctx context.Context, id strin
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerRecoveryLockPasswordV4(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result ComputerInventoryRecoveryLockPasswordResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-recovery-lock-password", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1372,7 +1372,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV4(ctx context.Context, id strin
 // Parameters:
 //   - id: instance id of computer record.
 func (c *Client) GetComputerRecoveryLockPasswordV3(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ComputerInventoryRecoveryLockPasswordResponse
 	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-recovery-lock-password", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -1383,7 +1383,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV3(ctx context.Context, id strin
 
 // ResolveComputerInventoryV1IDByName looks up a ComputerInventoryV1 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1394,7 +1394,7 @@ func (c *Client) ResolveComputerInventoryV1IDByName(ctx context.Context, name st
 
 // ResolveComputerInventoryV1ByName looks up a ComputerInventoryV1 by its general.name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV1ByName(ctx context.Context, name string) (*ComputerInventory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1409,7 +1409,7 @@ func (c *Client) ResolveComputerInventoryV1ByName(ctx context.Context, name stri
 
 // ResolveComputerInventoryV1IDBySerialNumber looks up a ComputerInventoryV1 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV1IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1420,7 +1420,7 @@ func (c *Client) ResolveComputerInventoryV1IDBySerialNumber(ctx context.Context,
 
 // ResolveComputerInventoryV1BySerialNumber looks up a ComputerInventoryV1 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV1BySerialNumber(ctx context.Context, name string) (*ComputerInventory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1435,7 +1435,7 @@ func (c *Client) ResolveComputerInventoryV1BySerialNumber(ctx context.Context, n
 
 // ResolveComputerInventoryV1IDByUDID looks up a ComputerInventoryV1 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV1IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computers-inventory"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {
@@ -1446,7 +1446,7 @@ func (c *Client) ResolveComputerInventoryV1IDByUDID(ctx context.Context, name st
 
 // ResolveComputerInventoryV1ByUDID looks up a ComputerInventoryV1 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV1ByUDID(ctx context.Context, name string) (*ComputerInventory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/computers-inventory"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {
@@ -1461,7 +1461,7 @@ func (c *Client) ResolveComputerInventoryV1ByUDID(ctx context.Context, name stri
 
 // ResolveComputerInventoryV2IDByName looks up a ComputerInventoryV2 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1472,7 +1472,7 @@ func (c *Client) ResolveComputerInventoryV2IDByName(ctx context.Context, name st
 
 // ResolveComputerInventoryV2ByName looks up a ComputerInventoryV2 by its general.name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV2ByName(ctx context.Context, name string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1487,7 +1487,7 @@ func (c *Client) ResolveComputerInventoryV2ByName(ctx context.Context, name stri
 
 // ResolveComputerInventoryV2IDBySerialNumber looks up a ComputerInventoryV2 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1498,7 +1498,7 @@ func (c *Client) ResolveComputerInventoryV2IDBySerialNumber(ctx context.Context,
 
 // ResolveComputerInventoryV2BySerialNumber looks up a ComputerInventoryV2 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV2BySerialNumber(ctx context.Context, name string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1513,7 +1513,7 @@ func (c *Client) ResolveComputerInventoryV2BySerialNumber(ctx context.Context, n
 
 // ResolveComputerInventoryV2IDByUDID looks up a ComputerInventoryV2 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV2IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/computers-inventory"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {
@@ -1524,7 +1524,7 @@ func (c *Client) ResolveComputerInventoryV2IDByUDID(ctx context.Context, name st
 
 // ResolveComputerInventoryV2ByUDID looks up a ComputerInventoryV2 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV2ByUDID(ctx context.Context, name string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/computers-inventory"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {
@@ -1539,7 +1539,7 @@ func (c *Client) ResolveComputerInventoryV2ByUDID(ctx context.Context, name stri
 
 // ResolveComputerInventoryV4IDByName looks up a ComputerInventoryV4 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV4IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1550,7 +1550,7 @@ func (c *Client) ResolveComputerInventoryV4IDByName(ctx context.Context, name st
 
 // ResolveComputerInventoryV4ByName looks up a ComputerInventoryV4 by its general.name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV4ByName(ctx context.Context, name string) (*ComputerInventoryV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1565,7 +1565,7 @@ func (c *Client) ResolveComputerInventoryV4ByName(ctx context.Context, name stri
 
 // ResolveComputerInventoryV4IDBySerialNumber looks up a ComputerInventoryV4 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV4IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1576,7 +1576,7 @@ func (c *Client) ResolveComputerInventoryV4IDBySerialNumber(ctx context.Context,
 
 // ResolveComputerInventoryV4BySerialNumber looks up a ComputerInventoryV4 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV4BySerialNumber(ctx context.Context, name string) (*ComputerInventoryV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1591,7 +1591,7 @@ func (c *Client) ResolveComputerInventoryV4BySerialNumber(ctx context.Context, n
 
 // ResolveComputerInventoryV4IDByUDID looks up a ComputerInventoryV4 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV4IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	listPath := prefix + "/computers-inventory"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {
@@ -1602,7 +1602,7 @@ func (c *Client) ResolveComputerInventoryV4IDByUDID(ctx context.Context, name st
 
 // ResolveComputerInventoryV4ByUDID looks up a ComputerInventoryV4 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV4ByUDID(ctx context.Context, name string) (*ComputerInventoryV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	listPath := prefix + "/computers-inventory"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {
@@ -1617,7 +1617,7 @@ func (c *Client) ResolveComputerInventoryV4ByUDID(ctx context.Context, name stri
 
 // ResolveComputerInventoryV3IDByName looks up a ComputerInventoryV3 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV3IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1628,7 +1628,7 @@ func (c *Client) ResolveComputerInventoryV3IDByName(ctx context.Context, name st
 
 // ResolveComputerInventoryV3ByName looks up a ComputerInventoryV3 by its general.name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV3ByName(ctx context.Context, name string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory?section=GENERAL"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
 	if err != nil {
@@ -1643,7 +1643,7 @@ func (c *Client) ResolveComputerInventoryV3ByName(ctx context.Context, name stri
 
 // ResolveComputerInventoryV3IDBySerialNumber looks up a ComputerInventoryV3 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV3IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1654,7 +1654,7 @@ func (c *Client) ResolveComputerInventoryV3IDBySerialNumber(ctx context.Context,
 
 // ResolveComputerInventoryV3BySerialNumber looks up a ComputerInventoryV3 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV3BySerialNumber(ctx context.Context, name string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory?section=HARDWARE"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
 	if err != nil {
@@ -1669,7 +1669,7 @@ func (c *Client) ResolveComputerInventoryV3BySerialNumber(ctx context.Context, n
 
 // ResolveComputerInventoryV3IDByUDID looks up a ComputerInventoryV3 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveComputerInventoryV3IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {
@@ -1680,7 +1680,7 @@ func (c *Client) ResolveComputerInventoryV3IDByUDID(ctx context.Context, name st
 
 // ResolveComputerInventoryV3ByUDID looks up a ComputerInventoryV3 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveComputerInventoryV3ByUDID(ctx context.Context, name string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/computers-inventory"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
 	if err != nil {

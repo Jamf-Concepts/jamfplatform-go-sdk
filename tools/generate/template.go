@@ -51,14 +51,8 @@ var funcMap = template.FuncMap{
 		return fmt.Sprintf(`"%s(%%s): %%w", %s, err`, m.Name, m.PathParams[0].GoName)
 	},
 	"testPath": func(m GoMethod) string {
-		var base string
-		if m.Version == "" {
-			base = fmt.Sprintf("/api/%s/tenant/t-test", m.Namespace)
-		} else {
-			base = fmt.Sprintf("/api/%s/%s/tenant/t-test", m.Namespace, m.Version)
-		}
 		path := pathParamRe.ReplaceAllString(m.ResourcePath, "test-id")
-		return base + path
+		return testAPIBase(m.Namespace, m.Version) + path
 	},
 	"testCallArgs": func(m GoMethod) string {
 		if len(m.PathParams) == 0 {
@@ -148,10 +142,7 @@ var funcMap = template.FuncMap{
 	// applyListPath builds the test-server handler path for the list endpoint
 	// used by the apply method's resolver call.
 	"applyListPath": func(a *GoApply) string {
-		if a.ListVersion == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.ListNamespace, a.ListPath)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.ListNamespace, a.ListVersion, a.ListPath)
+		return testAPIBase(a.ListNamespace, a.ListVersion) + a.ListPath
 	},
 	// applyCreatePath builds the test-server handler path for the create endpoint.
 	"applyCreatePath": func(a *GoApply) string {
@@ -160,10 +151,7 @@ var funcMap = template.FuncMap{
 			replacement = "0"
 		}
 		path := pathParamRe.ReplaceAllString(a.CreatePath, replacement)
-		if a.CreateVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.CreateNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.CreateNS, a.CreateVer, path)
+		return testAPIBase(a.CreateNS, a.CreateVer) + path
 	},
 	// applyUpdatePath builds the test-server handler path for the update endpoint.
 	"applyUpdatePath": func(a *GoApply) string {
@@ -172,56 +160,38 @@ var funcMap = template.FuncMap{
 			replacement = "42"
 		}
 		path := pathParamRe.ReplaceAllString(a.UpdatePath, replacement)
-		if a.UpdateVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+		return testAPIBase(a.UpdateNS, a.UpdateVer) + path
 	},
 	// applyGetPath builds the test-server handler path for the get endpoint
 	// used by versionLock-enabled apply methods.
 	"applyGetPath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.GetPath, "existing-id")
-		if a.GetVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.GetNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.GetNS, a.GetVer, path)
+		return testAPIBase(a.GetNS, a.GetVer) + path
 	},
 	// applyTokenUploadPath builds the test-server handler path for the token
 	// upload endpoint used to create resources in tokenUploadMode.
 	"applyTokenUploadPath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.TokenUploadPath, "test-id")
-		if a.TokenUploadVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenUploadNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenUploadNS, a.TokenUploadVer, path)
+		return testAPIBase(a.TokenUploadNS, a.TokenUploadVer) + path
 	},
 	// applyTokenReplacePath builds the test-server handler path for the token
 	// replace endpoint used to re-upload tokens on update in tokenUploadMode.
 	"applyTokenReplacePath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.TokenReplacePath, "existing-id")
-		if a.TokenReplaceVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.TokenReplaceNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.TokenReplaceNS, a.TokenReplaceVer, path)
+		return testAPIBase(a.TokenReplaceNS, a.TokenReplaceVer) + path
 	},
 	// applyMembershipFetchPath builds the test-server handler path for the
 	// membership list endpoint used in membershipPreFetch apply mode.
 	"applyMembershipFetchPath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.MembershipFetchPath, "existing-id")
-		if a.MembershipFetchVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.MembershipFetchNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.MembershipFetchNS, a.MembershipFetchVer, path)
+		return testAPIBase(a.MembershipFetchNS, a.MembershipFetchVer) + path
 	},
 	// applyTokenCreateUpdatePath builds the test-server handler path for the
 	// metadata update endpoint in the token-upload create test. Uses "new-id"
 	// as the path parameter since the upload response returns that ID.
 	"applyTokenCreateUpdatePath": func(a *GoApply) string {
 		path := pathParamRe.ReplaceAllString(a.UpdatePath, "new-id")
-		if a.UpdateVer == "" {
-			return fmt.Sprintf("/api/%s/tenant/t-test%s", a.UpdateNS, path)
-		}
-		return fmt.Sprintf("/api/%s/%s/tenant/t-test%s", a.UpdateNS, a.UpdateVer, path)
+		return testAPIBase(a.UpdateNS, a.UpdateVer) + path
 	},
 	// applyCreateStatus returns the HTTP status code for test create responses.
 	"applyCreateStatus": func(a *GoApply) int {
@@ -478,7 +448,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
@@ -500,7 +470,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
@@ -526,7 +496,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
@@ -544,7 +514,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "update" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 {{- if .ContentType }}
@@ -561,7 +531,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "action" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, nil); err != nil {
@@ -581,7 +551,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 // transfer encoding and is not retried on 429.
 {{- if .ResponseType }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .MultipartFields }}{{ if .IsFile }}, {{ .GoName }}Filename string, {{ .GoName }} io.Reader{{ else }}, {{ .GoName }} {{ .Type }}{{ end }}{{ end }}) (*{{ .ResponseType }}, error) {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 	parts := []client.MultipartField{
@@ -600,7 +570,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 }
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .MultipartFields }}{{ if .IsFile }}, {{ .GoName }}Filename string, {{ .GoName }} io.Reader{{ else }}, {{ .GoName }} {{ .Type }}{{ end }}{{ end }}) error {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 	parts := []client.MultipartField{
 {{- range .MultipartFields }}
@@ -623,7 +593,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 // {{ .Comment }}
 {{- if and .RequestType .ResponseType }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, body []byte) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result []byte
 	endpoint := {{ fmtPath . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, body, {{ statusConst .ExpectedStatus }}, &result); err != nil {
@@ -633,7 +603,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 }
 {{- else if .RequestType }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, body []byte) error {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, body, {{ statusConst .ExpectedStatus }}, nil); err != nil {
 		return fmt.Errorf({{ errWrap . }})
@@ -642,7 +612,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 }
 {{- else if .ResponseType }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result []byte
 	endpoint := {{ fmtPath . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, &result); err != nil {
@@ -652,7 +622,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 }
 {{- else }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}) error {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, nil); err != nil {
 		return fmt.Errorf({{ errWrap . }})
@@ -665,7 +635,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "unwrap" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .UnwrapResults }}, error) {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 
@@ -683,7 +653,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "paginated" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ([]{{ .ItemType }}, error) {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	return client.ListAllPages(ctx, {{ .MaxPageSize }}, func(ctx context.Context, page, pageSize int) ([]{{ .ItemType }}, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -759,7 +729,7 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "resolverID" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.MatchField }}", "{{ .Resolver.IDField }}", name)
@@ -778,7 +748,7 @@ func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
 {{- define "resolverTyped" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context, name string) (*{{ .Resolver.TypedReturn }}, error) {
-	prefix := c.transport.TenantPrefix("{{ .Namespace }}", "{{ .Version }}")
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	listPath := prefix + "{{ .ResourcePath }}{{ if .Resolver.ExtraParams }}?{{ .Resolver.ExtraParams }}{{ end }}"
 {{- if eq .Resolver.Mode "filtered" }}
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "{{ .Resolver.ResultsField }}", "{{ .Resolver.NameField }}", "{{ .Resolver.MatchField }}", "{{ .Resolver.IDField }}", name)
@@ -1650,3 +1620,17 @@ func Test<% .Name %>_Update(t *testing.T) {
 }
 <% end %>
 `
+
+// testAPIBase builds the URL prefix the generated httptest handlers register,
+// for one namespace and version. It mirrors Transport.APIPrefix.
+//
+// There is no scope segment: the tenant travels in the X-Tenant-Id header, so
+// the path is identical for every tenant. A generated test therefore asserts
+// the path the transport actually builds, and a tenant ID appearing in one
+// would be a bug.
+func testAPIBase(namespace, version string) string {
+	if version == "" {
+		return fmt.Sprintf("/api/%s", namespace)
+	}
+	return fmt.Sprintf("/api/%s/%s", namespace, version)
+}

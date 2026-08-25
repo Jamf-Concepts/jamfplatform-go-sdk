@@ -21,7 +21,7 @@ import (
 //
 // Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetADUESessionTokenSettingsV1(ctx context.Context) (*AccountDrivenUserEnrollmentSessionTokenSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AccountDrivenUserEnrollmentSessionTokenSettings
 	endpoint := prefix + "/adue-session-token-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -34,7 +34,7 @@ func (c *Client) GetADUESessionTokenSettingsV1(ctx context.Context) (*AccountDri
 //
 // Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateADUESessionTokenSettingsV1(ctx context.Context, request *AccountDrivenUserEnrollmentSessionTokenSettings) (*AccountDrivenUserEnrollmentSessionTokenSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AccountDrivenUserEnrollmentSessionTokenSettings
 	endpoint := prefix + "/adue-session-token-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) UpdateADUESessionTokenSettingsV1(ctx context.Context, request *
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `date:desc`. Multiple sort
 //     criteria are supported and must be separated with a comma. Example: `sort=date:desc,name:asc`.
 func (c *Client) ListEnrollmentHistoryV2(ctx context.Context, sort []string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -80,7 +80,7 @@ func (c *Client) ListEnrollmentHistoryV2(ctx context.Context, sort []string) ([]
 //
 // Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) CreateEnrollmentHistoryNoteV2(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/enrollment/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -107,7 +107,7 @@ func (c *Client) CreateEnrollmentHistoryNoteV2(ctx context.Context, request *Obj
 //   - returning all results for the requested page. Fields allowed in the query: id, name. This param
 //     can be combined with paging and sorting. Example: name=="*script*".
 func (c *Client) ExportEnrollmentHistoryV2(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := prefix + "/enrollment/history/export"
 	params := url.Values{}
@@ -141,7 +141,7 @@ func (c *Client) ExportEnrollmentHistoryV2(ctx context.Context, request *ExportP
 //     criteria are supported and must be separated with a comma. Example: `sort=date:desc,name:asc`.
 //   - allUsersOptionFirst: Return "All LDAP Users" option on the first position if it is present in the current page.
 func (c *Client) ListEnrollmentAccessGroupsV3(ctx context.Context, sort []string, allUsersOptionFirst bool) ([]EnrollmentAccessGroupPreview, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]EnrollmentAccessGroupPreview, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -173,7 +173,7 @@ func (c *Client) ListEnrollmentAccessGroupsV3(ctx context.Context, sort []string
 //
 // Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) CreateEnrollmentAccessGroupV3(ctx context.Context, request *EnrollmentAccessGroupPreview) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
 	endpoint := prefix + "/enrollment/access-groups"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -189,7 +189,7 @@ func (c *Client) CreateEnrollmentAccessGroupV3(ctx context.Context, request *Enr
 // Parameters:
 //   - id: Autogenerated Access Group ID.
 func (c *Client) GetEnrollmentAccessGroupV3(ctx context.Context, id string) (*EnrollmentAccessGroupPreview, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result EnrollmentAccessGroupPreview
 	endpoint := fmt.Sprintf("%s/enrollment/access-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -205,7 +205,7 @@ func (c *Client) GetEnrollmentAccessGroupV3(ctx context.Context, id string) (*En
 // Parameters:
 //   - id: Autogenerated Access Group ID.
 func (c *Client) UpdateEnrollmentAccessGroupV3(ctx context.Context, id string, request *EnrollmentAccessGroupPreview) (*EnrollmentAccessGroupPreview, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result EnrollmentAccessGroupPreview
 	endpoint := fmt.Sprintf("%s/enrollment/access-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -221,7 +221,7 @@ func (c *Client) UpdateEnrollmentAccessGroupV3(ctx context.Context, id string, r
 // Parameters:
 //   - id: Autogenerated Access Group ID.
 func (c *Client) DeleteEnrollmentAccessGroupV3(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/enrollment/access-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteEnrollmentAccessGroupV3(%s): %w", id, err)
@@ -233,7 +233,7 @@ func (c *Client) DeleteEnrollmentAccessGroupV3(ctx context.Context, id string) e
 //
 // Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ListFilteredEnrollmentLanguageCodesV3(ctx context.Context) ([]LanguageCode, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []LanguageCode
 	endpoint := prefix + "/enrollment/filtered-language-codes"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -246,7 +246,7 @@ func (c *Client) ListFilteredEnrollmentLanguageCodesV3(ctx context.Context) ([]L
 //
 // Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) ListEnrollmentLanguageCodesV3(ctx context.Context) ([]LanguageCode, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []LanguageCode
 	endpoint := prefix + "/enrollment/language-codes"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -263,7 +263,7 @@ func (c *Client) ListEnrollmentLanguageCodesV3(ctx context.Context) ([]LanguageC
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is `languageCode:asc`. Multiple sort
 //     criteria are supported and must be separated with a comma. Example: `sort=date:desc,name:asc`.
 func (c *Client) ListEnrollmentLanguagesV3(ctx context.Context, sort []string) ([]EnrollmentProcessTextObject, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]EnrollmentProcessTextObject, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -292,7 +292,7 @@ func (c *Client) ListEnrollmentLanguagesV3(ctx context.Context, sort []string) (
 //
 // Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) DeleteMultipleEnrollmentLanguagesV3(ctx context.Context, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := prefix + "/enrollment/languages/delete-multiple"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleEnrollmentLanguagesV3: %w", err)
@@ -307,7 +307,7 @@ func (c *Client) DeleteMultipleEnrollmentLanguagesV3(ctx context.Context, reques
 // Parameters:
 //   - languageID: Two letter ISO 639-1 Language Code.
 func (c *Client) GetEnrollmentLanguageV3(ctx context.Context, languageID string) (*EnrollmentProcessTextObject, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result EnrollmentProcessTextObject
 	endpoint := fmt.Sprintf("%s/enrollment/languages/%s", prefix, url.PathEscape(languageID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -323,7 +323,7 @@ func (c *Client) GetEnrollmentLanguageV3(ctx context.Context, languageID string)
 // Parameters:
 //   - languageID: Two letter ISO 639-1 Language Code.
 func (c *Client) UpdateEnrollmentLanguageV3(ctx context.Context, languageID string, request *EnrollmentProcessTextObject) (*EnrollmentProcessTextObject, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	var result EnrollmentProcessTextObject
 	endpoint := fmt.Sprintf("%s/enrollment/languages/%s", prefix, url.PathEscape(languageID))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -339,7 +339,7 @@ func (c *Client) UpdateEnrollmentLanguageV3(ctx context.Context, languageID stri
 // Parameters:
 //   - languageID: Two letter ISO 639-1 Language Code.
 func (c *Client) DeleteEnrollmentLanguageV3(ctx context.Context, languageID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := fmt.Sprintf("%s/enrollment/languages/%s", prefix, url.PathEscape(languageID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteEnrollmentLanguageV3(%s): %w", languageID, err)
@@ -351,7 +351,7 @@ func (c *Client) DeleteEnrollmentLanguageV3(ctx context.Context, languageID stri
 //
 // Required privileges: read:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment.
 func (c *Client) GetEnrollmentSettingsV4(ctx context.Context) (*EnrollmentSettingsV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result EnrollmentSettingsV4
 	endpoint := prefix + "/enrollment"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -364,7 +364,7 @@ func (c *Client) GetEnrollmentSettingsV4(ctx context.Context) (*EnrollmentSettin
 //
 // Required privileges: update:pro:user-initiated-enrollment. Legacy Jamf Pro privilege name(s): Update User-Initiated Enrollment.
 func (c *Client) UpdateEnrollmentSettingsV4(ctx context.Context, request *EnrollmentSettingsV4) (*EnrollmentSettingsV4, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result EnrollmentSettingsV4
 	endpoint := prefix + "/enrollment"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -377,7 +377,7 @@ func (c *Client) UpdateEnrollmentSettingsV4(ctx context.Context, request *Enroll
 //
 // Required privileges: read:pro:access-management-setting. Legacy Jamf Pro privilege name(s): Access Management Setting Read.
 func (c *Client) GetEnrollmentAccessManagementV4(ctx context.Context) (*AccessManagementSetting, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result AccessManagementSetting
 	endpoint := prefix + "/enrollment/access-management"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -390,7 +390,7 @@ func (c *Client) GetEnrollmentAccessManagementV4(ctx context.Context) (*AccessMa
 //
 // Required privileges: update:pro:access-management-setting. Legacy Jamf Pro privilege name(s): Access Management Setting Update.
 func (c *Client) UpdateEnrollmentAccessManagementV4(ctx context.Context, request *AccessManagementSetting) (*AccessManagementSetting, error) {
-	prefix := c.transport.TenantPrefix("pro", "v4")
+	prefix := c.transport.APIPrefix("pro", "v4")
 	var result AccessManagementSetting
 	endpoint := prefix + "/enrollment/access-management"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -401,7 +401,7 @@ func (c *Client) UpdateEnrollmentAccessManagementV4(ctx context.Context, request
 
 // ResolveEnrollmentAccessGroupV3IDByName looks up a EnrollmentAccessGroupV3 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveEnrollmentAccessGroupV3IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/enrollment/access-groups"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -412,7 +412,7 @@ func (c *Client) ResolveEnrollmentAccessGroupV3IDByName(ctx context.Context, nam
 
 // ResolveEnrollmentAccessGroupV3ByName looks up a EnrollmentAccessGroupV3 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveEnrollmentAccessGroupV3ByName(ctx context.Context, name string) (*EnrollmentAccessGroupPreview, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/enrollment/access-groups"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -427,7 +427,7 @@ func (c *Client) ResolveEnrollmentAccessGroupV3ByName(ctx context.Context, name 
 
 // ResolveEnrollmentLanguageV3IDByName looks up a EnrollmentLanguageV3 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveEnrollmentLanguageV3IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/enrollment/languages"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "languageCode", name)
 	if err != nil {
@@ -438,7 +438,7 @@ func (c *Client) ResolveEnrollmentLanguageV3IDByName(ctx context.Context, name s
 
 // ResolveEnrollmentLanguageV3ByName looks up a EnrollmentLanguageV3 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveEnrollmentLanguageV3ByName(ctx context.Context, name string) (*EnrollmentProcessTextObject, error) {
-	prefix := c.transport.TenantPrefix("pro", "v3")
+	prefix := c.transport.APIPrefix("pro", "v3")
 	listPath := prefix + "/enrollment/languages"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "languageCode", name)
 	if err != nil {

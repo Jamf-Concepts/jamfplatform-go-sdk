@@ -17,7 +17,7 @@ import (
 // Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateMdmRenewalDeviceCommonDetailsV1(ctx context.Context, request *DeviceCommonDetailsRequest) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/mdm-renewal/device-common-details"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateMdmRenewalDeviceCommonDetailsV1: %w", err)
@@ -33,7 +33,7 @@ func (c *Client) UpdateMdmRenewalDeviceCommonDetailsV1(ctx context.Context, requ
 // Parameters:
 //   - clientManagementID: The client management ID to retrieve device common details for.
 func (c *Client) GetMdmRenewalDeviceCommonDetailsV1(ctx context.Context, clientManagementID string) (*DeviceCommonDetails, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceCommonDetails
 	endpoint := fmt.Sprintf("%s/mdm-renewal/device-common-details/%s", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -50,7 +50,7 @@ func (c *Client) GetMdmRenewalDeviceCommonDetailsV1(ctx context.Context, clientM
 // Parameters:
 //   - clientManagementID: The client management ID to retrieve renewal strategies for.
 func (c *Client) GetMdmRenewalStrategiesV1(ctx context.Context, clientManagementID string) ([]MDMRenewalErrorStrategiesResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []MDMRenewalErrorStrategiesResponse
 	endpoint := fmt.Sprintf("%s/mdm-renewal/renewal-strategies/%s", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) GetMdmRenewalStrategiesV1(ctx context.Context, clientManagement
 // Parameters:
 //   - clientManagementID: The client management ID to delete renewal strategies for.
 func (c *Client) DeleteMdmRenewalStrategiesV1(ctx context.Context, clientManagementID string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/mdm-renewal/renewal-strategies/%s", prefix, url.PathEscape(clientManagementID))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMdmRenewalStrategiesV1(%s): %w", clientManagementID, err)

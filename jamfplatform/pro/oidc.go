@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetOidcDirectIdpLoginUrlV1(ctx context.Context) (*OidcDirectIdpLoginSkipURL, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result OidcDirectIdpLoginSkipURL
 	endpoint := prefix + "/oidc/direct-idp-login-url"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetOidcDirectIdpLoginUrlV1(ctx context.Context) (*OidcDirectIdp
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) GenerateOidcCertificateV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/oidc/generate-certificate"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("GenerateOidcCertificateV1: %w", err)
@@ -40,7 +40,7 @@ func (c *Client) GenerateOidcCertificateV1(ctx context.Context) error {
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetOidcPublicFeaturesV1(ctx context.Context) (*OidcPublicFeaturesResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result OidcPublicFeaturesResponse
 	endpoint := prefix + "/oidc/public-features"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -53,7 +53,7 @@ func (c *Client) GetOidcPublicFeaturesV1(ctx context.Context) (*OidcPublicFeatur
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetOidcPublicKeyV1(ctx context.Context) (*OidcJwksResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result OidcJwksResponse
 	endpoint := prefix + "/oidc/public-key"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -66,7 +66,7 @@ func (c *Client) GetOidcPublicKeyV1(ctx context.Context) (*OidcJwksResponse, err
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) DispatchOidcLoginV2(ctx context.Context, request *OidcLoginDispatchRequest) (*OidcLoginDispatchResponseV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result OidcLoginDispatchResponseV2
 	endpoint := prefix + "/oidc/dispatch"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -81,7 +81,7 @@ func (c *Client) DispatchOidcLoginV2(ctx context.Context, request *OidcLoginDisp
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) DispatchOidcV1(ctx context.Context, request *OidcLoginDispatchRequest) (*OidcLoginDispatchResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result OidcLoginDispatchResponse
 	endpoint := prefix + "/oidc/dispatch"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

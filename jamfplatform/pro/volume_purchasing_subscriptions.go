@@ -25,7 +25,7 @@ import (
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
 //     are supported and must be separated with a comma. Allowable properties are id, name, and enabled.
 func (c *Client) ListVolumePurchasingSubscriptionsV1(ctx context.Context, sort []string) ([]VolumePurchasingSubscription, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]VolumePurchasingSubscription, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -54,7 +54,7 @@ func (c *Client) ListVolumePurchasingSubscriptionsV1(ctx context.Context, sort [
 //
 // Required privileges: create:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Create Volume Purchasing Locations.
 func (c *Client) CreateVolumePurchasingSubscriptionV1(ctx context.Context, request *VolumePurchasingSubscriptionBase) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/volume-purchasing-subscriptions"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -70,7 +70,7 @@ func (c *Client) CreateVolumePurchasingSubscriptionV1(ctx context.Context, reque
 // Parameters:
 //   - id: Volume Purchasing Subscription identifier.
 func (c *Client) GetVolumePurchasingSubscriptionV1(ctx context.Context, id string) (*VolumePurchasingSubscription, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VolumePurchasingSubscription
 	endpoint := fmt.Sprintf("%s/volume-purchasing-subscriptions/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -86,7 +86,7 @@ func (c *Client) GetVolumePurchasingSubscriptionV1(ctx context.Context, id strin
 // Parameters:
 //   - id: Volume Purchasing Subscription identifier.
 func (c *Client) UpdateVolumePurchasingSubscriptionV1(ctx context.Context, id string, request *VolumePurchasingSubscriptionBase) (*VolumePurchasingSubscription, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result VolumePurchasingSubscription
 	endpoint := fmt.Sprintf("%s/volume-purchasing-subscriptions/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -102,7 +102,7 @@ func (c *Client) UpdateVolumePurchasingSubscriptionV1(ctx context.Context, id st
 // Parameters:
 //   - id: Volume Purchasing Subscription identifier.
 func (c *Client) DeleteVolumePurchasingSubscriptionV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/volume-purchasing-subscriptions/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteVolumePurchasingSubscriptionV1(%s): %w", id, err)
@@ -123,7 +123,7 @@ func (c *Client) DeleteVolumePurchasingSubscriptionV1(ctx context.Context, id st
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListVolumePurchasingSubscriptionHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -158,7 +158,7 @@ func (c *Client) ListVolumePurchasingSubscriptionHistoryV1(ctx context.Context, 
 // Parameters:
 //   - id: Volume Purchasing Subscription Id.
 func (c *Client) CreateVolumePurchasingSubscriptionHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/volume-purchasing-subscriptions/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -169,7 +169,7 @@ func (c *Client) CreateVolumePurchasingSubscriptionHistoryNoteV1(ctx context.Con
 
 // ResolveVolumePurchasingSubscriptionV1IDByName looks up a VolumePurchasingSubscriptionV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveVolumePurchasingSubscriptionV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/volume-purchasing-subscriptions"
 	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -180,7 +180,7 @@ func (c *Client) ResolveVolumePurchasingSubscriptionV1IDByName(ctx context.Conte
 
 // ResolveVolumePurchasingSubscriptionV1ByName looks up a VolumePurchasingSubscriptionV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveVolumePurchasingSubscriptionV1ByName(ctx context.Context, name string) (*VolumePurchasingSubscription, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/volume-purchasing-subscriptions"
 	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

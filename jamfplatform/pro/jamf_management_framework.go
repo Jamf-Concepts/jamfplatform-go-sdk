@@ -20,7 +20,7 @@ import (
 // Parameters:
 //   - id: instance id of computer.
 func (c *Client) RedeployJamfManagementFrameworkV1(ctx context.Context, id string) (*RedeployJamfManagementFrameworkResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result RedeployJamfManagementFrameworkResponse
 	endpoint := fmt.Sprintf("%s/jamf-management-framework/redeploy/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, &result); err != nil {

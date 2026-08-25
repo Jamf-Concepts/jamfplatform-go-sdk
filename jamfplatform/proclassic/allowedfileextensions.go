@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: Database ID of the extension.
 func (c *Client) GetAllowedFileExtensionByID(ctx context.Context, id string) (*AllowedFileExtension, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AllowedFileExtension
 	endpoint := fmt.Sprintf("%s/allowedfileextensions/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetAllowedFileExtensionByID(ctx context.Context, id string) (*A
 // Parameters:
 //   - id: Database ID of the extension.
 func (c *Client) CreateAllowedFileExtensionByID(ctx context.Context, id string, request *AllowedFileExtension) (*AllowedFileExtension, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AllowedFileExtension
 	endpoint := fmt.Sprintf("%s/allowedfileextensions/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateAllowedFileExtensionByID(ctx context.Context, id string, 
 // Parameters:
 //   - id: Database ID of the extension.
 func (c *Client) DeleteAllowedFileExtensionByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/allowedfileextensions/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteAllowedFileExtensionByID(%s): %w", id, err)
@@ -66,7 +66,7 @@ func (c *Client) DeleteAllowedFileExtensionByID(ctx context.Context, id string) 
 // Parameters:
 //   - extension: String value of extension.
 func (c *Client) GetAllowedFileExtensionByExtension(ctx context.Context, extension string) (*AllowedFileExtension, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AllowedFileExtension
 	endpoint := fmt.Sprintf("%s/allowedfileextensions/extension/%s", prefix, url.PathEscape(extension))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -79,7 +79,7 @@ func (c *Client) GetAllowedFileExtensionByExtension(ctx context.Context, extensi
 //
 // Required privileges: read:pro:allowed-file-extension.
 func (c *Client) ListAllowedFileExtensions(ctx context.Context) (*AllowedFileExtensions, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AllowedFileExtensions
 	endpoint := prefix + "/allowedfileextensions"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

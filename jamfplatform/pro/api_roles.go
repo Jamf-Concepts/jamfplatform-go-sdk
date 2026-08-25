@@ -29,7 +29,7 @@ import (
 //     returning all results for the requested page. Fields allowed in the query: id, displayName. Example:
 //     displayName=="*myRole*".
 func (c *Client) ListApiRolesV1(ctx context.Context, sort []string, filter string) ([]ApiRole, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ApiRole, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -61,7 +61,7 @@ func (c *Client) ListApiRolesV1(ctx context.Context, sort []string, filter strin
 //
 // Required privileges: create:pro:api-roles. Legacy Jamf Pro privilege name(s): Create API Roles.
 func (c *Client) CreateApiRoleV1(ctx context.Context, request *ApiRoleRequest) (*ApiRole, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ApiRole
 	endpoint := prefix + "/api-roles"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) CreateApiRoleV1(ctx context.Context, request *ApiRoleRequest) (
 // Parameters:
 //   - id: instance id of API role.
 func (c *Client) GetApiRoleV1(ctx context.Context, id string) (*ApiRole, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ApiRole
 	endpoint := fmt.Sprintf("%s/api-roles/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -93,7 +93,7 @@ func (c *Client) GetApiRoleV1(ctx context.Context, id string) (*ApiRole, error) 
 // Parameters:
 //   - id: instance id of API role.
 func (c *Client) UpdateApiRoleV1(ctx context.Context, id string, request *ApiRoleRequest) (*ApiRole, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ApiRole
 	endpoint := fmt.Sprintf("%s/api-roles/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -109,7 +109,7 @@ func (c *Client) UpdateApiRoleV1(ctx context.Context, id string, request *ApiRol
 // Parameters:
 //   - id: instance id of API role.
 func (c *Client) DeleteApiRoleV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/api-roles/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteApiRoleV1(%s): %w", id, err)
@@ -119,7 +119,7 @@ func (c *Client) DeleteApiRoleV1(ctx context.Context, id string) error {
 
 // ResolveApiRoleV1IDByName looks up a ApiRoleV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveApiRoleV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/api-roles"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
 	if err != nil {
@@ -130,7 +130,7 @@ func (c *Client) ResolveApiRoleV1IDByName(ctx context.Context, name string) (str
 
 // ResolveApiRoleV1ByName looks up a ApiRoleV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveApiRoleV1ByName(ctx context.Context, name string) (*ApiRole, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/api-roles"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "displayName", "displayName", "id", name)
 	if err != nil {

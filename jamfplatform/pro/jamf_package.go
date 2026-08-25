@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - application: The Jamf Application key. The only supported values are protect and connect.
 func (c *Client) ListJamfPackagesV1(ctx context.Context, application string) ([]JamfPackageResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []JamfPackageResponse
 	endpoint := prefix + "/jamf-package"
 	params := url.Values{}
@@ -42,7 +42,7 @@ func (c *Client) ListJamfPackagesV1(ctx context.Context, application string) ([]
 // Parameters:
 //   - application: The Jamf Application key. The only supported values are protect and connect.
 func (c *Client) GetJamfPackageV2(ctx context.Context, application string) (*JamfApplicationResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result JamfApplicationResponse
 	endpoint := prefix + "/jamf-package"
 	params := url.Values{}

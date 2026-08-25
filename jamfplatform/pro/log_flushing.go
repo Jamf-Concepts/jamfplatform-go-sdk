@@ -16,7 +16,7 @@ import (
 //
 // Required privileges: read:pro:retention-policy. Legacy Jamf Pro privilege name(s): Read Retention Policy.
 func (c *Client) GetLogFlushingV1(ctx context.Context) (*LogFlushingV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LogFlushingV1
 	endpoint := prefix + "/log-flushing"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -29,7 +29,7 @@ func (c *Client) GetLogFlushingV1(ctx context.Context) (*LogFlushingV1, error) {
 //
 // Required privileges: read:pro:retention-policy. Legacy Jamf Pro privilege name(s): Read Retention Policy.
 func (c *Client) ListLogFlushingTasksV1(ctx context.Context) ([]LogFlushingTaskV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []LogFlushingTaskV1
 	endpoint := prefix + "/log-flushing/task"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -42,7 +42,7 @@ func (c *Client) ListLogFlushingTasksV1(ctx context.Context) ([]LogFlushingTaskV
 //
 // Required privileges: update:pro:retention-policy. Legacy Jamf Pro privilege name(s): Update Retention Policy.
 func (c *Client) CreateLogFlushingTaskV1(ctx context.Context, request *LogFlushingTaskV1) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/log-flushing/task"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, &result); err != nil {
@@ -58,7 +58,7 @@ func (c *Client) CreateLogFlushingTaskV1(ctx context.Context, request *LogFlushi
 // Parameters:
 //   - id: The identifier of the log flushing task.
 func (c *Client) GetLogFlushingTaskV1(ctx context.Context, id string) (*LogFlushingTaskV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LogFlushingTaskV1
 	endpoint := fmt.Sprintf("%s/log-flushing/task/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -74,7 +74,7 @@ func (c *Client) GetLogFlushingTaskV1(ctx context.Context, id string) (*LogFlush
 // Parameters:
 //   - id: The identifier of the log flushing task.
 func (c *Client) DeleteLogFlushingTaskV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/log-flushing/task/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteLogFlushingTaskV1(%s): %w", id, err)

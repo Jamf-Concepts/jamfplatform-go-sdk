@@ -13,7 +13,7 @@ import (
 
 func TestGetBaselineRules(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/rules", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/compliance-benchmarks/v1/rules", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetBaselineRules(t *testing.T) {
 
 func TestGetBaselineRules_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/compliance-benchmarks/v1/tenant/t-test/rules", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/compliance-benchmarks/v1/rules", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

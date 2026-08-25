@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: Computer ID value to filter by.
 func (c *Client) GetComputerHistoryByID(ctx context.Context, id string) (*ComputerHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHistory
 	endpoint := fmt.Sprintf("%s/computerhistory/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetComputerHistoryByID(ctx context.Context, id string) (*Comput
 // Parameters:
 //   - name: Computer Name to filter by.
 func (c *Client) GetComputerHistoryByName(ctx context.Context, name string) (*ComputerHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHistory
 	endpoint := fmt.Sprintf("%s/computerhistory/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) GetComputerHistoryByName(ctx context.Context, name string) (*Co
 // Parameters:
 //   - udid: Computer UDID to filter by.
 func (c *Client) GetComputerHistoryByUDID(ctx context.Context, udid string) (*ComputerHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHistory
 	endpoint := fmt.Sprintf("%s/computerhistory/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) GetComputerHistoryByUDID(ctx context.Context, udid string) (*Co
 // Parameters:
 //   - serialNumber: Computer Serial Number to filter by.
 func (c *Client) GetComputerHistoryBySerialNumber(ctx context.Context, serialNumber string) (*ComputerHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHistory
 	endpoint := fmt.Sprintf("%s/computerhistory/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -83,7 +83,7 @@ func (c *Client) GetComputerHistoryBySerialNumber(ctx context.Context, serialNum
 // Parameters:
 //   - macAddress: Computer Mac Address to filter by.
 func (c *Client) GetComputerHistoryByMacAddress(ctx context.Context, macAddress string) (*ComputerHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHistory
 	endpoint := fmt.Sprintf("%s/computerhistory/macaddress/%s", prefix, url.PathEscape(macAddress))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -102,7 +102,7 @@ func (c *Client) GetComputerHistoryByMacAddress(ctx context.Context, macAddress 
 //     Allowed values: "General", "ComputerUsageLogs", "Audits", "PolicyLogs", "CasperRemoteLogs",
 //     "ScreenSharingLogs", "CasperImagingLogs", "Commands", "UserLocation", "MacAppStoreApplications".
 func (c *Client) GetComputerHistoryByIDSubset(ctx context.Context, id string, subset string) (*ComputerHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerHistory
 	endpoint := fmt.Sprintf("%s/computerhistory/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

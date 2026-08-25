@@ -13,7 +13,7 @@ import (
 
 func TestListMobileDeviceExtensionAttributesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListMobileDeviceExtensionAttributesV1(t *testing.T) {
 
 func TestCreateMobileDeviceExtensionAttributeV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 func TestGetMobileDeviceExtensionAttributeV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 func TestGetMobileDeviceExtensionAttributeV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetMobileDeviceExtensionAttributeV1_NotFound(t *testing.T) {
 
 func TestUpdateMobileDeviceExtensionAttributeV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestUpdateMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 func TestDeleteMobileDeviceExtensionAttributeV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -120,7 +120,7 @@ func TestDeleteMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 func TestGetMobileDeviceExtensionAttributeDataDependencyV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id/data-dependency", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id/data-dependency", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -138,7 +138,7 @@ func TestGetMobileDeviceExtensionAttributeDataDependencyV1(t *testing.T) {
 
 func TestGetMobileDeviceExtensionAttributeDataDependencyV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id/data-dependency", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id/data-dependency", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -154,7 +154,7 @@ func TestGetMobileDeviceExtensionAttributeDataDependencyV1_NotFound(t *testing.T
 
 func TestListMobileDeviceExtensionAttributeHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -176,7 +176,7 @@ func TestListMobileDeviceExtensionAttributeHistoryV1(t *testing.T) {
 
 func TestCreateMobileDeviceExtensionAttributeHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -194,7 +194,7 @@ func TestCreateMobileDeviceExtensionAttributeHistoryNoteV1(t *testing.T) {
 
 func TestListDeviceExtensionAttributesPreview(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/tenant/t-test/devices/extensionAttributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/devices/extensionAttributes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -212,7 +212,7 @@ func TestListDeviceExtensionAttributesPreview(t *testing.T) {
 
 func TestListDeviceExtensionAttributesPreview_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/tenant/t-test/devices/extensionAttributes", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/devices/extensionAttributes", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -228,7 +228,7 @@ func TestListDeviceExtensionAttributesPreview_NotFound(t *testing.T) {
 
 func TestResolveMobileDeviceExtensionAttributeV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -251,7 +251,7 @@ func TestResolveMobileDeviceExtensionAttributeV1IDByName(t *testing.T) {
 
 func TestResolveMobileDeviceExtensionAttributeV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -275,7 +275,7 @@ func TestResolveMobileDeviceExtensionAttributeV1ByName(t *testing.T) {
 func TestApplyMobileDeviceExtensionAttributeV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -307,7 +307,7 @@ func TestApplyMobileDeviceExtensionAttributeV1_Create(t *testing.T) {
 func TestApplyMobileDeviceExtensionAttributeV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -318,7 +318,7 @@ func TestApplyMobileDeviceExtensionAttributeV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/mobile-device-extension-attributes/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/mobile-device-extension-attributes/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
 	})
 

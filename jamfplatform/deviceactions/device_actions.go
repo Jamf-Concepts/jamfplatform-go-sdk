@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) CheckInDevice(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("device-actions", "v1")
+	prefix := c.transport.APIPrefix("device-actions", "v1")
 	endpoint := fmt.Sprintf("%s/devices/%s/check-in", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("CheckInDevice(%s): %w", id, err)
@@ -34,7 +34,7 @@ func (c *Client) CheckInDevice(ctx context.Context, id string) error {
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDeviceRequest) ([]DeviceCommandResponse, error) {
-	prefix := c.transport.TenantPrefix("device-actions", "v1")
+	prefix := c.transport.APIPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -50,7 +50,7 @@ func (c *Client) EraseDevice(ctx context.Context, id string, request *EraseDevic
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) RestartDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
-	prefix := c.transport.TenantPrefix("device-actions", "v1")
+	prefix := c.transport.APIPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/restart", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, &result); err != nil {
@@ -66,7 +66,7 @@ func (c *Client) RestartDevice(ctx context.Context, id string) ([]DeviceCommandR
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) ShutdownDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
-	prefix := c.transport.TenantPrefix("device-actions", "v1")
+	prefix := c.transport.APIPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/shutdown", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, &result); err != nil {
@@ -82,7 +82,7 @@ func (c *Client) ShutdownDevice(ctx context.Context, id string) ([]DeviceCommand
 // Parameters:
 //   - id: The ID of the device, in UUID format.
 func (c *Client) UnmanageDevice(ctx context.Context, id string) ([]DeviceCommandResponse, error) {
-	prefix := c.transport.TenantPrefix("device-actions", "v1")
+	prefix := c.transport.APIPrefix("device-actions", "v1")
 	var result []DeviceCommandResponse
 	endpoint := fmt.Sprintf("%s/devices/%s/unmanage", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusCreated, &result); err != nil {

@@ -19,7 +19,7 @@ import (
 //
 // Required privileges: read:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Read App Request Settings.
 func (c *Client) ListAppRequestFormInputFieldsV1(ctx context.Context) (*AppRequestFormInputFieldSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppRequestFormInputFieldSearchResults
 	endpoint := prefix + "/app-request/form-input-fields"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) ListAppRequestFormInputFieldsV1(ctx context.Context) (*AppReque
 //
 // Required privileges: update:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Update App Request Settings.
 func (c *Client) CreateAppRequestFormInputFieldV1(ctx context.Context, request *AppRequestFormInputField) (*AppRequestFormInputField, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppRequestFormInputField
 	endpoint := prefix + "/app-request/form-input-fields"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -45,7 +45,7 @@ func (c *Client) CreateAppRequestFormInputFieldV1(ctx context.Context, request *
 //
 // Required privileges: update:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Update App Request Settings.
 func (c *Client) ReorderAppRequestFormInputFieldsV1(ctx context.Context, request *[]AppRequestFormInputField) ([]AppRequestFormInputField, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []AppRequestFormInputField
 	endpoint := prefix + "/app-request/form-input-fields"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -61,7 +61,7 @@ func (c *Client) ReorderAppRequestFormInputFieldsV1(ctx context.Context, request
 // Parameters:
 //   - id: Instance id of form input field record.
 func (c *Client) GetAppRequestFormInputFieldV1(ctx context.Context, id string) (*AppRequestFormInputField, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppRequestFormInputField
 	endpoint := fmt.Sprintf("%s/app-request/form-input-fields/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -77,7 +77,7 @@ func (c *Client) GetAppRequestFormInputFieldV1(ctx context.Context, id string) (
 // Parameters:
 //   - id: Instance id of form input field record.
 func (c *Client) UpdateAppRequestFormInputFieldV1(ctx context.Context, id string, request *AppRequestFormInputField) (*AppRequestFormInputField, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppRequestFormInputField
 	endpoint := fmt.Sprintf("%s/app-request/form-input-fields/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -93,7 +93,7 @@ func (c *Client) UpdateAppRequestFormInputFieldV1(ctx context.Context, id string
 // Parameters:
 //   - id: Instance id of form input field record.
 func (c *Client) DeleteAppRequestFormInputFieldV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/app-request/form-input-fields/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteAppRequestFormInputFieldV1(%s): %w", id, err)
@@ -105,7 +105,7 @@ func (c *Client) DeleteAppRequestFormInputFieldV1(ctx context.Context, id string
 //
 // Required privileges: read:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Read App Request Settings.
 func (c *Client) GetAppRequestSettingsV1(ctx context.Context) (*AppRequestSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppRequestSettings
 	endpoint := prefix + "/app-request/settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -118,7 +118,7 @@ func (c *Client) GetAppRequestSettingsV1(ctx context.Context) (*AppRequestSettin
 //
 // Required privileges: update:pro:app-request-settings. Legacy Jamf Pro privilege name(s): Update App Request Settings.
 func (c *Client) UpdateAppRequestSettingsV1(ctx context.Context, request *AppRequestSettings) (*AppRequestSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AppRequestSettings
 	endpoint := prefix + "/app-request/settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -129,7 +129,7 @@ func (c *Client) UpdateAppRequestSettingsV1(ctx context.Context, request *AppReq
 
 // ResolveAppRequestFormInputFieldV1IDByName looks up a AppRequestFormInputFieldV1 by its title field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveAppRequestFormInputFieldV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/app-request/form-input-fields"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "title", "id", name)
 	if err != nil {
@@ -140,7 +140,7 @@ func (c *Client) ResolveAppRequestFormInputFieldV1IDByName(ctx context.Context, 
 
 // ResolveAppRequestFormInputFieldV1ByName looks up a AppRequestFormInputFieldV1 by its title field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveAppRequestFormInputFieldV1ByName(ctx context.Context, name string) (*AppRequestFormInputField, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/app-request/form-input-fields"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "title", "id", name)
 	if err != nil {

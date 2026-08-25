@@ -28,7 +28,7 @@ import (
 //     `description`, `deviceType`, `groupType`. This param can be combined with paging. Example:
 //     `name=="*Managed*" and deviceType=="MOBILE"`.
 func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter string) ([]DeviceGroupListReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]DeviceGroupListReadRepresentationV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -59,7 +59,7 @@ func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter str
 //
 // Required privileges: create:pro:device-groups.
 func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCreateRepresentationV1) (*HrefRepresentation, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	var result HrefRepresentation
 	endpoint := prefix + "/device-groups"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -75,7 +75,7 @@ func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCrea
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
 func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	var result DeviceGroupReadRepresentationV1
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -91,7 +91,7 @@ func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupRea
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
 func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *DeviceGroupUpdateRepresentationV1) error {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDeviceGroup(%s): %w", id, err)
@@ -106,7 +106,7 @@ func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *Devi
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
 func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteDeviceGroup(%s): %w", id, err)
@@ -121,7 +121,7 @@ func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
 func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]string, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
 
 	var result struct {
@@ -141,7 +141,7 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
 func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, request *DeviceGroupMemberPatchRepresentationV1) error {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateDeviceGroupMembers(%s): %w", id, err)
@@ -151,7 +151,7 @@ func (c *Client) UpdateDeviceGroupMembers(ctx context.Context, id string, reques
 
 // ResolveDeviceGroupIDByName looks up a DeviceGroup by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDeviceGroupIDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	listPath := prefix + "/device-groups"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {
@@ -162,7 +162,7 @@ func (c *Client) ResolveDeviceGroupIDByName(ctx context.Context, name string) (s
 
 // ResolveDeviceGroupByName looks up a DeviceGroup by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveDeviceGroupByName(ctx context.Context, name string) (*DeviceGroupListReadRepresentationV1, error) {
-	prefix := c.transport.TenantPrefix("device-groups", "v1")
+	prefix := c.transport.APIPrefix("device-groups", "v1")
 	listPath := prefix + "/device-groups"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "name", "name", "id", name)
 	if err != nil {

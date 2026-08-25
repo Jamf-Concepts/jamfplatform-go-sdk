@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetJamfProVersionV1(ctx context.Context) (*JamfProVersion, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result JamfProVersion
 	endpoint := prefix + "/jamf-pro-version"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

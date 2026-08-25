@@ -19,7 +19,7 @@ import (
 //
 // Required privileges: read:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
 func (c *Client) ListAdvancedMobileDeviceSearchesV1(ctx context.Context) (*AdvancedSearchSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedSearchSearchResults
 	endpoint := prefix + "/advanced-mobile-device-searches"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) ListAdvancedMobileDeviceSearchesV1(ctx context.Context) (*Advan
 //
 // Required privileges: create:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Create Advanced Mobile Device Searches.
 func (c *Client) CreateAdvancedMobileDeviceSearchV1(ctx context.Context, request *AdvancedSearch) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/advanced-mobile-device-searches"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -45,7 +45,7 @@ func (c *Client) CreateAdvancedMobileDeviceSearchV1(ctx context.Context, request
 //
 // Required privileges: delete:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Delete Advanced Mobile Device Searches.
 func (c *Client) DeleteMultipleAdvancedMobileDeviceSearchesV1(ctx context.Context, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/advanced-mobile-device-searches/delete-multiple"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultipleAdvancedMobileDeviceSearchesV1: %w", err)
@@ -57,7 +57,7 @@ func (c *Client) DeleteMultipleAdvancedMobileDeviceSearchesV1(ctx context.Contex
 //
 // Required privileges: read:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
 func (c *Client) ListAdvancedMobileDeviceSearchChoicesV1(ctx context.Context, criteria string, site string, contains string) (*AdvancedSearchCriteriaChoices, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedSearchCriteriaChoices
 	endpoint := prefix + "/advanced-mobile-device-searches/choices"
 	params := url.Values{}
@@ -86,7 +86,7 @@ func (c *Client) ListAdvancedMobileDeviceSearchChoicesV1(ctx context.Context, cr
 // Parameters:
 //   - id: id of target Advanced Search.
 func (c *Client) GetAdvancedMobileDeviceSearchV1(ctx context.Context, id string) (*AdvancedSearch, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedSearch
 	endpoint := fmt.Sprintf("%s/advanced-mobile-device-searches/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -102,7 +102,7 @@ func (c *Client) GetAdvancedMobileDeviceSearchV1(ctx context.Context, id string)
 // Parameters:
 //   - id: id of target Advanced Search.
 func (c *Client) UpdateAdvancedMobileDeviceSearchV1(ctx context.Context, id string, request *AdvancedSearch) (*AdvancedSearch, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedSearch
 	endpoint := fmt.Sprintf("%s/advanced-mobile-device-searches/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -118,7 +118,7 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchV1(ctx context.Context, id stri
 // Parameters:
 //   - id: instance id of advanced search record.
 func (c *Client) DeleteAdvancedMobileDeviceSearchV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/advanced-mobile-device-searches/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteAdvancedMobileDeviceSearchV1(%s): %w", id, err)
@@ -128,7 +128,7 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchV1(ctx context.Context, id stri
 
 // ResolveAdvancedMobileDeviceSearchV1IDByName looks up a AdvancedMobileDeviceSearchV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveAdvancedMobileDeviceSearchV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/advanced-mobile-device-searches"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -139,7 +139,7 @@ func (c *Client) ResolveAdvancedMobileDeviceSearchV1IDByName(ctx context.Context
 
 // ResolveAdvancedMobileDeviceSearchV1ByName looks up a AdvancedMobileDeviceSearchV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveAdvancedMobileDeviceSearchV1ByName(ctx context.Context, name string) (*AdvancedSearch, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/advanced-mobile-device-searches"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

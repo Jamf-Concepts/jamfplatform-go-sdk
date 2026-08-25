@@ -30,7 +30,7 @@ import (
 //     categoryId, info, notes, manifestFileName, cloudTransferStatus. Default filter is an empty query and
 //     returns all results from the requested page.
 func (c *Client) ListPackagesV1(ctx context.Context, sort []string, filter string) ([]Package, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]Package, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -62,7 +62,7 @@ func (c *Client) ListPackagesV1(ctx context.Context, sort []string, filter strin
 //
 // Required privileges: create:pro:packages. Legacy Jamf Pro privilege name(s): Create Packages.
 func (c *Client) CreatePackageV1(ctx context.Context, request *Package) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/packages"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -78,7 +78,7 @@ func (c *Client) CreatePackageV1(ctx context.Context, request *Package) (*HrefRe
 // Parameters:
 //   - id: instance id of package.
 func (c *Client) GetPackageV1(ctx context.Context, id string) (*Package, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Package
 	endpoint := fmt.Sprintf("%s/packages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -94,7 +94,7 @@ func (c *Client) GetPackageV1(ctx context.Context, id string) (*Package, error) 
 // Parameters:
 //   - id: Instance ID of package.
 func (c *Client) UpdatePackageV1(ctx context.Context, id string, request *Package) (*Package, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Package
 	endpoint := fmt.Sprintf("%s/packages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -110,7 +110,7 @@ func (c *Client) UpdatePackageV1(ctx context.Context, id string, request *Packag
 // Parameters:
 //   - id: Instance ID of package.
 func (c *Client) DeletePackageV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/packages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeletePackageV1(%s): %w", id, err)
@@ -132,7 +132,7 @@ func (c *Client) DeletePackageV1(ctx context.Context, id string) error {
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadPackageV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := fmt.Sprintf("%s/packages/%s/upload", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -148,7 +148,7 @@ func (c *Client) UploadPackageV1(ctx context.Context, id string, fileFilename st
 //
 // Required privileges: delete:pro:packages. Legacy Jamf Pro privilege name(s): Delete Packages.
 func (c *Client) DeleteMultiplePackagesV1(ctx context.Context, request *Ids) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/packages/delete-multiple"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteMultiplePackagesV1: %w", err)
@@ -174,7 +174,7 @@ func (c *Client) DeleteMultiplePackagesV1(ctx context.Context, request *Ids) err
 //     combined with paging and sorting. Default filter is an empty query and returns all results from the
 //     requested page.
 func (c *Client) ExportPackagesV1(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/packages/export"
 	params := url.Values{}
@@ -211,7 +211,7 @@ func (c *Client) ExportPackagesV1(ctx context.Context, request *ExportParameters
 //     combined with paging and sorting. Default filter is an empty query and returns all results from the
 //     requested page.
 func (c *Client) ListPackageHistoryV1(ctx context.Context, id string, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -246,7 +246,7 @@ func (c *Client) ListPackageHistoryV1(ctx context.Context, id string, sort []str
 // Parameters:
 //   - id: Instance ID of package history.
 func (c *Client) CreatePackageHistoryNoteV1(ctx context.Context, id string, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/packages/%s/history", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -274,7 +274,7 @@ func (c *Client) CreatePackageHistoryNoteV1(ctx context.Context, id string, requ
 //     combined with paging and sorting. Default filter is an empty query and returns all results from the
 //     requested page.
 func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/packages/%s/history/export", prefix, url.PathEscape(id))
 	params := url.Values{}
@@ -313,7 +313,7 @@ func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request 
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*Package, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Package
 	endpoint := fmt.Sprintf("%s/packages/%s/manifest", prefix, url.PathEscape(id))
 	parts := []client.MultipartField{
@@ -333,7 +333,7 @@ func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFil
 // Parameters:
 //   - id: Id of the package to delete manifest from.
 func (c *Client) DeletePackageManifestV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/packages/%s/manifest", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeletePackageManifestV1(%s): %w", id, err)
@@ -343,7 +343,7 @@ func (c *Client) DeletePackageManifestV1(ctx context.Context, id string) error {
 
 // ResolvePackageV1IDByName looks up a PackageV1 by its packageName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolvePackageV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/packages"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "packageName", "id", name)
 	if err != nil {
@@ -354,7 +354,7 @@ func (c *Client) ResolvePackageV1IDByName(ctx context.Context, name string) (str
 
 // ResolvePackageV1ByName looks up a PackageV1 by its packageName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolvePackageV1ByName(ctx context.Context, name string) (*Package, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/packages"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "packageName", "packageName", "id", name)
 	if err != nil {

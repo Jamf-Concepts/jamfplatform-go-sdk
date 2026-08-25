@@ -13,7 +13,7 @@ import (
 
 func TestGetActiveCertificateAuthorityV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/active", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/active", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetActiveCertificateAuthorityV1(t *testing.T) {
 
 func TestGetActiveCertificateAuthorityV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/active", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/active", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetActiveCertificateAuthorityV1_NotFound(t *testing.T) {
 
 func TestDownloadActiveCertificateAuthorityDerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/active/der", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/active/der", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestDownloadActiveCertificateAuthorityDerV1(t *testing.T) {
 
 func TestDownloadActiveCertificateAuthorityDerV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/active/der", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/active/der", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestDownloadActiveCertificateAuthorityDerV1_NotFound(t *testing.T) {
 
 func TestDownloadActiveCertificateAuthorityPemV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/active/pem", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/active/pem", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestDownloadActiveCertificateAuthorityPemV1(t *testing.T) {
 
 func TestDownloadActiveCertificateAuthorityPemV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/active/pem", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/active/pem", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -115,7 +115,7 @@ func TestDownloadActiveCertificateAuthorityPemV1_NotFound(t *testing.T) {
 
 func TestGetCertificateAuthorityV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -133,7 +133,7 @@ func TestGetCertificateAuthorityV1(t *testing.T) {
 
 func TestGetCertificateAuthorityV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -149,7 +149,7 @@ func TestGetCertificateAuthorityV1_NotFound(t *testing.T) {
 
 func TestDownloadCertificateAuthorityDerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/test-id/der", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/test-id/der", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -167,7 +167,7 @@ func TestDownloadCertificateAuthorityDerV1(t *testing.T) {
 
 func TestDownloadCertificateAuthorityDerV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/test-id/der", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/test-id/der", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -183,7 +183,7 @@ func TestDownloadCertificateAuthorityDerV1_NotFound(t *testing.T) {
 
 func TestDownloadCertificateAuthorityPemV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/test-id/pem", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/test-id/pem", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -201,7 +201,7 @@ func TestDownloadCertificateAuthorityPemV1(t *testing.T) {
 
 func TestDownloadCertificateAuthorityPemV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/pki/certificate-authority/test-id/pem", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/pki/certificate-authority/test-id/pem", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

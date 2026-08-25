@@ -21,7 +21,7 @@ import (
 // Required privileges: read:pro:push-certificates, read:pro:gsx-connection. Legacy Jamf Pro privilege name(s): Read GSX Connection, Read Push Certificates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) GetGSXConnectionV1(ctx context.Context) (*GsxConnection, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GsxConnection
 	endpoint := prefix + "/gsx-connection"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetGSXConnectionV1(ctx context.Context) (*GsxConnection, error)
 // Required privileges: update:pro:gsx-connection, update:pro:push-certificates. Legacy Jamf Pro privilege name(s): Update GSX Connection, Update Push Certificates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) UpdateGSXConnectionV1(ctx context.Context, request *GsxConnection) (*GsxConnection, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GsxConnection
 	endpoint := prefix + "/gsx-connection"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
@@ -49,7 +49,7 @@ func (c *Client) UpdateGSXConnectionV1(ctx context.Context, request *GsxConnecti
 // Required privileges: update:pro:gsx-connection, update:pro:push-certificates. Legacy Jamf Pro privilege name(s): Update GSX Connection, Update Push Certificates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) PatchGSXConnectionV1(ctx context.Context, request *GsxConnectionUpdate) (*GsxConnection, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GsxConnection
 	endpoint := prefix + "/gsx-connection"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/merge-patch+json", http.StatusOK, &result); err != nil {
@@ -70,7 +70,7 @@ func (c *Client) PatchGSXConnectionV1(ctx context.Context, request *GsxConnectio
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListGSXConnectionHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistoryV1, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistoryV1, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -102,7 +102,7 @@ func (c *Client) ListGSXConnectionHistoryV1(ctx context.Context, sort []string, 
 //
 // Required privileges: update:pro:gsx-connection. Legacy Jamf Pro privilege name(s): Update GSX Connection.
 func (c *Client) CreateGSXConnectionHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/gsx-connection/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -115,7 +115,7 @@ func (c *Client) CreateGSXConnectionHistoryNoteV1(ctx context.Context, request *
 //
 // Required privileges: read:pro:gsx-connection. Legacy Jamf Pro privilege name(s): Read GSX Connection.
 func (c *Client) TestGSXConnectionV1(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/gsx-connection/test"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("TestGSXConnectionV1: %w", err)

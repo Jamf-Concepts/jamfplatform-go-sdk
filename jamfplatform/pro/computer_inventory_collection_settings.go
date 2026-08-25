@@ -18,7 +18,7 @@ import (
 //
 // Required privileges: read:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Read Computer Inventory Collection Settings.
 func (c *Client) GetComputerInventoryCollectionSettingsV1(ctx context.Context) (*ComputerInventoryCollectionSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventoryCollectionSettings
 	endpoint := prefix + "/computer-inventory-collection-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -31,7 +31,7 @@ func (c *Client) GetComputerInventoryCollectionSettingsV1(ctx context.Context) (
 //
 // Required privileges: read:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Read Computer Inventory Collection Settings.
 func (c *Client) GetComputerInventoryCollectionSettingsV2(ctx context.Context) (*ComputerInventoryCollectionSettingsV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ComputerInventoryCollectionSettingsV2
 	endpoint := prefix + "/computer-inventory-collection-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -46,7 +46,7 @@ func (c *Client) GetComputerInventoryCollectionSettingsV2(ctx context.Context) (
 //
 // Required privileges: update:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Update Computer Inventory Collection Settings.
 func (c *Client) UpdateComputerInventoryCollectionSettingsV1(ctx context.Context, request *ComputerInventoryCollectionSettings) (*ComputerInventoryCollectionSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventoryCollectionSettings
 	endpoint := prefix + "/computer-inventory-collection-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -59,7 +59,7 @@ func (c *Client) UpdateComputerInventoryCollectionSettingsV1(ctx context.Context
 //
 // Required privileges: update:pro:computer-inventory-collection-settings. Legacy Jamf Pro privilege name(s): Update Computer Inventory Collection Settings.
 func (c *Client) UpdateComputerInventoryCollectionSettingsV2(ctx context.Context, request *ComputerInventoryCollectionSettingsV2) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := prefix + "/computer-inventory-collection-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("UpdateComputerInventoryCollectionSettingsV2: %w", err)
@@ -73,7 +73,7 @@ func (c *Client) UpdateComputerInventoryCollectionSettingsV2(ctx context.Context
 //
 // Required privileges: create:pro:custom-paths. Legacy Jamf Pro privilege name(s): Create Custom Paths.
 func (c *Client) CreateComputerInventoryCollectionCustomPathV1(ctx context.Context, request *CreatePath) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/computer-inventory-collection-settings/custom-path"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -86,7 +86,7 @@ func (c *Client) CreateComputerInventoryCollectionCustomPathV1(ctx context.Conte
 //
 // Required privileges: create:pro:custom-paths. Legacy Jamf Pro privilege name(s): Create Custom Paths.
 func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Context, request *CreatePathV2) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/computer-inventory-collection-settings/custom-path"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -104,7 +104,7 @@ func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Conte
 // Parameters:
 //   - id: id of Custom Path.
 func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryCollectionCustomPathV1(%s): %w", id, err)
@@ -119,7 +119,7 @@ func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Conte
 // Parameters:
 //   - id: id of Custom Path.
 func (c *Client) DeleteComputerInventoryCollectionCustomPathV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteComputerInventoryCollectionCustomPathV2(%s): %w", id, err)

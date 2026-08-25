@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: Id value to filter by.
 func (c *Client) GetMobileDeviceProvisioningProfileByID(ctx context.Context, id string) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetMobileDeviceProvisioningProfileByID(ctx context.Context, id 
 // Parameters:
 //   - id: Id value to filter by.
 func (c *Client) CreateMobileDeviceProvisioningProfileByID(ctx context.Context, id string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByID(ctx context.Context, 
 // Parameters:
 //   - id: Id value to filter by.
 func (c *Client) UpdateMobileDeviceProvisioningProfileByID(ctx context.Context, id string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -70,7 +70,7 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByID(ctx context.Context, 
 // Parameters:
 //   - id: Id value to filter by.
 func (c *Client) DeleteMobileDeviceProvisioningProfileByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceProvisioningProfileByID(%s): %w", id, err)
@@ -85,7 +85,7 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByID(ctx context.Context, 
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) GetMobileDeviceProvisioningProfileByName(ctx context.Context, name string) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -101,7 +101,7 @@ func (c *Client) GetMobileDeviceProvisioningProfileByName(ctx context.Context, n
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteMobileDeviceProvisioningProfileByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceProvisioningProfileByName(%s): %w", name, err)
@@ -116,7 +116,7 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByName(ctx context.Context
 // Parameters:
 //   - uuid: Uuid value to filter by.
 func (c *Client) GetMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -132,7 +132,7 @@ func (c *Client) GetMobileDeviceProvisioningProfileByUUID(ctx context.Context, u
 // Parameters:
 //   - uuid: Uuid value to filter by.
 func (c *Client) DeleteMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteMobileDeviceProvisioningProfileByUUID(%s): %w", uuid, err)
@@ -144,7 +144,7 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByUUID(ctx context.Context
 //
 // Required privileges: read:pro:provisioning-profiles.
 func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*MobileDeviceProvisioningProfiles, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfiles
 	endpoint := prefix + "/mobiledeviceprovisioningprofiles"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -160,7 +160,7 @@ func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*Mob
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) CreateMobileDeviceProvisioningProfileByName(ctx context.Context, name string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -176,7 +176,7 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByName(ctx context.Context
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateMobileDeviceProvisioningProfileByName(ctx context.Context, name string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -192,7 +192,7 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByName(ctx context.Context
 // Parameters:
 //   - uuid: Uuid value to filter by.
 func (c *Client) CreateMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -208,7 +208,7 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 // Parameters:
 //   - uuid: Uuid value to filter by.
 func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context, uuid string, request *MobileDeviceProvisioningProfile) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/uuid/%s", prefix, url.PathEscape(uuid))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -225,7 +225,7 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 //   - id: Id value to filter by.
 //   - subset: Path parameter subset.
 func (c *Client) GetMobileDeviceProvisioningProfileByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceProvisioningProfile, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfile
 	endpoint := fmt.Sprintf("%s/mobiledeviceprovisioningprofiles/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

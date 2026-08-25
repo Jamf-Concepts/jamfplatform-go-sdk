@@ -21,7 +21,7 @@ import (
 //
 // Required privileges: read:pro:sites. Legacy Jamf Pro privilege name(s): Read Sites.
 func (c *Client) ListSitesV1(ctx context.Context) ([]V1Site, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []V1Site
 	endpoint := prefix + "/sites"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -56,7 +56,7 @@ func (c *Client) ListSitesV1(ctx context.Context) ([]V1Site, error) {
 //     Password", "Mobile Device Inventory", "Computer Inventory", "Change Management", "Licensed Software
 //     License"].
 func (c *Client) ListSiteObjectsV1(ctx context.Context, id string, sort []string, filter string) ([]SiteObject, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]SiteObject, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -82,7 +82,7 @@ func (c *Client) ListSiteObjectsV1(ctx context.Context, id string, sort []string
 
 // ResolveSiteV1IDByName looks up a SiteV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveSiteV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/sites"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
@@ -93,7 +93,7 @@ func (c *Client) ResolveSiteV1IDByName(ctx context.Context, name string) (string
 
 // ResolveSiteV1ByName looks up a SiteV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveSiteV1ByName(ctx context.Context, name string) (*V1Site, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/sites"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {

@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetVPPAssignmentByID(ctx context.Context, id string) (*VppAssignment, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAssignment
 	endpoint := fmt.Sprintf("%s/vppassignments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetVPPAssignmentByID(ctx context.Context, id string) (*VppAssig
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateVPPAssignmentByID(ctx context.Context, id string, request *VppAssignmentPost) (*VppAssignment, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAssignment
 	endpoint := fmt.Sprintf("%s/vppassignments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) CreateVPPAssignmentByID(ctx context.Context, id string, request
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateVPPAssignmentByID(ctx context.Context, id string, request *VppAssignmentPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppassignments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateVPPAssignmentByID(%s): %w", id, err)
@@ -66,7 +66,7 @@ func (c *Client) UpdateVPPAssignmentByID(ctx context.Context, id string, request
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteVPPAssignmentByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/vppassignments/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteVPPAssignmentByID(%s): %w", id, err)
@@ -78,7 +78,7 @@ func (c *Client) DeleteVPPAssignmentByID(ctx context.Context, id string) error {
 //
 // Required privileges: read:pro:vpp-assignment.
 func (c *Client) ListVPPAssignments(ctx context.Context) (*VppAssignments, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAssignments
 	endpoint := prefix + "/vppassignments"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

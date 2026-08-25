@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) GetSsoCertificateV2(ctx context.Context) (*SsoKeystoreResponseWithDetails, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SsoKeystoreResponseWithDetails
 	endpoint := prefix + "/sso/cert"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetSsoCertificateV2(ctx context.Context) (*SsoKeystoreResponseW
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) UpdateSsoCertificateV2(ctx context.Context, request *SsoKeystore) (*SsoKeystoreResponseWithDetails, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SsoKeystoreResponseWithDetails
 	endpoint := prefix + "/sso/cert"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -41,7 +41,7 @@ func (c *Client) UpdateSsoCertificateV2(ctx context.Context, request *SsoKeystor
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) GenerateSsoCertificateV2(ctx context.Context) (*SsoKeystoreResponseWithDetails, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SsoKeystoreResponseWithDetails
 	endpoint := prefix + "/sso/cert"
 	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) GenerateSsoCertificateV2(ctx context.Context) (*SsoKeystoreResp
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) DeleteSsoCertificateV2(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := prefix + "/sso/cert"
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteSsoCertificateV2: %w", err)
@@ -66,7 +66,7 @@ func (c *Client) DeleteSsoCertificateV2(ctx context.Context) error {
 //
 // Required privileges: read:pro:sso-settings. Legacy Jamf Pro privilege name(s): Read SSO Settings.
 func (c *Client) DownloadSsoCertificateV2(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := prefix + "/sso/cert/download"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -79,7 +79,7 @@ func (c *Client) DownloadSsoCertificateV2(ctx context.Context) ([]byte, error) {
 //
 // Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) ParseSsoCertificateV2(ctx context.Context, request *SsoKeystoreParse) (*SsoKeystoreCertParseResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SsoKeystoreCertParseResponse
 	endpoint := prefix + "/sso/cert/parse"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {

@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetPolicyByID(ctx context.Context, id string) (*Policy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policy
 	endpoint := fmt.Sprintf("%s/policies/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetPolicyByID(ctx context.Context, id string) (*Policy, error) 
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetPolicyByName(ctx context.Context, name string) (*Policy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policy
 	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) GetPolicyByName(ctx context.Context, name string) (*Policy, err
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreatePolicyByID(ctx context.Context, id string, request *PolicyPost) (*Policy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policy
 	endpoint := fmt.Sprintf("%s/policies/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -70,7 +70,7 @@ func (c *Client) CreatePolicyByID(ctx context.Context, id string, request *Polic
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdatePolicyByID(ctx context.Context, id string, request *PolicyPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePolicyByID(%s): %w", id, err)
@@ -85,7 +85,7 @@ func (c *Client) UpdatePolicyByID(ctx context.Context, id string, request *Polic
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdatePolicyByName(ctx context.Context, name string, request *PolicyPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePolicyByName(%s): %w", name, err)
@@ -100,7 +100,7 @@ func (c *Client) UpdatePolicyByName(ctx context.Context, name string, request *P
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeletePolicyByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePolicyByID(%s): %w", id, err)
@@ -115,7 +115,7 @@ func (c *Client) DeletePolicyByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeletePolicyByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePolicyByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeletePolicyByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:policies.
 func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policies
 	endpoint := prefix + "/policies"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
 // Parameters:
 //   - category: Category to filter by.
 func (c *Client) GetPolicyByCategory(ctx context.Context, category string) (*Policy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policy
 	endpoint := fmt.Sprintf("%s/policies/category/%s", prefix, url.PathEscape(category))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -160,7 +160,7 @@ func (c *Client) GetPolicyByCategory(ctx context.Context, category string) (*Pol
 //   - createdBy: Type to filter by.
 //     Allowed values: "jss", "casper".
 func (c *Client) GetPolicyByCreatedBy(ctx context.Context, createdBy string) (*Policy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policy
 	endpoint := fmt.Sprintf("%s/policies/createdBy/%s", prefix, url.PathEscape(createdBy))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -180,7 +180,7 @@ func (c *Client) GetPolicyByCreatedBy(ctx context.Context, createdBy string) (*P
 //     "DockItems", "AccountMaintenance", "Reboot", "Maintenance", "FilesProcesses", "UserInteraction",
 //     "DiskEncryption".
 func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset string) (*Policy, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policy
 	endpoint := fmt.Sprintf("%s/policies/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -196,7 +196,7 @@ func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset stri
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreatePolicyByName(ctx context.Context, name string, request *PolicyPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/policies/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreatePolicyByName(%s): %w", name, err)

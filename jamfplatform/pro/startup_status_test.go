@@ -13,7 +13,7 @@ import (
 
 func TestGetStartupStatus(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/tenant/t-test/startup-status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/startup-status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetStartupStatus(t *testing.T) {
 
 func TestGetStartupStatus_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/tenant/t-test/startup-status", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/startup-status", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

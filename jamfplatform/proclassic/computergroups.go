@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetComputerGroupByID(ctx context.Context, id string) (*ComputerGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerGroup
 	endpoint := fmt.Sprintf("%s/computergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetComputerGroupByID(ctx context.Context, id string) (*Computer
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateComputerGroupByID(ctx context.Context, id string, request *ComputerGroupPost) (*ComputerGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerGroup
 	endpoint := fmt.Sprintf("%s/computergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateComputerGroupByID(ctx context.Context, id string, request
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateComputerGroupByID(ctx context.Context, id string, request *ComputerGroupPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerGroupByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateComputerGroupByID(ctx context.Context, id string, request
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteComputerGroupByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerGroupByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteComputerGroupByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetComputerGroupByName(ctx context.Context, name string) (*ComputerGroup, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerGroup
 	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetComputerGroupByName(ctx context.Context, name string) (*Comp
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateComputerGroupByName(ctx context.Context, name string, request *ComputerGroupPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerGroupByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateComputerGroupByName(ctx context.Context, name string, req
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteComputerGroupByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteComputerGroupByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteComputerGroupByName(ctx context.Context, name string) err
 //
 // Required privileges: read:pro:computer-groups.
 func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerGroups
 	endpoint := prefix + "/computergroups"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateComputerGroupByName(ctx context.Context, name string, request *ComputerGroupPost) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/computergroups/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerGroupByName(%s): %w", name, err)

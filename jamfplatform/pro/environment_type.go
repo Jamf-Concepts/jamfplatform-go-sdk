@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetEnvironmentTypeV2(ctx context.Context) (*EnvironmentType, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result EnvironmentType
 	endpoint := prefix + "/environment-type"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

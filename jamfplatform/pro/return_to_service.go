@@ -19,7 +19,7 @@ import (
 //
 // Required privileges: read:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): View Return To Service Configurations.
 func (c *Client) ListReturnToServiceConfigurationsV1(ctx context.Context) (*ReturnToServiceConfigurationSearchResults, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ReturnToServiceConfigurationSearchResults
 	endpoint := prefix + "/return-to-service"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -32,7 +32,7 @@ func (c *Client) ListReturnToServiceConfigurationsV1(ctx context.Context) (*Retu
 //
 // Required privileges: update:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): Edit Return To Service Configurations.
 func (c *Client) CreateReturnToServiceConfigurationV1(ctx context.Context, request *ReturnToServiceConfigurationRequest) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
 	endpoint := prefix + "/return-to-service"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -48,7 +48,7 @@ func (c *Client) CreateReturnToServiceConfigurationV1(ctx context.Context, reque
 // Parameters:
 //   - id: Return to Service Configuration identifier.
 func (c *Client) GetReturnToServiceConfigurationV1(ctx context.Context, id string) (*ReturnToServiceConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ReturnToServiceConfiguration
 	endpoint := fmt.Sprintf("%s/return-to-service/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -64,7 +64,7 @@ func (c *Client) GetReturnToServiceConfigurationV1(ctx context.Context, id strin
 // Parameters:
 //   - id: Return to Service Configuration identifier.
 func (c *Client) UpdateReturnToServiceConfigurationV1(ctx context.Context, id string, request *ReturnToServiceConfigurationRequest) (*ReturnToServiceConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ReturnToServiceConfiguration
 	endpoint := fmt.Sprintf("%s/return-to-service/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -80,7 +80,7 @@ func (c *Client) UpdateReturnToServiceConfigurationV1(ctx context.Context, id st
 // Parameters:
 //   - id: Return To Service Configurations identifier.
 func (c *Client) DeleteReturnToServiceConfigurationV1(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/return-to-service/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteReturnToServiceConfigurationV1(%s): %w", id, err)
@@ -90,7 +90,7 @@ func (c *Client) DeleteReturnToServiceConfigurationV1(ctx context.Context, id st
 
 // ResolveReturnToServiceConfigurationV1IDByName looks up a ReturnToServiceConfigurationV1 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveReturnToServiceConfigurationV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/return-to-service"
 	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {
@@ -101,7 +101,7 @@ func (c *Client) ResolveReturnToServiceConfigurationV1IDByName(ctx context.Conte
 
 // ResolveReturnToServiceConfigurationV1ByName looks up a ReturnToServiceConfigurationV1 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveReturnToServiceConfigurationV1ByName(ctx context.Context, name string) (*ReturnToServiceConfiguration, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	listPath := prefix + "/return-to-service"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "displayName", "id", name)
 	if err != nil {

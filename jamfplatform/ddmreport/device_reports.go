@@ -26,7 +26,7 @@ import (
 // Parameters:
 //   - deviceID: The platform deviceId.
 func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	prefix := c.transport.APIPrefix("ddm/report", "v1")
 	var result DeviceReportDto
 	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -47,7 +47,7 @@ func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string
 //   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort
 //     criteria are supported.
 func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceID string, filter string, sort []string) ([]FilteredResultDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	prefix := c.transport.APIPrefix("ddm/report", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]FilteredResultDto, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -83,7 +83,7 @@ func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceI
 // Parameters:
 //   - deviceID: The platform deviceId.
 func (c *Client) GetDeviceChannels(ctx context.Context, deviceID string) (*DeviceChannelsDto, error) {
-	prefix := c.transport.TenantPrefix("ddm/report", "v1")
+	prefix := c.transport.APIPrefix("ddm/report", "v1")
 	var result DeviceChannelsDto
 	endpoint := fmt.Sprintf("%s/devices/%s/channels", prefix, url.PathEscape(deviceID))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

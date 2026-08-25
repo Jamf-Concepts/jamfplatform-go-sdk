@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetPatchExternalSourceByID(ctx context.Context, id string) (*PatchExternalSource, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchExternalSource
 	endpoint := fmt.Sprintf("%s/patchexternalsources/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetPatchExternalSourceByID(ctx context.Context, id string) (*Pa
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreatePatchExternalSourceByID(ctx context.Context, id string, request *PatchExternalSource) (*PatchExternalSource, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchExternalSource
 	endpoint := fmt.Sprintf("%s/patchexternalsources/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreatePatchExternalSourceByID(ctx context.Context, id string, r
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdatePatchExternalSourceByID(ctx context.Context, id string, request *PatchExternalSource) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePatchExternalSourceByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdatePatchExternalSourceByID(ctx context.Context, id string, r
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeletePatchExternalSourceByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePatchExternalSourceByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeletePatchExternalSourceByID(ctx context.Context, id string) e
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetPatchExternalSourceByName(ctx context.Context, name string) (*PatchExternalSource, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchExternalSource
 	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -97,7 +97,7 @@ func (c *Client) GetPatchExternalSourceByName(ctx context.Context, name string) 
 //
 // Required privileges: read:pro:patch-external-source.
 func (c *Client) ListPatchExternalSources(ctx context.Context) (*PatchExternalSources, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchExternalSources
 	endpoint := prefix + "/patchexternalsources"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -113,7 +113,7 @@ func (c *Client) ListPatchExternalSources(ctx context.Context) (*PatchExternalSo
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) CreatePatchExternalSourceByName(ctx context.Context, name string, request *PatchExternalSource) (*PatchExternalSource, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchExternalSource
 	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -129,7 +129,7 @@ func (c *Client) CreatePatchExternalSourceByName(ctx context.Context, name strin
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name string, request *PatchExternalSource) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePatchExternalSourceByName(%s): %w", name, err)
@@ -144,7 +144,7 @@ func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name strin
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) DeletePatchExternalSourceByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/patchexternalsources/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePatchExternalSourceByName(%s): %w", name, err)

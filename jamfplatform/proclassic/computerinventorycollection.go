@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:computer-inventory-collection.
 func (c *Client) GetComputerInventoryCollection(ctx context.Context) (*ComputerInventoryCollection, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInventoryCollection
 	endpoint := prefix + "/computerinventorycollection"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetComputerInventoryCollection(ctx context.Context) (*ComputerI
 //
 // Required privileges: update:pro:computer-inventory-collection.
 func (c *Client) UpdateComputerInventoryCollection(ctx context.Context, request *ComputerInventoryCollection) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/computerinventorycollection"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerInventoryCollection: %w", err)

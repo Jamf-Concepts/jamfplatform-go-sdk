@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetUserExtensionAttributeByID(ctx context.Context, id string) (*UserExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserExtensionAttribute
 	endpoint := fmt.Sprintf("%s/userextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetUserExtensionAttributeByID(ctx context.Context, id string) (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreateUserExtensionAttributeByID(ctx context.Context, id string, request *UserExtensionAttribute) (*UserExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserExtensionAttribute
 	endpoint := fmt.Sprintf("%s/userextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreateUserExtensionAttributeByID(ctx context.Context, id string
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdateUserExtensionAttributeByID(ctx context.Context, id string, request *UserExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateUserExtensionAttributeByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdateUserExtensionAttributeByID(ctx context.Context, id string
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeleteUserExtensionAttributeByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteUserExtensionAttributeByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeleteUserExtensionAttributeByID(ctx context.Context, id string
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetUserExtensionAttributeByName(ctx context.Context, name string) (*UserExtensionAttribute, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserExtensionAttribute
 	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetUserExtensionAttributeByName(ctx context.Context, name strin
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdateUserExtensionAttributeByName(ctx context.Context, name string, request *UserExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateUserExtensionAttributeByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdateUserExtensionAttributeByName(ctx context.Context, name st
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeleteUserExtensionAttributeByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeleteUserExtensionAttributeByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeleteUserExtensionAttributeByName(ctx context.Context, name st
 //
 // Required privileges: read:pro:user-extension-attributes.
 func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensionAttributes, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserExtensionAttributes
 	endpoint := prefix + "/userextensionattributes"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensio
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreateUserExtensionAttributeByName(ctx context.Context, name string, request *UserExtensionAttribute) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/userextensionattributes/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateUserExtensionAttributeByName(%s): %w", name, err)

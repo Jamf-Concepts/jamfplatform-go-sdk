@@ -19,7 +19,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetMobileDeviceHistoryByID(ctx context.Context, id string) (*MobileDeviceHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceHistory
 	endpoint := fmt.Sprintf("%s/mobiledevicehistory/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetMobileDeviceHistoryByID(ctx context.Context, id string) (*Mo
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetMobileDeviceHistoryByName(ctx context.Context, name string) (*MobileDeviceHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceHistory
 	endpoint := fmt.Sprintf("%s/mobiledevicehistory/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -51,7 +51,7 @@ func (c *Client) GetMobileDeviceHistoryByName(ctx context.Context, name string) 
 // Parameters:
 //   - udid: UDID to filter by.
 func (c *Client) GetMobileDeviceHistoryByUDID(ctx context.Context, udid string) (*MobileDeviceHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceHistory
 	endpoint := fmt.Sprintf("%s/mobiledevicehistory/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -67,7 +67,7 @@ func (c *Client) GetMobileDeviceHistoryByUDID(ctx context.Context, udid string) 
 // Parameters:
 //   - serialNumber: Serial number to filter by.
 func (c *Client) GetMobileDeviceHistoryBySerialNumber(ctx context.Context, serialNumber string) (*MobileDeviceHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceHistory
 	endpoint := fmt.Sprintf("%s/mobiledevicehistory/serialnumber/%s", prefix, url.PathEscape(serialNumber))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -83,7 +83,7 @@ func (c *Client) GetMobileDeviceHistoryBySerialNumber(ctx context.Context, seria
 // Parameters:
 //   - macAddress: Mac address to filter by.
 func (c *Client) GetMobileDeviceHistoryByMacAddress(ctx context.Context, macAddress string) (*MobileDeviceHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceHistory
 	endpoint := fmt.Sprintf("%s/mobiledevicehistory/macaddress/%s", prefix, url.PathEscape(macAddress))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -101,7 +101,7 @@ func (c *Client) GetMobileDeviceHistoryByMacAddress(ctx context.Context, macAddr
 //   - subset: Subset to filter by.
 //     Allowed values: "General", "ManagementCommands", "UserLocation", "Audits", "Applications", "Ebooks".
 func (c *Client) GetMobileDeviceHistoryByIDSubset(ctx context.Context, id string, subset string) (*MobileDeviceHistory, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceHistory
 	endpoint := fmt.Sprintf("%s/mobiledevicehistory/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

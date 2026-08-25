@@ -13,7 +13,7 @@ import (
 func TestListDeclarationReportClients_MultiPage(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	callCount := 0
-	mux.HandleFunc("/api/ddm/report/v1/tenant/t-test/declarations/decl-1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/ddm/report/v1/declarations/decl-1", func(w http.ResponseWriter, r *http.Request) {
 		callCount++
 		page := r.URL.Query().Get("page")
 		switch page {

@@ -22,7 +22,7 @@ import (
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) GetPrinterByID(ctx context.Context, id string) (*Printer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Printer
 	endpoint := fmt.Sprintf("%s/printers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetPrinterByID(ctx context.Context, id string) (*Printer, error
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) CreatePrinterByID(ctx context.Context, id string, request *Printer) (*Printer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Printer
 	endpoint := fmt.Sprintf("%s/printers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) CreatePrinterByID(ctx context.Context, id string, request *Prin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) UpdatePrinterByID(ctx context.Context, id string, request *Printer) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePrinterByID(%s): %w", id, err)
@@ -69,7 +69,7 @@ func (c *Client) UpdatePrinterByID(ctx context.Context, id string, request *Prin
 // Parameters:
 //   - id: ID value to filter by.
 func (c *Client) DeletePrinterByID(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePrinterByID(%s): %w", id, err)
@@ -84,7 +84,7 @@ func (c *Client) DeletePrinterByID(ctx context.Context, id string) error {
 // Parameters:
 //   - name: Name to filter by.
 func (c *Client) GetPrinterByName(ctx context.Context, name string) (*Printer, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Printer
 	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -100,7 +100,7 @@ func (c *Client) GetPrinterByName(ctx context.Context, name string) (*Printer, e
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) UpdatePrinterByName(ctx context.Context, name string, request *Printer) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdatePrinterByName(%s): %w", name, err)
@@ -115,7 +115,7 @@ func (c *Client) UpdatePrinterByName(ctx context.Context, name string, request *
 // Parameters:
 //   - name: Name value to filter by.
 func (c *Client) DeletePrinterByName(ctx context.Context, name string) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
 		return fmt.Errorf("DeletePrinterByName(%s): %w", name, err)
@@ -127,7 +127,7 @@ func (c *Client) DeletePrinterByName(ctx context.Context, name string) error {
 //
 // Required privileges: read:pro:printers.
 func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Printers
 	endpoint := prefix + "/printers"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -143,7 +143,7 @@ func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
 // Parameters:
 //   - name: ID value to filter by.
 func (c *Client) CreatePrinterByName(ctx context.Context, name string, request *Printer) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := fmt.Sprintf("%s/printers/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreatePrinterByName(%s): %w", name, err)

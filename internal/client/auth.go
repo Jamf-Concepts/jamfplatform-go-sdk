@@ -203,8 +203,7 @@ func annotateTokenError(err error) error {
 
 	const guidance = "this is typically a security policy (WAF or IP allowlist) blocking the request from this host's IP address rather than a credential problem"
 
-	var re *oauth2.RetrieveError
-	if errors.As(err, &re) {
+	if re, ok := errors.AsType[*oauth2.RetrieveError](err); ok {
 		if looksLikeJSON(re.Body) {
 			return err
 		}

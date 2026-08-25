@@ -13,7 +13,7 @@ import (
 
 func TestListApiIntegrationsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListApiIntegrationsV1(t *testing.T) {
 
 func TestCreateApiIntegrationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateApiIntegrationV1(t *testing.T) {
 
 func TestGetApiIntegrationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetApiIntegrationV1(t *testing.T) {
 
 func TestGetApiIntegrationV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetApiIntegrationV1_NotFound(t *testing.T) {
 
 func TestUpdateApiIntegrationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestUpdateApiIntegrationV1(t *testing.T) {
 
 func TestDeleteApiIntegrationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -120,7 +120,7 @@ func TestDeleteApiIntegrationV1(t *testing.T) {
 
 func TestRotateApiIntegrationClientCredentialsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations/test-id/client-credentials", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations/test-id/client-credentials", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -138,7 +138,7 @@ func TestRotateApiIntegrationClientCredentialsV1(t *testing.T) {
 
 func TestRotateApiIntegrationClientCredentialsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations/test-id/client-credentials", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations/test-id/client-credentials", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -154,7 +154,7 @@ func TestRotateApiIntegrationClientCredentialsV1_NotFound(t *testing.T) {
 
 func TestResolveApiIntegrationV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -177,7 +177,7 @@ func TestResolveApiIntegrationV1IDByName(t *testing.T) {
 
 func TestResolveApiIntegrationV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -201,7 +201,7 @@ func TestResolveApiIntegrationV1ByName(t *testing.T) {
 func TestApplyApiIntegrationV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -233,7 +233,7 @@ func TestApplyApiIntegrationV1_Create(t *testing.T) {
 func TestApplyApiIntegrationV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -244,7 +244,7 @@ func TestApplyApiIntegrationV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/tenant/t-test/api-integrations/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v1/api-integrations/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": 99})
 	})
 

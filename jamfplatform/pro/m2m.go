@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:m2m.
 func (c *Client) GetM2MTenantIDV1(ctx context.Context) (*M2mTenantIDInfo, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result M2mTenantIDInfo
 	endpoint := prefix + "/m2m/tenant-id"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {

@@ -22,7 +22,7 @@ import (
 //
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) DownloadInventoryPreloadCsvV2(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := prefix + "/inventory-preload/csv"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -42,7 +42,7 @@ func (c *Client) DownloadInventoryPreloadCsvV2(ctx context.Context) ([]byte, err
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) UploadInventoryPreloadCsvV2(ctx context.Context, fileFilename string, file io.Reader) (*[]HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []HrefResponse
 	endpoint := prefix + "/inventory-preload/csv"
 	parts := []client.MultipartField{
@@ -60,7 +60,7 @@ func (c *Client) UploadInventoryPreloadCsvV2(ctx context.Context, fileFilename s
 //
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) DownloadInventoryPreloadCsvTemplateV1(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
 	endpoint := prefix + "/inventory-preload/csv-template"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -73,7 +73,7 @@ func (c *Client) DownloadInventoryPreloadCsvTemplateV1(ctx context.Context) ([]b
 //
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) DownloadInventoryPreloadCsvTemplateV2(ctx context.Context) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := prefix + "/inventory-preload/csv-template"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -92,7 +92,7 @@ func (c *Client) DownloadInventoryPreloadCsvTemplateV2(ctx context.Context) ([]b
 // io.Reader is accepted too but the upload falls back to chunked
 // transfer encoding and is not retried on 429.
 func (c *Client) ValidateInventoryPreloadCsvV2(ctx context.Context, fileFilename string, file io.Reader) (*InventoryPreloadCsvValidationSuccess, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result InventoryPreloadCsvValidationSuccess
 	endpoint := prefix + "/inventory-preload/csv-validate"
 	parts := []client.MultipartField{
@@ -108,7 +108,7 @@ func (c *Client) ValidateInventoryPreloadCsvV2(ctx context.Context, fileFilename
 //
 // Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) ListInventoryPreloadExtensionAttributeColumnsV2(ctx context.Context) (*InventoryPreloadExtensionAttributeColumnResult, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result InventoryPreloadExtensionAttributeColumnResult
 	endpoint := prefix + "/inventory-preload/ea-columns"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -141,7 +141,7 @@ func (c *Client) ListInventoryPreloadExtensionAttributeColumnsV2(ctx context.Con
 //     Query in the RSQL format, allowing `==`, `!=`, `>`, `<`, and `=in=`.
 //     Example: `filter=categoryName=="Category"`.
 func (c *Client) ExportInventoryPreloadV2(ctx context.Context, request *ExportParameters, exportFields []string, exportLabels []string, sort []string, filter string) ([]byte, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
 	endpoint := prefix + "/inventory-preload/export"
 	params := url.Values{}
@@ -176,7 +176,7 @@ func (c *Client) ExportInventoryPreloadV2(ctx context.Context, request *ExportPa
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
 //     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
 func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -214,7 +214,7 @@ func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []strin
 //     Query in the RSQL format, allowing `==`, `!=`, `>`, `<`, and `=in=`.
 //     Example: `filter=username=="admin"`.
 func (c *Client) ListInventoryPreloadHistoryV2(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -248,7 +248,7 @@ func (c *Client) ListInventoryPreloadHistoryV2(ctx context.Context, sort []strin
 //
 // Required privileges: update:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
 func (c *Client) CreateInventoryPreloadHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/inventory-preload/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -261,7 +261,7 @@ func (c *Client) CreateInventoryPreloadHistoryNoteV1(ctx context.Context, reques
 //
 // Required privileges: update:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
 func (c *Client) CreateInventoryPreloadHistoryNoteV2(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/inventory-preload/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -287,7 +287,7 @@ func (c *Client) CreateInventoryPreloadHistoryNoteV2(ctx context.Context, reques
 //     Query in the RSQL format, allowing `==`, `!=`, `>`, `<`, and `=in=`.
 //     Example: `filter=categoryName=="Category"`.
 func (c *Client) ListInventoryPreloadRecordsV2(ctx context.Context, sort []string, filter string) ([]InventoryPreloadRecordV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryPreloadRecordV2, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -319,7 +319,7 @@ func (c *Client) ListInventoryPreloadRecordsV2(ctx context.Context, sort []strin
 //
 // Required privileges: create:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records.
 func (c *Client) CreateInventoryPreloadRecordV2(ctx context.Context, request *InventoryPreloadRecordV2) (*HrefResponse, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
 	endpoint := prefix + "/inventory-preload/records"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
@@ -332,7 +332,7 @@ func (c *Client) CreateInventoryPreloadRecordV2(ctx context.Context, request *In
 //
 // Required privileges: delete:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Delete Inventory Preload Records.
 func (c *Client) DeleteAllInventoryPreloadRecordsV2(ctx context.Context) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := prefix + "/inventory-preload/records/delete-all"
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteAllInventoryPreloadRecordsV2: %w", err)
@@ -347,7 +347,7 @@ func (c *Client) DeleteAllInventoryPreloadRecordsV2(ctx context.Context) error {
 // Parameters:
 //   - id: Inventory Preload identifier.
 func (c *Client) GetInventoryPreloadRecordV2(ctx context.Context, id string) (*InventoryPreloadRecordV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result InventoryPreloadRecordV2
 	endpoint := fmt.Sprintf("%s/inventory-preload/records/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -363,7 +363,7 @@ func (c *Client) GetInventoryPreloadRecordV2(ctx context.Context, id string) (*I
 // Parameters:
 //   - id: Inventory Preload identifier.
 func (c *Client) UpdateInventoryPreloadRecordV2(ctx context.Context, id string, request *InventoryPreloadRecordV2) (*InventoryPreloadRecordV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	var result InventoryPreloadRecordV2
 	endpoint := fmt.Sprintf("%s/inventory-preload/records/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -379,7 +379,7 @@ func (c *Client) UpdateInventoryPreloadRecordV2(ctx context.Context, id string, 
 // Parameters:
 //   - id: Inventory Preload identifier.
 func (c *Client) DeleteInventoryPreloadRecordV2(ctx context.Context, id string) error {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := fmt.Sprintf("%s/inventory-preload/records/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("DeleteInventoryPreloadRecordV2(%s): %w", id, err)
@@ -389,7 +389,7 @@ func (c *Client) DeleteInventoryPreloadRecordV2(ctx context.Context, id string) 
 
 // ResolveInventoryPreloadRecordV2IDBySerialNumber looks up a InventoryPreloadRecordV2 by its serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/inventory-preload/records"
 	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
 	if err != nil {
@@ -400,7 +400,7 @@ func (c *Client) ResolveInventoryPreloadRecordV2IDBySerialNumber(ctx context.Con
 
 // ResolveInventoryPreloadRecordV2BySerialNumber looks up a InventoryPreloadRecordV2 by its serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
 func (c *Client) ResolveInventoryPreloadRecordV2BySerialNumber(ctx context.Context, name string) (*InventoryPreloadRecordV2, error) {
-	prefix := c.transport.TenantPrefix("pro", "v2")
+	prefix := c.transport.APIPrefix("pro", "v2")
 	listPath := prefix + "/inventory-preload/records"
 	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "serialNumber", "serialNumber", "id", name)
 	if err != nil {

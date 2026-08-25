@@ -13,7 +13,7 @@ import (
 
 func TestGetSsoSettingsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetSsoSettingsV3(t *testing.T) {
 
 func TestGetSsoSettingsV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetSsoSettingsV3_NotFound(t *testing.T) {
 
 func TestUpdateSsoSettingsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateSsoSettingsV3(t *testing.T) {
 
 func TestGetSsoDependenciesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso/dependencies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso/dependencies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestGetSsoDependenciesV3(t *testing.T) {
 
 func TestGetSsoDependenciesV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso/dependencies", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso/dependencies", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestGetSsoDependenciesV3_NotFound(t *testing.T) {
 
 func TestDisableSsoV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso/disable", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso/disable", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -114,7 +114,7 @@ func TestDisableSsoV3(t *testing.T) {
 
 func TestListSsoHistoryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestListSsoHistoryV3(t *testing.T) {
 
 func TestCreateSsoHistoryNoteV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -154,7 +154,7 @@ func TestCreateSsoHistoryNoteV3(t *testing.T) {
 
 func TestDownloadSsoMetadataV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso/metadata/download", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso/metadata/download", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -172,7 +172,7 @@ func TestDownloadSsoMetadataV3(t *testing.T) {
 
 func TestDownloadSsoMetadataV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/tenant/t-test/sso/metadata/download", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/api/pro/v3/sso/metadata/download", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

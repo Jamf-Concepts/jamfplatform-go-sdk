@@ -20,7 +20,7 @@ import (
 //
 // Required privileges: read:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Read Automatically Renew MDM Profile Settings.
 func (c *Client) GetDeviceCommunicationSettingsV1(ctx context.Context) (*DeviceCommunicationSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceCommunicationSettings
 	endpoint := prefix + "/device-communication-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -33,7 +33,7 @@ func (c *Client) GetDeviceCommunicationSettingsV1(ctx context.Context) (*DeviceC
 //
 // Required privileges: update:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Update Automatically Renew MDM Profile Settings.
 func (c *Client) UpdateDeviceCommunicationSettingsV1(ctx context.Context, request *DeviceCommunicationSettings) (*DeviceCommunicationSettings, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceCommunicationSettings
 	endpoint := prefix + "/device-communication-settings"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
@@ -54,7 +54,7 @@ func (c *Client) UpdateDeviceCommunicationSettingsV1(ctx context.Context, reques
 //     details. This param can be combined with paging and sorting. Example: filter=username!=admin and
 //     details==*disabled* and date<2019-12-15.
 func (c *Client) ListDeviceCommunicationSettingsHistoryV1(ctx context.Context, sort []string, filter string) ([]ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
@@ -86,7 +86,7 @@ func (c *Client) ListDeviceCommunicationSettingsHistoryV1(ctx context.Context, s
 //
 // Required privileges: update:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Update Automatically Renew MDM Profile Settings.
 func (c *Client) CreateDeviceCommunicationSettingsHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/device-communication-settings/history"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {

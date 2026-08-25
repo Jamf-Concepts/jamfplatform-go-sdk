@@ -15,7 +15,7 @@ import (
 //
 // Required privileges: read:pro:computer-check-in.
 func (c *Client) GetComputerCheckIn(ctx context.Context) (*ComputerCheckIn, error) {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCheckIn
 	endpoint := prefix + "/computercheckin"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -28,7 +28,7 @@ func (c *Client) GetComputerCheckIn(ctx context.Context) (*ComputerCheckIn, erro
 //
 // Required privileges: update:pro:computer-check-in.
 func (c *Client) UpdateComputerCheckIn(ctx context.Context, request *ComputerCheckIn) error {
-	prefix := c.transport.TenantPrefix("proclassic", "")
+	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/computercheckin"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/xml", http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("UpdateComputerCheckIn: %w", err)

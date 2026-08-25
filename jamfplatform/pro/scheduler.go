@@ -17,7 +17,7 @@ import (
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetSchedulerJobsV1(ctx context.Context) (*SchedulerJobs, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SchedulerJobs
 	endpoint := prefix + "/scheduler/jobs"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
@@ -38,7 +38,7 @@ func (c *Client) GetSchedulerJobsV1(ctx context.Context) (*SchedulerJobs, error)
 //     filter is empty query - returning all results for the requested page. Fields allowed in the query:
 //     triggerKey, previousFireTime, nextFireTime.
 func (c *Client) GetSchedulerJobTriggersV1(ctx context.Context, jobKey string, sort []string, filter string) (*SchedulerJob, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SchedulerJob
 	endpoint := fmt.Sprintf("%s/scheduler/jobs/%s/triggers", prefix, url.PathEscape(jobKey))
 	params := url.Values{}
@@ -61,7 +61,7 @@ func (c *Client) GetSchedulerJobTriggersV1(ctx context.Context, jobKey string, s
 //
 // Required privileges: none (callable by any authenticated API client).
 func (c *Client) GetSchedulerSummaryV1(ctx context.Context) (*SchedulerSummary, error) {
-	prefix := c.transport.TenantPrefix("pro", "v1")
+	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SchedulerSummary
 	endpoint := prefix + "/scheduler/summary"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
