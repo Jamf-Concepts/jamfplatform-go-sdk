@@ -168,10 +168,16 @@ func WithFileCookieJar(dir string) Option {
 // WithTenantID configures the tenant this client is scoped to. It is sent as
 // the X-Tenant-Id request header on every API call.
 //
+// Tenant scoping is the legacy form. Prefer WithEnvironmentID: an environment
+// groups a customer's tenants, and it is the scope Jamf intends integrations to
+// be created with. Tenant scope remains supported — a tenant is a single
+// product, and some surfaces are only reachable that way — but new integrations
+// should not choose it by default.
+//
 // The gateway used to take the tenant from the URL path
 // (/api/{namespace}/{version}/tenant/{tenantID}); it moved to a header at the
-// Platform API GA. When this is unset no scope header is sent and the gateway
-// resolves the context from the access token instead.
+// Platform API GA. When neither scope option is set, no scope header is sent
+// and the gateway resolves the context from the access token instead.
 func WithTenantID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.tenantID = id
@@ -181,13 +187,18 @@ func WithTenantID(id string) Option {
 // WithEnvironmentID configures the platform environment this client is scoped
 // to. It is sent as the X-Environment-Id request header on every API call.
 //
-// An environment groups a customer's tenants. Use this instead of WithTenantID
-// when the integration was created with environment scope: the header must
-// match the credential, and a mismatch is refused with 403
-// OWNERSHIP_FORBIDDEN even when both IDs belong to the same customer.
+// This is the scope to prefer. An environment groups a customer's tenants, and
+// it is what Jamf intends new integrations to be created with; WithTenantID is
+// the legacy alternative. The Platform API GA invalidates every public-beta
+// credential, so integrations have to be re-created regardless — which makes it
+// the moment to create them environment-scoped rather than a migration to
+// schedule later.
 //
-// Setting both options is not meaningful — the last one wins, because a client
-// carries exactly one scope.
+// The header must match the credential. An integration is minted against one
+// scope, and crossing over is refused with 403 OWNERSHIP_FORBIDDEN even when
+// both IDs belong to the same customer, so this is a choice between two
+// integrations rather than two IDs for one. Setting both options is not
+// meaningful — the last one wins, because a client carries exactly one scope.
 func WithEnvironmentID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.environmentID = id

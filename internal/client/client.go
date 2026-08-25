@@ -101,6 +101,8 @@ func WithTokenCache(cache TokenCache, cacheKey string) Option {
 
 // WithTenantID sets the tenant this client is scoped to. It is sent as the
 // X-Tenant-Id request header on every API call; see ScopeHeader.
+//
+// Tenant is the legacy scope; prefer WithEnvironmentID for new integrations.
 func WithTenantID(id string) Option {
 	return func(c *Transport) {
 		c.scopeKind = ScopeTenant
@@ -215,14 +217,16 @@ type ScopeKind int
 
 const (
 	// ScopeTenant scopes requests to a single product tenant, sent as
-	// X-Tenant-Id. This is what every API surface in this SDK uses today.
+	// X-Tenant-Id. This is the legacy scope: every spec still declares this
+	// header, but Jamf intends new integrations to be environment-scoped.
 	ScopeTenant ScopeKind = iota + 1
 	// ScopeEnvironment scopes requests to a platform environment — a grouping
-	// of tenants — sent as X-Environment-Id, set by WithEnvironmentID. Every
-	// spec this SDK generates declares X-Tenant-Id, so no operation *requires*
-	// environment scope; it is offered because the gateway accepts it (several
-	// api-products declare request-context-types [tenant, environment]) and an
-	// environment-scoped credential can only use this.
+	// of tenants — sent as X-Environment-Id, set by WithEnvironmentID. This is
+	// the scope to prefer: no spec *declares* this header yet (they all declare
+	// X-Tenant-Id), but the gateway accepts it wherever an api-product lists
+	// request-context-types [tenant, environment], and it is what Jamf intends
+	// new integrations to use. Wire-verified against blueprints,
+	// compliance-benchmarks, pro, proclassic, devices and securitycloud.
 	ScopeEnvironment
 )
 
