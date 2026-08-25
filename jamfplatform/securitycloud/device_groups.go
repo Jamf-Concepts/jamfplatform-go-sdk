@@ -19,7 +19,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-08-12) and may be removed in a future release.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: device-groups:read.
 func (c *Client) ListDeviceGroupsV1(ctx context.Context) (*GroupListResponse, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result GroupListResponse
@@ -32,7 +32,7 @@ func (c *Client) ListDeviceGroupsV1(ctx context.Context) (*GroupListResponse, er
 
 // CreateDeviceGroupV1 create a new device group.
 //
-// Required privileges: create:jsc:all.
+// Required privileges: device-groups:create.
 func (c *Client) CreateDeviceGroupV1(ctx context.Context, request *CreateGroupRequest) (*Group, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	var result Group
@@ -45,7 +45,7 @@ func (c *Client) CreateDeviceGroupV1(ctx context.Context, request *CreateGroupRe
 
 // ListDeviceGroupsV2 list all device groups for a customer.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: device-groups:read.
 func (c *Client) ListDeviceGroupsV2(ctx context.Context) (*GroupListResponseV2, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v2")
 	var result GroupListResponseV2
@@ -58,7 +58,7 @@ func (c *Client) ListDeviceGroupsV2(ctx context.Context) (*GroupListResponseV2, 
 
 // GetDeviceGroupV1 get a device group by ID.
 //
-// Required privileges: read:jsc:all.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - groupID: Unique identifier of the group to retrieve.
@@ -74,7 +74,7 @@ func (c *Client) GetDeviceGroupV1(ctx context.Context, groupID string) (*Group, 
 
 // UpdateDeviceGroupV1 update a device group.
 //
-// Required privileges: update:jsc:all.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - groupID: Unique identifier of the group to update.
@@ -90,7 +90,7 @@ func (c *Client) UpdateDeviceGroupV1(ctx context.Context, groupID string, reques
 
 // DeleteDeviceGroupV1 delete a device group.
 //
-// Required privileges: delete:jsc:all.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - groupID: Unique identifier of the group to delete.

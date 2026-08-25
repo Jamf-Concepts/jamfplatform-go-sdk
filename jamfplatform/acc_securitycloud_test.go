@@ -395,7 +395,7 @@ func TestAcceptance_SecurityCloudZtnaReads(t *testing.T) {
 		if err != nil {
 			t.Fatalf("GetZtnaAppV1(%s) failed: %v", apps[0].ID, err)
 		}
-		t.Logf("app %s: name=%q category=%q hostnames=%v", a.ID, a.Name, a.CategoryName, a.Hostnames)
+		t.Logf("app %s: name=%v category=%q hostnames=%v", a.ID, a.Name, a.CategoryName, a.Hostnames)
 	}
 
 	predefined, err := sc.ListZtnaPredefinedAppsV1(ctx)
@@ -467,8 +467,15 @@ func TestAcceptance_SecurityCloudZtnaAppLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetZtnaAppV1 after patch failed: %v", err)
 	}
-	if got.Name != renamed {
-		t.Errorf("app name = %q, want %q", got.Name, renamed)
+	// App.name became *string in build v1582: the spec now declares it nullable
+	// (and required), matching the wire — a predefined-template app returns
+	// name:null. A custom app like this one must still carry a real name, so a
+	// nil here is a regression, not the nullable case.
+	if got.Name == nil {
+		t.Fatal("app name is nil after a name patch; only predefined-template apps return name null")
+	}
+	if *got.Name != renamed {
+		t.Errorf("app name = %q, want %q", *got.Name, renamed)
 	}
 	if len(got.Hostnames) != 1 || got.Hostnames[0] != "sdk-acc-app.invalid" {
 		t.Errorf("merge-patch of name should leave hostnames untouched, got %v", got.Hostnames)
@@ -1398,7 +1405,7 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 	}
 	var namedApp *securitycloud.App
 	for i := range apps {
-		if apps[i].Name != "" {
+		if apps[i].Name != nil && *apps[i].Name != "" {
 			namedApp = &apps[i]
 			break
 		}
@@ -1406,9 +1413,9 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 	if namedApp == nil {
 		t.Logf("no ZTNA app has a name (all %d are predefined-template apps, which return name null) — ResolveZtnaAppV1ByName is covered by the app lifecycle test instead", len(apps))
 	} else {
-		id, err := sc.ResolveZtnaAppV1IDByName(ctx, namedApp.Name)
+		id, err := sc.ResolveZtnaAppV1IDByName(ctx, *namedApp.Name)
 		if err != nil {
-			t.Fatalf("ResolveZtnaAppV1IDByName(%q) failed: %v", namedApp.Name, err)
+			t.Fatalf("ResolveZtnaAppV1IDByName(%q) failed: %v", *namedApp.Name, err)
 		}
 		if id != namedApp.ID {
 			t.Errorf("resolved app ID = %q, want %q", id, namedApp.ID)
@@ -1613,8 +1620,8 @@ func TestAcceptance_SecurityCloudApplyZtnaApp(t *testing.T) {
 	if len(got.Hostnames) != 2 {
 		t.Errorf("after Apply update, app has hostnames %v; the AppCreateRequest→AppPatchRequest round-trip dropped them", got.Hostnames)
 	}
-	if got.Name == "" {
-		t.Error("after Apply update, app name is empty; the pointer name field was lost")
+	if got.Name == nil || *got.Name == "" {
+		t.Error("after Apply update, app name is nil or empty; the pointer name field was lost")
 	}
 }
 

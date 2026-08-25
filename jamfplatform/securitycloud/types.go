@@ -137,12 +137,10 @@ type App struct {
 	Assignments *Assignments `json:"assignments,omitempty"`
 	// IPv4 CIDR subnets (e.g. `192.168.1.0/24`). Duplicating a subnet across Apps returns 409.
 	BareIps []string `json:"bareIps"`
-	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
-	// authoritative source. The value must exactly match a `displayName` returned by
-	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// server-owned and may change, so an unrecognized name is a state conflict, not a malformed request.
-	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
-	// `"Category - Business & Industry"`).
+	// App category name. Must exactly match a `displayName` returned by `GET /v1/categories` (e.g.
+	// `"Business & Industry"`) — that endpoint is the authoritative source. Unknown values return `409
+	// MISSING_CATEGORY_NAME` — the category list is server-owned and may change, so an unrecognized name
+	// is a state conflict, not a malformed request.
 	CategoryName CategoryName `json:"categoryName"`
 	// Per-group routing overrides that take precedence over the App's default routing. Each override's
 	// `groupIds` must be a subset of `assignments.inclusions.groups` (or `allUsers: true`); references to
@@ -155,11 +153,12 @@ type App struct {
 	Hostnames []string `json:"hostnames"`
 	// App ID. Format: UUID (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 	ID string `json:"id"`
-	// Ignored when `predefinedAppId` is set — inherited from the predefined app template.
-	Name string `json:"name"`
+	// Null when `predefinedAppId` is set — the name is owned by the predefined app template. Present and
+	// non-null when `predefinedAppId` is absent (custom app).
+	Name *string `json:"name,omitempty"`
 	// ID of the predefined SaaS app template (from `GET /predefined-apps`). Once set, cannot be changed or
-	// removed. When set, `name` and `hostnames` are inherited from the template; additional `hostnames`
-	// can still be appended.
+	// removed. When set, `name` is null (owned by the template); additional `hostnames` can still be
+	// appended.
 	PredefinedAppID *string `json:"predefinedAppId,omitempty"`
 	// Traffic routing configuration for an App.
 	Routing *Routing `json:"routing,omitempty"`
@@ -173,12 +172,10 @@ type AppCreateRequest struct {
 	Assignments Assignments `json:"assignments"`
 	// IPv4 CIDR subnets (e.g. `192.168.1.0/24`). Duplicating a subnet across Apps returns 409.
 	BareIps *[]string `json:"bareIps,omitempty"`
-	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
-	// authoritative source. The value must exactly match a `displayName` returned by
-	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// server-owned and may change, so an unrecognized name is a state conflict, not a malformed request.
-	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
-	// `"Category - Business & Industry"`).
+	// App category name. Must exactly match a `displayName` returned by `GET /v1/categories` (e.g.
+	// `"Business & Industry"`) — that endpoint is the authoritative source. Unknown values return `409
+	// MISSING_CATEGORY_NAME` — the category list is server-owned and may change, so an unrecognized name
+	// is a state conflict, not a malformed request.
 	CategoryName CategoryName `json:"categoryName"`
 	// Per-group routing overrides that take precedence over the App's default routing. Each override's
 	// `groupIds` must be a subset of `assignments.inclusions.groups` (or `allUsers: true`); references to
@@ -189,11 +186,12 @@ type AppCreateRequest struct {
 	// hostname across multiple Apps returns `409`. When `predefinedAppId` is set, additional hostnames
 	// extend the template set.
 	Hostnames *[]string `json:"hostnames,omitempty"`
-	// Ignored when `predefinedAppId` is set — name is inherited from the template.
+	// Required (non-null) when `predefinedAppId` is absent — `400` if missing or null. Must be null or
+	// omitted when `predefinedAppId` is set.
 	Name *string `json:"name,omitempty"`
 	// Optional. ID from `GET /predefined-apps`. Once set, cannot be changed or removed. When set, `name`
-	// and `hostnames` are inherited; additional `hostnames` can be appended. Presence indicates a
-	// Predefined (SaaS) App; absence indicates a Custom (Enterprise) App.
+	// must be null or omitted; additional `hostnames` can be appended. Presence indicates a Predefined
+	// (SaaS) App; absence indicates a Custom (Enterprise) App.
 	PredefinedAppID *string `json:"predefinedAppId,omitempty"`
 	// Traffic routing configuration for an App.
 	Routing Routing `json:"routing"`
@@ -214,12 +212,10 @@ type AppPatchRequest struct {
 	Assignments *Assignments `json:"assignments,omitempty"`
 	// Replaces the full bareIps list. IPv4 CIDR subnets (e.g. `192.168.1.0/24`).
 	BareIps *[]string `json:"bareIps,omitempty"`
-	// App category name. Use the `displayName` field from `GET /v1/categories` — that endpoint is the
-	// authoritative source. The value must exactly match a `displayName` returned by
-	// `content-block-service`. Unknown values return `409 MISSING_CATEGORY_NAME` — the category list is
-	// server-owned and may change, so an unrecognized name is a state conflict, not a malformed request.
-	// TRS validates against `displayName` (e.g. `"Business & Industry"`), not the internal `name` (e.g.
-	// `"Category - Business & Industry"`).
+	// App category name. Must exactly match a `displayName` returned by `GET /v1/categories` (e.g.
+	// `"Business & Industry"`) — that endpoint is the authoritative source. Unknown values return `409
+	// MISSING_CATEGORY_NAME` — the category list is server-owned and may change, so an unrecognized name
+	// is a state conflict, not a malformed request.
 	CategoryName *CategoryName `json:"categoryName,omitempty"`
 	// Per-group routing overrides that take precedence over the App's default routing. Each override's
 	// `groupIds` must be a subset of `assignments.inclusions.groups` (or `allUsers: true`); references to
@@ -229,9 +225,8 @@ type AppPatchRequest struct {
 	// Overlapping entries (e.g. `["*.example.com", "sub.example.com"]`) return `400`. Specifying the same
 	// hostname as another App returns `409`.
 	Hostnames *[]string `json:"hostnames,omitempty"`
-	// New name. Must be non-empty if supplied and `predefinedAppId` is not set — a blank string returns
-	// `400`. Ignored when `predefinedAppId` is set (name is inherited from the template). Omit to leave
-	// unchanged.
+	// New name. Must be non-empty — a blank string returns `400`. Ignored when `predefinedAppId` is set
+	// (name is owned by the template). Omit to leave unchanged.
 	Name *string `json:"name,omitempty"`
 	// Traffic routing configuration for an App.
 	Routing *Routing `json:"routing,omitempty"`
@@ -259,8 +254,8 @@ type Assignments struct {
 type AssignmentsInclusions struct {
 	// `true` grants access to all users; `groups` array is then ignored.
 	AllUsers bool `json:"allUsers"`
-	// Device Group IDs (from the Device Groups API — JSC-71029). Used when `allUsers` is `false`. When
-	// `allUsers: false`, at least one group ID must be supplied — an empty `groups` array returns `400`.
+	// Device Group IDs (from the Device Groups API). Used when `allUsers` is `false`. When `allUsers:
+	// false`, at least one group ID must be supplied — an empty `groups` array returns `400`.
 	Groups *[]string `json:"groups,omitempty"`
 }
 
@@ -382,8 +377,8 @@ type CreateResponse struct {
 type DedicatedIps struct {
 	// Whether dedicated egress IPs are provisioned for this gateway.
 	Enabled bool `json:"enabled"`
-	// Dedicated egress IPv4 addresses provisioned by the system (vpn-service-controller). Present when
-	// `enabled: true` and provisioning is complete.
+	// Dedicated egress IPv4 addresses provisioned by the system. Present when `enabled: true` and
+	// provisioning is complete.
 	Ips *[]string `json:"ips,omitempty"`
 }
 
@@ -407,8 +402,7 @@ type DohIntegration struct {
 type Gateway struct {
 	// Public IPv4 addresses of the availability zone nodes (e.g. `18.202.42.169`). Must belong to the
 	// gateway's datacenter region. Note: despite the field name, values are IPv4 addresses — not zone
-	// identifier strings. TRS `/external/v1` translates these to/from TRS internal zone IDs (e.g.
-	// `eu-west-1a`) transparently.
+	// identifier strings.
 	// For **IPsec gateways**, these are the source addresses the peer firewall must allow. Valid IPs per
 	// datacenter:
 	// | Datacenter | Name | IP 1 | IP 2 |
@@ -430,8 +424,8 @@ type Gateway struct {
 	// Operational contact for this gateway.
 	Contact *GatewayContact `json:"contact,omitempty"`
 	// Datacenter this gateway is deployed to (e.g. `eu-west-1`). Can be changed on PATCH — triggers
-	// re-provisioning; `availabilityZones` must match the new datacenter prefix (TRS enforces this and
-	// returns `400` on mismatch).
+	// re-provisioning; `availabilityZones` must match the new datacenter prefix (returns `400` on
+	// mismatch).
 	// Allowed values: see the GatewayDatacenter constants.
 	Datacenter string `json:"datacenter"`
 	// Dedicated egress IP configuration.
@@ -463,8 +457,7 @@ type GatewayContact struct {
 type GatewayCreateRequest struct {
 	// Public IPv4 addresses of the availability zone nodes to deploy into (e.g. `18.202.42.169`). Must
 	// belong to the gateway's datacenter region. Must be empty when `dedicatedIps.enabled: true`. Note:
-	// despite the field name, values are IPv4 addresses — TRS `/external/v1` translates to/from TRS
-	// internal zone IDs (e.g. `eu-west-1a`) transparently.
+	// despite the field name, values are IPv4 addresses — not zone identifier strings.
 	// For **IPsec gateways**, these are the source addresses the peer firewall must allow. Valid IPs per
 	// datacenter:
 	// | Datacenter | Name | IP 1 | IP 2 |
@@ -516,7 +509,7 @@ type GatewayIpSec struct {
 	Right *ConnectionConfigRightResponse `json:"right,omitempty"`
 }
 
-// GatewayIpSecPatchRequest Partial IPSec configuration for PATCH. All fields optional — TRS performs a deep merge. Supply only `left.secret` to rotate the pre-shared key, or the full block to replace cipher suites and endpoint addresses simultaneously. `right.secret` is derived automatically from `left.secret` — callers never set it directly.
+// GatewayIpSecPatchRequest Partial IPSec configuration for PATCH. All fields optional — fields are deep-merged. Supply only `left.secret` to rotate the pre-shared key, or the full block to replace cipher suites and endpoint addresses simultaneously. `right.secret` is derived automatically from `left.secret` — callers never set it directly.
 type GatewayIpSecPatchRequest struct {
 	// Cipher suite configuration for an IKE or ESP phase.
 	Esp *CipherSuiteConfig `json:"esp,omitempty"`
@@ -591,10 +584,10 @@ type GatewayPatchRequest struct {
 	Datacenter *string `json:"datacenter,omitempty"`
 	// Whether the deployment should be active.
 	Enabled *bool `json:"enabled,omitempty"`
-	// Partial IPSec configuration for PATCH. All fields optional — TRS performs a deep merge. Supply
-	// only `left.secret` to rotate the pre-shared key, or the full block to replace cipher suites and
-	// endpoint addresses simultaneously. `right.secret` is derived automatically from `left.secret` —
-	// callers never set it directly.
+	// Partial IPSec configuration for PATCH. All fields optional — fields are deep-merged. Supply only
+	// `left.secret` to rotate the pre-shared key, or the full block to replace cipher suites and endpoint
+	// addresses simultaneously. `right.secret` is derived automatically from `left.secret` — callers
+	// never set it directly.
 	Ipsec *GatewayIpSecPatchRequest `json:"ipsec,omitempty"`
 	// New name for the gateway.
 	Name *string `json:"name,omitempty"`
@@ -728,7 +721,7 @@ type RiskControls struct {
 
 // Routing Traffic routing configuration for an App.
 type Routing struct {
-	// DNS IP resolution preference. Optional. When omitted and `type=CUSTOM`, TRS defaults to `IPv6`.
+	// DNS IP resolution preference. Optional. When omitted and `type=CUSTOM`, defaults to `IPv6`.
 	// Explicitly set to `IPv4` if your network requires it. **Must be absent (or null) when
 	// `type=DIRECT`** — returns `400` if set.
 	// Allowed values: see the RoutingDnsIpResolutionType constants.
@@ -738,8 +731,7 @@ type Routing struct {
 	// are UUIDs (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
 	GatewayID *string `json:"gatewayId,omitempty"`
 	// `CUSTOM` routes traffic via a ZTNA gateway (`gatewayId` required). `DIRECT` uses default device
-	// routing (`gatewayId` must be null/absent). The internal TRS value `BLOCK` is not exposed in the
-	// public API.
+	// routing (`gatewayId` must be null/absent). `BLOCK` is not exposed in the public API.
 	// Allowed values: see the RoutingType constants.
 	Type string `json:"type"`
 }
@@ -868,11 +860,15 @@ type ConnectorConfig struct {
 	ID string `json:"id"`
 	// ISO country code for the UEM instance, when applicable.
 	IsoCountry *string `json:"isoCountry,omitempty"`
-	// Summary of the connector's most recent sync run, embedded in `ConnectorConfig`.
+	// Summary of the connector's most recent sync run, embedded in `ConnectorConfig`. The containing
+	// `latestSync` property is `null` until the connector has run its first sync.
 	// This is **not** the same shape as the `SyncRun` entries returned by `GET
-	// /connectors/{configId}/sync/runs`: it carries `lastSeen`, `errorDetails` and epoch-millis duplicates
-	// of the timestamps, has no per-run device counters, and — unlike `SyncRun` — reports the
-	// `CANCELLING` status with the British spelling. Use the sync-runs endpoint for run history.
+	// /connectors/{configId}/sync/runs`: it carries `lastSeen` and `errorDetails`, and has no per-run
+	// device counters, because the connector record keeps only the current transaction's state and not its
+	// tallies. Use the sync-runs endpoint for run history and counts.
+	// `startedUtcMs` and `finishedUtcMs` are retained, deprecated epoch-millisecond duplicates of the
+	// ISO-8601 `started` and `finished`. They are still emitted for existing consumers; new consumers
+	// should read the ISO-8601 fields.
 	LatestSync *LatestSync `json:"latestSync,omitempty"`
 	// Timestamp of the next scheduled sync (ISO 8601).
 	NextScheduledSync *time.Time `json:"nextScheduledSync,omitempty"`
@@ -926,8 +922,16 @@ type ConnectorPage struct {
 	TotalCount int64 `json:"totalCount"`
 }
 
-// CreatedResource Identifier of a newly created resource.
+// CreatedResource Identifier and location of a newly created resource.
 type CreatedResource struct {
+	// Location of the created resource, as a path relative to the API base URL the request was made
+	// against.
+	// It is deliberately relative rather than absolute, and it does not repeat the tenant scope segment:
+	// connector-service is customer-scoped downstream of the gateway and never receives the `tenantId` or
+	// the external host, so it cannot construct the fully qualified tenant-scoped URL. Resolve it against
+	// the same base URL — including the tenant scope prefix the publishing pipeline injects — that was
+	// used for the `POST`.
+	Href string `json:"href"`
 	// Identifier of the created resource.
 	ID string `json:"id"`
 }
@@ -1003,7 +1007,7 @@ type GroupSettings struct {
 	GroupMappings *[]GroupMapping `json:"groupMappings,omitempty"`
 }
 
-// LatestSync Summary of the connector's most recent sync run, embedded in `ConnectorConfig`. This is **not** the same shape as the `SyncRun` entries returned by `GET /connectors/{configId}/sync/runs`: it carries `lastSeen`, `errorDetails` and epoch-millis duplicates of the timestamps, has no per-run device counters, and — unlike `SyncRun` — reports the `CANCELLING` status with the British spelling. Use the sync-runs endpoint for run history.
+// LatestSync Summary of the connector's most recent sync run, embedded in `ConnectorConfig`. The containing `latestSync` property is `null` until the connector has run its first sync. This is **not** the same shape as the `SyncRun` entries returned by `GET /connectors/{configId}/sync/runs`: it carries `lastSeen` and `errorDetails`, and has no per-run device counters, because the connector record keeps only the current transaction's state and not its tallies. Use the sync-runs endpoint for run history and counts. `startedUtcMs` and `finishedUtcMs` are retained, deprecated epoch-millisecond duplicates of the ISO-8601 `started` and `finished`. They are still emitted for existing consumers; new consumers should read the ISO-8601 fields.
 type LatestSync struct {
 	// Why the most recent sync failed. Always present, with null members when the sync did not fail.
 	ErrorDetails *SyncErrorDetails `json:"errorDetails,omitempty"`
@@ -1011,7 +1015,8 @@ type LatestSync struct {
 	Finished *time.Time `json:"finished,omitempty"`
 	// `finished` as epoch milliseconds. Deprecated duplicate — prefer the ISO-8601 `finished`.
 	FinishedUtcMs *int64 `json:"finishedUtcMs,omitempty"`
-	// Timestamp of the last heartbeat from the running sync (ISO 8601), used to detect stalled syncs.
+	// Timestamp of the last progress heartbeat from the running sync (ISO 8601), used to detect stalled
+	// syncs.
 	LastSeen *time.Time `json:"lastSeen,omitempty"`
 	// What triggered this sync.
 	// Allowed values: see the LatestSyncRefreshType constants.
@@ -1023,7 +1028,9 @@ type LatestSync struct {
 	// Current sync status.
 	// Allowed values: see the LatestSyncStatus constants.
 	Status string `json:"status"`
-	// Unique identifier for this sync run.
+	// Unique identifier for this sync run. Always present when `latestSync` itself is present: it is the
+	// identifier of the underlying sync transaction, and the whole object is null when there is no
+	// transaction.
 	TransactionID string `json:"transactionId"`
 }
 

@@ -190,6 +190,13 @@ Do **not** fall back to the source specs in `public-apis-oas/redocly-implementat
 
 **Re-probed 2026-08-20 and now routed:** `GET /v2/…/groups` (200, `{groups: []}`) and `GET /v1/…/activation-profiles` (200). The `skipOnGatewayUnrouted` acceptance helper existed only for these two and has been deleted — both tests now fail on a 403 rather than skipping, which is the point: a 403 resurfacing means routing regressed or the region in use lags EU. Nothing else in the SDK needed it, so do not reintroduce a blanket-403 skip; name the endpoint and fail.
 
+**Build v1582 (2026-08-25) — the privilege split finishes, and three schema corrections.** dns and categories are byte-identical to v1559; the rest:
+
+- **Device groups joined the fine-grained privileges**: all six ops moved from `*:jsc:all` to `device-groups:{read,create,update,delete}`. With v1559 that completes the split across the whole Security Cloud surface — nothing still declares a `*:jsc:all` privilege.
+- **`App.name` is now `required` *and* `nullable`**, so `Name` is `*string`. Odd as a declaration, but it is exactly what the wire does and the spec is catching up: an app created from a `predefinedAppId` inherits its name from the template and returns `name: null`. Re-confirmed 2026-08-25 — both apps on the sandbox are predefined-derived and both return null. This is the same fact that makes `ResolveZtnaAppV1ByName` unable to reach such apps; the resolver blind spot is unchanged, but the Go type no longer pretends the field is always present. Breaking for consumers.
+- **`LatestSync.status` fixed a misspelling**: `CANCELLING` → `CANCELING`, so `LatestSyncStatusCancelling` becomes `LatestSyncStatusCanceling`. Breaking, and **unverifiable from here** — the value only appears while a sync is being cancelled, and the tenant's connector cannot be driven through a sync (see the UEM Connect notes). Taken on the spec's word, unusually for this package.
+- **uem-connect's `CreatedResource` gained a required `href`**, matching the `href`-injection plugin. Note the Go field is `Href string` but a Go caller still cannot observe it — `net/http` always requests gzip and the plugin skips compressed bodies. See the `href` note below before assuming this is now usable.
+
 **Build v1559 (2026-08-25) — the `*:jsc:all` privileges split into fine-grained ones.** Metadata only: no path, schema, type or URL change anywhere in the five specs, and uem-connect and device-groups are byte-identical to v1528. 29 operations swapped their `x-required-privileges`, which the SDK surfaces in `securitycloud/permissions.go` and in each method's godoc, so the generated diff is privilege strings and nothing else.
 
 | old | new | ops |

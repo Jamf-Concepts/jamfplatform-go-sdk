@@ -779,7 +779,7 @@ type LatestSyncStatus = string
 const (
 	LatestSyncStatusNotSynchronized      LatestSyncStatus = "NOT_SYNCHRONIZED"
 	LatestSyncStatusRunning              LatestSyncStatus = "RUNNING"
-	LatestSyncStatusCancelling           LatestSyncStatus = "CANCELLING"
+	LatestSyncStatusCanceling            LatestSyncStatus = "CANCELING"
 	LatestSyncStatusCanceled             LatestSyncStatus = "CANCELED"
 	LatestSyncStatusCompleted            LatestSyncStatus = "COMPLETED"
 	LatestSyncStatusFailed               LatestSyncStatus = "FAILED"
@@ -799,7 +799,7 @@ func LatestSyncStatusValues() []LatestSyncStatus {
 	return []LatestSyncStatus{
 		LatestSyncStatusNotSynchronized,
 		LatestSyncStatusRunning,
-		LatestSyncStatusCancelling,
+		LatestSyncStatusCanceling,
 		LatestSyncStatusCanceled,
 		LatestSyncStatusCompleted,
 		LatestSyncStatusFailed,
