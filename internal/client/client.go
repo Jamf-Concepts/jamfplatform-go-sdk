@@ -247,6 +247,20 @@ func (k ScopeKind) ScopeHeader() string {
 	}
 }
 
+// String names the scope kind, for logs and diagnostics. An unset kind reports
+// "none" rather than an empty string, so a log line cannot read as though the
+// field were missing.
+func (k ScopeKind) String() string {
+	switch k {
+	case ScopeTenant:
+		return "tenant"
+	case ScopeEnvironment:
+		return "environment"
+	default:
+		return "none"
+	}
+}
+
 // setScopeHeader stamps the scope header on a request. It is applied before
 // extraHeaders so an operation that needs to override the scope for one call
 // still can, and it is a no-op when no scope was configured — the gateway then
@@ -260,11 +274,29 @@ func (c *Transport) setScopeHeader(req *http.Request) {
 
 // TenantID returns the tenant ID configured on the transport, or "" when this
 // client is scoped to something other than a tenant.
+//
+// This is a partial view of a three-valued property and cannot distinguish an
+// environment-scoped client from an unscoped, organization-style one — both
+// report "". Prefer Scope, which reports the kind alongside the ID.
 func (c *Transport) TenantID() string {
 	if c.scopeKind != ScopeTenant {
 		return ""
 	}
 	return c.scopeID
+}
+
+// Scope reports which kind of scope this client carries and the ID it sends.
+//
+// A zero ScopeKind with an empty ID means no scope header is sent at all, which
+// is how organization-scoped credentials work: the gateway resolves the context
+// from the access token, so there is nothing for the client to state. Callers
+// switching on the kind should handle that case rather than assuming a scope is
+// always present.
+func (c *Transport) Scope() (ScopeKind, string) {
+	if c.scopeKind.ScopeHeader() == "" || c.scopeID == "" {
+		return 0, ""
+	}
+	return c.scopeKind, c.scopeID
 }
 
 // APIPrefix returns the /api/{namespace}/{version} URL prefix for a namespace.
