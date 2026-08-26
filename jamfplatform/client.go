@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
@@ -58,6 +59,12 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	}
 	if cfg.minRequestIntervalSet {
 		transportOpts = append(transportOpts, client.WithMinRequestInterval(cfg.minRequestInterval))
+	}
+	if len(cfg.headers) > 0 {
+		transportOpts = append(transportOpts, client.WithHeaders(cfg.headers))
+	}
+	if cfg.authHeaderName != "" {
+		transportOpts = append(transportOpts, client.WithAuthorizationHeaderName(cfg.authHeaderName))
 	}
 	if cfg.retryPolicySet {
 		transportOpts = append(transportOpts, client.WithRetryPolicy(cfg.retryWaitMin, cfg.retryWaitMax, cfg.retryMax))
@@ -137,6 +144,9 @@ type clientConfig struct {
 	cacheDir      string
 	cookieJarDir  string
 
+	headers        http.Header
+	authHeaderName string
+
 	minRequestInterval    time.Duration
 	minRequestIntervalSet bool
 
@@ -162,6 +172,57 @@ func WithUserAgent(userAgent string) Option {
 func WithHTTPClient(httpClient *http.Client) Option {
 	return func(cfg *clientConfig) {
 		cfg.httpClient = httpClient
+	}
+}
+
+// WithHeaders sets additional HTTP headers sent on every request the client
+// makes, including the OAuth2 token exchange. Calling it more than once merges;
+// a repeated header name takes the last value given.
+//
+// For callers whose traffic is fronted by a reverse proxy needing headers of its
+// own. Prefer this over WithHTTPClient for that purpose — supplying a client
+// replaces the SDK's tuned transport and drops proxy-from-environment support,
+// the per-phase timeouts, the connection-pool ceiling matched to Terraform's
+// default parallelism, and the write buffer package upload depends on. This
+// layers onto that transport, and composes with WithHTTPClient when both are
+// genuinely needed.
+//
+// The scope headers (X-Tenant-Id, X-Environment-Id) are rejected and logged; set
+// the scope with WithTenantID or WithEnvironmentID. User-Agent set here is
+// overridden by WithUserAgent. Cookie is allowed but replaces rather than merges,
+// so it displaces the sticky-session cookie Jamf Cloud uses to pin a client to
+// one app node.
+func WithHeaders(h http.Header) Option {
+	return func(cfg *clientConfig) {
+		if len(h) == 0 {
+			return
+		}
+		if cfg.headers == nil {
+			cfg.headers = make(http.Header, len(h))
+		}
+		for name, values := range h {
+			cfg.headers[http.CanonicalHeaderKey(name)] = slices.Clone(values)
+		}
+	}
+}
+
+// WithAuthorizationHeaderName moves the OAuth2 bearer credential out of the
+// Authorization header into the named header on every API request, leaving
+// Authorization free for a header supplied via WithHeaders.
+//
+// For callers behind a reverse proxy that consumes Authorization for its own
+// service-account credential and expects Jamf's bearer under a different name.
+// The token exchange is unaffected: the client-credential Basic header x/oauth2
+// writes there is left in place, since relocating it would leave the token
+// endpoint with nothing to authenticate.
+//
+// "Authorization" and the scope headers are refused and the refusal logged.
+// Relocating the bearer onto Authorization would delete it, and relocating it
+// onto a scope header would overwrite the scope; both fail with a status —
+// 401 and 403 OWNERSHIP_FORBIDDEN — that names something else as the cause.
+func WithAuthorizationHeaderName(name string) Option {
+	return func(cfg *clientConfig) {
+		cfg.authHeaderName = name
 	}
 }
 

@@ -20,11 +20,13 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
 
@@ -59,6 +61,8 @@ type Transport struct {
 	cookieJar       http.CookieJar
 	deprecationSeen sync.Map // dedup runtime Deprecation header warnings
 	throttle        *requestThrottle
+	extraHeaders    http.Header           // caller-supplied headers, applied to token exchange and API calls alike
+	authHeaderName  string                // when set, the OAuth2 bearer moves from Authorization to this header
 	retry           *retryablehttp.Client // backs httpClient; mutating retry.HTTPClient (see SetHTTPClient/SetUserAgent) updates httpClient's behavior in place
 }
 
@@ -85,6 +89,96 @@ func WithHTTPClient(httpClient *http.Client) Option {
 			c.baseClient = httpClient
 			c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
 			c.retry.HTTPClient = c.uploadClient
+		}
+	}
+}
+
+// WithHeaders sets additional HTTP headers sent on every request this client
+// makes, including the OAuth2 token exchange. Existing values for the same
+// header name are replaced.
+//
+// Intended for callers whose traffic is fronted by a reverse proxy that requires
+// headers of its own — a vaulted service-account credential, a routing tag —
+// which the SDK cannot know about. Prefer this over WithHTTPClient for the
+// purpose: supplying a client replaces the SDK's tuned *http.Transport and
+// silently drops proxy-from-environment support, the per-phase timeouts, the
+// connection-pool ceiling matched to Terraform's default parallelism, and the
+// large write buffer that package upload depends on. This option layers onto
+// that transport instead of replacing it, and composes with WithHTTPClient when
+// a caller genuinely needs both.
+//
+// The scope headers (X-Tenant-Id, X-Environment-Id) are rejected: the gateway
+// resolves the request context from them, and an override is refused with the
+// same 403 OWNERSHIP_FORBIDDEN a mismatched credential gives. Set the scope with
+// WithTenantID or WithEnvironmentID. Rejections are logged rather than silently
+// dropped.
+//
+// Values replace rather than merge, which is worth knowing for one header:
+// passing Cookie here replaces the sticky-session cookie Jamf Cloud uses to pin a
+// client to a single app node, so a write may not be visible on the next read. It
+// is allowed anyway, because a proxy may require a cookie of its own.
+//
+// Supplying an Authorization header here moves the OAuth2 client credential from
+// the Authorization header into the request body on the token exchange (RFC 6749
+// §2.3.1 permits both forms). Without that, the caller's header would overwrite
+// the client credential and every token fetch would fail — or, under x/oauth2's
+// auto-detection, succeed only after a wasted 401 round trip per fetch. This is
+// what makes "proxy takes Authorization, Jamf credential rides in the body"
+// work, which is the arrangement such proxies expect.
+func WithHeaders(h http.Header) Option {
+	return func(c *Transport) {
+		if len(h) == 0 {
+			return
+		}
+		if c.extraHeaders == nil {
+			c.extraHeaders = make(http.Header, len(h))
+		}
+		for name, values := range h {
+			canonical := http.CanonicalHeaderKey(name)
+			if reservedHeaders[canonical] {
+				log.Printf("jamfplatform: WithHeaders: refusing to set %s — the SDK owns the scope headers; use WithTenantID or WithEnvironmentID", canonical)
+				continue
+			}
+			c.extraHeaders[canonical] = slices.Clone(values)
+		}
+	}
+}
+
+// WithAuthorizationHeaderName moves the OAuth2 bearer credential out of the
+// Authorization header and into the named header on every API request.
+//
+// For callers behind a reverse proxy that consumes Authorization for its own
+// credential and expects Jamf's bearer elsewhere. The relocation runs before the
+// WithHeaders values are applied, so pairing the two — Authorization supplied by
+// WithHeaders, the bearer relocated by this option — sends both credentials on
+// the same request.
+//
+// Only a Bearer credential is moved, so the token exchange is unaffected:
+// x/oauth2 writes the client credential there as Basic, and relocating it would
+// leave the token endpoint with nothing to read while appearing to have worked.
+//
+// Two names are refused, both because accepting them breaks the request in a way
+// no error message points at. "Authorization" is the header the bearer is already
+// in, and relocating a header onto itself deletes it — RoundTrip sets the target
+// and then deletes the source, which for one name are the same key, so every API
+// call would go out with no credential at all and answer 401 exactly as a wrong
+// client secret does. The scope headers are refused for the reason WithHeaders
+// refuses them, reached the other way round: the bearer would overwrite the
+// scope setScopeHeader stamped, and the gateway answers 403 OWNERSHIP_FORBIDDEN.
+// Both rejections are logged.
+func WithAuthorizationHeaderName(name string) Option {
+	return func(c *Transport) {
+		if name == "" {
+			return
+		}
+		canonical := http.CanonicalHeaderKey(name)
+		switch {
+		case canonical == "Authorization":
+			log.Printf("jamfplatform: WithAuthorizationHeaderName: ignoring %q — the bearer is already in Authorization, and relocating it onto itself would delete it; omit the option to leave it there", name)
+		case reservedHeaders[canonical]:
+			log.Printf("jamfplatform: WithAuthorizationHeaderName: refusing to relocate the bearer into %s — the SDK owns the scope headers, and overwriting one is refused with 403 OWNERSHIP_FORBIDDEN", canonical)
+		default:
+			c.authHeaderName = canonical
 		}
 	}
 }
@@ -194,6 +288,7 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 	for _, opt := range opts {
 		opt(c)
 	}
+	c.installHeaderTransport()
 	if c.tokenCache != nil {
 		c.uploadClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
 		c.retry.HTTPClient = c.uploadClient
@@ -332,10 +427,16 @@ func (c *Transport) HTTPClient() *http.Client {
 }
 
 // SetHTTPClient sets a custom base HTTP client (useful for testing).
+//
+// installHeaderTransport runs afterwards for the same reason it does in
+// SetUserAgent: this replaces baseClient outright, so any headerTransport
+// layered onto the previous one is gone and the caller's headers and bearer
+// relocation would silently stop being applied.
 func (c *Transport) SetHTTPClient(httpClient *http.Client) {
 	c.baseClient = httpClient
 	c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
 	c.retry.HTTPClient = c.uploadClient
+	c.installHeaderTransport()
 }
 
 // SetLogger sets the logger for the client.
@@ -347,6 +448,40 @@ func (c *Transport) SetLogger(logger Logger) {
 func (c *Transport) SetUserAgent(ua string) {
 	c.userAgent = ua
 	c.uploadClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua, c.throttle)
+	c.retry.HTTPClient = c.uploadClient
+	c.installHeaderTransport()
+}
+
+// installHeaderTransport layers the caller's headers onto the base client's
+// transport and rebuilds the OAuth2 wrapper on top of the result.
+//
+// The rebuild is required, not defensive: oauth2.NewClient captures the base
+// transport by value when it constructs oauth2.Transport, so mutating
+// baseClient.Transport afterwards would leave the already-built API client
+// pointing at the unwrapped chain and the headers would reach the token exchange
+// only. Wrapping the base rather than the OAuth2 client is what puts this
+// transport below oauth2 — see headerTransport for why that ordering matters.
+//
+// No throttle is passed to wrapWithOAuth2: the base chain already carries the
+// throttle wrapper from newOAuth2Client (or from the WithHTTPClient path), and
+// adding a second would double every request's pacing interval.
+func (c *Transport) installHeaderTransport() {
+	if len(c.extraHeaders) == 0 && c.authHeaderName == "" {
+		return
+	}
+	if len(c.extraHeaders.Values("Authorization")) > 0 {
+		c.oauthConfig.AuthStyle = oauth2.AuthStyleInParams
+	}
+	base := c.baseClient.Transport
+	if base == nil {
+		base = http.DefaultTransport
+	}
+	c.baseClient.Transport = &headerTransport{
+		base:       base,
+		headers:    c.extraHeaders,
+		authHeader: c.authHeaderName,
+	}
+	c.uploadClient = wrapWithOAuth2(c.oauthConfig, c.baseClient, nil)
 	c.retry.HTTPClient = c.uploadClient
 }
 
