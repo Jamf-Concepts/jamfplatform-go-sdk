@@ -121,3 +121,51 @@ func TestScopeOptionsAreMutuallyExclusive(t *testing.T) {
 		})
 	}
 }
+
+// TestScopeIsReadableByConsumers is written the way a consumer must write it:
+// naming jamfplatform.ScopeKind, switching over the exported constants and
+// calling ScopeHeader, with no import of internal/client. That was impossible
+// before — the kind was exported from an internal package, so no consumer could
+// name the type — which forced downstream code to pass the scope in alongside
+// the client rather than read it back off one.
+//
+// It also pins that all three states are distinguishable. TenantID alone cannot
+// do that: it returns "" for both environment and organization scope, so a
+// consumer reading only that accessor cannot tell an environment-scoped client
+// from an unscoped one.
+func TestScopeIsReadableByConsumers(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		opts       []Option
+		wantKind   ScopeKind
+		wantHeader string
+		wantID     string
+	}{
+		{"tenant", []Option{WithTenantID("T-1")}, ScopeTenant, "X-Tenant-Id", "T-1"},
+		{"environment", []Option{WithEnvironmentID("E-1")}, ScopeEnvironment, "X-Environment-Id", "E-1"},
+		// No scope option: the organization-scoped case, where the gateway
+		// resolves context from the token and the client sends no scope header.
+		{"organization", nil, 0, "", ""},
+		// An ID-less kind is not a scope; Scope must not report a header the
+		// request will not carry.
+		{"tenant with empty ID", []Option{WithTenantID("")}, 0, "", ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := NewClient("https://example.invalid", "id", "secret", tc.opts...)
+			kind, id := c.Scope()
+			if kind != tc.wantKind {
+				t.Errorf("kind = %v, want %v", kind, tc.wantKind)
+			}
+			if got := kind.ScopeHeader(); got != tc.wantHeader {
+				t.Errorf("ScopeHeader() = %q, want %q", got, tc.wantHeader)
+			}
+			if id != tc.wantID {
+				t.Errorf("id = %q, want %q", id, tc.wantID)
+			}
+			// The three states must not collapse into each other.
+			if kind == ScopeTenant && c.transport.TenantID() != id {
+				t.Errorf("TenantID() = %q disagrees with Scope() id %q", c.transport.TenantID(), id)
+			}
+		})
+	}
+}

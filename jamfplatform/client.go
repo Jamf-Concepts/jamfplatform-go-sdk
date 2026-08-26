@@ -88,6 +88,37 @@ func (c *Client) AccessToken(ctx context.Context) (*oauth2.Token, error) {
 	return c.transport.AccessToken(ctx)
 }
 
+// ScopeKind identifies which kind of Jamf scope a client is bound to. It is an
+// alias for the transport's type, so a consumer can name it, switch on it and
+// call ScopeHeader on it without importing internal/client — which is what made
+// the kind unreachable before.
+type ScopeKind = client.ScopeKind
+
+// Scope kinds. A zero value means no scope, which is how organization-scoped
+// credentials work: the gateway resolves the context from the access token, so
+// the client sends no scope header. Organization deliberately has no constant —
+// there is no header for it, confirmed absent across every published spec and
+// the gateway configuration.
+const (
+	// ScopeTenant scopes requests to a single product tenant, sent as
+	// X-Tenant-Id. The legacy scope; prefer ScopeEnvironment.
+	ScopeTenant = client.ScopeTenant
+	// ScopeEnvironment scopes requests to a platform environment — a grouping
+	// of tenants — sent as X-Environment-Id. The scope to prefer.
+	ScopeEnvironment = client.ScopeEnvironment
+)
+
+// Scope reports which kind of scope this client carries and the ID it sends.
+//
+// Prefer this over reading a single ID: the scope is a three-valued property,
+// and an accessor for one kind cannot express the others. A zero kind with an
+// empty ID means no scope header is sent at all — the organization-scoped case
+// — so a caller switching on the kind should handle it rather than assume a
+// scope is always present.
+func (c *Client) Scope() (ScopeKind, string) {
+	return c.transport.Scope()
+}
+
 // Transport returns the underlying transport used by sub-package clients in
 // jamfplatform/. Sub-package constructors (e.g. devices.New) call this to
 // share the authenticated HTTP layer.
