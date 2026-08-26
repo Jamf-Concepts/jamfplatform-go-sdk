@@ -55,7 +55,7 @@ make testacc
 Or manually:
 
 ```bash
-JAMFPLATFORM_ACC=1 go test -v -cover -count=1 -timeout 120m -p=1 ./...
+go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 ./...
 ```
 
 ## Project Structure

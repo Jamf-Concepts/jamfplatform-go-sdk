@@ -53,6 +53,9 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cfg.tenantID != "" {
 		transportOpts = append(transportOpts, client.WithTenantID(cfg.tenantID))
 	}
+	if cfg.environmentID != "" {
+		transportOpts = append(transportOpts, client.WithEnvironmentID(cfg.environmentID))
+	}
 	if cfg.minRequestIntervalSet {
 		transportOpts = append(transportOpts, client.WithMinRequestInterval(cfg.minRequestInterval))
 	}
@@ -94,13 +97,14 @@ func (c *Client) Transport() *client.Transport {
 
 // clientConfig holds configuration applied via Option functions.
 type clientConfig struct {
-	userAgent    string
-	httpClient   *http.Client
-	logger       Logger
-	tenantID     string
-	tokenCache   TokenCache
-	cacheDir     string
-	cookieJarDir string
+	userAgent     string
+	httpClient    *http.Client
+	logger        Logger
+	tenantID      string
+	environmentID string
+	tokenCache    TokenCache
+	cacheDir      string
+	cookieJarDir  string
 
 	minRequestInterval    time.Duration
 	minRequestIntervalSet bool
@@ -164,13 +168,50 @@ func WithFileCookieJar(dir string) Option {
 // WithTenantID configures the tenant this client is scoped to. It is sent as
 // the X-Tenant-Id request header on every API call.
 //
+// Tenant scoping is the legacy form. Prefer WithEnvironmentID: an environment
+// groups a customer's tenants, and it is the scope Jamf intends integrations to
+// be created with. Tenant scope remains supported — a tenant is a single
+// product, and some surfaces are only reachable that way — but new integrations
+// should not choose it by default.
+//
+// Mutually exclusive with WithEnvironmentID. If both are set, environment wins
+// regardless of the order they are passed in; see WithEnvironmentID.
+//
 // The gateway used to take the tenant from the URL path
 // (/api/{namespace}/{version}/tenant/{tenantID}); it moved to a header at the
-// Platform API GA. When this is unset no scope header is sent and the gateway
-// resolves the context from the access token instead.
+// Platform API GA. When neither scope option is set, no scope header is sent
+// and the gateway resolves the context from the access token instead.
 func WithTenantID(id string) Option {
 	return func(cfg *clientConfig) {
 		cfg.tenantID = id
+	}
+}
+
+// WithEnvironmentID configures the platform environment this client is scoped
+// to. It is sent as the X-Environment-Id request header on every API call.
+//
+// This is the scope to prefer. An environment groups a customer's tenants, and
+// it is what Jamf intends new integrations to be created with; WithTenantID is
+// the legacy alternative. The Platform API GA invalidates every public-beta
+// credential, so integrations have to be re-created regardless — which makes it
+// the moment to create them environment-scoped rather than a migration to
+// schedule later.
+//
+// The header must match the credential. An integration is minted against one
+// scope, and crossing over is refused with 403 OWNERSHIP_FORBIDDEN even when
+// both IDs belong to the same customer, so this is a choice between two
+// integrations rather than two IDs for one.
+//
+// The two scopes are mutually exclusive: a client carries exactly one, and
+// exactly one scope header is ever sent. Setting both this and WithTenantID is
+// a configuration mistake rather than a combination — **environment takes
+// precedence**, whichever order the options are passed in, because a client
+// built from an environment-scoped credential cannot use a tenant header
+// anyway. Callers that can validate their own input should reject the pair up
+// front instead of relying on that precedence.
+func WithEnvironmentID(id string) Option {
+	return func(cfg *clientConfig) {
+		cfg.environmentID = id
 	}
 }
 

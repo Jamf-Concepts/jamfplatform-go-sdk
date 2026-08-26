@@ -121,12 +121,33 @@ jobs:
           fi
         env:
           SCOPE: ${{ needs.plan.outputs.run }}
-          JAMFPLATFORM_ACC: "1"
-          # Required credentials — all suites fail/skip without these.
+          # Tenant-scoped credentials — most suites fail/skip without these.
           JAMFPLATFORM_BASE_URL: ${{ secrets.JAMFPLATFORM_BASE_URL }}
           JAMFPLATFORM_CLIENT_ID: ${{ secrets.JAMFPLATFORM_CLIENT_ID }}
           JAMFPLATFORM_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_CLIENT_SECRET }}
           JAMFPLATFORM_TENANT_ID: ${{ secrets.JAMFPLATFORM_TENANT_ID }}
+          # Environment-scoped credentials. A separate integration, not a second
+          # ID: the header must match the credential, so an environment scope
+          # cannot be exercised with the tenant credential above. Without these
+          # the environment-scope suite skips entirely, which is why they are
+          # wired rather than left to local runs — environment is becoming the
+          # predominant scope, with tenant the fallback.
+          JAMFPLATFORM_ENVIRONMENT_ID: ${{ secrets.JAMFPLATFORM_ENVIRONMENT_ID }}
+          JAMFPLATFORM_ENV_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ENV_CLIENT_ID }}
+          JAMFPLATFORM_ENV_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ENV_CLIENT_SECRET }}
+          JAMFPLATFORM_ENV_BASE_URL: ${{ secrets.JAMFPLATFORM_ENV_BASE_URL }}
+          # Security Cloud credentials. A different product with its own
+          # organization and tenant: neither the tenant nor the environment
+          # credential above reaches /api/securitycloud (403 both ways), so the
+          # whole Security Cloud suite skips without these.
+          JAMFPLATFORM_JSC_CLIENT_ID: ${{ secrets.JAMFPLATFORM_JSC_CLIENT_ID }}
+          JAMFPLATFORM_JSC_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_JSC_CLIENT_SECRET }}
+          JAMFPLATFORM_JSC_TENANT_ID: ${{ secrets.JAMFPLATFORM_JSC_TENANT_ID }}
+          JAMFPLATFORM_JSC_BASE_URL: ${{ secrets.JAMFPLATFORM_JSC_BASE_URL }}
+          # JAMFPLATFORM_JSC_GATEWAY_WRITE_OK is deliberately NOT wired: creating
+          # a ZTNA gateway provisions real network egress and deleting one severs
+          # traffic for every access policy routed through it. Opt in locally on
+          # a tenant reserved for it.
           # Optional tokens — when present, the suite exercises real
           # register/lifecycle flows instead of probe-only paths.
           JAMFPLATFORM_DEP_TOKEN: ${{ secrets.JAMFPLATFORM_DEP_TOKEN }}
@@ -137,7 +158,7 @@ jobs:
           # Fixture-ID env vars (JAMFPLATFORM_CLASSIC_COMPUTER_ID,
           # JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID,
           # JAMFPLATFORM_DEVICE_GROUP_ID, JAMFPLATFORM_WIFI_PROFILE_ID,
-          # JAMFPLATFORM_VPP_TEST_LOCATION_ID) are intentionally NOT
+          # JAMFPLATFORM_VPP_INVITATION_ID) are intentionally NOT
           # wired — tests auto-discover or self-create those fixtures
           # when the vars are unset. The vars exist as local-run
           # overrides only.

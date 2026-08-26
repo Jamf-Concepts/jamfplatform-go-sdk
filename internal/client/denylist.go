@@ -14,7 +14,7 @@ import (
 // this SDK handles automatically — so the SDK fails closed with a clear error
 // instead of letting the misuse hit the wire.
 //
-// Keys are "METHOD /suffix" where /suffix is the URL tail after /tenant/{id}.
+// Keys are "METHOD /suffix", matched against the tail of the request path.
 var deniedPathSuffixes = map[string]string{
 	"POST /auth/token":            "authentication is managed by the platform gateway; the SDK handles OAuth2 client credentials automatically",
 	"POST /auth/keep-alive":       "token lifecycle is managed by the platform gateway",
@@ -23,24 +23,30 @@ var deniedPathSuffixes = map[string]string{
 	"POST /oauth/token":           "authentication is managed by the platform gateway; the SDK handles OAuth2 client credentials automatically",
 }
 
-// checkDeniedPath returns a formatted error if method+fullURL targets a
-// denied API path. Matching uses the URL tail after /tenant/{id}, so it
-// applies uniformly across namespace and version path segments.
+// checkDeniedPath returns a formatted error if method+fullURL targets a denied
+// API path. Matching is on the tail of the path, so it applies uniformly across
+// namespace and version segments.
+//
+// This used to key on the URL tail after /tenant/{id}, which silently stopped
+// matching anything when scoping moved from the path to a request header: no URL
+// the SDK builds contains /tenant/ any more, so every denied path was allowed
+// through. The guard failed open, and its tests kept passing because their
+// fixture URLs still carried the old segment. Matching the suffix directly has
+// no such dependency on the surrounding shape, and still catches the legacy
+// path form that the gateway accepts during the transition.
+//
+// Each key's suffix begins with "/", which is what stops a path ending in
+// "/xauth/token" matching "/auth/token".
 func checkDeniedPath(method, fullURL string) error {
-	_, after, ok := strings.Cut(fullURL, "/tenant/")
-	if !ok {
-		return nil
+	path := fullURL
+	if q := strings.Index(path, "?"); q >= 0 {
+		path = path[:q]
 	}
-	slash := strings.Index(after, "/")
-	if slash < 0 {
-		return nil
-	}
-	suffix := after[slash:]
-	if q := strings.Index(suffix, "?"); q >= 0 {
-		suffix = suffix[:q]
-	}
-	key := method + " " + suffix
-	if reason, ok := deniedPathSuffixes[key]; ok {
+	for key, reason := range deniedPathSuffixes {
+		keyMethod, suffix, ok := strings.Cut(key, " ")
+		if !ok || keyMethod != method || !strings.HasSuffix(path, suffix) {
+			continue
+		}
 		return fmt.Errorf("jamfplatform: path not supported by SDK: %s %s — %s", method, suffix, reason)
 	}
 	return nil

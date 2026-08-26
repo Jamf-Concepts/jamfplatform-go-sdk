@@ -17,6 +17,23 @@ func TestCheckDeniedPath(t *testing.T) {
 		url     string
 		wantErr bool
 	}{
+		// Header-scoped URLs — the shape the SDK builds now. These are the
+		// cases that regressed to "allowed" when scoping left the path, so they
+		// come first: a fixture carrying /tenant/ can no longer prove anything
+		// about a real request.
+		{"denied auth token, header-scoped URL", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/auth/token", true},
+		{"denied auth keep-alive, header-scoped URL", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/auth/keep-alive", true},
+		{"denied auth invalidate, header-scoped URL", http.MethodPost, "https://x.apigw.jamf.com/api/pro/auth/invalidate-token", true},
+		{"denied auth current, header-scoped URL", http.MethodGet, "https://x.apigw.jamf.com/api/pro/auth/current", true},
+		{"denied oauth token, header-scoped URL", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/oauth/token", true},
+		{"denied with query string, header-scoped URL", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/auth/token?foo=1", true},
+		{"allowed resource, header-scoped URL", http.MethodGet, "https://x.apigw.jamf.com/api/pro/v1/computers", false},
+		{"method mismatch is allowed, header-scoped URL", http.MethodGet, "https://x.apigw.jamf.com/api/pro/v1/auth/token", false},
+		// A path ending in a longer segment must not match: the leading slash on
+		// each denied suffix is what prevents it.
+		{"similar suffix is not denied", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/xauth/token", false},
+		// Legacy path-scoped URLs. The gateway still accepts them during the
+		// transition, so the guard must still catch them.
 		{"denied pro auth token", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/tenant/abc123/auth/token", true},
 		{"denied pro auth keep-alive", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/tenant/abc123/auth/keep-alive", true},
 		{"denied pro auth invalidate", http.MethodPost, "https://x.apigw.jamf.com/api/pro/v1/tenant/abc123/auth/invalidate-token", true},
@@ -26,7 +43,10 @@ func TestCheckDeniedPath(t *testing.T) {
 		{"allowed pro resource", http.MethodGet, "https://x.apigw.jamf.com/api/pro/v1/tenant/abc123/computers", false},
 		{"allowed platform resource", http.MethodGet, "https://x.apigw.jamf.com/api/devices/v1/tenant/abc123/devices", false},
 		{"method mismatch is allowed", http.MethodGet, "https://x.apigw.jamf.com/api/pro/v1/tenant/abc123/auth/token", false},
-		{"no tenant segment", http.MethodPost, "https://x.apigw.jamf.com/api/auth/token", false},
+		// Previously asserted as allowed on the grounds that it had no /tenant/
+		// segment. That reasoning described every URL the SDK now builds, so the
+		// expectation is inverted: a denied suffix is denied regardless of shape.
+		{"no tenant segment is still denied", http.MethodPost, "https://x.apigw.jamf.com/api/auth/token", true},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -138,6 +158,41 @@ func TestSetScopeHeader(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// TestWithEnvironmentID checks the option records an environment scope, and
+// that a client carries exactly one scope — the options are alternatives, not
+// additive, because the gateway refuses a header that disagrees with the
+// credential (403 OWNERSHIP_FORBIDDEN).
+func TestWithEnvironmentID(t *testing.T) {
+	tr := &Transport{}
+	WithEnvironmentID("e-123")(tr)
+	if tr.scopeKind != ScopeEnvironment {
+		t.Errorf("scopeKind = %v, want ScopeEnvironment", tr.scopeKind)
+	}
+	if tr.scopeID != "e-123" {
+		t.Errorf("scopeID = %q, want %q", tr.scopeID, "e-123")
+	}
+	if got := tr.TenantID(); got != "" {
+		t.Errorf("TenantID() on an environment-scoped client = %q, want empty", got)
+	}
+
+	// Last option wins; the client never sends both headers.
+	WithTenantID("t-456")(tr)
+	if tr.scopeKind != ScopeTenant || tr.scopeID != "t-456" {
+		t.Errorf("after WithTenantID: kind=%v id=%q, want ScopeTenant/t-456", tr.scopeKind, tr.scopeID)
+	}
+	req, err := http.NewRequest(http.MethodGet, "https://example.invalid/api/pro/v1/buildings", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tr.setScopeHeader(req)
+	if got := req.Header.Get("X-Environment-Id"); got != "" {
+		t.Errorf("X-Environment-Id = %q after switching to tenant scope, want empty", got)
+	}
+	if got := req.Header.Get("X-Tenant-Id"); got != "t-456" {
+		t.Errorf("X-Tenant-Id = %q, want t-456", got)
 	}
 }
 
