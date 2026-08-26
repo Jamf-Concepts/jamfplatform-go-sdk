@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/cookiejar"
+	"slices"
 	"strings"
 	"time"
 
@@ -84,6 +85,75 @@ type userAgentTransport struct {
 func (t *userAgentTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req2 := req.Clone(req.Context())
 	req2.Header.Set("User-Agent", t.userAgent)
+	return t.base.RoundTrip(req2)
+}
+
+// reservedHeaders are request headers the SDK owns and a caller may not set via
+// WithHeaders. The scope headers decide which request context the gateway
+// resolves, and a wrong value is refused with 403 OWNERSHIP_FORBIDDEN — the same
+// answer a genuinely mismatched credential gives, so a silently overridden scope
+// is close to undiagnosable from the error alone.
+// The keys are canonicalised rather than trusted to already be in canonical
+// form: lookups come from http.CanonicalHeaderKey, so a scope header renamed to
+// a spelling Go canonicalises differently (X-Tenant-ID, say) would make every
+// lookup miss and the guard would fail open silently.
+var reservedHeaders = map[string]bool{
+	http.CanonicalHeaderKey(ScopeTenant.ScopeHeader()):      true,
+	http.CanonicalHeaderKey(ScopeEnvironment.ScopeHeader()): true,
+}
+
+// headerTransport injects caller-supplied headers on every outbound request and
+// optionally relocates the credential oauth2 wrote into Authorization.
+//
+// It is installed *below* oauth2.Transport, so by the time RoundTrip runs the
+// bearer token is already on the request and can be moved or overwritten. That
+// ordering is the point: a reverse proxy fronting the gateway may demand its own
+// Authorization (typically Basic, for a service account) while expecting Jamf's
+// bearer under a different name. Relocation happens before the static headers
+// are applied, so a caller-supplied Authorization lands after the bearer has
+// been moved out of the way rather than being clobbered by it.
+//
+// Relocation is deliberately restricted to a Bearer credential. Both phases of
+// an OAuth2 exchange put something in Authorization, and only one of them is the
+// bearer: oauth2.Transport writes "Bearer <token>" on API calls, while
+// clientcredentials writes "Basic <client_id:client_secret>" on the token
+// request itself. Moving the latter would send the client credential to a header
+// the token endpoint does not read, so authentication would fail with the
+// relocation looking like it worked. Matching on the scheme separates the two
+// without the transport needing to know which phase it is on.
+//
+// User-Agent is deliberately not protected: userAgentTransport sits above this
+// one and sets it unconditionally, so WithUserAgent wins over a User-Agent
+// passed to WithHeaders.
+//
+// Application is a replace, not a merge, which matters for exactly one header:
+// http.Client writes the cookie jar's Cookie header before the transport chain
+// runs, so a Cookie passed to WithHeaders replaces the sticky-session cookie
+// Jamf Cloud uses to pin a client to one app node (see newCookieJar). It is not
+// reserved — a proxy may legitimately require a cookie of its own, and blocking
+// that would be worse than the pinning loss — so the godoc on WithHeaders says
+// so instead.
+type headerTransport struct {
+	base       http.RoundTripper
+	headers    http.Header
+	authHeader string
+}
+
+// RoundTrip relocates the Authorization credential when configured, applies the
+// caller's headers, and delegates to the base transport. The request is cloned
+// because a RoundTripper must not mutate the request it is given — retries and
+// oauth2 refresh both re-send the same *http.Request.
+func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req2 := req.Clone(req.Context())
+	if t.authHeader != "" {
+		if v := req2.Header.Get("Authorization"); strings.HasPrefix(v, "Bearer ") {
+			req2.Header.Set(t.authHeader, v)
+			req2.Header.Del("Authorization")
+		}
+	}
+	for name, values := range t.headers {
+		req2.Header[http.CanonicalHeaderKey(name)] = slices.Clone(values)
+	}
 	return t.base.RoundTrip(req2)
 }
 
