@@ -143,6 +143,8 @@ Also established while testing this, and worth not re-deriving: **credentials in
 
 All API paths use `/api/{namespace}/{version}/{resource}`, built by `Transport.APIPrefix(namespace, version)`. Namespace and version are derived from the spec path in config; an empty version collapses that segment (proclassic, Pro preview paths).
 
+**GA readiness: the transport is already header-shaped, and config still declaring the old paths is not evidence otherwise.** `APIPrefix` emits `/api/{namespace}/{version}` with no scope segment, `TenantPrefix`/`tenantFirstNamespaces` are gone, and the generator's `stripTenantPathSegment` removes a leading `/tenant/{tenantId}` from any spec path that still carries one. So a spec ingested in the old path-scoped form still generates a correct GA URL, and the `"op"` strings in `config.json` are matched against the spec, not the wire. `pro` (770 ops) and the app-installer specs still declare `/tenant/{tenantId}` in config for exactly that reason; the six small Platform specs and Classic lost it in build v1671 when their specs did. **Re-ingesting a header-form spec without stripping the segment from its `"op"` strings in the same change fails hard** with `path %s not found in spec` — which is the good outcome, since the alternative is silence.
+
 **The tenant is a request header, not a path segment.** `WithTenantID` records a scope on the transport and `setScopeHeader` stamps `X-Tenant-Id` on every request, including the multipart path. Until 2026-08-25 the tenant sat in the URL as `/tenant/{tenantId}` and the gateway resolved the request context from `path`; `header` became an allowed source in prod that day (`tyk-gateway-management` `0793131b`, "JSC-73421 Enable header context support - Prod"), and the published specs had already dropped the segment in GitOps build v1495.
 
 Both forms answered 200 during the transition — wire-verified across EU securitycloud and US pro/blueprints/compliance-benchmarks/devices/device-groups — so the path form was **deleted** rather than kept behind a flag. A second code path that nothing exercises is how URL-shape bugs survive unnoticed; the generated httptest handlers now assert the header-form path, and `TestTransportAPIPrefix` asserts a tenant ID can never reach the URL.
@@ -162,6 +164,77 @@ A caution learned while establishing this, worth repeating for any future scope 
 One credential set reaches one product: a Security Cloud client answers 403 on `/api/pro` and a Jamf Pro client answers 403 on `/api/securitycloud`. A single `Client` therefore cannot span products no matter how many tenant IDs it holds, which is why there is no per-namespace tenant override — a consumer needing two products builds two Clients, and in Terraform that is a provider alias per credential.
 
 The tenant ID is the client-wide `WithTenantID` value unless a namespace registered its own via `WithNamespaceTenantID` (internal) / `WithSecurityCloudTenantID` (exported). An override matches the namespace exactly or on its first path segment, so one registered for `securitycloud` also covers a future `securitycloud/<sub>`. This exists because Jamf Security Cloud is a separate product with its own tenant identifier — see below.
+
+### Jamf Account (`account` package) — organization scope
+
+Three specs, one package: `account-licensing` (namespace `licensing`, 1 op), `account-partners` (`partners`, 7 ops) and `account-sso` (`sso`, 10 ops). One package rather than three because they are one Jamf product behind one tyk api-product (`account`), reached with one organization-scoped credential; the namespace is per-spec so each generated method still builds its own prefix and the URLs are unaffected. This is the documented exception to package-follows-namespace. Their tags do not collide, so tag-split filenames stay distinct.
+
+**These are the SDK's first organization-scoped APIs, and organization scope is the absence of a scope, not a header.** No `WithTenantID`/`WithEnvironmentID`; the gateway derives the organization from the token. `Client.Scope()` correctly reports the zero kind with an empty ID, which is the organization case a consumer has to handle when switching on the kind.
+
+**Wire-verified 2026-08-27** against a real organization credential (all URLs exactly as generated):
+
+| endpoint | result |
+|---|---|
+| `GET /api/licensing/v1/licenses` | 200 — 16 real licence rows |
+| `GET /api/sso/v1/domains` | 200 — 5 real domain rows |
+| `GET /api/partners/v1/deal-registrations` | 200 `[]` |
+| `GET /api/sso/v1/connections` | **502** `An upstream service returned an error` |
+
+Three things that only the wire could have told us:
+
+- **US only.** The `account` tyk product ships *only* `use1` api-definitions in every environment — there is no euc1 or apne1 file. An EU credential cannot reach these at all, and the failure will not look like a region problem. Use `https://us.apigw.jamf.com`.
+- **The list endpoints return bare JSON arrays, not the spec's `{totalCount, results}` envelope.** `LicenseList`, `DomainList`, `DealRegistrationList` and `ConnectionSummaryList` are all declared as envelopes with both members `required`; the server sends `[…]` for all four. Following the spec produced methods that fail every decode. Fixed with an operation-level `"responseType": "[]License"` (and `[]Domain`, `[]DealRegistration`, `[]ConnectionSummary`) — see **Bare-array responses** below for why this is an override and not a spec patch.
+- **`Domain.id` is a JSON number declared as a string**, so it gets `"domain.id": "json.Number"` in `fieldTypeOverrides`. The spec's own description is self-aware about it — *"Treat it as an opaque string, even though it is currently a decimal number"* — but it declares `type: string` and the server does not stringify the value (`1552`, not `"1552"`). `json.Number` is the honest target rather than `int`: it decodes the number, preserves the exact text, and converts to the string the `domainId` path params want via `string(d.ID)`, so it keeps working if the server ever does start quoting it. Same precedent as pro's `deployment_task.id` and `sso_keystore_details.serialNumber`.
+
+A wire-vs-spec type sweep across `License`, `Domain`, `DealRegistration` and `DistributorConfiguration` found `Domain.id` as the **only** type mismatch, so this is bounded rather than the start of a whack-a-mole. `DistributorConfiguration` declares three properties (`jamfInfo`, `poSubmissionPermission`, `webhook`) the wire never sent; harmless, since they are optional.
+
+**No `x-required-privileges` anywhere in these specs** — 0 privileged ops in every variant, and there is no `-beta` variant to take them from (unlike audit and ai-governance). So `account/permissions.go` is a registry of `Scoped: nil` entries. That is honest reporting of what the spec says, not a gap to fill.
+
+The 502 on `/sso/v1/connections` is an upstream fault, not a URL problem — but note its body is the *account service's own* envelope (`{classification, fields, message}`), a fourth dialect none of the shapes in **Error handling** below cover. `Details()`/`FieldErrors()` parse nothing from it and `Summary()` falls back to status text. It is also retryable, so a client with the default retry policy will sit on it until the context deadline rather than failing fast.
+
+### AI Governance (`aigovernance` package) — environment scope
+
+`ai-governance-beta`, 12 ops over policies and tools, namespace **`ai/governance/policies`**.
+
+**The published path is wrong in every variant and the gateway is the authority.** Every spec — external, stage, dev, beta and non-beta — declares `servers: …/api/ai-governance/policies`. The tyk listen_path is `/api/ai/governance/policies`, with slashes. Wire-verified 2026-08-27: the generated form returns **200** with real data and the spec's hyphenated form returns **`404 page not found`**, the unknown-namespace tell. Config therefore sets the namespace with slashes, the same shape as `ddm/report`. Do not "fix" this by following the spec.
+
+**Package name is `aigovernance`, not `aigovernancepolicies`, and the gateway settles that too:** `/api/ai/governance/visibility` already exists in prod in all three regions as a sibling of `.../policies`. So `ai/governance` is the product segment and `policies`/`visibility` are capabilities beneath it. When Visibility gets a published spec it becomes a second spec in this package with namespace `ai/governance/visibility`, exactly as `securitycloud` holds five specs under one root. **Visibility is routed but has no spec in build v1671** — same class as `securitycloud-enrollment`, so it is not ingestable yet.
+
+Wire-verified 2026-08-27 with an environment credential: `ListPolicies` walked its `{totalCount, results}` envelope and returned 2 real policies, `ListTools` returned 3 tools. `X-Environment-Id` is `required: true` here and the gateway does accept `header` for this product.
+
+### Audit (`audit` package) — unreachable today, and the reason is in the gateway, not the SDK
+
+`audit-beta`, 4 read-only ops, namespace `audit`. Generated, compiled and typed correctly — and **every call is refused**, wire-verified 2026-08-27 with *both* an organization credential (us) and an environment credential (eu), each with a known-good control passing in the same invocation (`/api/licensing/v1/licenses` → 200; `/api/blueprints/v1/blueprints` → 200).
+
+| attempt | result |
+|---|---|
+| no scope at all | `400 REQUEST_CONTEXT_NOT_PROVIDED` |
+| `+ X-Environment-Id` | `400 REQUEST_CONTEXT_NOT_PROVIDED` |
+| `/v1/organization/{orgUuid}/audit` | `403 BAD_PERMISSIONS` |
+| `/v1/environment/{envUuid}/audit` | `403 BAD_PERMISSIONS` |
+| `/v1/environment/{orgUuid}/audit` | `404 ENVIRONMENT_NOT_FOUND` |
+
+**Root cause of the 400 is in `jamf/tyk-custom-plugins/plugins/authz-plugin/requestcontext/token.go`.** An external-M2M token carries no tenant, environment or organization claim, so `TokenProvider.Resolve` falls through to a special case that resolves the organization server-side — but only when `len(apiConfig.RequestContextTypes) == 1 && [0] == "organization"`. licensing/partners/sso declare exactly `[organization]`, so the fallback fires and they work. **Audit declares `[environment, organization]`, so it never fires**, nothing resolves a context type, and `validateRequestContext` returns `REQUEST_CONTEXT_NOT_PROVIDED`. The header is refused separately, because audit's `request-context-allowed-sources` is `[token, path]` in every environment including dev and stage.
+
+The 404 is the useful probe: it proves the `PathProvider` regex (`/(tenant|environment|organization)/<uuid>` anywhere in the path) matches and the ID is really looked up, so the **path form is live and correctly shaped** — the remaining 403 is authorization, i.e. the credential lacks `read:org:audit`/`read:env:audit`.
+
+So audit needs one of two things, and **the upstream fix is the better one**: audit should declare `[organization]` like every other external-M2M API, or the plugin fallback should handle the multi-type case. Report it. The SDK workaround would be to reintroduce path scoping for the `audit` namespace alone — the mechanism deliberately deleted at GA — which is not worth building against a 403 that a one-line gateway change removes. **Do not add it speculatively.** Until then the audit package compiles and is unusable, which is the honest state; when a credential with the audit privileges exists, re-probe the path form first, because that is the only shape with any evidence behind it.
+
+### Bare-array responses: `"responseType": "[]T"`
+
+`responseType` normally names a component schema. It now also accepts a `[]T` literal, whose element is a schema name, for the case where the spec declares a wrapper the server does not send. The account list endpoints are the reason (see above).
+
+This is deliberately an operation-level override rather than a `schemaPatches`/`schemaCreations` repair. The disagreement is about *server behaviour*, so it belongs where the wire evidence is cited and it is one line to delete when either side changes. A patched schema would instead shadow the corrected declaration forever, and neither existing tripwire would catch it — `schemaCreations` only panics on a name collision and `schemaPatchesRequireAbsent` only on a path that resolves, and a re-typed root triggers neither. The compliance-benchmarks repair in build v1671 is the worked example of that failure: our creation was `ODVRecommendation`, upstream shipped `OdvRecommendation`, so the casing difference meant no panic fired even though the spec had been fully repaired.
+
+### Discriminator-less `oneOf` unions
+
+A `oneOf` with no discriminator and no properties of its own used to emit **nothing at all**. It failed loudly only by luck: such a union used as a *named response type* aborts generation with "Go type not emitted", but one reached solely through a property would have silently become `any`.
+
+`mergeOneOfVariants` (`schema.go`) now collapses these into one struct: the union of every variant's properties, with `required` **intersected** across variants. A property required by every variant stays required; one required by only some becomes an optional pointer, which is what lets the merged struct represent any variant without lying about presence.
+
+audit's `AuditEnvelope` is the first case — the spec says it is discriminated *structurally*, a gateway event carrying `actor` + `requestContext` and a service event carrying `data`, and the two never mix. It comes out with the six shared base fields required and `Actor`/`RequestContext`/`Data` as pointers, so nil `Actor` means service event and nil `Data` means gateway event. **No discriminator is synthesised**, deliberately: the nearest candidate field is `auditSource`, an open string whose own description says "e.g. `api-gateway`, `blueprints`, `ai-policy`", so any mapping would rot the first time a new source appears.
+
+blueprints' `SwUpdateConfiguration` is also discriminator-less but declares its own `type: object` plus `properties`, so it takes the pre-existing path and is unaffected — it was the only other candidate in any active spec.
 
 ### Jamf Security Cloud (`securitycloud` package)
 
@@ -375,6 +448,14 @@ One deliberate gap remains, and two former ones are closed:
 `ResolveZtnaAppV1ByName` has a real blind spot: an app created from a `predefinedAppId` inherits its name from the template and returns `name: null` on the wire, so it is unreachable by name. Only apps created with an explicit `name` resolve.
 
 ### Pagination
+
+**Cursor pagination is a fourth style with its own walker.** `pagination: "cursor"` emits a method built on `ListAllCursorPages[T]`, whose callback takes the cursor for the page to fetch (empty on the first call) and returns that page's items plus the cursor for the next, empty when the page just returned was the last. Configured with `resultsField` (the envelope key holding the array) and, if they ever differ from the defaults, `cursorField` (`nextCursor`) and `cursorParam` (`cursor`). audit is the only user: `ListAuditEvents` over `{items, nextCursor}` and `GetResourceLineage` over `{transactions, nextCursor}`.
+
+It cannot silently truncate the way the offset styles can, which is the whole reason it exists rather than forcing a cursor endpoint into `totalCount`: the next page's position comes from the server's own cursor, not an offset the client multiplies out, so a clamped `page-size` costs extra round trips and nothing else. audit's `page-size` is `maximum: 200, default: 50`, and the conservative 100 default sits safely under it.
+
+Two behaviours worth knowing before changing it. **An empty page does not end the walk** — only an absent cursor does — because a cursor endpoint can legitimately return a page whose every row was filtered out server-side while the rows beyond it are still reachable through the cursor it carries. That leaves a misbehaving server able to hand back the same cursor forever and hang the caller with no error, so **a repeated cursor is returned as an error**, not trusted. Both are pinned in `internal/client/pagination_test.go`, and the generated httptest stub serves *two* pages so it fails if a method ignores the cursor.
+
+Threading `resultsField` into the method IR also fixed two hardcoded `"results"` keys: `detectPaginatedItemType`, which had silently returned `any` for audit rather than the real element type, and the `testPaginated` stub. That is the same trap CLAUDE.md already records for the Apply templates — a hardcoded envelope key that is invisible while every spec happens to use the default.
 
 `ListAllPages[T]` is a generic helper taking a `fetchPage(ctx, page, pageSize) ([]T, bool, error)` callback. Three styles configured per operation: `hasNext` (uses `HasNext` field), `sizeCheck` (compares result count to page size), `totalCount` (computes from total). The page size requested per call is `defaultMaxPageSize(pkg, paginationStyle)` (see `tools/generate/util.go`) unless overridden per operation via `"maxPageSize"` in `config.json` — threaded through as an explicit argument to `ListAllPages`, never a hardcoded constant.
 
