@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand/v2"
+	"strings"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -63,17 +64,89 @@ func TestAcceptance_AccountReads(t *testing.T) {
 	}
 	t.Logf("organization has %d deal registrations", len(deals))
 
+	// The distributor surface is covered separately: it currently fails for an
+	// upstream reason that has nothing to do with these three, and folding it in
+	// here would mask them. See TestAcceptance_AccountDistributorReads.
+}
+
+// isSkywayScopeFault reports whether err is the known upstream fault behind every
+// distributor endpoint: the Jamf Account partners backend calls Skyway with the
+// scope `skyway-use2-product`, which exists only in the dev environment. Prod
+// declares `skyway-use1-product` and the region-independent `skyway-product`
+// (added by tyk-gateway-management e2f54c1c, EAI-4327) — so prod's auth server
+// rejects the request and the 400 surfaces to us as an OAuth error on an API path.
+//
+// Matched on the scope name rather than the status code: a 400 from these
+// endpoints could equally be a real validation verdict, which must not be
+// swallowed.
+func isSkywayScopeFault(err error) bool {
+	if err == nil {
+		return false
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		return false
+	}
+	return apiErr.HasStatus(400) && strings.Contains(apiErr.Body, "skyway-use2-product")
+}
+
+const skywayFaultReport = "the Jamf Account partners backend requests the Skyway scope %q, which exists only in dev — " +
+	"prod declares skyway-use1-product and the region-independent skyway-product. " +
+	"Report to Jamf: the account service needs repointing at skyway-product (tyk-gateway-management e2f54c1c, EAI-4327). " +
+	"The SDK URL is confirmed correct; every non-distributor endpoint on the same credential returns 200"
+
+// TestAcceptance_AccountDistributorReads is separated from the other account
+// reads because the whole distributor surface is currently unreachable for a
+// server-side reason. It fails rather than skips, so the suite reports the day it
+// is fixed — see isSkywayScopeFault for the diagnosis.
+func TestAcceptance_AccountDistributorReads(t *testing.T) {
+	ac := account.New(accOrgClient(t))
+	ctx := context.Background()
+
 	cfg, err := ac.GetDistributorConfiguration(ctx)
-	if err != nil {
-		// A non-distributor organization legitimately has no configuration.
+	switch {
+	case isSkywayScopeFault(err):
+		t.Fatalf("GetDistributorConfiguration: "+skywayFaultReport, "skyway-use2-product")
+	case err != nil:
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
-			t.Log("GetDistributorConfiguration: 404 — this organization is not a distributor")
-		} else {
-			t.Fatalf("GetDistributorConfiguration: %v", err)
+			t.Skip("Skipping: this organization is not a distributor, so it has no configuration")
+		}
+		t.Fatalf("GetDistributorConfiguration: %v", err)
+	default:
+		t.Logf("distributor configuration: poSubmissionPermission=%v", cfg.PoSubmissionPermission)
+	}
+
+	// GetDistributorQuote and GetDistributorPurchaseOrder need identifiers only a
+	// real order can supply, so they are probed with values that cannot exist.
+	// A 404 is the pass here: it proves the endpoint is routed and looking the
+	// identifier up rather than refusing the request outright.
+	if _, err := ac.GetDistributorQuote(ctx, "SDK-ACC-NO-SUCH-QUOTE"); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		switch {
+		case isSkywayScopeFault(err):
+			t.Errorf("GetDistributorQuote: "+skywayFaultReport, "skyway-use2-product")
+		case errors.As(err, &apiErr) && apiErr.HasStatus(404):
+			t.Log("GetDistributorQuote correctly 404s for a quote that does not exist")
+		default:
+			t.Errorf("GetDistributorQuote: unexpected failure: %v", err)
 		}
 	} else {
-		t.Logf("distributor configuration: poSubmissionPermission=%v", cfg.PoSubmissionPermission)
+		t.Error("GetDistributorQuote returned a quote for SDK-ACC-NO-SUCH-QUOTE")
+	}
+
+	if _, err := ac.GetDistributorPurchaseOrder(ctx, "SDK-ACC-NO-SUCH-PO"); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		switch {
+		case isSkywayScopeFault(err):
+			t.Errorf("GetDistributorPurchaseOrder: "+skywayFaultReport, "skyway-use2-product")
+		case errors.As(err, &apiErr) && apiErr.HasStatus(404):
+			t.Log("GetDistributorPurchaseOrder correctly 404s for a PO that does not exist")
+		default:
+			t.Errorf("GetDistributorPurchaseOrder: unexpected failure: %v", err)
+		}
+	} else {
+		t.Error("GetDistributorPurchaseOrder returned an order for SDK-ACC-NO-SUCH-PO")
 	}
 }
 
@@ -179,6 +252,13 @@ func TestAcceptance_AccountDistributorConfigRoundTrip(t *testing.T) {
 
 	before, err := ac.GetDistributorConfiguration(ctx)
 	if err != nil {
+		// Skipping rather than failing only because the PATCH is genuinely
+		// unreachable: there is nothing to write back when the read cannot
+		// happen. TestAcceptance_AccountDistributorReads is what reports the
+		// fault, so it is not being hidden.
+		if isSkywayScopeFault(err) {
+			t.Skip("Skipping: the distributor surface is blocked upstream, so there is no configuration to round-trip. See TestAcceptance_AccountDistributorReads")
+		}
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
 			t.Skip("Skipping: this organization is not a distributor, so there is no configuration to round-trip")
@@ -227,6 +307,8 @@ func TestAcceptance_AccountPurchaseOrderValidation(t *testing.T) {
 
 	result, err := ac.ValidateDistributorPurchaseOrder(ctx, order)
 	switch {
+	case isSkywayScopeFault(err):
+		t.Fatalf("ValidateDistributorPurchaseOrder: "+skywayFaultReport, "skyway-use2-product")
 	case err == nil:
 		t.Logf("ValidateDistributorPurchaseOrder returned a result for a bogus quote: %+v", *result)
 	default:
@@ -246,6 +328,9 @@ func TestAcceptance_AccountPurchaseOrderValidation(t *testing.T) {
 	// The create must NOT succeed. If it ever does, this organization just grew
 	// an undeletable purchase order and the test needs redesigning, not relaxing.
 	err = ac.CreateDistributorPurchaseOrder(ctx, order)
+	if isSkywayScopeFault(err) {
+		t.Fatalf("CreateDistributorPurchaseOrder: "+skywayFaultReport, "skyway-use2-product")
+	}
 	if err == nil {
 		t.Fatalf("CreateDistributorPurchaseOrder ACCEPTED an order referencing quote %q — an unremovable record may have been created; investigate before re-running", quote)
 	}
