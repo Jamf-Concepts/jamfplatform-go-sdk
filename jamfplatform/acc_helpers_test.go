@@ -6,12 +6,15 @@
 package jamfplatform_test
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,6 +31,194 @@ import (
 var runSuffix = sync.OnceValue(func() string {
 	return strconv.FormatInt(time.Now().Unix(), 10)
 })
+
+// accTraceOpts returns the diagnostic client options every acceptance client
+// constructor spreads, so one variable turns each on for the whole suite:
+//
+//	JAMFPLATFORM_ACC_TRACE=1      print every request and response
+//	JAMFPLATFORM_ACC_FAST_RETRY=1 shorten the retry backoff (see accRetryOpts)
+//	JAMFPLATFORM_ACC_TRACE_MAX=n  per-body byte cap; 0 for none
+//
+//	JAMFPLATFORM_ACC_TRACE=1 JAMFPLATFORM_ACC_FAST_RETRY=1 \
+//	  go test -v -tags acceptance -run TestAcceptance_Account ./jamfplatform/
+//
+// Off by default and free when unset: with no logger installed the transport
+// skips the calls entirely rather than formatting and discarding.
+//
+// Output goes to stderr rather than t.Logf because the logger has no *testing.T
+// to attach to, and because stderr streams as the requests happen — the point of
+// tracing is watching a hang or a retry storm unfold, which buffered per-test
+// output cannot show.
+//
+// -v is REQUIRED for that streaming: without it `go test` buffers the test
+// binary's output and shows it only for a failing test, so a trace of a passing
+// test is swallowed and a trace of a hanging one appears only once it ends.
+func accTraceOpts() []jamfplatform.Option {
+	var opts []jamfplatform.Option
+	if os.Getenv("JAMFPLATFORM_ACC_TRACE") != "" {
+		opts = append(opts, jamfplatform.WithLogger(&accTracer{max: traceBodyLimit()}))
+	}
+	opts = append(opts, accRetryOpts()...)
+	return opts
+}
+
+// accRetryOpts shortens the retry backoff when JAMFPLATFORM_ACC_FAST_RETRY is
+// set. It is opt-in rather than the default because the production timing is
+// part of what the suite exercises.
+//
+// Why it is worth having: the production policy is RetryMax=4 with
+// RetryWaitMin=1s and RetryWaitMax=60s, and retryablehttp's
+// RateLimitLinearJitterBackoff treats those two as the *jitter range*, not as
+// (initial, cap) — the wait is (1s + rand*59s) * attemptNum, capped at 60s. So
+// the first retry alone waits a median of ~30s and four retries total a median
+// of ~184s, up to 240s. An endpoint that returns a persistent 502 in 1.5s (which
+// GET /api/sso/v1/connections currently does) therefore takes about three
+// minutes to surface, with no output in between: retries happen inside the
+// retryablehttp client, below the SDK's Logger, so a trace shows one request line
+// and then silence. That reads as a hang, and it was reported as one.
+//
+// 50ms/500ms/2 keeps a retry in the loop — so a genuinely transient failure is
+// still absorbed — while bounding the wait to about a second.
+func accRetryOpts() []jamfplatform.Option {
+	if os.Getenv("JAMFPLATFORM_ACC_FAST_RETRY") == "" {
+		return nil
+	}
+	return []jamfplatform.Option{jamfplatform.WithRetryPolicy(50*time.Millisecond, 500*time.Millisecond, 2)}
+}
+
+// traceBodyLimit is the per-body byte cap, overridable with
+// JAMFPLATFORM_ACC_TRACE_MAX. It is deliberately generous: truncation can hide
+// the exact field a trace was turned on to find, so the default only guards
+// against a genuinely huge list body (the account licence list is ~245 rows)
+// rather than trying to keep output tidy. Set it to 0 for no cap.
+func traceBodyLimit() int {
+	if v := os.Getenv("JAMFPLATFORM_ACC_TRACE_MAX"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			return n
+		}
+	}
+	return 16384
+}
+
+// accTracer prints each request and response as it happens.
+//
+// Two precautions, because a trace is routinely pasted into a ticket or a chat.
+// Headers are printed from a fixed allowlist rather than filtered, so
+// Authorization — which LogResponse receives in full, carrying a bearer token
+// live for the next 900 seconds — can never be printed by accident, and a header
+// added upstream tomorrow cannot leak either. Request and response bodies have
+// credential-shaped members replaced by name, which is best-effort by nature: a
+// secret under an unrecognised key still prints, so treat a trace as sensitive
+// regardless.
+type accTracer struct {
+	max int
+	mu  sync.Mutex // one request's two lines must not interleave with another's
+}
+
+// secretBodyKeys are JSON members whose values are replaced before printing.
+// Matched case-insensitively on the key. clientSecret and password are the ones
+// the suite actually sends — UEM Connect connector creation and the Pro
+// credential minting it does — but the list covers the obvious neighbours so a
+// new endpoint does not quietly start logging a secret.
+var secretBodyKeys = []string{
+	"clientsecret", "client_secret", "password", "secret", "privatekey",
+	"private_key", "token", "accesstoken", "access_token", "refreshtoken",
+	"refresh_token", "apikey", "api_key", "passphrase", "psk",
+}
+
+func (l *accTracer) LogRequest(_ context.Context, method, url string, body []byte) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	fmt.Fprintf(os.Stderr, "\n--> %s %s\n", method, url)
+	if len(body) > 0 {
+		fmt.Fprintf(os.Stderr, "    body: %s\n", l.render(redactSecrets(body)))
+	}
+}
+
+func (l *accTracer) LogResponse(_ context.Context, statusCode int, headers http.Header, body []byte) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	fmt.Fprintf(os.Stderr, "<-- %d\n", statusCode)
+
+	// Response headers carry the facts that explain a failure a body cannot:
+	// the traceId to quote to Jamf Support, the Deprecation notice, and the
+	// Content-Encoding that determines whether href survives (see CLAUDE.md).
+	for _, h := range []string{"X-Tyk-Trace-Id", "X-B3-Traceid", "Deprecation", "Sunset", "Link", "Content-Type", "Content-Encoding", "Retry-After"} {
+		if v := headers.Get(h); v != "" {
+			fmt.Fprintf(os.Stderr, "    %s: %s\n", h, v)
+		}
+	}
+	if len(body) > 0 {
+		fmt.Fprintf(os.Stderr, "    body: %s\n", l.render(redactSecrets(body)))
+	}
+}
+
+// render indents a JSON body so it is readable, falls back to the raw bytes when
+// it is not JSON (Classic is XML, and a gateway or WAF error page is HTML), and
+// applies the byte cap last so the cap is measured against what is printed.
+func (l *accTracer) render(body []byte) string {
+	out := body
+	var buf bytes.Buffer
+	if json.Indent(&buf, body, "    ", "  ") == nil {
+		out = buf.Bytes()
+	}
+	if l.max > 0 && len(out) > l.max {
+		return fmt.Sprintf("%s\n    … truncated at %d of %d bytes (raise JAMFPLATFORM_ACC_TRACE_MAX, or set it to 0)", out[:l.max], l.max, len(out))
+	}
+	return string(out)
+}
+
+// redactSecrets replaces the values of credential-shaped JSON members. It
+// re-encodes through a generic map, so a body that is not JSON object-shaped is
+// returned untouched — including Classic's XML, which the suite does send.
+//
+// Returning the original on any failure is deliberate: a redaction pass that
+// silently dropped a body would make tracing useless exactly when it matters.
+func redactSecrets(body []byte) []byte {
+	var v any
+	if err := json.Unmarshal(body, &v); err != nil {
+		return body
+	}
+	if !redactInto(v) {
+		return body
+	}
+	out, err := json.Marshal(v)
+	if err != nil {
+		return body
+	}
+	return out
+}
+
+// redactInto walks maps and slices in place, reporting whether it changed
+// anything so the caller can skip a pointless re-encode.
+func redactInto(v any) bool {
+	changed := false
+	switch t := v.(type) {
+	case map[string]any:
+		for k, inner := range t {
+			lk := strings.ToLower(k)
+			if slices.Contains(secretBodyKeys, lk) {
+				// A null stays null: replacing it would make a trace claim the
+				// request carried a secret it did not send.
+				if inner != nil {
+					t[k] = "***REDACTED***"
+					changed = true
+				}
+				continue
+			}
+			if redactInto(inner) {
+				changed = true
+			}
+		}
+	case []any:
+		for _, inner := range t {
+			if redactInto(inner) {
+				changed = true
+			}
+		}
+	}
+	return changed
+}
 
 // errAccCredsUnset marks the one condition under which skipping the whole suite
 // is legitimate: no tenant was configured, as on a local run or a fork PR.
@@ -61,7 +252,8 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 		envBase = os.Getenv("JAMFPLATFORM_BASE_URL")
 	}
 	if envBase != "" && envClient != "" && envSecret != "" && envID != "" {
-		c := jamfplatform.NewClient(envBase, envClient, envSecret, jamfplatform.WithEnvironmentID(envID))
+		c := jamfplatform.NewClient(envBase, envClient, envSecret,
+			append(accTraceOpts(), jamfplatform.WithEnvironmentID(envID))...)
 		if err := c.ValidateCredentials(context.Background()); err != nil {
 			return nil, fmt.Errorf("failed to validate environment-scoped credentials: %w", err)
 		}
@@ -78,7 +270,8 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 		return nil, fmt.Errorf("%w: set JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID (or the JAMFPLATFORM_ENV_* set for environment scope)", errAccCredsUnset)
 	}
 
-	c := jamfplatform.NewClient(baseURL, clientID, clientSecret, jamfplatform.WithTenantID(tenantID))
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+		append(accTraceOpts(), jamfplatform.WithTenantID(tenantID))...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate credentials: %w", err)
 	}
@@ -125,7 +318,7 @@ var initJSCAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, erro
 	// Cloud client answers 403 on /api/pro and vice versa), so a single Client
 	// could never have served both regardless of how many tenant IDs it held.
 	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
-		jamfplatform.WithTenantID(tenantID))
+		append(accTraceOpts(), jamfplatform.WithTenantID(tenantID))...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate Security Cloud credentials: %w", err)
 	}
@@ -176,7 +369,7 @@ var initEnvAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, erro
 	}
 
 	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
-		jamfplatform.WithEnvironmentID(environmentID))
+		append(accTraceOpts(), jamfplatform.WithEnvironmentID(environmentID))...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate environment-scoped credentials: %w", err)
 	}
@@ -224,7 +417,7 @@ var initOrgAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, erro
 		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ORG_CLIENT_ID, JAMFPLATFORM_ORG_CLIENT_SECRET (and JAMFPLATFORM_ORG_BASE_URL — must be the US gateway)", errAccOrgCredsUnset)
 	}
 
-	c := jamfplatform.NewClient(baseURL, clientID, clientSecret)
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret, accTraceOpts()...)
 	if err := c.ValidateCredentials(context.Background()); err != nil {
 		return nil, fmt.Errorf("failed to validate organization-scoped credentials: %w", err)
 	}
