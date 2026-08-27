@@ -1232,7 +1232,27 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 				t := schemaToGoType(name, schema, usage.isRequest, format)
 				t.XMLName = xmlName
 				types = append(types, t)
-			} else if len(schema.AllOf) == 0 && len(schema.OneOf) == 0 && len(schema.AnyOf) == 0 {
+			} else if len(schema.OneOf) > 0 {
+				// oneOf with no discriminator and no properties of its own:
+				// a *structurally* discriminated union, where the variant is
+				// identified by which optional fields are present rather than
+				// by a tag value. Merge the variants into one struct.
+				//
+				// Emitting nothing was the previous behaviour and it failed
+				// closed only by luck: a union used as a *named* response type
+				// aborts generation with "Go type not emitted", but one
+				// reached solely through a property would have silently become
+				// `any`. audit's AuditEnvelope is the first case — a gateway
+				// event carries actor+requestContext, a service event carries
+				// data, and the two never mix.
+				//
+				// A discriminator cannot be synthesised here: the nearest
+				// candidate field (auditSource) is an open string, so a
+				// mapping would rot the moment a new source appears.
+				t := schemaToGoType(name, mergeOneOfVariants(schema), usage.isRequest, format)
+				t.XMLName = xmlName
+				types = append(types, t)
+			} else if len(schema.AllOf) == 0 && len(schema.AnyOf) == 0 {
 				// Completely empty schema (e.g. JsonNode: {}) — no type, no
 				// properties, no composition. Treat as freeform → json.RawMessage.
 				comment := name + " represents a freeform JSON value."
@@ -1656,6 +1676,59 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 	}
 	sort.Strings(required)
 	return props, required
+}
+
+// mergeOneOfVariants collapses a discriminator-less oneOf union into a single
+// schema carrying the union of every variant's properties. A property required
+// by *every* variant stays required; one required by only some becomes
+// optional, which is what makes the merged struct able to represent any variant
+// without lying about presence. Variant-specific fields therefore land as
+// pointers and nil is the caller's signal for "not this variant".
+//
+// The union root's own properties and required list are kept and take part in
+// the intersection, so a schema mixing `oneOf` with its own `properties`
+// behaves the same as one without.
+func mergeOneOfVariants(schema *openapi3.Schema) *openapi3.Schema {
+	merged := openapi3.NewObjectSchema()
+	merged.Description = schema.Description
+	merged.Properties = make(map[string]*openapi3.SchemaRef)
+
+	if rootProps, rootRequired := flattenAllOf(schema); len(rootProps) > 0 {
+		maps.Copy(merged.Properties, rootProps)
+		merged.Required = rootRequired
+	}
+
+	// Intersect required across variants: counted, then kept only where the
+	// count reaches the number of variants that actually resolved.
+	requiredCount := make(map[string]int)
+	resolved := 0
+	for _, variant := range schema.OneOf {
+		if variant == nil || variant.Value == nil {
+			continue
+		}
+		resolved++
+		props, required := flattenAllOf(variant.Value)
+		maps.Copy(merged.Properties, props)
+		for _, r := range required {
+			requiredCount[r]++
+		}
+	}
+
+	rootRequired := toSet(merged.Required)
+	required := make([]string, 0, len(requiredCount))
+	for name, n := range requiredCount {
+		if n == resolved || rootRequired[name] {
+			required = append(required, name)
+		}
+	}
+	for name := range rootRequired {
+		if requiredCount[name] == 0 {
+			required = append(required, name)
+		}
+	}
+	sort.Strings(required)
+	merged.Required = required
+	return merged
 }
 
 // fieldDocWidth is the wrap width for struct field documentation. Matches
