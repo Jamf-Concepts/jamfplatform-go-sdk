@@ -11299,6 +11299,220 @@
         "ConnectorCreateRequest.authStrategy",
         "ConnectorCreateRequest.deviceSyncAuth"
       ]
+    },
+    {
+      "file": "testing/account-licensing-api.yaml",
+      "namespace": "licensing",
+      "package": "account",
+      "splitByTag": true,
+      "specFile": "account_licensing_api.json",
+      "operations": [
+        {
+          "op": "GET /v1/licenses",
+          "name": "ListLicenses",
+          "responseType": "[]License"
+        }
+      ]
+    },
+    {
+      "file": "testing/account-partners-api.yaml",
+      "namespace": "partners",
+      "package": "account",
+      "splitByTag": true,
+      "specFile": "account_partners_api.json",
+      "operations": [
+        {
+          "op": "GET /v1/deal-registrations",
+          "name": "ListDealRegistrations",
+          "responseType": "[]DealRegistration"
+        },
+        {
+          "op": "GET /v1/distributor/configuration",
+          "name": "GetDistributorConfiguration"
+        },
+        {
+          "op": "PATCH /v1/distributor/configuration",
+          "name": "UpdateDistributorConfiguration"
+        },
+        {
+          "op": "POST /v1/distributor/purchase-orders",
+          "name": "CreateDistributorPurchaseOrder"
+        },
+        {
+          "op": "GET /v1/distributor/purchase-orders/{jamfPoNumber}",
+          "name": "GetDistributorPurchaseOrder"
+        },
+        {
+          "op": "GET /v1/distributor/quotes/{quoteNumber}",
+          "name": "GetDistributorQuote"
+        },
+        {
+          "op": "POST /v1/distributor/validate-purchase-order",
+          "name": "ValidateDistributorPurchaseOrder"
+        }
+      ]
+    },
+    {
+      "file": "testing/account-sso-api.yaml",
+      "namespace": "sso",
+      "package": "account",
+      "splitByTag": true,
+      "specFile": "account_sso_api.json",
+      "fieldTypeOverrides": {
+        "domain.id": "json.Number"
+      },
+      "operations": [
+        {
+          "op": "GET /v1/connections",
+          "name": "ListConnections",
+          "responseType": "[]ConnectionSummary"
+        },
+        {
+          "op": "POST /v1/connections",
+          "name": "CreateConnection"
+        },
+        {
+          "op": "GET /v1/connections/{connectionId}",
+          "name": "GetConnection"
+        },
+        {
+          "op": "PUT /v1/connections/{connectionId}",
+          "name": "UpdateConnection"
+        },
+        {
+          "op": "DELETE /v1/connections/{connectionId}",
+          "name": "DeleteConnection"
+        },
+        {
+          "op": "GET /v1/domains",
+          "name": "ListDomains",
+          "responseType": "[]Domain"
+        },
+        {
+          "op": "POST /v1/domains",
+          "name": "CreateDomain"
+        },
+        {
+          "op": "GET /v1/domains/allocation/{domain}",
+          "name": "GetDomainAllocation"
+        },
+        {
+          "op": "DELETE /v1/domains/{domainId}",
+          "name": "DeleteDomain"
+        },
+        {
+          "op": "POST /v1/domains/{domainId}/actions/verify",
+          "name": "VerifyDomain"
+        }
+      ]
+    },
+    {
+      "file": "testing/audit-api.yaml",
+      "namespace": "audit",
+      "package": "audit",
+      "splitByTag": true,
+      "specFile": "audit_api.json",
+      "operations": [
+        {
+          "op": "GET /v1/audit",
+          "name": "ListAuditEvents",
+          "pagination": "cursor",
+          "resultsField": "items",
+          "params": [
+            "since",
+            "until",
+            "actor",
+            "audit-source:[]string",
+            "audit-type:[]string",
+            "resource-id:[]string"
+          ]
+        },
+        {
+          "op": "GET /v1/audit/resources/{resourceId}/lineage",
+          "name": "GetResourceLineage",
+          "pagination": "cursor",
+          "resultsField": "transactions",
+          "params": [
+            "audit-type",
+            "since",
+            "until"
+          ]
+        },
+        {
+          "op": "GET /v1/audit/sources",
+          "name": "ListAuditSources",
+          "params": [
+            "since"
+          ]
+        },
+        {
+          "op": "GET /v1/audit/transactions/{txId}",
+          "name": "GetTransactionTimeline"
+        }
+      ]
+    },
+    {
+      "file": "testing/ai-governance-api.yaml",
+      "namespace": "ai/governance/policies",
+      "package": "aigovernance",
+      "splitByTag": true,
+      "specFile": "ai_governance_policies_api.json",
+      "operations": [
+        {
+          "op": "GET /v1/policies",
+          "name": "ListPolicies",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string",
+            "schema-drift:bool"
+          ]
+        },
+        {
+          "op": "POST /v1/policies",
+          "name": "CreatePolicy"
+        },
+        {
+          "op": "GET /v1/policies/{policyId}",
+          "name": "GetPolicy"
+        },
+        {
+          "op": "PATCH /v1/policies/{policyId}",
+          "name": "UpdatePolicy"
+        },
+        {
+          "op": "DELETE /v1/policies/{policyId}",
+          "name": "ArchivePolicy"
+        },
+        {
+          "op": "GET /v1/policies/{policyId}/deployment",
+          "name": "GetPolicyDeployment"
+        },
+        {
+          "op": "POST /v1/policies/{policyId}/publish",
+          "name": "PublishPolicy"
+        },
+        {
+          "op": "GET /v1/policies/{policyId}/versions",
+          "name": "ListPolicyVersions",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "GET /v1/policies/{policyId}/versions/{versionNumber}",
+          "name": "GetPolicyVersion"
+        },
+        {
+          "op": "GET /v1/tools",
+          "name": "ListTools"
+        },
+        {
+          "op": "GET /v1/tools/{toolId}",
+          "name": "GetTool"
+        },
+        {
+          "op": "GET /v1/tools/{toolId}/schemas/{schemaVersion}",
+          "name": "GetToolSchema"
+        }
+      ]
     }
   ]
 }
