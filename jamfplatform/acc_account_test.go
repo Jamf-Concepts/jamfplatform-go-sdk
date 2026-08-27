@@ -46,7 +46,15 @@ func TestAcceptance_AccountReads(t *testing.T) {
 		if domainID(d) == "" {
 			t.Errorf("domain %q has an empty ID", d.Domain)
 		}
-		t.Logf("  %s id=%s status=%v shared=%v", d.Domain, domainID(d), d.DomainStatus, d.SharedDomain)
+		// verifiedTldId is the second numeric-ID-declared-as-string field on this
+		// struct. Logging it exercises the decode on every row, which is how the
+		// first one was missed: it is null on most domains, so a small sample
+		// never populates it.
+		var tld string
+		if d.VerifiedTldID != nil {
+			tld = d.VerifiedTldID.String()
+		}
+		t.Logf("  %s id=%s verifiedTldId=%q status=%v shared=%v", d.Domain, domainID(d), tld, d.DomainStatus, d.SharedDomain)
 	}
 
 	deals, err := ac.ListDealRegistrations(ctx)

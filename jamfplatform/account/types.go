@@ -506,7 +506,7 @@ type Domain struct {
 	VerificationKey string `json:"verificationKey"`
 	// Identifier of the verified parent domain this subdomain inherits its verification from, in the same
 	// form as `id`. Null for a domain verified in its own right.
-	VerifiedTldID *string `json:"verifiedTldId,omitempty"`
+	VerifiedTldID *json.Number `json:"verifiedTldId,omitempty"`
 }
 
 // DomainAllocation The connections a domain is currently assigned to, and whether Jamf ID sign-in is enabled for it.

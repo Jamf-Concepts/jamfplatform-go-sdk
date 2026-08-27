@@ -11359,7 +11359,8 @@
       "splitByTag": true,
       "specFile": "account_sso_api.json",
       "fieldTypeOverrides": {
-        "domain.id": "json.Number"
+        "domain.id": "json.Number",
+        "domain.verifiedTldId": "json.Number"
       },
       "operations": [
         {
