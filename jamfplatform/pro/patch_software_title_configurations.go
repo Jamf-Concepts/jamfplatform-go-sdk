@@ -19,7 +19,7 @@ import (
 
 // ListPatchSoftwareTitleConfigurationsV3 retrieve Patch Software Title Configurations.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 func (c *Client) ListPatchSoftwareTitleConfigurationsV3(ctx context.Context) ([]PatchSoftwareTitleConfiguration, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []PatchSoftwareTitleConfiguration
@@ -47,7 +47,7 @@ func (c *Client) ListPatchSoftwareTitleConfigurationsV2(ctx context.Context) ([]
 
 // CreatePatchSoftwareTitleConfigurationV3 create Patch Software Title Configurations.
 //
-// Required privileges: create:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Create Patch Management Software Titles.
+// Required privileges: create:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Create Patch Management Software Titles.
 func (c *Client) CreatePatchSoftwareTitleConfigurationV3(ctx context.Context, request *PatchSoftwareTitleConfigurationBase) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
@@ -75,7 +75,7 @@ func (c *Client) CreatePatchSoftwareTitleConfigurationV2(ctx context.Context, re
 
 // GetPatchSoftwareTitleConfigurationV3 retrieve Patch Software Title Configurations with the supplied id.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
@@ -109,7 +109,7 @@ func (c *Client) GetPatchSoftwareTitleConfigurationV2(ctx context.Context, id st
 
 // DeletePatchSoftwareTitleConfigurationV3 delete Patch Software Title Configurations with the supplied id.
 //
-// Required privileges: delete:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Delete Patch Management Software Titles.
+// Required privileges: delete:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Delete Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
@@ -141,7 +141,7 @@ func (c *Client) DeletePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 
 // UpdatePatchSoftwareTitleConfigurationV3 update Patch Software Title Configurations.
 //
-// Required privileges: update:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
+// Required privileges: update:env:patch-software-title-configurations. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
@@ -175,7 +175,7 @@ func (c *Client) UpdatePatchSoftwareTitleConfigurationV2(ctx context.Context, id
 
 // GetPatchSoftwareTitleDashboardStatusV3 return whether or not the requested software title configuration is on the dashboard.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:dashboard. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: software title configuration id.
@@ -209,7 +209,7 @@ func (c *Client) GetPatchSoftwareTitleDashboardStatusV2(ctx context.Context, id 
 
 // AddPatchSoftwareTitleToDashboardV3 add a software title configuration to the dashboard.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: create:env:dashboard. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: software title configuration id.
@@ -241,7 +241,7 @@ func (c *Client) AddPatchSoftwareTitleToDashboardV2(ctx context.Context, id stri
 
 // RemovePatchSoftwareTitleFromDashboardV3 remove a software title configuration from the dashboard.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: delete:env:dashboard. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: software title configuration id.
@@ -273,7 +273,7 @@ func (c *Client) RemovePatchSoftwareTitleFromDashboardV2(ctx context.Context, id
 
 // ListPatchSoftwareTitleDefinitionsV3 retrieve Patch Software Title Definitions with the supplied id.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:definitions. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title identifier.
@@ -357,7 +357,7 @@ func (c *Client) ListPatchSoftwareTitleDefinitionsV2(ctx context.Context, id str
 
 // GetPatchSoftwareTitleDependenciesV3 retrieve list of Patch Software Title Configuration Dependencies.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:dependencies. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
@@ -391,7 +391,7 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV2(ctx context.Context, id str
 
 // ExportPatchSoftwareTitleReportV3 export Patch Reporting Data.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:export-report. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
@@ -455,7 +455,7 @@ func (c *Client) ExportPatchSoftwareTitleReportV2(ctx context.Context, id string
 
 // ListPatchSoftwareTitleExtensionAttributesV3 retrieve Software Title Extension Attributes with the supplied id.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:extension-attributes. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title identifier.
@@ -489,7 +489,7 @@ func (c *Client) ListPatchSoftwareTitleExtensionAttributesV2(ctx context.Context
 
 // ListPatchSoftwareTitleHistoryV3 get specified Patch Software Title Configuration history object.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:history. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
@@ -573,7 +573,7 @@ func (c *Client) ListPatchSoftwareTitleHistoryV2(ctx context.Context, id string,
 
 // CreatePatchSoftwareTitleHistoryNoteV3 add Patch Software Title Configuration history object notes.
 //
-// Required privileges: update:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
+// Required privileges: create:env:history. Legacy Jamf Pro privilege name(s): Update Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configuration Id.
@@ -607,7 +607,7 @@ func (c *Client) CreatePatchSoftwareTitleHistoryNoteV2(ctx context.Context, id s
 
 // ListPatchSoftwareTitlePatchReportV3 retrieve Patch Software Title Configuration Patch Report.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:patch-report. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch Software Title Configurations identifier.
@@ -693,7 +693,7 @@ func (c *Client) ListPatchSoftwareTitlePatchReportV2(ctx context.Context, id str
 
 // GetPatchSoftwareTitlePatchSummaryV3 return Active Patch Summary.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:patch-summary. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch id.
@@ -727,7 +727,7 @@ func (c *Client) GetPatchSoftwareTitlePatchSummaryV2(ctx context.Context, id str
 
 // ListPatchSoftwareTitlePatchSummaryVersionsV3 returns patch versions.
 //
-// Required privileges: read:pro:patch-management-software-titles. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
+// Required privileges: read:env:versions. Legacy Jamf Pro privilege name(s): Read Patch Management Software Titles.
 //
 // Parameters:
 //   - id: Patch id.

@@ -412,54 +412,54 @@
       },
       "operations": [
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/settings",
+          "op": "GET /v2/local-admin-password/settings",
           "name": "GetLocalAdminPasswordSettingsV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/local-admin-password/settings",
+          "op": "PUT /v2/local-admin-password/settings",
           "name": "UpdateLocalAdminPasswordSettingsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/pending-rotations",
+          "op": "GET /v2/local-admin-password/pending-rotations",
           "name": "ListLocalAdminPasswordPendingRotationsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/accounts",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/accounts",
           "name": "ListLocalAdminPasswordAccountsV2",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/history",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/history",
           "name": "ListLocalAdminPasswordHistoryV2",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/password",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/password",
           "name": "GetLocalAdminPasswordV2",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/audit",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/audit",
           "name": "ListLocalAdminPasswordAuditsV2",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/history",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/history",
           "name": "ListLocalAdminPasswordAccountHistoryV2",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/password",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/password",
           "name": "GetLocalAdminPasswordByGuidV2",
           "pathNames": {
             "clientManagementId": "clientManagementID",
@@ -467,7 +467,7 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/audit",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/audit",
           "name": "ListLocalAdminPasswordAuditsByGuidV2",
           "pathNames": {
             "clientManagementId": "clientManagementID",
@@ -475,7 +475,7 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/account/{username}/{guid}/history",
+          "op": "GET /v2/local-admin-password/{clientManagementId}/account/{username}/{guid}/history",
           "name": "ListLocalAdminPasswordAccountHistoryByGuidV2",
           "pathNames": {
             "clientManagementId": "clientManagementID",
@@ -483,14 +483,14 @@
           }
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/local-admin-password/{clientManagementId}/set-password",
+          "op": "PUT /v2/local-admin-password/{clientManagementId}/set-password",
           "name": "SetLocalAdminPasswordV2",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/buildings",
+          "op": "GET /v1/buildings",
           "name": "ListBuildingsV1",
           "pagination": "totalCount",
           "params": [
@@ -512,31 +512,31 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/buildings",
+          "op": "POST /v1/buildings",
           "name": "CreateBuildingV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/buildings/{id}",
+          "op": "GET /v1/buildings/{id}",
           "name": "GetBuildingV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/buildings/{id}",
+          "op": "PUT /v1/buildings/{id}",
           "name": "UpdateBuildingV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/buildings/{id}",
+          "op": "DELETE /v1/buildings/{id}",
           "name": "DeleteBuildingV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/startup-status",
+          "op": "GET /startup-status",
           "name": "GetStartupStatus"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/user/change-password",
+          "op": "POST /v1/user/change-password",
           "name": "ChangeUserPasswordV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/buildings/export",
+          "op": "POST /v1/buildings/export",
           "name": "ExportBuildingsV1",
           "params": [
             "sort:[]string",
@@ -544,11 +544,11 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/icon",
+          "op": "POST /v1/icon",
           "name": "UploadIconV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-devices/detail",
+          "op": "GET /v2/mobile-devices/detail",
           "name": "ListMobileDevicesDetailV2",
           "pagination": "totalCount",
           "params": [
@@ -589,7 +589,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/packages",
+          "op": "GET /v1/packages",
           "name": "ListPackagesV1",
           "pagination": "totalCount",
           "params": [
@@ -611,27 +611,27 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/packages",
+          "op": "POST /v1/packages",
           "name": "CreatePackageV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/packages/{id}",
+          "op": "GET /v1/packages/{id}",
           "name": "GetPackageV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/packages/{id}",
+          "op": "PUT /v1/packages/{id}",
           "name": "UpdatePackageV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/packages/{id}",
+          "op": "DELETE /v1/packages/{id}",
           "name": "DeletePackageV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/packages/{id}/upload",
+          "op": "POST /v1/packages/{id}/upload",
           "name": "UploadPackageV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/categories",
+          "op": "GET /v1/categories",
           "name": "ListCategoriesV1",
           "pagination": "totalCount",
           "params": [
@@ -653,27 +653,27 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/categories",
+          "op": "POST /v1/categories",
           "name": "CreateCategoryV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/categories/delete-multiple",
+          "op": "POST /v1/categories/delete-multiple",
           "name": "DeleteMultipleCategoriesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/categories/{id}",
+          "op": "GET /v1/categories/{id}",
           "name": "GetCategoryV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/categories/{id}",
+          "op": "PUT /v1/categories/{id}",
           "name": "UpdateCategoryV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/categories/{id}",
+          "op": "DELETE /v1/categories/{id}",
           "name": "DeleteCategoryV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/categories/{id}/history",
+          "op": "GET /v1/categories/{id}/history",
           "name": "ListCategoryHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -682,12 +682,12 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/categories/{id}/history",
+          "op": "POST /v1/categories/{id}/history",
           "name": "CreateCategoryHistoryNoteV1",
           "expectedStatus": 200
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/departments",
+          "op": "GET /v1/departments",
           "name": "ListDepartmentsV1",
           "pagination": "totalCount",
           "params": [
@@ -709,27 +709,27 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/departments",
+          "op": "POST /v1/departments",
           "name": "CreateDepartmentV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/departments/delete-multiple",
+          "op": "POST /v1/departments/delete-multiple",
           "name": "DeleteMultipleDepartmentsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/departments/{id}",
+          "op": "GET /v1/departments/{id}",
           "name": "GetDepartmentV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/departments/{id}",
+          "op": "PUT /v1/departments/{id}",
           "name": "UpdateDepartmentV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/departments/{id}",
+          "op": "DELETE /v1/departments/{id}",
           "name": "DeleteDepartmentV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/departments/{id}/history",
+          "op": "GET /v1/departments/{id}/history",
           "name": "ListDepartmentHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -738,11 +738,11 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/departments/{id}/history",
+          "op": "POST /v1/departments/{id}/history",
           "name": "CreateDepartmentHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/sites",
+          "op": "GET /v1/sites",
           "name": "ListSitesV1",
           "resolver": {
             "resourceType": "SiteV1",
@@ -753,7 +753,7 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/sites/{id}/objects",
+          "op": "GET /v1/sites/{id}/objects",
           "name": "ListSiteObjectsV1",
           "pagination": "rawArray",
           "params": [
@@ -762,7 +762,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/scripts",
+          "op": "GET /v1/scripts",
           "name": "ListScriptsV1",
           "pagination": "totalCount",
           "params": [
@@ -784,27 +784,27 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/scripts",
+          "op": "POST /v1/scripts",
           "name": "CreateScriptV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/scripts/{id}",
+          "op": "GET /v1/scripts/{id}",
           "name": "GetScriptV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/scripts/{id}",
+          "op": "PUT /v1/scripts/{id}",
           "name": "UpdateScriptV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/scripts/{id}",
+          "op": "DELETE /v1/scripts/{id}",
           "name": "DeleteScriptV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/scripts/{id}/download",
+          "op": "GET /v1/scripts/{id}/download",
           "name": "DownloadScriptV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/scripts/{id}/history",
+          "op": "GET /v1/scripts/{id}/history",
           "name": "ListScriptHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -813,12 +813,12 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/scripts/{id}/history",
+          "op": "POST /v1/scripts/{id}/history",
           "name": "CreateScriptHistoryNoteV1",
           "expectedStatus": 200
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-groups",
+          "op": "GET /v1/computer-groups",
           "name": "ListComputerGroupsV1",
           "resolver": {
             "resourceType": "ComputerGroupV1",
@@ -829,7 +829,7 @@
           }
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-groups",
+          "op": "GET /v3/computer-groups/smart-groups",
           "name": "ListSmartComputerGroupsV3",
           "pagination": "totalCount",
           "params": [
@@ -851,7 +851,7 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-groups",
+          "op": "GET /v2/computer-groups/smart-groups",
           "name": "ListSmartComputerGroupsV2",
           "pagination": "totalCount",
           "params": [
@@ -873,55 +873,55 @@
           }
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/computer-groups/smart-groups",
+          "op": "POST /v3/computer-groups/smart-groups",
           "name": "CreateSmartComputerGroupV3",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/computer-groups/smart-groups",
+          "op": "POST /v2/computer-groups/smart-groups",
           "name": "CreateSmartComputerGroupV2",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "op": "GET /v3/computer-groups/smart-groups/{id}",
           "name": "GetSmartComputerGroupV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "op": "GET /v2/computer-groups/smart-groups/{id}",
           "name": "GetSmartComputerGroupV2"
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "op": "PUT /v3/computer-groups/smart-groups/{id}",
           "name": "UpdateSmartComputerGroupV3"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "op": "PUT /v2/computer-groups/smart-groups/{id}",
           "name": "UpdateSmartComputerGroupV2",
           "expectedStatus": 202
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "op": "DELETE /v3/computer-groups/smart-groups/{id}",
           "name": "DeleteSmartComputerGroupV3"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/computer-groups/smart-groups/{id}",
+          "op": "DELETE /v2/computer-groups/smart-groups/{id}",
           "name": "DeleteSmartComputerGroupV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computer-groups/smart-group-membership/{id}",
+          "op": "GET /v3/computer-groups/smart-group-membership/{id}",
           "name": "GetSmartComputerGroupMembershipV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-groups/smart-group-membership/{id}",
+          "op": "GET /v2/computer-groups/smart-group-membership/{id}",
           "name": "GetSmartComputerGroupMembershipV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computer-groups/static-groups",
+          "op": "GET /v3/computer-groups/static-groups",
           "name": "ListStaticComputerGroupsV3",
           "pagination": "totalCount",
           "params": [
@@ -943,7 +943,7 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-groups/static-groups",
+          "op": "GET /v2/computer-groups/static-groups",
           "name": "ListStaticComputerGroupsV2",
           "pagination": "totalCount",
           "params": [
@@ -965,47 +965,47 @@
           }
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/computer-groups/static-groups",
+          "op": "POST /v3/computer-groups/static-groups",
           "name": "CreateStaticComputerGroupV3",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/computer-groups/static-groups",
+          "op": "POST /v2/computer-groups/static-groups",
           "name": "CreateStaticComputerGroupV2",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "op": "GET /v3/computer-groups/static-groups/{id}",
           "name": "GetStaticComputerGroupV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "op": "GET /v2/computer-groups/static-groups/{id}",
           "name": "GetStaticComputerGroupV2"
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "op": "PUT /v3/computer-groups/static-groups/{id}",
           "name": "UpdateStaticComputerGroupV3"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "op": "PUT /v2/computer-groups/static-groups/{id}",
           "name": "UpdateStaticComputerGroupV2",
           "expectedStatus": 202
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "op": "DELETE /v3/computer-groups/static-groups/{id}",
           "name": "DeleteStaticComputerGroupV3"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/computer-groups/static-groups/{id}",
+          "op": "DELETE /v2/computer-groups/static-groups/{id}",
           "name": "DeleteStaticComputerGroupV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-extension-attributes",
+          "op": "GET /v1/computer-extension-attributes",
           "name": "ListComputerExtensionAttributesV1",
           "pagination": "totalCount",
           "params": [
@@ -1027,15 +1027,15 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computer-extension-attributes",
+          "op": "POST /v1/computer-extension-attributes",
           "name": "CreateComputerExtensionAttributeV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computer-extension-attributes/delete-multiple",
+          "op": "POST /v1/computer-extension-attributes/delete-multiple",
           "name": "DeleteMultipleComputerExtensionAttributesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-extension-attributes/templates",
+          "op": "GET /v1/computer-extension-attributes/templates",
           "name": "ListComputerExtensionAttributeTemplatesV1",
           "pagination": "totalCount",
           "params": [
@@ -1044,36 +1044,36 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-extension-attributes/templates/{id}",
+          "op": "GET /v1/computer-extension-attributes/templates/{id}",
           "name": "GetComputerExtensionAttributeTemplateV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computer-extension-attributes/upload",
+          "op": "POST /v1/computer-extension-attributes/upload",
           "name": "UploadComputerExtensionAttributeV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-extension-attributes/{id}",
+          "op": "GET /v1/computer-extension-attributes/{id}",
           "name": "GetComputerExtensionAttributeV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/computer-extension-attributes/{id}",
+          "op": "PUT /v1/computer-extension-attributes/{id}",
           "name": "UpdateComputerExtensionAttributeV1",
           "expectedStatus": 202
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/computer-extension-attributes/{id}",
+          "op": "DELETE /v1/computer-extension-attributes/{id}",
           "name": "DeleteComputerExtensionAttributeV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-extension-attributes/{id}/data-dependency",
+          "op": "GET /v1/computer-extension-attributes/{id}/data-dependency",
           "name": "GetComputerExtensionAttributeDataDependencyV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-extension-attributes/{id}/download",
+          "op": "GET /v1/computer-extension-attributes/{id}/download",
           "name": "DownloadComputerExtensionAttributeV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-extension-attributes/{id}/history",
+          "op": "GET /v1/computer-extension-attributes/{id}/history",
           "name": "ListComputerExtensionAttributeHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -1082,11 +1082,11 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computer-extension-attributes/{id}/history",
+          "op": "POST /v1/computer-extension-attributes/{id}/history",
           "name": "CreateComputerExtensionAttributeHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/advanced-mobile-device-searches",
+          "op": "GET /v1/advanced-mobile-device-searches",
           "name": "ListAdvancedMobileDeviceSearchesV1",
           "resolver": {
             "resourceType": "AdvancedMobileDeviceSearchV1",
@@ -1103,15 +1103,15 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/advanced-mobile-device-searches",
+          "op": "POST /v1/advanced-mobile-device-searches",
           "name": "CreateAdvancedMobileDeviceSearchV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/advanced-mobile-device-searches/delete-multiple",
+          "op": "POST /v1/advanced-mobile-device-searches/delete-multiple",
           "name": "DeleteMultipleAdvancedMobileDeviceSearchesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/advanced-mobile-device-searches/choices",
+          "op": "GET /v1/advanced-mobile-device-searches/choices",
           "name": "ListAdvancedMobileDeviceSearchChoicesV1",
           "params": [
             "criteria",
@@ -1120,20 +1120,20 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/advanced-mobile-device-searches/{id}",
+          "op": "GET /v1/advanced-mobile-device-searches/{id}",
           "name": "GetAdvancedMobileDeviceSearchV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/advanced-mobile-device-searches/{id}",
+          "op": "PUT /v1/advanced-mobile-device-searches/{id}",
           "name": "UpdateAdvancedMobileDeviceSearchV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/advanced-mobile-device-searches/{id}",
+          "op": "DELETE /v1/advanced-mobile-device-searches/{id}",
           "name": "DeleteAdvancedMobileDeviceSearchV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-extension-attributes",
+          "op": "GET /v1/mobile-device-extension-attributes",
           "name": "ListMobileDeviceExtensionAttributesV1",
           "pagination": "totalCount",
           "params": [
@@ -1155,28 +1155,28 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mobile-device-extension-attributes",
+          "op": "POST /v1/mobile-device-extension-attributes",
           "name": "CreateMobileDeviceExtensionAttributeV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-extension-attributes/{id}",
+          "op": "GET /v1/mobile-device-extension-attributes/{id}",
           "name": "GetMobileDeviceExtensionAttributeV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/mobile-device-extension-attributes/{id}",
+          "op": "PUT /v1/mobile-device-extension-attributes/{id}",
           "name": "UpdateMobileDeviceExtensionAttributeV1",
           "expectedStatus": 202
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/mobile-device-extension-attributes/{id}",
+          "op": "DELETE /v1/mobile-device-extension-attributes/{id}",
           "name": "DeleteMobileDeviceExtensionAttributeV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-extension-attributes/{id}/data-dependency",
+          "op": "GET /v1/mobile-device-extension-attributes/{id}/data-dependency",
           "name": "GetMobileDeviceExtensionAttributeDataDependencyV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-extension-attributes/{id}/history",
+          "op": "GET /v1/mobile-device-extension-attributes/{id}/history",
           "name": "ListMobileDeviceExtensionAttributeHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -1185,11 +1185,11 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mobile-device-extension-attributes/{id}/history",
+          "op": "POST /v1/mobile-device-extension-attributes/{id}/history",
           "name": "CreateMobileDeviceExtensionAttributeHistoryNoteV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups",
+          "op": "GET /v2/mobile-device-groups",
           "name": "ListMobileDeviceGroupsV2",
           "resolver": {
             "resourceType": "MobileDeviceGroupV2",
@@ -1201,7 +1201,7 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-groups",
+          "op": "GET /v1/mobile-device-groups",
           "name": "ListMobileDeviceGroupsV1",
           "resolver": {
             "resourceType": "MobileDeviceGroupV1",
@@ -1213,7 +1213,7 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "op": "GET /v2/mobile-device-groups/smart-groups",
           "name": "ListSmartMobileDeviceGroupsV2",
           "pagination": "totalCount",
           "params": [
@@ -1235,7 +1235,7 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "op": "GET /v1/mobile-device-groups/smart-groups",
           "name": "ListSmartMobileDeviceGroupsV1",
           "pagination": "totalCount",
           "params": [
@@ -1257,48 +1257,48 @@
           }
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "op": "POST /v2/mobile-device-groups/smart-groups",
           "name": "CreateSmartMobileDeviceGroupV2",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/smart-groups",
+          "op": "POST /v1/mobile-device-groups/smart-groups",
           "name": "CreateSmartMobileDeviceGroupV1",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "op": "GET /v2/mobile-device-groups/smart-groups/{id}",
           "name": "GetSmartMobileDeviceGroupV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "op": "GET /v1/mobile-device-groups/smart-groups/{id}",
           "name": "GetSmartMobileDeviceGroupV1"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "op": "PUT /v2/mobile-device-groups/smart-groups/{id}",
           "name": "UpdateSmartMobileDeviceGroupV2",
           "expectedStatus": 200
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "op": "PUT /v1/mobile-device-groups/smart-groups/{id}",
           "name": "UpdateSmartMobileDeviceGroupV1",
           "expectedStatus": 200
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "op": "DELETE /v2/mobile-device-groups/smart-groups/{id}",
           "name": "DeleteSmartMobileDeviceGroupV2"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/mobile-device-groups/smart-groups/{id}",
+          "op": "DELETE /v1/mobile-device-groups/smart-groups/{id}",
           "name": "DeleteSmartMobileDeviceGroupV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/smart-group-membership/{id}",
+          "op": "GET /v2/mobile-device-groups/smart-group-membership/{id}",
           "name": "ListSmartMobileDeviceGroupMembershipV2",
           "pagination": "totalCount",
           "params": [
@@ -1307,7 +1307,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/smart-group-membership/{id}",
+          "op": "GET /v1/mobile-device-groups/smart-group-membership/{id}",
           "name": "ListSmartMobileDeviceGroupMembershipV1",
           "pagination": "totalCount",
           "params": [
@@ -1316,7 +1316,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "op": "GET /v2/mobile-device-groups/static-groups",
           "name": "ListStaticMobileDeviceGroupsV2",
           "pagination": "totalCount",
           "params": [
@@ -1346,7 +1346,7 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "op": "GET /v1/mobile-device-groups/static-groups",
           "name": "ListStaticMobileDeviceGroupsV1",
           "pagination": "totalCount",
           "params": [
@@ -1376,46 +1376,46 @@
           }
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "op": "POST /v2/mobile-device-groups/static-groups",
           "name": "CreateStaticMobileDeviceGroupV2",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/static-groups",
+          "op": "POST /v1/mobile-device-groups/static-groups",
           "name": "CreateStaticMobileDeviceGroupV1",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "op": "GET /v2/mobile-device-groups/static-groups/{id}",
           "name": "GetStaticMobileDeviceGroupV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "op": "GET /v1/mobile-device-groups/static-groups/{id}",
           "name": "GetStaticMobileDeviceGroupV1"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "op": "DELETE /v2/mobile-device-groups/static-groups/{id}",
           "name": "DeleteStaticMobileDeviceGroupV2"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "op": "DELETE /v1/mobile-device-groups/static-groups/{id}",
           "name": "DeleteStaticMobileDeviceGroupV1",
           "expectedStatus": 204
         },
         {
-          "op": "PATCH /v2/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "op": "PATCH /v2/mobile-device-groups/static-groups/{id}",
           "name": "PatchStaticMobileDeviceGroupV2"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/mobile-device-groups/static-groups/{id}",
+          "op": "PATCH /v1/mobile-device-groups/static-groups/{id}",
           "name": "PatchStaticMobileDeviceGroupV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-groups/static-group-membership/{id}",
+          "op": "GET /v2/mobile-device-groups/static-group-membership/{id}",
           "name": "ListStaticMobileDeviceGroupMembershipV2",
           "pagination": "totalCount",
           "params": [
@@ -1424,7 +1424,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-groups/static-group-membership/{id}",
+          "op": "GET /v1/mobile-device-groups/static-group-membership/{id}",
           "name": "ListStaticMobileDeviceGroupMembershipV1",
           "pagination": "totalCount",
           "params": [
@@ -1433,15 +1433,15 @@
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-groups/{id}/erase",
+          "op": "POST /v2/mobile-device-groups/{id}/erase",
           "name": "EraseMobileDeviceGroupV2"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mobile-device-groups/{id}/erase",
+          "op": "POST /v1/mobile-device-groups/{id}/erase",
           "name": "EraseMobileDeviceGroupV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-devices",
+          "op": "GET /v2/mobile-devices",
           "name": "ListMobileDevicesV2",
           "pagination": "totalCount",
           "params": [
@@ -1449,23 +1449,23 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-devices/{id}",
+          "op": "GET /v2/mobile-devices/{id}",
           "name": "GetMobileDeviceV2"
         },
         {
-          "op": "PATCH /v2/tenant/{tenantId}/mobile-devices/{id}",
+          "op": "PATCH /v2/mobile-devices/{id}",
           "name": "PatchMobileDeviceV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-devices/{id}/detail",
+          "op": "GET /v2/mobile-devices/{id}/detail",
           "name": "GetMobileDeviceDetailV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-devices/{id}/erase",
+          "op": "POST /v2/mobile-devices/{id}/erase",
           "name": "EraseMobileDeviceV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-devices/{id}/paired-devices",
+          "op": "GET /v2/mobile-devices/{id}/paired-devices",
           "name": "ListMobileDevicePairedDevicesV2",
           "pagination": "totalCount",
           "params": [
@@ -1475,11 +1475,11 @@
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-devices/{id}/unmanage",
+          "op": "POST /v2/mobile-devices/{id}/unmanage",
           "name": "UnmanageMobileDeviceV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/advanced-user-content-searches",
+          "op": "GET /v1/advanced-user-content-searches",
           "name": "ListAdvancedUserContentSearchesV1",
           "resolver": {
             "resourceType": "AdvancedUserContentSearchV1",
@@ -1496,24 +1496,24 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/advanced-user-content-searches",
+          "op": "POST /v1/advanced-user-content-searches",
           "name": "CreateAdvancedUserContentSearchV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/advanced-user-content-searches/{id}",
+          "op": "GET /v1/advanced-user-content-searches/{id}",
           "name": "GetAdvancedUserContentSearchV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/advanced-user-content-searches/{id}",
+          "op": "PUT /v1/advanced-user-content-searches/{id}",
           "name": "UpdateAdvancedUserContentSearchV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/advanced-user-content-searches/{id}",
+          "op": "DELETE /v1/advanced-user-content-searches/{id}",
           "name": "DeleteAdvancedUserContentSearchV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/groups",
+          "op": "GET /v2/groups",
           "name": "ListGroupsV2",
           "pagination": "totalCount",
           "params": [
@@ -1529,7 +1529,7 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/groups",
+          "op": "GET /v1/groups",
           "name": "ListGroupsV1",
           "pagination": "totalCount",
           "params": [
@@ -1545,32 +1545,32 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/groups/{id}",
+          "op": "GET /v2/groups/{id}",
           "name": "GetGroupV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/groups/{id}",
+          "op": "GET /v1/groups/{id}",
           "name": "GetGroupV1"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/groups/{id}",
+          "op": "DELETE /v2/groups/{id}",
           "name": "DeleteGroupV2"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/groups/{id}",
+          "op": "DELETE /v1/groups/{id}",
           "name": "DeleteGroupV1",
           "expectedStatus": 204
         },
         {
-          "op": "PATCH /v2/tenant/{tenantId}/groups/{id}",
+          "op": "PATCH /v2/groups/{id}",
           "name": "PatchGroupV2"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/groups/{id}",
+          "op": "PATCH /v1/groups/{id}",
           "name": "PatchGroupV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/users",
+          "op": "GET /v1/users",
           "name": "ListUsersV1",
           "pagination": "hasNext",
           "params": [
@@ -1593,42 +1593,42 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/users",
+          "op": "POST /v1/users",
           "name": "CreateUserV1",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/users/{id}",
+          "op": "GET /v1/users/{id}",
           "name": "GetUserV1",
           "params": [
             "platform:bool"
           ]
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/users/{id}",
+          "op": "PUT /v1/users/{id}",
           "name": "UpdateUserV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/users/{id}",
+          "op": "DELETE /v1/users/{id}",
           "name": "DeleteUserV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/policy-properties",
+          "op": "GET /v1/policy-properties",
           "name": "GetPolicyPropertiesV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/policy-properties",
+          "op": "PUT /v1/policy-properties",
           "name": "UpdatePolicyPropertiesV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/patch-management-accept-disclaimer",
+          "op": "POST /v2/patch-management-accept-disclaimer",
           "name": "AcceptPatchManagementDisclaimerV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-policies",
+          "op": "GET /v2/patch-policies",
           "name": "ListPatchPoliciesV2",
           "pagination": "totalCount",
           "params": [
@@ -1644,7 +1644,7 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-policies/policy-details",
+          "op": "GET /v2/patch-policies/policy-details",
           "name": "ListPatchPolicyDetailsV2",
           "pagination": "totalCount",
           "params": [
@@ -1653,19 +1653,19 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-policies/{id}/dashboard",
+          "op": "GET /v2/patch-policies/{id}/dashboard",
           "name": "GetPatchPolicyDashboardStatusV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/patch-policies/{id}/dashboard",
+          "op": "POST /v2/patch-policies/{id}/dashboard",
           "name": "AddPatchPolicyToDashboardV2"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/patch-policies/{id}/dashboard",
+          "op": "DELETE /v2/patch-policies/{id}/dashboard",
           "name": "RemovePatchPolicyFromDashboardV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-policies/{id}/logs",
+          "op": "GET /v2/patch-policies/{id}/logs",
           "name": "ListPatchPolicyLogsV2",
           "pagination": "totalCount",
           "params": [
@@ -1674,29 +1674,29 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-policies/{id}/logs/eligible-retry-count",
+          "op": "GET /v2/patch-policies/{id}/logs/eligible-retry-count",
           "name": "GetPatchPolicyEligibleRetryCountV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/patch-policies/{id}/logs/retry",
+          "op": "POST /v2/patch-policies/{id}/logs/retry",
           "name": "RetryPatchPolicyLogsV2",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/patch-policies/{id}/logs/retry-all",
+          "op": "POST /v2/patch-policies/{id}/logs/retry-all",
           "name": "RetryAllPatchPolicyLogsV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-policies/{id}/logs/{deviceId}",
+          "op": "GET /v2/patch-policies/{id}/logs/{deviceId}",
           "name": "GetPatchPolicyLogForDeviceV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-policies/{id}/logs/{deviceId}/details",
+          "op": "GET /v2/patch-policies/{id}/logs/{deviceId}/details",
           "name": "ListPatchPolicyLogDetailsForDeviceV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations",
+          "op": "GET /v3/patch-software-title-configurations",
           "name": "ListPatchSoftwareTitleConfigurationsV3",
           "resolver": {
             "resourceType": "PatchSoftwareTitleConfigurationV3",
@@ -1714,7 +1714,7 @@
           }
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations",
+          "op": "GET /v2/patch-software-title-configurations",
           "name": "ListPatchSoftwareTitleConfigurationsV2",
           "resolver": {
             "resourceType": "PatchSoftwareTitleConfigurationV2",
@@ -1732,66 +1732,66 @@
           }
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/patch-software-title-configurations",
+          "op": "POST /v3/patch-software-title-configurations",
           "name": "CreatePatchSoftwareTitleConfigurationV3"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/patch-software-title-configurations",
+          "op": "POST /v2/patch-software-title-configurations",
           "name": "CreatePatchSoftwareTitleConfigurationV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "op": "GET /v3/patch-software-title-configurations/{id}",
           "name": "GetPatchSoftwareTitleConfigurationV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "op": "GET /v2/patch-software-title-configurations/{id}",
           "name": "GetPatchSoftwareTitleConfigurationV2"
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "op": "DELETE /v3/patch-software-title-configurations/{id}",
           "name": "DeletePatchSoftwareTitleConfigurationV3"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "op": "DELETE /v2/patch-software-title-configurations/{id}",
           "name": "DeletePatchSoftwareTitleConfigurationV2",
           "expectedStatus": 204
         },
         {
-          "op": "PATCH /v3/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "op": "PATCH /v3/patch-software-title-configurations/{id}",
           "name": "UpdatePatchSoftwareTitleConfigurationV3",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "PATCH /v2/tenant/{tenantId}/patch-software-title-configurations/{id}",
+          "op": "PATCH /v2/patch-software-title-configurations/{id}",
           "name": "UpdatePatchSoftwareTitleConfigurationV2",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "op": "GET /v3/patch-software-title-configurations/{id}/dashboard",
           "name": "GetPatchSoftwareTitleDashboardStatusV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "op": "GET /v2/patch-software-title-configurations/{id}/dashboard",
           "name": "GetPatchSoftwareTitleDashboardStatusV2"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "op": "POST /v3/patch-software-title-configurations/{id}/dashboard",
           "name": "AddPatchSoftwareTitleToDashboardV3"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "op": "POST /v2/patch-software-title-configurations/{id}/dashboard",
           "name": "AddPatchSoftwareTitleToDashboardV2"
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "op": "DELETE /v3/patch-software-title-configurations/{id}/dashboard",
           "name": "RemovePatchSoftwareTitleFromDashboardV3"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dashboard",
+          "op": "DELETE /v2/patch-software-title-configurations/{id}/dashboard",
           "name": "RemovePatchSoftwareTitleFromDashboardV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/definitions",
+          "op": "GET /v3/patch-software-title-configurations/{id}/definitions",
           "name": "ListPatchSoftwareTitleDefinitionsV3",
           "pagination": "totalCount",
           "params": [
@@ -1800,7 +1800,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/definitions",
+          "op": "GET /v2/patch-software-title-configurations/{id}/definitions",
           "name": "ListPatchSoftwareTitleDefinitionsV2",
           "pagination": "totalCount",
           "params": [
@@ -1809,15 +1809,15 @@
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/dependencies",
+          "op": "GET /v3/patch-software-title-configurations/{id}/dependencies",
           "name": "GetPatchSoftwareTitleDependenciesV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/dependencies",
+          "op": "GET /v2/patch-software-title-configurations/{id}/dependencies",
           "name": "GetPatchSoftwareTitleDependenciesV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/export-report",
+          "op": "GET /v3/patch-software-title-configurations/{id}/export-report",
           "name": "ExportPatchSoftwareTitleReportV3",
           "params": [
             "filter",
@@ -1825,7 +1825,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/export-report",
+          "op": "GET /v2/patch-software-title-configurations/{id}/export-report",
           "name": "ExportPatchSoftwareTitleReportV2",
           "params": [
             "filter",
@@ -1833,15 +1833,15 @@
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/extension-attributes",
+          "op": "GET /v3/patch-software-title-configurations/{id}/extension-attributes",
           "name": "ListPatchSoftwareTitleExtensionAttributesV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/extension-attributes",
+          "op": "GET /v2/patch-software-title-configurations/{id}/extension-attributes",
           "name": "ListPatchSoftwareTitleExtensionAttributesV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
+          "op": "GET /v3/patch-software-title-configurations/{id}/history",
           "name": "ListPatchSoftwareTitleHistoryV3",
           "pagination": "totalCount",
           "params": [
@@ -1850,7 +1850,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
+          "op": "GET /v2/patch-software-title-configurations/{id}/history",
           "name": "ListPatchSoftwareTitleHistoryV2",
           "pagination": "totalCount",
           "params": [
@@ -1859,15 +1859,15 @@
           ]
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
+          "op": "POST /v3/patch-software-title-configurations/{id}/history",
           "name": "CreatePatchSoftwareTitleHistoryNoteV3"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/history",
+          "op": "POST /v2/patch-software-title-configurations/{id}/history",
           "name": "CreatePatchSoftwareTitleHistoryNoteV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-report",
+          "op": "GET /v3/patch-software-title-configurations/{id}/patch-report",
           "name": "ListPatchSoftwareTitlePatchReportV3",
           "pagination": "totalCount",
           "params": [
@@ -1876,7 +1876,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-report",
+          "op": "GET /v2/patch-software-title-configurations/{id}/patch-report",
           "name": "ListPatchSoftwareTitlePatchReportV2",
           "pagination": "totalCount",
           "params": [
@@ -1885,39 +1885,39 @@
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary",
+          "op": "GET /v3/patch-software-title-configurations/{id}/patch-summary",
           "name": "GetPatchSoftwareTitlePatchSummaryV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary",
+          "op": "GET /v2/patch-software-title-configurations/{id}/patch-summary",
           "name": "GetPatchSoftwareTitlePatchSummaryV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary/versions",
+          "op": "GET /v3/patch-software-title-configurations/{id}/patch-summary/versions",
           "name": "ListPatchSoftwareTitlePatchSummaryVersionsV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/patch-software-title-configurations/{id}/patch-summary/versions",
+          "op": "GET /v2/patch-software-title-configurations/{id}/patch-summary/versions",
           "name": "ListPatchSoftwareTitlePatchSummaryVersionsV2"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computer-inventory/{id}/erase",
+          "op": "POST /v1/computer-inventory/{id}/erase",
           "name": "EraseComputerV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computer-inventory/{id}/remove-mdm-profile",
+          "op": "POST /v1/computer-inventory/{id}/remove-mdm-profile",
           "name": "RemoveMdmProfileFromComputerV1"
         },
         {
-          "op": "POST /v4/tenant/{tenantId}/computers-inventory/{id}/erase",
+          "op": "POST /v4/computers-inventory/{id}/erase",
           "name": "EraseComputerV4"
         },
         {
-          "op": "POST /v4/tenant/{tenantId}/computers-inventory/{id}/remove-mdm-profile",
+          "op": "POST /v4/computers-inventory/{id}/remove-mdm-profile",
           "name": "RemoveMdmProfileFromComputerV4"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory",
+          "op": "GET /v1/computers-inventory",
           "name": "ListComputersInventoryV1",
           "pagination": "totalCount",
           "params": [
@@ -1954,7 +1954,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory",
+          "op": "GET /v2/computers-inventory",
           "name": "ListComputersInventoryV2",
           "pagination": "totalCount",
           "params": [
@@ -1991,7 +1991,7 @@
           ]
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory",
+          "op": "GET /v4/computers-inventory",
           "name": "ListComputersInventoryV4",
           "pagination": "totalCount",
           "params": [
@@ -2028,7 +2028,7 @@
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory",
+          "op": "GET /v3/computers-inventory",
           "name": "ListComputersInventoryV3",
           "pagination": "totalCount",
           "params": [
@@ -2065,275 +2065,275 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computers-inventory",
+          "op": "POST /v1/computers-inventory",
           "name": "CreateComputerInventoryV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/computers-inventory",
+          "op": "POST /v2/computers-inventory",
           "name": "CreateComputerInventoryV2"
         },
         {
-          "op": "POST /v4/tenant/{tenantId}/computers-inventory",
+          "op": "POST /v4/computers-inventory",
           "name": "CreateComputerInventoryV4"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/computers-inventory",
+          "op": "POST /v3/computers-inventory",
           "name": "CreateComputerInventoryV3"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory/filevault",
+          "op": "GET /v1/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV1",
           "pagination": "totalCount"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory/filevault",
+          "op": "GET /v2/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV2",
           "pagination": "totalCount"
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory/filevault",
+          "op": "GET /v4/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV4",
           "pagination": "totalCount"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory/filevault",
+          "op": "GET /v3/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV3",
           "pagination": "totalCount"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "GET /v1/computers-inventory/{id}",
           "name": "GetComputerInventoryV1",
           "params": [
             "section:[]string"
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "GET /v2/computers-inventory/{id}",
           "name": "GetComputerInventoryV2",
           "params": [
             "section:[]string"
           ]
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "GET /v4/computers-inventory/{id}",
           "name": "GetComputerInventoryV4",
           "params": [
             "section:[]string"
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "GET /v3/computers-inventory/{id}",
           "name": "GetComputerInventoryV3",
           "params": [
             "section:[]string"
           ]
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "DELETE /v1/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV1"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "DELETE /v2/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV2"
         },
         {
-          "op": "DELETE /v4/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "DELETE /v4/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV4"
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/computers-inventory/{id}",
+          "op": "DELETE /v3/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV3",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "GET /v1/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "GET /v2/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV2"
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "GET /v4/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV4"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "GET /v3/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV3"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "PATCH /v1/computers-inventory-detail/{id}",
           "name": "UpdateComputerInventoryDetailV1"
         },
         {
-          "op": "PATCH /v2/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "PATCH /v2/computers-inventory-detail/{id}",
           "name": "UpdateComputerInventoryDetailV2"
         },
         {
-          "op": "PATCH /v4/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "PATCH /v4/computers-inventory-detail/{id}",
           "name": "UpdateComputerInventoryDetailV4"
         },
         {
-          "op": "PATCH /v3/tenant/{tenantId}/computers-inventory-detail/{id}",
+          "op": "PATCH /v3/computers-inventory-detail/{id}",
           "name": "UpdateComputerInventoryDetailV3",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computers-inventory/{id}/attachments",
+          "op": "POST /v1/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/computers-inventory/{id}/attachments",
+          "op": "POST /v2/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV2"
         },
         {
-          "op": "POST /v4/tenant/{tenantId}/computers-inventory/{id}/attachments",
+          "op": "POST /v4/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV4"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/computers-inventory/{id}/attachments",
+          "op": "POST /v3/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV3"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "GET /v1/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "GET /v2/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV2"
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "GET /v4/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV4"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "GET /v3/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV3"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "DELETE /v1/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DeleteComputerInventoryAttachmentV1"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "DELETE /v2/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DeleteComputerInventoryAttachmentV2"
         },
         {
-          "op": "DELETE /v4/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "DELETE /v4/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DeleteComputerInventoryAttachmentV4"
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/computers-inventory/{id}/attachments/{attachmentId}",
+          "op": "DELETE /v3/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DeleteComputerInventoryAttachmentV3",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/filevault",
+          "op": "GET /v1/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/filevault",
+          "op": "GET /v2/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV2"
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/filevault",
+          "op": "GET /v4/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV4"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/filevault",
+          "op": "GET /v3/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV3"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
+          "op": "GET /v1/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
+          "op": "GET /v2/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV2"
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
+          "op": "GET /v4/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV4"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/view-device-lock-pin",
+          "op": "GET /v3/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV3"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
+          "op": "GET /v1/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
+          "op": "GET /v2/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV2"
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
+          "op": "GET /v4/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV4"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computers-inventory/{id}/view-recovery-lock-password",
+          "op": "GET /v3/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV3"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/computer-inventory-collection-settings",
+          "op": "GET /v1/computer-inventory-collection-settings",
           "name": "GetComputerInventoryCollectionSettingsV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-inventory-collection-settings",
+          "op": "GET /v2/computer-inventory-collection-settings",
           "name": "GetComputerInventoryCollectionSettingsV2"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/computer-inventory-collection-settings",
+          "op": "PATCH /v1/computer-inventory-collection-settings",
           "name": "UpdateComputerInventoryCollectionSettingsV1"
         },
         {
-          "op": "PATCH /v2/tenant/{tenantId}/computer-inventory-collection-settings",
+          "op": "PATCH /v2/computer-inventory-collection-settings",
           "name": "UpdateComputerInventoryCollectionSettingsV2"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computer-inventory-collection-settings/custom-path",
+          "op": "POST /v1/computer-inventory-collection-settings/custom-path",
           "name": "CreateComputerInventoryCollectionCustomPathV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/computer-inventory-collection-settings/custom-path",
+          "op": "POST /v2/computer-inventory-collection-settings/custom-path",
           "name": "CreateComputerInventoryCollectionCustomPathV2"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/computer-inventory-collection-settings/custom-path/{id}",
+          "op": "DELETE /v1/computer-inventory-collection-settings/custom-path/{id}",
           "name": "DeleteComputerInventoryCollectionCustomPathV1"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/computer-inventory-collection-settings/custom-path/{id}",
+          "op": "DELETE /v2/computer-inventory-collection-settings/custom-path/{id}",
           "name": "DeleteComputerInventoryCollectionCustomPathV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/inventory-preload/csv",
+          "op": "GET /v2/inventory-preload/csv",
           "name": "DownloadInventoryPreloadCsvV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/inventory-preload/csv",
+          "op": "POST /v2/inventory-preload/csv",
           "name": "UploadInventoryPreloadCsvV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/inventory-preload/csv-template",
+          "op": "GET /v1/inventory-preload/csv-template",
           "name": "DownloadInventoryPreloadCsvTemplateV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/inventory-preload/csv-template",
+          "op": "GET /v2/inventory-preload/csv-template",
           "name": "DownloadInventoryPreloadCsvTemplateV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/inventory-preload/csv-validate",
+          "op": "POST /v2/inventory-preload/csv-validate",
           "name": "ValidateInventoryPreloadCsvV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/inventory-preload/ea-columns",
+          "op": "GET /v2/inventory-preload/ea-columns",
           "name": "ListInventoryPreloadExtensionAttributeColumnsV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/inventory-preload/export",
+          "op": "POST /v2/inventory-preload/export",
           "name": "ExportInventoryPreloadV2",
           "params": [
             "export-fields:[]string:exportFields",
@@ -2343,7 +2343,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/inventory-preload/history",
+          "op": "GET /v1/inventory-preload/history",
           "name": "ListInventoryPreloadHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -2351,7 +2351,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/inventory-preload/history",
+          "op": "GET /v2/inventory-preload/history",
           "name": "ListInventoryPreloadHistoryV2",
           "pagination": "totalCount",
           "params": [
@@ -2360,15 +2360,15 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/inventory-preload/history",
+          "op": "POST /v1/inventory-preload/history",
           "name": "CreateInventoryPreloadHistoryNoteV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/inventory-preload/history",
+          "op": "POST /v2/inventory-preload/history",
           "name": "CreateInventoryPreloadHistoryNoteV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/inventory-preload/records",
+          "op": "GET /v2/inventory-preload/records",
           "name": "ListInventoryPreloadRecordsV2",
           "pagination": "totalCount",
           "params": [
@@ -2391,32 +2391,32 @@
           }
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/inventory-preload/records",
+          "op": "POST /v2/inventory-preload/records",
           "name": "CreateInventoryPreloadRecordV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/inventory-preload/records/delete-all",
+          "op": "POST /v2/inventory-preload/records/delete-all",
           "name": "DeleteAllInventoryPreloadRecordsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/inventory-preload/records/{id}",
+          "op": "GET /v2/inventory-preload/records/{id}",
           "name": "GetInventoryPreloadRecordV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/inventory-preload/records/{id}",
+          "op": "PUT /v2/inventory-preload/records/{id}",
           "name": "UpdateInventoryPreloadRecordV2"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/inventory-preload/records/{id}",
+          "op": "DELETE /v2/inventory-preload/records/{id}",
           "name": "DeleteInventoryPreloadRecordV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/inventory-information",
+          "op": "GET /v1/inventory-information",
           "name": "GetInventoryInformationV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments",
+          "op": "GET /v1/device-enrollments",
           "name": "ListDeviceEnrollmentsV1",
           "pagination": "totalCount",
           "params": [
@@ -2440,36 +2440,36 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments/public-key",
+          "op": "GET /v1/device-enrollments/public-key",
           "name": "GetDeviceEnrollmentPublicKeyV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments/syncs",
+          "op": "GET /v1/device-enrollments/syncs",
           "name": "ListAllDeviceEnrollmentSyncsV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/device-enrollments/upload-token",
+          "op": "POST /v1/device-enrollments/upload-token",
           "name": "UploadDeviceEnrollmentTokenV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments/{id}",
+          "op": "GET /v1/device-enrollments/{id}",
           "name": "GetDeviceEnrollmentV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/device-enrollments/{id}",
+          "op": "PUT /v1/device-enrollments/{id}",
           "name": "UpdateDeviceEnrollmentV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/device-enrollments/{id}",
+          "op": "DELETE /v1/device-enrollments/{id}",
           "name": "DeleteDeviceEnrollmentV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/device-enrollments/{id}/disown",
+          "op": "POST /v1/device-enrollments/{id}/disown",
           "name": "DisownDeviceEnrollmentDevicesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments/{id}/history",
+          "op": "GET /v1/device-enrollments/{id}/history",
           "name": "ListDeviceEnrollmentHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -2478,47 +2478,47 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/device-enrollments/{id}/history",
+          "op": "POST /v1/device-enrollments/{id}/history",
           "name": "CreateDeviceEnrollmentHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments/{id}/syncs",
+          "op": "GET /v1/device-enrollments/{id}/syncs",
           "name": "ListDeviceEnrollmentSyncsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments/{id}/syncs/latest",
+          "op": "GET /v1/device-enrollments/{id}/syncs/latest",
           "name": "GetLatestDeviceEnrollmentSyncV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/device-enrollments/{id}/upload-token",
+          "op": "PUT /v1/device-enrollments/{id}/upload-token",
           "name": "ReplaceDeviceEnrollmentTokenV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-enrollments/{id}/devices",
+          "op": "GET /v1/device-enrollments/{id}/devices",
           "name": "ListDeviceEnrollmentDevicesV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-prestages/scope",
+          "op": "GET /v2/computer-prestages/scope",
           "name": "GetAllComputerPrestageScopeV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/computer-prestages/{id}/scope",
+          "op": "GET /v2/computer-prestages/{id}/scope",
           "name": "GetComputerPrestageScopeV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/computer-prestages/{id}/scope",
+          "op": "PUT /v2/computer-prestages/{id}/scope",
           "name": "ReplaceComputerPrestageScopeV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/computer-prestages/{id}/scope",
+          "op": "POST /v2/computer-prestages/{id}/scope",
           "name": "AddToComputerPrestageScopeV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/computer-prestages/{id}/scope/delete-multiple",
+          "op": "POST /v2/computer-prestages/{id}/scope/delete-multiple",
           "name": "RemoveFromComputerPrestageScopeV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computer-prestages",
+          "op": "GET /v3/computer-prestages",
           "name": "ListComputerPrestagesV3",
           "pagination": "totalCount",
           "params": [
@@ -2541,57 +2541,57 @@
           }
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/computer-prestages",
+          "op": "POST /v3/computer-prestages",
           "name": "CreateComputerPrestageV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/computer-prestages/{id}",
+          "op": "GET /v3/computer-prestages/{id}",
           "name": "GetComputerPrestageV3"
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/computer-prestages/{id}",
+          "op": "PUT /v3/computer-prestages/{id}",
           "name": "UpdateComputerPrestageV3",
           "noRetry": true
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/computer-prestages/{id}",
+          "op": "DELETE /v3/computer-prestages/{id}",
           "name": "DeleteComputerPrestageV3",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/scope",
+          "op": "GET /v2/mobile-device-prestages/scope",
           "name": "GetAllMobileDevicePrestageScopeV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/syncs",
+          "op": "GET /v2/mobile-device-prestages/syncs",
           "name": "ListAllMobileDevicePrestageSyncsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}/scope",
+          "op": "GET /v2/mobile-device-prestages/{id}/scope",
           "name": "GetMobileDevicePrestageScopeV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/mobile-device-prestages/{id}/scope",
+          "op": "PUT /v2/mobile-device-prestages/{id}/scope",
           "name": "ReplaceMobileDevicePrestageScopeV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/scope",
+          "op": "POST /v2/mobile-device-prestages/{id}/scope",
           "name": "AddToMobileDevicePrestageScopeV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/scope/delete-multiple",
+          "op": "POST /v2/mobile-device-prestages/{id}/scope/delete-multiple",
           "name": "RemoveFromMobileDevicePrestageScopeV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}/syncs",
+          "op": "GET /v2/mobile-device-prestages/{id}/syncs",
           "name": "ListMobileDevicePrestageSyncsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}/syncs/latest",
+          "op": "GET /v2/mobile-device-prestages/{id}/syncs/latest",
           "name": "GetLatestMobileDevicePrestageSyncV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages",
+          "op": "GET /v2/mobile-device-prestages",
           "name": "ListMobileDevicePrestagesV2",
           "pagination": "totalCount",
           "params": [
@@ -2614,7 +2614,7 @@
           }
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages",
+          "op": "GET /v3/mobile-device-prestages",
           "name": "ListMobileDevicePrestagesV3",
           "pagination": "totalCount",
           "params": [
@@ -2637,65 +2637,65 @@
           }
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages",
+          "op": "POST /v2/mobile-device-prestages",
           "name": "CreateMobileDevicePrestageV2"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages",
+          "op": "POST /v3/mobile-device-prestages",
           "name": "CreateMobileDevicePrestageV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "op": "GET /v2/mobile-device-prestages/{id}",
           "name": "GetMobileDevicePrestageV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "op": "GET /v3/mobile-device-prestages/{id}",
           "name": "GetMobileDevicePrestageV3"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "op": "PUT /v2/mobile-device-prestages/{id}",
           "name": "UpdateMobileDevicePrestageV2"
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "op": "PUT /v3/mobile-device-prestages/{id}",
           "name": "UpdateMobileDevicePrestageV3",
           "noRetry": true
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "op": "DELETE /v2/mobile-device-prestages/{id}",
           "name": "DeleteMobileDevicePrestageV2"
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/mobile-device-prestages/{id}",
+          "op": "DELETE /v3/mobile-device-prestages/{id}",
           "name": "DeleteMobileDevicePrestageV3",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
+          "op": "GET /v2/mobile-device-prestages/{id}/attachments",
           "name": "ListMobileDevicePrestageAttachmentsV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
+          "op": "GET /v3/mobile-device-prestages/{id}/attachments",
           "name": "ListMobileDevicePrestageAttachmentsV3"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
+          "op": "POST /v2/mobile-device-prestages/{id}/attachments",
           "name": "UploadMobileDevicePrestageAttachmentV2"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages/{id}/attachments",
+          "op": "POST /v3/mobile-device-prestages/{id}/attachments",
           "name": "UploadMobileDevicePrestageAttachmentV3"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/attachments/delete-multiple",
+          "op": "POST /v2/mobile-device-prestages/{id}/attachments/delete-multiple",
           "name": "DeleteMultipleMobileDevicePrestageAttachmentsV2"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages/{id}/attachments/delete-multiple",
+          "op": "POST /v3/mobile-device-prestages/{id}/attachments/delete-multiple",
           "name": "DeleteMultipleMobileDevicePrestageAttachmentsV3"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mobile-device-prestages/{id}/history",
+          "op": "GET /v2/mobile-device-prestages/{id}/history",
           "name": "ListMobileDevicePrestageHistoryV2",
           "pagination": "totalCount",
           "params": [
@@ -2703,7 +2703,7 @@
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/mobile-device-prestages/{id}/history",
+          "op": "GET /v3/mobile-device-prestages/{id}/history",
           "name": "ListMobileDevicePrestageHistoryV3",
           "pagination": "totalCount",
           "params": [
@@ -2711,23 +2711,23 @@
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mobile-device-prestages/{id}/history",
+          "op": "POST /v2/mobile-device-prestages/{id}/history",
           "name": "CreateMobileDevicePrestageHistoryNoteV2"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/mobile-device-prestages/{id}/history",
+          "op": "POST /v3/mobile-device-prestages/{id}/history",
           "name": "CreateMobileDevicePrestageHistoryNoteV3"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/adue-session-token-settings",
+          "op": "GET /v1/adue-session-token-settings",
           "name": "GetADUESessionTokenSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/adue-session-token-settings",
+          "op": "PUT /v1/adue-session-token-settings",
           "name": "UpdateADUESessionTokenSettingsV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/enrollment/history",
+          "op": "GET /v2/enrollment/history",
           "name": "ListEnrollmentHistoryV2",
           "pagination": "totalCount",
           "params": [
@@ -2735,11 +2735,11 @@
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/enrollment/history",
+          "op": "POST /v2/enrollment/history",
           "name": "CreateEnrollmentHistoryNoteV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/enrollment/history/export",
+          "op": "POST /v2/enrollment/history/export",
           "name": "ExportEnrollmentHistoryV2",
           "params": [
             "export-fields:[]string:exportFields",
@@ -2749,7 +2749,7 @@
           ]
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/enrollment/access-groups",
+          "op": "GET /v3/enrollment/access-groups",
           "name": "ListEnrollmentAccessGroupsV3",
           "pagination": "totalCount",
           "params": [
@@ -2771,32 +2771,32 @@
           }
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/enrollment/access-groups",
+          "op": "POST /v3/enrollment/access-groups",
           "name": "CreateEnrollmentAccessGroupV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/enrollment/access-groups/{id}",
+          "op": "GET /v3/enrollment/access-groups/{id}",
           "name": "GetEnrollmentAccessGroupV3"
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/enrollment/access-groups/{id}",
+          "op": "PUT /v3/enrollment/access-groups/{id}",
           "name": "UpdateEnrollmentAccessGroupV3"
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/enrollment/access-groups/{id}",
+          "op": "DELETE /v3/enrollment/access-groups/{id}",
           "name": "DeleteEnrollmentAccessGroupV3",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/enrollment/filtered-language-codes",
+          "op": "GET /v3/enrollment/filtered-language-codes",
           "name": "ListFilteredEnrollmentLanguageCodesV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/enrollment/language-codes",
+          "op": "GET /v3/enrollment/language-codes",
           "name": "ListEnrollmentLanguageCodesV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/enrollment/languages",
+          "op": "GET /v3/enrollment/languages",
           "name": "ListEnrollmentLanguagesV3",
           "pagination": "totalCount",
           "params": [
@@ -2811,25 +2811,25 @@
           }
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/enrollment/languages/delete-multiple",
+          "op": "POST /v3/enrollment/languages/delete-multiple",
           "name": "DeleteMultipleEnrollmentLanguagesV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/enrollment/languages/{languageId}",
+          "op": "GET /v3/enrollment/languages/{languageId}",
           "name": "GetEnrollmentLanguageV3",
           "pathNames": {
             "languageId": "languageID"
           }
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/enrollment/languages/{languageId}",
+          "op": "PUT /v3/enrollment/languages/{languageId}",
           "name": "UpdateEnrollmentLanguageV3",
           "pathNames": {
             "languageId": "languageID"
           }
         },
         {
-          "op": "DELETE /v3/tenant/{tenantId}/enrollment/languages/{languageId}",
+          "op": "DELETE /v3/enrollment/languages/{languageId}",
           "name": "DeleteEnrollmentLanguageV3",
           "pathNames": {
             "languageId": "languageID"
@@ -2837,32 +2837,32 @@
           "expectedStatus": 204
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/enrollment",
+          "op": "GET /v4/enrollment",
           "name": "GetEnrollmentSettingsV4"
         },
         {
-          "op": "PUT /v4/tenant/{tenantId}/enrollment",
+          "op": "PUT /v4/enrollment",
           "name": "UpdateEnrollmentSettingsV4"
         },
         {
-          "op": "GET /v4/tenant/{tenantId}/enrollment/access-management",
+          "op": "GET /v4/enrollment/access-management",
           "name": "GetEnrollmentAccessManagementV4"
         },
         {
-          "op": "POST /v4/tenant/{tenantId}/enrollment/access-management",
+          "op": "POST /v4/enrollment/access-management",
           "name": "UpdateEnrollmentAccessManagementV4"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/reenrollment",
+          "op": "GET /v1/reenrollment",
           "name": "GetReenrollmentSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/reenrollment",
+          "op": "PUT /v1/reenrollment",
           "name": "UpdateReenrollmentSettingsV1",
           "expectedStatus": 200
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/reenrollment/history",
+          "op": "GET /v1/reenrollment/history",
           "name": "ListReenrollmentHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -2870,12 +2870,12 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/reenrollment/history",
+          "op": "POST /v1/reenrollment/history",
           "name": "CreateReenrollmentHistoryNoteV1",
           "expectedStatus": 200
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/reenrollment/history/export",
+          "op": "POST /v1/reenrollment/history/export",
           "name": "ExportReenrollmentHistoryV1",
           "params": [
             "export-fields:[]string:exportFields",
@@ -2885,87 +2885,87 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/service-discovery-enrollment/well-known-settings",
+          "op": "GET /v1/service-discovery-enrollment/well-known-settings",
           "name": "GetServiceDiscoveryEnrollmentWellKnownSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/service-discovery-enrollment/well-known-settings",
+          "op": "PUT /v1/service-discovery-enrollment/well-known-settings",
           "name": "UpdateServiceDiscoveryEnrollmentWellKnownSettingsV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/enrollment-customization/parse-markdown",
+          "op": "POST /v1/enrollment-customization/parse-markdown",
           "name": "ParseEnrollmentCustomizationMarkdownV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/enrollment-customization/{id}/all",
+          "op": "GET /v1/enrollment-customization/{id}/all",
           "name": "ListEnrollmentCustomizationPanelsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/enrollment-customization/{id}/all/{panel-id}",
+          "op": "GET /v1/enrollment-customization/{id}/all/{panel-id}",
           "name": "GetEnrollmentCustomizationPanelV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/enrollment-customization/{id}/all/{panel-id}",
+          "op": "DELETE /v1/enrollment-customization/{id}/all/{panel-id}",
           "name": "DeleteEnrollmentCustomizationPanelV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/enrollment-customization/{id}/ldap",
+          "op": "POST /v1/enrollment-customization/{id}/ldap",
           "name": "CreateEnrollmentCustomizationLdapPanelV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/enrollment-customization/{id}/ldap/{panel-id}",
+          "op": "GET /v1/enrollment-customization/{id}/ldap/{panel-id}",
           "name": "GetEnrollmentCustomizationLdapPanelV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/enrollment-customization/{id}/ldap/{panel-id}",
+          "op": "PUT /v1/enrollment-customization/{id}/ldap/{panel-id}",
           "name": "UpdateEnrollmentCustomizationLdapPanelV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/enrollment-customization/{id}/ldap/{panel-id}",
+          "op": "DELETE /v1/enrollment-customization/{id}/ldap/{panel-id}",
           "name": "DeleteEnrollmentCustomizationLdapPanelV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/enrollment-customization/{id}/sso",
+          "op": "POST /v1/enrollment-customization/{id}/sso",
           "name": "CreateEnrollmentCustomizationSsoPanelV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/enrollment-customization/{id}/sso/{panel-id}",
+          "op": "GET /v1/enrollment-customization/{id}/sso/{panel-id}",
           "name": "GetEnrollmentCustomizationSsoPanelV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/enrollment-customization/{id}/sso/{panel-id}",
+          "op": "PUT /v1/enrollment-customization/{id}/sso/{panel-id}",
           "name": "UpdateEnrollmentCustomizationSsoPanelV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/enrollment-customization/{id}/sso/{panel-id}",
+          "op": "DELETE /v1/enrollment-customization/{id}/sso/{panel-id}",
           "name": "DeleteEnrollmentCustomizationSsoPanelV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/enrollment-customization/{id}/text",
+          "op": "POST /v1/enrollment-customization/{id}/text",
           "name": "CreateEnrollmentCustomizationTextPanelV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/enrollment-customization/{id}/text/{panel-id}",
+          "op": "GET /v1/enrollment-customization/{id}/text/{panel-id}",
           "name": "GetEnrollmentCustomizationTextPanelV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/enrollment-customization/{id}/text/{panel-id}",
+          "op": "PUT /v1/enrollment-customization/{id}/text/{panel-id}",
           "name": "UpdateEnrollmentCustomizationTextPanelV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/enrollment-customization/{id}/text/{panel-id}",
+          "op": "DELETE /v1/enrollment-customization/{id}/text/{panel-id}",
           "name": "DeleteEnrollmentCustomizationTextPanelV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/enrollment-customization/{id}/text/{panel-id}/markdown",
+          "op": "GET /v1/enrollment-customization/{id}/text/{panel-id}/markdown",
           "name": "GetEnrollmentCustomizationTextPanelMarkdownV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/enrollment-customizations",
+          "op": "GET /v2/enrollment-customizations",
           "name": "ListEnrollmentCustomizationsV2",
           "pagination": "totalCount",
           "params": [
@@ -2985,33 +2985,33 @@
           }
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/enrollment-customizations",
+          "op": "POST /v2/enrollment-customizations",
           "name": "CreateEnrollmentCustomizationV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/enrollment-customizations/images",
+          "op": "POST /v2/enrollment-customizations/images",
           "name": "UploadEnrollmentCustomizationImageV2",
           "expectedStatus": 200
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/enrollment-customizations/images/{id}",
+          "op": "GET /v2/enrollment-customizations/images/{id}",
           "name": "DownloadEnrollmentCustomizationImageV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/enrollment-customizations/{id}",
+          "op": "GET /v2/enrollment-customizations/{id}",
           "name": "GetEnrollmentCustomizationV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/enrollment-customizations/{id}",
+          "op": "PUT /v2/enrollment-customizations/{id}",
           "name": "UpdateEnrollmentCustomizationV2"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/enrollment-customizations/{id}",
+          "op": "DELETE /v2/enrollment-customizations/{id}",
           "name": "DeleteEnrollmentCustomizationV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/enrollment-customizations/{id}/history",
+          "op": "GET /v2/enrollment-customizations/{id}/history",
           "name": "ListEnrollmentCustomizationHistoryV2",
           "pagination": "totalCount",
           "params": [
@@ -3019,15 +3019,15 @@
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/enrollment-customizations/{id}/history",
+          "op": "POST /v2/enrollment-customizations/{id}/history",
           "name": "CreateEnrollmentCustomizationHistoryNoteV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/enrollment-customizations/{id}/prestages",
+          "op": "GET /v2/enrollment-customizations/{id}/prestages",
           "name": "ListEnrollmentCustomizationPrestagesV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/apns-client-push-status",
+          "op": "GET /v1/apns-client-push-status",
           "name": "ListApnsClientPushStatusesV1",
           "pagination": "totalCount",
           "params": [
@@ -3036,44 +3036,44 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/apns-client-push-status/enable-all-clients",
+          "op": "POST /v1/apns-client-push-status/enable-all-clients",
           "name": "EnableAllApnsClientsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/apns-client-push-status/enable-all-clients/status",
+          "op": "GET /v1/apns-client-push-status/enable-all-clients/status",
           "name": "GetEnableAllApnsClientsStatusV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/apns-client-push-status/enable-client",
+          "op": "POST /v1/apns-client-push-status/enable-client",
           "name": "EnableApnsClientV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ddm/{clientManagementId}/status-items",
+          "op": "GET /v1/ddm/{clientManagementId}/status-items",
           "name": "ListDdmStatusItemsV1",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ddm/{clientManagementId}/status-items/{key}",
+          "op": "GET /v1/ddm/{clientManagementId}/status-items/{key}",
           "name": "GetDdmStatusItemV1",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/ddm/{clientManagementId}/sync",
+          "op": "POST /v1/ddm/{clientManagementId}/sync",
           "name": "SyncDdmV1",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/available-updates",
+          "op": "GET /v1/managed-software-updates/available-updates",
           "name": "ListAvailableOsUpdatesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/plans",
+          "op": "GET /v1/managed-software-updates/plans",
           "name": "ListManagedSoftwareUpdatePlansV1",
           "pagination": "totalCount",
           "params": [
@@ -3082,88 +3082,88 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/managed-software-updates/plans",
+          "op": "POST /v1/managed-software-updates/plans",
           "name": "CreateManagedSoftwareUpdatePlanV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/plans/feature-toggle",
+          "op": "GET /v1/managed-software-updates/plans/feature-toggle",
           "name": "GetManagedSoftwareUpdateFeatureToggleV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/managed-software-updates/plans/feature-toggle",
+          "op": "PUT /v1/managed-software-updates/plans/feature-toggle",
           "name": "UpdateManagedSoftwareUpdateFeatureToggleV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/managed-software-updates/plans/feature-toggle/abandon",
+          "op": "POST /v1/managed-software-updates/plans/feature-toggle/abandon",
           "name": "AbandonManagedSoftwareUpdateFeatureToggleV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/plans/feature-toggle/status",
+          "op": "GET /v1/managed-software-updates/plans/feature-toggle/status",
           "name": "GetManagedSoftwareUpdateFeatureToggleStatusV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/managed-software-updates/plans/group",
+          "op": "POST /v1/managed-software-updates/plans/group",
           "name": "CreateManagedSoftwareUpdateGroupPlanV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/plans/group/{id}",
+          "op": "GET /v1/managed-software-updates/plans/group/{id}",
           "name": "GetManagedSoftwareUpdateGroupPlansV1",
           "params": [
             "group-type:string:groupType"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/plans/{id}",
+          "op": "GET /v1/managed-software-updates/plans/{id}",
           "name": "GetManagedSoftwareUpdatePlanV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/plans/{id}/declarations",
+          "op": "GET /v1/managed-software-updates/plans/{id}/declarations",
           "name": "GetManagedSoftwareUpdatePlanDeclarationsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/plans/{id}/events",
+          "op": "GET /v1/managed-software-updates/plans/{id}/events",
           "name": "GetManagedSoftwareUpdatePlanEventsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/update-statuses",
+          "op": "GET /v1/managed-software-updates/update-statuses",
           "name": "ListManagedSoftwareUpdateStatusesV1",
           "params": [
             "filter"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/update-statuses/computer-groups/{id}",
+          "op": "GET /v1/managed-software-updates/update-statuses/computer-groups/{id}",
           "name": "GetManagedSoftwareUpdateStatusesForComputerGroupV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/update-statuses/computers/{id}",
+          "op": "GET /v1/managed-software-updates/update-statuses/computers/{id}",
           "name": "GetManagedSoftwareUpdateStatusesForComputerV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/update-statuses/mobile-device-groups/{id}",
+          "op": "GET /v1/managed-software-updates/update-statuses/mobile-device-groups/{id}",
           "name": "GetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/managed-software-updates/update-statuses/mobile-devices/{id}",
+          "op": "GET /v1/managed-software-updates/update-statuses/mobile-devices/{id}",
           "name": "GetManagedSoftwareUpdateStatusesForMobileDeviceV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/deploy-package",
+          "op": "POST /v1/deploy-package",
           "name": "DeployPackageV1",
           "params": [
             "verbose:bool"
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mdm/renew-profile",
+          "op": "POST /v1/mdm/renew-profile",
           "name": "RenewMdmProfileV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mdm/blank-push",
+          "op": "POST /v2/mdm/blank-push",
           "name": "SendMdmBlankPushV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mdm/commands",
+          "op": "GET /v1/mdm/commands",
           "name": "ListMdmCommandsV1",
           "params": [
             "uuids:[]string",
@@ -3171,7 +3171,7 @@
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/mdm/commands",
+          "op": "GET /v2/mdm/commands",
           "name": "ListMdmCommandsV2",
           "pagination": "totalCount",
           "params": [
@@ -3180,29 +3180,29 @@
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/mdm/commands",
+          "op": "POST /v2/mdm/commands",
           "name": "SendMdmCommandV2"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/mdm-renewal/device-common-details",
+          "op": "PATCH /v1/mdm-renewal/device-common-details",
           "name": "UpdateMdmRenewalDeviceCommonDetailsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mdm-renewal/device-common-details/{clientManagementId}",
+          "op": "GET /v1/mdm-renewal/device-common-details/{clientManagementId}",
           "name": "GetMdmRenewalDeviceCommonDetailsV1",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mdm-renewal/renewal-strategies/{clientManagementId}",
+          "op": "GET /v1/mdm-renewal/renewal-strategies/{clientManagementId}",
           "name": "GetMdmRenewalStrategiesV1",
           "pathNames": {
             "clientManagementId": "clientManagementID"
           }
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/mdm-renewal/renewal-strategies/{clientManagementId}",
+          "op": "DELETE /v1/mdm-renewal/renewal-strategies/{clientManagementId}",
           "name": "DeleteMdmRenewalStrategiesV1",
           "pathNames": {
             "clientManagementId": "clientManagementID"
@@ -3210,7 +3210,7 @@
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/return-to-service",
+          "op": "GET /v1/return-to-service",
           "name": "ListReturnToServiceConfigurationsV1",
           "resolver": {
             "resourceType": "ReturnToServiceConfigurationV1",
@@ -3227,24 +3227,24 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/return-to-service",
+          "op": "POST /v1/return-to-service",
           "name": "CreateReturnToServiceConfigurationV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/return-to-service/{id}",
+          "op": "GET /v1/return-to-service/{id}",
           "name": "GetReturnToServiceConfigurationV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/return-to-service/{id}",
+          "op": "PUT /v1/return-to-service/{id}",
           "name": "UpdateReturnToServiceConfigurationV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/return-to-service/{id}",
+          "op": "DELETE /v1/return-to-service/{id}",
           "name": "DeleteReturnToServiceConfigurationV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/api-integrations",
+          "op": "GET /v1/api-integrations",
           "name": "ListApiIntegrationsV1",
           "pagination": "totalCount",
           "params": [
@@ -3267,29 +3267,29 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/api-integrations",
+          "op": "POST /v1/api-integrations",
           "name": "CreateApiIntegrationV1",
           "expectedStatus": 200
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/api-integrations/{id}",
+          "op": "GET /v1/api-integrations/{id}",
           "name": "GetApiIntegrationV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/api-integrations/{id}",
+          "op": "PUT /v1/api-integrations/{id}",
           "name": "UpdateApiIntegrationV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/api-integrations/{id}",
+          "op": "DELETE /v1/api-integrations/{id}",
           "name": "DeleteApiIntegrationV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/api-integrations/{id}/client-credentials",
+          "op": "POST /v1/api-integrations/{id}/client-credentials",
           "name": "RotateApiIntegrationClientCredentialsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/api-roles",
+          "op": "GET /v1/api-roles",
           "name": "ListApiRolesV1",
           "pagination": "totalCount",
           "params": [
@@ -3311,28 +3311,28 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/api-roles",
+          "op": "POST /v1/api-roles",
           "name": "CreateApiRoleV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/api-roles/{id}",
+          "op": "GET /v1/api-roles/{id}",
           "name": "GetApiRoleV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/api-roles/{id}",
+          "op": "PUT /v1/api-roles/{id}",
           "name": "UpdateApiRoleV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/api-roles/{id}",
+          "op": "DELETE /v1/api-roles/{id}",
           "name": "DeleteApiRoleV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/api-role-privileges",
+          "op": "GET /v1/api-role-privileges",
           "name": "ListApiRolePrivilegesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/api-role-privileges/search",
+          "op": "GET /v1/api-role-privileges/search",
           "name": "SearchApiRolePrivilegesV1",
           "params": [
             "name",
@@ -3340,39 +3340,39 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/adcs-settings",
+          "op": "POST /v1/pki/adcs-settings",
           "name": "CreateAdcsSettingsV1",
           "responseType": "HrefResponse"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/adcs-settings/validate-certificate",
+          "op": "POST /v1/pki/adcs-settings/validate-certificate",
           "name": "ValidateAdcsCertificateV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/adcs-settings/validate-client-certificate",
+          "op": "POST /v1/pki/adcs-settings/validate-client-certificate",
           "name": "ValidateAdcsClientCertificateV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/adcs-settings/{id}",
+          "op": "GET /v1/pki/adcs-settings/{id}",
           "name": "GetAdcsSettingsV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/pki/adcs-settings/{id}",
+          "op": "DELETE /v1/pki/adcs-settings/{id}",
           "name": "DeleteAdcsSettingsV1",
           "expectedStatus": 204
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/pki/adcs-settings/{id}",
+          "op": "PATCH /v1/pki/adcs-settings/{id}",
           "name": "UpdateAdcsSettingsV1",
           "contentType": "application/merge-patch+json",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/adcs-settings/{id}/dependencies",
+          "op": "GET /v1/pki/adcs-settings/{id}/dependencies",
           "name": "GetAdcsSettingsDependenciesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/adcs-settings/{id}/history",
+          "op": "GET /v1/pki/adcs-settings/{id}/history",
           "name": "ListAdcsSettingsHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -3381,60 +3381,60 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/adcs-settings/{id}/history",
+          "op": "POST /v1/pki/adcs-settings/{id}/history",
           "name": "CreateAdcsSettingsHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/certificate-authority/active",
+          "op": "GET /v1/pki/certificate-authority/active",
           "name": "GetActiveCertificateAuthorityV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/certificate-authority/active/der",
+          "op": "GET /v1/pki/certificate-authority/active/der",
           "name": "DownloadActiveCertificateAuthorityDerV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/certificate-authority/active/pem",
+          "op": "GET /v1/pki/certificate-authority/active/pem",
           "name": "DownloadActiveCertificateAuthorityPemV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/certificate-authority/{id}",
+          "op": "GET /v1/pki/certificate-authority/{id}",
           "name": "GetCertificateAuthorityV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/certificate-authority/{id}/der",
+          "op": "GET /v1/pki/certificate-authority/{id}/der",
           "name": "DownloadCertificateAuthorityDerV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/certificate-authority/{id}/pem",
+          "op": "GET /v1/pki/certificate-authority/{id}/pem",
           "name": "DownloadCertificateAuthorityPemV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/classic-ldap/{id}",
+          "op": "GET /v1/classic-ldap/{id}",
           "name": "GetClassicLdapMappingsV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-azure",
+          "op": "POST /v1/cloud-azure",
           "name": "CreateCloudAzureV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-azure/defaults/server-configuration",
+          "op": "GET /v1/cloud-azure/defaults/server-configuration",
           "name": "GetCloudAzureDefaultServerConfigurationV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-azure/{id}",
+          "op": "GET /v1/cloud-azure/{id}",
           "name": "GetCloudAzureV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/cloud-azure/{id}",
+          "op": "PUT /v1/cloud-azure/{id}",
           "name": "UpdateCloudAzureV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/cloud-azure/{id}",
+          "op": "DELETE /v1/cloud-azure/{id}",
           "name": "DeleteCloudAzureV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-idp",
+          "op": "GET /v1/cloud-idp",
           "name": "ListCloudIdpV1",
           "pagination": "totalCount",
           "params": [
@@ -3449,7 +3449,7 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-idp/export",
+          "op": "POST /v1/cloud-idp/export",
           "name": "ExportCloudIdpV1",
           "params": [
             "export-fields:[]string:exportFields",
@@ -3459,11 +3459,11 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-idp/{id}",
+          "op": "GET /v1/cloud-idp/{id}",
           "name": "GetCloudIdpV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-idp/{id}/history",
+          "op": "GET /v1/cloud-idp/{id}/history",
           "name": "ListCloudIdpHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -3472,198 +3472,198 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-idp/{id}/history",
+          "op": "POST /v1/cloud-idp/{id}/history",
           "name": "CreateCloudIdpHistoryNoteV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-idp/{id}/test-group",
+          "op": "POST /v1/cloud-idp/{id}/test-group",
           "name": "TestCloudIdpGroupV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-idp/{id}/test-user",
+          "op": "POST /v1/cloud-idp/{id}/test-user",
           "name": "TestCloudIdpUserV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-idp/{id}/test-user-membership",
+          "op": "POST /v1/cloud-idp/{id}/test-user-membership",
           "name": "TestCloudIdpUserMembershipV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/ldap-keystore/verify",
+          "op": "POST /v1/ldap-keystore/verify",
           "name": "VerifyLdapKeystoreV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/cloud-ldaps",
+          "op": "POST /v2/cloud-ldaps",
           "name": "CreateCloudLdapV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/cloud-ldaps/defaults/{provider}/mappings",
+          "op": "GET /v2/cloud-ldaps/defaults/{provider}/mappings",
           "name": "GetCloudLdapDefaultMappingsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/cloud-ldaps/defaults/{provider}/server-configuration",
+          "op": "GET /v2/cloud-ldaps/defaults/{provider}/server-configuration",
           "name": "GetCloudLdapDefaultServerConfigurationV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/cloud-ldaps/{id}",
+          "op": "GET /v2/cloud-ldaps/{id}",
           "name": "GetCloudLdapV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/cloud-ldaps/{id}",
+          "op": "PUT /v2/cloud-ldaps/{id}",
           "name": "UpdateCloudLdapV2"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/cloud-ldaps/{id}",
+          "op": "DELETE /v2/cloud-ldaps/{id}",
           "name": "DeleteCloudLdapV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/cloud-ldaps/{id}/connection/bind",
+          "op": "GET /v2/cloud-ldaps/{id}/connection/bind",
           "name": "GetCloudLdapBindStatisticsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/cloud-ldaps/{id}/connection/search",
+          "op": "GET /v2/cloud-ldaps/{id}/connection/search",
           "name": "GetCloudLdapSearchStatisticsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/cloud-ldaps/{id}/connection/status",
+          "op": "GET /v2/cloud-ldaps/{id}/connection/status",
           "name": "GetCloudLdapConnectionStatusV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/cloud-ldaps/{id}/mappings",
+          "op": "GET /v2/cloud-ldaps/{id}/mappings",
           "name": "GetCloudLdapMappingsV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/cloud-ldaps/{id}/mappings",
+          "op": "PUT /v2/cloud-ldaps/{id}/mappings",
           "name": "UpdateCloudLdapMappingsV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/conditional-access/device-compliance/feature-toggle",
+          "op": "GET /v1/conditional-access/device-compliance/feature-toggle",
           "name": "GetConditionalAccessFeatureToggleV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/conditional-access/device-compliance-information/computer/{deviceId}",
+          "op": "GET /v1/conditional-access/device-compliance-information/computer/{deviceId}",
           "name": "GetConditionalAccessComputerComplianceV1",
           "pathNames": {
             "deviceId": "deviceID"
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/conditional-access/device-compliance-information/mobile/{deviceId}",
+          "op": "GET /v1/conditional-access/device-compliance-information/mobile/{deviceId}",
           "name": "GetConditionalAccessMobileComplianceV1",
           "pathNames": {
             "deviceId": "deviceID"
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/csa/tenant-id",
+          "op": "GET /v1/csa/tenant-id",
           "name": "GetCsaTenantIdV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/csa/token",
+          "op": "GET /v1/csa/token",
           "name": "GetCsaTokenV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/csa/token",
+          "op": "DELETE /v1/csa/token",
           "name": "DeleteCsaTokenV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /tenant/{tenantId}/ldap/groups",
+          "op": "GET /ldap/groups",
           "name": "SearchLdapGroupsPreview",
           "params": [
             "q"
           ]
         },
         {
-          "op": "GET /tenant/{tenantId}/ldap/servers",
+          "op": "GET /ldap/servers",
           "name": "ListLdapServersPreview"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ldap/groups",
+          "op": "GET /v1/ldap/groups",
           "name": "SearchLdapGroupsV1",
           "params": [
             "q"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ldap/ldap-servers",
+          "op": "GET /v1/ldap/ldap-servers",
           "name": "ListLdapLdapServersV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ldap/servers",
+          "op": "GET /v1/ldap/servers",
           "name": "ListLdapServersV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/oidc/direct-idp-login-url",
+          "op": "GET /v1/oidc/direct-idp-login-url",
           "name": "GetOidcDirectIdpLoginUrlV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/oidc/generate-certificate",
+          "op": "POST /v1/oidc/generate-certificate",
           "name": "GenerateOidcCertificateV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/oidc/public-features",
+          "op": "GET /v1/oidc/public-features",
           "name": "GetOidcPublicFeaturesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/oidc/public-key",
+          "op": "GET /v1/oidc/public-key",
           "name": "GetOidcPublicKeyV1"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/oidc/dispatch",
+          "op": "POST /v2/oidc/dispatch",
           "name": "DispatchOidcLoginV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/sso/cert",
+          "op": "GET /v2/sso/cert",
           "name": "GetSsoCertificateV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/sso/cert",
+          "op": "PUT /v2/sso/cert",
           "name": "UpdateSsoCertificateV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/sso/cert",
+          "op": "POST /v2/sso/cert",
           "name": "GenerateSsoCertificateV2"
         },
         {
-          "op": "DELETE /v2/tenant/{tenantId}/sso/cert",
+          "op": "DELETE /v2/sso/cert",
           "name": "DeleteSsoCertificateV2",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/sso/cert/download",
+          "op": "GET /v2/sso/cert/download",
           "name": "DownloadSsoCertificateV2"
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/sso/cert/parse",
+          "op": "POST /v2/sso/cert/parse",
           "name": "ParseSsoCertificateV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/sso/failover",
+          "op": "GET /v1/sso/failover",
           "name": "GetSsoFailoverV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/sso/failover/generate",
+          "op": "POST /v1/sso/failover/generate",
           "name": "GenerateSsoFailoverV1"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/sso",
+          "op": "GET /v3/sso",
           "name": "GetSsoSettingsV3"
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/sso",
+          "op": "PUT /v3/sso",
           "name": "UpdateSsoSettingsV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/sso/dependencies",
+          "op": "GET /v3/sso/dependencies",
           "name": "GetSsoDependenciesV3"
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/sso/disable",
+          "op": "POST /v3/sso/disable",
           "name": "DisableSsoV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/sso/history",
+          "op": "GET /v3/sso/history",
           "name": "ListSsoHistoryV3",
           "pagination": "totalCount",
           "params": [
@@ -3672,33 +3672,33 @@
           ]
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/sso/history",
+          "op": "POST /v3/sso/history",
           "name": "CreateSsoHistoryNoteV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/sso/metadata/download",
+          "op": "GET /v3/sso/metadata/download",
           "name": "DownloadSsoMetadataV3"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-distribution-point",
+          "op": "GET /v1/cloud-distribution-point",
           "name": "GetCloudDistributionPointV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-distribution-point",
+          "op": "POST /v1/cloud-distribution-point",
           "name": "CreateCloudDistributionPointV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/cloud-distribution-point",
+          "op": "DELETE /v1/cloud-distribution-point",
           "name": "DeleteCloudDistributionPointV1",
           "expectedStatus": 204
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/cloud-distribution-point",
+          "op": "PATCH /v1/cloud-distribution-point",
           "name": "UpdateCloudDistributionPointV1",
           "expectedStatus": 202
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-distribution-point/fail-upload/{id}",
+          "op": "POST /v1/cloud-distribution-point/fail-upload/{id}",
           "name": "FailCloudDistributionPointUploadV1",
           "params": [
             "file-name:string:fileName",
@@ -3706,7 +3706,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-distribution-point/files",
+          "op": "GET /v1/cloud-distribution-point/files",
           "name": "ListCloudDistributionPointFilesV1",
           "pagination": "totalCount",
           "params": [
@@ -3715,7 +3715,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-distribution-point/history",
+          "op": "GET /v1/cloud-distribution-point/history",
           "name": "ListCloudDistributionPointHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -3724,43 +3724,43 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-distribution-point/history",
+          "op": "POST /v1/cloud-distribution-point/history",
           "name": "CreateCloudDistributionPointHistoryNoteV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/cloud-distribution-point/refresh-inventory",
+          "op": "POST /v1/cloud-distribution-point/refresh-inventory",
           "name": "RefreshCloudDistributionPointInventoryV1",
           "params": [
             "file-name:string:fileName"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-distribution-point/test-connection",
+          "op": "GET /v1/cloud-distribution-point/test-connection",
           "name": "TestCloudDistributionPointConnectionV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-distribution-point/upload-capability",
+          "op": "GET /v1/cloud-distribution-point/upload-capability",
           "name": "GetCloudDistributionPointUploadCapabilityV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jcds/files",
+          "op": "GET /v1/jcds/files",
           "name": "ListJCDSFilesV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jcds/files",
+          "op": "POST /v1/jcds/files",
           "name": "InitiateJCDSUploadV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jcds/files/{fileName}",
+          "op": "GET /v1/jcds/files/{fileName}",
           "name": "GetJCDSFileDownloadURLV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/jcds/files/{fileName}",
+          "op": "DELETE /v1/jcds/files/{fileName}",
           "name": "DeleteJCDSFileV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jcds/refresh-inventory",
+          "op": "POST /v1/jcds/refresh-inventory",
           "name": "RefreshJCDSInventoryV1",
           "expectedStatus": 204,
           "params": [
@@ -3768,11 +3768,11 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jcds/renew-credentials",
+          "op": "POST /v1/jcds/renew-credentials",
           "name": "RenewJCDSCredentialsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/distribution-points",
+          "op": "GET /v1/distribution-points",
           "name": "ListDistributionPointsV1",
           "pagination": "totalCount",
           "params": [
@@ -3794,32 +3794,32 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/distribution-points",
+          "op": "POST /v1/distribution-points",
           "name": "CreateDistributionPointV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/distribution-points/delete-multiple",
+          "op": "POST /v1/distribution-points/delete-multiple",
           "name": "DeleteMultipleDistributionPointsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/distribution-points/{id}",
+          "op": "GET /v1/distribution-points/{id}",
           "name": "GetDistributionPointV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/distribution-points/{id}",
+          "op": "PUT /v1/distribution-points/{id}",
           "name": "UpdateDistributionPointV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/distribution-points/{id}",
+          "op": "DELETE /v1/distribution-points/{id}",
           "name": "DeleteDistributionPointV1",
           "expectedStatus": 204
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/distribution-points/{id}",
+          "op": "PATCH /v1/distribution-points/{id}",
           "name": "PatchDistributionPointV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/distribution-points/{id}/history",
+          "op": "GET /v1/distribution-points/{id}/history",
           "name": "ListDistributionPointHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -3828,11 +3828,11 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/distribution-points/{id}/history",
+          "op": "POST /v1/distribution-points/{id}/history",
           "name": "CreateDistributionPointHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/volume-purchasing-locations",
+          "op": "GET /v1/volume-purchasing-locations",
           "name": "ListVolumePurchasingLocationsV1",
           "pagination": "totalCount",
           "params": [
@@ -3855,25 +3855,25 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/volume-purchasing-locations",
+          "op": "POST /v1/volume-purchasing-locations",
           "name": "CreateVolumePurchasingLocationV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/volume-purchasing-locations/{id}",
+          "op": "GET /v1/volume-purchasing-locations/{id}",
           "name": "GetVolumePurchasingLocationV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/volume-purchasing-locations/{id}",
+          "op": "DELETE /v1/volume-purchasing-locations/{id}",
           "name": "DeleteVolumePurchasingLocationV1",
           "expectedStatus": 204
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/volume-purchasing-locations/{id}",
+          "op": "PATCH /v1/volume-purchasing-locations/{id}",
           "name": "UpdateVolumePurchasingLocationV1",
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/volume-purchasing-locations/{id}/content",
+          "op": "GET /v1/volume-purchasing-locations/{id}/content",
           "name": "ListVolumePurchasingLocationContentV1",
           "pagination": "totalCount",
           "params": [
@@ -3882,7 +3882,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/volume-purchasing-locations/{id}/history",
+          "op": "GET /v1/volume-purchasing-locations/{id}/history",
           "name": "ListVolumePurchasingLocationHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -3891,20 +3891,20 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/volume-purchasing-locations/{id}/history",
+          "op": "POST /v1/volume-purchasing-locations/{id}/history",
           "name": "CreateVolumePurchasingLocationHistoryNoteV1",
           "expectedStatus": 200
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/volume-purchasing-locations/{id}/reclaim",
+          "op": "POST /v1/volume-purchasing-locations/{id}/reclaim",
           "name": "ReclaimVolumePurchasingLocationLicensesV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/volume-purchasing-locations/{id}/revoke-licenses",
+          "op": "POST /v1/volume-purchasing-locations/{id}/revoke-licenses",
           "name": "RevokeVolumePurchasingLocationLicensesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/volume-purchasing-subscriptions",
+          "op": "GET /v1/volume-purchasing-subscriptions",
           "name": "ListVolumePurchasingSubscriptionsV1",
           "pagination": "totalCount",
           "params": [
@@ -3925,24 +3925,24 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/volume-purchasing-subscriptions",
+          "op": "POST /v1/volume-purchasing-subscriptions",
           "name": "CreateVolumePurchasingSubscriptionV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/volume-purchasing-subscriptions/{id}",
+          "op": "GET /v1/volume-purchasing-subscriptions/{id}",
           "name": "GetVolumePurchasingSubscriptionV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/volume-purchasing-subscriptions/{id}",
+          "op": "PUT /v1/volume-purchasing-subscriptions/{id}",
           "name": "UpdateVolumePurchasingSubscriptionV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/volume-purchasing-subscriptions/{id}",
+          "op": "DELETE /v1/volume-purchasing-subscriptions/{id}",
           "name": "DeleteVolumePurchasingSubscriptionV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/volume-purchasing-subscriptions/{id}/history",
+          "op": "GET /v1/volume-purchasing-subscriptions/{id}/history",
           "name": "ListVolumePurchasingSubscriptionHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -3951,16 +3951,16 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/volume-purchasing-subscriptions/{id}/history",
+          "op": "POST /v1/volume-purchasing-subscriptions/{id}/history",
           "name": "CreateVolumePurchasingSubscriptionHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-connect",
+          "op": "GET /v1/jamf-connect",
           "name": "GetJamfConnectSettingsV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-connect/config-profiles",
+          "op": "GET /v1/jamf-connect/config-profiles",
           "name": "ListJamfConnectConfigProfilesV1",
           "pagination": "totalCount",
           "params": [
@@ -3978,11 +3978,11 @@
           }
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/jamf-connect/config-profiles/{id}",
+          "op": "PUT /v1/jamf-connect/config-profiles/{id}",
           "name": "UpdateJamfConnectConfigProfileV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-connect/deployments/{id}/tasks",
+          "op": "GET /v1/jamf-connect/deployments/{id}/tasks",
           "name": "ListJamfConnectDeploymentTasksV1",
           "pagination": "totalCount",
           "params": [
@@ -3991,12 +3991,12 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jamf-connect/deployments/{id}/tasks/retry",
+          "op": "POST /v1/jamf-connect/deployments/{id}/tasks/retry",
           "name": "RetryJamfConnectDeploymentTasksV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-connect/history",
+          "op": "GET /v1/jamf-connect/history",
           "name": "ListJamfConnectHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4005,24 +4005,24 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jamf-connect/history",
+          "op": "POST /v1/jamf-connect/history",
           "name": "CreateJamfConnectHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-protect",
+          "op": "GET /v1/jamf-protect",
           "name": "GetJamfProtectSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/jamf-protect",
+          "op": "PUT /v1/jamf-protect",
           "name": "UpdateJamfProtectSettingsV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/jamf-protect",
+          "op": "DELETE /v1/jamf-protect",
           "name": "UnregisterJamfProtectV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-protect/deployments/{id}/tasks",
+          "op": "GET /v1/jamf-protect/deployments/{id}/tasks",
           "name": "ListJamfProtectDeploymentTasksV1",
           "pagination": "totalCount",
           "params": [
@@ -4031,12 +4031,12 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jamf-protect/deployments/{id}/tasks/retry",
+          "op": "POST /v1/jamf-protect/deployments/{id}/tasks/retry",
           "name": "RetryJamfProtectDeploymentTasksV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-protect/history",
+          "op": "GET /v1/jamf-protect/history",
           "name": "ListJamfProtectHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4045,11 +4045,11 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jamf-protect/history",
+          "op": "POST /v1/jamf-protect/history",
           "name": "CreateJamfProtectHistoryNoteV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-protect/plans",
+          "op": "GET /v1/jamf-protect/plans",
           "name": "ListJamfProtectPlansV1",
           "pagination": "totalCount",
           "params": [
@@ -4058,24 +4058,24 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jamf-protect/plans/sync",
+          "op": "POST /v1/jamf-protect/plans/sync",
           "name": "SyncJamfProtectPlansV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jamf-protect/register",
+          "op": "POST /v1/jamf-protect/register",
           "name": "RegisterJamfProtectV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-remote-assist/session",
+          "op": "GET /v1/jamf-remote-assist/session",
           "name": "ListJamfRemoteAssistSessionsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-remote-assist/session/{id}",
+          "op": "GET /v1/jamf-remote-assist/session/{id}",
           "name": "GetJamfRemoteAssistSessionV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/jamf-remote-assist/session",
+          "op": "GET /v2/jamf-remote-assist/session",
           "name": "ListJamfRemoteAssistSessionsV2",
           "pagination": "totalCount",
           "params": [
@@ -4084,20 +4084,20 @@
           ]
         },
         {
-          "op": "POST /v2/tenant/{tenantId}/jamf-remote-assist/session/export",
+          "op": "POST /v2/jamf-remote-assist/session/export",
           "name": "ExportJamfRemoteAssistSessionsV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/jamf-remote-assist/session/{id}",
+          "op": "GET /v2/jamf-remote-assist/session/{id}",
           "name": "GetJamfRemoteAssistSessionV2"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/activation-code",
+          "op": "PUT /v1/activation-code",
           "name": "UpdateActivationCodeV1",
           "expectedStatus": 202
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/activation-code/history",
+          "op": "GET /v1/activation-code/history",
           "name": "ListActivationCodeHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4106,53 +4106,53 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/activation-code/history",
+          "op": "POST /v1/activation-code/history",
           "name": "CreateActivationCodeHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/activation-code/history/export",
+          "op": "POST /v1/activation-code/history/export",
           "name": "ExportActivationCodeHistoryV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/activation-code/organization-name",
+          "op": "PATCH /v1/activation-code/organization-name",
           "name": "UpdateActivationCodeOrganizationNameV1",
           "expectedStatus": 202
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/smtp-server",
+          "op": "GET /v2/smtp-server",
           "name": "GetSmtpServerV2"
         },
         {
-          "op": "PUT /v2/tenant/{tenantId}/smtp-server",
+          "op": "PUT /v2/smtp-server",
           "name": "UpdateSmtpServerV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/smtp-server/allowed-auth-types",
+          "op": "GET /v2/smtp-server/allowed-auth-types",
           "name": "ListSmtpServerAllowedAuthTypesV2"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/environment-type",
+          "op": "GET /v2/environment-type",
           "name": "GetEnvironmentTypeV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-pro-server-url",
+          "op": "GET /v1/jamf-pro-server-url",
           "name": "GetJamfProServerURLV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/jamf-pro-server-url",
+          "op": "PUT /v1/jamf-pro-server-url",
           "name": "UpdateJamfProServerURLV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-communication-settings",
+          "op": "GET /v1/device-communication-settings",
           "name": "GetDeviceCommunicationSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/device-communication-settings",
+          "op": "PUT /v1/device-communication-settings",
           "name": "UpdateDeviceCommunicationSettingsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-communication-settings/history",
+          "op": "GET /v1/device-communication-settings/history",
           "name": "ListDeviceCommunicationSettingsHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4161,20 +4161,20 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/device-communication-settings/history",
+          "op": "POST /v1/device-communication-settings/history",
           "name": "CreateDeviceCommunicationSettingsHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/check-in",
+          "op": "GET /v3/check-in",
           "name": "GetCheckInSettingsV3"
         },
         {
-          "op": "PUT /v3/tenant/{tenantId}/check-in",
+          "op": "PUT /v3/check-in",
           "name": "UpdateCheckInSettingsV3"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/check-in/history",
+          "op": "GET /v3/check-in/history",
           "name": "ListCheckInHistoryV3",
           "pagination": "totalCount",
           "params": [
@@ -4183,28 +4183,28 @@
           ]
         },
         {
-          "op": "POST /v3/tenant/{tenantId}/check-in/history",
+          "op": "POST /v3/check-in/history",
           "name": "CreateCheckInHistoryNoteV3",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/login-customization",
+          "op": "GET /v1/login-customization",
           "name": "GetLoginCustomizationV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/login-customization",
+          "op": "PUT /v1/login-customization",
           "name": "UpdateLoginCustomizationV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/parent-app",
+          "op": "GET /v1/parent-app",
           "name": "GetParentAppSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/parent-app",
+          "op": "PUT /v1/parent-app",
           "name": "UpdateParentAppSettingsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/parent-app/history",
+          "op": "GET /v1/parent-app/history",
           "name": "ListParentAppHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4213,20 +4213,20 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/parent-app/history",
+          "op": "POST /v1/parent-app/history",
           "name": "CreateParentAppHistoryNoteV1",
           "expectedStatus": 200
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/teacher-app",
+          "op": "GET /v1/teacher-app",
           "name": "GetTeacherAppSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/teacher-app",
+          "op": "PUT /v1/teacher-app",
           "name": "UpdateTeacherAppSettingsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/teacher-app/history",
+          "op": "GET /v1/teacher-app/history",
           "name": "ListTeacherAppHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4235,24 +4235,24 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/teacher-app/history",
+          "op": "POST /v1/teacher-app/history",
           "name": "CreateTeacherAppHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/gsx-connection",
+          "op": "GET /v1/gsx-connection",
           "name": "GetGSXConnectionV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/gsx-connection",
+          "op": "PUT /v1/gsx-connection",
           "name": "UpdateGSXConnectionV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/gsx-connection",
+          "op": "PATCH /v1/gsx-connection",
           "name": "PatchGSXConnectionV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/gsx-connection/history",
+          "op": "GET /v1/gsx-connection/history",
           "name": "ListGSXConnectionHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4261,104 +4261,104 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/gsx-connection/history",
+          "op": "POST /v1/gsx-connection/history",
           "name": "CreateGSXConnectionHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/gsx-connection/test",
+          "op": "POST /v1/gsx-connection/test",
           "name": "TestGSXConnectionV1",
           "expectedStatus": 202
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/impact-alert-notification-settings",
+          "op": "GET /v1/impact-alert-notification-settings",
           "name": "GetImpactAlertNotificationSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/impact-alert-notification-settings",
+          "op": "PUT /v1/impact-alert-notification-settings",
           "name": "UpdateImpactAlertNotificationSettingsV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service-plus/feature-toggle/enabled",
+          "op": "GET /v1/self-service-plus/feature-toggle/enabled",
           "name": "GetSelfServicePlusFeatureToggleEnabledV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service-plus/settings",
+          "op": "GET /v1/self-service-plus/settings",
           "name": "GetSelfServicePlusSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/self-service-plus/settings",
+          "op": "PUT /v1/self-service-plus/settings",
           "name": "UpdateSelfServicePlusSettingsV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager",
+          "op": "POST /v1/pki/digicert/trust-lifecycle-manager",
           "name": "CreateDigicertTrustLifecycleManagerV1",
           "expectedStatus": 201,
           "responseType": "HrefResponse"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}",
+          "op": "GET /v1/pki/digicert/trust-lifecycle-manager/{id}",
           "name": "GetDigicertTrustLifecycleManagerV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}",
+          "op": "PATCH /v1/pki/digicert/trust-lifecycle-manager/{id}",
           "name": "UpdateDigicertTrustLifecycleManagerV1",
           "expectedStatus": 204
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}",
+          "op": "DELETE /v1/pki/digicert/trust-lifecycle-manager/{id}",
           "name": "DeleteDigicertTrustLifecycleManagerV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}/connection-status",
+          "op": "GET /v1/pki/digicert/trust-lifecycle-manager/{id}/connection-status",
           "name": "GetDigicertTrustLifecycleManagerConnectionStatusV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}/dependencies",
+          "op": "GET /v1/pki/digicert/trust-lifecycle-manager/{id}/dependencies",
           "name": "GetDigicertTrustLifecycleManagerDependenciesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/{id}/privilege-check",
+          "op": "GET /v1/pki/digicert/trust-lifecycle-manager/{id}/privilege-check",
           "name": "CheckDigicertTrustLifecycleManagerPrivilegesV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/digicert/trust-lifecycle-manager/validate-client-certificate",
+          "op": "POST /v1/pki/digicert/trust-lifecycle-manager/validate-client-certificate",
           "name": "ValidateDigicertClientCertificateV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/venafi",
+          "op": "POST /v1/pki/venafi",
           "name": "CreateVenafiV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/venafi/{id}",
+          "op": "GET /v1/pki/venafi/{id}",
           "name": "GetVenafiV1"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/pki/venafi/{id}",
+          "op": "PATCH /v1/pki/venafi/{id}",
           "name": "UpdateVenafiV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/pki/venafi/{id}",
+          "op": "DELETE /v1/pki/venafi/{id}",
           "name": "DeleteVenafiV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/venafi/{id}/connection-status",
+          "op": "GET /v1/pki/venafi/{id}/connection-status",
           "name": "GetVenafiConnectionStatusV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/venafi/{id}/dependent-profiles",
+          "op": "GET /v1/pki/venafi/{id}/dependent-profiles",
           "name": "GetVenafiDependentProfilesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/venafi/{id}/history",
+          "op": "GET /v1/pki/venafi/{id}/history",
           "name": "ListVenafiHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4367,36 +4367,36 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/venafi/{id}/history",
+          "op": "POST /v1/pki/venafi/{id}/history",
           "name": "CreateVenafiHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/venafi/{id}/jamf-public-key",
+          "op": "GET /v1/pki/venafi/{id}/jamf-public-key",
           "name": "GetVenafiJamfPublicKeyV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/venafi/{id}/jamf-public-key/regenerate",
+          "op": "POST /v1/pki/venafi/{id}/jamf-public-key/regenerate",
           "name": "RegenerateVenafiJamfPublicKeyV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/pki/venafi/{id}/proxy-trust-store",
+          "op": "GET /v1/pki/venafi/{id}/proxy-trust-store",
           "name": "GetVenafiProxyTrustStoreV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/pki/venafi/{id}/proxy-trust-store",
+          "op": "POST /v1/pki/venafi/{id}/proxy-trust-store",
           "name": "UploadVenafiProxyTrustStoreV1",
           "expectedStatus": 204,
           "requestType": "[]byte"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/pki/venafi/{id}/proxy-trust-store",
+          "op": "DELETE /v1/pki/venafi/{id}/proxy-trust-store",
           "name": "DeleteVenafiProxyTrustStoreV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/supervision-identities",
+          "op": "GET /v1/supervision-identities",
           "name": "ListSupervisionIdentitiesV1",
           "pagination": "totalCount",
           "params": [
@@ -4419,34 +4419,34 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/supervision-identities",
+          "op": "POST /v1/supervision-identities",
           "name": "CreateSupervisionIdentityV1",
           "expectedStatus": 200
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/supervision-identities/{id}",
+          "op": "GET /v1/supervision-identities/{id}",
           "name": "GetSupervisionIdentityV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/supervision-identities/{id}",
+          "op": "PUT /v1/supervision-identities/{id}",
           "name": "UpdateSupervisionIdentityV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/supervision-identities/{id}",
+          "op": "DELETE /v1/supervision-identities/{id}",
           "name": "DeleteSupervisionIdentityV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/supervision-identities/{id}/download",
+          "op": "GET /v1/supervision-identities/{id}/download",
           "name": "DownloadSupervisionIdentityV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/supervision-identities/upload",
+          "op": "POST /v1/supervision-identities/upload",
           "name": "UploadSupervisionIdentityV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service/branding/ios",
+          "op": "GET /v1/self-service/branding/ios",
           "name": "ListIOSBrandingConfigurationsV1",
           "pagination": "totalCount",
           "params": [
@@ -4467,25 +4467,25 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/self-service/branding/ios",
+          "op": "POST /v1/self-service/branding/ios",
           "name": "CreateIOSBrandingConfigurationV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service/branding/ios/{id}",
+          "op": "GET /v1/self-service/branding/ios/{id}",
           "name": "GetIOSBrandingConfigurationV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/self-service/branding/ios/{id}",
+          "op": "PUT /v1/self-service/branding/ios/{id}",
           "name": "UpdateIOSBrandingConfigurationV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/self-service/branding/ios/{id}",
+          "op": "DELETE /v1/self-service/branding/ios/{id}",
           "name": "DeleteIOSBrandingConfigurationV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service/branding/macos",
+          "op": "GET /v1/self-service/branding/macos",
           "name": "ListMacOSBrandingConfigurationsV1",
           "pagination": "totalCount",
           "params": [
@@ -4506,33 +4506,33 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/self-service/branding/macos",
+          "op": "POST /v1/self-service/branding/macos",
           "name": "CreateMacOSBrandingConfigurationV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service/branding/macos/{id}",
+          "op": "GET /v1/self-service/branding/macos/{id}",
           "name": "GetMacOSBrandingConfigurationV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/self-service/branding/macos/{id}",
+          "op": "PUT /v1/self-service/branding/macos/{id}",
           "name": "UpdateMacOSBrandingConfigurationV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/self-service/branding/macos/{id}",
+          "op": "DELETE /v1/self-service/branding/macos/{id}",
           "name": "DeleteMacOSBrandingConfigurationV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service/settings",
+          "op": "GET /v1/self-service/settings",
           "name": "GetSelfServiceSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/self-service/settings",
+          "op": "PUT /v1/self-service/settings",
           "name": "UpdateSelfServiceSettingsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/self-service/settings/history",
+          "op": "GET /v1/self-service/settings/history",
           "name": "ListSelfServiceSettingsHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4541,21 +4541,21 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/self-service/settings/history",
+          "op": "POST /v1/self-service/settings/history",
           "name": "CreateSelfServiceSettingsHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/self-service/branding/images",
+          "op": "POST /self-service/branding/images",
           "name": "UploadBrandingImageV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/icon/{id}",
+          "op": "GET /v1/icon/{id}",
           "name": "GetIconV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/icon/download/{id}",
+          "op": "GET /v1/icon/download/{id}",
           "name": "DownloadIconV1",
           "params": [
             "res:int",
@@ -4563,19 +4563,19 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/branding-images/download/{id}",
+          "op": "GET /v1/branding-images/download/{id}",
           "name": "DownloadBrandingImageV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/onboarding",
+          "op": "GET /v1/onboarding",
           "name": "GetOnboardingV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/onboarding",
+          "op": "PUT /v1/onboarding",
           "name": "UpdateOnboardingV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/onboarding/eligible-apps",
+          "op": "GET /v1/onboarding/eligible-apps",
           "name": "ListOnboardingEligibleAppsV1",
           "pagination": "totalCount",
           "params": [
@@ -4583,7 +4583,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/onboarding/eligible-configuration-profiles",
+          "op": "GET /v1/onboarding/eligible-configuration-profiles",
           "name": "ListOnboardingEligibleConfigurationProfilesV1",
           "pagination": "totalCount",
           "params": [
@@ -4591,7 +4591,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/onboarding/eligible-policies",
+          "op": "GET /v1/onboarding/eligible-policies",
           "name": "ListOnboardingEligiblePoliciesV1",
           "pagination": "totalCount",
           "params": [
@@ -4599,7 +4599,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/onboarding/history",
+          "op": "GET /v1/onboarding/history",
           "name": "ListOnboardingHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4608,16 +4608,16 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/onboarding/history",
+          "op": "POST /v1/onboarding/history",
           "name": "CreateOnboardingHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/onboarding/history/export",
+          "op": "POST /v1/onboarding/history/export",
           "name": "ExportOnboardingHistoryV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/app-request/form-input-fields",
+          "op": "GET /v1/app-request/form-input-fields",
           "name": "ListAppRequestFormInputFieldsV1",
           "resolver": {
             "resourceType": "AppRequestFormInputFieldV1",
@@ -4636,42 +4636,42 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/app-request/form-input-fields",
+          "op": "POST /v1/app-request/form-input-fields",
           "name": "CreateAppRequestFormInputFieldV1",
           "expectedStatus": 200
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/app-request/form-input-fields",
+          "op": "PUT /v1/app-request/form-input-fields",
           "name": "ReorderAppRequestFormInputFieldsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/app-request/form-input-fields/{id}",
+          "op": "GET /v1/app-request/form-input-fields/{id}",
           "name": "GetAppRequestFormInputFieldV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/app-request/form-input-fields/{id}",
+          "op": "PUT /v1/app-request/form-input-fields/{id}",
           "name": "UpdateAppRequestFormInputFieldV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/app-request/form-input-fields/{id}",
+          "op": "DELETE /v1/app-request/form-input-fields/{id}",
           "name": "DeleteAppRequestFormInputFieldV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/app-request/settings",
+          "op": "GET /v1/app-request/settings",
           "name": "GetAppRequestSettingsV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/app-request/settings",
+          "op": "PUT /v1/app-request/settings",
           "name": "UpdateAppRequestSettingsV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/packages/delete-multiple",
+          "op": "POST /v1/packages/delete-multiple",
           "name": "DeleteMultiplePackagesV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/packages/export",
+          "op": "POST /v1/packages/export",
           "name": "ExportPackagesV1",
           "params": [
             "export-fields:[]string:exportFields",
@@ -4681,7 +4681,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/packages/{id}/history",
+          "op": "GET /v1/packages/{id}/history",
           "name": "ListPackageHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4690,12 +4690,12 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/packages/{id}/history",
+          "op": "POST /v1/packages/{id}/history",
           "name": "CreatePackageHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/packages/{id}/history/export",
+          "op": "POST /v1/packages/{id}/history/export",
           "name": "ExportPackageHistoryV1",
           "params": [
             "export-fields:[]string:exportFields",
@@ -4705,17 +4705,17 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/packages/{id}/manifest",
+          "op": "POST /v1/packages/{id}/manifest",
           "name": "UploadPackageManifestV1",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/packages/{id}/manifest",
+          "op": "DELETE /v1/packages/{id}/manifest",
           "name": "DeletePackageManifestV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/smtp-server/history",
+          "op": "GET /v1/smtp-server/history",
           "name": "ListSmtpServerHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4724,17 +4724,17 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/smtp-server/history",
+          "op": "POST /v1/smtp-server/history",
           "name": "CreateSmtpServerHistoryNoteV1",
           "expectedStatus": 201
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/smtp-server/test",
+          "op": "POST /v1/smtp-server/test",
           "name": "TestSmtpServerV1",
           "expectedStatus": 202
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/buildings/{id}/history",
+          "op": "GET /v1/buildings/{id}/history",
           "name": "ListBuildingHistoryV1",
           "pagination": "totalCount",
           "params": [
@@ -4743,17 +4743,17 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/buildings/delete-multiple",
+          "op": "POST /v1/buildings/delete-multiple",
           "name": "DeleteMultipleBuildingsV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/buildings/{id}/history",
+          "op": "POST /v1/buildings/{id}/history",
           "name": "CreateBuildingHistoryNoteV1",
           "expectedStatus": 200
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/buildings/{id}/history/export",
+          "op": "POST /v1/buildings/{id}/history/export",
           "name": "ExportBuildingHistoryV1",
           "params": [
             "export-fields:[]string:exportFields",
@@ -4763,51 +4763,51 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/dock-items",
+          "op": "POST /v1/dock-items",
           "name": "CreateDockItemV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/dock-items/{id}",
+          "op": "GET /v1/dock-items/{id}",
           "name": "GetDockItemV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/dock-items/{id}",
+          "op": "PUT /v1/dock-items/{id}",
           "name": "UpdateDockItemV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/dock-items/{id}",
+          "op": "DELETE /v1/dock-items/{id}",
           "name": "DeleteDockItemV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/log-flushing",
+          "op": "GET /v1/log-flushing",
           "name": "GetLogFlushingV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/log-flushing/task",
+          "op": "GET /v1/log-flushing/task",
           "name": "ListLogFlushingTasksV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/log-flushing/task",
+          "op": "POST /v1/log-flushing/task",
           "name": "CreateLogFlushingTaskV1",
           "expectedStatus": 202
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/log-flushing/task/{id}",
+          "op": "GET /v1/log-flushing/task/{id}",
           "name": "GetLogFlushingTaskV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/log-flushing/task/{id}",
+          "op": "DELETE /v1/log-flushing/task/{id}",
           "name": "DeleteLogFlushingTaskV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/scheduler/jobs",
+          "op": "GET /v1/scheduler/jobs",
           "name": "GetSchedulerJobsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/scheduler/jobs/{jobKey}/triggers",
+          "op": "GET /v1/scheduler/jobs/{jobKey}/triggers",
           "name": "GetSchedulerJobTriggersV1",
           "params": [
             "sort:[]string",
@@ -4815,11 +4815,11 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/scheduler/summary",
+          "op": "GET /v1/scheduler/summary",
           "name": "GetSchedulerSummaryV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ebooks",
+          "op": "GET /v1/ebooks",
           "name": "ListEbooksV1",
           "pagination": "totalCount",
           "params": [
@@ -4834,24 +4834,24 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ebooks/{id}",
+          "op": "GET /v1/ebooks/{id}",
           "name": "GetEbookV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/ebooks/{id}/scope",
+          "op": "GET /v1/ebooks/{id}/scope",
           "name": "GetEbookScopeV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/slasa",
+          "op": "GET /v1/slasa",
           "name": "GetSlasaAcceptanceV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/slasa",
+          "op": "POST /v1/slasa",
           "name": "AcceptSlasaV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/accounts",
+          "op": "GET /v1/accounts",
           "name": "ListAccountsV1",
           "pagination": "totalCount",
           "params": [
@@ -4868,50 +4868,50 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/accounts",
+          "op": "POST /v1/accounts",
           "name": "CreateAccountV1",
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/accounts/{id}",
+          "op": "GET /v1/accounts/{id}",
           "name": "GetAccountV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/accounts/{id}",
+          "op": "DELETE /v1/accounts/{id}",
           "name": "DeleteAccountV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /tenant/{tenantId}/user",
+          "op": "GET /user",
           "name": "GetUserSessionV1"
         },
         {
-          "op": "POST /tenant/{tenantId}/user/updateSession",
+          "op": "POST /user/updateSession",
           "name": "UpdateUserSessionV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/user/preferences/settings/{keyId}",
+          "op": "GET /v1/user/preferences/settings/{keyId}",
           "name": "GetUserPreferencesSettingsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/user/preferences/{keyId}",
+          "op": "GET /v1/user/preferences/{keyId}",
           "name": "GetUserPreferenceV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/user/preferences/{keyId}",
+          "op": "PUT /v1/user/preferences/{keyId}",
           "name": "UpdateUserPreferenceV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/user/preferences/{keyId}",
+          "op": "DELETE /v1/user/preferences/{keyId}",
           "name": "DeleteUserPreferenceV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/notifications",
+          "op": "GET /v1/notifications",
           "name": "ListNotificationsV1"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/notifications/{type}/{id}",
+          "op": "DELETE /v1/notifications/{type}/{id}",
           "name": "DeleteNotificationV1",
           "expectedStatus": 204,
           "pathNames": {
@@ -4919,80 +4919,80 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/dashboard",
+          "op": "GET /v1/dashboard",
           "name": "GetDashboardV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/dashboard/toggle",
+          "op": "POST /v1/dashboard/toggle",
           "name": "ToggleDashboardObjectV1",
           "expectedStatus": 202
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/account-preferences",
+          "op": "GET /v2/account-preferences",
           "name": "GetAccountPreferencesV2"
         },
         {
-          "op": "GET /v3/tenant/{tenantId}/account-preferences",
+          "op": "GET /v3/account-preferences",
           "name": "GetAccountPreferencesV3"
         },
         {
-          "op": "PATCH /v2/tenant/{tenantId}/account-preferences",
+          "op": "PATCH /v2/account-preferences",
           "name": "UpdateAccountPreferencesV2"
         },
         {
-          "op": "PATCH /v3/tenant/{tenantId}/account-preferences",
+          "op": "PATCH /v3/account-preferences",
           "name": "UpdateAccountPreferencesV3",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/health-check",
+          "op": "GET /v1/health-check",
           "name": "HealthCheckV1",
           "expectedStatus": 204
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/health-status",
+          "op": "GET /v1/health-status",
           "name": "GetHealthStatusV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-pro-version",
+          "op": "GET /v1/jamf-pro-version",
           "name": "GetJamfProVersionV1"
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/jamf-pro-information",
+          "op": "GET /v2/jamf-pro-information",
           "name": "GetJamfProInformationV2"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/locales",
+          "op": "GET /v1/locales",
           "name": "ListLocalesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/time-zones",
+          "op": "GET /v1/time-zones",
           "name": "ListTimeZonesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/cloud-information",
+          "op": "GET /v1/cloud-information",
           "name": "GetCloudInformationV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/app-store-country-codes",
+          "op": "GET /v1/app-store-country-codes",
           "name": "ListAppStoreCountryCodesV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/jamf-package",
+          "op": "GET /v1/jamf-package",
           "name": "ListJamfPackagesV1",
           "params": [
             "application"
           ]
         },
         {
-          "op": "GET /v2/tenant/{tenantId}/jamf-package",
+          "op": "GET /v2/jamf-package",
           "name": "GetJamfPackageV2",
           "params": [
             "application"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/static-user-groups",
+          "op": "GET /v1/static-user-groups",
           "name": "ListStaticUserGroupsV1",
           "resolver": {
             "resourceType": "StaticUserGroupV1",
@@ -5004,22 +5004,22 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/static-user-groups/{id}",
+          "op": "GET /v1/static-user-groups/{id}",
           "name": "GetStaticUserGroupV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/devices/extensionAttributes",
+          "op": "GET /devices/extensionAttributes",
           "name": "ListDeviceExtensionAttributesPreview",
           "params": [
             "select:string:selectAttr"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/devices/{id}/groups",
+          "op": "GET /v1/devices/{id}/groups",
           "name": "GetDeviceGroupsForDeviceV1"
         },
         {
-          "op": "GET /tenant/{tenantId}/preview/computers",
+          "op": "GET /preview/computers",
           "name": "ListPreviewComputers",
           "pagination": "totalCount",
           "params": [
@@ -5027,65 +5027,65 @@
           ]
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/smart-computer-groups/{id}/recalculate",
+          "op": "POST /v1/smart-computer-groups/{id}/recalculate",
           "name": "RecalculateSmartComputerGroupV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/smart-mobile-device-groups/{id}/recalculate",
+          "op": "POST /v1/smart-mobile-device-groups/{id}/recalculate",
           "name": "RecalculateSmartMobileDeviceGroupV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/smart-user-groups/{id}/recalculate",
+          "op": "POST /v1/smart-user-groups/{id}/recalculate",
           "name": "RecalculateSmartUserGroupV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/computers/{id}/recalculate-smart-groups",
+          "op": "POST /v1/computers/{id}/recalculate-smart-groups",
           "name": "RecalculateComputerSmartGroupsV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mobile-devices/{id}/recalculate-smart-groups",
+          "op": "POST /v1/mobile-devices/{id}/recalculate-smart-groups",
           "name": "RecalculateMobileDeviceSmartGroupsV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/users/{id}/recalculate-smart-groups",
+          "op": "POST /v1/users/{id}/recalculate-smart-groups",
           "name": "RecalculateUserSmartGroupsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/mobile-device-enrollment-profile/{id}/download-profile",
+          "op": "GET /v1/mobile-device-enrollment-profile/{id}/download-profile",
           "name": "DownloadMobileDeviceEnrollmentProfileV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/jamf-management-framework/redeploy/{id}",
+          "op": "POST /v1/jamf-management-framework/redeploy/{id}",
           "name": "RedeployJamfManagementFrameworkV1",
           "expectedStatus": 202
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/mobile-device-apps/reinstall-app-config",
+          "op": "POST /v1/mobile-device-apps/reinstall-app-config",
           "name": "ReinstallMobileDeviceAppConfigV1",
           "expectedStatus": 204
         },
         {
-          "op": "POST /tenant/{tenantId}/settings/issueTomcatSslCertificate",
+          "op": "POST /settings/issueTomcatSslCertificate",
           "name": "IssueTomcatSslCertificate"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/oidc/dispatch",
+          "op": "POST /v1/oidc/dispatch",
           "name": "DispatchOidcV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/system/initialize",
+          "op": "POST /v1/system/initialize",
           "name": "InitializeSystemV1"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/system/platform-initialize",
+          "op": "POST /v1/system/platform-initialize",
           "name": "PlatformInitializeSystemV1"
         },
         {
-          "op": "PUT /v1/tenant/{tenantId}/accounts/{id}",
+          "op": "PUT /v1/accounts/{id}",
           "name": "UpdateAccountV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/account-groups",
+          "op": "GET /v1/account-groups",
           "name": "ListAccountGroupsV1",
           "pagination": "totalCount",
           "params": [
@@ -5101,23 +5101,23 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/account-groups/{id}",
+          "op": "GET /v1/account-groups/{id}",
           "name": "GetAccountGroupV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/last-login",
+          "op": "GET /v1/last-login",
           "name": "GetLastLoginV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/m2m/tenant-id",
+          "op": "GET /v1/m2m/tenant-id",
           "name": "GetM2MTenantIDV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/user-sessions/active",
+          "op": "GET /v1/user-sessions/active",
           "name": "ListActiveUserSessionsV1"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/user-sessions/count",
+          "op": "GET /v1/user-sessions/count",
           "name": "GetActiveUsersCountV1"
         }
       ]
