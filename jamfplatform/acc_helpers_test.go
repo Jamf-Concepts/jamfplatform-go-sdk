@@ -197,6 +197,65 @@ func accEnvClient(t *testing.T) *jamfplatform.Client {
 	return c
 }
 
+// errAccOrgCredsUnset marks an absent organization-scoped credential set.
+var errAccOrgCredsUnset = errors.New("organization-scoped acceptance credentials not configured")
+
+// initOrgAcceptanceClient creates and validates the singleton organization-scoped
+// client used by the Jamf Account tests.
+//
+// Organization scope is the *absence* of a scope, not a header: the gateway
+// derives the organization from the token itself, so no WithTenantID or
+// WithEnvironmentID is applied and Client.Scope() reports the zero kind with an
+// empty ID. Passing either option would be actively wrong — it would make the
+// gateway resolve a different context type and refuse the request.
+//
+// JAMFPLATFORM_ORG_BASE_URL is separate from JAMFPLATFORM_BASE_URL because the
+// Jamf Account api-product ships only use1 api-definitions: an EU base URL
+// cannot reach these endpoints at all, and the failure does not look regional.
+var initOrgAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
+	baseURL := os.Getenv("JAMFPLATFORM_ORG_BASE_URL")
+	if baseURL == "" {
+		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+	}
+	clientID := os.Getenv("JAMFPLATFORM_ORG_CLIENT_ID")
+	clientSecret := os.Getenv("JAMFPLATFORM_ORG_CLIENT_SECRET")
+
+	if baseURL == "" || clientID == "" || clientSecret == "" {
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ORG_CLIENT_ID, JAMFPLATFORM_ORG_CLIENT_SECRET (and JAMFPLATFORM_ORG_BASE_URL — must be the US gateway)", errAccOrgCredsUnset)
+	}
+
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret)
+	if err := c.ValidateCredentials(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed to validate organization-scoped credentials: %w", err)
+	}
+	return c, nil
+})
+
+// accOrgClient returns a live organization-scoped client. Unset credentials skip;
+// supplied-but-rejected credentials fail, the same distinction accClient draws.
+func accOrgClient(t *testing.T) *jamfplatform.Client {
+	t.Helper()
+	c, err := initOrgAcceptanceClient()
+	switch {
+	case errors.Is(err, errAccOrgCredsUnset):
+		t.Skipf("Skipping organization-scope acceptance test: %v", err)
+	case err != nil:
+		t.Fatal(credentialRejectedMessage(err))
+	}
+	return c
+}
+
+// requireWriteOptIn skips unless the named environment variable is set. Used for
+// mutations that touch shared organization or environment state, where the
+// blast radius is a real customer record rather than a throwaway tenant object.
+// The message names the variable so the skip is actionable rather than a dead end.
+func requireWriteOptIn(t *testing.T, envVar, why string) {
+	t.Helper()
+	if os.Getenv(envVar) == "" {
+		t.Skipf("Skipping: set %s to opt in. %s", envVar, why)
+	}
+}
+
 // egressIP reports this host's public egress IP, resolved once per run because a
 // rejected credential fails every test in the suite and a per-test lookup would
 // add three seconds each. An empty result is itself a signal: a host that cannot
