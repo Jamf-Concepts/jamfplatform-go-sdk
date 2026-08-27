@@ -121,6 +121,24 @@ Spec prose is wrapped at 100 columns, paragraph by paragraph (blank-line separat
 - `DoExpect(ctx, method, path, body, expectedStatus, result)` — expects specific status
 - `DoWithContentType(ctx, method, path, body, contentType, expectedStatus, result)` — overrides Content-Type
 
+### Custom request headers (reverse-proxy support)
+
+`WithHeaders(http.Header)` adds headers to every request **including the OAuth2 token exchange**, and `WithAuthorizationHeaderName(name)` moves the bearer out of `Authorization` into a header of the caller's choosing. Both exist for consumers whose traffic is fronted by a corporate reverse proxy that authenticates callers itself: proxy credential in `Authorization`, Jamf's bearer under a name the proxy picked.
+
+**Prefer these over `WithHTTPClient` for the purpose.** Supplying a client replaces `newTunedTransport` and silently discards `Proxy: http.ProxyFromEnvironment`, the per-phase timeouts, `MaxIdleConnsPerHost: 10` (matched to Terraform's default parallelism) and the 1 MiB write buffer package upload depends on. Nothing fails — throughput and env-proxy support just go. These options layer a `headerTransport` onto the tuned chain instead, the way `userAgentTransport` already does, and compose with `WithHTTPClient` when a caller genuinely needs both. `TestWithHeaders_PreservesTunedTransport` pins it.
+
+Three details that are not guessable and each cost a wrong turn:
+
+- **The wrapper installs on `baseClient.Transport`, below `oauth2.Transport`.** That is what lets it see — and move — the bearer oauth2 already wrote, and what gets the headers onto the token exchange (oauth2 uses that client for it). Wrapping the OAuth2 client instead passes an API-only assertion while leaving authentication unproxied. `installHeaderTransport` must also **rebuild** the OAuth2 wrapper afterwards: `oauth2.NewClient` captures the base transport by value, so mutating it later leaves the API client pointing at the unwrapped chain. Both mutations are caught by the tests — verified by reverting each.
+- **Relocation matches on the `Bearer ` scheme, not on the request phase.** Both phases put something in `Authorization`: `oauth2.Transport` writes `Bearer <token>` on API calls, `clientcredentials` writes `Basic <client_id:client_secret>` on the token request. Moving the latter sends the client credential to a header the token endpoint does not read — authentication fails while the relocation looks like it worked.
+- **A caller-supplied `Authorization` flips the token exchange to `oauth2.AuthStyleInParams`.** The caller's header takes the slot the client credential would have used, so the credential has to ride in the body (RFC 6749 §2.3.1 permits both). **Wire-verified 2026-08-26: `us.apigw.jamf.com/auth/token` accepts body-form client credentials** — a full proxied round trip against tenant `5c4425d9` returned `11.31.1`. Without the flip, x/oauth2's auto-detection still gets there but only after a rejected header-style attempt per fetch; the live negative run shows both attempts back to back on every retry.
+
+The scope headers (`X-Tenant-Id`, `X-Environment-Id`) are **rejected** by `WithHeaders` *and* as a relocation target for `WithAuthorizationHeaderName`, and the rejection logged. The gateway resolves the request context from them and refuses a wrong value with `403 OWNERSHIP_FORBIDDEN` — the same answer a mismatched credential gives, so a silent override is close to undiagnosable from the error alone. `User-Agent` is deliberately *not* protected: `userAgentTransport` sits above and wins, so `WithUserAgent` stays authoritative. Neither is `Cookie`, because a proxy may legitimately require one — but headers *replace* rather than merge, and `http.Client` writes the jar's `Cookie` before the transport chain runs, so a caller-supplied `Cookie` displaces Jamf Cloud's sticky-session pin. The godoc says so.
+
+`WithAuthorizationHeaderName` also refuses `Authorization` itself. The relocation sets the target then deletes the source, which for that one name is the same key, so honouring it deletes the bearer and every call answers 401 — indistinguishable from a wrong client secret. The guard on both option paths is the point: `reservedHeaders` is keyed through `http.CanonicalHeaderKey` so renaming a scope header to a spelling Go canonicalises differently fails a test rather than failing open, the way the path denylist did in `47d462c`. `SetHTTPClient` and `SetUserAgent` both re-run `installHeaderTransport`, since each replaces `baseClient` outright.
+
+Also established while testing this, and worth not re-deriving: **credentials in the base URL's userinfo (`https://user:pass@host/path`) never reach the wire.** `net/http` applies `URL.User` as Basic only when `Authorization` is empty, and both phases already carry one. Inline userinfo is reported to work against other Jamf SDKs; on this one it is silently dropped, with no error. `TestURLUserinfoIsNotSentAsBasicAuth` documents it and fails if that ever changes.
+
 ### URL path construction
 
 All API paths use `/api/{namespace}/{version}/{resource}`, built by `Transport.APIPrefix(namespace, version)`. Namespace and version are derived from the spec path in config; an empty version collapses that segment (proclassic, Pro preview paths).
@@ -513,7 +531,7 @@ For JSON APIs (Platform, Pro), the spec-driven heuristic is sufficient — those
 ## Conventions
 
 - MIT license. Copyright headers managed by HashiCorp `copywrite` (uses `--plan` flag, not `--check`).
-- Options pattern for client configuration: `WithTenantID`, `WithUserAgent`, `WithHTTPClient`, `WithLogger`, `WithFileTokenCache`, `WithFileCookieJar`.
+- Options pattern for client configuration: `WithTenantID`, `WithEnvironmentID`, `WithUserAgent`, `WithHTTPClient`, `WithLogger`, `WithFileTokenCache`, `WithFileCookieJar`, `WithHeaders`, `WithAuthorizationHeaderName`.
 - Generated types use spec schema names directly. Pointer fields for nullable/optional JSON per spec annotations.
 - `url.PathEscape` for path parameters, `url.QueryEscape` for query parameters.
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.

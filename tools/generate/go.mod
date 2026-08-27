@@ -3,7 +3,7 @@ module github.com/Jamf-Concepts/jamfplatform-go-sdk/tools/generate
 go 1.26.5
 
 require (
-	github.com/getkin/kin-openapi v0.146.0
+	github.com/getkin/kin-openapi v0.147.0
 	golang.org/x/tools v0.49.0
 	gopkg.in/yaml.v3 v3.0.1
 )
