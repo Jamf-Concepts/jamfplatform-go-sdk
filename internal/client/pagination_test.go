@@ -102,3 +102,102 @@ func TestListAllPages(t *testing.T) {
 		}
 	})
 }
+
+func TestListAllCursorPages(t *testing.T) {
+	t.Run("single page", func(t *testing.T) {
+		items, err := ListAllCursorPages(context.Background(), 100, func(_ context.Context, cursor string, pageSize int) ([]string, string, error) {
+			if cursor != "" {
+				t.Fatalf("first call should carry no cursor, got %q", cursor)
+			}
+			if pageSize != 100 {
+				t.Fatalf("pageSize = %d, want 100", pageSize)
+			}
+			return []string{"a", "b"}, "", nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(items) != 2 || items[0] != "a" || items[1] != "b" {
+			t.Fatalf("got %v, want [a b]", items)
+		}
+	})
+
+	t.Run("follows the cursor across pages", func(t *testing.T) {
+		var seen []string
+		items, err := ListAllCursorPages(context.Background(), 50, func(_ context.Context, cursor string, _ int) ([]int, string, error) {
+			seen = append(seen, cursor)
+			switch cursor {
+			case "":
+				return []int{1, 2}, "c1", nil
+			case "c1":
+				return []int{3}, "c2", nil
+			case "c2":
+				return []int{4}, "", nil
+			default:
+				t.Fatalf("unexpected cursor %q", cursor)
+				return nil, "", nil
+			}
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := []int{1, 2, 3, 4}; len(items) != len(want) {
+			t.Fatalf("got %v, want %v", items, want)
+		}
+		if len(seen) != 3 || seen[0] != "" || seen[1] != "c1" || seen[2] != "c2" {
+			t.Fatalf("cursors seen = %v, want [\"\" c1 c2]", seen)
+		}
+	})
+
+	// An empty page must not end the walk: a cursor endpoint can return one
+	// legitimately when every row on it was filtered out server-side, and the
+	// rows beyond it are still reachable through the cursor it carries.
+	t.Run("empty page with a cursor keeps going", func(t *testing.T) {
+		items, err := ListAllCursorPages(context.Background(), 100, func(_ context.Context, cursor string, _ int) ([]string, string, error) {
+			switch cursor {
+			case "":
+				return nil, "c1", nil
+			case "c1":
+				return []string{"z"}, "", nil
+			default:
+				t.Fatalf("unexpected cursor %q", cursor)
+				return nil, "", nil
+			}
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(items) != 1 || items[0] != "z" {
+			t.Fatalf("got %v, want [z]", items)
+		}
+	})
+
+	// A server that keeps handing back the same cursor would otherwise hang the
+	// caller forever with no error.
+	t.Run("repeated cursor is an error, not a hang", func(t *testing.T) {
+		calls := 0
+		_, err := ListAllCursorPages(context.Background(), 100, func(_ context.Context, _ string, _ int) ([]string, string, error) {
+			calls++
+			if calls > 10 {
+				t.Fatal("walker did not stop on a repeated cursor")
+			}
+			return []string{"a"}, "stuck", nil
+		})
+		if err == nil {
+			t.Fatal("want an error on a repeated cursor, got nil")
+		}
+		if calls != 2 {
+			t.Fatalf("calls = %d, want 2 (first page, then the repeat is detected)", calls)
+		}
+	})
+
+	t.Run("propagates fetch errors", func(t *testing.T) {
+		want := fmt.Errorf("boom")
+		_, err := ListAllCursorPages(context.Background(), 100, func(_ context.Context, _ string, _ int) ([]string, string, error) {
+			return nil, "", want
+		})
+		if err == nil {
+			t.Fatal("want an error, got nil")
+		}
+	})
+}

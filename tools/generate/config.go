@@ -195,11 +195,21 @@ func (s SpecDef) outputFile() string     { return "jamfplatform/" + s.baseName()
 func (s SpecDef) testOutputFile() string { return "jamfplatform/" + s.baseName() + "_test.go" }
 
 type OperationDef struct {
-	Op             string            `json:"op"`   // "GET /v1/devices/{id}"
-	Name           string            `json:"name"` // Go method name
-	ContentType    string            `json:"contentType,omitempty"`
-	Pagination     string            `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount, rawArray
-	PageSizeParam  string            `json:"pageSizeParam,omitempty"`
+	Op            string `json:"op"`   // "GET /v1/devices/{id}"
+	Name          string `json:"name"` // Go method name
+	ContentType   string `json:"contentType,omitempty"`
+	Pagination    string `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount, rawArray, cursor
+	PageSizeParam string `json:"pageSizeParam,omitempty"`
+	// ResultsField is the envelope key holding the element array. Empty
+	// defaults to "results"; cursor-paginated endpoints in particular tend to
+	// name it something else (audit uses "items" and "transactions").
+	ResultsField string `json:"resultsField,omitempty"`
+	// CursorField is the envelope key carrying the next page's cursor, for
+	// Pagination == "cursor". Empty defaults to "nextCursor".
+	CursorField string `json:"cursorField,omitempty"`
+	// CursorParam is the query parameter the cursor is sent back in, for
+	// Pagination == "cursor". Empty defaults to "cursor".
+	CursorParam    string            `json:"cursorParam,omitempty"`
 	MaxPageSize    int               `json:"maxPageSize,omitempty"` // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
 	Version        string            `json:"version,omitempty"`     // override version for tenantPrefix
 	PathNames      map[string]string `json:"pathNames,omitempty"`   // spec param -> Go param name

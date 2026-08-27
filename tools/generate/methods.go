@@ -950,7 +950,9 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		PaginationStyle: opDef.Pagination,
 		PageSizeParam:   coalesce(opDef.PageSizeParam, "page-size"),
 		MaxPageSize:     coalesceInt(opDef.MaxPageSize, defaultMaxPageSize(spec.Package, opDef.Pagination)),
-		ResultsField:    "results",
+		ResultsField:    coalesce(opDef.ResultsField, "results"),
+		CursorField:     coalesce(opDef.CursorField, "nextCursor"),
+		CursorParam:     coalesce(opDef.CursorParam, "cursor"),
 		SpecPath:        specPath,
 		UnwrapResults:   opDef.UnwrapResults,
 		NoRetry:         opDef.NoRetry,
@@ -1084,11 +1086,31 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		m.RequestType = goTypeName(opDef.RequestType)
 	}
 	if opDef.ResponseType != "" {
-		m.ResponseType = goTypeName(opDef.ResponseType)
+		// A "[]T" literal names a bare JSON array response whose element type
+		// is a component schema, for the case where the spec declares an
+		// envelope the server does not send. Passed through verbatim rather
+		// than run through goTypeName, which would mangle the brackets.
+		//
+		// This is deliberately an operation-level override and not a spec
+		// patch: the disagreement is about what the server does, so it is
+		// recorded where the wire evidence is cited (CLAUDE.md) and deleted in
+		// one line when the server or the spec changes. A patched schema would
+		// instead shadow the corrected declaration silently.
+		if elem, isSlice := strings.CutPrefix(opDef.ResponseType, "[]"); isSlice {
+			// ReturnsSlice / ResponseIsJSONArray / Category are all derived
+			// from ResponseType further down, so setting it here is enough —
+			// no need to short-circuit the rest of the build.
+			m.ResponseType = "[]" + goTypeName(elem)
+			m.ResponseWireName = elem
+		} else {
+			m.ResponseType = goTypeName(opDef.ResponseType)
+		}
 		// XML wire name is the raw spec name unless the schema overrides
 		// via xml.name — test stubs emit <wireName> bodies so the generated
 		// type's XMLName check passes.
-		m.ResponseWireName = opDef.ResponseType
+		if m.ResponseWireName == "" {
+			m.ResponseWireName = opDef.ResponseType
+		}
 		if doc.Components != nil && doc.Components.Schemas != nil {
 			if ref, ok := doc.Components.Schemas[opDef.ResponseType]; ok && ref.Value != nil && ref.Value.XML != nil && ref.Value.XML.Name != "" {
 				m.ResponseWireName = ref.Value.XML.Name
@@ -1101,7 +1123,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	// Paginated item type
 	if m.PaginationStyle != "" {
-		m.ItemType = detectPaginatedItemType(op)
+		m.ItemType = detectPaginatedItemType(op, m.ResultsField)
 		m.ResponseType = ""
 	}
 
@@ -1142,6 +1164,9 @@ func categorize(m GoMethod) string {
 	}
 	if m.UnwrapResults != "" {
 		return "unwrap"
+	}
+	if m.PaginationStyle == "cursor" {
+		return "paginatedCursor"
 	}
 	if m.PaginationStyle != "" {
 		return "paginated"
@@ -1293,7 +1318,20 @@ func isJSONContentType(ct string) bool {
 	return base == "" || base == "application/json" || strings.HasSuffix(base, "+json")
 }
 
-func detectPaginatedItemType(op *openapi3.Operation) string {
+// detectPaginatedItemType finds the Go element type of a paginated response's
+// element array. resultsField names the envelope key holding it, because the
+// key is not always "results" — cursor-paginated endpoints in particular name it
+// for the resource (audit uses "items" and "transactions"). Defaulting to
+// "results" when the caller passes an empty string keeps every existing
+// operation on the old behaviour.
+//
+// Falling back to "any" on a miss is deliberate but easy to misread: it is not a
+// harmless default, it silently widens the method's element type, which is what
+// a wrong resultsField looks like from the outside.
+func detectPaginatedItemType(op *openapi3.Operation, resultsField string) string {
+	if resultsField == "" {
+		resultsField = "results"
+	}
 	resp := op.Responses.Status(200)
 	if resp == nil || resp.Value == nil {
 		return "any"
@@ -1311,12 +1349,12 @@ func detectPaginatedItemType(op *openapi3.Operation) string {
 			if part.Value == nil {
 				continue
 			}
-			if r := part.Value.Properties["results"]; r != nil && r.Value != nil && r.Value.Items != nil {
+			if r := part.Value.Properties[resultsField]; r != nil && r.Value != nil && r.Value.Items != nil {
 				return refName(r.Value.Items)
 			}
 		}
 		// Direct results field
-		if r := schema.Properties["results"]; r != nil && r.Value != nil && r.Value.Items != nil {
+		if r := schema.Properties[resultsField]; r != nil && r.Value != nil && r.Value.Items != nil {
 			return refName(r.Value.Items)
 		}
 		// Raw array response — no wrapper, items live at the top level.

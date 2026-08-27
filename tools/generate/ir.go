@@ -75,6 +75,8 @@ type GoMethod struct {
 	MaxPageSize      int
 	ItemType         string
 	ResultsField     string
+	CursorField      string
+	CursorParam      string
 	ReturnsSlice     bool
 	// ResponseIsJSONArray reports that the success body is a JSON array,
 	// which ReturnsSlice does not: a named schema declared `type: array`

@@ -389,6 +389,8 @@ func {{ .Name }}Values() []{{ $enumType }} {
 {{ range .Methods }}
 {{- if eq .Category "paginated" }}
 {{ template "paginated" . }}
+{{- else if eq .Category "paginatedCursor" }}
+{{ template "paginatedCursor" . }}
 {{- else if eq .Category "unwrap" }}
 {{ template "unwrap" . }}
 {{- else if eq .Category "get" }}
@@ -737,6 +739,57 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 }
 {{ end }}
 
+{{- define "paginatedCursor" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ([]{{ .ItemType }}, error) {
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
+	return client.ListAllCursorPages(ctx, {{ .MaxPageSize }}, func(ctx context.Context, cursor string, pageSize int) ([]{{ .ItemType }}, string, error) {
+		params := url.Values{}
+		params.Set("{{ .PageSizeParam }}", strconv.Itoa(pageSize))
+		if cursor != "" {
+			params.Set("{{ .CursorParam }}", cursor)
+		}
+{{- range .QueryParams }}
+{{- if eq .Type "[]string" }}
+		if len({{ .Go }}) > 0 {
+			params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
+		}
+{{- else if eq .Type "bool" }}
+		if {{ .Go }} {
+			params.Set("{{ .Spec }}", "true")
+		}
+{{- else if eq .Type "int" }}
+		if {{ .Go }} != 0 {
+			params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
+		}
+{{- else if eq .Type "int64" }}
+		if {{ .Go }} != 0 {
+			params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
+		}
+{{- else }}
+		if {{ .Go }} != "" {
+			params.Set("{{ .Spec }}", {{ .Go }})
+		}
+{{- end }}
+{{- end }}
+
+		endpoint := {{ fmtPath . }}
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+
+		var result struct {
+			Results    []{{ .ItemType }} ` + "`" + `json:"{{ .ResultsField }}"` + "`" + `
+			NextCursor string ` + "`" + `json:"{{ .CursorField }}"` + "`" + `
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, "", err
+		}
+		return result.Results, result.NextCursor, nil
+	})
+}
+{{ end }}
+
 {{- define "resolverID" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context, name string) (string, error) {
@@ -988,6 +1041,8 @@ import (
 <% range .Methods -%>
 <%- if eq .Category "paginated" %>
 <% template "testPaginated" . %>
+<%- else if eq .Category "paginatedCursor" %>
+<% template "testPaginatedCursor" . %>
 <%- else if eq .Category "unwrap" %>
 <% template "testUnwrap" . %>
 <%- else if eq .Category "get" %>
@@ -1252,9 +1307,9 @@ func Test<% .Name %>(t *testing.T) {
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 <%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
+			"<% .ResultsField %>": []map[string]any{{}},
+			"totalCount":          1,
+			"hasNext":             false,
 		})
 <%- end %>
 	})
@@ -1265,6 +1320,41 @@ func Test<% .Name %>(t *testing.T) {
 	}
 	if len(results) != 1 {
 		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+<% end %>
+
+<%- define "testPaginatedCursor" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Two pages, so the walk is actually exercised: the handler hands out a
+	// cursor on the first call and withholds one on the second. A single-page
+	// stub would pass even if the generated method ignored the cursor entirely.
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != <% httpConst .HTTPMethod %> {
+			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
+		}
+		switch r.URL.Query().Get("<% .CursorParam %>") {
+		case "":
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"<% .ResultsField %>": []map[string]any{{}},
+				"<% .CursorField %>":  "page-2",
+			})
+		case "page-2":
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"<% .ResultsField %>": []map[string]any{{}},
+			})
+		default:
+			t.Errorf("unexpected cursor %q", r.URL.Query().Get("<% .CursorParam %>"))
+		}
+	})
+
+	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 2 {
+		t.Fatalf("len = %d, want 2", len(results))
 	}
 }
 <% end %>
