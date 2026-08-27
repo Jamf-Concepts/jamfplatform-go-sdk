@@ -39,9 +39,9 @@ func ptrProclassicPayloads(s string) *proclassic.PayloadsXMLText {
 // The user explicitly instructed: do NOT skip 500 errors.
 // ---------------------------------------------------------------------------
 
-// ptrStr is defined in acc_pro_app_installers_test.go.
-func ptrInt(i int) *int    { return &i }
-func ptrBool(b bool) *bool { return &b }
+func ptrStr(s string) *string { return &s }
+func ptrInt(i int) *int       { return &i }
+func ptrBool(b bool) *bool    { return &b }
 
 // Minimal mobileconfig plist payload used for configuration profile tests.
 const minimalProfilePayload = `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>PayloadContent</key><array/><key>PayloadDisplayName</key><string>SDK Test Profile</string><key>PayloadIdentifier</key><string>com.jamf.sdk.test</string><key>PayloadType</key><string>Configuration</string><key>PayloadUUID</key><string>A1B2C3D4-E5F6-7890-ABCD-EF1234567890</string><key>PayloadVersion</key><integer>1</integer></dict></plist>`

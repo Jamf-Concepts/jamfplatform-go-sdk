@@ -40,9 +40,9 @@ type SpecDef struct {
 	// all $ref strings that reference the old name. Applied before all other
 	// patches so downstream fixups see the corrected names. Use when a spec
 	// uses generic schema names that would collide with schemas emitted by
-	// other specs in the same Go package (e.g. "SelfServiceSettings" is a
-	// top-level Pro API type; an app-installer spec reusing that name would
-	// silently shadow it). Outer key: old schema name. Value: new schema name.
+	// other specs in the same Go package (e.g. a generic "SelfServiceSettings"
+	// in a second spec would silently shadow the top-level Pro API type of the
+	// same name). Outer key: old schema name. Value: new schema name.
 	SchemaRenames map[string]string `json:"schemaRenames,omitempty"`
 
 	// SchemaCreations adds whole named component schemas the spec no longer

@@ -986,61 +986,6 @@ func TestAcceptance_ApplyMacOSBrandingConfigurationV1(t *testing.T) {
 	}
 }
 
-// ---------- AppInstallerDeploymentV1 ----------
-
-func TestAcceptance_ApplyAppInstallerDeploymentV1(t *testing.T) {
-	// App Installer deployments require a valid app installer title reference.
-	// List existing titles and use the first one.
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	titles, err := p.ListAppInstallerTitlesV1(ctx)
-	if err != nil {
-		t.Fatalf("list app installer titles: %v", err)
-	}
-	if len(titles) == 0 {
-		t.Skip("no app installer titles available — cannot test deployment apply")
-	}
-	titleID := titles[0].ID
-
-	name := "sdk-acc-apply-aid-" + runSuffix()
-	req := &pro.AppInstallerDeploymentCreate{
-		Name:           name,
-		AppTitleID:     titleID,
-		DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeInstallAutomatically,
-		UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
-	}
-
-	id, created, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "AppInstallerDeployment "+id, func() error { return p.DeleteAppInstallerDeploymentV1(ctx, id) })
-	if !created {
-		t.Error("expected created = true")
-	}
-
-	id2, created2, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false")
-	}
-	if id2 != id {
-		t.Errorf("id changed: %s → %s", id, id2)
-	}
-
-	if err := p.DeleteAppInstallerDeploymentV1(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolveAppInstallerDeploymentV1IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
-
 // ---------- ReturnToServiceConfigurationV1 ----------
 
 // wifiMobileProfilePayload returns a minimal mobile-device Wi-Fi mobileconfig plist.

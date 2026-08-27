@@ -240,7 +240,7 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				createReturnID = `fmt.Sprintf("%d", *resp.ID)`
 			} else {
 				switch createM.ResponseType {
-				case "HrefResponse", "AppInstallerDeploymentHrefResponse":
+				case "HrefResponse":
 					createReturnID = "resp.ID"
 				default:
 					// Non-HrefResponse: check if the response has a string or int ID.
