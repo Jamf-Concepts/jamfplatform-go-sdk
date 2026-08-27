@@ -206,7 +206,7 @@ Also re-verified on EU (2026-08-20): the tenant segment must be the tenant **UUI
 
 Note the last row's mismatch: the file is named for the *tag* (`device-groups`) but the spec is the **Security Cloud Devices API**, whose only whitelisted operations are the group ones. `internal/stage/device-groups-beta` is the unrelated *Platform* Device Groups API — diffing against that produces 800 lines of noise and, if copied, silently replaces the spec.
 
-Build v1416 kept every one of these directory names, so the renaming is episodic rather than per-build — check, don't assume either way.
+Builds v1416 through v1671 kept every one of these directory names, so the renaming is episodic rather than per-build — check, don't assume either way. No Security Cloud spec has moved into `external/` since; the four stage rows are still stage-sourced as of v1671.
 
 Stage vs dev differ only in `info.title`, the `servers`/`tokenUrl` host, and an `x-generated`/`x-debug` block dev carries and stage does not. Take stage. Build v1401 also moved the beta hosts from `{region}.stage.apigw.jamfnebula.com` (us/eu/apac) to `{region}.api.stage.platform.jamflabs.com` (us1 only) — ingested verbatim because these specs are upstream mirrors, but it means the `servers` block in the published `api/*.json` names a labs stage host that is not the `{region}.apigw.jamf.com` prod gateway the SDK actually calls. Cosmetic for the SDK; worth reporting upstream rather than patching locally.
 
@@ -217,6 +217,26 @@ Do **not** fall back to the source specs in `public-apis-oas/redocly-implementat
 **Not routed by the gateway** (403 `BAD_PERMISSIONS` with credentials that reach every other Security Cloud path — the unrouted-endpoint tell, not a privilege problem): the `jsc-api-gateway` ping, `securitycloud-devices`' `GET /v1/…/devices`, and — while they were generated — `POST /v1/activation-profiles/{code}/pause` and `/resume`.
 
 **Re-probed 2026-08-20 and now routed:** `GET /v2/…/groups` (200, `{groups: []}`) and `GET /v1/…/activation-profiles` (200). The `skipOnGatewayUnrouted` acceptance helper existed only for these two and has been deleted — both tests now fail on a 403 rather than skipping, which is the point: a 403 resurfacing means routing regressed or the region in use lags EU. Nothing else in the SDK needed it, so do not reintroduce a blanket-403 skip; name the endpoint and fail.
+
+**Build v1671 (2026-08-26) — no spec change at all, and a prod host that does not exist yet.** dns, ztna, categories and uem-connect are **byte-identical** to v1582. device-groups changed exactly four lines: `servers[0].url` and the OAuth `tokenUrl` moved from `{region}.apigw.jamf.com` to `{region}.api.jamfcloud.com`. No path, schema, `required`, `enum` or `x-required-privileges` change anywhere in the five. The generated diff is the same two strings in `api/securitycloud_device_groups_api.json` and nothing else — no Go moved.
+
+**The new host resolves but is not wired up, so do not chase it.** Wire-verified 2026-08-27: `eu.api.jamfcloud.com` and `us.api.jamfcloud.com` both resolve to one CloudFront distribution (`d2jmnb3kwds4a0`) which answers **502** on every path with *"CloudFront wasn't able to resolve the origin domain name"* — the distribution exists, its origin does not. `eu.apigw.jamf.com` still answers normally in the same probe (401 on an unauthenticated call, 400 on a bodyless token POST), and every authenticated probe and the whole acceptance suite ran against it. This is bundle-wide, not a Security Cloud quirk: **all 27 `external/` specs in v1671 advertise `{region}.api.jamfcloud.com`**, so a full ingest of any other family carries the same dead host into `api/*.json`.
+
+Ingested verbatim regardless, for the same reason the v1401 labs-stage host was: these specs are upstream mirrors, `servers` is documentation the SDK never reads (the base URL is caller-supplied — nothing in Go references either host outside doc comments), and patching it locally would break the round-trip. But it *is* published in our `api/*.json` as guidance, so it is worth reporting upstream — this is the v1495 pattern again, specs landing ahead of the release, only this time in a field that cannot break a call.
+
+**Device groups v1 carries runtime `Deprecation` headers, and the spec declares only half of them.** Wire-verified 2026-08-27, header-by-header across all five v1 group operations:
+
+| op | `Deprecation` header | spec `deprecated` | advertised successor |
+|---|---|---|---|
+| `GET /v1/groups` | `@1786492800` (2026-08-12) | **true**, `x-deprecation-date: 2026-08-12` | `/v2/customers/{tenantId}/groups` |
+| `PUT /v1/groups/{id}` | `@1787616000` (2026-08-25) | **absent** | `/v2/customers/{tenantId}/groups/{id}` |
+| `POST /v1/groups` | none | absent | — |
+| `GET /v1/groups/{id}` | none | absent | — |
+| `DELETE /v1/groups/{id}` | none | absent | — |
+
+Two things follow. First, `ListDeviceGroupsV1` gets its `// Deprecated:` godoc from the spec and `ListDeviceGroupsV2` is whitelisted alongside it, so the never-deprecate-without-a-successor rule holds. `UpdateDeviceGroupV1` gets no marker, correctly — the spec is silent and we do not edit specs — and consumers are still warned, because `logDeprecation` (`internal/client/client.go`) logs any runtime `Deprecation` header once per method+path. That mechanism is what covers a wire-only deprecation, and it fired on this build's suite run unprompted; nothing needed building for it.
+
+Second, **the successor the header names does not exist.** `/v2/customers/{tenantId}/groups` is a third URL shape — `customers`, not `tenant`, with the ID back in the path — and it answers `403 BAD_PERMISSIONS`, the unrouted-path tell, as does `PUT /v2/groups/{id}` and the `customers`-shaped PUT. The spec declares no `PUT /v2/…` at all: v2 is list-only. So the server is telling callers to migrate a write operation to a path that is neither published nor routed. Report upstream; and **if a future build adds `deprecated: true` to `PUT /v1/groups/{id}`, hold that half of the ingest** until a v2 write is routed — emitting the marker with no reachable successor turns every consumer's `staticcheck` SA1019 red with nothing to migrate to, which is exactly the failure the rule above exists to prevent.
 
 **Build v1582 (2026-08-25) — the privilege split finishes, and three schema corrections.** dns and categories are byte-identical to v1559; the rest:
 
