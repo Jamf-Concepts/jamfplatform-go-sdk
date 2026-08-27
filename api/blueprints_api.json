@@ -2777,7 +2777,7 @@
         ]
       },
       "patch": {
-        "description": "Updates a blueprint configuration.\n\n**Required Permissions:** `blueprints:update`",
+        "description": "Updates a blueprint configuration.\n\nDivision assignment is managed outside of this API. A `divisionId` field in the\nrequest body is rejected with a `400` and error code `DIVISION_ASSIGNMENT_NOT_ALLOWED`,\nwhether it carries a value or `null`. A blueprint that is already assigned to a division\ncannot be updated here at all, and any update to it is rejected with a `409` and error\ncode `DIVISION_PATCH_NOT_ALLOWED`.\n\n\n**Required Permissions:** `blueprints:update`",
         "operationId": "patchBlueprint",
         "parameters": [
           {
@@ -2816,7 +2816,7 @@
                 }
               }
             },
-            "description": "Blueprint update is not valid"
+            "description": "Blueprint update is not valid, or contains fields that cannot be set through this API, such as `divisionId`"
           },
           "404": {
             "content": {
@@ -2827,6 +2827,16 @@
               }
             },
             "description": "Blueprint wasn't found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Blueprint is assigned to a division and cannot be updated through this API"
           },
           "415": {
             "content": {

@@ -944,6 +944,10 @@ type DeviceFieldMappings struct {
 	PhoneNumberMapping *string `json:"phoneNumberMapping,omitempty"`
 	// How the device email is derived. `EMAIL_ADDRESS` uses the UEM email attribute directly; any other
 	// type reads from that attribute and optionally decorates it into an address.
+	// Vendors that support the `CUSTOM` type carry an additional `fieldName` property naming the UEM
+	// attribute to read. It is not documented as a property here because the vendors that do not support
+	// `CUSTOM` do not emit it at all, and ADG-125 requires every documented field to be present in every
+	// response.
 	UserEmailMapping *EmailMapping `json:"userEmailMapping,omitempty"`
 	// UEM attribute the user identifier is read from.
 	UserIDMapping *string `json:"userIdMapping,omitempty"`
@@ -968,7 +972,7 @@ type DeviceSyncAuth struct {
 	Username *string `json:"username,omitempty"`
 }
 
-// EmailMapping How the device email is derived. `EMAIL_ADDRESS` uses the UEM email attribute directly; any other type reads from that attribute and optionally decorates it into an address.
+// EmailMapping How the device email is derived. `EMAIL_ADDRESS` uses the UEM email attribute directly; any other type reads from that attribute and optionally decorates it into an address. Vendors that support the `CUSTOM` type carry an additional `fieldName` property naming the UEM attribute to read. It is not documented as a property here because the vendors that do not support `CUSTOM` do not emit it at all, and ADG-125 requires every documented field to be present in every response.
 type EmailMapping struct {
 	// Prepended to the resolved value. Ignored when `type` is `EMAIL_ADDRESS`.
 	FieldPrefix *string `json:"fieldPrefix,omitempty"`

@@ -635,16 +635,16 @@ type ConnectorConfigVendor = string
 // ConnectorConfigVendor values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	ConnectorConfigVendorIntune       ConnectorConfigVendor = "INTUNE"
-	ConnectorConfigVendorXenmobile    ConnectorConfigVendor = "XENMOBILE"
-	ConnectorConfigVendorMaas360      ConnectorConfigVendor = "MAAS360"
-	ConnectorConfigVendorWorkspaceOne ConnectorConfigVendor = "WORKSPACE_ONE"
-	ConnectorConfigVendorJamfPro      ConnectorConfigVendor = "JAMF_PRO"
-	ConnectorConfigVendorJamfSchool   ConnectorConfigVendor = "JAMF_SCHOOL"
-	ConnectorConfigVendorMicloud      ConnectorConfigVendor = "MICLOUD"
-	ConnectorConfigVendorMicore       ConnectorConfigVendor = "MICORE"
-	ConnectorConfigVendorGoogle       ConnectorConfigVendor = "GOOGLE"
-	ConnectorConfigVendorWizy         ConnectorConfigVendor = "WIZY"
+	ConnectorConfigVendorIntune          ConnectorConfigVendor = "INTUNE"
+	ConnectorConfigVendorXenmobile       ConnectorConfigVendor = "XENMOBILE"
+	ConnectorConfigVendorMaas360         ConnectorConfigVendor = "MAAS360"
+	ConnectorConfigVendorAirwatch        ConnectorConfigVendor = "AIRWATCH"
+	ConnectorConfigVendorJamfPro         ConnectorConfigVendor = "JAMF_PRO"
+	ConnectorConfigVendorJamfSchool      ConnectorConfigVendor = "JAMF_SCHOOL"
+	ConnectorConfigVendorMobileironcloud ConnectorConfigVendor = "MOBILEIRONCLOUD"
+	ConnectorConfigVendorMobileironcore  ConnectorConfigVendor = "MOBILEIRONCORE"
+	ConnectorConfigVendorGoogle          ConnectorConfigVendor = "GOOGLE"
+	ConnectorConfigVendorWizy            ConnectorConfigVendor = "WIZY"
 )
 
 // ConnectorConfigVendorValues returns every value the Jamf API accepts for ConnectorConfigVendor,
@@ -658,11 +658,11 @@ func ConnectorConfigVendorValues() []ConnectorConfigVendor {
 		ConnectorConfigVendorIntune,
 		ConnectorConfigVendorXenmobile,
 		ConnectorConfigVendorMaas360,
-		ConnectorConfigVendorWorkspaceOne,
+		ConnectorConfigVendorAirwatch,
 		ConnectorConfigVendorJamfPro,
 		ConnectorConfigVendorJamfSchool,
-		ConnectorConfigVendorMicloud,
-		ConnectorConfigVendorMicore,
+		ConnectorConfigVendorMobileironcloud,
+		ConnectorConfigVendorMobileironcore,
 		ConnectorConfigVendorGoogle,
 		ConnectorConfigVendorWizy,
 	}
@@ -674,16 +674,16 @@ type ConnectorCreateRequestVendor = string
 // ConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	ConnectorCreateRequestVendorIntune       ConnectorCreateRequestVendor = "INTUNE"
-	ConnectorCreateRequestVendorXenmobile    ConnectorCreateRequestVendor = "XENMOBILE"
-	ConnectorCreateRequestVendorMaas360      ConnectorCreateRequestVendor = "MAAS360"
-	ConnectorCreateRequestVendorWorkspaceOne ConnectorCreateRequestVendor = "WORKSPACE_ONE"
-	ConnectorCreateRequestVendorJamfPro      ConnectorCreateRequestVendor = "JAMF_PRO"
-	ConnectorCreateRequestVendorJamfSchool   ConnectorCreateRequestVendor = "JAMF_SCHOOL"
-	ConnectorCreateRequestVendorMicloud      ConnectorCreateRequestVendor = "MICLOUD"
-	ConnectorCreateRequestVendorMicore       ConnectorCreateRequestVendor = "MICORE"
-	ConnectorCreateRequestVendorGoogle       ConnectorCreateRequestVendor = "GOOGLE"
-	ConnectorCreateRequestVendorWizy         ConnectorCreateRequestVendor = "WIZY"
+	ConnectorCreateRequestVendorIntune          ConnectorCreateRequestVendor = "INTUNE"
+	ConnectorCreateRequestVendorXenmobile       ConnectorCreateRequestVendor = "XENMOBILE"
+	ConnectorCreateRequestVendorMaas360         ConnectorCreateRequestVendor = "MAAS360"
+	ConnectorCreateRequestVendorAirwatch        ConnectorCreateRequestVendor = "AIRWATCH"
+	ConnectorCreateRequestVendorJamfPro         ConnectorCreateRequestVendor = "JAMF_PRO"
+	ConnectorCreateRequestVendorJamfSchool      ConnectorCreateRequestVendor = "JAMF_SCHOOL"
+	ConnectorCreateRequestVendorMobileironcloud ConnectorCreateRequestVendor = "MOBILEIRONCLOUD"
+	ConnectorCreateRequestVendorMobileironcore  ConnectorCreateRequestVendor = "MOBILEIRONCORE"
+	ConnectorCreateRequestVendorGoogle          ConnectorCreateRequestVendor = "GOOGLE"
+	ConnectorCreateRequestVendorWizy            ConnectorCreateRequestVendor = "WIZY"
 )
 
 // ConnectorCreateRequestVendorValues returns every value the Jamf API accepts for ConnectorCreateRequestVendor,
@@ -697,11 +697,11 @@ func ConnectorCreateRequestVendorValues() []ConnectorCreateRequestVendor {
 		ConnectorCreateRequestVendorIntune,
 		ConnectorCreateRequestVendorXenmobile,
 		ConnectorCreateRequestVendorMaas360,
-		ConnectorCreateRequestVendorWorkspaceOne,
+		ConnectorCreateRequestVendorAirwatch,
 		ConnectorCreateRequestVendorJamfPro,
 		ConnectorCreateRequestVendorJamfSchool,
-		ConnectorCreateRequestVendorMicloud,
-		ConnectorCreateRequestVendorMicore,
+		ConnectorCreateRequestVendorMobileironcloud,
+		ConnectorCreateRequestVendorMobileironcore,
 		ConnectorCreateRequestVendorGoogle,
 		ConnectorCreateRequestVendorWizy,
 	}
@@ -722,6 +722,7 @@ const (
 	EmailMappingTypeDeviceName     EmailMappingType = "DEVICE_NAME"
 	EmailMappingTypeExternalUserID EmailMappingType = "EXTERNAL_USER_ID"
 	EmailMappingTypeName           EmailMappingType = "NAME"
+	EmailMappingTypeCustom         EmailMappingType = "CUSTOM"
 )
 
 // EmailMappingTypeValues returns every value the Jamf API accepts for EmailMappingType,
@@ -741,6 +742,7 @@ func EmailMappingTypeValues() []EmailMappingType {
 		EmailMappingTypeDeviceName,
 		EmailMappingTypeExternalUserID,
 		EmailMappingTypeName,
+		EmailMappingTypeCustom,
 	}
 }
 
@@ -955,16 +957,16 @@ type SyncSettingsVendor = string
 // SyncSettingsVendor values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	SyncSettingsVendorIntune       SyncSettingsVendor = "INTUNE"
-	SyncSettingsVendorXenmobile    SyncSettingsVendor = "XENMOBILE"
-	SyncSettingsVendorMaas360      SyncSettingsVendor = "MAAS360"
-	SyncSettingsVendorWorkspaceOne SyncSettingsVendor = "WORKSPACE_ONE"
-	SyncSettingsVendorJamfPro      SyncSettingsVendor = "JAMF_PRO"
-	SyncSettingsVendorJamfSchool   SyncSettingsVendor = "JAMF_SCHOOL"
-	SyncSettingsVendorMicloud      SyncSettingsVendor = "MICLOUD"
-	SyncSettingsVendorMicore       SyncSettingsVendor = "MICORE"
-	SyncSettingsVendorGoogle       SyncSettingsVendor = "GOOGLE"
-	SyncSettingsVendorWizy         SyncSettingsVendor = "WIZY"
+	SyncSettingsVendorIntune          SyncSettingsVendor = "INTUNE"
+	SyncSettingsVendorXenmobile       SyncSettingsVendor = "XENMOBILE"
+	SyncSettingsVendorMaas360         SyncSettingsVendor = "MAAS360"
+	SyncSettingsVendorAirwatch        SyncSettingsVendor = "AIRWATCH"
+	SyncSettingsVendorJamfPro         SyncSettingsVendor = "JAMF_PRO"
+	SyncSettingsVendorJamfSchool      SyncSettingsVendor = "JAMF_SCHOOL"
+	SyncSettingsVendorMobileironcloud SyncSettingsVendor = "MOBILEIRONCLOUD"
+	SyncSettingsVendorMobileironcore  SyncSettingsVendor = "MOBILEIRONCORE"
+	SyncSettingsVendorGoogle          SyncSettingsVendor = "GOOGLE"
+	SyncSettingsVendorWizy            SyncSettingsVendor = "WIZY"
 )
 
 // SyncSettingsVendorValues returns every value the Jamf API accepts for SyncSettingsVendor,
@@ -978,11 +980,11 @@ func SyncSettingsVendorValues() []SyncSettingsVendor {
 		SyncSettingsVendorIntune,
 		SyncSettingsVendorXenmobile,
 		SyncSettingsVendorMaas360,
-		SyncSettingsVendorWorkspaceOne,
+		SyncSettingsVendorAirwatch,
 		SyncSettingsVendorJamfPro,
 		SyncSettingsVendorJamfSchool,
-		SyncSettingsVendorMicloud,
-		SyncSettingsVendorMicore,
+		SyncSettingsVendorMobileironcloud,
+		SyncSettingsVendorMobileironcore,
 		SyncSettingsVendorGoogle,
 		SyncSettingsVendorWizy,
 	}
