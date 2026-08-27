@@ -20,8 +20,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
 //
-// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: declarations:read.
 //
 // Parameters:
 //   - deviceID: The platform deviceId.
@@ -37,8 +36,7 @@ func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string
 
 // GetDeviceDeclarationReportFiltered get filtered device report declarations.
 //
-// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: declarations:read.
 //
 // Parameters:
 //   - deviceID: The platform deviceId.
@@ -77,8 +75,7 @@ func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceI
 
 // GetDeviceChannels get device channels.
 //
-// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: declarations:read.
 //
 // Parameters:
 //   - deviceID: The platform deviceId.

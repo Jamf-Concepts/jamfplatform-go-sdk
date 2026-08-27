@@ -13,11 +13,11 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"GetDeviceChannels":                    {Method: "GetDeviceChannels", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/channels", Scoped: []string{"read:pro:declaration-reporting", "read:school:declaration-reporting"}, Legacy: nil},
-	"GetDeviceDeclarationReport":           {Method: "GetDeviceDeclarationReport", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}", Scoped: []string{"read:pro:declaration-reporting", "read:school:declaration-reporting"}, Legacy: nil},
-	"GetDeviceDeclarationReportFiltered":   {Method: "GetDeviceDeclarationReportFiltered", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/declarations", Scoped: []string{"read:pro:declaration-reporting", "read:school:declaration-reporting"}, Legacy: nil},
-	"ListDeclarationReportClients":         {Method: "ListDeclarationReportClients", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}", Scoped: []string{"read:pro:declaration-reporting", "read:school:declaration-reporting"}, Legacy: nil},
-	"ListDeclarationReportClientsFiltered": {Method: "ListDeclarationReportClientsFiltered", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}/devices", Scoped: []string{"read:pro:declaration-reporting", "read:school:declaration-reporting"}, Legacy: nil},
+	"GetDeviceChannels":                    {Method: "GetDeviceChannels", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/channels", Scoped: []string{"declarations:read"}, Legacy: nil},
+	"GetDeviceDeclarationReport":           {Method: "GetDeviceDeclarationReport", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}", Scoped: []string{"declarations:read"}, Legacy: nil},
+	"GetDeviceDeclarationReportFiltered":   {Method: "GetDeviceDeclarationReportFiltered", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/declarations", Scoped: []string{"declarations:read"}, Legacy: nil},
+	"ListDeclarationReportClients":         {Method: "ListDeclarationReportClients", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}", Scoped: []string{"declarations:read"}, Legacy: nil},
+	"ListDeclarationReportClientsFiltered": {Method: "ListDeclarationReportClientsFiltered", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}/devices", Scoped: []string{"declarations:read"}, Legacy: nil},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

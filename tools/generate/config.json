@@ -11,7 +11,7 @@
       "specFile": "device_inventory_api.json",
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/devices",
+          "op": "GET /v1/devices",
           "name": "ListDevices",
           "pagination": "hasNext",
           "maxPageSize": 1000,
@@ -38,19 +38,19 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/devices/{id}",
+          "op": "GET /v1/devices/{id}",
           "name": "GetDevice"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/devices/{id}",
+          "op": "PATCH /v1/devices/{id}",
           "name": "UpdateDevice"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/devices/{id}",
+          "op": "DELETE /v1/devices/{id}",
           "name": "DeleteDevice"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/devices/{id}/applications",
+          "op": "GET /v1/devices/{id}/applications",
           "name": "ListDeviceApplications",
           "pagination": "hasNext",
           "maxPageSize": 1000,
@@ -60,7 +60,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/users/{id}/devices",
+          "op": "GET /v1/users/{id}/devices",
           "name": "ListDevicesForUser",
           "pagination": "hasNext",
           "maxPageSize": 1000,
@@ -82,7 +82,7 @@
       "specFile": "blueprints_api.json",
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/blueprints",
+          "op": "GET /v1/blueprints",
           "name": "ListBlueprints",
           "pagination": "sizeCheck",
           "params": [
@@ -99,35 +99,35 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/blueprints",
+          "op": "POST /v1/blueprints",
           "name": "CreateBlueprint"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/blueprints/{blueprintId}",
+          "op": "GET /v1/blueprints/{blueprintId}",
           "name": "GetBlueprint"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/blueprints/{blueprintId}",
+          "op": "PATCH /v1/blueprints/{blueprintId}",
           "name": "UpdateBlueprint"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/blueprints/{blueprintId}",
+          "op": "DELETE /v1/blueprints/{blueprintId}",
           "name": "DeleteBlueprint"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/blueprints/{blueprintId}/deploy",
+          "op": "POST /v1/blueprints/{blueprintId}/deploy",
           "name": "DeployBlueprint"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/blueprints/{blueprintId}/undeploy",
+          "op": "POST /v1/blueprints/{blueprintId}/undeploy",
           "name": "UndeployBlueprint"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/blueprints/{blueprintId}/report",
+          "op": "GET /v1/blueprints/{blueprintId}/report",
           "name": "GetBlueprintReport"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/blueprint-components",
+          "op": "GET /v1/blueprint-components",
           "name": "ListBlueprintComponents",
           "pagination": "sizeCheck",
           "resolver": {
@@ -139,7 +139,7 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/blueprint-components/{identifier}",
+          "op": "GET /v1/blueprint-components/{identifier}",
           "name": "GetBlueprintComponent"
         }
       ],
@@ -161,7 +161,7 @@
       "specFile": "device_group_inventory_api.json",
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/device-groups",
+          "op": "GET /v1/device-groups",
           "name": "ListDeviceGroups",
           "pagination": "hasNext",
           "params": [
@@ -177,32 +177,32 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/device-groups",
+          "op": "POST /v1/device-groups",
           "name": "CreateDeviceGroup"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-groups/{id}",
+          "op": "GET /v1/device-groups/{id}",
           "name": "GetDeviceGroup"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/device-groups/{id}",
+          "op": "PATCH /v1/device-groups/{id}",
           "name": "UpdateDeviceGroup"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/device-groups/{id}",
+          "op": "DELETE /v1/device-groups/{id}",
           "name": "DeleteDeviceGroup"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/device-groups/{id}/members",
+          "op": "GET /v1/device-groups/{id}/members",
           "name": "ListDeviceGroupMembers",
           "unwrapResults": "[]string"
         },
         {
-          "op": "PATCH /v1/tenant/{tenantId}/device-groups/{id}/members",
+          "op": "PATCH /v1/device-groups/{id}/members",
           "name": "UpdateDeviceGroupMembers"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/devices/{id}/device-groups",
+          "op": "GET /v1/devices/{id}/device-groups",
           "name": "ListDeviceGroupsForDevice",
           "pathNames": {
             "id": "deviceID"
@@ -219,23 +219,23 @@
       "specFile": "device_management_action_api.json",
       "operations": [
         {
-          "op": "POST /v1/tenant/{tenantId}/devices/{id}/check-in",
+          "op": "POST /v1/devices/{id}/check-in",
           "name": "CheckInDevice"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/devices/{id}/erase",
+          "op": "POST /v1/devices/{id}/erase",
           "name": "EraseDevice"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/devices/{id}/restart",
+          "op": "POST /v1/devices/{id}/restart",
           "name": "RestartDevice"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/devices/{id}/shutdown",
+          "op": "POST /v1/devices/{id}/shutdown",
           "name": "ShutdownDevice"
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/devices/{id}/unmanage",
+          "op": "POST /v1/devices/{id}/unmanage",
           "name": "UnmanageDevice"
         }
       ]
@@ -248,11 +248,11 @@
       "specFile": "declaration_reporting_service.json",
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}",
+          "op": "GET /v1/devices/{deviceId}",
           "name": "GetDeviceDeclarationReport"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}/declarations",
+          "op": "GET /v1/devices/{deviceId}/declarations",
           "name": "GetDeviceDeclarationReportFiltered",
           "pagination": "totalCount",
           "pageSizeParam": "size",
@@ -262,11 +262,11 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/devices/{deviceId}/channels",
+          "op": "GET /v1/devices/{deviceId}/channels",
           "name": "GetDeviceChannels"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/declarations/{declarationIdentifier}",
+          "op": "GET /v1/declarations/{declarationIdentifier}",
           "name": "ListDeclarationReportClients",
           "pagination": "totalCount",
           "pageSizeParam": "size",
@@ -275,7 +275,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/declarations/{declarationIdentifier}/devices",
+          "op": "GET /v1/declarations/{declarationIdentifier}/devices",
           "name": "ListDeclarationReportClientsFiltered",
           "pagination": "totalCount",
           "pageSizeParam": "size",
@@ -292,51 +292,9 @@
       "package": "compliancebenchmarks",
       "splitByTag": true,
       "specFile": "compliance_benchmark_engine.json",
-      "schemaCreations": {
-        "ODVRecommendation": {
-          "type": "object",
-          "description": "The recommended organization-defined value for a rule on one OS version.",
-          "properties": {
-            "hint": {
-              "type": "string",
-              "description": "Guidance on what values the rule accepts."
-            },
-            "value": {
-              "type": "string",
-              "description": "The recommended value for this OS version."
-            }
-          }
-        },
-        "OsSpecificRuleInfo": {
-          "type": "object",
-          "description": "Per-OS-version overrides of a rule's title, description and recommended organization-defined value.",
-          "properties": {
-            "description": {
-              "type": "string"
-            },
-            "odv": {
-              "$ref": "#/components/schemas/ODVRecommendation"
-            },
-            "title": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "schemaPatches": {
-        "RuleInfo": {
-          "osSpecificDefaults": {
-            "type": "object",
-            "description": "Per-OS-version rule overrides, keyed by OS identifier (MAC_OS_13, MAC_OS_14, ...). Empty when the rule is identical on every supported OS.",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/OsSpecificRuleInfo"
-            }
-          }
-        }
-      },
       "operations": [
         {
-          "op": "GET /v1/tenant/{tenantId}/benchmarks",
+          "op": "GET /v1/benchmarks",
           "name": "ListBenchmarks",
           "resolver": {
             "resourceType": "Benchmark",
@@ -348,20 +306,20 @@
           }
         },
         {
-          "op": "POST /v1/tenant/{tenantId}/benchmarks",
+          "op": "POST /v1/benchmarks",
           "name": "CreateBenchmark",
           "expectedStatus": 202
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}",
+          "op": "GET /v1/benchmarks/{id}",
           "name": "GetBenchmark"
         },
         {
-          "op": "DELETE /v1/tenant/{tenantId}/benchmarks/{id}",
+          "op": "DELETE /v1/benchmarks/{id}",
           "name": "DeleteBenchmark"
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/baselines",
+          "op": "GET /v1/baselines",
           "name": "ListBaselines",
           "resolver": {
             "resourceType": "Baseline",
@@ -373,14 +331,14 @@
           }
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/rules",
+          "op": "GET /v1/rules",
           "name": "GetBaselineRules",
           "params": [
             "baseline-id:string:baselineID"
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}/rules",
+          "op": "GET /v1/benchmarks/{id}/rules",
           "name": "ListBenchmarkRulesStats",
           "pagination": "sizeCheck",
           "params": [
@@ -389,7 +347,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}/devices",
+          "op": "GET /v1/benchmarks/{id}/devices",
           "name": "ListBenchmarkRuleDevices",
           "pagination": "sizeCheck",
           "params": [
@@ -400,7 +358,7 @@
           ]
         },
         {
-          "op": "GET /v1/tenant/{tenantId}/benchmarks/{id}/compliance-percentage",
+          "op": "GET /v1/benchmarks/{id}/compliance-percentage",
           "name": "GetBenchmarkCompliancePercentage"
         }
       ]
@@ -6273,7 +6231,7 @@
       },
       "operations": [
         {
-          "op": "GET /tenant/{tenantId}/computers/id/{id}",
+          "op": "GET /computers/id/{id}",
           "name": "GetComputerByID",
           "responseType": "computer",
           "pathNames": {
@@ -6281,12 +6239,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/name/{name}",
+          "op": "GET /computers/name/{name}",
           "name": "GetComputerByName",
           "responseType": "computer"
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/serialnumber/{serialnumber}",
+          "op": "GET /computers/serialnumber/{serialnumber}",
           "name": "GetComputerBySerialNumber",
           "responseType": "computer",
           "pathNames": {
@@ -6294,7 +6252,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/computers/id/{id}",
+          "op": "POST /computers/id/{id}",
           "name": "CreateComputerByID",
           "requestType": "computer_post",
           "pathNames": {
@@ -6303,7 +6261,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/computers/id/{id}",
+          "op": "PUT /computers/id/{id}",
           "name": "UpdateComputerByID",
           "requestType": "computer_post",
           "pathNames": {
@@ -6312,31 +6270,31 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/computers/name/{name}",
+          "op": "PUT /computers/name/{name}",
           "name": "UpdateComputerByName",
           "requestType": "computer_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computers/id/{id}",
+          "op": "DELETE /computers/id/{id}",
           "name": "DeleteComputerByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computers/name/{name}",
+          "op": "DELETE /computers/name/{name}",
           "name": "DeleteComputerByName"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computers/serialnumber/{serialnumber}",
+          "op": "DELETE /computers/serialnumber/{serialnumber}",
           "name": "DeleteComputerBySerialNumber",
           "pathNames": {
             "serialnumber": "serialNumber"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/buildings/id/{id}",
+          "op": "GET /buildings/id/{id}",
           "name": "GetBuildingByID",
           "responseType": "building",
           "pathNames": {
@@ -6344,7 +6302,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/buildings/id/{id}",
+          "op": "POST /buildings/id/{id}",
           "name": "CreateBuildingByID",
           "requestType": "building",
           "responseType": "building",
@@ -6354,7 +6312,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/buildings/id/{id}",
+          "op": "PUT /buildings/id/{id}",
           "name": "UpdateBuildingByID",
           "requestType": "building",
           "pathNames": {
@@ -6363,14 +6321,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/buildings/id/{id}",
+          "op": "DELETE /buildings/id/{id}",
           "name": "DeleteBuildingByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/departments/id/{id}",
+          "op": "GET /departments/id/{id}",
           "name": "GetDepartmentByID",
           "responseType": "department",
           "pathNames": {
@@ -6378,7 +6336,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/departments/id/{id}",
+          "op": "POST /departments/id/{id}",
           "name": "CreateDepartmentByID",
           "requestType": "department",
           "responseType": "department",
@@ -6388,7 +6346,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/departments/id/{id}",
+          "op": "PUT /departments/id/{id}",
           "name": "UpdateDepartmentByID",
           "requestType": "department",
           "pathNames": {
@@ -6397,14 +6355,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/departments/id/{id}",
+          "op": "DELETE /departments/id/{id}",
           "name": "DeleteDepartmentByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/categories/id/{id}",
+          "op": "GET /categories/id/{id}",
           "name": "GetCategoryByID",
           "responseType": "category",
           "pathNames": {
@@ -6412,7 +6370,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/categories/id/{id}",
+          "op": "POST /categories/id/{id}",
           "name": "CreateCategoryByID",
           "requestType": "category",
           "responseType": "category",
@@ -6422,7 +6380,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/categories/id/{id}",
+          "op": "PUT /categories/id/{id}",
           "name": "UpdateCategoryByID",
           "requestType": "category",
           "pathNames": {
@@ -6431,14 +6389,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/categories/id/{id}",
+          "op": "DELETE /categories/id/{id}",
           "name": "DeleteCategoryByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/sites/id/{id}",
+          "op": "GET /sites/id/{id}",
           "name": "GetSiteByID",
           "responseType": "site",
           "pathNames": {
@@ -6446,7 +6404,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/sites/id/{id}",
+          "op": "POST /sites/id/{id}",
           "name": "CreateSiteByID",
           "requestType": "site",
           "responseType": "site",
@@ -6456,7 +6414,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/sites/id/{id}",
+          "op": "PUT /sites/id/{id}",
           "name": "UpdateSiteByID",
           "requestType": "site",
           "pathNames": {
@@ -6465,14 +6423,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/sites/id/{id}",
+          "op": "DELETE /sites/id/{id}",
           "name": "DeleteSiteByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/scripts/id/{id}",
+          "op": "GET /scripts/id/{id}",
           "name": "GetScriptByID",
           "responseType": "script",
           "pathNames": {
@@ -6480,7 +6438,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/scripts/id/{id}",
+          "op": "POST /scripts/id/{id}",
           "name": "CreateScriptByID",
           "requestType": "script",
           "responseType": "script",
@@ -6490,7 +6448,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/scripts/id/{id}",
+          "op": "PUT /scripts/id/{id}",
           "name": "UpdateScriptByID",
           "requestType": "script",
           "pathNames": {
@@ -6499,14 +6457,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/scripts/id/{id}",
+          "op": "DELETE /scripts/id/{id}",
           "name": "DeleteScriptByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/users/id/{id}",
+          "op": "GET /users/id/{id}",
           "name": "GetUserByID",
           "responseType": "user",
           "pathNames": {
@@ -6514,7 +6472,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/users/id/{id}",
+          "op": "POST /users/id/{id}",
           "name": "CreateUserByID",
           "requestType": "user_post",
           "responseType": "user",
@@ -6524,7 +6482,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/users/id/{id}",
+          "op": "PUT /users/id/{id}",
           "name": "UpdateUserByID",
           "requestType": "user_post",
           "pathNames": {
@@ -6533,14 +6491,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/users/id/{id}",
+          "op": "DELETE /users/id/{id}",
           "name": "DeleteUserByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerextensionattributes/id/{id}",
+          "op": "GET /computerextensionattributes/id/{id}",
           "name": "GetComputerExtensionAttributeByID",
           "responseType": "computer_extension_attribute",
           "pathNames": {
@@ -6548,7 +6506,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/computerextensionattributes/id/{id}",
+          "op": "POST /computerextensionattributes/id/{id}",
           "name": "CreateComputerExtensionAttributeByID",
           "requestType": "computer_extension_attribute",
           "responseType": "computer_extension_attribute",
@@ -6558,7 +6516,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/computerextensionattributes/id/{id}",
+          "op": "PUT /computerextensionattributes/id/{id}",
           "name": "UpdateComputerExtensionAttributeByID",
           "requestType": "computer_extension_attribute",
           "pathNames": {
@@ -6567,14 +6525,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computerextensionattributes/id/{id}",
+          "op": "DELETE /computerextensionattributes/id/{id}",
           "name": "DeleteComputerExtensionAttributeByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceextensionattributes/id/{id}",
+          "op": "GET /mobiledeviceextensionattributes/id/{id}",
           "name": "GetMobileDeviceExtensionAttributeByID",
           "responseType": "mobile_device_extension_attribute",
           "pathNames": {
@@ -6582,7 +6540,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceextensionattributes/id/{id}",
+          "op": "POST /mobiledeviceextensionattributes/id/{id}",
           "name": "CreateMobileDeviceExtensionAttributeByID",
           "requestType": "mobile_device_extension_attribute",
           "responseType": "mobile_device_extension_attribute",
@@ -6592,7 +6550,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceextensionattributes/id/{id}",
+          "op": "PUT /mobiledeviceextensionattributes/id/{id}",
           "name": "UpdateMobileDeviceExtensionAttributeByID",
           "requestType": "mobile_device_extension_attribute",
           "pathNames": {
@@ -6601,14 +6559,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceextensionattributes/id/{id}",
+          "op": "DELETE /mobiledeviceextensionattributes/id/{id}",
           "name": "DeleteMobileDeviceExtensionAttributeByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/userextensionattributes/id/{id}",
+          "op": "GET /userextensionattributes/id/{id}",
           "name": "GetUserExtensionAttributeByID",
           "responseType": "user_extension_attribute",
           "pathNames": {
@@ -6616,7 +6574,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/userextensionattributes/id/{id}",
+          "op": "POST /userextensionattributes/id/{id}",
           "name": "CreateUserExtensionAttributeByID",
           "requestType": "user_extension_attribute",
           "responseType": "user_extension_attribute",
@@ -6626,7 +6584,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/userextensionattributes/id/{id}",
+          "op": "PUT /userextensionattributes/id/{id}",
           "name": "UpdateUserExtensionAttributeByID",
           "requestType": "user_extension_attribute",
           "pathNames": {
@@ -6635,14 +6593,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/userextensionattributes/id/{id}",
+          "op": "DELETE /userextensionattributes/id/{id}",
           "name": "DeleteUserExtensionAttributeByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computergroups/id/{id}",
+          "op": "GET /computergroups/id/{id}",
           "name": "GetComputerGroupByID",
           "responseType": "computer_group",
           "pathNames": {
@@ -6650,7 +6608,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/computergroups/id/{id}",
+          "op": "POST /computergroups/id/{id}",
           "name": "CreateComputerGroupByID",
           "requestType": "computer_group_post",
           "responseType": "computer_group",
@@ -6660,7 +6618,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/computergroups/id/{id}",
+          "op": "PUT /computergroups/id/{id}",
           "name": "UpdateComputerGroupByID",
           "requestType": "computer_group_post",
           "pathNames": {
@@ -6669,14 +6627,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computergroups/id/{id}",
+          "op": "DELETE /computergroups/id/{id}",
           "name": "DeleteComputerGroupByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicegroups/id/{id}",
+          "op": "GET /mobiledevicegroups/id/{id}",
           "name": "GetMobileDeviceGroupByID",
           "responseType": "mobile_device_group",
           "pathNames": {
@@ -6684,7 +6642,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicegroups/id/{id}",
+          "op": "POST /mobiledevicegroups/id/{id}",
           "name": "CreateMobileDeviceGroupByID",
           "requestType": "mobile_device_group",
           "responseType": "mobile_device_group",
@@ -6694,7 +6652,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledevicegroups/id/{id}",
+          "op": "PUT /mobiledevicegroups/id/{id}",
           "name": "UpdateMobileDeviceGroupByID",
           "requestType": "mobile_device_group",
           "pathNames": {
@@ -6703,14 +6661,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledevicegroups/id/{id}",
+          "op": "DELETE /mobiledevicegroups/id/{id}",
           "name": "DeleteMobileDeviceGroupByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/usergroups/id/{id}",
+          "op": "GET /usergroups/id/{id}",
           "name": "GetUserGroupByID",
           "responseType": "user_group",
           "pathNames": {
@@ -6718,7 +6676,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/usergroups/id/{id}",
+          "op": "POST /usergroups/id/{id}",
           "name": "CreateUserGroupByID",
           "requestType": "user_group",
           "responseType": "user_group",
@@ -6728,7 +6686,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/usergroups/id/{id}",
+          "op": "PUT /usergroups/id/{id}",
           "name": "UpdateUserGroupByID",
           "requestType": "user_group",
           "pathNames": {
@@ -6737,14 +6695,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/usergroups/id/{id}",
+          "op": "DELETE /usergroups/id/{id}",
           "name": "DeleteUserGroupByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedcomputersearches/id/{id}",
+          "op": "GET /advancedcomputersearches/id/{id}",
           "name": "GetAdvancedComputerSearchByID",
           "responseType": "advanced_computer_search",
           "pathNames": {
@@ -6752,7 +6710,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/advancedcomputersearches/id/{id}",
+          "op": "POST /advancedcomputersearches/id/{id}",
           "name": "CreateAdvancedComputerSearchByID",
           "requestType": "advanced_computer_search",
           "responseType": "advanced_computer_search",
@@ -6762,7 +6720,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/advancedcomputersearches/id/{id}",
+          "op": "PUT /advancedcomputersearches/id/{id}",
           "name": "UpdateAdvancedComputerSearchByID",
           "requestType": "advanced_computer_search",
           "pathNames": {
@@ -6771,14 +6729,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/advancedcomputersearches/id/{id}",
+          "op": "DELETE /advancedcomputersearches/id/{id}",
           "name": "DeleteAdvancedComputerSearchByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedmobiledevicesearches/id/{id}",
+          "op": "GET /advancedmobiledevicesearches/id/{id}",
           "name": "GetAdvancedMobileDeviceSearchByID",
           "responseType": "advanced_mobile_device_search",
           "pathNames": {
@@ -6786,7 +6744,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/advancedmobiledevicesearches/id/{id}",
+          "op": "POST /advancedmobiledevicesearches/id/{id}",
           "name": "CreateAdvancedMobileDeviceSearchByID",
           "requestType": "advanced_mobile_device_search",
           "responseType": "advanced_mobile_device_search",
@@ -6796,7 +6754,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/advancedmobiledevicesearches/id/{id}",
+          "op": "PUT /advancedmobiledevicesearches/id/{id}",
           "name": "UpdateAdvancedMobileDeviceSearchByID",
           "requestType": "advanced_mobile_device_search",
           "pathNames": {
@@ -6805,14 +6763,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/advancedmobiledevicesearches/id/{id}",
+          "op": "DELETE /advancedmobiledevicesearches/id/{id}",
           "name": "DeleteAdvancedMobileDeviceSearchByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedusersearches/id/{id}",
+          "op": "GET /advancedusersearches/id/{id}",
           "name": "GetAdvancedUserSearchByID",
           "responseType": "advanced_user_search",
           "pathNames": {
@@ -6820,7 +6778,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/advancedusersearches/id/{id}",
+          "op": "POST /advancedusersearches/id/{id}",
           "name": "CreateAdvancedUserSearchByID",
           "requestType": "advanced_user_search",
           "responseType": "advanced_user_search",
@@ -6830,7 +6788,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/advancedusersearches/id/{id}",
+          "op": "PUT /advancedusersearches/id/{id}",
           "name": "UpdateAdvancedUserSearchByID",
           "requestType": "advanced_user_search",
           "pathNames": {
@@ -6839,14 +6797,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/advancedusersearches/id/{id}",
+          "op": "DELETE /advancedusersearches/id/{id}",
           "name": "DeleteAdvancedUserSearchByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/policies/id/{id}",
+          "op": "GET /policies/id/{id}",
           "name": "GetPolicyByID",
           "responseType": "policy",
           "pathNames": {
@@ -6854,7 +6812,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/policies/name/{name}",
+          "op": "GET /policies/name/{name}",
           "name": "GetPolicyByName",
           "responseType": "policy",
           "resolver": {
@@ -6870,7 +6828,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/policies/id/{id}",
+          "op": "POST /policies/id/{id}",
           "name": "CreatePolicyByID",
           "requestType": "policy_post",
           "responseType": "policy",
@@ -6880,7 +6838,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/policies/id/{id}",
+          "op": "PUT /policies/id/{id}",
           "name": "UpdatePolicyByID",
           "requestType": "policy_post",
           "pathNames": {
@@ -6889,24 +6847,24 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/policies/name/{name}",
+          "op": "PUT /policies/name/{name}",
           "name": "UpdatePolicyByName",
           "requestType": "policy_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/policies/id/{id}",
+          "op": "DELETE /policies/id/{id}",
           "name": "DeletePolicyByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/policies/name/{name}",
+          "op": "DELETE /policies/name/{name}",
           "name": "DeletePolicyByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices/id/{id}",
+          "op": "GET /mobiledevices/id/{id}",
           "name": "GetMobileDeviceByID",
           "responseType": "mobile_device",
           "pathNames": {
@@ -6914,12 +6872,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices/name/{name}",
+          "op": "GET /mobiledevices/name/{name}",
           "name": "GetMobileDeviceByName",
           "responseType": "mobile_device"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices/serialnumber/{serialnumber}",
+          "op": "GET /mobiledevices/serialnumber/{serialnumber}",
           "name": "GetMobileDeviceBySerialNumber",
           "responseType": "mobile_device",
           "pathNames": {
@@ -6927,7 +6885,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices/udid/{udid}",
+          "op": "GET /mobiledevices/udid/{udid}",
           "name": "GetMobileDeviceByUDID",
           "responseType": "mobile_device",
           "pathNames": {
@@ -6935,7 +6893,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices/macaddress/{macaddress}",
+          "op": "GET /mobiledevices/macaddress/{macaddress}",
           "name": "GetMobileDeviceByMacAddress",
           "responseType": "mobile_device",
           "pathNames": {
@@ -6943,7 +6901,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevices/id/{id}",
+          "op": "POST /mobiledevices/id/{id}",
           "name": "CreateMobileDeviceByID",
           "requestType": "mobile_device_post",
           "responseType": "mobile_device",
@@ -6953,7 +6911,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledevices/id/{id}",
+          "op": "PUT /mobiledevices/id/{id}",
           "name": "UpdateMobileDeviceByID",
           "requestType": "mobile_device_post",
           "pathNames": {
@@ -6962,13 +6920,13 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledevices/name/{name}",
+          "op": "PUT /mobiledevices/name/{name}",
           "name": "UpdateMobileDeviceByName",
           "requestType": "mobile_device_post",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledevices/serialnumber/{serialnumber}",
+          "op": "PUT /mobiledevices/serialnumber/{serialnumber}",
           "name": "UpdateMobileDeviceBySerialNumber",
           "requestType": "mobile_device_post",
           "pathNames": {
@@ -6977,7 +6935,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledevices/udid/{udid}",
+          "op": "PUT /mobiledevices/udid/{udid}",
           "name": "UpdateMobileDeviceByUDID",
           "requestType": "mobile_device_post",
           "pathNames": {
@@ -6986,7 +6944,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledevices/macaddress/{macaddress}",
+          "op": "PUT /mobiledevices/macaddress/{macaddress}",
           "name": "UpdateMobileDeviceByMacAddress",
           "requestType": "mobile_device_post",
           "pathNames": {
@@ -6995,39 +6953,39 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledevices/id/{id}",
+          "op": "DELETE /mobiledevices/id/{id}",
           "name": "DeleteMobileDeviceByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledevices/name/{name}",
+          "op": "DELETE /mobiledevices/name/{name}",
           "name": "DeleteMobileDeviceByName"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledevices/serialnumber/{serialnumber}",
+          "op": "DELETE /mobiledevices/serialnumber/{serialnumber}",
           "name": "DeleteMobileDeviceBySerialNumber",
           "pathNames": {
             "serialnumber": "serialNumber"
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledevices/udid/{udid}",
+          "op": "DELETE /mobiledevices/udid/{udid}",
           "name": "DeleteMobileDeviceByUDID",
           "pathNames": {
             "udid": "udid"
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledevices/macaddress/{macaddress}",
+          "op": "DELETE /mobiledevices/macaddress/{macaddress}",
           "name": "DeleteMobileDeviceByMacAddress",
           "pathNames": {
             "macaddress": "macAddress"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/osxconfigurationprofiles/id/{id}",
+          "op": "GET /osxconfigurationprofiles/id/{id}",
           "name": "GetOSXConfigurationProfileByID",
           "responseType": "os_x_configuration_profile",
           "pathNames": {
@@ -7035,7 +6993,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/osxconfigurationprofiles/id/{id}",
+          "op": "POST /osxconfigurationprofiles/id/{id}",
           "name": "CreateOSXConfigurationProfileByID",
           "requestType": "os_x_configuration_profile",
           "responseType": "os_x_configuration_profile",
@@ -7045,7 +7003,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/osxconfigurationprofiles/id/{id}",
+          "op": "PUT /osxconfigurationprofiles/id/{id}",
           "name": "UpdateOSXConfigurationProfileByID",
           "requestType": "os_x_configuration_profile",
           "pathNames": {
@@ -7054,14 +7012,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/osxconfigurationprofiles/id/{id}",
+          "op": "DELETE /osxconfigurationprofiles/id/{id}",
           "name": "DeleteOSXConfigurationProfileByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceconfigurationprofiles/id/{id}",
+          "op": "GET /mobiledeviceconfigurationprofiles/id/{id}",
           "name": "GetMobileDeviceConfigurationProfileByID",
           "responseType": "mobile_device_configuration_profile",
           "pathNames": {
@@ -7069,7 +7027,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceconfigurationprofiles/id/{id}",
+          "op": "POST /mobiledeviceconfigurationprofiles/id/{id}",
           "name": "CreateMobileDeviceConfigurationProfileByID",
           "requestType": "mobile_device_configuration_profile",
           "responseType": "mobile_device_configuration_profile",
@@ -7079,7 +7037,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceconfigurationprofiles/id/{id}",
+          "op": "PUT /mobiledeviceconfigurationprofiles/id/{id}",
           "name": "UpdateMobileDeviceConfigurationProfileByID",
           "requestType": "mobile_device_configuration_profile",
           "pathNames": {
@@ -7088,14 +7046,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceconfigurationprofiles/id/{id}",
+          "op": "DELETE /mobiledeviceconfigurationprofiles/id/{id}",
           "name": "DeleteMobileDeviceConfigurationProfileByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/packages/id/{id}",
+          "op": "GET /packages/id/{id}",
           "name": "GetClassicPackageByID",
           "responseType": "package",
           "pathNames": {
@@ -7103,7 +7061,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/packages/id/{id}",
+          "op": "POST /packages/id/{id}",
           "name": "CreateClassicPackageByID",
           "requestType": "package",
           "responseType": "package",
@@ -7113,7 +7071,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/packages/id/{id}",
+          "op": "PUT /packages/id/{id}",
           "name": "UpdateClassicPackageByID",
           "requestType": "package",
           "pathNames": {
@@ -7122,14 +7080,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/packages/id/{id}",
+          "op": "DELETE /packages/id/{id}",
           "name": "DeleteClassicPackageByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/printers/id/{id}",
+          "op": "GET /printers/id/{id}",
           "name": "GetPrinterByID",
           "responseType": "printer",
           "pathNames": {
@@ -7137,7 +7095,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/printers/id/{id}",
+          "op": "POST /printers/id/{id}",
           "name": "CreatePrinterByID",
           "requestType": "printer",
           "responseType": "printer",
@@ -7147,7 +7105,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/printers/id/{id}",
+          "op": "PUT /printers/id/{id}",
           "name": "UpdatePrinterByID",
           "requestType": "printer",
           "pathNames": {
@@ -7156,14 +7114,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/printers/id/{id}",
+          "op": "DELETE /printers/id/{id}",
           "name": "DeletePrinterByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/directorybindings/id/{id}",
+          "op": "GET /directorybindings/id/{id}",
           "name": "GetDirectoryBindingByID",
           "responseType": "directory_binding",
           "pathNames": {
@@ -7171,7 +7129,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/directorybindings/id/{id}",
+          "op": "POST /directorybindings/id/{id}",
           "name": "CreateDirectoryBindingByID",
           "requestType": "directory_binding",
           "responseType": "directory_binding",
@@ -7181,7 +7139,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/directorybindings/id/{id}",
+          "op": "PUT /directorybindings/id/{id}",
           "name": "UpdateDirectoryBindingByID",
           "requestType": "directory_binding",
           "pathNames": {
@@ -7190,14 +7148,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/directorybindings/id/{id}",
+          "op": "DELETE /directorybindings/id/{id}",
           "name": "DeleteDirectoryBindingByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/networksegments/id/{id}",
+          "op": "GET /networksegments/id/{id}",
           "name": "GetNetworkSegmentByID",
           "responseType": "network_segment",
           "pathNames": {
@@ -7205,7 +7163,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/networksegments/id/{id}",
+          "op": "POST /networksegments/id/{id}",
           "name": "CreateNetworkSegmentByID",
           "requestType": "network_segment_post",
           "responseType": "network_segment",
@@ -7215,7 +7173,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/networksegments/id/{id}",
+          "op": "PUT /networksegments/id/{id}",
           "name": "UpdateNetworkSegmentByID",
           "requestType": "network_segment_post",
           "pathNames": {
@@ -7224,14 +7182,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/networksegments/id/{id}",
+          "op": "DELETE /networksegments/id/{id}",
           "name": "DeleteNetworkSegmentByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ldapservers/id/{id}",
+          "op": "GET /ldapservers/id/{id}",
           "name": "GetLDAPServerByID",
           "responseType": "ldap_server",
           "pathNames": {
@@ -7239,7 +7197,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/ldapservers/id/{id}",
+          "op": "POST /ldapservers/id/{id}",
           "name": "CreateLDAPServerByID",
           "requestType": "ldap_server_post",
           "responseType": "ldap_server",
@@ -7249,7 +7207,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/ldapservers/id/{id}",
+          "op": "PUT /ldapservers/id/{id}",
           "name": "UpdateLDAPServerByID",
           "requestType": "ldap_server_post",
           "pathNames": {
@@ -7258,14 +7216,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ldapservers/id/{id}",
+          "op": "DELETE /ldapservers/id/{id}",
           "name": "DeleteLDAPServerByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/distributionpoints/id/{id}",
+          "op": "GET /distributionpoints/id/{id}",
           "name": "GetDistributionPointByID",
           "responseType": "distribution_point",
           "pathNames": {
@@ -7273,7 +7231,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/distributionpoints/id/{id}",
+          "op": "POST /distributionpoints/id/{id}",
           "name": "CreateDistributionPointByID",
           "requestType": "distribution_point_post",
           "responseType": "distribution_point",
@@ -7283,7 +7241,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/distributionpoints/id/{id}",
+          "op": "PUT /distributionpoints/id/{id}",
           "name": "UpdateDistributionPointByID",
           "requestType": "distribution_point_post",
           "pathNames": {
@@ -7292,14 +7250,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/distributionpoints/id/{id}",
+          "op": "DELETE /distributionpoints/id/{id}",
           "name": "DeleteDistributionPointByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/macapplications/id/{id}",
+          "op": "GET /macapplications/id/{id}",
           "name": "GetMacApplicationByID",
           "responseType": "mac_application",
           "pathNames": {
@@ -7307,7 +7265,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/macapplications/id/{id}",
+          "op": "POST /macapplications/id/{id}",
           "name": "CreateMacApplicationByID",
           "requestType": "mac_application",
           "responseType": "mac_application",
@@ -7317,7 +7275,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/macapplications/id/{id}",
+          "op": "PUT /macapplications/id/{id}",
           "name": "UpdateMacApplicationByID",
           "requestType": "mac_application",
           "pathNames": {
@@ -7326,14 +7284,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/macapplications/id/{id}",
+          "op": "DELETE /macapplications/id/{id}",
           "name": "DeleteMacApplicationByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceapplications/id/{id}",
+          "op": "GET /mobiledeviceapplications/id/{id}",
           "name": "GetMobileDeviceApplicationByID",
           "responseType": "mobile_device_application",
           "pathNames": {
@@ -7341,7 +7299,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceapplications/id/{id}",
+          "op": "POST /mobiledeviceapplications/id/{id}",
           "name": "CreateMobileDeviceApplicationByID",
           "requestType": "mobile_device_application",
           "responseType": "mobile_device_application",
@@ -7351,7 +7309,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceapplications/id/{id}",
+          "op": "PUT /mobiledeviceapplications/id/{id}",
           "name": "UpdateMobileDeviceApplicationByID",
           "requestType": "mobile_device_application",
           "pathNames": {
@@ -7360,14 +7318,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceapplications/id/{id}",
+          "op": "DELETE /mobiledeviceapplications/id/{id}",
           "name": "DeleteMobileDeviceApplicationByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ebooks/id/{id}",
+          "op": "GET /ebooks/id/{id}",
           "name": "GetEbookByID",
           "responseType": "ebook",
           "pathNames": {
@@ -7375,7 +7333,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/ebooks/id/{id}",
+          "op": "POST /ebooks/id/{id}",
           "name": "CreateEbookByID",
           "requestType": "ebook_post",
           "responseType": "ebook",
@@ -7385,7 +7343,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/ebooks/id/{id}",
+          "op": "PUT /ebooks/id/{id}",
           "name": "UpdateEbookByID",
           "requestType": "ebook_post",
           "pathNames": {
@@ -7394,14 +7352,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ebooks/id/{id}",
+          "op": "DELETE /ebooks/id/{id}",
           "name": "DeleteEbookByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/classes/id/{id}",
+          "op": "GET /classes/id/{id}",
           "name": "GetClassByID",
           "responseType": "class",
           "pathNames": {
@@ -7409,7 +7367,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/classes/id/{id}",
+          "op": "POST /classes/id/{id}",
           "name": "CreateClassByID",
           "requestType": "class_post",
           "responseType": "class",
@@ -7419,7 +7377,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/classes/id/{id}",
+          "op": "PUT /classes/id/{id}",
           "name": "UpdateClassByID",
           "requestType": "class_post",
           "pathNames": {
@@ -7428,14 +7386,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/classes/id/{id}",
+          "op": "DELETE /classes/id/{id}",
           "name": "DeleteClassByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/licensedsoftware/id/{id}",
+          "op": "GET /licensedsoftware/id/{id}",
           "name": "GetLicensedSoftwareByID",
           "responseType": "licensed_software",
           "pathNames": {
@@ -7443,7 +7401,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/licensedsoftware/id/{id}",
+          "op": "POST /licensedsoftware/id/{id}",
           "name": "CreateLicensedSoftwareByID",
           "requestType": "licensed_software",
           "responseType": "licensed_software",
@@ -7453,7 +7411,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/licensedsoftware/id/{id}",
+          "op": "PUT /licensedsoftware/id/{id}",
           "name": "UpdateLicensedSoftwareByID",
           "requestType": "licensed_software",
           "pathNames": {
@@ -7462,14 +7420,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/licensedsoftware/id/{id}",
+          "op": "DELETE /licensedsoftware/id/{id}",
           "name": "DeleteLicensedSoftwareByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/restrictedsoftware/id/{id}",
+          "op": "GET /restrictedsoftware/id/{id}",
           "name": "GetRestrictedSoftwareByID",
           "responseType": "restricted_software",
           "pathNames": {
@@ -7477,7 +7435,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/restrictedsoftware/id/{id}",
+          "op": "POST /restrictedsoftware/id/{id}",
           "name": "CreateRestrictedSoftwareByID",
           "requestType": "restricted_software",
           "responseType": "restricted_software",
@@ -7487,7 +7445,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/restrictedsoftware/id/{id}",
+          "op": "PUT /restrictedsoftware/id/{id}",
           "name": "UpdateRestrictedSoftwareByID",
           "requestType": "restricted_software",
           "pathNames": {
@@ -7496,14 +7454,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/restrictedsoftware/id/{id}",
+          "op": "DELETE /restrictedsoftware/id/{id}",
           "name": "DeleteRestrictedSoftwareByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/peripheraltypes/id/{id}",
+          "op": "GET /peripheraltypes/id/{id}",
           "name": "GetPeripheralTypeByID",
           "responseType": "peripheral_type",
           "pathNames": {
@@ -7511,7 +7469,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/peripheraltypes/id/{id}",
+          "op": "POST /peripheraltypes/id/{id}",
           "name": "CreatePeripheralTypeByID",
           "requestType": "peripheral_type",
           "responseType": "peripheral_type",
@@ -7521,7 +7479,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/peripheraltypes/id/{id}",
+          "op": "PUT /peripheraltypes/id/{id}",
           "name": "UpdatePeripheralTypeByID",
           "requestType": "peripheral_type",
           "pathNames": {
@@ -7530,14 +7488,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/peripheraltypes/id/{id}",
+          "op": "DELETE /peripheraltypes/id/{id}",
           "name": "DeletePeripheralTypeByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/peripherals/id/{id}",
+          "op": "GET /peripherals/id/{id}",
           "name": "GetPeripheralByID",
           "responseType": "peripheral",
           "pathNames": {
@@ -7545,7 +7503,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/peripherals/id/{id}",
+          "op": "POST /peripherals/id/{id}",
           "name": "CreatePeripheralByID",
           "requestType": "peripheral_post",
           "responseType": "peripheral",
@@ -7555,7 +7513,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/peripherals/id/{id}",
+          "op": "PUT /peripherals/id/{id}",
           "name": "UpdatePeripheralByID",
           "requestType": "peripheral_post",
           "pathNames": {
@@ -7564,14 +7522,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/peripherals/id/{id}",
+          "op": "DELETE /peripherals/id/{id}",
           "name": "DeletePeripheralByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/diskencryptionconfigurations/id/{id}",
+          "op": "GET /diskencryptionconfigurations/id/{id}",
           "name": "GetDiskEncryptionConfigurationByID",
           "responseType": "disk_encryption_configuration",
           "pathNames": {
@@ -7579,7 +7537,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/diskencryptionconfigurations/id/{id}",
+          "op": "POST /diskencryptionconfigurations/id/{id}",
           "name": "CreateDiskEncryptionConfigurationByID",
           "requestType": "disk_encryption_configuration",
           "responseType": "disk_encryption_configuration",
@@ -7589,7 +7547,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/diskencryptionconfigurations/id/{id}",
+          "op": "PUT /diskencryptionconfigurations/id/{id}",
           "name": "UpdateDiskEncryptionConfigurationByID",
           "requestType": "disk_encryption_configuration",
           "pathNames": {
@@ -7598,14 +7556,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/diskencryptionconfigurations/id/{id}",
+          "op": "DELETE /diskencryptionconfigurations/id/{id}",
           "name": "DeleteDiskEncryptionConfigurationByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ibeacons/id/{id}",
+          "op": "GET /ibeacons/id/{id}",
           "name": "GetIBeaconByID",
           "responseType": "ibeacon",
           "pathNames": {
@@ -7613,7 +7571,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/ibeacons/id/{id}",
+          "op": "POST /ibeacons/id/{id}",
           "name": "CreateIBeaconByID",
           "requestType": "ibeacon",
           "responseType": "ibeacon",
@@ -7623,7 +7581,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/ibeacons/id/{id}",
+          "op": "PUT /ibeacons/id/{id}",
           "name": "UpdateIBeaconByID",
           "requestType": "ibeacon",
           "pathNames": {
@@ -7632,14 +7590,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ibeacons/id/{id}",
+          "op": "DELETE /ibeacons/id/{id}",
           "name": "DeleteIBeaconByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/dockitems/id/{id}",
+          "op": "GET /dockitems/id/{id}",
           "name": "GetDockItemByID",
           "responseType": "dock_item",
           "pathNames": {
@@ -7647,7 +7605,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/dockitems/id/{id}",
+          "op": "POST /dockitems/id/{id}",
           "name": "CreateDockItemByID",
           "requestType": "dock_item",
           "responseType": "dock_item",
@@ -7657,7 +7615,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/dockitems/id/{id}",
+          "op": "PUT /dockitems/id/{id}",
           "name": "UpdateDockItemByID",
           "requestType": "dock_item",
           "pathNames": {
@@ -7666,14 +7624,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/dockitems/id/{id}",
+          "op": "DELETE /dockitems/id/{id}",
           "name": "DeleteDockItemByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/removablemacaddresses/id/{id}",
+          "op": "GET /removablemacaddresses/id/{id}",
           "name": "GetRemovableMacAddressByID",
           "responseType": "removable_mac_address",
           "pathNames": {
@@ -7681,7 +7639,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/removablemacaddresses/id/{id}",
+          "op": "POST /removablemacaddresses/id/{id}",
           "name": "CreateRemovableMacAddressByID",
           "requestType": "removable_mac_address",
           "responseType": "removable_mac_address",
@@ -7691,7 +7649,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/removablemacaddresses/id/{id}",
+          "op": "PUT /removablemacaddresses/id/{id}",
           "name": "UpdateRemovableMacAddressByID",
           "requestType": "removable_mac_address",
           "pathNames": {
@@ -7700,14 +7658,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/removablemacaddresses/id/{id}",
+          "op": "DELETE /removablemacaddresses/id/{id}",
           "name": "DeleteRemovableMacAddressByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/allowedfileextensions/id/{id}",
+          "op": "GET /allowedfileextensions/id/{id}",
           "name": "GetAllowedFileExtensionByID",
           "responseType": "allowed_file_extension",
           "pathNames": {
@@ -7715,7 +7673,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/allowedfileextensions/id/{id}",
+          "op": "POST /allowedfileextensions/id/{id}",
           "name": "CreateAllowedFileExtensionByID",
           "requestType": "allowed_file_extension",
           "responseType": "allowed_file_extension",
@@ -7725,14 +7683,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/allowedfileextensions/id/{id}",
+          "op": "DELETE /allowedfileextensions/id/{id}",
           "name": "DeleteAllowedFileExtensionByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/jsonwebtokenconfigurations/id/{id}",
+          "op": "GET /jsonwebtokenconfigurations/id/{id}",
           "name": "GetJsonWebTokenConfigurationByID",
           "responseType": "json_web_token_configuration",
           "pathNames": {
@@ -7740,7 +7698,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/jsonwebtokenconfigurations/id/{id}",
+          "op": "POST /jsonwebtokenconfigurations/id/{id}",
           "name": "CreateJsonWebTokenConfigurationByID",
           "requestType": "json_web_token_configuration",
           "responseType": "json_web_token_configuration",
@@ -7750,7 +7708,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/jsonwebtokenconfigurations/id/{id}",
+          "op": "PUT /jsonwebtokenconfigurations/id/{id}",
           "name": "UpdateJsonWebTokenConfigurationByID",
           "requestType": "json_web_token_configuration",
           "pathNames": {
@@ -7759,14 +7717,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/jsonwebtokenconfigurations/id/{id}",
+          "op": "DELETE /jsonwebtokenconfigurations/id/{id}",
           "name": "DeleteJsonWebTokenConfigurationByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/webhooks/id/{id}",
+          "op": "GET /webhooks/id/{id}",
           "name": "GetWebhookByID",
           "responseType": "webhook",
           "pathNames": {
@@ -7774,7 +7732,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/webhooks/id/{id}",
+          "op": "POST /webhooks/id/{id}",
           "name": "CreateWebhookByID",
           "requestType": "webhook",
           "responseType": "webhook",
@@ -7784,7 +7742,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/webhooks/id/{id}",
+          "op": "PUT /webhooks/id/{id}",
           "name": "UpdateWebhookByID",
           "requestType": "webhook",
           "pathNames": {
@@ -7793,14 +7751,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/webhooks/id/{id}",
+          "op": "DELETE /webhooks/id/{id}",
           "name": "DeleteWebhookByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/accounts/userid/{id}",
+          "op": "GET /accounts/userid/{id}",
           "name": "GetAccountByUserID",
           "responseType": "account",
           "pathNames": {
@@ -7808,7 +7766,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/accounts/userid/{id}",
+          "op": "POST /accounts/userid/{id}",
           "name": "CreateAccountByUserID",
           "requestType": "account",
           "responseType": "account",
@@ -7818,7 +7776,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/accounts/userid/{id}",
+          "op": "PUT /accounts/userid/{id}",
           "name": "UpdateAccountByUserID",
           "requestType": "account",
           "pathNames": {
@@ -7827,14 +7785,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/accounts/userid/{id}",
+          "op": "DELETE /accounts/userid/{id}",
           "name": "DeleteAccountByUserID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/accounts/groupid/{id}",
+          "op": "GET /accounts/groupid/{id}",
           "name": "GetAccountGroupByID",
           "responseType": "group",
           "pathNames": {
@@ -7842,7 +7800,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/accounts/groupid/{id}",
+          "op": "POST /accounts/groupid/{id}",
           "name": "CreateAccountGroupByID",
           "requestType": "group",
           "responseType": "group",
@@ -7852,7 +7810,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/accounts/groupid/{id}",
+          "op": "PUT /accounts/groupid/{id}",
           "name": "UpdateAccountGroupByID",
           "requestType": "group",
           "pathNames": {
@@ -7861,14 +7819,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/accounts/groupid/{id}",
+          "op": "DELETE /accounts/groupid/{id}",
           "name": "DeleteAccountGroupByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerinvitations/id/{id}",
+          "op": "GET /computerinvitations/id/{id}",
           "name": "GetComputerInvitationByID",
           "responseType": "computer_invitation",
           "pathNames": {
@@ -7876,7 +7834,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/computerinvitations/id/{id}",
+          "op": "POST /computerinvitations/id/{id}",
           "name": "CreateComputerInvitationByID",
           "requestType": "computer_invitation",
           "responseType": "computer_invitation",
@@ -7886,14 +7844,14 @@
           "expectedStatus": 200
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computerinvitations/id/{id}",
+          "op": "DELETE /computerinvitations/id/{id}",
           "name": "DeleteComputerInvitationByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceinvitations/id/{id}",
+          "op": "GET /mobiledeviceinvitations/id/{id}",
           "name": "GetMobileDeviceInvitationByID",
           "responseType": "mobile_device_invitation",
           "pathNames": {
@@ -7901,7 +7859,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceinvitations/id/{id}",
+          "op": "POST /mobiledeviceinvitations/id/{id}",
           "name": "CreateMobileDeviceInvitationByID",
           "requestType": "mobile_device_invitation_post",
           "responseType": "mobile_device_invitation",
@@ -7911,14 +7869,14 @@
           "expectedStatus": 200
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceinvitations/id/{id}",
+          "op": "DELETE /mobiledeviceinvitations/id/{id}",
           "name": "DeleteMobileDeviceInvitationByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceenrollmentprofiles/id/{id}",
+          "op": "GET /mobiledeviceenrollmentprofiles/id/{id}",
           "name": "GetMobileDeviceEnrollmentProfileByID",
           "responseType": "mobile_device_enrollment_profile",
           "pathNames": {
@@ -7926,7 +7884,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceenrollmentprofiles/id/{id}",
+          "op": "POST /mobiledeviceenrollmentprofiles/id/{id}",
           "name": "CreateMobileDeviceEnrollmentProfileByID",
           "requestType": "mobile_device_enrollment_profile_post",
           "responseType": "mobile_device_enrollment_profile",
@@ -7936,7 +7894,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceenrollmentprofiles/id/{id}",
+          "op": "PUT /mobiledeviceenrollmentprofiles/id/{id}",
           "name": "UpdateMobileDeviceEnrollmentProfileByID",
           "requestType": "mobile_device_enrollment_profile_post",
           "pathNames": {
@@ -7945,14 +7903,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceenrollmentprofiles/id/{id}",
+          "op": "DELETE /mobiledeviceenrollmentprofiles/id/{id}",
           "name": "DeleteMobileDeviceEnrollmentProfileByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceprovisioningprofiles/id/{id}",
+          "op": "GET /mobiledeviceprovisioningprofiles/id/{id}",
           "name": "GetMobileDeviceProvisioningProfileByID",
           "responseType": "mobile_device_provisioning_profile",
           "pathNames": {
@@ -7960,7 +7918,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceprovisioningprofiles/id/{id}",
+          "op": "POST /mobiledeviceprovisioningprofiles/id/{id}",
           "name": "CreateMobileDeviceProvisioningProfileByID",
           "requestType": "mobile_device_provisioning_profile",
           "responseType": "mobile_device_provisioning_profile",
@@ -7970,7 +7928,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceprovisioningprofiles/id/{id}",
+          "op": "PUT /mobiledeviceprovisioningprofiles/id/{id}",
           "name": "UpdateMobileDeviceProvisioningProfileByID",
           "requestType": "mobile_device_provisioning_profile",
           "pathNames": {
@@ -7979,14 +7937,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceprovisioningprofiles/id/{id}",
+          "op": "DELETE /mobiledeviceprovisioningprofiles/id/{id}",
           "name": "DeleteMobileDeviceProvisioningProfileByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchavailabletitles/sourceid/{id}",
+          "op": "GET /patchavailabletitles/sourceid/{id}",
           "name": "ListPatchAvailableTitlesBySourceID",
           "responseType": "patch_available_titles",
           "pathNames": {
@@ -7994,7 +7952,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patches/id/{id}",
+          "op": "GET /patches/id/{id}",
           "name": "GetPatchByID",
           "responseType": "software_title",
           "pathNames": {
@@ -8002,7 +7960,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/patches/id/{id}",
+          "op": "POST /patches/id/{id}",
           "name": "CreatePatchByID",
           "requestType": "software_title",
           "responseType": "software_title",
@@ -8012,7 +7970,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/patches/id/{id}",
+          "op": "PUT /patches/id/{id}",
           "name": "UpdatePatchByID",
           "requestType": "software_title",
           "pathNames": {
@@ -8021,14 +7979,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/patches/id/{id}",
+          "op": "DELETE /patches/id/{id}",
           "name": "DeletePatchByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchexternalsources/id/{id}",
+          "op": "GET /patchexternalsources/id/{id}",
           "name": "GetPatchExternalSourceByID",
           "responseType": "patch_external_source",
           "pathNames": {
@@ -8036,7 +7994,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/patchexternalsources/id/{id}",
+          "op": "POST /patchexternalsources/id/{id}",
           "name": "CreatePatchExternalSourceByID",
           "requestType": "patch_external_source",
           "responseType": "patch_external_source",
@@ -8046,7 +8004,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/patchexternalsources/id/{id}",
+          "op": "PUT /patchexternalsources/id/{id}",
           "name": "UpdatePatchExternalSourceByID",
           "requestType": "patch_external_source",
           "pathNames": {
@@ -8055,14 +8013,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/patchexternalsources/id/{id}",
+          "op": "DELETE /patchexternalsources/id/{id}",
           "name": "DeletePatchExternalSourceByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchinternalsources/id/{id}",
+          "op": "GET /patchinternalsources/id/{id}",
           "name": "GetPatchInternalSourceByID",
           "responseType": "patch_internal_source",
           "pathNames": {
@@ -8070,7 +8028,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchpolicies/id/{id}",
+          "op": "GET /patchpolicies/id/{id}",
           "name": "GetPatchPolicyByID",
           "responseType": "patch_policy",
           "pathNames": {
@@ -8078,7 +8036,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}",
+          "op": "POST /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}",
           "name": "CreatePatchPolicyBySoftwareTitleConfigID",
           "requestType": "patch_policy",
           "responseType": "patch_policy",
@@ -8088,7 +8046,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/patchpolicies/id/{id}",
+          "op": "PUT /patchpolicies/id/{id}",
           "name": "UpdatePatchPolicyByID",
           "requestType": "patch_policy",
           "pathNames": {
@@ -8097,14 +8055,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/patchpolicies/id/{id}",
+          "op": "DELETE /patchpolicies/id/{id}",
           "name": "DeletePatchPolicyByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchreports/patchsoftwaretitleid/{id}",
+          "op": "GET /patchreports/patchsoftwaretitleid/{id}",
           "name": "GetPatchReportByPatchSoftwareTitleID",
           "responseType": "patch_report",
           "pathNames": {
@@ -8112,7 +8070,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchsoftwaretitles/id/{id}",
+          "op": "GET /patchsoftwaretitles/id/{id}",
           "name": "GetPatchSoftwareTitleByID",
           "responseType": "patch_software_title",
           "pathNames": {
@@ -8120,7 +8078,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/patchsoftwaretitles/id/{id}",
+          "op": "POST /patchsoftwaretitles/id/{id}",
           "name": "CreatePatchSoftwareTitleByID",
           "requestType": "patch_software_title",
           "responseType": "patch_software_title",
@@ -8130,7 +8088,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/patchsoftwaretitles/id/{id}",
+          "op": "PUT /patchsoftwaretitles/id/{id}",
           "name": "UpdatePatchSoftwareTitleByID",
           "requestType": "patch_software_title",
           "pathNames": {
@@ -8139,69 +8097,69 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/patchsoftwaretitles/id/{id}",
+          "op": "DELETE /patchsoftwaretitles/id/{id}",
           "name": "DeletePatchSoftwareTitleByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/activationcode",
+          "op": "GET /activationcode",
           "name": "GetActivationCode",
           "responseType": "activation_code"
         },
         {
-          "op": "PUT /tenant/{tenantId}/activationcode",
+          "op": "PUT /activationcode",
           "name": "UpdateActivationCode",
           "requestType": "activation_code",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/smtpserver",
+          "op": "GET /smtpserver",
           "name": "GetSMTPServer",
           "responseType": "smtp_server"
         },
         {
-          "op": "PUT /tenant/{tenantId}/smtpserver",
+          "op": "PUT /smtpserver",
           "name": "UpdateSMTPServer",
           "requestType": "smtp_server",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/gsxconnection",
+          "op": "GET /gsxconnection",
           "name": "GetGSXConnection",
           "responseType": "gsx_connection"
         },
         {
-          "op": "PUT /tenant/{tenantId}/gsxconnection",
+          "op": "PUT /gsxconnection",
           "name": "UpdateGSXConnection",
           "requestType": "gsx_connection",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computercheckin",
+          "op": "GET /computercheckin",
           "name": "GetComputerCheckIn",
           "responseType": "computer_check_in"
         },
         {
-          "op": "PUT /tenant/{tenantId}/computercheckin",
+          "op": "PUT /computercheckin",
           "name": "UpdateComputerCheckIn",
           "requestType": "computer_check_in",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computerinventorycollection",
+          "op": "GET /computerinventorycollection",
           "name": "GetComputerInventoryCollection",
           "responseType": "computer_inventory_collection"
         },
         {
-          "op": "PUT /tenant/{tenantId}/computerinventorycollection",
+          "op": "PUT /computerinventorycollection",
           "name": "UpdateComputerInventoryCollection",
           "requestType": "computer_inventory_collection",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/id/{id}",
+          "op": "GET /computermanagement/id/{id}",
           "name": "GetComputerManagementByID",
           "responseType": "computer_management",
           "pathNames": {
@@ -8209,12 +8167,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/name/{name}",
+          "op": "GET /computermanagement/name/{name}",
           "name": "GetComputerManagementByName",
           "responseType": "computer_management"
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/udid/{udid}",
+          "op": "GET /computermanagement/udid/{udid}",
           "name": "GetComputerManagementByUDID",
           "responseType": "computer_management",
           "pathNames": {
@@ -8222,7 +8180,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/serialnumber/{serialnumber}",
+          "op": "GET /computermanagement/serialnumber/{serialnumber}",
           "name": "GetComputerManagementBySerialNumber",
           "responseType": "computer_management",
           "pathNames": {
@@ -8230,7 +8188,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/macaddress/{macaddress}",
+          "op": "GET /computermanagement/macaddress/{macaddress}",
           "name": "GetComputerManagementByMacAddress",
           "responseType": "computer_management",
           "pathNames": {
@@ -8238,7 +8196,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/healthcarelistener/id/{id}",
+          "op": "GET /healthcarelistener/id/{id}",
           "name": "GetHealthcareListenerByID",
           "responseType": "healthcare_listener",
           "pathNames": {
@@ -8246,7 +8204,7 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/healthcarelistener/id/{id}",
+          "op": "PUT /healthcarelistener/id/{id}",
           "name": "UpdateHealthcareListenerByID",
           "requestType": "healthcare_listener",
           "pathNames": {
@@ -8255,7 +8213,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/healthcarelistenerrule/id/{id}",
+          "op": "GET /healthcarelistenerrule/id/{id}",
           "name": "GetHealthcareListenerRuleByID",
           "responseType": "healthcare_listener_rule",
           "pathNames": {
@@ -8263,7 +8221,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/healthcarelistenerrule/id/{id}",
+          "op": "POST /healthcarelistenerrule/id/{id}",
           "name": "CreateHealthcareListenerRuleByID",
           "requestType": "healthcare_listener_rule",
           "responseType": "healthcare_listener_rule",
@@ -8273,7 +8231,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/healthcarelistenerrule/id/{id}",
+          "op": "PUT /healthcarelistenerrule/id/{id}",
           "name": "UpdateHealthcareListenerRuleByID",
           "requestType": "healthcare_listener_rule",
           "pathNames": {
@@ -8282,7 +8240,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/infrastructuremanager/id/{id}",
+          "op": "GET /infrastructuremanager/id/{id}",
           "name": "GetInfrastructureManagerByID",
           "responseType": "infrastructure_manager",
           "pathNames": {
@@ -8290,7 +8248,7 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/infrastructuremanager/id/{id}",
+          "op": "PUT /infrastructuremanager/id/{id}",
           "name": "UpdateInfrastructureManagerByID",
           "requestType": "infrastructure_manager",
           "pathNames": {
@@ -8299,7 +8257,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/softwareupdateservers/id/{id}",
+          "op": "GET /softwareupdateservers/id/{id}",
           "name": "GetSoftwareUpdateServerByID",
           "responseType": "software_update_server",
           "pathNames": {
@@ -8307,7 +8265,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/softwareupdateservers/id/{id}",
+          "op": "POST /softwareupdateservers/id/{id}",
           "name": "CreateSoftwareUpdateServerByID",
           "requestType": "software_update_server",
           "responseType": "software_update_server",
@@ -8317,7 +8275,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/softwareupdateservers/id/{id}",
+          "op": "PUT /softwareupdateservers/id/{id}",
           "name": "UpdateSoftwareUpdateServerByID",
           "requestType": "software_update_server",
           "pathNames": {
@@ -8326,14 +8284,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/softwareupdateservers/id/{id}",
+          "op": "DELETE /softwareupdateservers/id/{id}",
           "name": "DeleteSoftwareUpdateServerByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computercommands/uuid/{uuid}",
+          "op": "GET /computercommands/uuid/{uuid}",
           "name": "GetComputerCommandByUUID",
           "responseType": "computer_command",
           "pathNames": {
@@ -8341,7 +8299,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/computercommands/command/{command}/id/{id}",
+          "op": "POST /computercommands/command/{command}/id/{id}",
           "name": "IssueComputerCommandByID",
           "requestType": "computer_command_post",
           "responseType": "computer_command",
@@ -8352,7 +8310,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicecommands/uuid/{uuid}",
+          "op": "GET /mobiledevicecommands/uuid/{uuid}",
           "name": "GetMobileDeviceCommandByUUID",
           "responseType": "mobile_device_command",
           "pathNames": {
@@ -8360,14 +8318,14 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicecommands/command",
+          "op": "POST /mobiledevicecommands/command",
           "name": "IssueMobileDeviceCommand",
           "requestType": "mobile_device_command_post",
           "responseType": "mobile_device_command",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhistory/id/{id}",
+          "op": "GET /computerhistory/id/{id}",
           "name": "GetComputerHistoryByID",
           "responseType": "computer_history",
           "pathNames": {
@@ -8375,12 +8333,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhistory/name/{name}",
+          "op": "GET /computerhistory/name/{name}",
           "name": "GetComputerHistoryByName",
           "responseType": "computer_history"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhistory/udid/{udid}",
+          "op": "GET /computerhistory/udid/{udid}",
           "name": "GetComputerHistoryByUDID",
           "responseType": "computer_history",
           "pathNames": {
@@ -8388,7 +8346,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhistory/serialnumber/{serialnumber}",
+          "op": "GET /computerhistory/serialnumber/{serialnumber}",
           "name": "GetComputerHistoryBySerialNumber",
           "responseType": "computer_history",
           "pathNames": {
@@ -8396,7 +8354,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhistory/macaddress/{macaddress}",
+          "op": "GET /computerhistory/macaddress/{macaddress}",
           "name": "GetComputerHistoryByMacAddress",
           "responseType": "computer_history",
           "pathNames": {
@@ -8404,7 +8362,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicehistory/id/{id}",
+          "op": "GET /mobiledevicehistory/id/{id}",
           "name": "GetMobileDeviceHistoryByID",
           "responseType": "mobile_device_history",
           "pathNames": {
@@ -8412,12 +8370,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicehistory/name/{name}",
+          "op": "GET /mobiledevicehistory/name/{name}",
           "name": "GetMobileDeviceHistoryByName",
           "responseType": "mobile_device_history"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicehistory/udid/{udid}",
+          "op": "GET /mobiledevicehistory/udid/{udid}",
           "name": "GetMobileDeviceHistoryByUDID",
           "responseType": "mobile_device_history",
           "pathNames": {
@@ -8425,7 +8383,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicehistory/serialnumber/{serialnumber}",
+          "op": "GET /mobiledevicehistory/serialnumber/{serialnumber}",
           "name": "GetMobileDeviceHistoryBySerialNumber",
           "responseType": "mobile_device_history",
           "pathNames": {
@@ -8433,7 +8391,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicehistory/macaddress/{macaddress}",
+          "op": "GET /mobiledevicehistory/macaddress/{macaddress}",
           "name": "GetMobileDeviceHistoryByMacAddress",
           "responseType": "mobile_device_history",
           "pathNames": {
@@ -8441,7 +8399,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplicationusage/id/{id}/{start_date}_{end_date}",
+          "op": "GET /computerapplicationusage/id/{id}/{start_date}_{end_date}",
           "name": "GetComputerApplicationUsageByID",
           "responseType": "computer_application_usage",
           "pathNames": {
@@ -8451,7 +8409,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerreports/id/{id}",
+          "op": "GET /computerreports/id/{id}",
           "name": "GetComputerReportByID",
           "responseType": "computer_report",
           "pathNames": {
@@ -8459,12 +8417,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerreports/name/{name}",
+          "op": "GET /computerreports/name/{name}",
           "name": "GetComputerReportByName",
           "responseType": "computer_report"
         },
         {
-          "op": "GET /tenant/{tenantId}/vppaccounts/id/{id}",
+          "op": "GET /vppaccounts/id/{id}",
           "name": "GetVPPAccountByID",
           "responseType": "vpp_account",
           "pathNames": {
@@ -8472,7 +8430,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/vppaccounts/id/{id}",
+          "op": "POST /vppaccounts/id/{id}",
           "name": "CreateVPPAccountByID",
           "requestType": "vpp_account",
           "responseType": "vpp_account",
@@ -8482,7 +8440,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/vppaccounts/id/{id}",
+          "op": "PUT /vppaccounts/id/{id}",
           "name": "UpdateVPPAccountByID",
           "requestType": "vpp_account",
           "pathNames": {
@@ -8491,14 +8449,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/vppaccounts/id/{id}",
+          "op": "DELETE /vppaccounts/id/{id}",
           "name": "DeleteVPPAccountByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/vppassignments/id/{id}",
+          "op": "GET /vppassignments/id/{id}",
           "name": "GetVPPAssignmentByID",
           "responseType": "vpp_assignment",
           "pathNames": {
@@ -8506,7 +8464,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/vppassignments/id/{id}",
+          "op": "POST /vppassignments/id/{id}",
           "name": "CreateVPPAssignmentByID",
           "requestType": "vpp_assignment_post",
           "responseType": "vpp_assignment",
@@ -8516,7 +8474,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/vppassignments/id/{id}",
+          "op": "PUT /vppassignments/id/{id}",
           "name": "UpdateVPPAssignmentByID",
           "requestType": "vpp_assignment_post",
           "pathNames": {
@@ -8525,14 +8483,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/vppassignments/id/{id}",
+          "op": "DELETE /vppassignments/id/{id}",
           "name": "DeleteVPPAssignmentByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/vppinvitations/id/{id}",
+          "op": "GET /vppinvitations/id/{id}",
           "name": "GetVPPInvitationByID",
           "responseType": "vpp_invitation",
           "pathNames": {
@@ -8540,7 +8498,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/vppinvitations/id/{id}",
+          "op": "POST /vppinvitations/id/{id}",
           "name": "CreateVPPInvitationByID",
           "requestType": "vpp_invitation",
           "responseType": "vpp_invitation",
@@ -8550,7 +8508,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/vppinvitations/id/{id}",
+          "op": "PUT /vppinvitations/id/{id}",
           "name": "UpdateVPPInvitationByID",
           "requestType": "vpp_invitation",
           "pathNames": {
@@ -8559,14 +8517,14 @@
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/vppinvitations/id/{id}",
+          "op": "DELETE /vppinvitations/id/{id}",
           "name": "DeleteVPPInvitationByID",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/buildings/name/{name}",
+          "op": "GET /buildings/name/{name}",
           "name": "GetBuildingByName",
           "responseType": "building",
           "resolver": {
@@ -8581,17 +8539,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/buildings/name/{name}",
+          "op": "PUT /buildings/name/{name}",
           "name": "UpdateBuildingByName",
           "requestType": "building",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/buildings/name/{name}",
+          "op": "DELETE /buildings/name/{name}",
           "name": "DeleteBuildingByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/categories/name/{name}",
+          "op": "GET /categories/name/{name}",
           "name": "GetCategoryByName",
           "responseType": "category",
           "resolver": {
@@ -8606,17 +8564,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/categories/name/{name}",
+          "op": "PUT /categories/name/{name}",
           "name": "UpdateCategoryByName",
           "requestType": "category",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/categories/name/{name}",
+          "op": "DELETE /categories/name/{name}",
           "name": "DeleteCategoryByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/classes/name/{name}",
+          "op": "GET /classes/name/{name}",
           "name": "GetClassByName",
           "responseType": "class",
           "resolver": {
@@ -8631,17 +8589,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/classes/name/{name}",
+          "op": "PUT /classes/name/{name}",
           "name": "UpdateClassByName",
           "requestType": "class_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/classes/name/{name}",
+          "op": "DELETE /classes/name/{name}",
           "name": "DeleteClassByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/departments/name/{name}",
+          "op": "GET /departments/name/{name}",
           "name": "GetDepartmentByName",
           "responseType": "department",
           "resolver": {
@@ -8656,17 +8614,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/departments/name/{name}",
+          "op": "PUT /departments/name/{name}",
           "name": "UpdateDepartmentByName",
           "requestType": "department",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/departments/name/{name}",
+          "op": "DELETE /departments/name/{name}",
           "name": "DeleteDepartmentByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/sites/name/{name}",
+          "op": "GET /sites/name/{name}",
           "name": "GetSiteByName",
           "responseType": "site",
           "resolver": {
@@ -8681,17 +8639,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/sites/name/{name}",
+          "op": "PUT /sites/name/{name}",
           "name": "UpdateSiteByName",
           "requestType": "site",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/sites/name/{name}",
+          "op": "DELETE /sites/name/{name}",
           "name": "DeleteSiteByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/scripts/name/{name}",
+          "op": "GET /scripts/name/{name}",
           "name": "GetScriptByName",
           "responseType": "script",
           "resolver": {
@@ -8706,17 +8664,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/scripts/name/{name}",
+          "op": "PUT /scripts/name/{name}",
           "name": "UpdateScriptByName",
           "requestType": "script",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/scripts/name/{name}",
+          "op": "DELETE /scripts/name/{name}",
           "name": "DeleteScriptByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/users/name/{name}",
+          "op": "GET /users/name/{name}",
           "name": "GetUserByName",
           "responseType": "user",
           "resolver": {
@@ -8731,17 +8689,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/users/name/{name}",
+          "op": "PUT /users/name/{name}",
           "name": "UpdateUserByName",
           "requestType": "user_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/users/name/{name}",
+          "op": "DELETE /users/name/{name}",
           "name": "DeleteUserByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/users/email/{email}",
+          "op": "GET /users/email/{email}",
           "name": "GetUserByEmail",
           "responseType": "user",
           "pathNames": {
@@ -8749,7 +8707,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/directorybindings/name/{name}",
+          "op": "GET /directorybindings/name/{name}",
           "name": "GetDirectoryBindingByName",
           "responseType": "directory_binding",
           "resolver": {
@@ -8764,17 +8722,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/directorybindings/name/{name}",
+          "op": "PUT /directorybindings/name/{name}",
           "name": "UpdateDirectoryBindingByName",
           "requestType": "directory_binding",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/directorybindings/name/{name}",
+          "op": "DELETE /directorybindings/name/{name}",
           "name": "DeleteDirectoryBindingByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/diskencryptionconfigurations/name/{name}",
+          "op": "GET /diskencryptionconfigurations/name/{name}",
           "name": "GetDiskEncryptionConfigurationByName",
           "responseType": "disk_encryption_configuration",
           "resolver": {
@@ -8789,17 +8747,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/diskencryptionconfigurations/name/{name}",
+          "op": "PUT /diskencryptionconfigurations/name/{name}",
           "name": "UpdateDiskEncryptionConfigurationByName",
           "requestType": "disk_encryption_configuration",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/diskencryptionconfigurations/name/{name}",
+          "op": "DELETE /diskencryptionconfigurations/name/{name}",
           "name": "DeleteDiskEncryptionConfigurationByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/dockitems/name/{name}",
+          "op": "GET /dockitems/name/{name}",
           "name": "GetDockItemByName",
           "responseType": "dock_item",
           "resolver": {
@@ -8814,17 +8772,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/dockitems/name/{name}",
+          "op": "PUT /dockitems/name/{name}",
           "name": "UpdateDockItemByName",
           "requestType": "dock_item",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/dockitems/name/{name}",
+          "op": "DELETE /dockitems/name/{name}",
           "name": "DeleteDockItemByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/ibeacons/name/{name}",
+          "op": "GET /ibeacons/name/{name}",
           "name": "GetIBeaconByName",
           "responseType": "ibeacon",
           "resolver": {
@@ -8840,17 +8798,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/ibeacons/name/{name}",
+          "op": "PUT /ibeacons/name/{name}",
           "name": "UpdateIBeaconByName",
           "requestType": "ibeacon",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ibeacons/name/{name}",
+          "op": "DELETE /ibeacons/name/{name}",
           "name": "DeleteIBeaconByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/ldapservers/name/{name}",
+          "op": "GET /ldapservers/name/{name}",
           "name": "GetLDAPServerByName",
           "responseType": "ldap_server",
           "resolver": {
@@ -8867,17 +8825,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/ldapservers/name/{name}",
+          "op": "PUT /ldapservers/name/{name}",
           "name": "UpdateLDAPServerByName",
           "requestType": "ldap_server_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ldapservers/name/{name}",
+          "op": "DELETE /ldapservers/name/{name}",
           "name": "DeleteLDAPServerByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/licensedsoftware/name/{name}",
+          "op": "GET /licensedsoftware/name/{name}",
           "name": "GetLicensedSoftwareByName",
           "responseType": "licensed_software",
           "resolver": {
@@ -8893,17 +8851,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/licensedsoftware/name/{name}",
+          "op": "PUT /licensedsoftware/name/{name}",
           "name": "UpdateLicensedSoftwareByName",
           "requestType": "licensed_software",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/licensedsoftware/name/{name}",
+          "op": "DELETE /licensedsoftware/name/{name}",
           "name": "DeleteLicensedSoftwareByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/restrictedsoftware/name/{name}",
+          "op": "GET /restrictedsoftware/name/{name}",
           "name": "GetRestrictedSoftwareByName",
           "responseType": "restricted_software",
           "resolver": {
@@ -8919,17 +8877,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/restrictedsoftware/name/{name}",
+          "op": "PUT /restrictedsoftware/name/{name}",
           "name": "UpdateRestrictedSoftwareByName",
           "requestType": "restricted_software",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/restrictedsoftware/name/{name}",
+          "op": "DELETE /restrictedsoftware/name/{name}",
           "name": "DeleteRestrictedSoftwareByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/printers/name/{name}",
+          "op": "GET /printers/name/{name}",
           "name": "GetPrinterByName",
           "responseType": "printer",
           "resolver": {
@@ -8944,17 +8902,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/printers/name/{name}",
+          "op": "PUT /printers/name/{name}",
           "name": "UpdatePrinterByName",
           "requestType": "printer",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/printers/name/{name}",
+          "op": "DELETE /printers/name/{name}",
           "name": "DeletePrinterByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/allowedfileextensions/extension/{extension}",
+          "op": "GET /allowedfileextensions/extension/{extension}",
           "name": "GetAllowedFileExtensionByExtension",
           "responseType": "allowed_file_extension",
           "pathNames": {
@@ -8962,7 +8920,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/softwareupdateservers/name/{name}",
+          "op": "GET /softwareupdateservers/name/{name}",
           "name": "GetSoftwareUpdateServerByName",
           "responseType": "software_update_server",
           "resolver": {
@@ -8977,17 +8935,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/softwareupdateservers/name/{name}",
+          "op": "PUT /softwareupdateservers/name/{name}",
           "name": "UpdateSoftwareUpdateServerByName",
           "requestType": "software_update_server",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/softwareupdateservers/name/{name}",
+          "op": "DELETE /softwareupdateservers/name/{name}",
           "name": "DeleteSoftwareUpdateServerByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedcomputersearches/name/{name}",
+          "op": "GET /advancedcomputersearches/name/{name}",
           "name": "GetAdvancedComputerSearchByName",
           "responseType": "advanced_computer_search",
           "resolver": {
@@ -9002,11 +8960,11 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/advancedcomputersearches/name/{name}",
+          "op": "DELETE /advancedcomputersearches/name/{name}",
           "name": "DeleteAdvancedComputerSearchByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedmobiledevicesearches/name/{name}",
+          "op": "GET /advancedmobiledevicesearches/name/{name}",
           "name": "GetAdvancedMobileDeviceSearchByName",
           "responseType": "advanced_mobile_device_search",
           "resolver": {
@@ -9021,11 +8979,11 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/advancedmobiledevicesearches/name/{name}",
+          "op": "DELETE /advancedmobiledevicesearches/name/{name}",
           "name": "DeleteAdvancedMobileDeviceSearchByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedusersearches/name/{name}",
+          "op": "GET /advancedusersearches/name/{name}",
           "name": "GetAdvancedUserSearchByName",
           "responseType": "advanced_user_search",
           "resolver": {
@@ -9040,11 +8998,11 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/advancedusersearches/name/{name}",
+          "op": "DELETE /advancedusersearches/name/{name}",
           "name": "DeleteAdvancedUserSearchByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/computergroups/name/{name}",
+          "op": "GET /computergroups/name/{name}",
           "name": "GetComputerGroupByName",
           "responseType": "computer_group",
           "resolver": {
@@ -9059,17 +9017,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/computergroups/name/{name}",
+          "op": "PUT /computergroups/name/{name}",
           "name": "UpdateComputerGroupByName",
           "requestType": "computer_group_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computergroups/name/{name}",
+          "op": "DELETE /computergroups/name/{name}",
           "name": "DeleteComputerGroupByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicegroups/name/{name}",
+          "op": "GET /mobiledevicegroups/name/{name}",
           "name": "GetMobileDeviceGroupByName",
           "responseType": "mobile_device_group",
           "resolver": {
@@ -9084,17 +9042,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledevicegroups/name/{name}",
+          "op": "PUT /mobiledevicegroups/name/{name}",
           "name": "UpdateMobileDeviceGroupByName",
           "requestType": "mobile_device_group",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledevicegroups/name/{name}",
+          "op": "DELETE /mobiledevicegroups/name/{name}",
           "name": "DeleteMobileDeviceGroupByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/usergroups/name/{name}",
+          "op": "GET /usergroups/name/{name}",
           "name": "GetUserGroupByName",
           "responseType": "user_group",
           "resolver": {
@@ -9109,17 +9067,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/usergroups/name/{name}",
+          "op": "PUT /usergroups/name/{name}",
           "name": "UpdateUserGroupByName",
           "requestType": "user_group",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/usergroups/name/{name}",
+          "op": "DELETE /usergroups/name/{name}",
           "name": "DeleteUserGroupByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerextensionattributes/name/{name}",
+          "op": "GET /computerextensionattributes/name/{name}",
           "name": "GetComputerExtensionAttributeByName",
           "responseType": "computer_extension_attribute",
           "resolver": {
@@ -9134,17 +9092,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/computerextensionattributes/name/{name}",
+          "op": "PUT /computerextensionattributes/name/{name}",
           "name": "UpdateComputerExtensionAttributeByName",
           "requestType": "computer_extension_attribute",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computerextensionattributes/name/{name}",
+          "op": "DELETE /computerextensionattributes/name/{name}",
           "name": "DeleteComputerExtensionAttributeByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceextensionattributes/name/{name}",
+          "op": "GET /mobiledeviceextensionattributes/name/{name}",
           "name": "GetMobileDeviceExtensionAttributeByName",
           "responseType": "mobile_device_extension_attribute",
           "resolver": {
@@ -9159,17 +9117,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceextensionattributes/name/{name}",
+          "op": "PUT /mobiledeviceextensionattributes/name/{name}",
           "name": "UpdateMobileDeviceExtensionAttributeByName",
           "requestType": "mobile_device_extension_attribute",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceextensionattributes/name/{name}",
+          "op": "DELETE /mobiledeviceextensionattributes/name/{name}",
           "name": "DeleteMobileDeviceExtensionAttributeByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/userextensionattributes/name/{name}",
+          "op": "GET /userextensionattributes/name/{name}",
           "name": "GetUserExtensionAttributeByName",
           "responseType": "user_extension_attribute",
           "resolver": {
@@ -9184,17 +9142,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/userextensionattributes/name/{name}",
+          "op": "PUT /userextensionattributes/name/{name}",
           "name": "UpdateUserExtensionAttributeByName",
           "requestType": "user_extension_attribute",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/userextensionattributes/name/{name}",
+          "op": "DELETE /userextensionattributes/name/{name}",
           "name": "DeleteUserExtensionAttributeByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/osxconfigurationprofiles/name/{name}",
+          "op": "GET /osxconfigurationprofiles/name/{name}",
           "name": "GetOSXConfigurationProfileByName",
           "responseType": "os_x_configuration_profile",
           "resolver": {
@@ -9211,17 +9169,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/osxconfigurationprofiles/name/{name}",
+          "op": "PUT /osxconfigurationprofiles/name/{name}",
           "name": "UpdateOSXConfigurationProfileByName",
           "requestType": "os_x_configuration_profile",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/osxconfigurationprofiles/name/{name}",
+          "op": "DELETE /osxconfigurationprofiles/name/{name}",
           "name": "DeleteOSXConfigurationProfileByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceconfigurationprofiles/name/{name}",
+          "op": "GET /mobiledeviceconfigurationprofiles/name/{name}",
           "name": "GetMobileDeviceConfigurationProfileByName",
           "responseType": "mobile_device_configuration_profile",
           "resolver": {
@@ -9237,17 +9195,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceconfigurationprofiles/name/{name}",
+          "op": "PUT /mobiledeviceconfigurationprofiles/name/{name}",
           "name": "UpdateMobileDeviceConfigurationProfileByName",
           "requestType": "mobile_device_configuration_profile",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceconfigurationprofiles/name/{name}",
+          "op": "DELETE /mobiledeviceconfigurationprofiles/name/{name}",
           "name": "DeleteMobileDeviceConfigurationProfileByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/macapplications/name/{name}",
+          "op": "GET /macapplications/name/{name}",
           "name": "GetMacApplicationByName",
           "responseType": "mac_application",
           "resolver": {
@@ -9263,17 +9221,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/macapplications/name/{name}",
+          "op": "PUT /macapplications/name/{name}",
           "name": "UpdateMacApplicationByName",
           "requestType": "mac_application",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/macapplications/name/{name}",
+          "op": "DELETE /macapplications/name/{name}",
           "name": "DeleteMacApplicationByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceapplications/name/{name}",
+          "op": "GET /mobiledeviceapplications/name/{name}",
           "name": "GetMobileDeviceApplicationByName",
           "responseType": "mobile_device_application",
           "resolver": {
@@ -9289,17 +9247,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceapplications/name/{name}",
+          "op": "PUT /mobiledeviceapplications/name/{name}",
           "name": "UpdateMobileDeviceApplicationByName",
           "requestType": "mobile_device_application",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceapplications/name/{name}",
+          "op": "DELETE /mobiledeviceapplications/name/{name}",
           "name": "DeleteMobileDeviceApplicationByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceapplications/bundleid/{bundleid}",
+          "op": "GET /mobiledeviceapplications/bundleid/{bundleid}",
           "name": "GetMobileDeviceApplicationByBundleID",
           "responseType": "mobile_device_application",
           "pathNames": {
@@ -9307,7 +9265,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ebooks/name/{name}",
+          "op": "GET /ebooks/name/{name}",
           "name": "GetEbookByName",
           "responseType": "ebook",
           "resolver": {
@@ -9323,17 +9281,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/ebooks/name/{name}",
+          "op": "PUT /ebooks/name/{name}",
           "name": "UpdateEbookByName",
           "requestType": "ebook_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/ebooks/name/{name}",
+          "op": "DELETE /ebooks/name/{name}",
           "name": "DeleteEbookByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/networksegments/name/{name}",
+          "op": "GET /networksegments/name/{name}",
           "name": "GetNetworkSegmentByName",
           "responseType": "network_segment",
           "resolver": {
@@ -9348,17 +9306,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/networksegments/name/{name}",
+          "op": "PUT /networksegments/name/{name}",
           "name": "UpdateNetworkSegmentByName",
           "requestType": "network_segment_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/networksegments/name/{name}",
+          "op": "DELETE /networksegments/name/{name}",
           "name": "DeleteNetworkSegmentByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/distributionpoints/name/{name}",
+          "op": "GET /distributionpoints/name/{name}",
           "name": "GetDistributionPointByName",
           "responseType": "distribution_point",
           "resolver": {
@@ -9373,17 +9331,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/distributionpoints/name/{name}",
+          "op": "PUT /distributionpoints/name/{name}",
           "name": "UpdateDistributionPointByName",
           "requestType": "distribution_point_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/distributionpoints/name/{name}",
+          "op": "DELETE /distributionpoints/name/{name}",
           "name": "DeleteDistributionPointByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceprovisioningprofiles/name/{name}",
+          "op": "GET /mobiledeviceprovisioningprofiles/name/{name}",
           "name": "GetMobileDeviceProvisioningProfileByName",
           "responseType": "mobile_device_provisioning_profile",
           "resolver": {
@@ -9399,11 +9357,11 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceprovisioningprofiles/name/{name}",
+          "op": "DELETE /mobiledeviceprovisioningprofiles/name/{name}",
           "name": "DeleteMobileDeviceProvisioningProfileByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceprovisioningprofiles/uuid/{uuid}",
+          "op": "GET /mobiledeviceprovisioningprofiles/uuid/{uuid}",
           "name": "GetMobileDeviceProvisioningProfileByUUID",
           "responseType": "mobile_device_provisioning_profile",
           "pathNames": {
@@ -9411,14 +9369,14 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceprovisioningprofiles/uuid/{uuid}",
+          "op": "DELETE /mobiledeviceprovisioningprofiles/uuid/{uuid}",
           "name": "DeleteMobileDeviceProvisioningProfileByUUID",
           "pathNames": {
             "uuid": "uuid"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceenrollmentprofiles/name/{name}",
+          "op": "GET /mobiledeviceenrollmentprofiles/name/{name}",
           "name": "GetMobileDeviceEnrollmentProfileByName",
           "responseType": "mobile_device_enrollment_profile",
           "resolver": {
@@ -9434,11 +9392,11 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceenrollmentprofiles/name/{name}",
+          "op": "DELETE /mobiledeviceenrollmentprofiles/name/{name}",
           "name": "DeleteMobileDeviceEnrollmentProfileByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceenrollmentprofiles/invitation/{invitation}",
+          "op": "GET /mobiledeviceenrollmentprofiles/invitation/{invitation}",
           "name": "GetMobileDeviceEnrollmentProfileByInvitation",
           "responseType": "mobile_device_enrollment_profile",
           "pathNames": {
@@ -9446,7 +9404,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/accounts/groupname/{name}",
+          "op": "GET /accounts/groupname/{name}",
           "name": "GetAccountGroupByName",
           "responseType": "group",
           "resolver": {
@@ -9462,32 +9420,32 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/accounts/groupname/{name}",
+          "op": "PUT /accounts/groupname/{name}",
           "name": "UpdateAccountGroupByName",
           "requestType": "group",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/accounts/groupname/{name}",
+          "op": "DELETE /accounts/groupname/{name}",
           "name": "DeleteAccountGroupByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/accounts/username/{name}",
+          "op": "GET /accounts/username/{name}",
           "name": "GetAccountByUsername",
           "responseType": "account"
         },
         {
-          "op": "PUT /tenant/{tenantId}/accounts/username/{name}",
+          "op": "PUT /accounts/username/{name}",
           "name": "UpdateAccountByUsername",
           "requestType": "account",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/accounts/username/{name}",
+          "op": "DELETE /accounts/username/{name}",
           "name": "DeleteAccountByUsername"
         },
         {
-          "op": "GET /tenant/{tenantId}/webhooks/name/{name}",
+          "op": "GET /webhooks/name/{name}",
           "name": "GetWebhookByName",
           "responseType": "webhook",
           "resolver": {
@@ -9502,17 +9460,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/webhooks/name/{name}",
+          "op": "PUT /webhooks/name/{name}",
           "name": "UpdateWebhookByName",
           "requestType": "webhook",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/webhooks/name/{name}",
+          "op": "DELETE /webhooks/name/{name}",
           "name": "DeleteWebhookByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/removablemacaddresses/name/{name}",
+          "op": "GET /removablemacaddresses/name/{name}",
           "name": "GetRemovableMacAddressByName",
           "responseType": "removable_mac_address",
           "resolver": {
@@ -9527,17 +9485,17 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/removablemacaddresses/name/{name}",
+          "op": "PUT /removablemacaddresses/name/{name}",
           "name": "UpdateRemovableMacAddressByName",
           "requestType": "removable_mac_address",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/removablemacaddresses/name/{name}",
+          "op": "DELETE /removablemacaddresses/name/{name}",
           "name": "DeleteRemovableMacAddressByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/patchexternalsources/name/{name}",
+          "op": "GET /patchexternalsources/name/{name}",
           "name": "GetPatchExternalSourceByName",
           "responseType": "patch_external_source",
           "resolver": {
@@ -9552,7 +9510,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchinternalsources/name/{name}",
+          "op": "GET /patchinternalsources/name/{name}",
           "name": "GetPatchInternalSourceByName",
           "responseType": "patch_internal_source",
           "resolver": {
@@ -9561,7 +9519,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}",
+          "op": "GET /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}",
           "name": "ListPatchPoliciesBySoftwareTitleConfigID",
           "responseType": "patch_policy",
           "pathNames": {
@@ -9569,7 +9527,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/peripherals/id/{id}/subset/{subset}",
+          "op": "GET /peripherals/id/{id}/subset/{subset}",
           "name": "GetPeripheralByIDSubset",
           "responseType": "peripheral",
           "pathNames": {
@@ -9578,345 +9536,345 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computercommands/name/{name}",
+          "op": "GET /computercommands/name/{name}",
           "name": "GetComputerCommandByName",
           "responseType": "computer_command"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicecommands/name/{name}",
+          "op": "GET /mobiledevicecommands/name/{name}",
           "name": "GetMobileDeviceCommandByName",
           "responseType": "mobile_device_command"
         },
         {
-          "op": "GET /tenant/{tenantId}/buildings",
+          "op": "GET /buildings",
           "name": "ListBuildings",
           "responseType": "buildings"
         },
         {
-          "op": "GET /tenant/{tenantId}/categories",
+          "op": "GET /categories",
           "name": "ListCategories",
           "responseType": "categories"
         },
         {
-          "op": "GET /tenant/{tenantId}/departments",
+          "op": "GET /departments",
           "name": "ListDepartments",
           "responseType": "departments"
         },
         {
-          "op": "GET /tenant/{tenantId}/sites",
+          "op": "GET /sites",
           "name": "ListSites",
           "responseType": "sites"
         },
         {
-          "op": "GET /tenant/{tenantId}/scripts",
+          "op": "GET /scripts",
           "name": "ListScripts",
           "responseType": "scripts"
         },
         {
-          "op": "GET /tenant/{tenantId}/users",
+          "op": "GET /users",
           "name": "ListUsers",
           "responseType": "users"
         },
         {
-          "op": "GET /tenant/{tenantId}/classes",
+          "op": "GET /classes",
           "name": "ListClasses",
           "responseType": "classes"
         },
         {
-          "op": "GET /tenant/{tenantId}/computers",
+          "op": "GET /computers",
           "name": "ListComputers",
           "responseType": "computers"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices",
+          "op": "GET /mobiledevices",
           "name": "ListMobileDevices",
           "responseType": "mobile_devices"
         },
         {
-          "op": "GET /tenant/{tenantId}/policies",
+          "op": "GET /policies",
           "name": "ListPolicies",
           "responseType": "policies"
         },
         {
-          "op": "GET /tenant/{tenantId}/computergroups",
+          "op": "GET /computergroups",
           "name": "ListComputerGroups",
           "responseType": "computer_groups"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicegroups",
+          "op": "GET /mobiledevicegroups",
           "name": "ListMobileDeviceGroups",
           "responseType": "mobile_device_groups"
         },
         {
-          "op": "GET /tenant/{tenantId}/usergroups",
+          "op": "GET /usergroups",
           "name": "ListUserGroups",
           "responseType": "user_groups"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerextensionattributes",
+          "op": "GET /computerextensionattributes",
           "name": "ListComputerExtensionAttributes",
           "responseType": "computer_extension_attributes"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceextensionattributes",
+          "op": "GET /mobiledeviceextensionattributes",
           "name": "ListMobileDeviceExtensionAttributes",
           "responseType": "mobile_device_extension_attributes"
         },
         {
-          "op": "GET /tenant/{tenantId}/userextensionattributes",
+          "op": "GET /userextensionattributes",
           "name": "ListUserExtensionAttributes",
           "responseType": "user_extension_attributes"
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedcomputersearches",
+          "op": "GET /advancedcomputersearches",
           "name": "ListAdvancedComputerSearches",
           "responseType": "advanced_computer_searches"
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedmobiledevicesearches",
+          "op": "GET /advancedmobiledevicesearches",
           "name": "ListAdvancedMobileDeviceSearches",
           "responseType": "advanced_mobile_device_searches"
         },
         {
-          "op": "GET /tenant/{tenantId}/advancedusersearches",
+          "op": "GET /advancedusersearches",
           "name": "ListAdvancedUserSearches",
           "responseType": "advanced_user_searches"
         },
         {
-          "op": "GET /tenant/{tenantId}/accounts",
+          "op": "GET /accounts",
           "name": "ListAccounts",
           "responseType": "accounts"
         },
         {
-          "op": "GET /tenant/{tenantId}/allowedfileextensions",
+          "op": "GET /allowedfileextensions",
           "name": "ListAllowedFileExtensions",
           "responseType": "allowed_file_extensions"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerinvitations",
+          "op": "GET /computerinvitations",
           "name": "ListComputerInvitations",
           "responseType": "computer_invitations"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerreports",
+          "op": "GET /computerreports",
           "name": "ListComputerReports",
           "responseType": "computer_reports"
         },
         {
-          "op": "GET /tenant/{tenantId}/directorybindings",
+          "op": "GET /directorybindings",
           "name": "ListDirectoryBindings",
           "responseType": "directory_bindings"
         },
         {
-          "op": "GET /tenant/{tenantId}/diskencryptionconfigurations",
+          "op": "GET /diskencryptionconfigurations",
           "name": "ListDiskEncryptionConfigurations",
           "responseType": "disk_encryption_configurations"
         },
         {
-          "op": "GET /tenant/{tenantId}/distributionpoints",
+          "op": "GET /distributionpoints",
           "name": "ListDistributionPoints",
           "responseType": "distribution_points"
         },
         {
-          "op": "GET /tenant/{tenantId}/dockitems",
+          "op": "GET /dockitems",
           "name": "ListDockItems",
           "responseType": "dock_items"
         },
         {
-          "op": "GET /tenant/{tenantId}/ebooks",
+          "op": "GET /ebooks",
           "name": "ListEbooks",
           "responseType": "ebooks"
         },
         {
-          "op": "GET /tenant/{tenantId}/healthcarelistener",
+          "op": "GET /healthcarelistener",
           "name": "ListHealthcareListeners",
           "responseType": "healthcare_listeners"
         },
         {
-          "op": "GET /tenant/{tenantId}/healthcarelistenerrule",
+          "op": "GET /healthcarelistenerrule",
           "name": "ListHealthcareListenerRules",
           "responseType": "healthcare_listener_rules"
         },
         {
-          "op": "GET /tenant/{tenantId}/ibeacons",
+          "op": "GET /ibeacons",
           "name": "ListIBeacons",
           "responseType": "ibeacons"
         },
         {
-          "op": "GET /tenant/{tenantId}/infrastructuremanager",
+          "op": "GET /infrastructuremanager",
           "name": "ListInfrastructureManagers",
           "responseType": "infrastructure_managers"
         },
         {
-          "op": "GET /tenant/{tenantId}/jsonwebtokenconfigurations",
+          "op": "GET /jsonwebtokenconfigurations",
           "name": "ListJsonWebTokenConfigurations",
           "responseType": "json_web_token_configurations"
         },
         {
-          "op": "GET /tenant/{tenantId}/ldapservers",
+          "op": "GET /ldapservers",
           "name": "ListLDAPServers",
           "responseType": "ldap_servers"
         },
         {
-          "op": "GET /tenant/{tenantId}/licensedsoftware",
+          "op": "GET /licensedsoftware",
           "name": "ListLicensedSoftware",
           "responseType": "licensed_software_all"
         },
         {
-          "op": "GET /tenant/{tenantId}/macapplications",
+          "op": "GET /macapplications",
           "name": "ListMacApplications",
           "responseType": "mac_applications"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceapplications",
+          "op": "GET /mobiledeviceapplications",
           "name": "ListMobileDeviceApplications",
           "responseType": "mobile_device_applications"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicecommands",
+          "op": "GET /mobiledevicecommands",
           "name": "ListMobileDeviceCommands",
           "responseType": "mobile_device_commands"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceconfigurationprofiles",
+          "op": "GET /mobiledeviceconfigurationprofiles",
           "name": "ListMobileDeviceConfigurationProfiles",
           "responseType": "mobile_device_configuration_profiles"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceenrollmentprofiles",
+          "op": "GET /mobiledeviceenrollmentprofiles",
           "name": "ListMobileDeviceEnrollmentProfiles",
           "responseType": "mobile_device_enrollment_profiles"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceinvitations",
+          "op": "GET /mobiledeviceinvitations",
           "name": "ListMobileDeviceInvitations",
           "responseType": "mobile_device_invitations"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceprovisioningprofiles",
+          "op": "GET /mobiledeviceprovisioningprofiles",
           "name": "ListMobileDeviceProvisioningProfiles",
           "responseType": "mobile_device_provisioning_profiles"
         },
         {
-          "op": "GET /tenant/{tenantId}/networksegments",
+          "op": "GET /networksegments",
           "name": "ListNetworkSegments",
           "responseType": "network_segments"
         },
         {
-          "op": "GET /tenant/{tenantId}/osxconfigurationprofiles",
+          "op": "GET /osxconfigurationprofiles",
           "name": "ListOSXConfigurationProfiles",
           "responseType": "os_x_configuration_profiles"
         },
         {
-          "op": "GET /tenant/{tenantId}/packages",
+          "op": "GET /packages",
           "name": "ListClassicPackages",
           "responseType": "packages"
         },
         {
-          "op": "GET /tenant/{tenantId}/patchexternalsources",
+          "op": "GET /patchexternalsources",
           "name": "ListPatchExternalSources",
           "responseType": "patch_external_sources"
         },
         {
-          "op": "GET /tenant/{tenantId}/patchinternalsources",
+          "op": "GET /patchinternalsources",
           "name": "ListPatchInternalSources",
           "responseType": "patch_internal_sources"
         },
         {
-          "op": "GET /tenant/{tenantId}/patches",
+          "op": "GET /patches",
           "name": "ListPatches",
           "responseType": "patch_management_software_titles"
         },
         {
-          "op": "GET /tenant/{tenantId}/patchpolicies",
+          "op": "GET /patchpolicies",
           "name": "ListPatchPolicies",
           "responseType": "patch_policies"
         },
         {
-          "op": "GET /tenant/{tenantId}/patchsoftwaretitles",
+          "op": "GET /patchsoftwaretitles",
           "name": "ListPatchSoftwareTitles",
           "responseType": "patch_software_titles"
         },
         {
-          "op": "GET /tenant/{tenantId}/peripherals",
+          "op": "GET /peripherals",
           "name": "ListPeripherals",
           "responseType": "peripherals"
         },
         {
-          "op": "GET /tenant/{tenantId}/peripheraltypes",
+          "op": "GET /peripheraltypes",
           "name": "ListPeripheralTypes",
           "responseType": "peripheral_types"
         },
         {
-          "op": "GET /tenant/{tenantId}/printers",
+          "op": "GET /printers",
           "name": "ListPrinters",
           "responseType": "printers"
         },
         {
-          "op": "GET /tenant/{tenantId}/removablemacaddresses",
+          "op": "GET /removablemacaddresses",
           "name": "ListRemovableMacAddresses",
           "responseType": "removable_mac_addresses"
         },
         {
-          "op": "GET /tenant/{tenantId}/restrictedsoftware",
+          "op": "GET /restrictedsoftware",
           "name": "ListRestrictedSoftware",
           "responseType": "restricted_software_all"
         },
         {
-          "op": "GET /tenant/{tenantId}/softwareupdateservers",
+          "op": "GET /softwareupdateservers",
           "name": "ListSoftwareUpdateServers",
           "responseType": "software_update_servers"
         },
         {
-          "op": "GET /tenant/{tenantId}/vppaccounts",
+          "op": "GET /vppaccounts",
           "name": "ListVPPAccounts",
           "responseType": "vpp_accounts"
         },
         {
-          "op": "GET /tenant/{tenantId}/vppassignments",
+          "op": "GET /vppassignments",
           "name": "ListVPPAssignments",
           "responseType": "vpp_assignments"
         },
         {
-          "op": "GET /tenant/{tenantId}/vppinvitations",
+          "op": "GET /vppinvitations",
           "name": "ListVPPInvitations",
           "responseType": "vpp_invitations"
         },
         {
-          "op": "GET /tenant/{tenantId}/webhooks",
+          "op": "GET /webhooks",
           "name": "ListWebhooks",
           "responseType": "webhooks"
         },
         {
-          "op": "GET /tenant/{tenantId}/computercommands",
+          "op": "GET /computercommands",
           "name": "ListComputerCommands",
           "responseType": "computer_commands"
         },
         {
-          "op": "PUT /tenant/{tenantId}/advancedcomputersearches/name/{name}",
+          "op": "PUT /advancedcomputersearches/name/{name}",
           "name": "UpdateAdvancedComputerSearchByName",
           "requestType": "advanced_computer_search",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/advancedmobiledevicesearches/name/{name}",
+          "op": "PUT /advancedmobiledevicesearches/name/{name}",
           "name": "UpdateAdvancedMobileDeviceSearchByName",
           "requestType": "advanced_mobile_device_search",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/advancedusersearches/name/{name}",
+          "op": "PUT /advancedusersearches/name/{name}",
           "name": "UpdateAdvancedUserSearchByName",
           "requestType": "advanced_user_search",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/commandflush",
+          "op": "DELETE /commandflush",
           "name": "DeleteCommandFlush",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/commandflush/{idtype}/id/{id}/status/{status}",
+          "op": "DELETE /commandflush/{idtype}/id/{id}/status/{status}",
           "name": "DeleteCommandFlushByIDTypeIDStatus",
           "expectedStatus": 201,
           "pathNames": {
@@ -9924,80 +9882,80 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplications/application/{application}",
+          "op": "GET /computerapplications/application/{application}",
           "name": "GetComputerApplicationByApplication"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplications/application/{application}/inventory/{inventory}",
+          "op": "GET /computerapplications/application/{application}/inventory/{inventory}",
           "name": "GetComputerApplicationByApplicationInventory"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplications/application/{application}/version/{version}",
+          "op": "GET /computerapplications/application/{application}/version/{version}",
           "name": "GetComputerApplicationByApplicationVersion"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplications/application/{application}/version/{version}/inventory/{inventory}",
+          "op": "GET /computerapplications/application/{application}/version/{version}/inventory/{inventory}",
           "name": "GetComputerApplicationByApplicationVersionInventory"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplicationusage/macaddress/{macaddress}/{start_date}_{end_date}",
+          "op": "GET /computerapplicationusage/macaddress/{macaddress}/{start_date}_{end_date}",
           "name": "GetComputerApplicationUsageByMacAddressDateRange",
           "responseType": "computer_application_usage"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplicationusage/name/{name}/{start_date}_{end_date}",
+          "op": "GET /computerapplicationusage/name/{name}/{start_date}_{end_date}",
           "name": "GetComputerApplicationUsageByNameDateRange",
           "responseType": "computer_application_usage"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplicationusage/serialnumber/{serialnumber}/{start_date}_{end_date}",
+          "op": "GET /computerapplicationusage/serialnumber/{serialnumber}/{start_date}_{end_date}",
           "name": "GetComputerApplicationUsageBySerialNumberDateRange",
           "responseType": "computer_application_usage"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerapplicationusage/udid/{udid}/{start_date}_{end_date}",
+          "op": "GET /computerapplicationusage/udid/{udid}/{start_date}_{end_date}",
           "name": "GetComputerApplicationUsageByUDIDDateRange",
           "responseType": "computer_application_usage"
         },
         {
-          "op": "POST /tenant/{tenantId}/computercommands/command/{command}",
+          "op": "POST /computercommands/command/{command}",
           "name": "CreateComputerCommandByCommand",
           "requestType": "computer_command_post",
           "responseType": "computer_command",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhardwaresoftwarereports/id/{id}/{start_date}_{end_date}",
+          "op": "GET /computerhardwaresoftwarereports/id/{id}/{start_date}_{end_date}",
           "name": "GetComputerHardwareSoftwareReportByIDDateRange",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhardwaresoftwarereports/id/{id}/{start_date}_{end_date}/subset/{subset}",
+          "op": "GET /computerhardwaresoftwarereports/id/{id}/{start_date}_{end_date}/subset/{subset}",
           "name": "GetComputerHardwareSoftwareReportByIDDateRangeSubset",
           "pathNames": {
             "id": "id"
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhardwaresoftwarereports/macaddress/{macaddress}/{start_date}_{end_date}",
+          "op": "GET /computerhardwaresoftwarereports/macaddress/{macaddress}/{start_date}_{end_date}",
           "name": "GetComputerHardwareSoftwareReportByMacAddressDateRange"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhardwaresoftwarereports/name/{name}/{start_date}_{end_date}",
+          "op": "GET /computerhardwaresoftwarereports/name/{name}/{start_date}_{end_date}",
           "name": "GetComputerHardwareSoftwareReportByNameDateRange"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhardwaresoftwarereports/serialnumber/{serialnumber}/{start_date}_{end_date}",
+          "op": "GET /computerhardwaresoftwarereports/serialnumber/{serialnumber}/{start_date}_{end_date}",
           "name": "GetComputerHardwareSoftwareReportBySerialNumberDateRange"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhardwaresoftwarereports/udid/{udid}/{start_date}_{end_date}",
+          "op": "GET /computerhardwaresoftwarereports/udid/{udid}/{start_date}_{end_date}",
           "name": "GetComputerHardwareSoftwareReportByUDIDDateRange"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerhistory/id/{id}/subset/{subset}",
+          "op": "GET /computerhistory/id/{id}/subset/{subset}",
           "name": "GetComputerHistoryByIDSubset",
           "responseType": "computer_history",
           "pathNames": {
@@ -10005,23 +9963,23 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computerinvitations/invitation/{invitation}",
+          "op": "DELETE /computerinvitations/invitation/{invitation}",
           "name": "DeleteComputerInvitationByInvitation"
         },
         {
-          "op": "GET /tenant/{tenantId}/computerinvitations/invitation/{invitation}",
+          "op": "GET /computerinvitations/invitation/{invitation}",
           "name": "GetComputerInvitationByInvitation",
           "responseType": "computer_invitation"
         },
         {
-          "op": "POST /tenant/{tenantId}/computerinvitations/invitation/{invitation}",
+          "op": "POST /computerinvitations/invitation/{invitation}",
           "name": "CreateComputerInvitationByInvitation",
           "requestType": "computer_invitation",
           "responseType": "computer_invitation",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/id/{id}/patchfilter/{filter}",
+          "op": "GET /computermanagement/id/{id}/patchfilter/{filter}",
           "name": "GetComputerManagementByIDPatchFilter",
           "responseType": "computer_management",
           "pathNames": {
@@ -10029,7 +9987,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/id/{id}/subset/{subset}",
+          "op": "GET /computermanagement/id/{id}/subset/{subset}",
           "name": "GetComputerManagementByIDSubset",
           "responseType": "computer_management",
           "pathNames": {
@@ -10037,7 +9995,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/id/{id}/username/{username}",
+          "op": "GET /computermanagement/id/{id}/username/{username}",
           "name": "GetComputerManagementByIDUsername",
           "responseType": "computer_management",
           "pathNames": {
@@ -10045,7 +10003,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computermanagement/id/{id}/username/{username}/subset/{subset}",
+          "op": "GET /computermanagement/id/{id}/username/{username}/subset/{subset}",
           "name": "GetComputerManagementByIDUsernameSubset",
           "responseType": "computer_management",
           "pathNames": {
@@ -10053,7 +10011,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ebooks/id/{id}/subset/{subset}",
+          "op": "GET /ebooks/id/{id}/subset/{subset}",
           "name": "GetEbookByIDSubset",
           "responseType": "ebook",
           "pathNames": {
@@ -10061,7 +10019,7 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/fileuploads/{resource}/{idType}/{id}",
+          "op": "POST /fileuploads/{resource}/{idType}/{id}",
           "name": "UploadFileByResourceIDTypeID",
           "expectedStatus": 201,
           "pathNames": {
@@ -10069,7 +10027,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ldapservers/id/{id}/group/{group}",
+          "op": "GET /ldapservers/id/{id}/group/{group}",
           "name": "GetLDAPServerByIDGroup",
           "responseType": "ldap_server",
           "pathNames": {
@@ -10077,7 +10035,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ldapservers/id/{id}/group/{group}/user/{user}",
+          "op": "GET /ldapservers/id/{id}/group/{group}/user/{user}",
           "name": "GetLDAPServerByIDGroupUser",
           "responseType": "ldap_server",
           "pathNames": {
@@ -10085,7 +10043,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/ldapservers/id/{id}/user/{user}",
+          "op": "GET /ldapservers/id/{id}/user/{user}",
           "name": "GetLDAPServerByIDUser",
           "responseType": "ldap_server",
           "pathNames": {
@@ -10093,12 +10051,12 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/logflush",
+          "op": "DELETE /logflush",
           "name": "DeleteLogFlush",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/logflush/{log}/id/{id}/interval/{interval}",
+          "op": "DELETE /logflush/{log}/id/{id}/interval/{interval}",
           "name": "DeleteLogFlushByLogIDInterval",
           "expectedStatus": 201,
           "pathNames": {
@@ -10106,12 +10064,12 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/logflush/{log}/interval/{interval}",
+          "op": "DELETE /logflush/{log}/interval/{interval}",
           "name": "DeleteLogFlushByLogInterval",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/macapplications/id/{id}/subset/{subset}",
+          "op": "GET /macapplications/id/{id}/subset/{subset}",
           "name": "GetMacApplicationByIDSubset",
           "responseType": "mac_application",
           "pathNames": {
@@ -10119,37 +10077,37 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/macapplications/name/{name}/subset/{subset}",
+          "op": "GET /macapplications/name/{name}/subset/{subset}",
           "name": "GetMacApplicationByNameSubset",
           "responseType": "mac_application"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceapplications/bundleid/{bundleid}",
+          "op": "DELETE /mobiledeviceapplications/bundleid/{bundleid}",
           "name": "DeleteMobileDeviceApplicationByBundleID"
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceapplications/bundleid/{bundleid}",
+          "op": "PUT /mobiledeviceapplications/bundleid/{bundleid}",
           "name": "UpdateMobileDeviceApplicationByBundleID",
           "requestType": "mobile_device_application",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceapplications/bundleid/{bundleid}/version/{version}",
+          "op": "DELETE /mobiledeviceapplications/bundleid/{bundleid}/version/{version}",
           "name": "DeleteMobileDeviceApplicationByBundleIDVersion"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceapplications/bundleid/{bundleid}/version/{version}",
+          "op": "GET /mobiledeviceapplications/bundleid/{bundleid}/version/{version}",
           "name": "GetMobileDeviceApplicationByBundleIDVersion",
           "responseType": "mobile_device_application"
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceapplications/bundleid/{bundleid}/version/{version}",
+          "op": "PUT /mobiledeviceapplications/bundleid/{bundleid}/version/{version}",
           "name": "UpdateMobileDeviceApplicationByBundleIDVersion",
           "requestType": "mobile_device_application",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceapplications/id/{id}/subset/{subset}",
+          "op": "GET /mobiledeviceapplications/id/{id}/subset/{subset}",
           "name": "GetMobileDeviceApplicationByIDSubset",
           "responseType": "mobile_device_application",
           "pathNames": {
@@ -10157,22 +10115,22 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceapplications/name/{name}/subset/{subset}",
+          "op": "GET /mobiledeviceapplications/name/{name}/subset/{subset}",
           "name": "GetMobileDeviceApplicationByNameSubset",
           "responseType": "mobile_device_application"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicecommands/command/{command}",
+          "op": "GET /mobiledevicecommands/command/{command}",
           "name": "GetMobileDeviceCommandByCommand"
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicecommands/command/{command}/id/{id_list}",
+          "op": "POST /mobiledevicecommands/command/{command}/id/{id_list}",
           "name": "CreateMobileDeviceCommandByCommandID",
           "requestType": "mobile_device_command_post",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceconfigurationprofiles/id/{id}/subset/{subset}",
+          "op": "GET /mobiledeviceconfigurationprofiles/id/{id}/subset/{subset}",
           "name": "GetMobileDeviceConfigurationProfileByIDSubset",
           "responseType": "mobile_device_configuration_profile",
           "pathNames": {
@@ -10180,12 +10138,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceconfigurationprofiles/name/{name}/subset/{subset}",
+          "op": "GET /mobiledeviceconfigurationprofiles/name/{name}/subset/{subset}",
           "name": "GetMobileDeviceConfigurationProfileByNameSubset",
           "responseType": "mobile_device_configuration_profile"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceenrollmentprofiles/id/{id}/subset/{subset}",
+          "op": "GET /mobiledeviceenrollmentprofiles/id/{id}/subset/{subset}",
           "name": "GetMobileDeviceEnrollmentProfileByIDSubset",
           "responseType": "mobile_device_enrollment_profile",
           "pathNames": {
@@ -10193,28 +10151,28 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceenrollmentprofiles/invitation/{invitation}",
+          "op": "DELETE /mobiledeviceenrollmentprofiles/invitation/{invitation}",
           "name": "DeleteMobileDeviceEnrollmentProfileByInvitation"
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceenrollmentprofiles/invitation/{invitation}",
+          "op": "PUT /mobiledeviceenrollmentprofiles/invitation/{invitation}",
           "name": "UpdateMobileDeviceEnrollmentProfileByInvitation",
           "requestType": "mobile_device_enrollment_profile_post",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceenrollmentprofiles/name/{name}",
+          "op": "PUT /mobiledeviceenrollmentprofiles/name/{name}",
           "name": "UpdateMobileDeviceEnrollmentProfileByName",
           "requestType": "mobile_device_enrollment_profile_post",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceenrollmentprofiles/name/{name}/subset/{subset}",
+          "op": "GET /mobiledeviceenrollmentprofiles/name/{name}/subset/{subset}",
           "name": "GetMobileDeviceEnrollmentProfileByNameSubset",
           "responseType": "mobile_device_enrollment_profile"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevicehistory/id/{id}/subset/{subset}",
+          "op": "GET /mobiledevicehistory/id/{id}/subset/{subset}",
           "name": "GetMobileDeviceHistoryByIDSubset",
           "responseType": "mobile_device_history",
           "pathNames": {
@@ -10222,49 +10180,49 @@
           }
         },
         {
-          "op": "DELETE /tenant/{tenantId}/mobiledeviceinvitations/invitation/{invitation}",
+          "op": "DELETE /mobiledeviceinvitations/invitation/{invitation}",
           "name": "DeleteMobileDeviceInvitationByInvitation"
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceinvitations/invitation/{invitation}",
+          "op": "GET /mobiledeviceinvitations/invitation/{invitation}",
           "name": "GetMobileDeviceInvitationByInvitation",
           "responseType": "mobile_device_invitation"
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceinvitations/invitation/{invitation}",
+          "op": "POST /mobiledeviceinvitations/invitation/{invitation}",
           "name": "CreateMobileDeviceInvitationByInvitation",
           "requestType": "mobile_device_invitation_post",
           "responseType": "mobile_device_invitation",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceprovisioningprofiles/name/{name}",
+          "op": "POST /mobiledeviceprovisioningprofiles/name/{name}",
           "name": "CreateMobileDeviceProvisioningProfileByName",
           "requestType": "mobile_device_provisioning_profile",
           "responseType": "mobile_device_provisioning_profile",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceprovisioningprofiles/name/{name}",
+          "op": "PUT /mobiledeviceprovisioningprofiles/name/{name}",
           "name": "UpdateMobileDeviceProvisioningProfileByName",
           "requestType": "mobile_device_provisioning_profile",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceprovisioningprofiles/uuid/{uuid}",
+          "op": "POST /mobiledeviceprovisioningprofiles/uuid/{uuid}",
           "name": "CreateMobileDeviceProvisioningProfileByUUID",
           "requestType": "mobile_device_provisioning_profile",
           "responseType": "mobile_device_provisioning_profile",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceprovisioningprofiles/uuid/{uuid}",
+          "op": "PUT /mobiledeviceprovisioningprofiles/uuid/{uuid}",
           "name": "UpdateMobileDeviceProvisioningProfileByUUID",
           "requestType": "mobile_device_provisioning_profile",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices/id/{id}/subset/{subset}",
+          "op": "GET /mobiledevices/id/{id}/subset/{subset}",
           "name": "GetMobileDeviceByIDSubset",
           "responseType": "mobile_device",
           "pathNames": {
@@ -10272,12 +10230,12 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledevices/match/{match}",
+          "op": "GET /mobiledevices/match/{match}",
           "name": "GetMobileDeviceByMatch",
           "responseType": "mobile_device"
         },
         {
-          "op": "GET /tenant/{tenantId}/osxconfigurationprofiles/id/{id}/subset/{subset}",
+          "op": "GET /osxconfigurationprofiles/id/{id}/subset/{subset}",
           "name": "GetOsxConfigurationProfileByIDSubset",
           "responseType": "os_x_configuration_profile",
           "pathNames": {
@@ -10285,16 +10243,16 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/osxconfigurationprofiles/name/{name}/subset/{subset}",
+          "op": "GET /osxconfigurationprofiles/name/{name}/subset/{subset}",
           "name": "GetOsxConfigurationProfileByNameSubset",
           "responseType": "os_x_configuration_profile"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/packages/name/{name}",
+          "op": "DELETE /packages/name/{name}",
           "name": "DeleteClassicPackageByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/packages/name/{name}",
+          "op": "GET /packages/name/{name}",
           "name": "GetClassicPackageByName",
           "responseType": "package",
           "resolver": {
@@ -10310,26 +10268,26 @@
           }
         },
         {
-          "op": "PUT /tenant/{tenantId}/packages/name/{name}",
+          "op": "PUT /packages/name/{name}",
           "name": "UpdateClassicPackageByName",
           "requestType": "package",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/patchexternalsources/name/{name}",
+          "op": "POST /patchexternalsources/name/{name}",
           "name": "CreatePatchExternalSourceByName",
           "requestType": "patch_external_source",
           "responseType": "patch_external_source",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/patchexternalsources/name/{name}",
+          "op": "PUT /patchexternalsources/name/{name}",
           "name": "UpdatePatchExternalSourceByName",
           "requestType": "patch_external_source",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/patchpolicies/id/{id}/subset/{subset}",
+          "op": "GET /patchpolicies/id/{id}/subset/{subset}",
           "name": "GetPatchPolicyByIDSubset",
           "responseType": "patch_policy",
           "pathNames": {
@@ -10337,17 +10295,17 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/policies/category/{category}",
+          "op": "GET /policies/category/{category}",
           "name": "GetPolicyByCategory",
           "responseType": "policy"
         },
         {
-          "op": "GET /tenant/{tenantId}/policies/createdBy/{createdBy}",
+          "op": "GET /policies/createdBy/{createdBy}",
           "name": "GetPolicyByCreatedBy",
           "responseType": "policy"
         },
         {
-          "op": "GET /tenant/{tenantId}/policies/id/{id}/subset/{subset}",
+          "op": "GET /policies/id/{id}/subset/{subset}",
           "name": "GetPolicyByIDSubset",
           "responseType": "policy",
           "pathNames": {
@@ -10355,7 +10313,7 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/vppinvitations/id/{id}/subset/{subset}",
+          "op": "GET /vppinvitations/id/{id}/subset/{subset}",
           "name": "GetVPPInvitationByIDSubset",
           "responseType": "vpp_invitation",
           "pathNames": {
@@ -10363,60 +10321,60 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/accounts/groupname/{name}",
+          "op": "POST /accounts/groupname/{name}",
           "name": "CreateAccountGroupByName",
           "requestType": "group",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/accounts/username/{name}",
+          "op": "POST /accounts/username/{name}",
           "name": "CreateAccountByUsername",
           "requestType": "account",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/advancedcomputersearches/name/{name}",
+          "op": "POST /advancedcomputersearches/name/{name}",
           "name": "CreateAdvancedComputerSearchByName",
           "requestType": "advanced_computer_search",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/advancedmobiledevicesearches/name/{name}",
+          "op": "POST /advancedmobiledevicesearches/name/{name}",
           "name": "CreateAdvancedMobileDeviceSearchByName",
           "requestType": "advanced_mobile_device_search",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/advancedusersearches/name/{name}",
+          "op": "POST /advancedusersearches/name/{name}",
           "name": "CreateAdvancedUserSearchByName",
           "requestType": "advanced_user_search",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/buildings/name/{name}",
+          "op": "POST /buildings/name/{name}",
           "name": "CreateBuildingByName",
           "requestType": "building",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/categories/name/{name}",
+          "op": "POST /categories/name/{name}",
           "name": "CreateCategoryByName",
           "requestType": "category",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/classes/name/{name}",
+          "op": "POST /classes/name/{name}",
           "name": "CreateClassByName",
           "requestType": "class_post",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computercommands/command/{command}",
+          "op": "GET /computercommands/command/{command}",
           "name": "GetComputerCommandsByCommand",
           "responseType": "computer_command"
         },
         {
-          "op": "GET /tenant/{tenantId}/computercommands/status/{uuid}",
+          "op": "GET /computercommands/status/{uuid}",
           "name": "GetComputerCommandsByStatus",
           "responseType": "computer_command",
           "pathNames": {
@@ -10424,35 +10382,35 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/computerextensionattributes/name/{name}",
+          "op": "POST /computerextensionattributes/name/{name}",
           "name": "CreateComputerExtensionAttributeByName",
           "requestType": "computer_extension_attribute",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/computergroups/name/{name}",
+          "op": "POST /computergroups/name/{name}",
           "name": "CreateComputerGroupByName",
           "requestType": "computer_group_post",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/computerinvitations/name/{name}",
+          "op": "GET /computerinvitations/name/{name}",
           "name": "GetComputerInvitationByName",
           "responseType": "computer_invitation"
         },
         {
-          "op": "POST /tenant/{tenantId}/computerinvitations/name/{name}",
+          "op": "POST /computerinvitations/name/{name}",
           "name": "CreateComputerInvitationByName",
           "requestType": "computer_invitation",
           "responseType": "computer_invitation",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computerinvitations/name/{name}",
+          "op": "DELETE /computerinvitations/name/{name}",
           "name": "DeleteComputerInvitationByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/id/{id}/subset/{subset}",
+          "op": "GET /computers/id/{id}/subset/{subset}",
           "name": "GetComputerByIDSubset",
           "responseType": "computer",
           "pathNames": {
@@ -10460,27 +10418,27 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/macaddress/{macaddress}",
+          "op": "GET /computers/macaddress/{macaddress}",
           "name": "GetComputerByMacAddress",
           "responseType": "computer"
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/udid/{udid}",
+          "op": "GET /computers/udid/{udid}",
           "name": "GetComputerByUDID",
           "responseType": "computer"
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/subset/basic",
+          "op": "GET /computers/subset/basic",
           "name": "GetComputersBasic",
           "responseType": "computers_basic"
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/match/{match}",
+          "op": "GET /computers/match/{match}",
           "name": "MatchComputers",
           "responseType": "computers"
         },
         {
-          "op": "GET /tenant/{tenantId}/computers/match/name/{matchname}",
+          "op": "GET /computers/match/name/{matchname}",
           "name": "MatchComputersByName",
           "responseType": "computers",
           "pathNames": {
@@ -10488,13 +10446,13 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/computers/name/{name}",
+          "op": "POST /computers/name/{name}",
           "name": "CreateComputerByName",
           "requestType": "computer_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/computers/serialnumber/{serialnumber}",
+          "op": "POST /computers/serialnumber/{serialnumber}",
           "name": "CreateComputerBySerialNumber",
           "requestType": "computer_post",
           "pathNames": {
@@ -10503,19 +10461,19 @@
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/computers/macaddress/{macaddress}",
+          "op": "POST /computers/macaddress/{macaddress}",
           "name": "CreateComputerByMacAddress",
           "requestType": "computer_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/computers/udid/{udid}",
+          "op": "POST /computers/udid/{udid}",
           "name": "CreateComputerByUDID",
           "requestType": "computer_post",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/computers/serialnumber/{serialnumber}",
+          "op": "PUT /computers/serialnumber/{serialnumber}",
           "name": "UpdateComputerBySerialNumber",
           "requestType": "computer_post",
           "pathNames": {
@@ -10524,69 +10482,69 @@
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/computers/macaddress/{macaddress}",
+          "op": "PUT /computers/macaddress/{macaddress}",
           "name": "UpdateComputerByMacAddress",
           "requestType": "computer_post",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/computers/udid/{udid}",
+          "op": "PUT /computers/udid/{udid}",
           "name": "UpdateComputerByUDID",
           "requestType": "computer_post",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computers/macaddress/{macaddress}",
+          "op": "DELETE /computers/macaddress/{macaddress}",
           "name": "DeleteComputerByMacAddress"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/computers/udid/{udid}",
+          "op": "DELETE /computers/udid/{udid}",
           "name": "DeleteComputerByUDID"
         },
         {
-          "op": "POST /tenant/{tenantId}/departments/name/{name}",
+          "op": "POST /departments/name/{name}",
           "name": "CreateDepartmentByName",
           "requestType": "department",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/directorybindings/name/{name}",
+          "op": "POST /directorybindings/name/{name}",
           "name": "CreateDirectoryBindingByName",
           "requestType": "directory_binding",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/diskencryptionconfigurations/name/{name}",
+          "op": "POST /diskencryptionconfigurations/name/{name}",
           "name": "CreateDiskEncryptionConfigurationByName",
           "requestType": "disk_encryption_configuration",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/distributionpoints/name/{name}",
+          "op": "POST /distributionpoints/name/{name}",
           "name": "CreateDistributionPointByName",
           "requestType": "distribution_point_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/dockitems/name/{name}",
+          "op": "POST /dockitems/name/{name}",
           "name": "CreateDockItemByName",
           "requestType": "dock_item",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/ebooks/name/{name}",
+          "op": "POST /ebooks/name/{name}",
           "name": "CreateEbookByName",
           "requestType": "ebook_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/ibeacons/name/{name}",
+          "op": "POST /ibeacons/name/{name}",
           "name": "CreateIBeaconByName",
           "requestType": "ibeacon",
           "expectedStatus": 201
         },
         {
-          "op": "DELETE /tenant/{tenantId}/infrastructuremanager/id/{id}",
+          "op": "DELETE /infrastructuremanager/id/{id}",
           "name": "DeleteInfrastructureManagerByID",
           "pathNames": {
             "id": "id"
@@ -10594,42 +10552,42 @@
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/jssuser",
+          "op": "GET /jssuser",
           "name": "GetJSSUser",
           "responseType": "jss_user"
         },
         {
-          "op": "POST /tenant/{tenantId}/ldapservers/name/{name}",
+          "op": "POST /ldapservers/name/{name}",
           "name": "CreateLDAPServerByName",
           "requestType": "ldap_server_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/licensedsoftware/name/{name}",
+          "op": "POST /licensedsoftware/name/{name}",
           "name": "CreateLicensedSoftwareByName",
           "requestType": "licensed_software",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/macapplications/name/{name}",
+          "op": "POST /macapplications/name/{name}",
           "name": "CreateMacApplicationByName",
           "requestType": "mac_application",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceapplications/name/{name}",
+          "op": "POST /mobiledeviceapplications/name/{name}",
           "name": "CreateMobileDeviceApplicationByName",
           "requestType": "mobile_device_application",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicecommands/command/{command}",
+          "op": "POST /mobiledevicecommands/command/{command}",
           "name": "CreateMobileDeviceCommandByCommand",
           "requestType": "mobile_device_command_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicecommands/command/{command}/{parameter}/id/{id_list}",
+          "op": "POST /mobiledevicecommands/command/{command}/{parameter}/id/{id_list}",
           "name": "CreateMobileDeviceCommandWithParameterByIDList",
           "requestType": "mobile_device_command_post",
           "pathNames": {
@@ -10638,7 +10596,7 @@
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicecommands/command/{command}/{parameter}/{version}/id/{id_list}",
+          "op": "POST /mobiledevicecommands/command/{command}/{parameter}/{version}/id/{id_list}",
           "name": "CreateMobileDeviceCommandWithParameterVersionByIDList",
           "requestType": "mobile_device_command_post",
           "pathNames": {
@@ -10647,55 +10605,55 @@
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicecommands/name/{name}",
+          "op": "POST /mobiledevicecommands/name/{name}",
           "name": "CreateMobileDeviceCommandByName",
           "requestType": "mobile_device_command_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceconfigurationprofiles/name/{name}",
+          "op": "POST /mobiledeviceconfigurationprofiles/name/{name}",
           "name": "CreateMobileDeviceConfigurationProfileByName",
           "requestType": "mobile_device_configuration_profile",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceenrollmentprofiles/invitation/{invitation}/subset/{subset}",
+          "op": "GET /mobiledeviceenrollmentprofiles/invitation/{invitation}/subset/{subset}",
           "name": "GetMobileDeviceEnrollmentProfileByInvitationSubset",
           "responseType": "mobile_device_enrollment_profile"
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceenrollmentprofiles/invitation/{invitation}",
+          "op": "POST /mobiledeviceenrollmentprofiles/invitation/{invitation}",
           "name": "CreateMobileDeviceEnrollmentProfileByInvitation",
           "requestType": "mobile_device_enrollment_profile_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceenrollmentprofiles/name/{name}",
+          "op": "POST /mobiledeviceenrollmentprofiles/name/{name}",
           "name": "CreateMobileDeviceEnrollmentProfileByName",
           "requestType": "mobile_device_enrollment_profile_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledeviceextensionattributes/name/{name}",
+          "op": "POST /mobiledeviceextensionattributes/name/{name}",
           "name": "CreateMobileDeviceExtensionAttributeByName",
           "requestType": "mobile_device_extension_attribute",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevicegroups/name/{name}",
+          "op": "POST /mobiledevicegroups/name/{name}",
           "name": "CreateMobileDeviceGroupByName",
           "requestType": "mobile_device_group",
           "expectedStatus": 201
         },
         {
-          "op": "PUT /tenant/{tenantId}/mobiledeviceinvitations/invitation/{invitation}",
+          "op": "PUT /mobiledeviceinvitations/invitation/{invitation}",
           "name": "UpdateMobileDeviceInvitationByInvitation",
           "requestType": "mobile_device_invitation_post",
           "responseType": "mobile_device_invitation",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/mobiledeviceprovisioningprofiles/id/{id}/subset/{subset}",
+          "op": "GET /mobiledeviceprovisioningprofiles/id/{id}/subset/{subset}",
           "name": "GetMobileDeviceProvisioningProfileByIDSubset",
           "responseType": "mobile_device_provisioning_profile",
           "pathNames": {
@@ -10703,13 +10661,13 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevices/name/{name}",
+          "op": "POST /mobiledevices/name/{name}",
           "name": "CreateMobileDeviceByName",
           "requestType": "mobile_device_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevices/serialnumber/{serialnumber}",
+          "op": "POST /mobiledevices/serialnumber/{serialnumber}",
           "name": "CreateMobileDeviceBySerialNumber",
           "requestType": "mobile_device_post",
           "pathNames": {
@@ -10718,51 +10676,51 @@
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevices/macaddress/{macaddress}",
+          "op": "POST /mobiledevices/macaddress/{macaddress}",
           "name": "CreateMobileDeviceByMacAddress",
           "requestType": "mobile_device_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/mobiledevices/udid/{udid}",
+          "op": "POST /mobiledevices/udid/{udid}",
           "name": "CreateMobileDeviceByUDID",
           "requestType": "mobile_device_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/networksegments/name/{name}",
+          "op": "POST /networksegments/name/{name}",
           "name": "CreateNetworkSegmentByName",
           "requestType": "network_segment_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/osxconfigurationprofiles/name/{name}",
+          "op": "POST /osxconfigurationprofiles/name/{name}",
           "name": "CreateOSXConfigurationProfileByName",
           "requestType": "os_x_configuration_profile",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/packages/name/{name}",
+          "op": "POST /packages/name/{name}",
           "name": "CreateClassicPackageByName",
           "requestType": "package",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/patches/name/{name}",
+          "op": "GET /patches/name/{name}",
           "name": "GetPatchByName",
           "responseType": "software_title"
         },
         {
-          "op": "GET /tenant/{tenantId}/patches/id/{id}/version/{version}",
+          "op": "GET /patches/id/{id}/version/{version}",
           "name": "GetPatchComputersByIDVersion",
           "responseType": "computers"
         },
         {
-          "op": "DELETE /tenant/{tenantId}/patchexternalsources/name/{name}",
+          "op": "DELETE /patchexternalsources/name/{name}",
           "name": "DeletePatchExternalSourceByName"
         },
         {
-          "op": "GET /tenant/{tenantId}/patchreports/patchsoftwaretitleid/{id}/version/{version}",
+          "op": "GET /patchreports/patchsoftwaretitleid/{id}/version/{version}",
           "name": "GetPatchReportByTitleIDVersion",
           "responseType": "patch_report",
           "pathNames": {
@@ -10770,36 +10728,36 @@
           }
         },
         {
-          "op": "POST /tenant/{tenantId}/policies/name/{name}",
+          "op": "POST /policies/name/{name}",
           "name": "CreatePolicyByName",
           "requestType": "policy_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/printers/name/{name}",
+          "op": "POST /printers/name/{name}",
           "name": "CreatePrinterByName",
           "requestType": "printer",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/removablemacaddresses/name/{name}",
+          "op": "POST /removablemacaddresses/name/{name}",
           "name": "CreateRemovableMacAddressByName",
           "requestType": "removable_mac_address",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/restrictedsoftware/name/{name}",
+          "op": "POST /restrictedsoftware/name/{name}",
           "name": "CreateRestrictedSoftwareByName",
           "requestType": "restricted_software",
           "expectedStatus": 201
         },
         {
-          "op": "GET /tenant/{tenantId}/savedsearches",
+          "op": "GET /savedsearches",
           "name": "ListSavedSearches",
           "responseType": "saved_searches"
         },
         {
-          "op": "GET /tenant/{tenantId}/savedsearches/id/{id}",
+          "op": "GET /savedsearches/id/{id}",
           "name": "GetSavedSearchByID",
           "responseType": "saved_searches",
           "pathNames": {
@@ -10807,48 +10765,48 @@
           }
         },
         {
-          "op": "GET /tenant/{tenantId}/savedsearches/name/{name}",
+          "op": "GET /savedsearches/name/{name}",
           "name": "GetSavedSearchByName",
           "responseType": "saved_searches"
         },
         {
-          "op": "POST /tenant/{tenantId}/scripts/name/{name}",
+          "op": "POST /scripts/name/{name}",
           "name": "CreateScriptByName",
           "requestType": "script",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/sites/name/{name}",
+          "op": "POST /sites/name/{name}",
           "name": "CreateSiteByName",
           "requestType": "site",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/softwareupdateservers/name/{name}",
+          "op": "POST /softwareupdateservers/name/{name}",
           "name": "CreateSoftwareUpdateServerByName",
           "requestType": "software_update_server",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/userextensionattributes/name/{name}",
+          "op": "POST /userextensionattributes/name/{name}",
           "name": "CreateUserExtensionAttributeByName",
           "requestType": "user_extension_attribute",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/usergroups/name/{name}",
+          "op": "POST /usergroups/name/{name}",
           "name": "CreateUserGroupByName",
           "requestType": "user_group",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/users/name/{name}",
+          "op": "POST /users/name/{name}",
           "name": "CreateUserByName",
           "requestType": "user_post",
           "expectedStatus": 201
         },
         {
-          "op": "POST /tenant/{tenantId}/webhooks/name/{name}",
+          "op": "POST /webhooks/name/{name}",
           "name": "CreateWebhookByName",
           "requestType": "webhook",
           "expectedStatus": 201

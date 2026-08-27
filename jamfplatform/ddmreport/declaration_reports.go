@@ -20,8 +20,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
 //
-// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: declarations:read.
 //
 // Parameters:
 //   - declarationIdentifier: The declarationIdentifier present on a status report.
@@ -55,8 +54,7 @@ func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationId
 
 // ListDeclarationReportClientsFiltered get filtered declaration report devices.
 //
-// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: declarations:read.
 //
 // Parameters:
 //   - declarationIdentifier: The declarationIdentifier present on a status report.

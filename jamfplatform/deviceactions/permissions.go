@@ -13,11 +13,11 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CheckInDevice":  {Method: "CheckInDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/check-in", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"EraseDevice":    {Method: "EraseDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/erase", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"RestartDevice":  {Method: "RestartDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/restart", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"ShutdownDevice": {Method: "ShutdownDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/shutdown", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"UnmanageDevice": {Method: "UnmanageDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/unmanage", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
+	"CheckInDevice":  {Method: "CheckInDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/check-in", Scoped: []string{"device-actions:execute"}, Legacy: nil},
+	"EraseDevice":    {Method: "EraseDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/erase", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil},
+	"RestartDevice":  {Method: "RestartDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/restart", Scoped: []string{"device-actions:execute"}, Legacy: nil},
+	"ShutdownDevice": {Method: "ShutdownDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/shutdown", Scoped: []string{"device-actions:execute"}, Legacy: nil},
+	"UnmanageDevice": {Method: "UnmanageDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/unmanage", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

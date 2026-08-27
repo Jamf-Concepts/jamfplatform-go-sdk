@@ -13,16 +13,16 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CreateBlueprint":         {Method: "CreateBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints", Scoped: []string{"create:pro:blueprints", "create:school:blueprints"}, Legacy: nil},
-	"DeleteBlueprint":         {Method: "DeleteBlueprint", HTTPMethod: "DELETE", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"delete:pro:blueprints", "delete:school:blueprints"}, Legacy: nil},
-	"DeployBlueprint":         {Method: "DeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/deploy", Scoped: []string{"deploy:pro:blueprints", "deploy:school:blueprints"}, Legacy: nil},
-	"GetBlueprint":            {Method: "GetBlueprint", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"read:pro:blueprints", "read:school:blueprints"}, Legacy: nil},
-	"GetBlueprintComponent":   {Method: "GetBlueprintComponent", HTTPMethod: "GET", Path: "/v1/blueprint-components/{identifier}", Scoped: []string{"read:pro:blueprints", "read:school:blueprints"}, Legacy: nil},
-	"GetBlueprintReport":      {Method: "GetBlueprintReport", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}/report", Scoped: []string{"read:pro:blueprints", "read:school:blueprints"}, Legacy: nil},
-	"ListBlueprintComponents": {Method: "ListBlueprintComponents", HTTPMethod: "GET", Path: "/v1/blueprint-components", Scoped: []string{"read:pro:blueprints", "read:school:blueprints"}, Legacy: nil},
-	"ListBlueprints":          {Method: "ListBlueprints", HTTPMethod: "GET", Path: "/v1/blueprints", Scoped: []string{"read:pro:blueprints", "read:school:blueprints"}, Legacy: nil},
-	"UndeployBlueprint":       {Method: "UndeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/undeploy", Scoped: []string{"deploy:pro:blueprints", "deploy:school:blueprints"}, Legacy: nil},
-	"UpdateBlueprint":         {Method: "UpdateBlueprint", HTTPMethod: "PATCH", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"update:pro:blueprints", "update:school:blueprints"}, Legacy: nil},
+	"CreateBlueprint":         {Method: "CreateBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints", Scoped: []string{"blueprints:create"}, Legacy: nil},
+	"DeleteBlueprint":         {Method: "DeleteBlueprint", HTTPMethod: "DELETE", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"blueprints:delete"}, Legacy: nil},
+	"DeployBlueprint":         {Method: "DeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/deploy", Scoped: []string{"blueprints:deploy"}, Legacy: nil},
+	"GetBlueprint":            {Method: "GetBlueprint", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"blueprints:read"}, Legacy: nil},
+	"GetBlueprintComponent":   {Method: "GetBlueprintComponent", HTTPMethod: "GET", Path: "/v1/blueprint-components/{identifier}", Scoped: []string{"blueprints:read"}, Legacy: nil},
+	"GetBlueprintReport":      {Method: "GetBlueprintReport", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}/report", Scoped: []string{"blueprints:read"}, Legacy: nil},
+	"ListBlueprintComponents": {Method: "ListBlueprintComponents", HTTPMethod: "GET", Path: "/v1/blueprint-components", Scoped: []string{"blueprints:read"}, Legacy: nil},
+	"ListBlueprints":          {Method: "ListBlueprints", HTTPMethod: "GET", Path: "/v1/blueprints", Scoped: []string{"blueprints:read"}, Legacy: nil},
+	"UndeployBlueprint":       {Method: "UndeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/undeploy", Scoped: []string{"blueprints:deploy"}, Legacy: nil},
+	"UpdateBlueprint":         {Method: "UpdateBlueprint", HTTPMethod: "PATCH", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"blueprints:update"}, Legacy: nil},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

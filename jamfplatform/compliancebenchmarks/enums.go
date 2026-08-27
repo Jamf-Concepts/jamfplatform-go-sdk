@@ -115,6 +115,7 @@ const (
 	OrganizationDefinedValueTypeString  OrganizationDefinedValueType = "STRING"
 	OrganizationDefinedValueTypeEnum    OrganizationDefinedValueType = "ENUM"
 	OrganizationDefinedValueTypeRegex   OrganizationDefinedValueType = "REGEX"
+	OrganizationDefinedValueTypeBoolean OrganizationDefinedValueType = "BOOLEAN"
 )
 
 // OrganizationDefinedValueTypeValues returns every value the Jamf API accepts for OrganizationDefinedValueType,
@@ -129,6 +130,7 @@ func OrganizationDefinedValueTypeValues() []OrganizationDefinedValueType {
 		OrganizationDefinedValueTypeString,
 		OrganizationDefinedValueTypeEnum,
 		OrganizationDefinedValueTypeRegex,
+		OrganizationDefinedValueTypeBoolean,
 	}
 }
 
@@ -161,8 +163,9 @@ type OsInfoOsType = string
 // OsInfoOsType values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	OsInfoOsTypeMacOs OsInfoOsType = "MAC_OS"
-	OsInfoOsTypeIos   OsInfoOsType = "IOS"
+	OsInfoOsTypeMacOs    OsInfoOsType = "MAC_OS"
+	OsInfoOsTypeIos      OsInfoOsType = "IOS"
+	OsInfoOsTypeVisionOs OsInfoOsType = "VISION_OS"
 )
 
 // OsInfoOsTypeValues returns every value the Jamf API accepts for OsInfoOsType,
@@ -175,6 +178,7 @@ func OsInfoOsTypeValues() []OsInfoOsType {
 	return []OsInfoOsType{
 		OsInfoOsTypeMacOs,
 		OsInfoOsTypeIos,
+		OsInfoOsTypeVisionOs,
 	}
 }
 
@@ -184,8 +188,9 @@ type OsVersionOsType = string
 // OsVersionOsType values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	OsVersionOsTypeMacOs OsVersionOsType = "MAC_OS"
-	OsVersionOsTypeIos   OsVersionOsType = "IOS"
+	OsVersionOsTypeMacOs    OsVersionOsType = "MAC_OS"
+	OsVersionOsTypeIos      OsVersionOsType = "IOS"
+	OsVersionOsTypeVisionOs OsVersionOsType = "VISION_OS"
 )
 
 // OsVersionOsTypeValues returns every value the Jamf API accepts for OsVersionOsType,
@@ -198,5 +203,6 @@ func OsVersionOsTypeValues() []OsVersionOsType {
 	return []OsVersionOsType{
 		OsVersionOsTypeMacOs,
 		OsVersionOsTypeIos,
+		OsVersionOsTypeVisionOs,
 	}
 }

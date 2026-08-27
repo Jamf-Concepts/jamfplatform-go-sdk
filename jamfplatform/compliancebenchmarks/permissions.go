@@ -13,15 +13,15 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CreateBenchmark":                  {Method: "CreateBenchmark", HTTPMethod: "POST", Path: "/v1/benchmarks", Scoped: []string{"create:pro:compliance-benchmarks"}, Legacy: nil},
-	"DeleteBenchmark":                  {Method: "DeleteBenchmark", HTTPMethod: "DELETE", Path: "/v1/benchmarks/{id}", Scoped: []string{"delete:pro:compliance-benchmarks"}, Legacy: nil},
-	"GetBaselineRules":                 {Method: "GetBaselineRules", HTTPMethod: "GET", Path: "/v1/rules", Scoped: []string{"read:pro:compliance-benchmarks"}, Legacy: nil},
-	"GetBenchmark":                     {Method: "GetBenchmark", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}", Scoped: []string{"read:pro:compliance-benchmarks"}, Legacy: nil},
-	"GetBenchmarkCompliancePercentage": {Method: "GetBenchmarkCompliancePercentage", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/compliance-percentage", Scoped: []string{"read:pro:compliance-benchmarks"}, Legacy: nil},
-	"ListBaselines":                    {Method: "ListBaselines", HTTPMethod: "GET", Path: "/v1/baselines", Scoped: []string{"read:pro:compliance-benchmarks"}, Legacy: nil},
-	"ListBenchmarkRuleDevices":         {Method: "ListBenchmarkRuleDevices", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/devices", Scoped: []string{"read:pro:compliance-benchmarks"}, Legacy: nil},
-	"ListBenchmarkRulesStats":          {Method: "ListBenchmarkRulesStats", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/rules", Scoped: []string{"read:pro:compliance-benchmarks"}, Legacy: nil},
-	"ListBenchmarks":                   {Method: "ListBenchmarks", HTTPMethod: "GET", Path: "/v1/benchmarks", Scoped: []string{"read:pro:compliance-benchmarks"}, Legacy: nil},
+	"CreateBenchmark":                  {Method: "CreateBenchmark", HTTPMethod: "POST", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:create"}, Legacy: nil},
+	"DeleteBenchmark":                  {Method: "DeleteBenchmark", HTTPMethod: "DELETE", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:delete"}, Legacy: nil},
+	"GetBaselineRules":                 {Method: "GetBaselineRules", HTTPMethod: "GET", Path: "/v1/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
+	"GetBenchmark":                     {Method: "GetBenchmark", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
+	"GetBenchmarkCompliancePercentage": {Method: "GetBenchmarkCompliancePercentage", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/compliance-percentage", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
+	"ListBaselines":                    {Method: "ListBaselines", HTTPMethod: "GET", Path: "/v1/baselines", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
+	"ListBenchmarkRuleDevices":         {Method: "ListBenchmarkRuleDevices", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/devices", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
+	"ListBenchmarkRulesStats":          {Method: "ListBenchmarkRulesStats", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
+	"ListBenchmarks":                   {Method: "ListBenchmarks", HTTPMethod: "GET", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

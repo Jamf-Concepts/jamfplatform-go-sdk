@@ -19,7 +19,7 @@ import (
 
 // ListDeviceGroups get all device groups.
 //
-// Required privileges: read:pro:device-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - sort: Fields to sort by and their orders. Fields allowed for sorting: `name`, `description`, `deviceType`,
@@ -57,7 +57,7 @@ func (c *Client) ListDeviceGroups(ctx context.Context, sort []string, filter str
 
 // CreateDeviceGroup create a new device group.
 //
-// Required privileges: create:pro:device-groups.
+// Required privileges: device-groups:create.
 func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCreateRepresentationV1) (*HrefRepresentation, error) {
 	prefix := c.transport.APIPrefix("device-groups", "v1")
 	var result HrefRepresentation
@@ -70,7 +70,7 @@ func (c *Client) CreateDeviceGroup(ctx context.Context, request *DeviceGroupCrea
 
 // GetDeviceGroup get a device group by ID.
 //
-// Required privileges: read:pro:device-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
@@ -86,7 +86,7 @@ func (c *Client) GetDeviceGroup(ctx context.Context, id string) (*DeviceGroupRea
 
 // UpdateDeviceGroup update a device group.
 //
-// Required privileges: update:pro:device-groups.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
@@ -101,7 +101,7 @@ func (c *Client) UpdateDeviceGroup(ctx context.Context, id string, request *Devi
 
 // DeleteDeviceGroup delete a device group.
 //
-// Required privileges: delete:pro:device-groups.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
@@ -116,7 +116,7 @@ func (c *Client) DeleteDeviceGroup(ctx context.Context, id string) error {
 
 // ListDeviceGroupMembers get group members.
 //
-// Required privileges: read:pro:device-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - id: The ID of the device group, in UUID format.
@@ -136,7 +136,7 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 
 // UpdateDeviceGroupMembers update device group members.
 //
-// Required privileges: update:pro:device-groups.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - id: The ID of the device group, in UUID format.

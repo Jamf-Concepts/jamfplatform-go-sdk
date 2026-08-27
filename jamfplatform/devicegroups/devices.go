@@ -14,7 +14,7 @@ import (
 
 // ListDeviceGroupsForDevice get device groups for a device.
 //
-// Required privileges: read:pro:device-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - deviceID: The ID of the device, in UUID format.

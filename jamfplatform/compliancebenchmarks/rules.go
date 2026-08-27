@@ -12,9 +12,9 @@ import (
 	"net/url"
 )
 
-// GetBaselineRules get list of rules for given baseline.
+// GetBaselineRules returns list of rules for specific baseline.
 //
-// Required privileges: read:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:read.
 //
 // Parameters:
 //   - baselineID: Given baseline ID.
