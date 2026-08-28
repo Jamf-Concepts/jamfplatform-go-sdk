@@ -41,7 +41,7 @@ golangci-lint run ./...
 Acceptance tests run against a live Jamf Platform tenant. Set the following environment variables:
 
 ```bash
-export JAMFPLATFORM_BASE_URL="https://your-tenant.apigw.jamf.com"
+export JAMFPLATFORM_BASE_URL="https://eu.api.jamfcloud.com"
 export JAMFPLATFORM_CLIENT_ID="your-client-id"
 export JAMFPLATFORM_CLIENT_SECRET="your-client-secret"
 ```

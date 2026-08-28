@@ -15,7 +15,7 @@ import (
 
 func TestGetAllMobileDevicePrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -33,7 +33,7 @@ func TestGetAllMobileDevicePrestageScopeV2(t *testing.T) {
 
 func TestGetAllMobileDevicePrestageScopeV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/scope", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/scope", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -49,7 +49,7 @@ func TestGetAllMobileDevicePrestageScopeV2_NotFound(t *testing.T) {
 
 func TestListAllMobileDevicePrestageSyncsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/syncs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/syncs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -67,7 +67,7 @@ func TestListAllMobileDevicePrestageSyncsV2(t *testing.T) {
 
 func TestListAllMobileDevicePrestageSyncsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/syncs", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/syncs", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -83,7 +83,7 @@ func TestListAllMobileDevicePrestageSyncsV2_NotFound(t *testing.T) {
 
 func TestGetMobileDevicePrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -101,7 +101,7 @@ func TestGetMobileDevicePrestageScopeV2(t *testing.T) {
 
 func TestGetMobileDevicePrestageScopeV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -117,7 +117,7 @@ func TestGetMobileDevicePrestageScopeV2_NotFound(t *testing.T) {
 
 func TestReplaceMobileDevicePrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -135,7 +135,7 @@ func TestReplaceMobileDevicePrestageScopeV2(t *testing.T) {
 
 func TestAddToMobileDevicePrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/scope", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -153,7 +153,7 @@ func TestAddToMobileDevicePrestageScopeV2(t *testing.T) {
 
 func TestRemoveFromMobileDevicePrestageScopeV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/scope/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/scope/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -171,7 +171,7 @@ func TestRemoveFromMobileDevicePrestageScopeV2(t *testing.T) {
 
 func TestListMobileDevicePrestageSyncsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/syncs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/syncs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -189,7 +189,7 @@ func TestListMobileDevicePrestageSyncsV2(t *testing.T) {
 
 func TestListMobileDevicePrestageSyncsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/syncs", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/syncs", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -205,7 +205,7 @@ func TestListMobileDevicePrestageSyncsV2_NotFound(t *testing.T) {
 
 func TestGetLatestMobileDevicePrestageSyncV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/syncs/latest", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/syncs/latest", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -223,7 +223,7 @@ func TestGetLatestMobileDevicePrestageSyncV2(t *testing.T) {
 
 func TestGetLatestMobileDevicePrestageSyncV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/syncs/latest", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/syncs/latest", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -239,7 +239,7 @@ func TestGetLatestMobileDevicePrestageSyncV2_NotFound(t *testing.T) {
 
 func TestListMobileDevicePrestagesV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -261,7 +261,7 @@ func TestListMobileDevicePrestagesV2(t *testing.T) {
 
 func TestListMobileDevicePrestagesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -283,7 +283,7 @@ func TestListMobileDevicePrestagesV3(t *testing.T) {
 
 func TestCreateMobileDevicePrestageV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -301,7 +301,7 @@ func TestCreateMobileDevicePrestageV2(t *testing.T) {
 
 func TestCreateMobileDevicePrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -319,7 +319,7 @@ func TestCreateMobileDevicePrestageV3(t *testing.T) {
 
 func TestGetMobileDevicePrestageV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -337,7 +337,7 @@ func TestGetMobileDevicePrestageV2(t *testing.T) {
 
 func TestGetMobileDevicePrestageV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -353,7 +353,7 @@ func TestGetMobileDevicePrestageV2_NotFound(t *testing.T) {
 
 func TestGetMobileDevicePrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -371,7 +371,7 @@ func TestGetMobileDevicePrestageV3(t *testing.T) {
 
 func TestGetMobileDevicePrestageV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -387,7 +387,7 @@ func TestGetMobileDevicePrestageV3_NotFound(t *testing.T) {
 
 func TestUpdateMobileDevicePrestageV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -405,7 +405,7 @@ func TestUpdateMobileDevicePrestageV2(t *testing.T) {
 
 func TestUpdateMobileDevicePrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -423,7 +423,7 @@ func TestUpdateMobileDevicePrestageV3(t *testing.T) {
 
 func TestDeleteMobileDevicePrestageV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -438,7 +438,7 @@ func TestDeleteMobileDevicePrestageV2(t *testing.T) {
 
 func TestDeleteMobileDevicePrestageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -453,7 +453,7 @@ func TestDeleteMobileDevicePrestageV3(t *testing.T) {
 
 func TestListMobileDevicePrestageAttachmentsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -471,7 +471,7 @@ func TestListMobileDevicePrestageAttachmentsV2(t *testing.T) {
 
 func TestListMobileDevicePrestageAttachmentsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -487,7 +487,7 @@ func TestListMobileDevicePrestageAttachmentsV2_NotFound(t *testing.T) {
 
 func TestListMobileDevicePrestageAttachmentsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -505,7 +505,7 @@ func TestListMobileDevicePrestageAttachmentsV3(t *testing.T) {
 
 func TestListMobileDevicePrestageAttachmentsV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -521,7 +521,7 @@ func TestListMobileDevicePrestageAttachmentsV3_NotFound(t *testing.T) {
 
 func TestUploadMobileDevicePrestageAttachmentV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -541,7 +541,7 @@ func TestUploadMobileDevicePrestageAttachmentV2(t *testing.T) {
 
 func TestUploadMobileDevicePrestageAttachmentV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -561,7 +561,7 @@ func TestUploadMobileDevicePrestageAttachmentV3(t *testing.T) {
 
 func TestDeleteMultipleMobileDevicePrestageAttachmentsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/attachments/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/attachments/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -576,7 +576,7 @@ func TestDeleteMultipleMobileDevicePrestageAttachmentsV2(t *testing.T) {
 
 func TestDeleteMultipleMobileDevicePrestageAttachmentsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id/attachments/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id/attachments/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -591,7 +591,7 @@ func TestDeleteMultipleMobileDevicePrestageAttachmentsV3(t *testing.T) {
 
 func TestListMobileDevicePrestageHistoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -613,7 +613,7 @@ func TestListMobileDevicePrestageHistoryV2(t *testing.T) {
 
 func TestListMobileDevicePrestageHistoryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -635,7 +635,7 @@ func TestListMobileDevicePrestageHistoryV3(t *testing.T) {
 
 func TestCreateMobileDevicePrestageHistoryNoteV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -653,7 +653,7 @@ func TestCreateMobileDevicePrestageHistoryNoteV2(t *testing.T) {
 
 func TestCreateMobileDevicePrestageHistoryNoteV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -671,7 +671,7 @@ func TestCreateMobileDevicePrestageHistoryNoteV3(t *testing.T) {
 
 func TestResolveMobileDevicePrestageV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -694,7 +694,7 @@ func TestResolveMobileDevicePrestageV2IDByName(t *testing.T) {
 
 func TestResolveMobileDevicePrestageV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -717,7 +717,7 @@ func TestResolveMobileDevicePrestageV2ByName(t *testing.T) {
 
 func TestResolveMobileDevicePrestageV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -740,7 +740,7 @@ func TestResolveMobileDevicePrestageV3IDByName(t *testing.T) {
 
 func TestResolveMobileDevicePrestageV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -764,7 +764,7 @@ func TestResolveMobileDevicePrestageV3ByName(t *testing.T) {
 func TestApplyMobileDevicePrestageV2_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -796,7 +796,7 @@ func TestApplyMobileDevicePrestageV2_Create(t *testing.T) {
 func TestApplyMobileDevicePrestageV2_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -808,7 +808,7 @@ func TestApplyMobileDevicePrestageV2_Update(t *testing.T) {
 		})
 	})
 	// GET (versionLock fetch) and Update share the same path — dispatch on method.
-	mux.HandleFunc("/api/pro/v2/mobile-device-prestages/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-prestages/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})
@@ -834,7 +834,7 @@ func TestApplyMobileDevicePrestageV2_Update(t *testing.T) {
 func TestApplyMobileDevicePrestageV3_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -866,7 +866,7 @@ func TestApplyMobileDevicePrestageV3_Create(t *testing.T) {
 func TestApplyMobileDevicePrestageV3_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -878,7 +878,7 @@ func TestApplyMobileDevicePrestageV3_Update(t *testing.T) {
 		})
 	})
 	// GET (versionLock fetch) and Update share the same path — dispatch on method.
-	mux.HandleFunc("/api/pro/v3/mobile-device-prestages/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/mobile-device-prestages/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{"id": "existing-id", "versionLock": 5})

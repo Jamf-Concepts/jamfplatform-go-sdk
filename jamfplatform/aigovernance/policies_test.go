@@ -13,7 +13,7 @@ import (
 
 func TestListPolicies(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListPolicies(t *testing.T) {
 
 func TestCreatePolicy(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreatePolicy(t *testing.T) {
 
 func TestGetPolicy(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetPolicy(t *testing.T) {
 
 func TestGetPolicy_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetPolicy_NotFound(t *testing.T) {
 
 func TestUpdatePolicy(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -102,7 +102,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 func TestArchivePolicy(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestArchivePolicy(t *testing.T) {
 
 func TestGetPolicyDeployment(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id/deployment", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id/deployment", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -135,7 +135,7 @@ func TestGetPolicyDeployment(t *testing.T) {
 
 func TestGetPolicyDeployment_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id/deployment", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id/deployment", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -151,7 +151,7 @@ func TestGetPolicyDeployment_NotFound(t *testing.T) {
 
 func TestPublishPolicy(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id/publish", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id/publish", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestPublishPolicy(t *testing.T) {
 
 func TestListPolicyVersions(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id/versions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id/versions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -191,7 +191,7 @@ func TestListPolicyVersions(t *testing.T) {
 
 func TestGetPolicyVersion(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id/versions/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id/versions/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -209,7 +209,7 @@ func TestGetPolicyVersion(t *testing.T) {
 
 func TestGetPolicyVersion_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/policies/test-id/versions/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/policies/test-id/versions/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

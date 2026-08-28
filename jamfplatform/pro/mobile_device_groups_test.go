@@ -13,7 +13,7 @@ import (
 
 func TestListMobileDeviceGroupsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListMobileDeviceGroupsV2(t *testing.T) {
 
 func TestListMobileDeviceGroupsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListMobileDeviceGroupsV2_NotFound(t *testing.T) {
 
 func TestListMobileDeviceGroupsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestListMobileDeviceGroupsV1(t *testing.T) {
 
 func TestListMobileDeviceGroupsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestListMobileDeviceGroupsV1_NotFound(t *testing.T) {
 
 func TestListSmartMobileDeviceGroupsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -103,7 +103,7 @@ func TestListSmartMobileDeviceGroupsV2(t *testing.T) {
 
 func TestListSmartMobileDeviceGroupsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -125,7 +125,7 @@ func TestListSmartMobileDeviceGroupsV1(t *testing.T) {
 
 func TestCreateSmartMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -143,7 +143,7 @@ func TestCreateSmartMobileDeviceGroupV2(t *testing.T) {
 
 func TestCreateSmartMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -161,7 +161,7 @@ func TestCreateSmartMobileDeviceGroupV1(t *testing.T) {
 
 func TestGetSmartMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -179,7 +179,7 @@ func TestGetSmartMobileDeviceGroupV2(t *testing.T) {
 
 func TestGetSmartMobileDeviceGroupV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -195,7 +195,7 @@ func TestGetSmartMobileDeviceGroupV2_NotFound(t *testing.T) {
 
 func TestGetSmartMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -213,7 +213,7 @@ func TestGetSmartMobileDeviceGroupV1(t *testing.T) {
 
 func TestGetSmartMobileDeviceGroupV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -229,7 +229,7 @@ func TestGetSmartMobileDeviceGroupV1_NotFound(t *testing.T) {
 
 func TestUpdateSmartMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -247,7 +247,7 @@ func TestUpdateSmartMobileDeviceGroupV2(t *testing.T) {
 
 func TestUpdateSmartMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -265,7 +265,7 @@ func TestUpdateSmartMobileDeviceGroupV1(t *testing.T) {
 
 func TestDeleteSmartMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -280,7 +280,7 @@ func TestDeleteSmartMobileDeviceGroupV2(t *testing.T) {
 
 func TestDeleteSmartMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -295,7 +295,7 @@ func TestDeleteSmartMobileDeviceGroupV1(t *testing.T) {
 
 func TestListSmartMobileDeviceGroupMembershipV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -317,7 +317,7 @@ func TestListSmartMobileDeviceGroupMembershipV2(t *testing.T) {
 
 func TestListSmartMobileDeviceGroupMembershipV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -339,7 +339,7 @@ func TestListSmartMobileDeviceGroupMembershipV1(t *testing.T) {
 
 func TestListStaticMobileDeviceGroupsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -361,7 +361,7 @@ func TestListStaticMobileDeviceGroupsV2(t *testing.T) {
 
 func TestListStaticMobileDeviceGroupsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -383,7 +383,7 @@ func TestListStaticMobileDeviceGroupsV1(t *testing.T) {
 
 func TestCreateStaticMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -401,7 +401,7 @@ func TestCreateStaticMobileDeviceGroupV2(t *testing.T) {
 
 func TestCreateStaticMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -419,7 +419,7 @@ func TestCreateStaticMobileDeviceGroupV1(t *testing.T) {
 
 func TestGetStaticMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -437,7 +437,7 @@ func TestGetStaticMobileDeviceGroupV2(t *testing.T) {
 
 func TestGetStaticMobileDeviceGroupV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -453,7 +453,7 @@ func TestGetStaticMobileDeviceGroupV2_NotFound(t *testing.T) {
 
 func TestGetStaticMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -471,7 +471,7 @@ func TestGetStaticMobileDeviceGroupV1(t *testing.T) {
 
 func TestGetStaticMobileDeviceGroupV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -487,7 +487,7 @@ func TestGetStaticMobileDeviceGroupV1_NotFound(t *testing.T) {
 
 func TestDeleteStaticMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -502,7 +502,7 @@ func TestDeleteStaticMobileDeviceGroupV2(t *testing.T) {
 
 func TestDeleteStaticMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -517,7 +517,7 @@ func TestDeleteStaticMobileDeviceGroupV1(t *testing.T) {
 
 func TestPatchStaticMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -535,7 +535,7 @@ func TestPatchStaticMobileDeviceGroupV2(t *testing.T) {
 
 func TestPatchStaticMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -553,7 +553,7 @@ func TestPatchStaticMobileDeviceGroupV1(t *testing.T) {
 
 func TestListStaticMobileDeviceGroupMembershipV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -575,7 +575,7 @@ func TestListStaticMobileDeviceGroupMembershipV2(t *testing.T) {
 
 func TestListStaticMobileDeviceGroupMembershipV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -597,7 +597,7 @@ func TestListStaticMobileDeviceGroupMembershipV1(t *testing.T) {
 
 func TestEraseMobileDeviceGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -612,7 +612,7 @@ func TestEraseMobileDeviceGroupV2(t *testing.T) {
 
 func TestEraseMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -627,7 +627,7 @@ func TestEraseMobileDeviceGroupV1(t *testing.T) {
 
 func TestResolveMobileDeviceGroupV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -650,7 +650,7 @@ func TestResolveMobileDeviceGroupV2IDByName(t *testing.T) {
 
 func TestResolveMobileDeviceGroupV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -673,7 +673,7 @@ func TestResolveMobileDeviceGroupV2ByName(t *testing.T) {
 
 func TestResolveMobileDeviceGroupV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -696,7 +696,7 @@ func TestResolveMobileDeviceGroupV1IDByName(t *testing.T) {
 
 func TestResolveMobileDeviceGroupV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -719,7 +719,7 @@ func TestResolveMobileDeviceGroupV1ByName(t *testing.T) {
 
 func TestResolveSmartMobileDeviceGroupV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -742,7 +742,7 @@ func TestResolveSmartMobileDeviceGroupV2IDByName(t *testing.T) {
 
 func TestResolveSmartMobileDeviceGroupV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -765,7 +765,7 @@ func TestResolveSmartMobileDeviceGroupV2ByName(t *testing.T) {
 
 func TestResolveSmartMobileDeviceGroupV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -788,7 +788,7 @@ func TestResolveSmartMobileDeviceGroupV1IDByName(t *testing.T) {
 
 func TestResolveSmartMobileDeviceGroupV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -811,7 +811,7 @@ func TestResolveSmartMobileDeviceGroupV1ByName(t *testing.T) {
 
 func TestResolveStaticMobileDeviceGroupV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -834,7 +834,7 @@ func TestResolveStaticMobileDeviceGroupV2IDByName(t *testing.T) {
 
 func TestResolveStaticMobileDeviceGroupV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -857,7 +857,7 @@ func TestResolveStaticMobileDeviceGroupV2ByName(t *testing.T) {
 
 func TestResolveStaticMobileDeviceGroupV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -880,7 +880,7 @@ func TestResolveStaticMobileDeviceGroupV1IDByName(t *testing.T) {
 
 func TestResolveStaticMobileDeviceGroupV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -904,7 +904,7 @@ func TestResolveStaticMobileDeviceGroupV1ByName(t *testing.T) {
 func TestApplySmartMobileDeviceGroupV2_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -936,7 +936,7 @@ func TestApplySmartMobileDeviceGroupV2_Create(t *testing.T) {
 func TestApplySmartMobileDeviceGroupV2_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -947,7 +947,7 @@ func TestApplySmartMobileDeviceGroupV2_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 
@@ -966,7 +966,7 @@ func TestApplySmartMobileDeviceGroupV2_Update(t *testing.T) {
 func TestApplySmartMobileDeviceGroupV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -998,7 +998,7 @@ func TestApplySmartMobileDeviceGroupV1_Create(t *testing.T) {
 func TestApplySmartMobileDeviceGroupV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1009,7 +1009,7 @@ func TestApplySmartMobileDeviceGroupV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 
@@ -1028,7 +1028,7 @@ func TestApplySmartMobileDeviceGroupV1_Update(t *testing.T) {
 func TestApplyStaticMobileDeviceGroupV2_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -1060,7 +1060,7 @@ func TestApplyStaticMobileDeviceGroupV2_Create(t *testing.T) {
 func TestApplyStaticMobileDeviceGroupV2_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1073,7 +1073,7 @@ func TestApplyStaticMobileDeviceGroupV2_Update(t *testing.T) {
 	})
 	// Membership pre-fetch handler: returns a single device so the Apply method
 	// has current membership to inject into the patch request.
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-group-membership/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-group-membership/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1082,7 +1082,7 @@ func TestApplyStaticMobileDeviceGroupV2_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v2/mobile-device-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-device-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 
@@ -1101,7 +1101,7 @@ func TestApplyStaticMobileDeviceGroupV2_Update(t *testing.T) {
 func TestApplyStaticMobileDeviceGroupV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -1133,7 +1133,7 @@ func TestApplyStaticMobileDeviceGroupV1_Create(t *testing.T) {
 func TestApplyStaticMobileDeviceGroupV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1146,7 +1146,7 @@ func TestApplyStaticMobileDeviceGroupV1_Update(t *testing.T) {
 	})
 	// Membership pre-fetch handler: returns a single device so the Apply method
 	// has current membership to inject into the patch request.
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-group-membership/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-group-membership/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1155,7 +1155,7 @@ func TestApplyStaticMobileDeviceGroupV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/mobile-device-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mobile-device-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

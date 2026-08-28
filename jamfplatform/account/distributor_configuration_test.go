@@ -13,7 +13,7 @@ import (
 
 func TestGetDistributorConfiguration(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/configuration", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/configuration", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetDistributorConfiguration(t *testing.T) {
 
 func TestGetDistributorConfiguration_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/configuration", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/configuration", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetDistributorConfiguration_NotFound(t *testing.T) {
 
 func TestUpdateDistributorConfiguration(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/configuration", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/configuration", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}

@@ -13,7 +13,7 @@ import (
 
 func TestCreateDistributorPurchaseOrder(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/purchase-orders", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/purchase-orders", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestCreateDistributorPurchaseOrder(t *testing.T) {
 
 func TestGetDistributorPurchaseOrder(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/purchase-orders/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/purchase-orders/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -46,7 +46,7 @@ func TestGetDistributorPurchaseOrder(t *testing.T) {
 
 func TestGetDistributorPurchaseOrder_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/purchase-orders/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/purchase-orders/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -62,7 +62,7 @@ func TestGetDistributorPurchaseOrder_NotFound(t *testing.T) {
 
 func TestValidateDistributorPurchaseOrder(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/validate-purchase-order", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/validate-purchase-order", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

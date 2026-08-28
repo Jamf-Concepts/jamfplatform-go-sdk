@@ -1725,13 +1725,18 @@ func Test<% .Name %>_Update(t *testing.T) {
 // testAPIBase builds the URL prefix the generated httptest handlers register,
 // for one namespace and version. It mirrors Transport.APIPrefix.
 //
-// There is no scope segment: the tenant travels in the X-Tenant-Id header now,
-// so the path is the same for every tenant. That also retired the duplicated
-// tenant-first namespace allowlist this file used to carry — with the scope out
-// of the path there is no ordering left to keep in sync with the transport.
+// There is no /api segment: the GA gateway mounts each namespace at the root
+// (see Transport.APIPrefix). This file is a deliberate second copy of that
+// rule, because the generator is its own Go module and cannot import the SDK —
+// a divergence is self-detecting rather than silent, since the generated
+// handlers would register at a path the client never calls and make test fails.
+//
+// There is no scope segment either: the tenant travels in the X-Tenant-Id
+// header now, so the path is the same for every tenant. That also retired the
+// duplicated tenant-first namespace allowlist this file used to carry.
 func testAPIBase(namespace, version string) string {
 	if version == "" {
-		return fmt.Sprintf("/api/%s", namespace)
+		return fmt.Sprintf("/%s", namespace)
 	}
-	return fmt.Sprintf("/api/%s/%s", namespace, version)
+	return fmt.Sprintf("/%s/%s", namespace, version)
 }

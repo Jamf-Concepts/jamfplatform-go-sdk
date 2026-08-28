@@ -13,7 +13,7 @@ import (
 
 func TestGetDeviceDeclarationReport(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/devices/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetDeviceDeclarationReport(t *testing.T) {
 
 func TestGetDeviceDeclarationReport_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetDeviceDeclarationReport_NotFound(t *testing.T) {
 
 func TestGetDeviceDeclarationReportFiltered(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/devices/test-id/declarations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/devices/test-id/declarations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -69,7 +69,7 @@ func TestGetDeviceDeclarationReportFiltered(t *testing.T) {
 
 func TestGetDeviceChannels(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/devices/test-id/channels", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/devices/test-id/channels", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestGetDeviceChannels(t *testing.T) {
 
 func TestGetDeviceChannels_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/devices/test-id/channels", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/devices/test-id/channels", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

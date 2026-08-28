@@ -13,7 +13,7 @@ import (
 
 func TestGetComputerHardwareSoftwareReportByIDDateRange(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetComputerHardwareSoftwareReportByIDDateRange(t *testing.T) {
 
 func TestGetComputerHardwareSoftwareReportByIDDateRange_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetComputerHardwareSoftwareReportByIDDateRange_NotFound(t *testing.T) {
 
 func TestGetComputerHardwareSoftwareReportByIDDateRangeSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestGetComputerHardwareSoftwareReportByIDDateRangeSubset(t *testing.T) {
 
 func TestGetComputerHardwareSoftwareReportByIDDateRangeSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/id/test-id/test-id_test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -73,7 +73,7 @@ func TestGetComputerHardwareSoftwareReportByIDDateRangeSubset_NotFound(t *testin
 
 func TestGetComputerHardwareSoftwareReportByMacAddressDateRange(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/macaddress/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/macaddress/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestGetComputerHardwareSoftwareReportByMacAddressDateRange(t *testing.T) {
 
 func TestGetComputerHardwareSoftwareReportByMacAddressDateRange_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/macaddress/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/macaddress/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -103,7 +103,7 @@ func TestGetComputerHardwareSoftwareReportByMacAddressDateRange_NotFound(t *test
 
 func TestGetComputerHardwareSoftwareReportByNameDateRange(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/name/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/name/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -121,7 +121,7 @@ func TestGetComputerHardwareSoftwareReportByNameDateRange(t *testing.T) {
 
 func TestGetComputerHardwareSoftwareReportByNameDateRange_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/name/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/name/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -133,7 +133,7 @@ func TestGetComputerHardwareSoftwareReportByNameDateRange_NotFound(t *testing.T)
 
 func TestGetComputerHardwareSoftwareReportBySerialNumberDateRange(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/serialnumber/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/serialnumber/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestGetComputerHardwareSoftwareReportBySerialNumberDateRange(t *testing.T) 
 
 func TestGetComputerHardwareSoftwareReportBySerialNumberDateRange_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/serialnumber/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/serialnumber/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -163,7 +163,7 @@ func TestGetComputerHardwareSoftwareReportBySerialNumberDateRange_NotFound(t *te
 
 func TestGetComputerHardwareSoftwareReportByUDIDDateRange(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/udid/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/udid/test-id/test-id_test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -181,7 +181,7 @@ func TestGetComputerHardwareSoftwareReportByUDIDDateRange(t *testing.T) {
 
 func TestGetComputerHardwareSoftwareReportByUDIDDateRange_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/computerhardwaresoftwarereports/udid/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/computerhardwaresoftwarereports/udid/test-id/test-id_test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 

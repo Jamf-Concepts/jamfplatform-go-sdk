@@ -13,7 +13,7 @@ import (
 
 func TestGetDistributorQuote(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/quotes/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/quotes/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetDistributorQuote(t *testing.T) {
 
 func TestGetDistributorQuote_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/partners/v1/distributor/quotes/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/partners/v1/distributor/quotes/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

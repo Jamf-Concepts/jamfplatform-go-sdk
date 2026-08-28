@@ -13,7 +13,7 @@ import (
 
 func TestListCategoriesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListCategoriesV1(t *testing.T) {
 
 func TestCreateCategoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateCategoryV1(t *testing.T) {
 
 func TestDeleteMultipleCategoriesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -68,7 +68,7 @@ func TestDeleteMultipleCategoriesV1(t *testing.T) {
 
 func TestGetCategoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -86,7 +86,7 @@ func TestGetCategoryV1(t *testing.T) {
 
 func TestGetCategoryV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -102,7 +102,7 @@ func TestGetCategoryV1_NotFound(t *testing.T) {
 
 func TestUpdateCategoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -120,7 +120,7 @@ func TestUpdateCategoryV1(t *testing.T) {
 
 func TestDeleteCategoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -135,7 +135,7 @@ func TestDeleteCategoryV1(t *testing.T) {
 
 func TestListCategoryHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -157,7 +157,7 @@ func TestListCategoryHistoryV1(t *testing.T) {
 
 func TestCreateCategoryHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -175,7 +175,7 @@ func TestCreateCategoryHistoryNoteV1(t *testing.T) {
 
 func TestResolveCategoryV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -198,7 +198,7 @@ func TestResolveCategoryV1IDByName(t *testing.T) {
 
 func TestResolveCategoryV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -222,7 +222,7 @@ func TestResolveCategoryV1ByName(t *testing.T) {
 func TestApplyCategoryV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -254,7 +254,7 @@ func TestApplyCategoryV1_Create(t *testing.T) {
 func TestApplyCategoryV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -265,7 +265,7 @@ func TestApplyCategoryV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/categories/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/categories/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

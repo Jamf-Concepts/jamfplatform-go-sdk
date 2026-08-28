@@ -27,7 +27,7 @@ import (
 
 func main() {
 	client := jamfplatform.NewClient(
-		"https://your-tenant.apigw.jamf.com",
+		"https://eu.api.jamfcloud.com",
 		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
 		jamfplatform.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),
@@ -45,6 +45,30 @@ func main() {
 	}
 }
 ```
+
+### Base URL
+
+Pass the regional gateway root, with no path:
+
+| Region | Base URL |
+|---|---|
+| US | `https://us.api.jamfcloud.com` |
+| EU | `https://eu.api.jamfcloud.com` |
+| APAC | `https://apac.api.jamfcloud.com` |
+
+The base URL must be the gateway **root**. The SDK appends
+`/{namespace}/{version}/...` for API calls and `/auth/token` for the token
+exchange, so a base URL carrying a path prefix (`https://host/api`) sends the
+token exchange to `/api/auth/token`, which the gateway does not serve — the
+call then fails during authentication rather than on the request you made.
+A path prefix works only against a reverse proxy that mounts both the token
+endpoint and the API namespaces beneath it.
+
+> **Breaking change for the Jamf Platform API GA (2026-09-01).** The previous
+> gateway, `{region}.apigw.jamf.com`, is retired, and it required an `/api`
+> segment the new host does not serve. Update the base URL; nothing else in
+> your code changes. GA also invalidates every public-beta credential, so
+> integrations have to be re-created regardless.
 
 ### Authentication
 

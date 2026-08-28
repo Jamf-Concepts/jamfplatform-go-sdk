@@ -13,7 +13,7 @@ import (
 
 func TestListDeclarationReportClients(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/declarations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/declarations/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListDeclarationReportClients(t *testing.T) {
 
 func TestListDeclarationReportClientsFiltered(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/declarations/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/declarations/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

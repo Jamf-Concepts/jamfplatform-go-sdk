@@ -13,7 +13,7 @@ import (
 
 func TestUpdateMdmRenewalDeviceCommonDetailsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mdm-renewal/device-common-details", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mdm-renewal/device-common-details", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestUpdateMdmRenewalDeviceCommonDetailsV1(t *testing.T) {
 
 func TestGetMdmRenewalDeviceCommonDetailsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mdm-renewal/device-common-details/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mdm-renewal/device-common-details/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -46,7 +46,7 @@ func TestGetMdmRenewalDeviceCommonDetailsV1(t *testing.T) {
 
 func TestGetMdmRenewalDeviceCommonDetailsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mdm-renewal/device-common-details/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/mdm-renewal/device-common-details/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -62,7 +62,7 @@ func TestGetMdmRenewalDeviceCommonDetailsV1_NotFound(t *testing.T) {
 
 func TestGetMdmRenewalStrategiesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mdm-renewal/renewal-strategies/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mdm-renewal/renewal-strategies/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -80,7 +80,7 @@ func TestGetMdmRenewalStrategiesV1(t *testing.T) {
 
 func TestGetMdmRenewalStrategiesV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mdm-renewal/renewal-strategies/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/mdm-renewal/renewal-strategies/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -96,7 +96,7 @@ func TestGetMdmRenewalStrategiesV1_NotFound(t *testing.T) {
 
 func TestDeleteMdmRenewalStrategiesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/mdm-renewal/renewal-strategies/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/mdm-renewal/renewal-strategies/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

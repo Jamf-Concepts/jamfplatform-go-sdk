@@ -13,7 +13,7 @@ import (
 
 func TestGetUserSessionV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/user", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/user", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetUserSessionV1(t *testing.T) {
 
 func TestGetUserSessionV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/user", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/user", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetUserSessionV1_NotFound(t *testing.T) {
 
 func TestUpdateUserSessionV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/user/updateSession", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/user/updateSession", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

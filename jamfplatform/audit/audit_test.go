@@ -16,7 +16,7 @@ func TestListAuditEvents(t *testing.T) {
 	// Two pages, so the walk is actually exercised: the handler hands out a
 	// cursor on the first call and withholds one on the second. A single-page
 	// stub would pass even if the generated method ignored the cursor entirely.
-	mux.HandleFunc("/api/audit/v1/audit", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/audit/v1/audit", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -49,7 +49,7 @@ func TestGetResourceLineage(t *testing.T) {
 	// Two pages, so the walk is actually exercised: the handler hands out a
 	// cursor on the first call and withholds one on the second. A single-page
 	// stub would pass even if the generated method ignored the cursor entirely.
-	mux.HandleFunc("/api/audit/v1/audit/resources/test-id/lineage", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/audit/v1/audit/resources/test-id/lineage", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -79,7 +79,7 @@ func TestGetResourceLineage(t *testing.T) {
 
 func TestListAuditSources(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/audit/v1/audit/sources", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/audit/v1/audit/sources", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -97,7 +97,7 @@ func TestListAuditSources(t *testing.T) {
 
 func TestListAuditSources_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/audit/v1/audit/sources", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/audit/v1/audit/sources", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -113,7 +113,7 @@ func TestListAuditSources_NotFound(t *testing.T) {
 
 func TestGetTransactionTimeline(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/audit/v1/audit/transactions/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/audit/v1/audit/transactions/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -131,7 +131,7 @@ func TestGetTransactionTimeline(t *testing.T) {
 
 func TestGetTransactionTimeline_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/audit/v1/audit/transactions/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/audit/v1/audit/transactions/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

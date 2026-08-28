@@ -13,7 +13,7 @@ import (
 
 func TestListDomains(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/sso/v1/domains", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListDomains(t *testing.T) {
 
 func TestListDomains_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/sso/v1/domains", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListDomains_NotFound(t *testing.T) {
 
 func TestCreateDomain(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/sso/v1/domains", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestCreateDomain(t *testing.T) {
 
 func TestGetDomainAllocation(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains/allocation/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/sso/v1/domains/allocation/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestGetDomainAllocation(t *testing.T) {
 
 func TestGetDomainAllocation_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains/allocation/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/sso/v1/domains/allocation/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestGetDomainAllocation_NotFound(t *testing.T) {
 
 func TestDeleteDomain(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/sso/v1/domains/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -114,7 +114,7 @@ func TestDeleteDomain(t *testing.T) {
 
 func TestVerifyDomain(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains/test-id/actions/verify", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/sso/v1/domains/test-id/actions/verify", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -132,7 +132,7 @@ func TestVerifyDomain(t *testing.T) {
 
 func TestVerifyDomain_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/sso/v1/domains/test-id/actions/verify", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/sso/v1/domains/test-id/actions/verify", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

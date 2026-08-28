@@ -13,7 +13,7 @@ import (
 
 func TestGetCloudDistributionPointV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetCloudDistributionPointV1(t *testing.T) {
 
 func TestGetCloudDistributionPointV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetCloudDistributionPointV1_NotFound(t *testing.T) {
 
 func TestCreateCloudDistributionPointV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestCreateCloudDistributionPointV1(t *testing.T) {
 
 func TestDeleteCloudDistributionPointV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -80,7 +80,7 @@ func TestDeleteCloudDistributionPointV1(t *testing.T) {
 
 func TestUpdateCloudDistributionPointV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -98,7 +98,7 @@ func TestUpdateCloudDistributionPointV1(t *testing.T) {
 
 func TestFailCloudDistributionPointUploadV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/fail-upload/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/fail-upload/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -113,7 +113,7 @@ func TestFailCloudDistributionPointUploadV1(t *testing.T) {
 
 func TestListCloudDistributionPointFilesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/files", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/files", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -135,7 +135,7 @@ func TestListCloudDistributionPointFilesV1(t *testing.T) {
 
 func TestListCloudDistributionPointHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -157,7 +157,7 @@ func TestListCloudDistributionPointHistoryV1(t *testing.T) {
 
 func TestCreateCloudDistributionPointHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -175,7 +175,7 @@ func TestCreateCloudDistributionPointHistoryNoteV1(t *testing.T) {
 
 func TestRefreshCloudDistributionPointInventoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/refresh-inventory", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/refresh-inventory", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -190,7 +190,7 @@ func TestRefreshCloudDistributionPointInventoryV1(t *testing.T) {
 
 func TestTestCloudDistributionPointConnectionV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/test-connection", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/test-connection", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -208,7 +208,7 @@ func TestTestCloudDistributionPointConnectionV1(t *testing.T) {
 
 func TestTestCloudDistributionPointConnectionV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/test-connection", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/test-connection", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -224,7 +224,7 @@ func TestTestCloudDistributionPointConnectionV1_NotFound(t *testing.T) {
 
 func TestGetCloudDistributionPointUploadCapabilityV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/upload-capability", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/upload-capability", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -242,7 +242,7 @@ func TestGetCloudDistributionPointUploadCapabilityV1(t *testing.T) {
 
 func TestGetCloudDistributionPointUploadCapabilityV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/cloud-distribution-point/upload-capability", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/cloud-distribution-point/upload-capability", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

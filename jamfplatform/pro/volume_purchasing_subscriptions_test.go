@@ -13,7 +13,7 @@ import (
 
 func TestListVolumePurchasingSubscriptionsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListVolumePurchasingSubscriptionsV1(t *testing.T) {
 
 func TestCreateVolumePurchasingSubscriptionV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateVolumePurchasingSubscriptionV1(t *testing.T) {
 
 func TestGetVolumePurchasingSubscriptionV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetVolumePurchasingSubscriptionV1(t *testing.T) {
 
 func TestGetVolumePurchasingSubscriptionV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetVolumePurchasingSubscriptionV1_NotFound(t *testing.T) {
 
 func TestUpdateVolumePurchasingSubscriptionV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestUpdateVolumePurchasingSubscriptionV1(t *testing.T) {
 
 func TestDeleteVolumePurchasingSubscriptionV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -120,7 +120,7 @@ func TestDeleteVolumePurchasingSubscriptionV1(t *testing.T) {
 
 func TestListVolumePurchasingSubscriptionHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -142,7 +142,7 @@ func TestListVolumePurchasingSubscriptionHistoryV1(t *testing.T) {
 
 func TestCreateVolumePurchasingSubscriptionHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -160,7 +160,7 @@ func TestCreateVolumePurchasingSubscriptionHistoryNoteV1(t *testing.T) {
 
 func TestResolveVolumePurchasingSubscriptionV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -183,7 +183,7 @@ func TestResolveVolumePurchasingSubscriptionV1IDByName(t *testing.T) {
 
 func TestResolveVolumePurchasingSubscriptionV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -207,7 +207,7 @@ func TestResolveVolumePurchasingSubscriptionV1ByName(t *testing.T) {
 func TestApplyVolumePurchasingSubscriptionV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -239,7 +239,7 @@ func TestApplyVolumePurchasingSubscriptionV1_Create(t *testing.T) {
 func TestApplyVolumePurchasingSubscriptionV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -250,7 +250,7 @@ func TestApplyVolumePurchasingSubscriptionV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/volume-purchasing-subscriptions/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/volume-purchasing-subscriptions/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

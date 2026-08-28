@@ -13,7 +13,7 @@ import (
 
 func TestCreateAdcsSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestCreateAdcsSettingsV1(t *testing.T) {
 
 func TestValidateAdcsCertificateV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/validate-certificate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/validate-certificate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -46,7 +46,7 @@ func TestValidateAdcsCertificateV1(t *testing.T) {
 
 func TestValidateAdcsClientCertificateV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/validate-client-certificate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/validate-client-certificate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestValidateAdcsClientCertificateV1(t *testing.T) {
 
 func TestGetAdcsSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -79,7 +79,7 @@ func TestGetAdcsSettingsV1(t *testing.T) {
 
 func TestGetAdcsSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -95,7 +95,7 @@ func TestGetAdcsSettingsV1_NotFound(t *testing.T) {
 
 func TestDeleteAdcsSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -110,7 +110,7 @@ func TestDeleteAdcsSettingsV1(t *testing.T) {
 
 func TestUpdateAdcsSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -125,7 +125,7 @@ func TestUpdateAdcsSettingsV1(t *testing.T) {
 
 func TestGetAdcsSettingsDependenciesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id/dependencies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id/dependencies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -143,7 +143,7 @@ func TestGetAdcsSettingsDependenciesV1(t *testing.T) {
 
 func TestGetAdcsSettingsDependenciesV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id/dependencies", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id/dependencies", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -159,7 +159,7 @@ func TestGetAdcsSettingsDependenciesV1_NotFound(t *testing.T) {
 
 func TestListAdcsSettingsHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -181,7 +181,7 @@ func TestListAdcsSettingsHistoryV1(t *testing.T) {
 
 func TestCreateAdcsSettingsHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/adcs-settings/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/adcs-settings/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

@@ -2466,7 +2466,7 @@ const JamfProAPIVersion = %q
 // to call typed methods.
 //
 //	c := %s.NewClient(
-//		"https://your-tenant.apigw.jamf.com",
+//		"https://eu.api.jamfcloud.com",
 //		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 //		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
 //		%s.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),

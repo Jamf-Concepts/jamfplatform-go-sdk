@@ -13,7 +13,7 @@ import (
 
 func TestGetComputerInventoryCollectionSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetComputerInventoryCollectionSettingsV1(t *testing.T) {
 
 func TestGetComputerInventoryCollectionSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-inventory-collection-settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-inventory-collection-settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetComputerInventoryCollectionSettingsV1_NotFound(t *testing.T) {
 
 func TestGetComputerInventoryCollectionSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestGetComputerInventoryCollectionSettingsV2(t *testing.T) {
 
 func TestGetComputerInventoryCollectionSettingsV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-inventory-collection-settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/computer-inventory-collection-settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestGetComputerInventoryCollectionSettingsV2_NotFound(t *testing.T) {
 
 func TestUpdateComputerInventoryCollectionSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestUpdateComputerInventoryCollectionSettingsV1(t *testing.T) {
 
 func TestUpdateComputerInventoryCollectionSettingsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/computer-inventory-collection-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -114,7 +114,7 @@ func TestUpdateComputerInventoryCollectionSettingsV2(t *testing.T) {
 
 func TestCreateComputerInventoryCollectionCustomPathV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-inventory-collection-settings/custom-path", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-inventory-collection-settings/custom-path", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -132,7 +132,7 @@ func TestCreateComputerInventoryCollectionCustomPathV1(t *testing.T) {
 
 func TestCreateComputerInventoryCollectionCustomPathV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-inventory-collection-settings/custom-path", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/computer-inventory-collection-settings/custom-path", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -150,7 +150,7 @@ func TestCreateComputerInventoryCollectionCustomPathV2(t *testing.T) {
 
 func TestDeleteComputerInventoryCollectionCustomPathV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-inventory-collection-settings/custom-path/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-inventory-collection-settings/custom-path/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -165,7 +165,7 @@ func TestDeleteComputerInventoryCollectionCustomPathV1(t *testing.T) {
 
 func TestDeleteComputerInventoryCollectionCustomPathV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-inventory-collection-settings/custom-path/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/computer-inventory-collection-settings/custom-path/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

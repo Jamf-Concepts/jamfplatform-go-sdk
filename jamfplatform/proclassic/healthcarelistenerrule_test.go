@@ -13,7 +13,7 @@ import (
 
 func TestGetHealthcareListenerRuleByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetHealthcareListenerRuleByID(t *testing.T) {
 
 func TestGetHealthcareListenerRuleByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetHealthcareListenerRuleByID_NotFound(t *testing.T) {
 
 func TestCreateHealthcareListenerRuleByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateHealthcareListenerRuleByID(t *testing.T) {
 
 func TestUpdateHealthcareListenerRuleByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/healthcarelistenerrule/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateHealthcareListenerRuleByID(t *testing.T) {
 
 func TestListHealthcareListenerRules(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/healthcarelistenerrule", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/healthcarelistenerrule", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -94,7 +94,7 @@ func TestListHealthcareListenerRules(t *testing.T) {
 
 func TestListHealthcareListenerRules_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/healthcarelistenerrule", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/healthcarelistenerrule", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 

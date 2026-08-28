@@ -13,7 +13,7 @@ import (
 
 func TestListTools(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/tools", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/tools", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListTools(t *testing.T) {
 
 func TestListTools_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/tools", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/tools", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListTools_NotFound(t *testing.T) {
 
 func TestGetTool(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/tools/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/tools/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestGetTool(t *testing.T) {
 
 func TestGetTool_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/tools/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/tools/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestGetTool_NotFound(t *testing.T) {
 
 func TestGetToolSchema(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/tools/test-id/schemas/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/tools/test-id/schemas/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestGetToolSchema(t *testing.T) {
 
 func TestGetToolSchema_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ai/governance/policies/v1/tools/test-id/schemas/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/ai/governance/policies/v1/tools/test-id/schemas/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
