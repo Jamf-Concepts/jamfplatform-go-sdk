@@ -894,8 +894,19 @@ type ConnectorCreateRequest struct {
 	// How the connector authenticates to the UEM instance. Required on create despite the published spec
 	// omitting it: without it the server answers `500 INTERNAL_ERROR` rather than a validation error
 	// (wire-verified 2026-08-21), so a request built from the spec alone can only fail. With it present
-	// but `deviceSyncAuth` absent the server answers a proper `422 VALIDATION_FAILED`. `JAMF_PRO_OAUTH` is
-	// the strategy a Jamf Pro connector uses and the only one wire-confirmed.
+	// but the credentials it implies absent, the server answers a proper `422 VALIDATION_FAILED`.
+	// The accepted set is enumerated by the server itself: sending an unknown value returns `422` naming
+	// every member of `JamfProAuthStrategy` (wire-verified 2026-08-28). Two are usable for a Jamf Pro
+	// connector, and they need different fields:
+	// - `JAMF_PRO_OAUTH` — the caller supplies `deviceSyncAuth.clientId` and `.clientSecret` for an API
+	// integration they created on the target Jamf Pro themselves, plus the `url` of that instance. - `M2M`
+	// — the caller supplies `tenantId` and no credentials at all; Jamf Security Cloud provisions its own
+	// API role and integration (named "JSC Connector") on that tenant. `url` is ignored on this path and
+	// may be omitted — the server derives it from the tenant.
+	// This field is a *provisioning instruction*, not stored state: a connector created with `M2M` reads
+	// back as `JAMF_PRO_OAUTH`, because that is the steady state the provisioning produced. Callers must
+	// not treat the value as round-tripping.
+	// Allowed values: see the ConnectorCreateRequestAuthStrategy constants.
 	AuthStrategy *string `json:"authStrategy,omitempty"`
 	// Credentials the connector uses to authenticate against the UEM instance. Absent from the published
 	// spec, which declares only `vendor`/`url`/`isoCountry` on the create request and defers the rest to
@@ -907,6 +918,15 @@ type ConnectorCreateRequest struct {
 	DeviceSyncAuth *DeviceSyncAuth `json:"deviceSyncAuth,omitempty"`
 	// ISO country code for the UEM instance, when applicable.
 	IsoCountry *string `json:"isoCountry,omitempty"`
+	// Platform tenant identifier of the target Jamf Pro instance. Required by `authStrategy: M2M` and
+	// rejected-as-null without it (`422 "tenantId: must not be null"`); unused by the credential-bearing
+	// strategies.
+	// Absent from the published spec, which declares only `vendor`/`url`/`isoCountry` on the create
+	// request and defers the rest to an undocumented "vendor-specific fields may also be included".
+	// Restored here from the wire (probed 2026-08-28): a create carrying `authStrategy: M2M` and this
+	// field returns `201`, and the resulting connector reports the tenant's own URL rather than whatever
+	// `url` the request carried.
+	TenantID *string `json:"tenantId,omitempty"`
 	// UEM server URL.
 	URL string `json:"url"`
 	// UEM vendor name.
@@ -1093,6 +1113,12 @@ type SyncSettings struct {
 	// Auto-deletion policy for devices removed from the UEM platform.
 	// Allowed values: see the SyncSettingsAutoDeviceDeletion constants.
 	AutoDeviceDeletion string `json:"autoDeviceDeletion"`
+	// Whether this connector may sync several devices concurrently, for faster inventory updates.
+	// Absent from the published spec's update request while present on the response, and writable — a
+	// `PUT` carrying `false` persists (wire-verified 2026-08-28). Because the update is a full
+	// replacement, a request built from the unpatched spec could not express the field and therefore reset
+	// it to `true` on every write, silently discarding an operator's choice.
+	ConcurrentSyncEnabled *bool `json:"concurrentSyncEnabled,omitempty"`
 	// Controls which UEM attribute each JSC device field is populated from. Each value is an enum of UEM
 	// attribute names whose members are vendor-specific, so the accepted values for a given key depend on
 	// the connector's `vendor`. The Google connector accepts no mappings.

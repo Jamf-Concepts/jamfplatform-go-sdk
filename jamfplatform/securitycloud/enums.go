@@ -668,6 +668,31 @@ func ConnectorConfigVendorValues() []ConnectorConfigVendor {
 	}
 }
 
+// ConnectorCreateRequestAuthStrategy is the set of values accepted by ConnectorCreateRequest.AuthStrategy.
+type ConnectorCreateRequestAuthStrategy = string
+
+// ConnectorCreateRequestAuthStrategy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ConnectorCreateRequestAuthStrategyM2m          ConnectorCreateRequestAuthStrategy = "M2M"
+	ConnectorCreateRequestAuthStrategyJamfProOauth ConnectorCreateRequestAuthStrategy = "JAMF_PRO_OAUTH"
+	ConnectorCreateRequestAuthStrategyBasic        ConnectorCreateRequestAuthStrategy = "BASIC"
+)
+
+// ConnectorCreateRequestAuthStrategyValues returns every value the Jamf API accepts for ConnectorCreateRequestAuthStrategy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectorCreateRequestAuthStrategyValues() []ConnectorCreateRequestAuthStrategy {
+	return []ConnectorCreateRequestAuthStrategy{
+		ConnectorCreateRequestAuthStrategyM2m,
+		ConnectorCreateRequestAuthStrategyJamfProOauth,
+		ConnectorCreateRequestAuthStrategyBasic,
+	}
+}
+
 // ConnectorCreateRequestVendor is the set of values accepted by ConnectorCreateRequest.Vendor.
 type ConnectorCreateRequestVendor = string
 
