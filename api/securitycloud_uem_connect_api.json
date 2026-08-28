@@ -353,6 +353,9 @@
             "example": false,
             "type": "boolean"
           },
+          "deviceSyncAuth": {
+            "$ref": "#/components/schemas/DeviceSyncAuth"
+          },
           "deviceUnmanagedThreshold": {
             "description": "Number of consecutive syncs a device may be absent from the UEM platform before it is\ntreated as unmanaged. `0` disables the grace period.\n",
             "example": 3,
@@ -418,6 +421,14 @@
           },
           "syncConfig": {
             "$ref": "#/components/schemas/SyncConfig"
+          },
+          "tenantId": {
+            "description": "Platform tenant identifier of the Jamf Pro instance this connector syncs with, when it was created by naming one. Null for a connector created from caller-supplied credentials.\n\nLoad-bearing beyond information: `authStrategy` reads back as `JAMF_PRO_OAUTH` whichever way the connector was created, so this field is the only thing in the response that distinguishes the two forms. A consumer reconstructing a connector's configuration — Terraform importing one it did not create, say — has nothing else to key on. Note that a tenant-named connector also reports a `deviceSyncAuth.clientId`, the credential Jamf Security Cloud provisioned for itself, so the presence of credentials cannot serve as the signal. Restored from the wire (probed 2026-08-28), where the published spec omits it.",
+            "type": "string"
+          },
+          "uemVersion": {
+            "description": "Version of the UEM instance the connector is talking to — for a Jamf Pro connector, the Jamf Pro version. Reported by the connector rather than configured, and useful for surfacing what the integration is actually connected to. Restored from the wire (probed 2026-08-28), where the published spec omits it.",
+            "type": "string"
           },
           "url": {
             "description": "UEM server URL",

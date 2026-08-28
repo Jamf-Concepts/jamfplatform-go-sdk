@@ -847,6 +847,14 @@ type ConnectorConfig struct {
 	DeviceFieldMappings *DeviceFieldMappings `json:"deviceFieldMappings,omitempty"`
 	// Whether device risk levels are sent back to the UEM platform.
 	DeviceRiskTagging bool `json:"deviceRiskTagging"`
+	// Credentials the connector uses to authenticate against the UEM instance. Absent from the published
+	// spec, which declares only `vendor`/`url`/`isoCountry` on the create request and defers the rest to
+	// an undocumented "vendor-specific fields may also be included". Restored here from the wire (probed
+	// 2026-08-21): a GET on a live JAMF_PRO connector returns `deviceSyncAuth` alongside `authStrategy`,
+	// and a create carrying both is accepted. Which members apply depends on `authStrategy` — OAuth
+	// strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`. Secrets
+	// are write-only and never returned; a GET reports only `clientId`, `username` and an `empty` flag.
+	DeviceSyncAuth *DeviceSyncAuth `json:"deviceSyncAuth,omitempty"`
 	// Number of consecutive syncs a device may be absent from the UEM platform before it is treated as
 	// unmanaged. `0` disables the grace period.
 	DeviceUnmanagedThreshold int `json:"deviceUnmanagedThreshold"`
@@ -882,6 +890,21 @@ type ConnectorConfig struct {
 	// request carries these two settings as **top-level** `autoDeviceDeletion` and
 	// `disableSyncOnAuthError` fields on `SyncSettings`, not nested under `syncConfig`.
 	SyncConfig *SyncConfig `json:"syncConfig,omitempty"`
+	// Platform tenant identifier of the Jamf Pro instance this connector syncs with, when it was created
+	// by naming one. Null for a connector created from caller-supplied credentials.
+	// Load-bearing beyond information: `authStrategy` reads back as `JAMF_PRO_OAUTH` whichever way the
+	// connector was created, so this field is the only thing in the response that distinguishes the two
+	// forms. A consumer reconstructing a connector's configuration — Terraform importing one it did not
+	// create, say — has nothing else to key on. Note that a tenant-named connector also reports a
+	// `deviceSyncAuth.clientId`, the credential Jamf Security Cloud provisioned for itself, so the
+	// presence of credentials cannot serve as the signal. Restored from the wire (probed 2026-08-28),
+	// where the published spec omits it.
+	TenantID *string `json:"tenantId"`
+	// Version of the UEM instance the connector is talking to — for a Jamf Pro connector, the Jamf Pro
+	// version. Reported by the connector rather than configured, and useful for surfacing what the
+	// integration is actually connected to. Restored from the wire (probed 2026-08-28), where the
+	// published spec omits it.
+	UemVersion *string `json:"uemVersion"`
 	// UEM server URL.
 	URL string `json:"url"`
 	// UEM vendor name.
