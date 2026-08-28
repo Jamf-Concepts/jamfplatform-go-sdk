@@ -11210,7 +11210,11 @@
         "ConnectorCreateRequest.deviceSyncAuth",
         "ConnectorCreateRequest.tenantId",
         "SyncSettings.concurrentSyncEnabled"
-      ]
+      ],
+      "docNotes": {
+        "SyncSettings": "Correction to the full-replacement claim above: `groupSettings` is exempt from it. Omit the whole object and the connector's existing group mapping configuration survives untouched; every other optional field omitted here resets to its default (wire-verified 2026-08-28 \u2014 probed from non-default state, since a connector already sitting at its defaults makes a full replacement indistinguishable from a merge). Within `groupSettings` the replacement rule applies again: an omitted `defaultGroupId` clears, and `groupMappings` replaces the whole list.",
+        "EmailMappingType": "This set spans every UEM vendor, so `EmailMappingTypeValues()` is a superset of what any one connector accepts and is not a safe validator source. Each vendor enforces its own subset server-side and enumerates it in the `422` returned for an unknown value. A `JAMF_PRO` connector, for one, rejects `EXTERNAL_USER_ID` and `CUSTOM` \u2014 both members here \u2014 and accepts `EMAIL_ADDRESS`, `SERIAL_NUMBER`, `IMEI`, `FIRST_NAME`, `NAME`, `MDM_ID`, `DEVICE_NAME` and `LAST_NAME` (wire-verified 2026-08-28). Validate against the vendor's own set, not this one. The same caveat applies to the four sibling mapping keys on `DeviceFieldMappings`, which the spec types as plain strings for exactly this reason."
+      }
     },
     {
       "file": "testing/account-licensing-api.yaml",

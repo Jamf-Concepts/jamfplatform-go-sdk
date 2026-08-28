@@ -1362,6 +1362,51 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 	return append(types, drainPropertyEnums()...)
 }
 
+// typeDocWidth is the wrap width for type-level documentation. Matches
+// fieldDocWidth; the rendered prefix here is "// " with no leading tab, so the
+// two land within a couple of columns of each other.
+const typeDocWidth = 100
+
+// applyDocNotes appends each configured note to the godoc of the type it names.
+// Returns an error naming every key that matched nothing, so a note that has
+// drifted off its type fails the build instead of vanishing — the wrong doc it
+// was written to correct would otherwise stay in place unremarked.
+//
+// The note is wrapped and joined the way struct field docs are, which renders
+// through the template's single "// {{ .Comment }}" line as one comment block
+// per type. No IR or template change is needed for that.
+func applyDocNotes(types []GoType, notes map[string]string) error {
+	if len(notes) == 0 {
+		return nil
+	}
+	applied := make(map[string]bool, len(notes))
+	for i := range types {
+		note, ok := notes[types[i].Name]
+		if !ok {
+			continue
+		}
+		applied[types[i].Name] = true
+		lines := docParagraphs(note, typeDocWidth)
+		if len(lines) == 0 {
+			continue
+		}
+		if types[i].Comment != "" {
+			types[i].Comment += "\n// "
+		}
+		types[i].Comment += strings.Join(lines, "\n// ")
+	}
+	var missing []string
+	for _, name := range sortedKeys(notes) {
+		if !applied[name] {
+			missing = append(missing, name)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("docNotes names no emitted type: %s", strings.Join(missing, ", "))
+	}
+	return nil
+}
+
 // drainPropertyEnums returns the collected inline-property enum types, name
 // order, so output is stable across runs. Collisions are already resolved at
 // registration time; anything reaching here is safe to declare.

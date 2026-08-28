@@ -329,6 +329,9 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	currentFieldOverrides = nil
 	currentEmitNullForOptional = nil
 	currentFieldOrder = nil
+	if err := applyDocNotes(types, spec.DocNotes); err != nil {
+		return fmt.Errorf("%s: %w", spec.File, err)
+	}
 
 	for _, t := range types {
 		emittedTypes[t.Name] = true
@@ -485,6 +488,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		currentFieldOverrides = nil
 		currentEmitNullForOptional = nil
 		currentFieldOrder = nil
+		if err := applyDocNotes(types, spec.DocNotes); err != nil {
+			return fmt.Errorf("%s: %w", spec.File, err)
+		}
 		for _, t := range types {
 			pkgEmitted[t.Name] = true
 		}
@@ -626,6 +632,9 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		currentFieldOverrides = nil
 		currentEmitNullForOptional = nil
 		currentFieldOrder = nil
+		if err := applyDocNotes(types, ls.spec.DocNotes); err != nil {
+			return fmt.Errorf("%s: %w", ls.spec.File, err)
+		}
 		for _, t := range types {
 			pkgEmitted[t.Name] = true
 		}

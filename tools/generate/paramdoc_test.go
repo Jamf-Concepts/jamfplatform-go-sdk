@@ -283,3 +283,60 @@ func TestDefaultMethodComment(t *testing.T) {
 		t.Errorf("undocumented spec = %q", got)
 	}
 }
+
+// TestApplyDocNotes pins the three behaviours the config key exists for: a note
+// reaches the type it names, it is appended rather than substituted for the
+// spec's own description, and a note naming nothing fails loudly instead of
+// being dropped.
+func TestApplyDocNotes(t *testing.T) {
+	t.Run("appends to an existing comment", func(t *testing.T) {
+		types := []GoType{{Name: "SyncSettings", Comment: "SyncSettings is a full replacement."}}
+		if err := applyDocNotes(types, map[string]string{"SyncSettings": "Except groupSettings."}); err != nil {
+			t.Fatalf("applyDocNotes: %v", err)
+		}
+		want := "SyncSettings is a full replacement.\n// Except groupSettings."
+		if types[0].Comment != want {
+			t.Errorf("Comment = %q, want %q", types[0].Comment, want)
+		}
+	})
+
+	t.Run("wraps a long note across comment lines", func(t *testing.T) {
+		types := []GoType{{Name: "EmailMappingType", Comment: "EmailMappingType is a set."}}
+		note := strings.Repeat("this set spans every vendor and is not a validator source. ", 6)
+		if err := applyDocNotes(types, map[string]string{"EmailMappingType": note}); err != nil {
+			t.Fatalf("applyDocNotes: %v", err)
+		}
+		for _, line := range strings.Split(types[0].Comment, "\n") {
+			if len(strings.TrimPrefix(line, "// ")) > typeDocWidth {
+				t.Errorf("line exceeds typeDocWidth (%d): %q", typeDocWidth, line)
+			}
+		}
+	})
+
+	t.Run("a note naming no emitted type is an error", func(t *testing.T) {
+		types := []GoType{{Name: "SyncSettings"}}
+		err := applyDocNotes(types, map[string]string{
+			"SyncSettings": "kept",
+			"RenamedAway":  "dropped",
+		})
+		if err == nil {
+			t.Fatal("applyDocNotes returned nil for a key matching no type")
+		}
+		if !strings.Contains(err.Error(), "RenamedAway") {
+			t.Errorf("error does not name the missing key: %v", err)
+		}
+		if strings.Contains(err.Error(), "SyncSettings") {
+			t.Errorf("error names a key that did match: %v", err)
+		}
+	})
+
+	t.Run("no notes is a no-op", func(t *testing.T) {
+		types := []GoType{{Name: "SyncSettings", Comment: "unchanged"}}
+		if err := applyDocNotes(types, nil); err != nil {
+			t.Fatalf("applyDocNotes: %v", err)
+		}
+		if types[0].Comment != "unchanged" {
+			t.Errorf("Comment = %q, want unchanged", types[0].Comment)
+		}
+	})
+}

@@ -733,6 +733,14 @@ func ConnectorCreateRequestVendorValues() []ConnectorCreateRequestVendor {
 }
 
 // EmailMappingType is the set of values accepted by EmailMapping.Type.
+// This set spans every UEM vendor, so `EmailMappingTypeValues()` is a superset of what any one
+// connector accepts and is not a safe validator source. Each vendor enforces its own subset
+// server-side and enumerates it in the `422` returned for an unknown value. A `JAMF_PRO` connector,
+// for one, rejects `EXTERNAL_USER_ID` and `CUSTOM` — both members here — and accepts
+// `EMAIL_ADDRESS`, `SERIAL_NUMBER`, `IMEI`, `FIRST_NAME`, `NAME`, `MDM_ID`, `DEVICE_NAME` and
+// `LAST_NAME` (wire-verified 2026-08-28). Validate against the vendor's own set, not this one. The
+// same caveat applies to the four sibling mapping keys on `DeviceFieldMappings`, which the spec types
+// as plain strings for exactly this reason.
 type EmailMappingType = string
 
 // EmailMappingType values accepted by the Jamf API. The alias above is a string, so

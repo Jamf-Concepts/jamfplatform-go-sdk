@@ -1109,6 +1109,12 @@ type SyncRunPage struct {
 }
 
 // SyncSettings Sync settings update request. Vendor-specific fields may also be included. The `vendor` field in the body determines which additional fields are applicable. This is a **full replacement**, not a patch: omitted optional fields are reset to their defaults rather than left unchanged. Send the complete desired state. Note the asymmetry with the response: `autoDeviceDeletion` and `disableSyncOnAuthError` are top-level here, but are returned nested under `syncConfig` on `ConnectorConfig`.
+// Correction to the full-replacement claim above: `groupSettings` is exempt from it. Omit the whole
+// object and the connector's existing group mapping configuration survives untouched; every other
+// optional field omitted here resets to its default (wire-verified 2026-08-28 — probed from
+// non-default state, since a connector already sitting at its defaults makes a full replacement
+// indistinguishable from a merge). Within `groupSettings` the replacement rule applies again: an
+// omitted `defaultGroupId` clears, and `groupMappings` replaces the whole list.
 type SyncSettings struct {
 	// Auto-deletion policy for devices removed from the UEM platform.
 	// Allowed values: see the SyncSettingsAutoDeviceDeletion constants.

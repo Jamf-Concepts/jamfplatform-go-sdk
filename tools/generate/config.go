@@ -92,6 +92,28 @@ type SpecDef struct {
 	// and both are listed here.
 	SchemaPatchesRequireAbsent []string `json:"schemaPatchesRequireAbsent,omitempty"`
 
+	// DocNotes appends a note to the godoc of an emitted Go type. Key: the Go
+	// type name as generated (a struct, or the alias a string enum emits).
+	// Value: prose, wrapped and appended to whatever comment the spec's own
+	// description produced.
+	//
+	// For the corrections that belong to the type as a whole rather than to one
+	// of its properties, which SchemaPatches cannot reach: it patches
+	// properties, so a schema-level description and a generated enum helper are
+	// both out of its range.
+	//
+	// Two live cases, both in securitycloud's uem-connect spec. SyncSettings
+	// calls itself a full replacement without noting that groupSettings is
+	// exempt from it. EmailMappingType enumerates every vendor's members at
+	// once, so EmailMappingTypeValues() is a superset of what any single vendor
+	// accepts and is not a safe validator source.
+	//
+	// A key that matches no type emitted for this spec is a build failure: the
+	// note is there to correct something, and a silently dropped correction
+	// leaves the wrong doc in place. Rename or delete the entry when upstream
+	// moves the type.
+	DocNotes map[string]string `json:"docNotes,omitempty"`
+
 	// PropertyRenames renames property keys at dotted paths under a named
 	// component schema. Outer key: schema name. Inner key: dotted path to the
 	// property to rename (e.g. "self_service.re-install_button_text"). Inner
