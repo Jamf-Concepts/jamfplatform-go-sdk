@@ -311,24 +311,37 @@ Do **not** fall back to the source specs in `public-apis-oas/redocly-implementat
 
 **Re-probed 2026-08-20 and now routed:** `GET /v2/…/groups` (200, `{groups: []}`) and `GET /v1/…/activation-profiles` (200). The `skipOnGatewayUnrouted` acceptance helper existed only for these two and has been deleted — both tests now fail on a 403 rather than skipping, which is the point: a 403 resurfacing means routing regressed or the region in use lags EU. Nothing else in the SDK needed it, so do not reintroduce a blanket-403 skip; name the endpoint and fail.
 
-**GA BLOCKER, found 2026-08-28: the new gateway's CloudFront/WAF edge refuses `.pkg` uploads, and it is a content match, not a size limit.** `POST /pro/v1/packages/{id}/upload` with a real 9.8 MiB installer answers **`403` with a CloudFront HTML error page** (*"The request could not be satisfied … Request blocked"*) in about 30 ms — the request never reaches Jamf. Icon and branding uploads fail identically (`TestAcceptance_Pro_IconV1`, `_IOSBrandingV1`, `_MacOSBrandingV1`), which is how it was found: 285 acceptance tests pass against the GA host and only the multipart ones fail.
+**RESOLVED 2026-08-28: the GA gateway's WAF briefly blocked every multipart upload, as an XSS false positive on plist/XML request bodies.** Recorded because the *diagnosis* is reusable — a future edge-level block will look exactly like a privilege 403, and this is how to tell them apart — and because the root cause has a much wider blast radius than the symptom suggested.
 
-**It is host-specific and nothing to do with this SDK.** The decisive control — byte-identical 4 KiB of real `.pkg` content, same URL shape, same credential, same invocation:
+**Symptom.** `POST /pro/v1/packages/{id}/upload` with a real signed installer answered **`403` with a CloudFront HTML page** (*"Request blocked"*) in about 30 ms, never reaching Jamf. Icon and Self Service branding uploads failed identically. It surfaced as three failures in an otherwise-green 285-test run against the GA host — the only three multipart tests in it.
 
-| host | result |
+**How it was localised, and what each step ruled out.** Worth repeating in order, because the first two hypotheses were wrong and cost real time:
+
+- **Not size.** 10 MiB of `'A'` filler passed. The SDK sends `Content-Length`, not chunked, so the streaming path was never implicated either.
+- **Not the SDK's request shape.** Dumping the actual bytes against a local server showed a textbook multipart body; replaying that exact boundary, `User-Agent` and `Accept-Encoding: gzip` through curl reached Jamf whenever the payload was benign.
+- **Not the protocol version.** Blocked on HTTP/2 and HTTP/1.1 alike.
+- **It was the file's own bytes.** Truncating the installer put the boundary between **512 B (passes)** and **2 KiB (blocked)** — precisely the span of the xar zlib-compressed table of contents (bytes 28–4716), whose uncompressed form is XML carrying an RSA `<signature>` and `KeyInfo` block.
+- **The decisive control was the retired gateway.** Byte-identical content, same credential, same invocation: `apigw.jamf.com` (not CloudFront) reached Jamf; `api.jamfcloud.com` blocked. The same 9.8 MiB upload through the *same SDK code* succeeded against `apigw` in 2.2 s. That is what proved the SDK was not at fault before anyone looked at the WAF.
+
+**Root cause, confirmed by the API team:** the IP had been added to a WAF blocklist under **XSS attack detection**, and *"including plist/XML content within request body can trigger the detection"*. That resolves the one thing the bisection could not explain — the TOC is compressed on disk, so an XML signature match implies the WAF decompresses (or the deflate stream itself matched).
+
+**Two failure modes were in play at once and are indistinguishable from the response.** The payload rule blocks a single request; the blocklist then blocks the *IP* after enough of them, with the same status, the same HTML and the same `x-amz-cf-id`. Roughly 150 probe requests from one host during the investigation triggered the second — so **the investigation caused a second, broader outage**. When re-probing an edge block: keep total volume low, always interleave a benign control in the *same* invocation (a passing control is what distinguishes a payload rule from an IP block), and stop as soon as the answer is in.
+
+**Verified fixed 2026-08-28, and the fix is not scoped to upload paths.** Confirmed in three widening steps, since a fix on `/upload` alone would have left Classic broken:
+
+| surface | result |
 |---|---|
-| `eu.apigw.jamf.com` (retired, not CloudFront) | 404 from Jamf — reached the application |
-| `eu.api.jamfcloud.com` (GA, CloudFront `d2jmnb3kwds4a0`) | **403, blocked at the edge** |
+| real 9.8 MiB signed `.pkg` through `UploadPackageV1`, GA host | **OK in 3.4 s**, `size`/`md5` populated |
+| `Pro_IOSBrandingV1`, `Pro_MacOSBrandingV1` | **PASS** |
+| Classic plain XML write (`ApplyCategory`) | **PASS** |
+| Classic XML carrying an embedded mobileconfig plist (`ApplyOSXConfigurationProfile`) | **PASS** |
+| the 8 Classic profile-payload roundtrips — quote, ampersand, line-break and reserved-character matrices, macOS and mobile | **all PASS** |
 
-**What it is not**, each ruled out by probe rather than reasoning — this cost several wrong turns and is worth not repeating:
+That last row matters most: those payloads are the closest thing in the suite to XSS-signature bait, and Classic is XML end-to-end across 617 operations, so a still-active rule would have taken out most of the SDK's write surface rather than just uploads.
 
-- **Not size.** 10 MiB of `'A'` filler passes on both hosts. The SDK sends `Content-Length`, not chunked, so the streaming path is not implicated either.
-- **Not the SDK's request shape.** Dumping the actual bytes against a local server shows a textbook multipart body: `Content-Length: 10313146`, a 60-hex-char boundary, `Content-Disposition: form-data; name="file"; filename="…"`, `Content-Type: application/octet-stream`. Replaying that exact boundary, `User-Agent: jamfplatform-go-sdk/dev` and `Accept-Encoding: gzip` through curl reaches Jamf when the payload is benign.
-- **Not the protocol version.** Blocked on both HTTP/2 and HTTP/1.1.
+**No SDK change was needed and none should be added.** Do not try to placate a WAF by reshaping the multipart body or escaping plist content — the trigger is the caller's own file, Classic's API contract *is* XML, and the transport already surfaces the CloudFront HTML correctly as an `*APIResponseError` with `Body` set. Note for whoever debugs the next one: an edge block carries `server: CloudFront`, `x-cache: Error from cloudfront` and an `x-amz-cf-id`, and **no Jamf `traceId`** — because the request never reached Jamf, there is nothing in Jamf's logs to correlate, and the `x-amz-cf-id` is the only handle the AWS-side WAF log lookup has.
 
-**It is the installer's own bytes.** Truncating the real `.pkg` and re-sending finds the boundary between **512 B (passes)** and **2 KiB (blocked)**. A xar header is 28 bytes and this package's zlib-compressed table of contents occupies bytes 28–4716, so the trigger is inside the compressed TOC — whose uncompressed form is XML carrying an RSA `<signature>` and `KeyInfo` block. A WAF managed rule is matching compressed binary as a payload attack: a textbook false positive, and one that will fire for essentially every signed `.pkg`.
-
-**Report this upstream as a GA blocker.** Package upload, icon upload and Self Service branding are all unusable through the GA host until the WAF rule is scoped off these paths (or body inspection is disabled for them). There is no SDK-side workaround worth building — the request is rejected before Jamf sees it, and the response is an HTML page the transport correctly surfaces as an `*APIResponseError` with `Body` set, so a consumer at least sees the CloudFront text rather than a decode error. Do **not** try to placate the WAF by reshaping the multipart body; the trigger is the file content a caller supplies.
+**Left failing and worth reporting separately:** `DownloadIconV1` answers `500` for an icon that uploaded successfully and returned a live CDN URL (traceId `3b39c7b12ddad6175c18030c5240c501`, id 2191). `TestAcceptance_Pro_IconV1` swallows it through a skip-on-server-error branch, which is itself contrary to this file's rule about never tolerating real errors — and because a 500 on a GET is retryable, the test spends ~153 s in the retry loop before skipping.
 
 **Build v1807 (2026-08-28) — the `/api` segment is gone from every external spec, and pro's 34 bogus privileges are fixed upstream. Ingested, except device groups.**
 
