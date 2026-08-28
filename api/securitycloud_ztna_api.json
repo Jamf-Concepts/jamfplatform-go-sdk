@@ -189,6 +189,19 @@
                   "traceId": "ecf2ca07e23c0abc12393472f2b783df"
                 }
               },
+              "dedicatedIpsLimit": {
+                "summary": "DEDICATED_IPS_LIMIT",
+                "value": {
+                  "errors": [
+                    {
+                      "code": "DEDICATED_IPS_LIMIT",
+                      "description": "The dedicated IP address limit has been reached (5 of 5)."
+                    }
+                  ],
+                  "httpStatus": 409,
+                  "traceId": "ecf2ca07e23c0abc12393472f2b783df"
+                }
+              },
               "gatewayReferencedByAccessPolicies": {
                 "summary": "GATEWAY_REFERENCED_BY_ACCESS_POLICIES",
                 "value": {
@@ -323,6 +336,45 @@
                   "traceId": "ecf2ca07e23c0abc12393472f2b783df"
                 }
               },
+              "missingCategoryName": {
+                "summary": "MISSING_CATEGORY_NAME",
+                "value": {
+                  "errors": [
+                    {
+                      "code": "MISSING_CATEGORY_NAME",
+                      "description": "Category Web Browsing does not exist."
+                    }
+                  ],
+                  "httpStatus": 409,
+                  "traceId": "ecf2ca07e23c0abc12393472f2b783df"
+                }
+              },
+              "missingSku2ForRiskControl": {
+                "summary": "MISSING_SKU2_FOR_RISK_CONTROL",
+                "value": {
+                  "errors": [
+                    {
+                      "code": "MISSING_SKU2_FOR_RISK_CONTROL",
+                      "description": "The required component is not enabled for risk-based access control."
+                    }
+                  ],
+                  "httpStatus": 409,
+                  "traceId": "ecf2ca07e23c0abc12393472f2b783df"
+                }
+              },
+              "missingUserGroups": {
+                "summary": "MISSING_USER_GROUPS",
+                "value": {
+                  "errors": [
+                    {
+                      "code": "MISSING_USER_GROUPS",
+                      "description": "User groups [c375d769-0e0e-4cb3-99c0-3dcd5f48a36f, a1b2c3d4-e5f6-7890-abcd-ef1234567890] do not exist."
+                    }
+                  ],
+                  "httpStatus": 409,
+                  "traceId": "ecf2ca07e23c0abc12393472f2b783df"
+                }
+              },
               "predefinedAppNotFound": {
                 "summary": "PREDEFINED_APP_NOT_FOUND",
                 "value": {
@@ -344,6 +396,19 @@
                     {
                       "code": "TLD_LIMIT_EXCEEDED",
                       "description": "The number of distinct top-level domains (10) exceeds the maximum of 8."
+                    }
+                  ],
+                  "httpStatus": 409,
+                  "traceId": "ecf2ca07e23c0abc12393472f2b783df"
+                }
+              },
+              "unsupportedBareIpInReferencedGatewayIpsecConfig": {
+                "summary": "UNSUPPORTED_BARE_IP_IN_REFERENCED_GATEWAY_IPSEC_CONFIG",
+                "value": {
+                  "errors": [
+                    {
+                      "code": "UNSUPPORTED_BARE_IP_IN_REFERENCED_GATEWAY_IPSEC_CONFIG",
+                      "description": "The referenced gateway's IPSec configuration does not support 10.10.0.0/24."
                     }
                   ],
                   "httpStatus": 409,
@@ -443,13 +508,27 @@
           "application/json": {
             "examples": {
               "gatewayNotFound": {
-                "summary": "Gateway ID in request body not accessible to caller",
+                "summary": "GATEWAY_NOT_FOUND — grouped gateway (field gatewayIds)",
                 "value": {
                   "errors": [
                     {
                       "code": "GATEWAY_NOT_FOUND",
-                      "description": "Gateway 'a1b2' does not exist or is not accessible to this customer.",
-                      "field": "gatewayId"
+                      "description": "A gateway in gatewayIds does not exist or is not accessible to this customer.",
+                      "field": "gatewayIds"
+                    }
+                  ],
+                  "httpStatus": 422,
+                  "traceId": "ecf2ca07e23c0abc12393472f2b783df"
+                }
+              },
+              "gatewayNotFoundInApp": {
+                "summary": "GATEWAY_NOT_FOUND — app routing (field routing.gatewayId)",
+                "value": {
+                  "errors": [
+                    {
+                      "code": "GATEWAY_NOT_FOUND",
+                      "description": "Gateway does not exist or is not accessible to this customer.",
+                      "field": "routing.gatewayId"
                     }
                   ],
                   "httpStatus": 422,

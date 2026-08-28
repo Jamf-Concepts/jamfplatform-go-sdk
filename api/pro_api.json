@@ -47676,7 +47676,7 @@
     },
     "/v1/pki/digicert/trust-lifecycle-manager/{id}/privilege-check": {
       "get": {
-        "description": "Checks that the DigiCert account associated with the given ID holds all\npermissions required to deploy certificates via the Trust Lifecycle Manager.\nReturns 204 if all required permissions are present. Returns 403 with a\nlist of missing permission names if any are absent.\n\n\n**Required Permissions:** `read:env:privilege-check`",
+        "description": "Checks that the DigiCert account associated with the given ID holds all\npermissions required to deploy certificates via the Trust Lifecycle Manager.\nReturns 204 if all required permissions are present. Returns 403 with a\nlist of missing permission names if any are absent.\n\n\n**Required Permissions:** `read:pro:digicert-settings`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -47721,17 +47721,18 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:digicert-settings"
+            ]
           }
         ],
         "summary": "Check DigiCert account permissions for certificate deployment",
         "tags": [
           "digicert"
         ],
-        "x-authentication-required": true,
         "x-jamf-expected-status": 204,
         "x-required-privileges": [
-          "read:env:privilege-check"
+          "read:pro:digicert-settings"
         ],
         "x-required-privileges-legacy": [
           "Read DigiCert Settings"
@@ -66042,7 +66043,7 @@
     },
     "/v2/smtp-server/allowed-auth-types": {
       "get": {
-        "description": "Returns the list of authentication types currently available on this instance.\nAvailability is controlled at the instance or knobs level and is independent of current SMTP settings.\n\n\n**Required Permissions:** `read:env:allowed-auth-types`",
+        "description": "Returns the list of authentication types currently available on this instance.\nAvailability is controlled at the instance or knobs level and is independent of current SMTP settings.\n\n\n**Required Permissions:** `read:pro:smtp-server`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -66062,16 +66063,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:smtp-server"
+            ]
           }
         ],
         "summary": "Get allowed SMTP authentication types\n",
         "tags": [
           "smtp-server"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:allowed-auth-types"
+          "read:pro:smtp-server"
         ],
         "x-required-privileges-legacy": [
           "Read SMTP Server"
@@ -69949,7 +69951,7 @@
     },
     "/v3/patch-software-title-configurations": {
       "get": {
-        "description": "Retrieves patch software title configurations\n\n**Required Permissions:** `read:env:patch-software-title-configurations`",
+        "description": "Retrieves patch software title configurations\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -69972,23 +69974,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Retrieve Patch Software Title Configurations",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:patch-software-title-configurations"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
         ]
       },
       "post": {
-        "description": "Creates Patch Software Title Configurations using sToken\n\n**Required Permissions:** `create:env:patch-software-title-configurations`",
+        "description": "Creates Patch Software Title Configurations using sToken\n\n**Required Permissions:** `create:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70029,16 +70032,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "create:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Create Patch Software Title Configurations",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:patch-software-title-configurations"
+          "create:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Create Patch Management Software Titles"
@@ -70047,7 +70051,7 @@
     },
     "/v3/patch-software-title-configurations/{id}": {
       "delete": {
-        "description": "Deletes Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `delete:env:patch-software-title-configurations`",
+        "description": "Deletes Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `delete:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70081,23 +70085,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "delete:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Delete Patch Software Title Configurations with the supplied id",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "delete:env:patch-software-title-configurations"
+          "delete:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Delete Patch Management Software Titles"
         ]
       },
       "get": {
-        "description": "Retrieves Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `read:env:patch-software-title-configurations`",
+        "description": "Retrieves Patch Software Title Configurations with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70138,23 +70143,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Retrieve Patch Software Title Configurations with the supplied id",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:patch-software-title-configurations"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
         ]
       },
       "patch": {
-        "description": "Updates Patch Software Title Configurations\n\n**Required Permissions:** `update:env:patch-software-title-configurations`",
+        "description": "Updates Patch Software Title Configurations\n\n**Required Permissions:** `update:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70226,16 +70232,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "update:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Update Patch Software Title Configurations",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "update:env:patch-software-title-configurations"
+          "update:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Update Patch Management Software Titles"
@@ -70244,7 +70251,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/dashboard": {
       "delete": {
-        "description": "Removes a software title configuration from the dashboard.\n\n**Required Permissions:** `delete:env:dashboard`",
+        "description": "Removes a software title configuration from the dashboard.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70268,23 +70275,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Remove a software title configuration from the dashboard\n",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "delete:env:dashboard"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
         ]
       },
       "get": {
-        "description": "Returns whether or not the requested software title configuration is on the dashboard\n\n**Required Permissions:** `read:env:dashboard`",
+        "description": "Returns whether or not the requested software title configuration is on the dashboard\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70325,23 +70333,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Return whether or not the requested software title configuration is on the dashboard\n",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:dashboard"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
         ]
       },
       "post": {
-        "description": "Adds a software title configuration to the dashboard.\n\n**Required Permissions:** `create:env:dashboard`",
+        "description": "Adds a software title configuration to the dashboard.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70365,7 +70374,9 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Add a software title configuration to the dashboard\n",
@@ -70373,9 +70384,8 @@
           "patch-software-title-configurations"
         ],
         "x-action": true,
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:dashboard"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -70384,7 +70394,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/definitions": {
       "get": {
-        "description": "Retrieves patch software title definitions with the supplied id\n\n**Required Permissions:** `read:env:definitions`",
+        "description": "Retrieves patch software title definitions with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70458,16 +70468,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Retrieve Patch Software Title Definitions with the supplied id",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:definitions"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -70476,7 +70487,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/dependencies": {
       "get": {
-        "description": "Retrieve list of Patch Software Title Configuration Dependencies\n\n**Required Permissions:** `read:env:dependencies`",
+        "description": "Retrieve list of Patch Software Title Configuration Dependencies\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70507,16 +70518,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Retrieve list of Patch Software Title Configuration Dependencies",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:dependencies"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -70525,7 +70537,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/export-report": {
       "get": {
-        "description": "Export Patch Reporting Data\n\n**Required Permissions:** `read:env:export-report`",
+        "description": "Export Patch Reporting Data\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70647,7 +70659,9 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Export Patch Reporting Data",
@@ -70655,9 +70669,8 @@
           "patch-software-title-configurations"
         ],
         "x-action": true,
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:export-report"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -70666,7 +70679,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/extension-attributes": {
       "get": {
-        "description": "Retrieves software title extension attributes with the supplied id\n\n**Required Permissions:** `read:env:extension-attributes`",
+        "description": "Retrieves software title extension attributes with the supplied id\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70710,16 +70723,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Retrieve Software Title Extension Attributes with the supplied id",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:extension-attributes"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -70728,7 +70742,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/history": {
       "get": {
-        "description": "Gets specified Patch Software Title Configuration history object\n\n\n**Required Permissions:** `read:env:history`",
+        "description": "Gets specified Patch Software Title Configuration history object\n\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70802,23 +70816,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Get specified Patch Software Title Configuration history object\n",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:history"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
         ]
       },
       "post": {
-        "description": "Adds Patch Software Title Configuration history object notes\n\n**Required Permissions:** `create:env:history`",
+        "description": "Adds Patch Software Title Configuration history object notes\n\n**Required Permissions:** `update:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70890,16 +70905,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "update:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Add Patch Software Title Configuration history object notes\n",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:history"
+          "update:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Update Patch Management Software Titles"
@@ -70908,7 +70924,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/patch-report": {
       "get": {
-        "description": "Retrieve Patch Software Title Configuration Patch Report\n\n**Required Permissions:** `read:env:patch-report`",
+        "description": "Retrieve Patch Software Title Configuration Patch Report\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -70992,16 +71008,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Retrieve Patch Software Title Configuration Patch Report",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:patch-report"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -71010,7 +71027,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/patch-summary": {
       "get": {
-        "description": "Returns active patch summary.\n\n**Required Permissions:** `read:env:patch-summary`",
+        "description": "Returns active patch summary.\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71061,16 +71078,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Return Active Patch Summary",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:patch-summary"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -71079,7 +71097,7 @@
     },
     "/v3/patch-software-title-configurations/{id}/patch-summary/versions": {
       "get": {
-        "description": "Returns patch versions\n\n**Required Permissions:** `read:env:versions`",
+        "description": "Returns patch versions\n\n**Required Permissions:** `read:pro:patch-management-software-titles`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71133,16 +71151,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:patch-management-software-titles"
+            ]
           }
         ],
         "summary": "Returns patch versions",
         "tags": [
           "patch-software-title-configurations"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:versions"
+          "read:pro:patch-management-software-titles"
         ],
         "x-required-privileges-legacy": [
           "Read Patch Management Software Titles"
@@ -71494,7 +71513,7 @@
     },
     "/v4/computers-inventory": {
       "get": {
-        "description": "Return paginated Computer Inventory records\n\n**Required Permissions:** `read:env:computers-inventory`",
+        "description": "Return paginated Computer Inventory records\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71566,23 +71585,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:computers"
+            ]
           }
         ],
         "summary": "Return paginated Computer Inventory records",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:computers-inventory"
+          "read:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Read Computers"
         ]
       },
       "post": {
-        "description": "Creates Computer Inventory record\n\n**Required Permissions:** `create:env:computers-inventory`",
+        "description": "Creates Computer Inventory record\n\n**Required Permissions:** `create:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71612,16 +71632,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "create:pro:computers"
+            ]
           }
         ],
         "summary": "Create Computer Inventory record",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:computers-inventory"
+          "create:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Create Computers"
@@ -71630,7 +71651,7 @@
     },
     "/v4/computers-inventory-detail/{id}": {
       "get": {
-        "description": "Return all sections of a computer\n\n**Required Permissions:** `read:env:computers-inventory-detail`",
+        "description": "Return all sections of a computer\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71671,23 +71692,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:computers"
+            ]
           }
         ],
         "summary": "Return all sections of a computer",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:computers-inventory-detail"
+          "read:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Read Computers"
         ]
       },
       "patch": {
-        "description": "Update specific fields on a computer, then return the updated computer object.\n\n**Required Permissions:** `update:env:computers-inventory-detail`",
+        "description": "Update specific fields on a computer, then return the updated computer object.\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71731,16 +71753,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "update:pro:computers"
+            ]
           }
         ],
         "summary": "Update specific fields on a computer",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "update:env:computers-inventory-detail"
+          "update:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Update Computers"
@@ -71749,7 +71772,7 @@
     },
     "/v4/computers-inventory/filevault": {
       "get": {
-        "description": "Return paginated FileVault information for all computers\n\n**Required Permissions:** `read:env:filevault`",
+        "description": "Return paginated FileVault information for all computers\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71775,16 +71798,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:disk-encryption-recovery-key"
+            ]
           }
         ],
         "summary": "Return paginated FileVault information for all computers",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:filevault"
+          "read:pro:disk-encryption-recovery-key"
         ],
         "x-required-privileges-legacy": [
           "View Disk Encryption Recovery Key"
@@ -71793,7 +71817,7 @@
     },
     "/v4/computers-inventory/{id}": {
       "delete": {
-        "description": "Remove specified Computer record\n\n**Required Permissions:** `delete:env:computers-inventory`",
+        "description": "Remove specified Computer record\n\n**Required Permissions:** `delete:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71827,23 +71851,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "delete:pro:computers"
+            ]
           }
         ],
         "summary": "Remove specified Computer record",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "delete:env:computers-inventory"
+          "delete:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Delete Computers"
         ]
       },
       "get": {
-        "description": "Return General section of a Computer\n\n**Required Permissions:** `read:env:computers-inventory`",
+        "description": "Return General section of a Computer\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71903,16 +71928,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:computers"
+            ]
           }
         ],
         "summary": "Return General section of a Computer",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:computers-inventory"
+          "read:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Read Computers"
@@ -71921,7 +71947,7 @@
     },
     "/v4/computers-inventory/{id}/attachments": {
       "post": {
-        "description": "Upload attachment and assign to computer\n\n**Required Permissions:** `create:env:attachments`",
+        "description": "Upload attachment and assign to computer\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -71982,16 +72008,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "update:pro:computers"
+            ]
           }
         ],
         "summary": "Upload attachment and assign to computer",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:attachments"
+          "update:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Update Computers"
@@ -72000,7 +72027,7 @@
     },
     "/v4/computers-inventory/{id}/attachments/{attachmentId}": {
       "delete": {
-        "description": "Remove attachment\n\n**Required Permissions:** `delete:env:attachments`",
+        "description": "Remove attachment\n\n**Required Permissions:** `update:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -72045,23 +72072,24 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "update:pro:computers"
+            ]
           }
         ],
         "summary": "Remove attachment",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "delete:env:attachments"
+          "update:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Update Computers"
         ]
       },
       "get": {
-        "description": "Download attachment file\n\n**Required Permissions:** `read:env:attachments`",
+        "description": "Download attachment file\n\n**Required Permissions:** `read:pro:computers`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -72115,16 +72143,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:computers"
+            ]
           }
         ],
         "summary": "Download attachment file",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:attachments"
+          "read:pro:computers"
         ],
         "x-required-privileges-legacy": [
           "Read Computers"
@@ -72133,7 +72162,7 @@
     },
     "/v4/computers-inventory/{id}/erase": {
       "post": {
-        "description": "Erase a computer\n\n**Required Permissions:** `create:env:erase`",
+        "description": "Erase a computer\n\n**Required Permissions:** `execute:pro:computer-commands`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -72190,7 +72219,9 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "execute:pro:computer-commands"
+            ]
           }
         ],
         "summary": "Erase a computer",
@@ -72198,9 +72229,8 @@
           "computer-inventory"
         ],
         "x-action": true,
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:erase"
+          "execute:pro:computer-commands"
         ],
         "x-required-privileges-legacy": [
           "Send Computer Remote Wipe Command"
@@ -72209,7 +72239,7 @@
     },
     "/v4/computers-inventory/{id}/filevault": {
       "get": {
-        "description": "Return FileVault information for a specific computer\n\n**Required Permissions:** `read:env:filevault`",
+        "description": "Return FileVault information for a specific computer\n\n**Required Permissions:** `read:pro:disk-encryption-recovery-key`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -72250,16 +72280,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:disk-encryption-recovery-key"
+            ]
           }
         ],
         "summary": "Return FileVault information for a specific computer",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:filevault"
+          "read:pro:disk-encryption-recovery-key"
         ],
         "x-required-privileges-legacy": [
           "View Disk Encryption Recovery Key"
@@ -72268,7 +72299,7 @@
     },
     "/v4/computers-inventory/{id}/remove-mdm-profile": {
       "post": {
-        "description": "Remove a computer's MDM profile\n\n**Required Permissions:** `create:env:remove-mdm-profile`",
+        "description": "Remove a computer's MDM profile\n\n**Required Permissions:** `execute:pro:computer-commands`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -72312,7 +72343,9 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "execute:pro:computer-commands"
+            ]
           }
         ],
         "summary": "Remove a computer's MDM profile",
@@ -72320,9 +72353,8 @@
           "computer-inventory"
         ],
         "x-action": true,
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "create:env:remove-mdm-profile"
+          "execute:pro:computer-commands"
         ],
         "x-required-privileges-legacy": [
           "Send Computer Unmanage Command"
@@ -72331,7 +72363,7 @@
     },
     "/v4/computers-inventory/{id}/view-device-lock-pin": {
       "get": {
-        "description": "Return a computer's Device Lock PIN\n\n**Required Permissions:** `read:env:view-device-lock-pin`",
+        "description": "Return a computer's Device Lock PIN\n\n**Required Permissions:** `read:pro:computer-device-lock-pin`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -72372,16 +72404,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:computer-device-lock-pin"
+            ]
           }
         ],
         "summary": "Return a computer's Device Lock PIN",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:view-device-lock-pin"
+          "read:pro:computer-device-lock-pin"
         ],
         "x-required-privileges-legacy": [
           "View Computer Device Lock Pin"
@@ -72390,7 +72423,7 @@
     },
     "/v4/computers-inventory/{id}/view-recovery-lock-password": {
       "get": {
-        "description": "Return a Computers Recovery Lock Password\n\n**Required Permissions:** `read:env:view-recovery-lock-password`",
+        "description": "Return a Computers Recovery Lock Password\n\n**Required Permissions:** `read:pro:recovery-lock`",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
@@ -72431,16 +72464,17 @@
         },
         "security": [
           {
-            "oauth2": []
+            "oauth2": [
+              "read:pro:recovery-lock"
+            ]
           }
         ],
         "summary": "Return a Computers Recovery Lock Password",
         "tags": [
           "computer-inventory"
         ],
-        "x-authentication-required": true,
         "x-required-privileges": [
-          "read:env:view-recovery-lock-password"
+          "read:pro:recovery-lock"
         ],
         "x-required-privileges-legacy": [
           "View Recovery Lock"
@@ -72641,7 +72675,7 @@
   "servers": [
     {
       "description": "Jamf Beta API Gateway - prod",
-      "url": "https://{region}.api.jamfcloud.com/api/pro",
+      "url": "https://{region}.api.jamfcloud.com/pro",
       "variables": {
         "region": {
           "default": "us",

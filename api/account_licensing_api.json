@@ -478,7 +478,7 @@
   "servers": [
     {
       "description": "Jamf Production API Gateway",
-      "url": "https://{region}.api.jamfcloud.com/api/licensing",
+      "url": "https://{region}.api.jamfcloud.com/licensing",
       "variables": {
         "region": {
           "default": "us",

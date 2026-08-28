@@ -2284,7 +2284,7 @@
   "servers": [
     {
       "description": "Jamf Production API Gateway",
-      "url": "https://{region}.api.jamfcloud.com/api/sso",
+      "url": "https://{region}.api.jamfcloud.com/sso",
       "variables": {
         "region": {
           "default": "us",

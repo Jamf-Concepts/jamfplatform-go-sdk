@@ -1537,7 +1537,7 @@
   "servers": [
     {
       "description": "Jamf Production API Gateway",
-      "url": "https://{region}.api.jamfcloud.com/api/partners",
+      "url": "https://{region}.api.jamfcloud.com/partners",
       "variables": {
         "region": {
           "default": "us",

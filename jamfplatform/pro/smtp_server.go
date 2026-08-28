@@ -44,7 +44,7 @@ func (c *Client) UpdateSmtpServerV2(ctx context.Context, request *SmtpServerV2) 
 
 // ListSmtpServerAllowedAuthTypesV2 get allowed SMTP authentication types.
 //
-// Required privileges: read:env:allowed-auth-types. Legacy Jamf Pro privilege name(s): Read SMTP Server.
+// Required privileges: read:pro:smtp-server. Legacy Jamf Pro privilege name(s): Read SMTP Server.
 func (c *Client) ListSmtpServerAllowedAuthTypesV2(ctx context.Context) (*SmtpAuthenticationTypeList, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result SmtpAuthenticationTypeList

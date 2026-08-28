@@ -45409,7 +45409,7 @@
   "servers": [
     {
       "description": "Jamf Beta API Gateway - prod",
-      "url": "https://{region}.api.jamfcloud.com/api/proclassic",
+      "url": "https://{region}.api.jamfcloud.com/proclassic",
       "variables": {
         "region": {
           "default": "us",

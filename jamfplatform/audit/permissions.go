@@ -13,10 +13,10 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"GetResourceLineage":     {Method: "GetResourceLineage", HTTPMethod: "GET", Path: "/v1/audit/resources/{resourceId}/lineage", Scoped: []string{"read:env:audit", "read:org:audit"}, Legacy: nil},
-	"GetTransactionTimeline": {Method: "GetTransactionTimeline", HTTPMethod: "GET", Path: "/v1/audit/transactions/{txId}", Scoped: []string{"read:env:audit", "read:org:audit"}, Legacy: nil},
-	"ListAuditEvents":        {Method: "ListAuditEvents", HTTPMethod: "GET", Path: "/v1/audit", Scoped: []string{"read:env:audit", "read:org:audit"}, Legacy: nil},
-	"ListAuditSources":       {Method: "ListAuditSources", HTTPMethod: "GET", Path: "/v1/audit/sources", Scoped: []string{"read:env:audit", "read:org:audit"}, Legacy: nil},
+	"GetResourceLineage":     {Method: "GetResourceLineage", HTTPMethod: "GET", Path: "/v1/audit/resources/{resourceId}/lineage", Scoped: []string{"audit:read"}, Legacy: nil},
+	"GetTransactionTimeline": {Method: "GetTransactionTimeline", HTTPMethod: "GET", Path: "/v1/audit/transactions/{txId}", Scoped: []string{"audit:read"}, Legacy: nil},
+	"ListAuditEvents":        {Method: "ListAuditEvents", HTTPMethod: "GET", Path: "/v1/audit", Scoped: []string{"audit:read"}, Legacy: nil},
+	"ListAuditSources":       {Method: "ListAuditSources", HTTPMethod: "GET", Path: "/v1/audit/sources", Scoped: []string{"audit:read"}, Legacy: nil},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

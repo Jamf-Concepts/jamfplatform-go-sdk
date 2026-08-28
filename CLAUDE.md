@@ -311,6 +311,57 @@ Do **not** fall back to the source specs in `public-apis-oas/redocly-implementat
 
 **Re-probed 2026-08-20 and now routed:** `GET /v2/…/groups` (200, `{groups: []}`) and `GET /v1/…/activation-profiles` (200). The `skipOnGatewayUnrouted` acceptance helper existed only for these two and has been deleted — both tests now fail on a 403 rather than skipping, which is the point: a 403 resurfacing means routing regressed or the region in use lags EU. Nothing else in the SDK needed it, so do not reintroduce a blanket-403 skip; name the endpoint and fail.
 
+**GA BLOCKER, found 2026-08-28: the new gateway's CloudFront/WAF edge refuses `.pkg` uploads, and it is a content match, not a size limit.** `POST /pro/v1/packages/{id}/upload` with a real 9.8 MiB installer answers **`403` with a CloudFront HTML error page** (*"The request could not be satisfied … Request blocked"*) in about 30 ms — the request never reaches Jamf. Icon and branding uploads fail identically (`TestAcceptance_Pro_IconV1`, `_IOSBrandingV1`, `_MacOSBrandingV1`), which is how it was found: 285 acceptance tests pass against the GA host and only the multipart ones fail.
+
+**It is host-specific and nothing to do with this SDK.** The decisive control — byte-identical 4 KiB of real `.pkg` content, same URL shape, same credential, same invocation:
+
+| host | result |
+|---|---|
+| `eu.apigw.jamf.com` (retired, not CloudFront) | 404 from Jamf — reached the application |
+| `eu.api.jamfcloud.com` (GA, CloudFront `d2jmnb3kwds4a0`) | **403, blocked at the edge** |
+
+**What it is not**, each ruled out by probe rather than reasoning — this cost several wrong turns and is worth not repeating:
+
+- **Not size.** 10 MiB of `'A'` filler passes on both hosts. The SDK sends `Content-Length`, not chunked, so the streaming path is not implicated either.
+- **Not the SDK's request shape.** Dumping the actual bytes against a local server shows a textbook multipart body: `Content-Length: 10313146`, a 60-hex-char boundary, `Content-Disposition: form-data; name="file"; filename="…"`, `Content-Type: application/octet-stream`. Replaying that exact boundary, `User-Agent: jamfplatform-go-sdk/dev` and `Accept-Encoding: gzip` through curl reaches Jamf when the payload is benign.
+- **Not the protocol version.** Blocked on both HTTP/2 and HTTP/1.1.
+
+**It is the installer's own bytes.** Truncating the real `.pkg` and re-sending finds the boundary between **512 B (passes)** and **2 KiB (blocked)**. A xar header is 28 bytes and this package's zlib-compressed table of contents occupies bytes 28–4716, so the trigger is inside the compressed TOC — whose uncompressed form is XML carrying an RSA `<signature>` and `KeyInfo` block. A WAF managed rule is matching compressed binary as a payload attack: a textbook false positive, and one that will fire for essentially every signed `.pkg`.
+
+**Report this upstream as a GA blocker.** Package upload, icon upload and Self Service branding are all unusable through the GA host until the WAF rule is scoped off these paths (or body inspection is disabled for them). There is no SDK-side workaround worth building — the request is rejected before Jamf sees it, and the response is an HTML page the transport correctly surfaces as an `*APIResponseError` with `Body` set, so a consumer at least sees the CloudFront text rather than a decode error. Do **not** try to placate the WAF by reshaping the multipart body; the trigger is the file content a caller supplies.
+
+**Build v1807 (2026-08-28) — the `/api` segment is gone from every external spec, and pro's 34 bogus privileges are fixed upstream. Ingested, except device groups.**
+
+**The `servers` blocks caught up with the GA gateway.** Every `external/` spec now declares `https://{region}.api.jamfcloud.com/{namespace}` — no `/api`. Thirteen of the SDK's specs are **semantically identical** to what we already carried, with the `servers` URL as the only change: devices, blueprints, device-groups (Platform), device-actions, ddm/report, compliance-benchmarks, Classic, all three account specs, ai-governance, and the four stage-sourced Security Cloud specs (which are unchanged in every respect, being jamflabs-hosted). That is independent upstream confirmation of the transport change made the same day — the specs and the wire now agree that there is no `/api`. `internal/stage` and `internal/dev` still carry `/api/...`, so do not diff against those to check this.
+
+**pro: the 34 `env:` privileges are corrected, and this closes the concern recorded under v1758.** Every one now names a real Jamf Pro resource in `{action}:pro:{resource}` form, and the whole spec is uniform — **845 privileges, 0 in any other format, 0 `env:` names left anywhere in the SDK.** The corrections are exactly what the v1758 note argued for:
+
+| endpoint | v1758 (wrong) | v1807 (correct) |
+|---|---|---|
+| `GET /v4/computers-inventory/{id}/filevault` | `read:env:filevault` | `read:pro:disk-encryption-recovery-key` |
+| `POST /v4/computers-inventory/{id}/erase` | `create:env:erase` | `execute:pro:computer-commands` |
+| `DELETE …/patch-software-title-configurations/{id}/dashboard` | `delete:env:dashboard` | `read:pro:patch-management-software-titles` |
+| `GET /v2/smtp-server/allowed-auth-types` | `read:env:allowed-auth-types` | `read:pro:smtp-server` |
+
+Three things worth noting about the shape of the fix. The **resource segment went back to inheriting the parent** — all twelve patch-software-title sub-resources collapse onto `patch-management-software-titles` rather than naming the path tail, so `read:env:history`/`dashboard`/`versions` are gone. The **verb stopped tracking the HTTP method**: `DELETE …/dashboard` and `POST …/dashboard` are both `read:pro:…` now, which is right — removing a title from a dashboard is a dashboard-membership edit, not a delete on the title. And `execute` appears for the first time in a `pro:` privilege (`execute:pro:computer-commands`), matching the GA action set the docs draft describes. `x-required-privileges-legacy` was **already** correct and is byte-identical across the build — 0 ops changed it — which is what made the scoped/legacy disagreement diagnosable in the first place. `security` also gained the privilege for those 34 ops, having been `[{oauth2: []}]`.
+
+**audit converted to the documented GA format:** `['read:env:audit', 'read:org:audit']` → **`['audit:read']`** on all four ops. So the v1758 note's second correction stands confirmed — audit was never a precedent for dual-listing, just an unconverted spec. Note pro did **not** convert to `{capability}:{action}`; it went to the older `{action}:pro:{resource}`. Both are now internally consistent, and the SDK reports what each spec says.
+
+**Zero type churn.** No `types.go`, no `enums.go`, no signature moved in the whole ingest — the entire Go diff is 38 privilege strings in `pro/permissions.go` and `audit/permissions.go`, their matching godoc lines, and the `api/*.json` servers URLs. Nothing breaking for consumers, and no `schemaCreations`/`schemaPatches` tripwire fired, so every local spec repair is still needed (`ConnectorCreateRequest.authStrategy`/`.deviceSyncAuth` included).
+
+**Device groups: HELD for the third build running (v1700, v1725, v1807).** The spec still adds `PUT /v2/groups/{groupId}` and still marks `PUT /v1/groups/{groupId}` deprecated, and the successor is still not routed. Re-probed 2026-08-28 with an environment credential, both shapes in one invocation:
+
+| request | result |
+|---|---|
+| `PUT /securitycloud/v1/groups/{bogus-uuid}` | `404 GROUP_NOT_FOUND`, `field: groupId` — routed, validating |
+| `PUT /securitycloud/v2/groups/{bogus-uuid}` | **`403 BAD_PERMISSIONS`** — the unrouted tell |
+| `GET /securitycloud/v1/groups` | 200 — bare array |
+| `GET /securitycloud/v2/groups` | 200 — `{groups: […]}` |
+
+A bogus UUID is the right probe here: it reaches routing and validation without being able to mutate anything. Ingesting would put `// Deprecated:` on `UpdateDeviceGroupV1` with nothing reachable to migrate to, turning every consumer's `staticcheck` SA1019 red — the exact failure the never-deprecate-without-a-successor rule exists to prevent. **Also re-confirmed in the same probe:** `Default Group` really does come back with no `id`, on both v1 and v2, which is what `GroupListItem` exists to model and what will make `ResolveDeviceGroupV1ByName`/`V2` yield an empty ID for it when this is finally ingested.
+
+**Two new surfaces appeared in `external/` and are not covered:** **User Inventory API** (`users`, 4 paths, 7 privileges — `GET /v1/users`, `/v1/users/{id}`, and the `/v1/users/{id}/devices` that the hidden-endpoint audit also flagged) and **Jamf Inventory API** (`inventory-api`, 4 paths, stage/dev only, `info.version: production`). `users` is prod-published with real privileges, so it is a genuine ingest candidate rather than a routing gap; `inventory-api` is not in `external/` yet. Neither is in `config.json`. `jsc-api-gateway` remains 0 paths, as ever.
+
 **Build v1758 (2026-08-27) — ztna and pro both ingested. The pro tenant→header migration is done; its 34 rewritten privileges were taken as-is and reported upstream.** Only two families moved from v1725, and hashing found them in one step: `jsc-ztna` and `jpapi`. Everything else — dns, categories, uem-connect, device-groups, all five account specs, Classic — is byte-identical.
 
 **ztna: pure documentation, ingested.** Ops, schemas, `required`, enums and `x-required-privileges` are all unchanged; the generated diff is `api/securitycloud_ztna_api.json` and **no Go moved**. What it adds is a large expansion of the documented `409` conflict codes — 14 new ones, each with its own response example: `BARE_IPS_CONFLICT`, `IPSEC_LIMIT`, `TLD_LIMIT_EXCEEDED`, `IPSEC_CONFIG_DUPLICATE`, `PREDEFINED_APP_NOT_FOUND`, `CUSTOMERS_FROM_DIFFERENT_ORGANIZATIONS`, `GATEWAYS_TUNNEL_FLAG_MISMATCH`, the five `*_REFERENCED_BY_*` deletion guards, the three `CUSTOMERS_REFERENCED_BY_*` patch guards, and a generic `CONFLICT` fallback. The 409 response also moved from a single `example` to a keyed `examples` map, and `UNSUPPORTED_BARE_IP_IN_REFERENCED_VPN_ROUTE_IPSEC_CONFIG` was renamed `..._REFERENCED_GATEWAY_IPSEC_CONFIG`.

@@ -18,8 +18,7 @@ import (
 
 // ListAuditEvents filter audit events.
 //
-// Required privileges: read:env:audit, read:org:audit.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: audit:read.
 //
 // Parameters:
 //   - since: Inclusive lower bound on event time (ISO-8601, required).
@@ -73,8 +72,7 @@ func (c *Client) ListAuditEvents(ctx context.Context, since string, until string
 
 // GetResourceLineage get resource lineage.
 //
-// Required privileges: read:env:audit, read:org:audit.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: audit:read.
 //
 // Parameters:
 //   - resourceID: Resource identifier (1-256 characters).
@@ -117,8 +115,7 @@ func (c *Client) GetResourceLineage(ctx context.Context, resourceID string, audi
 
 // ListAuditSources discover audit sources.
 //
-// Required privileges: read:env:audit, read:org:audit.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: audit:read.
 //
 // Parameters:
 //   - since: Optional lower bound on event time (ISO-8601). Defaults to 90 days ago.
@@ -141,8 +138,7 @@ func (c *Client) ListAuditSources(ctx context.Context, since string) ([]AuditSou
 
 // GetTransactionTimeline get transaction timeline.
 //
-// Required privileges: read:env:audit, read:org:audit.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: audit:read.
 //
 // Parameters:
 //   - txID: Transaction id (UUID).
