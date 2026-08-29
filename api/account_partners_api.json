@@ -1553,7 +1553,7 @@
   ],
   "tags": [
     {
-      "description": "Read operations for the deal registrations submitted by the partner organization resolved from the access token.",
+      "description": "Operations for the deal registrations submitted by the partner organization resolved from the access token.",
       "name": "deal-registrations"
     },
     {
