@@ -49,7 +49,12 @@ func auditUnreachable(t *testing.T, method string, err error) bool {
 		}
 	}
 	if apiErr.HasStatus(403) {
-		t.Logf("%s: context resolved but authorization denied (403) — the credential lacks read:org:audit / read:env:audit", method)
+		t.Logf("%s: context resolved but authorization denied (403) — the credential lacks audit:read. "+
+			"Audit is environment-scoped only as of 2026-08-28 (tyk 3e99c347, authorization-policies ee84e61); "+
+			"the policy requires audit:read in environmentPermissions with X-Environment-Id set, and the "+
+			"organization form is now refused outright with INVALID_REQUEST_CONTEXT_TYPE. Two separate "+
+			"environment credentials lacked the grant when probed on 2026-08-29, and a caller cannot check "+
+			"its own grants: the token is opaque and the exchange returns an empty scope", method)
 		return true
 	}
 	t.Fatalf("%s: unexpected failure, neither the known context block nor a 403: %v", method, err)
