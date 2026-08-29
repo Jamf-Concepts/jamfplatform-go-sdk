@@ -74,6 +74,8 @@ func (c *Client) GetDeviceGroupV1(ctx context.Context, groupID string) (*Group, 
 
 // UpdateDeviceGroupV1 update a device group.
 //
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-08-25) and may be removed in a future release.
+//
 // Required privileges: device-groups:update.
 //
 // Parameters:
@@ -86,6 +88,21 @@ func (c *Client) UpdateDeviceGroupV1(ctx context.Context, groupID string, reques
 		return nil, fmt.Errorf("UpdateDeviceGroupV1(%s): %w", groupID, err)
 	}
 	return &result, nil
+}
+
+// UpdateDeviceGroupV2 update a device group.
+//
+// Required privileges: device-groups:update.
+//
+// Parameters:
+//   - groupID: Unique identifier of the group to update.
+func (c *Client) UpdateDeviceGroupV2(ctx context.Context, groupID string, request *UpdateGroupRequest) error {
+	prefix := c.transport.APIPrefix("securitycloud", "v2")
+	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(groupID))
+	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("UpdateDeviceGroupV2(%s): %w", groupID, err)
+	}
+	return nil
 }
 
 // DeleteDeviceGroupV1 delete a device group.
@@ -115,14 +132,14 @@ func (c *Client) ResolveDeviceGroupV1IDByName(ctx context.Context, name string) 
 }
 
 // ResolveDeviceGroupV1ByName looks up a DeviceGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveDeviceGroupV1ByName(ctx context.Context, name string) (*Group, error) {
+func (c *Client) ResolveDeviceGroupV1ByName(ctx context.Context, name string) (*GroupListItem, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v1")
 	listPath := prefix + "/groups"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveDeviceGroupV1ByName(%s): %w", name, err)
 	}
-	var out Group
+	var out GroupListItem
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
 	}
@@ -141,14 +158,14 @@ func (c *Client) ResolveDeviceGroupV2IDByName(ctx context.Context, name string) 
 }
 
 // ResolveDeviceGroupV2ByName looks up a DeviceGroupV2 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveDeviceGroupV2ByName(ctx context.Context, name string) (*Group, error) {
+func (c *Client) ResolveDeviceGroupV2ByName(ctx context.Context, name string) (*GroupListItem, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v2")
 	listPath := prefix + "/groups"
 	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "groups", "name", "id", name)
 	if err != nil {
 		return nil, fmt.Errorf("ResolveDeviceGroupV2ByName(%s): %w", name, err)
 	}
-	var out Group
+	var out GroupListItem
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveDeviceGroupV2ByName(%s): decoding matched element: %w", name, err)
 	}

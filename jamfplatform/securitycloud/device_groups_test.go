@@ -149,6 +149,21 @@ func TestUpdateDeviceGroupV1(t *testing.T) {
 	}
 }
 
+func TestUpdateDeviceGroupV2(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/securitycloud/v2/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.UpdateDeviceGroupV2(context.Background(), "test-id", &UpdateGroupRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestDeleteDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/securitycloud/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {

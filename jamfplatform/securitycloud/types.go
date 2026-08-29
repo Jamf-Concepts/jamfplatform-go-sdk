@@ -794,13 +794,23 @@ type Group struct {
 	Name string `json:"name"`
 }
 
-// GroupListResponse is a list of Group.
-type GroupListResponse = []Group
+// GroupListItem A device group as returned by the list endpoints. Identical to Group, except that the implicit "Default Group" entry has no identifier and so omits the id field.
+type GroupListItem struct {
+	// Unique group identifier. Omitted for the implicit "Default Group" entry, which is not a stored
+	// group.
+	ID string `json:"id"`
+	// Display name of the group.
+	Name string `json:"name"`
+}
+
+// GroupListResponse is a list of GroupListItem.
+type GroupListResponse = []GroupListItem
 
 // GroupListResponseV2 List of device groups for the authenticated customer.
 type GroupListResponseV2 struct {
-	// Device groups belonging to the customer.
-	Groups []Group `json:"groups"`
+	// Device groups belonging to the customer. Always contains at least the implicit "Default Group"
+	// entry.
+	Groups []GroupListItem `json:"groups"`
 }
 
 // UpdateGroupRequest Request body for updating an existing device group.

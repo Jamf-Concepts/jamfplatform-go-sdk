@@ -11042,7 +11042,7 @@
             "nameField": "name",
             "idField": "id",
             "mode": "clientFilter",
-            "typedReturn": "Group",
+            "typedReturn": "GroupListItem",
             "apply": {
               "createOp": "CreateDeviceGroupV1",
               "updateOp": "UpdateDeviceGroupV1",
@@ -11065,7 +11065,7 @@
             "idField": "id",
             "mode": "clientFilter",
             "resultsField": "groups",
-            "typedReturn": "Group",
+            "typedReturn": "GroupListItem",
             "apply": {
               "createOp": "CreateDeviceGroupV1",
               "updateOp": "UpdateDeviceGroupV1",
@@ -11081,9 +11081,11 @@
         },
         {
           "op": "PUT /v1/groups/{groupId}",
-          "name": "UpdateDeviceGroupV1",
-          "expectedStatus": 200,
-          "responseType": "Group"
+          "name": "UpdateDeviceGroupV1"
+        },
+        {
+          "op": "PUT /v2/groups/{groupId}",
+          "name": "UpdateDeviceGroupV2"
         },
         {
           "op": "DELETE /v1/groups/{groupId}",

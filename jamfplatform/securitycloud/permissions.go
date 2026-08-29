@@ -55,6 +55,7 @@ var Privileges = map[string]jamfplatform.MethodPrivileges{
 	"SetDnsSearchDomainV1":               {Method: "SetDnsSearchDomainV1", HTTPMethod: "PUT", Path: "/v1/dns/search-domains", Scoped: []string{"search-domains:update"}, Legacy: nil},
 	"TriggerUemConnectorSyncV1":          {Method: "TriggerUemConnectorSyncV1", HTTPMethod: "POST", Path: "//uem-connect/v1/connectors/{configId}/sync/runs", Scoped: []string{"uem-connect:update"}, Legacy: nil},
 	"UpdateDeviceGroupV1":                {Method: "UpdateDeviceGroupV1", HTTPMethod: "PUT", Path: "/v1/groups/{groupId}", Scoped: []string{"device-groups:update"}, Legacy: nil},
+	"UpdateDeviceGroupV2":                {Method: "UpdateDeviceGroupV2", HTTPMethod: "PUT", Path: "/v2/groups/{groupId}", Scoped: []string{"device-groups:update"}, Legacy: nil},
 	"UpdateDnsZoneV1":                    {Method: "UpdateDnsZoneV1", HTTPMethod: "PATCH", Path: "/v1/dns/zones/{id}", Scoped: []string{"ztna:update"}, Legacy: nil},
 	"UpdateUemConnectorSyncSettingsV1":   {Method: "UpdateUemConnectorSyncSettingsV1", HTTPMethod: "PUT", Path: "//uem-connect/v1/connectors/{configId}/sync-settings", Scoped: []string{"uem-connect:update"}, Legacy: nil},
 	"UpdateZtnaAppV1":                    {Method: "UpdateZtnaAppV1", HTTPMethod: "PATCH", Path: "/v1/ztna/apps/{appId}", Scoped: []string{"ztna:update"}, Legacy: nil},

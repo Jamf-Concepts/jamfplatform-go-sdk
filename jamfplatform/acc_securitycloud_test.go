@@ -1041,8 +1041,10 @@ func TestAcceptance_SecurityCloudDeviceGroupLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListDeviceGroupsV1 failed: %v", err)
 	}
-	// GroupListResponse is an alias for []Group, so the method returns a
-	// pointer to a slice — the shape any bare-array response takes.
+	// GroupListResponse is an alias for []GroupListItem, so the method returns
+	// a pointer to a slice — the shape any bare-array response takes. The item
+	// type is deliberately not Group: the implicit "Default Group" entry comes
+	// back with no id, so the list schema cannot require one (build v1865).
 	var found bool
 	for _, g := range *groups {
 		if g.ID == created.ID {
@@ -1053,9 +1055,10 @@ func TestAcceptance_SecurityCloudDeviceGroupLifecycle(t *testing.T) {
 		t.Errorf("created group %s missing from ListDeviceGroupsV1 (%d groups)", created.ID, len(*groups))
 	}
 
-	// Wire-verified: the update answers 200 with the updated group, though the
-	// spec declares 204 with no content. An empty name back means the
-	// config-level expectedStatus/responseType override regressed.
+	// The update answers 200 with the updated group. This was a config-level
+	// expectedStatus/responseType override against a spec that wrongly declared
+	// 204; build v1865 corrected the spec, so the override was deleted and the
+	// signature is now spec-derived. An empty name back means that regressed.
 	updated, err := sc.UpdateDeviceGroupV1(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: jscName("group") + "-renamed"})
 	if err != nil {
 		t.Fatalf("UpdateDeviceGroupV1(%s) failed: %v", created.ID, err)
@@ -1088,6 +1091,62 @@ func TestAcceptance_SecurityCloudDeviceGroupsV2(t *testing.T) {
 		t.Fatalf("ListDeviceGroupsV2 failed: %v", err)
 	}
 	t.Logf("v2 returned %d device groups", len(groups.Groups))
+}
+
+// TestAcceptance_SecurityCloudUpdateDeviceGroupV2 pins a gateway gap, not a
+// client bug. UpdateDeviceGroupV1 is marked deprecated as of 2026-08-25 and the
+// spec names PUT /v2/groups/{groupId} as its successor, but that path is not
+// routed: it answers 403 BAD_PERMISSIONS on a real group that the v1 PUT
+// updates successfully in this same test. Wire-verified 2026-08-29, 7/7
+// attempts, eu tenant wisconsam.
+//
+// The method is generated and whitelisted anyway so the deprecation marker on
+// UpdateDeviceGroupV1 names something that exists in Go rather than leaving
+// consumers' staticcheck SA1019 pointing at nothing.
+//
+// This asserts the 403 so the suite FAILS when routing lands. On that day:
+// flip this to assert success, and drop the corresponding note from CLAUDE.md's
+// v1865 section. Do not weaken it to a skip — a blanket 403 tolerance is what
+// hid this class of gap before.
+//
+// One caution learned while probing it: the first attempt returned 500 on both
+// v1 and v2, which reads as "v2 is routed and merely faulting" — the opposite
+// of the truth. Repeat a routing probe before believing a single result.
+func TestAcceptance_SecurityCloudUpdateDeviceGroupV2(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	name := jscName("group-v2put")
+	created, err := sc.CreateDeviceGroupV1(ctx, &securitycloud.CreateGroupRequest{Name: name})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateDeviceGroupV1 failed: %v", err)
+	}
+	jscCleanupDelete(t, "device group "+created.ID, func() error {
+		return sc.DeleteDeviceGroupV1(context.Background(), created.ID)
+	})
+
+	// Control: the deprecated v1 write works on this exact group, so a v2
+	// failure below cannot be blamed on the group, the credential or the tenant.
+	if _, err := sc.UpdateDeviceGroupV1(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v1ok"}); err != nil {
+		t.Fatalf("control UpdateDeviceGroupV1(%s) failed, so the v2 result below is not interpretable: %v", created.ID, err)
+	}
+
+	err = sc.UpdateDeviceGroupV2(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v2"})
+	if err == nil {
+		t.Fatalf("UpdateDeviceGroupV2(%s) succeeded — the gateway now routes PUT /v2/groups/{groupId}. "+
+			"That is the outcome this test is waiting for: flip it to assert success and update CLAUDE.md's v1865 section.", created.ID)
+	}
+
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("UpdateDeviceGroupV2 failed with a non-API error, want 403 BAD_PERMISSIONS: %v", err)
+	}
+	if !apiErr.HasStatus(403) {
+		t.Fatalf("UpdateDeviceGroupV2 returned %v, want 403 BAD_PERMISSIONS (the unrouted-path tell). "+
+			"A different status means the gateway's behaviour changed — re-probe before adjusting this test.", err)
+	}
+	t.Logf("PUT /v2/groups/{groupId} still unrouted (403 BAD_PERMISSIONS), as expected; v1 control succeeded")
 }
 
 // ---------------------------------------------------------------------------
