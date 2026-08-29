@@ -70,7 +70,7 @@ Struct fields are documented the same way, from each property's `description`, w
 
 ### Enum constants
 
-Every string enum in a spec becomes a Go type plus one constant per value, in a per-package `enums.go` (never `types.go` — see `partitionEnumTypes`). **382 types carrying 1793 constants (recounted 2026-08-29)**: 204 in `pro`, 92 in `proclassic`, 32 in `securitycloud`, 15 in `blueprints`, 15 in `account`, 8 in `compliancebenchmarks`, 7 in `ddmreport`, 4 in `aigovernance`, 3 in `devicegroups`, 2 in `devices`. Treat these as point-in-time scale, not an invariant — they move with every spec ingest, and `securitycloud` was missing from this list entirely for several builds, as were `account` and `aigovernance` until this recount.
+Every string enum in a spec becomes a Go type plus one constant per value, in a per-package `enums.go` (never `types.go` — see `partitionEnumTypes`). **387 types carrying 1899 constants (recounted 2026-08-29)**: 209 in `pro`, 92 in `proclassic`, 32 in `securitycloud`, 15 in `blueprints`, 15 in `account`, 8 in `compliancebenchmarks`, 7 in `ddmreport`, 4 in `aigovernance`, 3 in `devicegroups`, 2 in `devices`. Treat these as point-in-time scale, not an invariant — they move with every spec ingest, and `securitycloud` was missing from this list entirely for several builds, as were `account` and `aigovernance` until this recount.
 
 #### Coverage audit (2026-08-29) — one real gap, now closed
 
@@ -81,7 +81,7 @@ Audited by matching each spec enum's **value set** against the emitted constants
 | schema string-enums, ≥2 distinct string values | **286** | **all emitted, all value-complete** |
 | single-value sets | 29 | constants skipped by design; values in field godoc via `inlineFieldEnumValues` — verified |
 | non-string enums | 7 | constants impossible (the alias is `= string`); values in field godoc — verified |
-| parameter-only enum schemas | 40 | inline godoc lists, never types — as documented above for `section` |
+| parameter-only enum schemas | 40 | 5 named ones are now emitted as types (see above); the rest are inline parameter schemas and keep their godoc lists |
 | schemas unreachable from any whitelisted op | 11 | correctly not emitted |
 
 **No value is ever silently dropped from an emitted type.** Zero missing values across all 286, zero identifier failures and zero intra-set collisions — the whole generate log carries exactly one skip line (`Deployment.State`). Note `enumConsts` *does* log per-value drops, but it silently skips a non-string or empty-string member of an otherwise-string enum; nothing in the tree hits that today, and it is the one path to check first if a set ever comes out short.
@@ -101,10 +101,13 @@ Classic is where this pays off most: its values are prose, not identifiers — `
 
 Each type also gets `<Type>Values() []<Type>` returning every value in spec order — for `stringvalidator.OneOf(pro.PolicyTriggerValues()...)` in the Terraform provider, and anything else that enumerates rather than names. A function, not a var: a var would let one consumer mutate the set for the whole process. It cannot be a method — Go forbids methods on an alias to a predeclared type, and that alias is what keeps constants assignable to plain `string`.
 
-Fields and parameters point at the type instead of re-listing values (`Allowed values: see the NotificationType constants.`), since godoc groups constants under their declared type. 309 such references. Two cases keep an inline list instead:
+Fields and parameters point at the type instead of re-listing values (`Allowed values: see the NotificationType constants.`), since godoc groups constants under their declared type.
 
-- A parameter whose enum schema is never emitted as a type (reachable only from that parameter) — which is why `section` on the computer-inventory endpoints still lists all 22 values.
-- A `$ref`'d property, where the field's own type already names the enum.
+**A named enum schema reachable only from a parameter is emitted too, as of 2026-08-29.** It previously was not, and its values survived solely as an inline `Allowed values:` list in the method godoc — readable but not referenceable, so every call site hard-coded string literals. `collectReferencedSchemas` walks request bodies and responses only, which is why these were invisible; it now also registers a parameter's schema **when that schema resolves to a component that is itself a string enum**. Both shapes the specs use are handled: a direct `$ref`, and the far more common `type: array` whose `items` are a `$ref` (the repeatable `section` query param).
+
+This is deliberately **not** a full parameter walk. Descending into parameter schemas the way the body walkers do would register arbitrary object schemas nothing currently emits, changing the type set across every spec. Restricting registration to string-enum components bounds the blast radius to the enum types alone: **5 schemas, all in `pro` — `ComputerSection`, `ComputerSectionV2/V3/V4` and `MobileDeviceSection`, 106 constants between them** — with no signature change anywhere and no other package touched. Callers can now pass `pro.ComputerSectionV4General` where they previously wrote `"GENERAL"`.
+
+One case still keeps an inline list: a `$ref`'d property, where the field's own type already names the enum.
 
 Skipped, each deliberately: non-string enums (constants are typed to a `= string` alias), single-value sets, values yielding no Go identifier, the second of any two values colliding on one identifier, and any synthesised name the spec already uses — checked for both `<Owner><Property>` and `<Owner><Property>Values`, since the accessor shares the namespace. Every skip logs. `Deployment.State` is the only one firing today (`DeploymentState` is a struct); its values remain reachable as `DeploymentStateState`.
 

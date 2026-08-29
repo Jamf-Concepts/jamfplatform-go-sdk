@@ -1105,6 +1105,67 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]*schemaU
 				}
 			}
 		}
+		// Named string-enum schemas reached only through a parameter. These are
+		// registered so they are emitted as a Go type with constants, which is
+		// what lets a caller pass pro.ComputerSectionV4General instead of the
+		// bare literal "GENERAL". Before this, an enum schema reachable *only*
+		// from a parameter was never emitted and the values survived solely as
+		// an inline `Allowed values:` list in the method godoc — readable, but
+		// not referenceable, so every call site hard-coded strings.
+		//
+		// Deliberately NOT a full parameter walk. Descending into parameter
+		// schemas the way the request/response walkers do would register
+		// arbitrary object schemas that nothing currently emits, changing the
+		// type set across every spec. This registers a name only when it
+		// resolves to a component that is itself a string enum, so the blast
+		// radius is exactly the enum types and nothing else. Today that is 5
+		// schemas, all in pro: ComputerSection, ComputerSectionV2/V3/V4 and
+		// MobileDeviceSection.
+		//
+		// Both shapes the specs use are handled: a parameter whose schema is a
+		// direct $ref, and the far more common `type: array` whose items are a
+		// $ref (the repeatable `section` query param).
+		registerParamEnum := func(ref *openapi3.SchemaRef) {
+			if ref == nil || doc.Components == nil || doc.Components.Schemas == nil {
+				return
+			}
+			candidates := []string{}
+			if ref.Ref != "" {
+				candidates = append(candidates, ref.Ref)
+			}
+			if ref.Value != nil && ref.Value.Items != nil && ref.Value.Items.Ref != "" {
+				candidates = append(candidates, ref.Value.Items.Ref)
+			}
+			for _, refStr := range candidates {
+				name := refStr[strings.LastIndex(refStr, "/")+1:]
+				target, ok := doc.Components.Schemas[name]
+				if !ok || target.Value == nil {
+					continue
+				}
+				if !target.Value.Type.Is("string") || len(target.Value.Enum) == 0 {
+					continue
+				}
+				if used[name] == nil {
+					used[name] = &schemaUsage{}
+				}
+				// Read-side: a bare `= string` alias carries no fields, so the
+				// request/response distinction drives nothing here. isResponse
+				// is the conservative choice — it keeps the request-type
+				// pointer heuristics in schemaToGoType out of play entirely.
+				used[name].isResponse = true
+			}
+		}
+		for _, paramRef := range op.Parameters {
+			if paramRef != nil && paramRef.Value != nil {
+				registerParamEnum(paramRef.Value.Schema)
+			}
+		}
+		for _, paramRef := range pathItem.Parameters {
+			if paramRef != nil && paramRef.Value != nil {
+				registerParamEnum(paramRef.Value.Schema)
+			}
+		}
+
 		// Config-level type overrides: when the spec is untyped (e.g. Classic)
 		// the curator names request/response schemas explicitly. Record those
 		// as referenced and descend into their properties.

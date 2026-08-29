@@ -24,9 +24,7 @@ import (
 // Parameters:
 //   - section: section of mobile device details, if not specified, General section data is returned. Multiple
 //     section parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING", "SECURITY",
-//     "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS", "CERTIFICATES", "PROFILES",
-//     "USER_PROFILES", "PROVISIONING_PROFILES", "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
+//     Allowed values: see the MobileDeviceSection constants.
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is displayName:asc. Multiple sort
 //     criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
@@ -215,9 +213,7 @@ func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *Er
 //   - id: instance id of mobile device record.
 //   - section: section of mobile device details, if not specified, Paired Devices section data is returned.
 //     Multiple section parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING", "SECURITY",
-//     "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS", "CERTIFICATES", "PROFILES",
-//     "USER_PROFILES", "PROVISIONING_PROFILES", "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
+//     Allowed values: see the MobileDeviceSection constants.
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is displayName:asc. Multiple sort
 //     criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,

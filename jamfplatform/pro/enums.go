@@ -119,6 +119,262 @@ func ComputerPartitionFileVault2StateValues() []ComputerPartitionFileVault2State
 	}
 }
 
+// ComputerSection represents a computer section value.
+type ComputerSection = string
+
+// ComputerSection values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSectionGeneral               ComputerSection = "GENERAL"
+	ComputerSectionDiskEncryption        ComputerSection = "DISK_ENCRYPTION"
+	ComputerSectionPurchasing            ComputerSection = "PURCHASING"
+	ComputerSectionApplications          ComputerSection = "APPLICATIONS"
+	ComputerSectionStorage               ComputerSection = "STORAGE"
+	ComputerSectionUserAndLocation       ComputerSection = "USER_AND_LOCATION"
+	ComputerSectionConfigurationProfiles ComputerSection = "CONFIGURATION_PROFILES"
+	ComputerSectionPrinters              ComputerSection = "PRINTERS"
+	ComputerSectionServices              ComputerSection = "SERVICES"
+	ComputerSectionHardware              ComputerSection = "HARDWARE"
+	ComputerSectionLocalUserAccounts     ComputerSection = "LOCAL_USER_ACCOUNTS"
+	ComputerSectionCertificates          ComputerSection = "CERTIFICATES"
+	ComputerSectionAttachments           ComputerSection = "ATTACHMENTS"
+	ComputerSectionPlugins               ComputerSection = "PLUGINS"
+	ComputerSectionPackageReceipts       ComputerSection = "PACKAGE_RECEIPTS"
+	ComputerSectionFonts                 ComputerSection = "FONTS"
+	ComputerSectionSecurity              ComputerSection = "SECURITY"
+	ComputerSectionOperatingSystem       ComputerSection = "OPERATING_SYSTEM"
+	ComputerSectionLicensedSoftware      ComputerSection = "LICENSED_SOFTWARE"
+	ComputerSectionIbeacons              ComputerSection = "IBEACONS"
+	ComputerSectionSoftwareUpdates       ComputerSection = "SOFTWARE_UPDATES"
+	ComputerSectionExtensionAttributes   ComputerSection = "EXTENSION_ATTRIBUTES"
+	ComputerSectionContentCaching        ComputerSection = "CONTENT_CACHING"
+	ComputerSectionGroupMemberships      ComputerSection = "GROUP_MEMBERSHIPS"
+)
+
+// ComputerSectionValues returns every value the Jamf API accepts for ComputerSection,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerSectionValues() []ComputerSection {
+	return []ComputerSection{
+		ComputerSectionGeneral,
+		ComputerSectionDiskEncryption,
+		ComputerSectionPurchasing,
+		ComputerSectionApplications,
+		ComputerSectionStorage,
+		ComputerSectionUserAndLocation,
+		ComputerSectionConfigurationProfiles,
+		ComputerSectionPrinters,
+		ComputerSectionServices,
+		ComputerSectionHardware,
+		ComputerSectionLocalUserAccounts,
+		ComputerSectionCertificates,
+		ComputerSectionAttachments,
+		ComputerSectionPlugins,
+		ComputerSectionPackageReceipts,
+		ComputerSectionFonts,
+		ComputerSectionSecurity,
+		ComputerSectionOperatingSystem,
+		ComputerSectionLicensedSoftware,
+		ComputerSectionIbeacons,
+		ComputerSectionSoftwareUpdates,
+		ComputerSectionExtensionAttributes,
+		ComputerSectionContentCaching,
+		ComputerSectionGroupMemberships,
+	}
+}
+
+// ComputerSectionV2 represents a computer section v2 value.
+type ComputerSectionV2 = string
+
+// ComputerSectionV2 values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSectionV2General               ComputerSectionV2 = "GENERAL"
+	ComputerSectionV2DiskEncryption        ComputerSectionV2 = "DISK_ENCRYPTION"
+	ComputerSectionV2Purchasing            ComputerSectionV2 = "PURCHASING"
+	ComputerSectionV2Applications          ComputerSectionV2 = "APPLICATIONS"
+	ComputerSectionV2Storage               ComputerSectionV2 = "STORAGE"
+	ComputerSectionV2UserAndLocation       ComputerSectionV2 = "USER_AND_LOCATION"
+	ComputerSectionV2ConfigurationProfiles ComputerSectionV2 = "CONFIGURATION_PROFILES"
+	ComputerSectionV2Printers              ComputerSectionV2 = "PRINTERS"
+	ComputerSectionV2Services              ComputerSectionV2 = "SERVICES"
+	ComputerSectionV2Hardware              ComputerSectionV2 = "HARDWARE"
+	ComputerSectionV2LocalUserAccounts     ComputerSectionV2 = "LOCAL_USER_ACCOUNTS"
+	ComputerSectionV2Certificates          ComputerSectionV2 = "CERTIFICATES"
+	ComputerSectionV2Attachments           ComputerSectionV2 = "ATTACHMENTS"
+	ComputerSectionV2PackageReceipts       ComputerSectionV2 = "PACKAGE_RECEIPTS"
+	ComputerSectionV2Security              ComputerSectionV2 = "SECURITY"
+	ComputerSectionV2OperatingSystem       ComputerSectionV2 = "OPERATING_SYSTEM"
+	ComputerSectionV2LicensedSoftware      ComputerSectionV2 = "LICENSED_SOFTWARE"
+	ComputerSectionV2Ibeacons              ComputerSectionV2 = "IBEACONS"
+	ComputerSectionV2SoftwareUpdates       ComputerSectionV2 = "SOFTWARE_UPDATES"
+	ComputerSectionV2ExtensionAttributes   ComputerSectionV2 = "EXTENSION_ATTRIBUTES"
+	ComputerSectionV2ContentCaching        ComputerSectionV2 = "CONTENT_CACHING"
+	ComputerSectionV2GroupMemberships      ComputerSectionV2 = "GROUP_MEMBERSHIPS"
+)
+
+// ComputerSectionV2Values returns every value the Jamf API accepts for ComputerSectionV2,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerSectionV2Values() []ComputerSectionV2 {
+	return []ComputerSectionV2{
+		ComputerSectionV2General,
+		ComputerSectionV2DiskEncryption,
+		ComputerSectionV2Purchasing,
+		ComputerSectionV2Applications,
+		ComputerSectionV2Storage,
+		ComputerSectionV2UserAndLocation,
+		ComputerSectionV2ConfigurationProfiles,
+		ComputerSectionV2Printers,
+		ComputerSectionV2Services,
+		ComputerSectionV2Hardware,
+		ComputerSectionV2LocalUserAccounts,
+		ComputerSectionV2Certificates,
+		ComputerSectionV2Attachments,
+		ComputerSectionV2PackageReceipts,
+		ComputerSectionV2Security,
+		ComputerSectionV2OperatingSystem,
+		ComputerSectionV2LicensedSoftware,
+		ComputerSectionV2Ibeacons,
+		ComputerSectionV2SoftwareUpdates,
+		ComputerSectionV2ExtensionAttributes,
+		ComputerSectionV2ContentCaching,
+		ComputerSectionV2GroupMemberships,
+	}
+}
+
+// ComputerSectionV3 represents a computer section v3 value.
+type ComputerSectionV3 = string
+
+// ComputerSectionV3 values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSectionV3General               ComputerSectionV3 = "GENERAL"
+	ComputerSectionV3DiskEncryption        ComputerSectionV3 = "DISK_ENCRYPTION"
+	ComputerSectionV3Purchasing            ComputerSectionV3 = "PURCHASING"
+	ComputerSectionV3Applications          ComputerSectionV3 = "APPLICATIONS"
+	ComputerSectionV3Storage               ComputerSectionV3 = "STORAGE"
+	ComputerSectionV3UserAndLocation       ComputerSectionV3 = "USER_AND_LOCATION"
+	ComputerSectionV3ConfigurationProfiles ComputerSectionV3 = "CONFIGURATION_PROFILES"
+	ComputerSectionV3Printers              ComputerSectionV3 = "PRINTERS"
+	ComputerSectionV3Services              ComputerSectionV3 = "SERVICES"
+	ComputerSectionV3Hardware              ComputerSectionV3 = "HARDWARE"
+	ComputerSectionV3LocalUserAccounts     ComputerSectionV3 = "LOCAL_USER_ACCOUNTS"
+	ComputerSectionV3Certificates          ComputerSectionV3 = "CERTIFICATES"
+	ComputerSectionV3Attachments           ComputerSectionV3 = "ATTACHMENTS"
+	ComputerSectionV3PackageReceipts       ComputerSectionV3 = "PACKAGE_RECEIPTS"
+	ComputerSectionV3Security              ComputerSectionV3 = "SECURITY"
+	ComputerSectionV3OperatingSystem       ComputerSectionV3 = "OPERATING_SYSTEM"
+	ComputerSectionV3LicensedSoftware      ComputerSectionV3 = "LICENSED_SOFTWARE"
+	ComputerSectionV3Ibeacons              ComputerSectionV3 = "IBEACONS"
+	ComputerSectionV3SoftwareUpdates       ComputerSectionV3 = "SOFTWARE_UPDATES"
+	ComputerSectionV3ExtensionAttributes   ComputerSectionV3 = "EXTENSION_ATTRIBUTES"
+	ComputerSectionV3ContentCaching        ComputerSectionV3 = "CONTENT_CACHING"
+	ComputerSectionV3GroupMemberships      ComputerSectionV3 = "GROUP_MEMBERSHIPS"
+)
+
+// ComputerSectionV3Values returns every value the Jamf API accepts for ComputerSectionV3,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerSectionV3Values() []ComputerSectionV3 {
+	return []ComputerSectionV3{
+		ComputerSectionV3General,
+		ComputerSectionV3DiskEncryption,
+		ComputerSectionV3Purchasing,
+		ComputerSectionV3Applications,
+		ComputerSectionV3Storage,
+		ComputerSectionV3UserAndLocation,
+		ComputerSectionV3ConfigurationProfiles,
+		ComputerSectionV3Printers,
+		ComputerSectionV3Services,
+		ComputerSectionV3Hardware,
+		ComputerSectionV3LocalUserAccounts,
+		ComputerSectionV3Certificates,
+		ComputerSectionV3Attachments,
+		ComputerSectionV3PackageReceipts,
+		ComputerSectionV3Security,
+		ComputerSectionV3OperatingSystem,
+		ComputerSectionV3LicensedSoftware,
+		ComputerSectionV3Ibeacons,
+		ComputerSectionV3SoftwareUpdates,
+		ComputerSectionV3ExtensionAttributes,
+		ComputerSectionV3ContentCaching,
+		ComputerSectionV3GroupMemberships,
+	}
+}
+
+// ComputerSectionV4 represents a computer section v4 value.
+type ComputerSectionV4 = string
+
+// ComputerSectionV4 values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSectionV4General               ComputerSectionV4 = "GENERAL"
+	ComputerSectionV4DiskEncryption        ComputerSectionV4 = "DISK_ENCRYPTION"
+	ComputerSectionV4Purchasing            ComputerSectionV4 = "PURCHASING"
+	ComputerSectionV4Applications          ComputerSectionV4 = "APPLICATIONS"
+	ComputerSectionV4Storage               ComputerSectionV4 = "STORAGE"
+	ComputerSectionV4UserAndLocation       ComputerSectionV4 = "USER_AND_LOCATION"
+	ComputerSectionV4ConfigurationProfiles ComputerSectionV4 = "CONFIGURATION_PROFILES"
+	ComputerSectionV4Printers              ComputerSectionV4 = "PRINTERS"
+	ComputerSectionV4Services              ComputerSectionV4 = "SERVICES"
+	ComputerSectionV4Hardware              ComputerSectionV4 = "HARDWARE"
+	ComputerSectionV4LocalUserAccounts     ComputerSectionV4 = "LOCAL_USER_ACCOUNTS"
+	ComputerSectionV4Certificates          ComputerSectionV4 = "CERTIFICATES"
+	ComputerSectionV4Attachments           ComputerSectionV4 = "ATTACHMENTS"
+	ComputerSectionV4PackageReceipts       ComputerSectionV4 = "PACKAGE_RECEIPTS"
+	ComputerSectionV4Security              ComputerSectionV4 = "SECURITY"
+	ComputerSectionV4OperatingSystem       ComputerSectionV4 = "OPERATING_SYSTEM"
+	ComputerSectionV4LicensedSoftware      ComputerSectionV4 = "LICENSED_SOFTWARE"
+	ComputerSectionV4Ibeacons              ComputerSectionV4 = "IBEACONS"
+	ComputerSectionV4SoftwareUpdates       ComputerSectionV4 = "SOFTWARE_UPDATES"
+	ComputerSectionV4ExtensionAttributes   ComputerSectionV4 = "EXTENSION_ATTRIBUTES"
+	ComputerSectionV4ContentCaching        ComputerSectionV4 = "CONTENT_CACHING"
+	ComputerSectionV4GroupMemberships      ComputerSectionV4 = "GROUP_MEMBERSHIPS"
+)
+
+// ComputerSectionV4Values returns every value the Jamf API accepts for ComputerSectionV4,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerSectionV4Values() []ComputerSectionV4 {
+	return []ComputerSectionV4{
+		ComputerSectionV4General,
+		ComputerSectionV4DiskEncryption,
+		ComputerSectionV4Purchasing,
+		ComputerSectionV4Applications,
+		ComputerSectionV4Storage,
+		ComputerSectionV4UserAndLocation,
+		ComputerSectionV4ConfigurationProfiles,
+		ComputerSectionV4Printers,
+		ComputerSectionV4Services,
+		ComputerSectionV4Hardware,
+		ComputerSectionV4LocalUserAccounts,
+		ComputerSectionV4Certificates,
+		ComputerSectionV4Attachments,
+		ComputerSectionV4PackageReceipts,
+		ComputerSectionV4Security,
+		ComputerSectionV4OperatingSystem,
+		ComputerSectionV4LicensedSoftware,
+		ComputerSectionV4Ibeacons,
+		ComputerSectionV4SoftwareUpdates,
+		ComputerSectionV4ExtensionAttributes,
+		ComputerSectionV4ContentCaching,
+		ComputerSectionV4GroupMemberships,
+	}
+}
+
 // DataRoamingSetting represents a data roaming setting value.
 type DataRoamingSetting = string
 
@@ -371,6 +627,57 @@ func MDMRenewalStrategyTypeValues() []MDMRenewalStrategyType {
 		MDMRenewalStrategyTypeReturnCheckInInvitationFromMDMProfilePrototypeTable,
 		MDMRenewalStrategyTypeJssURLOverride,
 		MDMRenewalStrategyTypePayloadIdentifier,
+	}
+}
+
+// MobileDeviceSection represents a mobile device section value.
+type MobileDeviceSection = string
+
+// MobileDeviceSection values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileDeviceSectionGeneral              MobileDeviceSection = "GENERAL"
+	MobileDeviceSectionHardware             MobileDeviceSection = "HARDWARE"
+	MobileDeviceSectionUserAndLocation      MobileDeviceSection = "USER_AND_LOCATION"
+	MobileDeviceSectionPurchasing           MobileDeviceSection = "PURCHASING"
+	MobileDeviceSectionSecurity             MobileDeviceSection = "SECURITY"
+	MobileDeviceSectionApplications         MobileDeviceSection = "APPLICATIONS"
+	MobileDeviceSectionEbooks               MobileDeviceSection = "EBOOKS"
+	MobileDeviceSectionNetwork              MobileDeviceSection = "NETWORK"
+	MobileDeviceSectionServiceSubscriptions MobileDeviceSection = "SERVICE_SUBSCRIPTIONS"
+	MobileDeviceSectionCertificates         MobileDeviceSection = "CERTIFICATES"
+	MobileDeviceSectionProfiles             MobileDeviceSection = "PROFILES"
+	MobileDeviceSectionUserProfiles         MobileDeviceSection = "USER_PROFILES"
+	MobileDeviceSectionProvisioningProfiles MobileDeviceSection = "PROVISIONING_PROFILES"
+	MobileDeviceSectionSharedUsers          MobileDeviceSection = "SHARED_USERS"
+	MobileDeviceSectionGroups               MobileDeviceSection = "GROUPS"
+	MobileDeviceSectionExtensionAttributes  MobileDeviceSection = "EXTENSION_ATTRIBUTES"
+)
+
+// MobileDeviceSectionValues returns every value the Jamf API accepts for MobileDeviceSection,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func MobileDeviceSectionValues() []MobileDeviceSection {
+	return []MobileDeviceSection{
+		MobileDeviceSectionGeneral,
+		MobileDeviceSectionHardware,
+		MobileDeviceSectionUserAndLocation,
+		MobileDeviceSectionPurchasing,
+		MobileDeviceSectionSecurity,
+		MobileDeviceSectionApplications,
+		MobileDeviceSectionEbooks,
+		MobileDeviceSectionNetwork,
+		MobileDeviceSectionServiceSubscriptions,
+		MobileDeviceSectionCertificates,
+		MobileDeviceSectionProfiles,
+		MobileDeviceSectionUserProfiles,
+		MobileDeviceSectionProvisioningProfiles,
+		MobileDeviceSectionSharedUsers,
+		MobileDeviceSectionGroups,
+		MobileDeviceSectionExtensionAttributes,
 	}
 }
 

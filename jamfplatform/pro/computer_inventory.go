@@ -95,11 +95,7 @@ func (c *Client) RemoveMdmProfileFromComputerV4(ctx context.Context, id string) 
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
-//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
-//     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSection constants.
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
 //     sort criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
@@ -180,11 +176,7 @@ func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string,
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV2 constants.
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
 //     sort criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
@@ -263,11 +255,7 @@ func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string,
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV4 constants.
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
 //     sort criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
@@ -348,11 +336,7 @@ func (c *Client) ListComputersInventoryV4(ctx context.Context, section []string,
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV3 constants.
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
 //     sort criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
@@ -602,11 +586,7 @@ func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]Compu
 //   - id: instance id of computer record.
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
-//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
-//     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSection constants.
 func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section []string) (*ComputerInventory, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ComputerInventory
@@ -634,11 +614,7 @@ func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section 
 //   - id: instance id of computer record.
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV2 constants.
 func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section []string) (*ComputerInventoryV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result ComputerInventoryV2
@@ -664,11 +640,7 @@ func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section 
 //   - id: instance id of computer record.
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV4 constants.
 func (c *Client) GetComputerInventoryV4(ctx context.Context, id string, section []string) (*ComputerInventoryV4, error) {
 	prefix := c.transport.APIPrefix("pro", "v4")
 	var result ComputerInventoryV4
@@ -696,11 +668,7 @@ func (c *Client) GetComputerInventoryV4(ctx context.Context, id string, section 
 //   - id: instance id of computer record.
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV3 constants.
 func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section []string) (*ComputerInventoryV3, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ComputerInventoryV3
