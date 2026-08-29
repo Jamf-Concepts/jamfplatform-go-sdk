@@ -90,7 +90,7 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpd
 
 // DeleteDevice delete a device.
 //
-// Required privileges: devices:delete.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - id: The ID of the device, in UUID format.

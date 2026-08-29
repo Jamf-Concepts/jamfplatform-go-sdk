@@ -13,7 +13,7 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"DeleteDevice":           {Method: "DeleteDevice", HTTPMethod: "DELETE", Path: "/v1/devices/{id}", Scoped: []string{"devices:delete"}, Legacy: nil},
+	"DeleteDevice":           {Method: "DeleteDevice", HTTPMethod: "DELETE", Path: "/v1/devices/{id}", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil},
 	"GetDevice":              {Method: "GetDevice", HTTPMethod: "GET", Path: "/v1/devices/{id}", Scoped: []string{"devices:read"}, Legacy: nil},
 	"ListDeviceApplications": {Method: "ListDeviceApplications", HTTPMethod: "GET", Path: "/v1/devices/{id}/applications", Scoped: []string{"devices:read"}, Legacy: nil},
 	"ListDevices":            {Method: "ListDevices", HTTPMethod: "GET", Path: "/v1/devices", Scoped: []string{"devices:read"}, Legacy: nil},

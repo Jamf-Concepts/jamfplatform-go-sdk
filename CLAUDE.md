@@ -343,6 +343,62 @@ That last row matters most: those payloads are the closest thing in the suite to
 
 **Left failing and worth reporting separately:** `DownloadIconV1` answers `500` for an icon that uploaded successfully and returned a live CDN URL (traceId `3b39c7b12ddad6175c18030c5240c501`, id 2191). `TestAcceptance_Pro_IconV1` swallows it through a skip-on-server-error branch, which is itself contrary to this file's rule about never tolerating real errors — and because a 500 on a GET is retryable, the test spends ~153 s in the retry loop before skipping.
 
+**Build v1839 (2026-08-28) — ingested, and it is three sentences of prose plus one privilege rename.** Two builds landed within four hours of v1824; hashing the 66 `external/` + `internal/stage/` specs found the whole delta in one step. Against v1824 **only `device-management-action` moved**; against v1807 (what the SDK carried) the changed families are `capi`, `devices`, `jpapi` and `device-management-action`, and `capi`/`jpapi` are byte-identical to the held v1824. **Every Security Cloud spec, all three account specs, blueprints, benchmarks, audit, ai-governance, users, device-groups and ddm/report are byte-identical to v1807** — so there was nothing for the Security Cloud ingest procedure to do beyond confirming that.
+
+What was taken, both zero-risk and both scoped exactly as predicted:
+
+- **device-actions gained three schema-level `description`s** — on `EraseDeviceRequest`, `DeviceCommandResponse` and `ApiError`. `schemaToGoType` prefers a schema's own description over its `"<Name> represents a <words>."` placeholder, so the entire Go effect is three struct godoc lines in `jamfplatform/deviceactions/types.go`. No path, schema, `required`, `enum` or privilege change in the spec.
+- **devices' `DELETE /v1/devices/{id}` moved `devices:delete` → `destructive-device-actions:execute`** — the *one* half of the v1824 privilege reformat that is separable from the removals, because the devices spec removes nothing. It is also the half the GA docs draft confirms verbatim, and `execute` is in the documented six-verb action set. Two lines of Go (`devices/permissions.go`, the `DeleteDevice` godoc) and no downstream references anywhere: `grep devices:delete` across both Terraform providers is empty.
+
+**The v1824 hold on `jpapi` and `capi` stands, re-probed against the GA host inside v1839's own build window.** A control in the same invocation, tenant credential, header scope:
+
+| endpoint | v1839 spec | wire |
+|---|---|---|
+| `GET /pro/v1/buildings` (control) | present | 200 |
+| `GET /pro/v1/api-roles` | removed | **200** |
+| `GET /pro/v1/api-integrations` | removed | **200** |
+| `GET /pro/v1/api-role-privileges` | removed | **200** |
+| `GET /proclassic/peripherals` | removed | **200** |
+| `GET /proclassic/peripheraltypes` | removed | **200** |
+| `GET /pro/v2/environment-type` | removed | 403 — never routed, no loss |
+
+So the specs still withdraw a live surface, the 75-reference provider breakage is still unpaid-for, and the gain is still documentation-only. Nothing in v1839 changes that calculus. Report the removal upstream as recorded under v1824.
+
+**A build advancing twice in an afternoon is not two ingests.** v1824 and v1839 together carry one substantive change plus three comments; the cost of finding that out was one `shasum` sweep. Diff the archives before reading anything.
+
+**The retired host now breaks every local acceptance run, and the failure does not look like a base-URL problem.** `.env.nm-test` still pointed at `https://eu.apigw.jamf.com`, which requires the `/api` segment `APIPrefix` stopped emitting on 2026-08-28 — so **every** call 404s while the token exchange still succeeds, because `/auth/token` sits at the root on both hosts. A blanket 404 with working authentication reads as a routing regression in the SDK, not as a wrong host. Repointed to `https://eu.api.jamfcloud.com` (`.bak-preGA` kept alongside) and the suite passes: `TestAcceptance_Pro_BuildingsDeleteMultipleV1`, `TestAcceptance_APIError_DeviceActions_NotFound` and all eight `TestAcceptance_DeviceGroup_*` green. Every consumer's config needs the same edit at GA, and this is the symptom they will report.
+
+**Build v1824 (2026-08-28) — HELD. The GA privilege format lands, but the same build removes 26 operations the gateway still serves.** Only three families moved from v1807 (`capi`, `devices`, `jpapi`); everything else is byte-identical, hashing confirmed in one step. **The `devices` third was ingested in v1839** — it removes nothing, so it separates cleanly; only `jpapi` and `capi` are held.
+
+**What is right about it.** The permission strings finally convert to the documented GA `{capability}:{action}` shape, replacing `{action}:pro:{resource}` across **746 pro ops and 606 Classic ops**:
+
+| old | new |
+|---|---|
+| `delete:pro:inventory-preload-records` | `inventory-preload-records:delete` |
+| `delete:pro:accounts` (Classic) | `accounts:delete` |
+| `devices:delete` on `DELETE /v1/devices/{id}` | `destructive-device-actions:execute` — taken separately in v1839, see above |
+
+pro is now **787 privileges, 100% in the two-segment form**, using exactly the documented six-verb action set — read 424, update 211, create 65, delete 58, execute 27, deploy 2. The devices change matches the GA docs draft verbatim ("destructive-device-actions:execute … erase a device, unmanage it, or remove its MDM profile"). `description` carries the same string in a `**Required Permissions:**` line, so the godoc moves with it.
+
+**Why it is held: the spec is ahead of the gateway again, the v1495 pattern.** 26 whitelisted operations vanish from the specs and every one still answers on the wire. Probed 2026-08-28 on the GA host:
+
+| endpoint | v1824 spec | wire |
+|---|---|---|
+| `GET /pro/v1/api-roles` | removed | **200**, 7 real roles |
+| `GET /pro/v1/api-integrations` | removed | **200**, 8 real integrations |
+| `GET /pro/v1/api-role-privileges` | removed | **200**, real privilege list |
+| `GET /proclassic/peripherals` | removed | **200** |
+| `GET /proclassic/peripheraltypes` | removed | **200** |
+| `GET /pro/v2/environment-type` | removed | 403 — never routed anyway, so no loss there |
+
+The removals are 15 pro ops (all of api-roles/api-integrations/api-role-privileges, plus `environment-type` and `POST /v2/mdm/commands`) and 11 Classic ops (peripherals, peripheraltypes), together with 60 pro and 4 Classic schemas. There is no mechanism to take the privileges without the removals: a whitelisted `"op"` whose path is absent fails generation hard with `path %s not found in spec`, and we do not edit specs.
+
+**Cost of ingesting now, measured rather than guessed:** 26 methods deleted, the `ApiIntegration` and `ApiRole` resolver+apply pairs gone, **75 references broken in `terraform-provider-jamfplatform`** — a whole `internal/resources/pro/api_client/` package with resource, data source, plural data source, list resource and CRUD — and the acceptance suite's credential provisioning broken in `acc_pro_security_test.go` (40 refs) and `jscProUemCredentials` (11 refs). Against that, the gain is documentation-only: per-privilege names are still not enforced anywhere, the gateway carries a product-level scope.
+
+**This is the "verify before GA rather than after" moment that the v1758 note called for**, and the answer is that the credential-management endpoints are still live. The GA docs draft says `/v1/api-roles` and `/v1/api-role-privileges` become unavailable through the gateway at GA because credential management moves to Jamf Account — so they will go, but they have not gone. When the gateway actually withdraws them, one ingest lands the removals and the privilege reformat together and the provider work can be planned rather than forced.
+
+**Report upstream:** the specs withdrew a live surface. Worth asking whether the removal is a deliberate GA withdrawal already scheduled, or a spec-generation slip — the peripherals removal in particular has nothing to do with credential management and looks like an unrelated cleanup.
+
 **Build v1807 (2026-08-28) — the `/api` segment is gone from every external spec, and pro's 34 bogus privileges are fixed upstream. Ingested, except device groups.**
 
 **The `servers` blocks caught up with the GA gateway.** Every `external/` spec now declares `https://{region}.api.jamfcloud.com/{namespace}` — no `/api`. Thirteen of the SDK's specs are **semantically identical** to what we already carried, with the `servers` URL as the only change: devices, blueprints, device-groups (Platform), device-actions, ddm/report, compliance-benchmarks, Classic, all three account specs, ai-governance, and the four stage-sourced Security Cloud specs (which are unchanged in every respect, being jamflabs-hosted). That is independent upstream confirmation of the transport change made the same day — the specs and the wire now agree that there is no `/api`. `internal/stage` and `internal/dev` still carry `/api/...`, so do not diff against those to check this.
