@@ -70,7 +70,23 @@ Struct fields are documented the same way, from each property's `description`, w
 
 ### Enum constants
 
-Every string enum in a spec becomes a Go type plus one constant per value, in a per-package `enums.go` (never `types.go` — see `partitionEnumTypes`). 364 types carrying 1602 constants (counted 2026-08-20): 211 in `pro`, 92 in `proclassic`, 26 in `securitycloud`, 15 in `blueprints`, 8 in `compliancebenchmarks`, 7 in `ddmreport`, 3 in `devicegroups`, 2 in `devices`. Treat these as point-in-time scale, not an invariant — they move with every spec ingest, and `securitycloud` was missing from this list entirely for several builds.
+Every string enum in a spec becomes a Go type plus one constant per value, in a per-package `enums.go` (never `types.go` — see `partitionEnumTypes`). **382 types carrying 1793 constants (recounted 2026-08-29)**: 204 in `pro`, 92 in `proclassic`, 32 in `securitycloud`, 15 in `blueprints`, 15 in `account`, 8 in `compliancebenchmarks`, 7 in `ddmreport`, 4 in `aigovernance`, 3 in `devicegroups`, 2 in `devices`. Treat these as point-in-time scale, not an invariant — they move with every spec ingest, and `securitycloud` was missing from this list entirely for several builds, as were `account` and `aigovernance` until this recount.
+
+#### Coverage audit (2026-08-29) — one real gap, now closed
+
+Audited by matching each spec enum's **value set** against the emitted constants rather than by predicting a type name, because a name-based check produces false positives on every acronym the generator re-cases (`Id`→`ID`, `Mdm`→`MDM`, `IdP`→`IDP`) and on `fieldRenames` (`date_type`→`data_type`). Five apparent gaps were all of that kind.
+
+| population | count | status |
+|---|---|---|
+| schema string-enums, ≥2 distinct string values | **286** | **all emitted, all value-complete** |
+| single-value sets | 29 | constants skipped by design; values in field godoc via `inlineFieldEnumValues` — verified |
+| non-string enums | 7 | constants impossible (the alias is `= string`); values in field godoc — verified |
+| parameter-only enum schemas | 40 | inline godoc lists, never types — as documented above for `section` |
+| schemas unreachable from any whitelisted op | 11 | correctly not emitted |
+
+**No value is ever silently dropped from an emitted type.** Zero missing values across all 286, zero identifier failures and zero intra-set collisions — the whole generate log carries exactly one skip line (`Deployment.State`). Note `enumConsts` *does* log per-value drops, but it silently skips a non-string or empty-string member of an otherwise-string enum; nothing in the tree hits that today, and it is the one path to check first if a set ever comes out short.
+
+**The one genuine gap was `ParentApp.RestrictedTimes`**, and it is a map-key problem rather than an enum-emission problem. The field is `map[string]TimeFrame`, which is right for the wire, but its legal keys are the `DayOfWeek` enum (`MONDAY`…`SUNDAY`) and **no Go field ever carries that type**, so no constants were emitted and the values reached callers nowhere — not even in godoc. The cause is in the spec: OpenAPI cannot constrain a map's *key* type, so the author wrote `properties: {key: {$ref: DayOfWeek}}` beside `additionalProperties: {$ref: TimeFrame}`. That pseudo-property named `key` is not a real property, the generator correctly ignores it, and `DayOfWeek` becomes unreachable. Closed with a `docNotes` entry on `ParentApp` — the field type is untouched. **Any future `additionalProperties` map whose keys are constrained by this pseudo-`key` trick will have the same gap and will not be caught by a name-based audit; match on value sets.**
 
 Two sources feed it:
 

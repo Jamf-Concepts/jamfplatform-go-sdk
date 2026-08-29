@@ -6147,6 +6147,13 @@ type PagedUserResults struct {
 }
 
 // ParentApp represents a parent app.
+// `RestrictedTimes` is keyed by day of week, and the legal keys are `MONDAY`, `TUESDAY`, `WEDNESDAY`,
+// `THURSDAY`, `FRIDAY`, `SATURDAY` and `SUNDAY`. The spec declares this as a `DayOfWeek` enum schema,
+// but reaches it through a pseudo-property literally named `key` alongside `additionalProperties` —
+// OpenAPI has no way to constrain a map's key type, so that construct is not a real property and no Go
+// field ever carries the type. The enum is therefore never emitted as constants, making this godoc the
+// only place the keys are documented. Sending an unrecognised key is silently dropped rather than
+// rejected, as everywhere else in Pro.
 type ParentApp struct {
 	AllowClearPasscode            *bool                `json:"allowClearPasscode,omitempty"`
 	AllowTemplates                *bool                `json:"allowTemplates,omitempty"`
