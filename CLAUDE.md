@@ -408,6 +408,21 @@ Updated provenance. The Security Cloud rows are still stage-sourced, and still t
 
 So ingesting `pro` deletes **17 working endpoints**, not merely most of them. That is the number to quote when this decision is revisited.
 
+**All 11 withdrawn Classic ops were probed the same way, and 11 of 11 are live — no exceptions.** Every response came from Classic itself, which is unusually easy to confirm here because Classic has its own two dialects: XML for a success, a Tomcat HTML status page for an error. Neither can be confused with the gateway's compact JSON `BAD_PERMISSIONS` or its plain-text `404 page not found` for an unknown namespace.
+
+| op(s) | probe result | verdict |
+|---|---|---|
+| `GET /peripherals`, `GET /peripheraltypes` | **200**, `<size>0</size>` | live |
+| `GET`/`PUT`/`DELETE /peripherals/id/{id}` | 404 Tomcat HTML on a bogus id | live |
+| `GET /peripherals/id/{id}/subset/General` | 404 Tomcat HTML | live |
+| `POST /peripherals/id/{id}` | 400 Tomcat HTML on malformed XML | live |
+| `GET`/`PUT`/`DELETE /peripheraltypes/id/{id}` | 404 Tomcat HTML | live |
+| `POST /peripheraltypes/id/{id}` | 400 Tomcat HTML | live |
+
+The 404s are an empty tenant and the 400s the deliberately-malformed body; neither is a routing signal. **Malformed XML is the right probe for a Classic write**: it is rejected at parse time, before anything can be created, so a POST's routing is provable without mutating the tenant.
+
+**So across both held specs, 28 of the 29 withdrawn methods are live** — 17 of 18 in pro, 11 of 11 in Classic — and the single exception, `GET /v2/environment-type`, was never routed. That is the whole cost of ingesting, and Classic's half of it has nothing to do with the credential-management withdrawal that motivates the pro half.
+
 **Server bug found while probing, worth reporting separately:** `POST /v2/mdm/commands` with a body of `{}` answers **`500` with an empty `errors` array**, while `{"clientData":[],"commandData":{}}` correctly answers `400 INVALID_FIELD`. A missing required body should be a validation error, not a 500 — the same shape of fault as uem-connect's missing `authStrategy`.
 
 **`routes.yaml` settles the question the v1824 note left open, and the answer is "deliberate".** It omits every one of the withdrawn paths while granting permissions to everything else, so two independently-generated artefacts in the same build agree that this surface is going. It is not a spec-generation slip. What is wrong is the *timing*: the specs and the permission map have both dropped a surface the gateway still serves, so ingesting still deletes 29 working methods and still breaks ~75 references in `terraform-provider-jamfplatform`, for a documentation-only gain. Report the sequencing, not the intent — and note the peripherals removal still has nothing to do with credential management, so it remains an unexplained cleanup riding along.
