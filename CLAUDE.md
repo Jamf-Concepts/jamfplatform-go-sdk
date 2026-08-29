@@ -392,6 +392,24 @@ Updated provenance. The Security Cloud rows are still stage-sourced, and still t
 | `GET /proclassic/peripheraltypes` | removed | **200** |
 | `GET /pro/v2/environment-type` | removed | 403 — never routed, no loss |
 
+**All 18 withdrawn pro ops were probed individually on 2026-08-29, and 17 of them are live.** The earlier note here said "6 of 7", which was a 7-op sample, not the population. Bogus IDs (`99999999`) and invalid bodies (`{}`) were used so routing is exercised without mutating anything — a non-200 from a deliberately-bad request still proves the path is routed, and the layer is readable from the body formatting (Jamf Pro pretty-prints; the gateway emits compact JSON):
+
+| op(s) | probe result | verdict |
+|---|---|---|
+| `GET /v1/api-roles`, `/v1/api-role-privileges`, `/v1/api-integrations`, `/v2/account-preferences` | **200**, real data | live |
+| `GET /v1/api-role-privileges/search?name=Read` | **200**, real privilege list | live — a bare call 400s for want of a query param, which is not a routing signal |
+| `GET`/`PUT`/`DELETE /v1/api-roles/{id}` | 404 on a bogus id | live |
+| `GET`/`PUT`/`DELETE /v1/api-integrations/{id}`, `POST …/client-credentials` | 404 / 400 `INVALID_*` | live |
+| `POST /v1/api-roles`, `POST /v1/api-integrations` | 400 on `{}` | live |
+| `PATCH /v2/account-preferences` | 400 `INVALID_FIELD` on a bogus field | live |
+| `POST /v1/oidc/dispatch` | 400 on `{}` | live |
+| `POST /v2/mdm/commands` | 400 `INVALID_FIELD` well-formed; 404 `NOT_FOUND` on a bogus `managementId` | live |
+| `GET /v2/environment-type` | **403, compact gateway body** | **never routed — the only one, and no loss on removal** |
+
+So ingesting `pro` deletes **17 working endpoints**, not merely most of them. That is the number to quote when this decision is revisited.
+
+**Server bug found while probing, worth reporting separately:** `POST /v2/mdm/commands` with a body of `{}` answers **`500` with an empty `errors` array**, while `{"clientData":[],"commandData":{}}` correctly answers `400 INVALID_FIELD`. A missing required body should be a validation error, not a 500 — the same shape of fault as uem-connect's missing `authStrategy`.
+
 **`routes.yaml` settles the question the v1824 note left open, and the answer is "deliberate".** It omits every one of the withdrawn paths while granting permissions to everything else, so two independently-generated artefacts in the same build agree that this surface is going. It is not a spec-generation slip. What is wrong is the *timing*: the specs and the permission map have both dropped a surface the gateway still serves, so ingesting still deletes 29 working methods and still breaks ~75 references in `terraform-provider-jamfplatform`, for a documentation-only gain. Report the sequencing, not the intent — and note the peripherals removal still has nothing to do with credential management, so it remains an unexplained cleanup riding along.
 
 **Device groups: ingested, and the deprecated v1 surface is fully retained.** The four-build hold (v1700, v1725, v1807) is lifted at the maintainer's direction, with the successor whitelisted so the deprecation marker names something that exists in Go. What the ingest took:
