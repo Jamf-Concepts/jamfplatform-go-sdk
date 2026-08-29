@@ -285,7 +285,7 @@ The `-beta` spec variants inject `/tenant/{tenantId}` but never the `betaApiConf
 
 Also re-verified on EU (2026-08-20): the tenant segment must be the tenant **UUID**. The tenant *name* returns `400 REQUEST_CONTEXT_NOT_PROVIDED` and another organisation's tenant ID returns `403 OWNERSHIP_FORBIDDEN` — so a failing tenant segment is distinguishable from both an unrouted path and a privilege failure, all three of which used to look alike.
 
-**Spec provenance: the GitOps build only, `-beta` variants only.** `internal/stage/*-beta`, or `external/*-beta` where a spec is published to prod. Those are the only variants carrying the `/api/securitycloud` namespace, tenant-scoped paths and `x-required-privileges`; the non-beta variants declare a per-service namespace (`/api/securitycloud-devices`) the gateway does not have, and answer `404 page not found`.
+**Spec provenance: the GitOps build only. Superseded for builds from v1865 on — the `-beta` directories no longer exist; see Build v1865 below for the current mapping. The rule as it stood through v1839 was `-beta` variants only.** `internal/stage/*-beta`, or `external/*-beta` where a spec is published to prod. Those are the only variants carrying the `/api/securitycloud` namespace, tenant-scoped paths and `x-required-privileges`; the non-beta variants declare a per-service namespace (`/api/securitycloud-devices`) the gateway does not have, and answer `404 page not found`.
 
 **The build's directory names for these specs are not stable.** Build v1401 renamed `securitycloud-dns` → `jsc-dns`, `securitycloud-ztna` → `jsc-ztna`, `securitycloud-categories` → `jsc-categories`; `uem-connect` and `securitycloud-devices` kept theirs. A name-keyed ingest step finds nothing and reports "no changes" rather than failing, so map source → destination by the spec's `info.title` and path set, not by directory name. Current mapping:
 
@@ -299,7 +299,7 @@ Also re-verified on EU (2026-08-20): the tenant segment must be the tenant **UUI
 
 Note the last row's mismatch: the file is named for the *tag* (`device-groups`) but the spec is the **Security Cloud Devices API**, whose only whitelisted operations are the group ones. `internal/stage/device-groups-beta` is the unrelated *Platform* Device Groups API — diffing against that produces 800 lines of noise and, if copied, silently replaces the spec.
 
-Builds v1416 through v1807 kept every one of these directory names, so the renaming is episodic rather than per-build — check, don't assume either way. No Security Cloud spec has moved into `external/` since; the four stage rows are still stage-sourced as of v1807, and their specs are byte-identical across the whole run.
+Builds v1416 through v1839 kept every one of these directory names, so the renaming is episodic rather than per-build — check, don't assume either way. **v1865 renamed all five by dropping the `-beta` suffix** (`jsc-dns-beta` → `jsc-dns`, and so on), keeping the beta *content* byte-identical; the table above is therefore the v1839-and-earlier mapping, and the v1865 section below carries the current one. No Security Cloud spec has moved into `external/`; the four stage rows are still stage-sourced as of v1865, and their specs are byte-identical across the whole run from v1582.
 
 Stage vs dev differ only in `info.title`, the `servers`/`tokenUrl` host, and an `x-generated`/`x-debug` block dev carries and stage does not. Take stage. Build v1401 also moved the beta hosts from `{region}.stage.apigw.jamfnebula.com` (us/eu/apac) to `{region}.api.stage.platform.jamflabs.com` (us1 only) — ingested verbatim because these specs are upstream mirrors, but it means the `servers` block in the published `api/*.json` names a labs stage host that is not the `{region}.apigw.jamf.com` prod gateway the SDK actually calls. Cosmetic for the SDK; worth reporting upstream rather than patching locally.
 
@@ -342,6 +342,73 @@ That last row matters most: those payloads are the closest thing in the suite to
 **No SDK change was needed and none should be added.** Do not try to placate a WAF by reshaping the multipart body or escaping plist content — the trigger is the caller's own file, Classic's API contract *is* XML, and the transport already surfaces the CloudFront HTML correctly as an `*APIResponseError` with `Body` set. Note for whoever debugs the next one: an edge block carries `server: CloudFront`, `x-cache: Error from cloudfront` and an `x-amz-cf-id`, and **no Jamf `traceId`** — because the request never reached Jamf, there is nothing in Jamf's logs to correlate, and the `x-amz-cf-id` is the only handle the AWS-side WAF log lookup has.
 
 **Left failing and worth reporting separately:** `DownloadIconV1` answers `500` for an icon that uploaded successfully and returned a live CDN URL (traceId `3b39c7b12ddad6175c18030c5240c501`, id 2191). `TestAcceptance_Pro_IconV1` swallows it through a skip-on-server-error branch, which is itself contrary to this file's rule about never tolerating real errors — and because a 500 on a GET is retryable, the test spends ~153 s in the retry loop before skipping.
+
+**Build v1865 (2026-08-29) — the bundle restructures for GA and ships a permission oracle. Nothing to ingest: 15 of the SDK's 18 specs are semantically identical to what it already carries.**
+
+**Two structural changes, and the first one silently breaks a name-keyed ingest.** Every `-beta` directory is gone. The bundle now ships one spec per family under its plain name, and **the surviving spec is the beta content**: v1865's `external/devices/openapi.yaml` is byte-identical to v1839's `external/devices-beta/openapi.yaml`, and the same holds for 18 of 21 families. The two double-suffixed oddities resolved the same way — `compliance-benchmarks` is v1839's `compliance-benchmarks-beta-beta` and `jsc-api-gateway` is `jsc-api-gateway-beta-beta`, both byte-identical. So the whole `-beta`-variants-only rule recorded above for Security Cloud is now a rule about directory names that no longer exist. The counts drop accordingly: 27 → 15 `external/`, 39 → 21 in each of `internal/stage` and `internal/dev`, and the archive is 2.1 MB against v1839's 3.86 MB. **A 45% smaller archive is the tell to check first** — an ingest step keyed on `*-beta` finds nothing and reports "no changes", which is the same silent failure the v1401 renames caused, in the same package.
+
+Updated provenance. The Security Cloud rows are still stage-sourced, and still the same bytes:
+
+| `testing/` file | v1865 source |
+|---|---|
+| `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` |
+| `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` |
+| `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories` |
+| `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` |
+| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` |
+
+**Second: a new `_permissions/` directory carrying `routes.yaml` and `scopes.yaml` — this is the artefact the v1758 note said to get before attempting a corrected privilege ingest.** It is per-environment, sitting alongside the specs.
+
+- **`scopes.yaml` is the capability catalogue**: 112 capabilities under `environment` plus one under `organization` (`audit`), each listing its legal actions. The action vocabulary is exactly the documented six — read 104, update 86, delete 61, create 60, execute 6, deploy 3.
+- **`routes.yaml` is the route → permission map**: 843 routes across 18 domain blocks, `pro` alone carrying 489 and `proclassic` 273.
+
+**The pair is exactly self-consistent, which is what makes it trustworthy: 320 permission strings declared in `scopes.yaml`, 320 distinct strings used by `routes.yaml`, zero orphans in either direction.** That is a machine-generated pair with one source of truth behind it, not two hand-maintained documents — so it can be used as an oracle in a way no single spec can.
+
+**It vindicates every correction the v1758 note argued for, verbatim.** The privileges that build derived from path tails now resolve to real capabilities:
+
+| endpoint | v1758 spec (wrong) | `routes.yaml` |
+|---|---|---|
+| `GET /v4/computers-inventory/{id}/filevault` | `read:env:filevault` | **`disk-encryption-recovery-key:read`** |
+| `POST /v4/computers-inventory/{id}/erase` | `create:env:erase` | **`destructive-device-actions:execute`** |
+| `GET /v2/smtp-server/allowed-auth-types` | `read:env:allowed-auth-types` | **`smtp-server:read`** |
+| `DELETE /v1/devices/{id}` | `devices:delete` | `destructive-device-actions:execute` — already ingested in v1839 |
+
+`disk-encryption-recovery-key` is a capability in its own right in `scopes.yaml`, so the concern that a deliberately separate sensitive privilege had been collapsed into a URL word was correct and is now fixed upstream.
+
+**And the specs themselves now agree with it, with zero disagreements.** Every `x-required-privileges` string in v1865's `jpapi`, `capi`, `devices` and `device-management-action` is in `{capability}:{action}` form — 787 pro, 627 Classic, 6 devices, 5 device-actions, **0 in any other format** — and every one matches `routes.yaml` on the routes the two share (746 pro, 606 Classic, 6, 5; **0 disagreements**). The 44 pro ops absent from `routes.yaml` are exactly the 44 that declare no `x-required-privileges` in the spec either (`/v1/health-check`, `/v1/dashboard`, `/startup-status`, `/v1/icon`, …), so the two artefacts agree about the silence too.
+
+**One inconsistency worth reporting: `routes.yaml` types 11 domains as `tenant` — `pro`, `proclassic`, `blueprints`, `compliance-benchmarks`, `ddm/report`, `devices`, `device-groups`, `device-actions`, `securitycloud`, `users`, `inventory-api` — and `scopes.yaml` has no `tenant` key at all.** So a consumer asking "what can a tenant-scoped integration be granted?" has nowhere to look, even though the capabilities those tenant routes reference (`buildings`, `devices`, `ztna`, …) are all present under `environment`. Either `scopes.yaml` should carry a `tenant` block or the tenant domains should be typed `environment`; as shipped, the scope taxonomy does not close.
+
+**The hold on `jpapi` and `capi` stands, and the withdrawal grew.** v1865 removes 4 more pro ops than v1839 did — `GET`/`PATCH /v2/account-preferences`, `POST /v1/oidc/dispatch` and `GET /v1/macos-managed-software-updates/available-updates` — taking the whitelisted casualties to **18 pro + 11 Classic = 29 SDK methods**, up from 26. Re-probed 2026-08-29 on both the EU and US sandbox tenants, control in the same invocation:
+
+| endpoint | v1865 spec | wire |
+|---|---|---|
+| `GET /pro/v1/buildings` (control) | present | 200 |
+| `GET /pro/v1/api-roles` | removed | **200**, 7 roles |
+| `GET /pro/v1/api-integrations` | removed | **200**, 8 integrations |
+| `GET /pro/v1/api-role-privileges` | removed | **200** |
+| `GET /pro/v2/account-preferences` | **newly removed** | **200** |
+| `GET /proclassic/peripherals` | removed | **200** |
+| `GET /proclassic/peripheraltypes` | removed | **200** |
+| `GET /pro/v2/environment-type` | removed | 403 — never routed, no loss |
+
+**`routes.yaml` settles the question the v1824 note left open, and the answer is "deliberate".** It omits every one of the withdrawn paths while granting permissions to everything else, so two independently-generated artefacts in the same build agree that this surface is going. It is not a spec-generation slip. What is wrong is the *timing*: the specs and the permission map have both dropped a surface the gateway still serves, so ingesting still deletes 29 working methods and still breaks ~75 references in `terraform-provider-jamfplatform`, for a documentation-only gain. Report the sequencing, not the intent — and note the peripherals removal still has nothing to do with credential management, so it remains an unexplained cleanup riding along.
+
+**The device-groups hold stands for the fourth build running (v1700, v1725, v1807, v1865), and this time it was probed properly.** `PUT /v2/groups/{groupId}` is still not routed. Wire-probed 2026-08-29 with the Security Cloud credential, on a throwaway group created and deleted by the probe:
+
+| request | result |
+|---|---|
+| `PUT /securitycloud/v2/groups/{real-id}` | **`403 BAD_PERMISSIONS`**, 4/4 attempts |
+| `PUT /securitycloud/v2/groups/{bogus-uuid}` | **`403 BAD_PERMISSIONS`**, 3/3 attempts |
+| `PUT /securitycloud/v1/groups/{real-id}` | **200** with the `Group` body — renamed successfully |
+| `PUT /securitycloud/v1/groups/{bogus-uuid}` | `404 GROUP_NOT_FOUND`, `field: groupId` |
+| `GET /securitycloud/v1/groups` / `/v2/groups` | 200 bare array / 200 `{groups:[…]}` |
+
+**A methodological warning from this probe, because it nearly produced a false positive.** The first attempt returned **500 `INTERNAL_SERVER_ERROR` on both v1 and v2**, which reads as "v2 is now routed and merely faulting" — the opposite of the truth. Repeating each request 3–4 times showed the 500s were transient and the steady state is 403 on v2, 200/404 on v1. A single probe of a routing question is not evidence; the unrouted tell here is a *repeated* `403 BAD_PERMISSIONS`, and a one-off 5xx from these services must be re-run before it is believed.
+
+Also re-confirmed in the same probe: `PUT /v1/groups/{id}` really does answer **200 with a `Group` body**, which is what the config's `expectedStatus: 200` + `responseType: Group` override exists for — and v1865's spec now declares 200 as well, so **both keys must be deleted in the same change that finally ingests this spec.**
+
+**Not probeable from the Jamf Pro credential, and the failure is indistinguishable from the real thing.** A pro tenant credential answers `403 BAD_PERMISSIONS` on `/securitycloud/v1/groups` *and* `/v2/groups` alike — the same body the unrouted v2 path gives. So a device-groups routing probe run on the wrong credential set concludes "still unrouted" no matter what the gateway is doing. Use the Security Cloud credential, and keep a v1 control in the same invocation to prove the credential reaches the product at all.
 
 **Build v1839 (2026-08-28) — ingested, and it is three sentences of prose plus one privilege rename.** Two builds landed within four hours of v1824; hashing the 66 `external/` + `internal/stage/` specs found the whole delta in one step. Against v1824 **only `device-management-action` moved**; against v1807 (what the SDK carried) the changed families are `capi`, `devices`, `jpapi` and `device-management-action`, and `capi`/`jpapi` are byte-identical to the held v1824. **Every Security Cloud spec, all three account specs, blueprints, benchmarks, audit, ai-governance, users, device-groups and ddm/report are byte-identical to v1807** — so there was nothing for the Security Cloud ingest procedure to do beyond confirming that.
 
@@ -397,7 +464,7 @@ The removals are 15 pro ops (all of api-roles/api-integrations/api-role-privileg
 
 **This is the "verify before GA rather than after" moment that the v1758 note called for**, and the answer is that the credential-management endpoints are still live. The GA docs draft says `/v1/api-roles` and `/v1/api-role-privileges` become unavailable through the gateway at GA because credential management moves to Jamf Account — so they will go, but they have not gone. When the gateway actually withdraws them, one ingest lands the removals and the privilege reformat together and the provider work can be planned rather than forced.
 
-**Report upstream:** the specs withdrew a live surface. Worth asking whether the removal is a deliberate GA withdrawal already scheduled, or a spec-generation slip — the peripherals removal in particular has nothing to do with credential management and looks like an unrelated cleanup.
+**Report upstream:** the specs withdrew a live surface. **Answered in v1865: deliberate.** That build's `routes.yaml` omits every withdrawn path while granting permissions to everything else, so two independently-generated artefacts agree the surface is going — what is wrong is the sequencing, since the gateway still serves it. The peripherals removal still has nothing to do with credential management and remains an unexplained cleanup riding along.
 
 **Build v1807 (2026-08-28) — the `/api` segment is gone from every external spec, and pro's 34 bogus privileges are fixed upstream. Ingested, except device groups.**
 
@@ -487,7 +554,7 @@ So there are three forms in play, and only one is right:
 - `Read Computer Inventory` → **`devices:read`**. So `GET /v4/computers-inventory` should be `devices:read`, not `read:env:computers-inventory`.
 - **`destructive-device-actions:execute`** is documented as granting *"Erase a device, unmanage it, or remove its MDM profile"* — exactly `POST /v4/computers-inventory/{id}/erase` and `.../remove-mdm-profile`, which the spec now labels `create:env:erase` and `create:env:remove-mdm-profile`. Note `execute` exists in the action set precisely for this, so the spec gets the action wrong as well as the capability.
 
-**The oracle question is answered too, in both directions.** `GET /v1/api-role-privileges` is not an oracle — and the doc explains why it never will be: `/v1/api-roles` and `/v1/api-role-privileges` are **unavailable through the gateway** at GA, because credential management moved to Jamf Account. The real reference is the doc's own **Jamf Pro permissions map** article (old privilege name → capability), which is exactly the artefact needed to re-derive all 34 properly. **Get that article and the full capability list before attempting a corrected ingest** — do not hand-guess capability names from paths, which is the error being reported.
+**The oracle question is answered too, in both directions.** `GET /v1/api-role-privileges` is not an oracle — and the doc explains why it never will be: `/v1/api-roles` and `/v1/api-role-privileges` are **unavailable through the gateway** at GA, because credential management moved to Jamf Account. The real reference is the doc's own **Jamf Pro permissions map** article (old privilege name → capability), which is exactly the artefact needed to re-derive all 34 properly. **Get that article and the full capability list before attempting a corrected ingest** — do not hand-guess capability names from paths, which is the error being reported. **Both arrived in build v1865 as `_permissions/routes.yaml` + `scopes.yaml`, and they confirm all four corrections predicted here; see Build v1865 above.**
 
 **Consequence for the acceptance suite, not yet acted on:** CLAUDE.md's gateway-bypass technique and `jscProUemCredentials` both provision an API role and client through `POST /api/pro/v1/api-roles` + `api-integrations`. If those endpoints go at GA, that provisioning breaks and the UEM Connect create test loses its credential source. Verify before GA rather than after.
 
