@@ -343,6 +343,34 @@ That last row matters most: those payloads are the closest thing in the suite to
 
 **Left failing and worth reporting separately:** `DownloadIconV1` answers `500` for an icon that uploaded successfully and returned a live CDN URL (traceId `3b39c7b12ddad6175c18030c5240c501`, id 2191). `TestAcceptance_Pro_IconV1` swallows it through a skip-on-server-error branch, which is itself contrary to this file's rule about never tolerating real errors — and because a 500 on a GET is retryable, the test spends ~153 s in the retry loop before skipping.
 
+### Where a per-path 403 actually comes from (checked in `tyk-gateway-management`, 2026-08-29)
+
+**Nothing merged or pending in `tyk-gateway-management` changes either the pro/Classic withdrawal or the device-groups `/v2` gap, and it never could: tyk does not route these per path.** Checked against `origin/master` (`92c06467`) and all 31 open PRs.
+
+- **`grep` for `api-roles`, `api-integrations`, `peripheral`, `account-preferences`, `oidc/dispatch`, `environment-type` across the whole repo returns nothing.** Tyk has no opinion about any withdrawn path.
+- **pro, proclassic and securitycloud are all catch-all proxies.** `listen_path: /api/pro/`, `/api/proclassic/`, `/api/securitycloud/`, each `strip_listen_path: true`, one `url_rewrite` apiece, no `white_list`, product-level `scopes` (`jamf-pro-product`, `securitycloud-product`). The `audit.rules` globs in the securitycloud definition are **audit** rules, as recorded above — not routing.
+- **The per-path decision is made by an external authorization service**, called from `plugins/authz-plugin/plugin/handler.go`: `CheckAuthorization(ctx, apiConfig.AuthorizationServiceUrl, &permissionData)`, and `if !result.Decision` returns `403 BAD_PERMISSIONS` with *"The given token was not authorized to access the requested resource."* — the exact body every unrouted-looking path returns. So **"the gateway keeps a per-path allowlist"**, as this file has said elsewhere, **is right about the behaviour and wrong about the mechanism**: the allowlist lives in that service, which is in neither `tyk-gateway-management` nor `tyk-custom-plugins`, and is not readable from either.
+
+**Consequence for the device-groups hold: the blocker is in the authorization service, and the published `routes.yaml` is ahead of it.** `routes.yaml` *does* list `PUT /v2/groups/{groupId}` → `device-groups:update`, and prod securitycloud tyk config contains no `/v2/groups` rule of any kind (last touched 2026-08-25, `88be6926`) — but since tyk is a catch-all, that absence is not the cause either. The deployed authorization service simply has not been given the route. **No tyk change will fix it**, so do not wait on one or file it there.
+
+**Audit moved forward, and this is the one thing in the gateway that did change.** Prod commit `3e99c347` (2026-08-28, *"TRIVIAL Audit Service is Environment scoped only"*, all three regions plus dev and stage) edited `platform-audit-service`:
+
+| key | before | after |
+|---|---|---|
+| `request-context-allowed-sources` | `[token, path]` | **`[token, path, header]`** |
+| `request-context-types` | `[environment, organization]` | **`[environment]`** |
+
+Both halves of the diagnosis recorded in the audit section above are addressed: `header` is now an allowed source, and the type list is down to one entry. Wire-tested 2026-08-29 with an environment credential, control in the same invocation (`GET /blueprints/v1/blueprints` → 200):
+
+| request | before | now |
+|---|---|---|
+| `GET /audit/v1/events` + `X-Environment-Id` | `400 REQUEST_CONTEXT_NOT_PROVIDED` | **`403 BAD_PERMISSIONS`** |
+| `GET /audit/v1/events`, no scope header | `400 REQUEST_CONTEXT_NOT_PROVIDED` | `400 REQUEST_CONTEXT_NOT_PROVIDED` |
+
+So the request-context half is **fixed** — the header is accepted and the context resolves — and the remaining 403 is authorization, exactly as that section predicted. **What audit now needs is a credential granted `audit:read`** (the capability `scopes.yaml` lists under both `environment` and `organization`), not an SDK change and not a gateway change. Re-probe when such a credential exists; the `[environment]`-only type list means the environment header is now the shape to use, so the path-scoping workaround this file warned against building is still not needed.
+
+**A trap that cost a wrong answer here: a stale local checkout of `tyk-gateway-management` shows the old config and looks authoritative.** The working tree was 4 commits behind and reported audit as `[token, path]` / `[environment, organization]` — the pre-change state — with no indication anything was missing. `git show origin/master:<path>` after a fetch, not the working tree, when the question is "what is deployed".
+
 **Build v1865 (2026-08-29) — the bundle restructures for GA and ships a permission oracle. Ingested except `jpapi` and `capi`: 15 of the SDK's 18 specs are semantically identical to what it already carried, so device groups was the only spec with anything to take.**
 
 **Two structural changes, and the first one silently breaks a name-keyed ingest.** Every `-beta` directory is gone. The bundle now ships one spec per family under its plain name, and **the surviving spec is the beta content**: v1865's `external/devices/openapi.yaml` is byte-identical to v1839's `external/devices-beta/openapi.yaml`, and the same holds for 18 of 21 families. The two double-suffixed oddities resolved the same way — `compliance-benchmarks` is v1839's `compliance-benchmarks-beta-beta` and `jsc-api-gateway` is `jsc-api-gateway-beta-beta`, both byte-identical. So the whole `-beta`-variants-only rule recorded above for Security Cloud is now a rule about directory names that no longer exist. The counts drop accordingly: 27 → 15 `external/`, 39 → 21 in each of `internal/stage` and `internal/dev`, and the archive is 2.1 MB against v1839's 3.86 MB. **A 45% smaller archive is the tell to check first** — an ingest step keyed on `*-beta` finds nothing and reports "no changes", which is the same silent failure the v1401 renames caused, in the same package.
@@ -425,7 +453,11 @@ The 404s are an empty tenant and the 400s the deliberately-malformed body; neith
 
 **Server bug found while probing, worth reporting separately:** `POST /v2/mdm/commands` with a body of `{}` answers **`500` with an empty `errors` array**, while `{"clientData":[],"commandData":{}}` correctly answers `400 INVALID_FIELD`. A missing required body should be a validation error, not a 500 — the same shape of fault as uem-connect's missing `authStrategy`.
 
-**`routes.yaml` settles the question the v1824 note left open, and the answer is "deliberate".** It omits every one of the withdrawn paths while granting permissions to everything else, so two independently-generated artefacts in the same build agree that this surface is going. It is not a spec-generation slip. What is wrong is the *timing*: the specs and the permission map have both dropped a surface the gateway still serves, so ingesting still deletes 29 working methods and still breaks ~75 references in `terraform-provider-jamfplatform`, for a documentation-only gain. Report the sequencing, not the intent — and note the peripherals removal still has nothing to do with credential management, so it remains an unexplained cleanup riding along.
+**`routes.yaml` does NOT corroborate the withdrawal, and an earlier version of this note wrongly said it did.** The retracted claim was that `routes.yaml` omitting the withdrawn paths made it a second, independent artefact agreeing the surface is going. It is not independent: **`routes.yaml` is generated from the specs' own `x-required-privileges`**, so its omission of a path the spec removed is tautological. The evidence is that the two match exactly and fail together — 0 disagreements across 1352 shared routes, and the 44 pro ops absent from `routes.yaml` are precisely the 44 that declare no privilege in the spec.
+
+**Proven, not merely argued: absence from `routes.yaml` does not cause a refusal.** Twelve pro GETs that are absent from it (`/startup-status`, `/v1/dashboard`, `/v1/health-check`, `/v1/jamf-pro-version`, `/v1/locales`, `/v1/cloud-information`, …) were probed on 2026-08-29 and **all twelve answer 200/204**. So a missing route entry is not the mechanism behind any 403, and `routes.yaml` cannot be read as the deployed authorization table. It is published documentation derived from the specs.
+
+That leaves v1824's question **open**: nothing in the bundle or the gateway config says whether the removal is a scheduled GA withdrawal or a spec-generation slip. What is certain is unchanged — the specs drop a surface the gateway still serves, so ingesting deletes 28 working methods (17 pro + 11 Classic) and breaks ~75 references in `terraform-provider-jamfplatform` for a documentation-only gain. Report it, and note the peripherals removal still has nothing to do with credential management, so it remains an unexplained cleanup riding along.
 
 **Device groups: ingested, and the deprecated v1 surface is fully retained.** The four-build hold (v1700, v1725, v1807) is lifted at the maintainer's direction, with the successor whitelisted so the deprecation marker names something that exists in Go. What the ingest took:
 
@@ -504,7 +536,7 @@ The removals are 15 pro ops (all of api-roles/api-integrations/api-role-privileg
 
 **This is the "verify before GA rather than after" moment that the v1758 note called for**, and the answer is that the credential-management endpoints are still live. The GA docs draft says `/v1/api-roles` and `/v1/api-role-privileges` become unavailable through the gateway at GA because credential management moves to Jamf Account — so they will go, but they have not gone. When the gateway actually withdraws them, one ingest lands the removals and the privilege reformat together and the provider work can be planned rather than forced.
 
-**Report upstream:** the specs withdrew a live surface. **Answered in v1865: deliberate.** That build's `routes.yaml` omits every withdrawn path while granting permissions to everything else, so two independently-generated artefacts agree the surface is going — what is wrong is the sequencing, since the gateway still serves it. The peripherals removal still has nothing to do with credential management and remains an unexplained cleanup riding along.
+**Report upstream:** the specs withdrew a live surface. **Still unanswered** — an earlier edit here claimed v1865's `routes.yaml` settled it as deliberate; that was wrong, because `routes.yaml` is generated from the specs and so cannot corroborate them (see Build v1865 above). The peripherals removal still has nothing to do with credential management and remains an unexplained cleanup riding along.
 
 **Build v1807 (2026-08-28) — the `/api` segment is gone from every external spec, and pro's 34 bogus privileges are fixed upstream. Ingested, except device groups.**
 
