@@ -159,7 +159,7 @@ Both forms answered 200 during the transition — wire-verified across EU securi
 
 **The two options are alternatives, not aliases: the header must match the credential.** An integration is minted against one scope, and crossing them over is refused with `403 OWNERSHIP_FORBIDDEN` even when both IDs belong to the same customer — an environment credential sending `X-Tenant-Id` gets *"Tenant 'x' is not part of your organization"*, and a tenant credential sending `X-Environment-Id` gets the mirror-image message. A client carries exactly one scope; setting both options means the last one wins. Wire-verified 2026-08-25 and pinned by `TestAcceptance_EnvironmentScopeMismatch`, which asserts *both* directions — the mismatch is the half worth testing, because it is what stops a consumer treating the options as interchangeable spellings.
 
-Environment scope reaches the same surface a tenant credential does: read-only probes with an environment-scoped credential returned real data from `blueprints`, `devices`, `pro` (server URL, categories, buildings), `proclassic` (sites) and `securitycloud` (gateways, zones, categories) on 2026-08-25. No spec this SDK generates *declares* `X-Environment-Id` — every one declares `X-Tenant-Id` — so the option exists for consumers who hold an environment credential rather than to satisfy any operation.
+Environment scope reaches the same surface a tenant credential does: read-only probes with an environment-scoped credential returned real data from `blueprints`, `devices`, `pro` (server URL, categories, buildings), `proclassic` (sites) and `securitycloud` (gateways, zones, categories) on 2026-08-25. `audit` is the **one** spec this SDK generates that declares `X-Environment-Id` (all four operations, `$ref`'d as a component parameter, and its prose names the header explicitly); every other spec declares `X-Tenant-Id`. So for the rest, the option exists for consumers who hold an environment credential rather than to satisfy any operation.
 
 A caution learned while establishing this, worth repeating for any future scope probe: tokens live **900 seconds**, and a rejected token gives the same plain-text `401 Authentication failed` as a credential with no policy for the api-product. Two rounds of probing were reported wrongly — once from a cached expired token, once from a broken shell helper — before a known-good positive control in the *same* invocation showed the harness, not the API, was at fault. Mint the token and run the control in one command, and never conclude from 401s alone.
 
@@ -227,6 +227,32 @@ Wire-verified 2026-08-27 with an environment credential: `ListPolicies` walked i
 The 404 is the useful probe: it proves the `PathProvider` regex (`/(tenant|environment|organization)/<uuid>` anywhere in the path) matches and the ID is really looked up, so the **path form is live and correctly shaped** — the remaining 403 is authorization, i.e. the credential lacks `read:org:audit`/`read:env:audit`.
 
 So audit needs one of two things, and **the upstream fix is the better one**: audit should declare `[organization]` like every other external-M2M API, or the plugin fallback should handle the multi-type case. Report it. The SDK workaround would be to reintroduce path scoping for the `audit` namespace alone — the mechanism deliberately deleted at GA — which is not worth building against a 403 that a one-line gateway change removes. **Do not add it speculatively.** Until then the audit package compiles and is unusable, which is the honest state; when a credential with the audit privileges exists, re-probe the path form first, because that is the only shape with any evidence behind it.
+
+**RESOLVED IN PART 2026-08-29: audit is now environment-scoped only, the header is accepted, and the sole remaining blocker is a missing `audit:read` grant.** Prod `tyk-gateway-management` commit `3e99c347` (2026-08-28, *"TRIVIAL Audit Service is Environment scoped only"*, all three prod regions plus dev and stage) changed `platform-audit-service`:
+
+| key | before | after |
+|---|---|---|
+| `request-context-allowed-sources` | `[token, path]` | **`[token, path, header]`** |
+| `request-context-types` | `[environment, organization]` | **`[environment]`** |
+
+Both halves of the diagnosis above are addressed — `header` is allowed, and the multi-type list that stopped the plugin's em2m fallback is down to one entry. The table above is therefore **superseded**. Re-probed 2026-08-29 on the real paths (`/v1/audit`, not the `/v1/events` an earlier probe guessed), each with a passing control in the same invocation:
+
+| credential | request | result |
+|---|---|---|
+| environment (eu) | `GET /blueprints/v1/blueprints` (control) | 200 |
+| environment (eu) | `GET /audit/v1/audit` + `X-Environment-Id` | **`403 BAD_PERMISSIONS`** |
+| environment (eu) | `GET /audit/v1/audit/sources` + `X-Environment-Id` | **`403 BAD_PERMISSIONS`** |
+| organization (us) | `GET /licensing/v1/licenses` (control) | 200 |
+| organization (us) | `GET /audit/v1/audit`, no header | `400 REQUEST_CONTEXT_NOT_PROVIDED` |
+| organization (us) | `GET /audit/v1/audit` + `X-Organization-Id` | `400 INVALID_REQUEST_CONTEXT_TYPE` |
+
+**The gateway now says what it wants, in as many words:** *"Request context type 'organization' is invalid. Expected any of 'environment'."* That is a new error code (`INVALID_REQUEST_CONTEXT_TYPE`) and it removes all the guesswork the table above was built on. The path form is refused for the same reason, so the path-scoping workaround this file warned against building is confirmed unnecessary — **do not add it.**
+
+**A caller cannot check its own grants, so a `403` here is not self-diagnosable.** The token endpoint returns an **opaque** access token — one segment, not a JWT, so nothing is decodable — and the token response's `scope` field comes back **empty** (verified 2026-08-29 on the environment credential). With `GET /v1/api-role-privileges` slated to disappear at GA, there is no introspection path at all: whether a credential holds `audit:read` can only be seen in Jamf Account. Worth knowing before spending time on a 403 that looks like a routing problem.
+
+So the environment header resolves the context and the remaining `403` is pure authorization. **What audit needs is an environment-scoped credential granted `audit:read`** — the capability `scopes.yaml` lists under `environment` (and, still, under `organization`). No SDK change, no gateway change. The `audit` package is correct as generated; re-probe when such a credential exists.
+
+**Report upstream: the audit spec's prose now contradicts the gateway.** All four operations say *"`audit:read` (environment scope, defined in X-Environment-Id header; or organization scope, when X-Environment-Id header not present)"*. The organization half is dead as of 2026-08-28 — an organization credential is refused outright with `INVALID_REQUEST_CONTEXT_TYPE` whether or not it sends a header. `scopes.yaml` in the same bundle also still lists `audit` under `organization`, so two published artefacts advertise a scope the gateway rejects.
 
 ### App Installers — removed 2026-08-27, and do not re-add without a published spec
 
