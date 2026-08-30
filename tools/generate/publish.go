@@ -39,7 +39,7 @@ func publishSpecs(root string, cfg Config) error {
 				return fmt.Errorf("reading typesOnly spec %s: %w", spec.File, err)
 			}
 			outPath := filepath.Join(outDir, spec.SpecFile)
-			if err := os.WriteFile(outPath, data, 0644); err != nil {
+			if err := writeGenerated(outPath, data, 0644); err != nil {
 				return fmt.Errorf("writing %s: %w", outPath, err)
 			}
 			log.Printf("wrote %s/%s", cfg.SpecDir, spec.SpecFile)
@@ -175,7 +175,7 @@ func publishSpecs(root string, cfg Config) error {
 		}
 
 		outPath := filepath.Join(outDir, specFile)
-		if err := os.WriteFile(outPath, append(data, '\n'), 0644); err != nil {
+		if err := writeGenerated(outPath, append(data, '\n'), 0644); err != nil {
 			return fmt.Errorf("writing %s: %w", outPath, err)
 		}
 		log.Printf("wrote %s/%s", cfg.SpecDir, specFile)

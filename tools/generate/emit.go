@@ -371,7 +371,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 		if err != nil {
 			return fmt.Errorf("goimports %s: %w\n---raw---\n%s", pair.out, err, buf.String())
 		}
-		if err := os.WriteFile(filepath.Join(root, pair.out), formatted, 0o644); err != nil {
+		if err := writeGenerated(filepath.Join(root, pair.out), formatted, 0o644); err != nil {
 			return fmt.Errorf("writing %s: %w", pair.out, err)
 		}
 		log.Printf("wrote %s", pair.out)
@@ -771,7 +771,7 @@ func TestRoundTrip_%s(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting types_test.go: %w\n---raw---\n%s", err, buf.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1220,7 +1220,7 @@ func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers.go: %w", err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1468,7 +1468,7 @@ func TestPayloadsXMLText_NilOmitsField(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers_test.go: %w\n---raw---\n%s", err, src)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1911,7 +1911,7 @@ func TestAccount_WireFixture_DirectoryUser(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting accounts_privileges_test.go: %w\n---raw---\n%s", err, src)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2040,7 +2040,7 @@ func injectVersionLock(dst, src reflect.Value) {
 	if err != nil {
 		return fmt.Errorf("formatting version_lock_helpers.go: %w", err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2151,7 +2151,7 @@ func emitTemplated(tmpl *template.Template, data any, outPath string) error {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, buf.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2190,7 +2190,7 @@ func New(base *jamfplatform.Client) *Client {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w", outPath, err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2280,7 +2280,7 @@ func PrivilegesFor(method string) (jamfplatform.MethodPrivileges, bool) {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, b.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2380,7 +2380,7 @@ func ptrStr(s string) *string { return &s }%s
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w", outPath, err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2744,7 +2744,7 @@ func ptrStr(s string) *string { return &s }
 		if err != nil {
 			return fmt.Errorf("formatting %s: %w", relPath, err)
 		}
-		if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+		if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 			return fmt.Errorf("writing %s: %w", relPath, err)
 		}
 		log.Printf("wrote %s", relPath)
