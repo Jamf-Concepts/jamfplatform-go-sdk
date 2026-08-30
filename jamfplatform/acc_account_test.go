@@ -32,7 +32,10 @@ func TestAcceptance_AccountReads(t *testing.T) {
 	t.Logf("organization holds %d licences", len(licences))
 	if len(licences) > 0 {
 		l := licences[0]
-		t.Logf("  first: title=%q type=%q parent=%q seats=%v", l.Title, l.LicenseType, l.ProductParent, l.PurchasedSeats)
+		// LicenseType/ProductParent are enum aliases of string, so the fields are
+		// *string once the single-member-allOf wrapper collapses; deref rather
+		// than printing a pointer.
+		t.Logf("  first: title=%q type=%q parent=%q seats=%v", l.Title, derefStr(l.LicenseType), derefStr(l.ProductParent), l.PurchasedSeats)
 	}
 
 	domains, err := ac.ListDomains(ctx)
@@ -55,7 +58,7 @@ func TestAcceptance_AccountReads(t *testing.T) {
 		if d.VerifiedTldID != nil {
 			tld = d.VerifiedTldID.String()
 		}
-		t.Logf("  %s id=%s verifiedTldId=%q status=%v shared=%v", d.Domain, domainID(d), tld, d.DomainStatus, d.SharedDomain)
+		t.Logf("  %s id=%s verifiedTldId=%q status=%q shared=%v", d.Domain, domainID(d), tld, derefStr(d.DomainStatus), d.SharedDomain)
 	}
 
 	deals, err := ac.ListDealRegistrations(ctx)
@@ -194,7 +197,7 @@ func TestAcceptance_AccountDomainLifecycle(t *testing.T) {
 		t.Fatal("CreateDomain returned an empty ID")
 	}
 	cleanupDelete(t, "domain "+name, func() error { return ac.DeleteDomain(ctx, id) })
-	t.Logf("created domain %s id=%s status=%v", created.Domain, id, created.DomainStatus)
+	t.Logf("created domain %s id=%s status=%q", created.Domain, id, derefStr(created.DomainStatus))
 
 	if created.VerificationKey == "" {
 		t.Error("CreateDomain returned no verificationKey — a caller has nothing to publish as a TXT record")
@@ -231,7 +234,7 @@ func TestAcceptance_AccountDomainLifecycle(t *testing.T) {
 	// rather than being a no-op that returns the domain unchanged.
 	verified, err := ac.VerifyDomain(ctx, id)
 	if err == nil {
-		t.Errorf("VerifyDomain succeeded for an unresolvable .invalid domain (status=%v) — verification is not being enforced", verified.DomainStatus)
+		t.Errorf("VerifyDomain succeeded for an unresolvable .invalid domain (status=%q) — verification is not being enforced", derefStr(verified.DomainStatus))
 	} else {
 		t.Logf("VerifyDomain correctly rejected %s: %v", name, err)
 	}

@@ -306,7 +306,7 @@ func TestApplyDocNotes(t *testing.T) {
 		if err := applyDocNotes(types, map[string]string{"EmailMappingType": note}); err != nil {
 			t.Fatalf("applyDocNotes: %v", err)
 		}
-		for _, line := range strings.Split(types[0].Comment, "\n") {
+		for line := range strings.SplitSeq(types[0].Comment, "\n") {
 			if len(strings.TrimPrefix(line, "// ")) > typeDocWidth {
 				t.Errorf("line exceeds typeDocWidth (%d): %q", typeDocWidth, line)
 			}

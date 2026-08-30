@@ -167,7 +167,7 @@ func docParagraphs(text string, width int) []string {
 // them.
 func markdownTableRows(para string) []string {
 	var rows []string
-	for _, line := range strings.Split(para, "\n") {
+	for line := range strings.SplitSeq(para, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue

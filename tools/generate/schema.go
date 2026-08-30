@@ -2133,6 +2133,36 @@ func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 	if schema == nil {
 		return "any"
 	}
+	// OpenAPI 3.0's `$ref`-with-siblings idiom. A property needing its own
+	// description, `nullable` or `example` alongside a reference has to wrap
+	// the reference in a single-member `allOf`, because 3.0 ignores every
+	// sibling of a bare `$ref`. The wrapper declares no type and no properties
+	// of its own, so without this it falls through to the default branch and
+	// becomes `any` — silently, since the transport sets no
+	// DisallowUnknownFields and an `any` field decodes anything. The
+	// referenced struct's fields are then unreachable without a map
+	// type-assert.
+	//
+	// aigovernance's BlueprintDeployment.lastDeployment is the live case:
+	// `nullable: true` + `allOf: [{$ref: DeploymentRun}]`, which produced
+	// `LastDeployment any` and hid DeploymentRun's started/state entirely.
+	//
+	// Only an exactly-one-member wrapper collapses. A multi-member `allOf` is
+	// a real composition with no single Go type, and a schema carrying `allOf`
+	// *plus* properties of its own (PolicyDetail extending PolicySummary) is a
+	// named component that extractTypes flattens into its own struct — this
+	// branch is only ever reached by an inline schema, since a `$ref` returns
+	// above.
+	//
+	// Nullability is unaffected and deliberately so: the wrapper is inline, so
+	// the field emitter still reads `nullable` off the wrapper rather than off
+	// the shared component the reference points at. Collapsing by mutating the
+	// target's Nullable — the way collapseNullableOneOf does for its $ref
+	// branch — would mark that component nullable for every field in the spec
+	// that references it.
+	if isSingleRefAllOfWrapper(schema) {
+		return schemaRefToGoType(schema.AllOf[0])
+	}
 	switch {
 	case schema.Type.Is("string"):
 		// OpenAPI format: byte means base64-encoded bytes. Go's encoding/json
@@ -2174,6 +2204,24 @@ func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 	default:
 		return "any"
 	}
+}
+
+// isSingleRefAllOfWrapper reports whether a schema is nothing but a
+// single-member `allOf` — OpenAPI 3.0's only way to attach a description,
+// `nullable` or an `example` to a `$ref`. Every other member of the schema
+// must be empty: a type, properties, an enum, `additionalProperties` or a
+// second composition keyword all mean the schema says something of its own
+// that collapsing to the reference would discard.
+func isSingleRefAllOfWrapper(schema *openapi3.Schema) bool {
+	if schema == nil || len(schema.AllOf) != 1 || schema.AllOf[0] == nil {
+		return false
+	}
+	if schema.Type != nil && len(*schema.Type) > 0 {
+		return false
+	}
+	return len(schema.Properties) == 0 && len(schema.OneOf) == 0 &&
+		len(schema.AnyOf) == 0 && len(schema.Enum) == 0 &&
+		schema.AdditionalProperties.Schema == nil
 }
 
 // refName extracts the schema name from a $ref string, or falls back to

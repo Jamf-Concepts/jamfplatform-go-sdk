@@ -31,7 +31,7 @@ type BlueprintDeployment struct {
 	// ID of the blueprint referencing this policy.
 	BlueprintID string `json:"blueprintId"`
 	// Present when state is DEPLOYED or OUT_OF_DATE; null when NOT_DEPLOYED.
-	LastDeployment any `json:"lastDeployment"`
+	LastDeployment *DeploymentRun `json:"lastDeployment,omitempty"`
 	// Deployment state of the blueprint.
 	// Allowed values: see the BlueprintDeploymentState constants.
 	State string `json:"state"`

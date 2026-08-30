@@ -148,8 +148,8 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 				gr.IDNilCheck = strings.Join(checks, " || ")
 				gr.IDDeref = "*" + expr.String()
 				xmlBody := "42"
-				for i := len(parts) - 1; i >= 0; i-- {
-					tag := strings.ToLower(parts[i])
+				for _, part := range slices.Backward(parts) {
+					tag := strings.ToLower(part)
 					xmlBody = "<" + tag + ">" + xmlBody + "</" + tag + ">"
 				}
 				gr.IDTestInnerXML = xmlBody
@@ -517,8 +517,8 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				}
 				idParts := strings.Split(idPath, ".")
 				idXML := "42"
-				for i := len(idParts) - 1; i >= 0; i-- {
-					tag := strings.ToLower(idParts[i])
+				for _, idPart := range slices.Backward(idParts) {
+					tag := strings.ToLower(idPart)
 					idXML = "<" + tag + ">" + idXML + "</" + tag + ">"
 				}
 				ga.ClassicResolverIDInnerXML = idXML
