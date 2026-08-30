@@ -2607,9 +2607,33 @@ type MethodPrivileges struct {
 	Scoped []string
 	// Legacy lists the human-readable Jamf Pro privilege names, e.g.
 	// "Create Buildings". It is populated for the Pro API family only —
-	// other families do not publish legacy names. Legacy is NOT
-	// index-aligned with Scoped: a single legacy name may correspond to
-	// multiple scoped identifiers.
+	// other families do not publish legacy names.
+	//
+	// Scoped and Legacy are INDEPENDENT SETS, not parallel arrays. Do not
+	// match them by position, and do not assume equal length. Both are copied
+	// in spec order.
+	//
+	// Two things make a positional pairing wrong, and each on its own is
+	// sufficient (counts are pro at spec 11.31.0, 746 privileged operations):
+	//
+	//   - The lengths differ on 29 operations, because the GA capability
+	//     consolidation mapped several legacy privileges onto one capability.
+	//     GET /v1/computer-groups is Scoped ["device-groups:read"] against
+	//     Legacy ["Read Smart Computer Groups", "Read Static Computer
+	//     Groups"]. There is no bijection to zip.
+	//   - Where the lengths do match, the orders still disagree, in the spec
+	//     itself. POST /v1/jamf-management-framework/redeploy/{id} is Scoped
+	//     ["computer-check-in:read", "device-actions:execute"] against Legacy
+	//     ["Send Computer Remote Command to Install Package", "Read Computer
+	//     Check-In"] — reversed. 9 of the 24 equal-length multi-privilege
+	//     operations are like this.
+	//
+	// A consumer rendering a table of required privileges therefore has to
+	// present the two lists separately, or label from Scoped alone. Jamf does
+	// not publish the scoped-to-legacy mapping in the specs; its "Jamf Pro
+	// permissions map" documentation article is the only artefact that carries
+	// it, and until that is machine-readable a correct label per scoped
+	// identifier cannot be derived here.
 	Legacy []string
 }
 `, pkg),

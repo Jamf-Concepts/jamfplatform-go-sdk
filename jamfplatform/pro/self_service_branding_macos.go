@@ -20,6 +20,7 @@ import (
 // ListMacOSBrandingConfigurationsV1 search for sorted and paged macOS branding configurations.
 //
 // Required privileges: self-service:read. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration, Read Self Service.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria

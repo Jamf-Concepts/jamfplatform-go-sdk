@@ -15,6 +15,7 @@ import (
 // ListDdmStatusItemsV1 retrieve the Status Items from the latest Status Report for a device.
 //
 // Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - clientManagementID: client management id of the target device.
@@ -31,6 +32,7 @@ func (c *Client) ListDdmStatusItemsV1(ctx context.Context, clientManagementID st
 // GetDdmStatusItemV1 retrieve a Status Item from the latest Status Report for a device.
 //
 // Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - clientManagementID: client management id of the target device.

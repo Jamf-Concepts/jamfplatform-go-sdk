@@ -20,6 +20,7 @@ import (
 // GetJamfConnectSettingsV1 get the Jamf Connect settings that you have access to see.
 //
 // Required privileges: jamf-connect-deployments:read. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings, Read Jamf Connect Deployments.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-connect"

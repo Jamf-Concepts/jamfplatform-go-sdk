@@ -631,6 +631,50 @@ whether their field was in the dropped tail.
 
 ### Required privileges
 
+**`Scoped` and `Legacy` are independent sets. Never pair them by position.**
+A downstream consumer rendered its "Required Jamf privileges" table by zipping
+`Scoped[i]` with `Legacy[i]`, and shipped two swapped labels for
+`RedeployJamfManagementFrameworkV1` before anyone noticed. Wrong privilege
+guidance sends an operator to grant the opposite privilege, so this is worth
+stating twice. Two facts make the pairing impossible, either one sufficient:
+
+- **The lengths differ on 29 pro operations**, because the GA capability
+  consolidation mapped several legacy privileges onto one capability.
+  `GET /v1/computer-groups` is one `device-groups:read` against
+  *Read Smart Computer Groups* + *Read Static Computer Groups*. There is no
+  bijection to zip.
+- **Where the lengths match, the orders still disagree — in the spec itself.**
+  `POST /v1/jamf-management-framework/redeploy/{id}` declares
+  `[computer-check-in:read, device-actions:execute]` against
+  `[Send Computer Remote Command to Install Package, Read Computer Check-In]`,
+  reversed. 9 of the 24 equal-length multi-privilege operations are like this, so
+  a length check does not make a zip safe either.
+
+**The legacy array is deliberately left unsorted, and this is the part most
+likely to be "cleaned up".** Upstream already ships every scoped array
+alphabetical (0 of 746 unsorted), so sorting legacy for stable diffs looks
+obviously right. It is not: measured against the spec, it would take an incorrect
+positional pairing from 16 of 24 equal-length operations coming out right to
+**23 of 24** — converting a bug that is visibly wrong on nine operations into one
+that is silently wrong on one, including the case above. The visible disorder is
+the only signal a consumer gets. `TestLegacyPrivilegesAreNotSorted` reads the
+generated `pro/permissions.go` and fails if the sort is ever introduced;
+`privilegeSetsAreNotPairs` in `tools/generate/privileges_test.go` carries the
+reasoning. Note the tripwire must read the *generated registry*, not a spec —
+`publishSpecs` copies the extension values straight from the source, so a
+generator-side sort never reaches the published spec and a spec-reading test
+cannot see it.
+
+The emitted method godoc says so inline wherever the two lists could be mistaken
+for parallel arrays (43 methods): *"The scoped and legacy lists are independent
+sets, not pairs: do not match them by position."*
+
+**Upstream ask:** Jamf publishes no scoped→legacy mapping in the specs. Its
+"Jamf Pro permissions map" article is the only artefact carrying it, and until
+that is machine-readable a correct label per scoped identifier cannot be derived
+here — so a consumer wanting labelled rows has to label from `Scoped` alone, or
+present the two lists separately.
+
 `x-required-privileges` feeds a per-package `Privileges` registry plus a
 `// Required privileges:` godoc line, and downstream a Terraform provider
 permissions table. The SDK **reports what the spec says** and does not correct it

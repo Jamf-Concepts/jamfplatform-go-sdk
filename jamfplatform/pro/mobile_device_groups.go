@@ -20,6 +20,7 @@ import (
 // ListMobileDeviceGroupsV2 return the list of all Mobile Device Groups.
 //
 // Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGroup, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []MobileDeviceGroup
@@ -35,6 +36,7 @@ func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGr
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 //
 // Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGroup, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []MobileDeviceGroup
@@ -281,6 +283,7 @@ func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) 
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: instance id of smart-group.
@@ -374,6 +377,7 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id 
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: instance id of smart-group.
@@ -697,6 +701,7 @@ func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, 
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: instance id of static-group.
@@ -790,6 +795,7 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: instance id of static-group.

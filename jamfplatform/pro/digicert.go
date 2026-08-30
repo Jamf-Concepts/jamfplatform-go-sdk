@@ -122,6 +122,7 @@ func (c *Client) CheckDigicertTrustLifecycleManagerPrivilegesV1(ctx context.Cont
 //
 // Required privileges: digicert-settings:create, digicert-settings:update. Legacy Jamf Pro privilege name(s): Create DigiCert Settings, Update DigiCert Settings.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ValidateDigicertClientCertificateV1(ctx context.Context, request *Certificate) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/pki/digicert/trust-lifecycle-manager/validate-client-certificate"

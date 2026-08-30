@@ -415,6 +415,7 @@ func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string,
 //
 // Required privileges: enrollment-customization:delete, enrollment-customization:read. Legacy Jamf Pro privilege name(s): Delete Enrollment Customizations, Read Enrollment Customizations.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.

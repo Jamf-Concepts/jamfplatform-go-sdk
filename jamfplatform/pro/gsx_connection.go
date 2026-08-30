@@ -20,6 +20,7 @@ import (
 //
 // Required privileges: gsx-connection:read, push-certificates:read. Legacy Jamf Pro privilege name(s): Read GSX Connection, Read Push Certificates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) GetGSXConnectionV1(ctx context.Context) (*GsxConnection, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GsxConnection
@@ -34,6 +35,7 @@ func (c *Client) GetGSXConnectionV1(ctx context.Context) (*GsxConnection, error)
 //
 // Required privileges: gsx-connection:update, push-certificates:update. Legacy Jamf Pro privilege name(s): Update GSX Connection, Update Push Certificates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) UpdateGSXConnectionV1(ctx context.Context, request *GsxConnection) (*GsxConnection, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GsxConnection
@@ -48,6 +50,7 @@ func (c *Client) UpdateGSXConnectionV1(ctx context.Context, request *GsxConnecti
 //
 // Required privileges: gsx-connection:update, push-certificates:update. Legacy Jamf Pro privilege name(s): Update GSX Connection, Update Push Certificates.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) PatchGSXConnectionV1(ctx context.Context, request *GsxConnectionUpdate) (*GsxConnection, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result GsxConnection

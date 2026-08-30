@@ -702,6 +702,12 @@ func privilegeComment(m GoMethod) string {
 	if len(m.ScopedPrivileges) > 1 {
 		line += "\n// The Jamf API spec does not encode whether these are required together or as alternatives."
 	}
+	// Say so wherever a reader could mistake the two lists for parallel arrays.
+	// They are independent sets: the spec's own ordering differs between them
+	// and the lengths need not match. See privilegeSetsAreNotPairs.
+	if len(m.LegacyPrivileges) > 0 && (len(m.ScopedPrivileges) > 1 || len(m.LegacyPrivileges) > 1) {
+		line += "\n// The scoped and legacy lists are independent sets, not pairs: do not match them by position."
+	}
 	return line
 }
 
@@ -1009,6 +1015,15 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 	_, hasPrivExt := op.Extensions["x-required-privileges"]
 	if !spec.Undocumented || hasPrivExt {
 		m.PrivilegesKnown = true
+		// Both arrays are copied in spec order and NEITHER is sorted. That is
+		// deliberate for the legacy one, and the reasoning is not guessable —
+		// see privilegeSetsAreNotPairs and TestLegacyPrivilegesAreNotSorted.
+		// Sorting it would make an (incorrect) positional pairing come out
+		// right on 23 of the 24 equal-length multi-privilege pro operations
+		// instead of 16, hiding a consumer's bug almost everywhere rather than
+		// exposing it. Upstream already ships every scoped array alphabetical,
+		// so the visible disorder in the legacy array is the only signal a
+		// consumer gets that the two are not parallel.
 		m.ScopedPrivileges = stringSliceExtension(op, "x-required-privileges")
 		m.LegacyPrivileges = stringSliceExtension(op, "x-required-privileges-legacy")
 		if c := privilegeComment(m); c != "" {

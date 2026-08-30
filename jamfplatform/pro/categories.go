@@ -21,6 +21,7 @@ import (
 //
 // Required privileges: categories:read, self-service:read. Legacy Jamf Pro privilege name(s): Read Categories, Read Self Service.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria

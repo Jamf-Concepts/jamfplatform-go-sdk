@@ -19,6 +19,7 @@ import (
 // GetJamfProtectSettingsV1 jamf Protect integration settings.
 //
 // Required privileges: jamf-protect-deployments:read. Legacy Jamf Pro privilege name(s): Read Jamf Protect Settings, Read Jamf Protect Deployments.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) GetJamfProtectSettingsV1(ctx context.Context) (*ProtectSettingsResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ProtectSettingsResponse

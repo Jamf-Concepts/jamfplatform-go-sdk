@@ -35,6 +35,7 @@ func (c *Client) DownloadInventoryPreloadCsvV2(ctx context.Context) ([]byte, err
 //
 // Required privileges: inventory-preload-records:create, inventory-preload-records:update, users:create, users:update. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records, Update Inventory Preload Records, Create User, Update User.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact

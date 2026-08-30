@@ -99,9 +99,10 @@ type GoMethod struct {
 	// spec-derived method with no declared privileges has PrivilegesKnown=true
 	// and empty slices — that means the endpoint needs no special privilege
 	// (any authenticated API client may call it), which is distinct from
-	// "unknown". ScopedPrivileges and LegacyPrivileges are NOT index-aligned:
-	// a single legacy name can cover multiple scoped IDs, and the legacy form
-	// is published only for the Pro family.
+	// "unknown". ScopedPrivileges and LegacyPrivileges are INDEPENDENT SETS,
+	// never to be paired by position: their lengths differ on 29 pro
+	// operations and their orders disagree on 9 more. The legacy form is
+	// published only for the Pro family. See privilegeSetsAreNotPairs.
 	PrivilegesKnown  bool
 	ScopedPrivileges []string // modern scoped privilege IDs, e.g. "create:pro:buildings"
 	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"

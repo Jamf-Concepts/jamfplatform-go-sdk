@@ -20,6 +20,7 @@ import (
 // ListComputerGroupsV1 returns the list of all computer groups.
 //
 // Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Smart Computer Groups, Read Static Computer Groups.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ListComputerGroupsV1(ctx context.Context) ([]ComputerGroup, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []ComputerGroup
