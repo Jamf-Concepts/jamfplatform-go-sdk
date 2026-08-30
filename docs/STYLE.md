@@ -89,6 +89,154 @@ enough and JSON has explicit field presence, so the heuristic suffices.
 
 ---
 
+## Config key inventory
+
+Every key `tools/generate/config.json` accepts, with what it does and who uses it.
+The struct definitions and their long-form comments are in
+`tools/generate/config.go` — that is the authority; this table is the map.
+
+**Usage counts are as of v1872 and move with every ingest.** A key with zero users
+is not dead code: each was added for a real case, is exercised by the generator's
+own tests, and is the right tool when that case recurs. Treat a zero-user key as
+available, not as a candidate for deletion — the App Installers removal
+deliberately kept three of them for exactly that reason.
+
+### Top level
+
+| key | meaning |
+|---|---|
+| `package` | Go package name for the root output (`jamfplatform`) |
+| `module` | module path used in generated imports |
+| `specDir` | where published filtered specs are written, and the **CI fallback source** when `testing/` is absent (`api`) |
+| `specs[]` | one entry per OpenAPI spec |
+
+### Spec level
+
+| key | users | meaning |
+|---|---|---|
+| `file` | 18 | source spec path, e.g. `testing/openapi-jpapi.json` |
+| `namespace` | 18 | first URL segment(s) after the host; slashes allowed (`ai/governance/policies`, `ddm/report`) |
+| `package` | 18 | target sub-package under `jamfplatform/`. Empty emits to the root (legacy; nothing uses it) |
+| `specFile` | 18 | filename for the published filtered spec under `specDir` |
+| `splitByTag` | 18 | **required** — one methods file per OpenAPI tag |
+| `fieldTypeOverrides` | 5 | `"schema.property"` → Go type, to correct a spec bug. `*.property` matches the property on every schema. Applied per spec so an upstream fix isn't silently overwritten |
+| `docNotes` | 3 | Go type name → prose appended to its godoc. For corrections belonging to the type as a whole, which `schemaPatches` cannot reach (it patches properties). **A key matching no emitted type is a build failure** — a silently dropped correction leaves the wrong doc in place |
+| `schemaPatches` | 3 | schema → dotted property path → raw OpenAPI 3 Schema. Adds or replaces at that path |
+| `emitNullForOptional` | 2 | schema names whose optional pointer fields must marshal as explicit `null` when nil rather than being omitted. For servers that distinguish "omitted" (keep) from "present and null" (clear). Accepts snake_case or PascalCase; JSON marshalling only |
+| `propertyRenames` | 2 | schema → dotted path → new key. Repairs a spec key that doesn't match the wire, which otherwise decodes silently to nothing |
+| `schemaAdditions` | 2 | schema → property → openapi type (`string`, `integer`, `boolean`, `string:password` for a writeOnly string). Injects a property the server accepts but the spec omits |
+| `fieldOrder` | 1 | schema → ordered property list, overriding the default alphabetical emission. For servers that are order-sensitive **within an XML element** (Classic `/vppinvitations <general>`). Unlisted properties are appended alphabetically |
+| `format` | 1 | `json` (default) or `xml`. Drives struct tags and the transport codec |
+| `propertyRemovals` | 1 | schema → list of dotted paths to delete. **Panics on a missing path** — a declared removal that can't be walked is a typo. Targets inline objects only: a path resolving through a shared `$ref` affects every schema referencing it |
+| `schemaCreations` | 1 | schema name → raw OpenAPI 3 Schema, for a component upstream **dropped** but the server still returns. Applied before every other pass, so it is indistinguishable from a spec-declared schema downstream. **Panics if the name already exists** |
+| `schemaPatchesRequireAbsent` | 1 | `"<Schema>.<dotted.path>"` entries that must **not** already resolve. The `schemaPatches` counterpart of the panic `schemaCreations` gets free |
+| `tagRenames` | 1 | OpenAPI tag → tag, **for filename selection only**. Method names, godoc and the published spec are untouched |
+| `version` | **0** | URL version segment for operations whose own path carries none. Precedence: operation `version` > a version prefix on the spec path > this. Zero users because all five Security Cloud specs now carry their own `/v1/` — see the version-key rule in [CLAUDE.md](../CLAUDE.md#ingesting-a-new-gitops-bundle) |
+| `excludePaths` | **0** | `"METHOD /path"` entries the generator must refuse to include. `validateConfig` errors if one also appears in `operations`, so it catches an accidental re-add rather than merely documenting one |
+| `schemaRenames` | **0** | old schema name → new, updating every `$ref`. Applied before all other patches. For a generic name in one spec that would silently shadow a same-named type from another spec in the same package |
+| `postSymmetryExcludes` | **0** | per `*_post` schema, property names **not** to mirror from the read sibling. The post-symmetry pass always runs and defaults to full symmetry; add an entry only when the server genuinely cannot accept a field on write (a server-assigned timestamp) |
+| `rawBody` | **0** | emit `[]byte` in and out with no struct marshaling; the consumer owns it. Resets every type-driven field, so the `raw` template takes over |
+| `typesOnly` | **0** | emit types from **all** schemas and nothing else — no methods, no method tests. For a spec defining types consumed inside another API's payloads (blueprint component configurations). `validateConfig` rejects it alongside `operations` |
+| `undocumented` | **0** | every operation is reverse-engineered: stamps an `Unofficial:` godoc line and skips the privilege name-match check. See the App Installers note in [CLAUDE.md](../CLAUDE.md#packages) for why the last user was removed and what the bar is for a new one |
+
+### Operation level
+
+| key | users | meaning |
+|---|---|---|
+| `op` | 1483 | `"GET /v1/devices/{id}"` — matched against the **spec**, not the wire |
+| `name` | 1483 | Go method name |
+| `expectedStatus` | 351 | success status when not 200 |
+| `responseType` | 320 | explicit response schema name, for an untyped spec body. Also accepts a `[]T` literal — see [bare-array responses](#responsetype-t--bare-array-responses) |
+| `pathNames` | 313 | spec path param → Go param name |
+| `requestType` | 229 | explicit request schema name |
+| `params` | 161 | query params, compact: `"name"`, `"name:type"`, `"spec:type:goName"`, plus a trailing `:undocumented` to opt out of the spec name-match check |
+| `pagination` | 127 | one of the five styles below |
+| `resolver` | 108 | one name→ID resolver, optionally with `apply` |
+| `contentType` | 8 | request Content-Type override. Every current user is `application/merge-patch+json` |
+| `resolvers` | 6 | **multiple** resolvers on one operation, e.g. resolve a device by name *and* by serial number |
+| `maxPageSize` | 3 | page size requested per page (default 100). **Raise only once the endpoint's true server-side cap is wire-verified** |
+| `pageSizeParam` | 3 | page-size query key (default `page-size`). All three users are `ddmreport`, which calls it `size` |
+| `noRetry` | 2 | opt out of the transport's automatic 5xx retry despite the method qualifying |
+| `resultsField` | 2 | envelope key holding the element array (default `results`) |
+| `unwrapResults` | 2 | return the envelope's array directly as this Go type, for a non-paginated `{totalCount, results}` body |
+| `version` | **0** | per-operation URL version override; highest precedence |
+| `cursorField` | **0** | envelope key carrying the next cursor (default `nextCursor`) |
+| `cursorParam` | **0** | query key the cursor goes back in (default `cursor`) |
+
+`noRetry` is a small enumerable exception list, not an escape hatch. Set it **only**
+when the endpoint requires a side-channel precondition in its body — an
+optimistic-lock field sourced from a GET taken before the write — that a blind
+byte-for-byte retry would replay stale, turning a successful-but-500ing write into
+a masked conflict on the retry. Both current users are prestage PUTs, which is the
+confirmed live case. Most PUTs have no such precondition and should keep the default.
+
+`unwrapResults` hardcodes `json:"results"` and does **not** honour `resultsField`.
+Nothing hits that today because both users are on the default key, but an endpoint
+wanting an unwrap over a differently-named envelope needs the template fixed
+first — the same hardcoded-envelope-key trap that bit the Apply templates.
+
+### Pagination styles
+
+All four offset styles wrap `ListAllPages[T]`; `cursor` wraps
+`ListAllCursorPages[T]`. What each uses to decide there is another page:
+
+| style | users | continuation test | shape |
+|---|---|---|---|
+| `totalCount` | 115 | `(page+1)*pageSize < totalCount` | `{totalCount, results}` |
+| `hasNext` | 5 | the response's own `hasNext` | `{hasNext, results}` |
+| `sizeCheck` | 4 | `len(results) >= pageSize && len(results) > 0` | `{results}`; `totalCount` is decoded and ignored |
+| `rawArray` | 1 | same as `sizeCheck`, on a top-level array | bare `[…]`, no envelope |
+| `cursor` | 2 | the server's own next cursor; **an empty page does not end the walk**, and a repeated cursor is an error | `{<resultsField>, nextCursor}` |
+
+**The style is a safety decision, not a shape decision.** `totalCount` multiplies
+the *requested* page size to compute each offset, so a server whose real cap is
+lower silently skips the untransferred tail; `sizeCheck` and `rawArray` stop early
+and truncate the remainder; `hasNext` can skip a chunk between pages. Configuring
+any of them for an endpoint that **ignores** `page`/`page-size` is a *duplication*
+bug — it re-fetches the full list and concatenates it. Probe before trusting a
+`{totalCount, results}` envelope; two Security Cloud operations were configured off
+their envelope shape alone and had to have the key removed.
+
+### Resolver keys
+
+| key | users | meaning |
+|---|---|---|
+| `mode` | 119 | `filtered` (42), `direct` (41), `clientFilter` (36) |
+| `resourceType` | 119 | Go type name used in the emitted method names |
+| `idField` | 89 | dotted JSON path to the ID on each list element |
+| `apply` | 81 | emit an `Apply<ResourceType>` upsert too |
+| `typedReturn` | 79 | Go type the typed wrapper returns; defaults to `resourceType` |
+| `nameField` | 78 | dotted JSON path to the name on each list element |
+| `byField` | 12 | override the `ByName` method suffix (`BySerialNumber` → `ResolveDeviceIDBySerialNumber`) |
+| `extraParams` | 11 | `filtered` only: query params appended before the filter, for endpoints needing e.g. `section=GENERAL` to populate the filterable fields |
+| `idNumeric` | 6 | the ID is a JSON number; test stubs emit numeric IDs |
+| `idPointer` | 3 | the ID is a `*int`; overrides `idNumeric`'s `strconv.Itoa` with a dereferencing `fmt.Sprintf` |
+| `matchField` | 3 | dotted path for client-side match verification when it differs from `nameField` — RSQL filters on `displayName` while the response nests it at `general.displayName` |
+| `resultsField` | 3 | envelope key holding the array (default `results`) |
+| `searchParam` | 1 | `clientFilter` only: server-side search key to narrow the list first. Empty fetches the whole list |
+
+`mode` and `resourceType` are on all 119; `nameField`/`idField` are absent on the
+41 `direct` resolvers, which delegate to a spec-generated `Get<X>ByName` and so
+need no field paths.
+
+### Apply keys
+
+| key | users | meaning |
+|---|---|---|
+| `createOp`, `updateOp`, `deleteOp`, `nameGoField` | 81 | the baseline set; `deleteOp` is for test generation |
+| `updateType` | 13 | Go type for the update request when it differs from create; triggers a JSON round-trip |
+| `getOp` | 3 | GET used to read current state — **required** when `versionLock` is set |
+| `versionLock` | 3 | zero `VersionLock` on create; fetch and inject the current value before update |
+| `tokenUploadMode` + `tokenUploadCreateOp` + `tokenReplaceOp` | 1 | create by uploading an encoded token then updating metadata; the Apply signature gains a trailing `token string` |
+| `membershipPreFetch` | 2 | re-specify current membership before a PATCH that would otherwise remove omitted members |
+
+`membershipPreFetch` takes `fetchOp`, `sourceIdField`, `assignmentType`,
+`assignmentIdField`, `requestField`, and `assignmentFieldIsSlicePtr` (set when the
+request field is `*[]T` rather than `[]T`). The generated assignment item always
+uses pointer fields.
+
+---
+
 ## Config mechanisms
 
 ### Local spec repairs are self-expiring by design

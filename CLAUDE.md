@@ -54,6 +54,12 @@ Operations are **whitelist-based** — only endpoints listed in
 CI enforces that generated output is current on every PR
 (`git diff --exit-code -- jamfplatform/`).
 
+Every key config accepts, with its current usage count and the traps attached to
+it, is inventoried in
+[docs/STYLE.md](docs/STYLE.md#config-key-inventory); the mechanisms behind the
+non-obvious ones are in the section after it. `tools/generate/config.go` is the
+authority — its struct comments carry the reasoning for each field.
+
 **`testing/` is gitignored and the generator falls back to `api/`.** So a stale
 local spec regenerates the tree *backwards*. When checking a generator change for
 CI parity, force the fallback path (a scratch root of symlinks with no `testing/`,
