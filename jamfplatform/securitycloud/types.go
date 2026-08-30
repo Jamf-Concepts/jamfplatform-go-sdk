@@ -167,6 +167,16 @@ type App struct {
 }
 
 // AppCreateRequest Request body for creating an App.
+// Two corrections to the `name` and `predefinedAppId` descriptions above, both wire-verified
+// 2026-08-30.
+// First, `name` supplied alongside `predefinedAppId` does not return `400`. The request succeeds with
+// `201` and the name is silently discarded — the created app reads back `"name": null`. PATCHing
+// `name` on a predefined app is likewise `204` and likewise ignored. A caller that wants the supplied
+// name to mean something must refuse the combination itself, because the server will not.
+// Second, a tenant may hold only one app per predefined app template. Reusing a `predefinedAppId` that
+// another app already references is refused with `409 CONFLICT` and the bare description "Resource
+// already exists." — naming neither the field nor the template, and using the generic fallback code
+// rather than a specific one.
 type AppCreateRequest struct {
 	// User/group assignment rules for an App.
 	Assignments Assignments `json:"assignments"`
@@ -251,6 +261,10 @@ type Assignments struct {
 }
 
 // AssignmentsInclusions Inclusion rules controlling who can access the App.
+// Correction to the `groups` description above: `allUsers: false` with an empty `groups` array does
+// **not** return `400`. It is accepted with `201`, producing an app assigned to no group at all
+// (wire-verified 2026-08-30). Tenants hold apps in exactly this state, so a client decoding an app
+// must tolerate it rather than treat it as impossible.
 type AssignmentsInclusions struct {
 	// `true` grants access to all users; `groups` array is then ignored.
 	AllUsers bool `json:"allUsers"`
@@ -720,16 +734,28 @@ type RiskControls struct {
 }
 
 // Routing Traffic routing configuration for an App.
+// Correction to `dnsIpResolutionType` above: it is **required** when `type` is `CUSTOM`, not optional,
+// and there is no server-side default. `{"type":"CUSTOM","gatewayId":"a7d2"}` is refused with `400
+// [INVALID_FIELD] routing: Routing definition is not valid.` on POST and on PATCH alike; adding
+// `"dnsIpResolutionType":"IPv6"` is what makes the same body succeed (wire-verified 2026-08-30).
+// Because PATCH is a JSON merge patch that merges this object field by field, changing `type` requires
+// sending the fields the new type forbids as explicit nulls rather than omitting them. `CUSTOM` to
+// `DIRECT` sending only `{"type":"DIRECT"}` fails, because the merged object keeps the old `gatewayId`
+// and `dnsIpResolutionType`, both of which `DIRECT` refuses;
+// `{"type":"DIRECT","gatewayId":null,"dnsIpResolutionType":null}` succeeds. This schema is listed in
+// `emitNullForOptional` so that a nil pointer marshals as an explicit null and both transitions are
+// expressible — which also means a create sends those keys as null rather than omitting them, a form
+// the endpoint accepts.
 type Routing struct {
 	// DNS IP resolution preference. Optional. When omitted and `type=CUSTOM`, defaults to `IPv6`.
 	// Explicitly set to `IPv4` if your network requires it. **Must be absent (or null) when
 	// `type=DIRECT`** — returns `400` if set.
 	// Allowed values: see the RoutingDnsIpResolutionType constants.
-	DnsIpResolutionType *string `json:"dnsIpResolutionType,omitempty"`
+	DnsIpResolutionType *string `json:"dnsIpResolutionType"`
 	// ID of a Gateway or Grouped Gateway. Required when `type=CUSTOM`, must be null/absent when
 	// `type=DIRECT`. Gateway IDs are 4-character lowercase hex strings (e.g. `a1b2`); Grouped Gateway IDs
 	// are UUIDs (e.g. `3fa85f64-5717-4562-b3fc-2c963f66afa6`).
-	GatewayID *string `json:"gatewayId,omitempty"`
+	GatewayID *string `json:"gatewayId"`
 	// `CUSTOM` routes traffic via a ZTNA gateway (`gatewayId` required). `DIRECT` uses default device
 	// routing (`gatewayId` must be null/absent). `BLOCK` is not exposed in the public API.
 	// Allowed values: see the RoutingType constants.
