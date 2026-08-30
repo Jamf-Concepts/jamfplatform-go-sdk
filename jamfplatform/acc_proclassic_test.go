@@ -1362,32 +1362,6 @@ func TestAcceptance_Classic_RestrictedSoftwareCRUD(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_PeripheralTypeCRUD(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	pc := proclassic.New(c)
-	name := "sdk-acc-ptype-" + runSuffix()
-	created, err := pc.CreatePeripheralTypeByID(ctx, "0", &proclassic.PeripheralType{Name: classicStrPtr(name)})
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("CreatePeripheralTypeByID: %v", err)
-	}
-	if created == nil || created.ID == nil {
-		t.Fatalf("no ID: %+v", created)
-	}
-	id := *created.ID
-	cleanupDelete(t, "DeletePeripheralTypeByID", func() error { return pc.DeletePeripheralTypeByID(ctx, intToStr(id)) })
-	if err := pc.DeletePeripheralTypeByID(ctx, intToStr(id)); err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = pc.GetPeripheralTypeByID(ctx, intToStr(id))
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("after delete: want 404, got %v", err)
-	}
-}
-
 func TestAcceptance_Classic_DiskEncryptionConfigurationCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()

@@ -13,7 +13,7 @@ import (
 
 // GetComputerInventoryCollection finds the Jamf Pro computer inventory collection information.
 //
-// Required privileges: read:pro:computer-inventory-collection.
+// Required privileges: computer-inventory-collection-settings:read.
 func (c *Client) GetComputerInventoryCollection(ctx context.Context) (*ComputerInventoryCollection, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerInventoryCollection
@@ -26,7 +26,7 @@ func (c *Client) GetComputerInventoryCollection(ctx context.Context) (*ComputerI
 
 // UpdateComputerInventoryCollection updates the Jamf Pro computer inventory collection information.
 //
-// Required privileges: update:pro:computer-inventory-collection.
+// Required privileges: computer-inventory-collection-settings:update.
 func (c *Client) UpdateComputerInventoryCollection(ctx context.Context, request *ComputerInventoryCollection) error {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/computerinventorycollection"

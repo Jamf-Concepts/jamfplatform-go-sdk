@@ -55,29 +55,6 @@ func AccountPreferencesUserInterfaceDisplayThemeValues() []AccountPreferencesUse
 	}
 }
 
-// AppAnalyticsSetting represents a app analytics setting value.
-type AppAnalyticsSetting = string
-
-// AppAnalyticsSetting values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	AppAnalyticsSettingEnableAppAnalytics  AppAnalyticsSetting = "ENABLE_APP_ANALYTICS"
-	AppAnalyticsSettingDisableAppAnalytics AppAnalyticsSetting = "DISABLE_APP_ANALYTICS"
-)
-
-// AppAnalyticsSettingValues returns every value the Jamf API accepts for AppAnalyticsSetting,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func AppAnalyticsSettingValues() []AppAnalyticsSetting {
-	return []AppAnalyticsSetting{
-		AppAnalyticsSettingEnableAppAnalytics,
-		AppAnalyticsSettingDisableAppAnalytics,
-	}
-}
-
 // ComputerPartitionFileVault2State represents a computer partition file vault2 state value.
 type ComputerPartitionFileVault2State = string
 
@@ -372,52 +349,6 @@ func ComputerSectionV4Values() []ComputerSectionV4 {
 		ComputerSectionV4ExtensionAttributes,
 		ComputerSectionV4ContentCaching,
 		ComputerSectionV4GroupMemberships,
-	}
-}
-
-// DataRoamingSetting represents a data roaming setting value.
-type DataRoamingSetting = string
-
-// DataRoamingSetting values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	DataRoamingSettingEnableDataRoaming  DataRoamingSetting = "ENABLE_DATA_ROAMING"
-	DataRoamingSettingDisableDataRoaming DataRoamingSetting = "DISABLE_DATA_ROAMING"
-)
-
-// DataRoamingSettingValues returns every value the Jamf API accepts for DataRoamingSetting,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func DataRoamingSettingValues() []DataRoamingSetting {
-	return []DataRoamingSetting{
-		DataRoamingSettingEnableDataRoaming,
-		DataRoamingSettingDisableDataRoaming,
-	}
-}
-
-// DiagnosticSubmissionSetting represents a diagnostic submission setting value.
-type DiagnosticSubmissionSetting = string
-
-// DiagnosticSubmissionSetting values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	DiagnosticSubmissionSettingEnableDiagnosticSubmission  DiagnosticSubmissionSetting = "ENABLE_DIAGNOSTIC_SUBMISSION"
-	DiagnosticSubmissionSettingDisableDiagnosticSubmission DiagnosticSubmissionSetting = "DISABLE_DIAGNOSTIC_SUBMISSION"
-)
-
-// DiagnosticSubmissionSettingValues returns every value the Jamf API accepts for DiagnosticSubmissionSetting,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func DiagnosticSubmissionSettingValues() []DiagnosticSubmissionSetting {
-	return []DiagnosticSubmissionSetting{
-		DiagnosticSubmissionSettingEnableDiagnosticSubmission,
-		DiagnosticSubmissionSettingDisableDiagnosticSubmission,
 	}
 }
 
@@ -830,29 +761,6 @@ func NotificationTypeValues() []NotificationType {
 	}
 }
 
-// PersonalHotspotSetting represents a personal hotspot setting value.
-type PersonalHotspotSetting = string
-
-// PersonalHotspotSetting values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	PersonalHotspotSettingEnablePersonalHotspot  PersonalHotspotSetting = "ENABLE_PERSONAL_HOTSPOT"
-	PersonalHotspotSettingDisablePersonalHotspot PersonalHotspotSetting = "DISABLE_PERSONAL_HOTSPOT"
-)
-
-// PersonalHotspotSettingValues returns every value the Jamf API accepts for PersonalHotspotSetting,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func PersonalHotspotSettingValues() []PersonalHotspotSetting {
-	return []PersonalHotspotSetting{
-		PersonalHotspotSettingEnablePersonalHotspot,
-		PersonalHotspotSettingDisablePersonalHotspot,
-	}
-}
-
 // ServiceDiscoveryVersion represents a service discovery version value.
 type ServiceDiscoveryVersion = string
 
@@ -875,29 +783,6 @@ func ServiceDiscoveryVersionValues() []ServiceDiscoveryVersion {
 		ServiceDiscoveryVersionNone,
 		ServiceDiscoveryVersionMDMByod,
 		ServiceDiscoveryVersionMDMAdde,
-	}
-}
-
-// VoiceRoamingSetting represents a voice roaming setting value.
-type VoiceRoamingSetting = string
-
-// VoiceRoamingSetting values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	VoiceRoamingSettingEnableVoiceRoaming  VoiceRoamingSetting = "ENABLE_VOICE_ROAMING"
-	VoiceRoamingSettingDisableVoiceRoaming VoiceRoamingSetting = "DISABLE_VOICE_ROAMING"
-)
-
-// VoiceRoamingSettingValues returns every value the Jamf API accepts for VoiceRoamingSetting,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func VoiceRoamingSettingValues() []VoiceRoamingSetting {
-	return []VoiceRoamingSetting{
-		VoiceRoamingSettingEnableVoiceRoaming,
-		VoiceRoamingSettingDisableVoiceRoaming,
 	}
 }
 
@@ -975,37 +860,6 @@ func AccountGroupV1PrivilegeLevelValues() []AccountGroupV1PrivilegeLevel {
 		AccountGroupV1PrivilegeLevelAuditor,
 		AccountGroupV1PrivilegeLevelEnrollment,
 		AccountGroupV1PrivilegeLevelCustom,
-	}
-}
-
-// AccountPreferencesV5Language is the set of values accepted by AccountPreferencesV5.Language.
-type AccountPreferencesV5Language = string
-
-// AccountPreferencesV5Language values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	AccountPreferencesV5LanguageEn     AccountPreferencesV5Language = "en"
-	AccountPreferencesV5LanguageDe     AccountPreferencesV5Language = "de"
-	AccountPreferencesV5LanguageFr     AccountPreferencesV5Language = "fr"
-	AccountPreferencesV5LanguageEs     AccountPreferencesV5Language = "es"
-	AccountPreferencesV5LanguageJa     AccountPreferencesV5Language = "ja"
-	AccountPreferencesV5LanguageZhHant AccountPreferencesV5Language = "zh-hant"
-)
-
-// AccountPreferencesV5LanguageValues returns every value the Jamf API accepts for AccountPreferencesV5Language,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func AccountPreferencesV5LanguageValues() []AccountPreferencesV5Language {
-	return []AccountPreferencesV5Language{
-		AccountPreferencesV5LanguageEn,
-		AccountPreferencesV5LanguageDe,
-		AccountPreferencesV5LanguageFr,
-		AccountPreferencesV5LanguageEs,
-		AccountPreferencesV5LanguageJa,
-		AccountPreferencesV5LanguageZhHant,
 	}
 }
 
@@ -1137,31 +991,6 @@ func AdcsDependencyConfigProfileTypeValues() []AdcsDependencyConfigProfileType {
 	return []AdcsDependencyConfigProfileType{
 		AdcsDependencyConfigProfileTypeOsxConfigurationProfile,
 		AdcsDependencyConfigProfileTypeIosConfigurationProfile,
-	}
-}
-
-// ApiIntegrationResponseAppType is the set of values accepted by ApiIntegrationResponse.AppType.
-type ApiIntegrationResponseAppType = string
-
-// ApiIntegrationResponseAppType values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	ApiIntegrationResponseAppTypeClientCredentials ApiIntegrationResponseAppType = "CLIENT_CREDENTIALS"
-	ApiIntegrationResponseAppTypeNativeAppOauth    ApiIntegrationResponseAppType = "NATIVE_APP_OAUTH"
-	ApiIntegrationResponseAppTypeNone              ApiIntegrationResponseAppType = "NONE"
-)
-
-// ApiIntegrationResponseAppTypeValues returns every value the Jamf API accepts for ApiIntegrationResponseAppType,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func ApiIntegrationResponseAppTypeValues() []ApiIntegrationResponseAppType {
-	return []ApiIntegrationResponseAppType{
-		ApiIntegrationResponseAppTypeClientCredentials,
-		ApiIntegrationResponseAppTypeNativeAppOauth,
-		ApiIntegrationResponseAppTypeNone,
 	}
 }
 
@@ -2897,58 +2726,6 @@ func EnrollmentSettingsV4FlushMDMCommandsOnReenrollValues() []EnrollmentSettings
 	}
 }
 
-// EnvironmentTypeEnvironment is the set of values accepted by EnvironmentType.Environment.
-type EnvironmentTypeEnvironment = string
-
-// EnvironmentTypeEnvironment values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	EnvironmentTypeEnvironmentStaging    EnvironmentTypeEnvironment = "staging"
-	EnvironmentTypeEnvironmentProduction EnvironmentTypeEnvironment = "production"
-	EnvironmentTypeEnvironmentSandbox    EnvironmentTypeEnvironment = "sandbox"
-)
-
-// EnvironmentTypeEnvironmentValues returns every value the Jamf API accepts for EnvironmentTypeEnvironment,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func EnvironmentTypeEnvironmentValues() []EnvironmentTypeEnvironment {
-	return []EnvironmentTypeEnvironment{
-		EnvironmentTypeEnvironmentStaging,
-		EnvironmentTypeEnvironmentProduction,
-		EnvironmentTypeEnvironmentSandbox,
-	}
-}
-
-// EraseDeviceCommandObliterationBehavior is the set of values accepted by EraseDeviceCommand.ObliterationBehavior.
-type EraseDeviceCommandObliterationBehavior = string
-
-// EraseDeviceCommandObliterationBehavior values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	EraseDeviceCommandObliterationBehaviorDefault               EraseDeviceCommandObliterationBehavior = "Default"
-	EraseDeviceCommandObliterationBehaviorDoNotObliterate       EraseDeviceCommandObliterationBehavior = "DoNotObliterate"
-	EraseDeviceCommandObliterationBehaviorObliterateWithWarning EraseDeviceCommandObliterationBehavior = "ObliterateWithWarning"
-	EraseDeviceCommandObliterationBehaviorAlways                EraseDeviceCommandObliterationBehavior = "Always"
-)
-
-// EraseDeviceCommandObliterationBehaviorValues returns every value the Jamf API accepts for EraseDeviceCommandObliterationBehavior,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func EraseDeviceCommandObliterationBehaviorValues() []EraseDeviceCommandObliterationBehavior {
-	return []EraseDeviceCommandObliterationBehavior{
-		EraseDeviceCommandObliterationBehaviorDefault,
-		EraseDeviceCommandObliterationBehaviorDoNotObliterate,
-		EraseDeviceCommandObliterationBehaviorObliterateWithWarning,
-		EraseDeviceCommandObliterationBehaviorAlways,
-	}
-}
-
 // ExtensionAttributeV2Type is the set of values accepted by ExtensionAttributeV2.Type.
 type ExtensionAttributeV2Type = string
 
@@ -3279,57 +3056,6 @@ func GroupWithCriteriaDtoV1GroupTypeValues() []GroupWithCriteriaDtoV1GroupType {
 	return []GroupWithCriteriaDtoV1GroupType{
 		GroupWithCriteriaDtoV1GroupTypeMobile,
 		GroupWithCriteriaDtoV1GroupTypeComputer,
-	}
-}
-
-// InstalledApplicationListCommandItems is the set of values accepted by InstalledApplicationListCommand.Items.
-type InstalledApplicationListCommandItems = string
-
-// InstalledApplicationListCommandItems values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	InstalledApplicationListCommandItemsAdHocCodeSigned           InstalledApplicationListCommandItems = "AdHocCodeSigned"
-	InstalledApplicationListCommandItemsAppStoreVendable          InstalledApplicationListCommandItems = "AppStoreVendable"
-	InstalledApplicationListCommandItemsBetaApp                   InstalledApplicationListCommandItems = "BetaApp"
-	InstalledApplicationListCommandItemsBundleSize                InstalledApplicationListCommandItems = "BundleSize"
-	InstalledApplicationListCommandItemsDeviceBasedVpp            InstalledApplicationListCommandItems = "DeviceBasedVpp"
-	InstalledApplicationListCommandItemsDistributorIdentifier     InstalledApplicationListCommandItems = "DistributorIdentifier"
-	InstalledApplicationListCommandItemsDynamicSize               InstalledApplicationListCommandItems = "DynamicSize"
-	InstalledApplicationListCommandItemsExternalVersionIdentifier InstalledApplicationListCommandItems = "ExternalVersionIdentifier"
-	InstalledApplicationListCommandItemsHasUpdateAvailable        InstalledApplicationListCommandItems = "HasUpdateAvailable"
-	InstalledApplicationListCommandItemsIdentifier                InstalledApplicationListCommandItems = "Identifier"
-	InstalledApplicationListCommandItemsInstalling                InstalledApplicationListCommandItems = "Installing"
-	InstalledApplicationListCommandItemsAppClip                   InstalledApplicationListCommandItems = "AppClip"
-	InstalledApplicationListCommandItemsValidated                 InstalledApplicationListCommandItems = "Validated"
-	InstalledApplicationListCommandItemsName                      InstalledApplicationListCommandItems = "Name"
-	InstalledApplicationListCommandItemsShortVersion              InstalledApplicationListCommandItems = "ShortVersion"
-	InstalledApplicationListCommandItemsVersion                   InstalledApplicationListCommandItems = "Version"
-)
-
-// InstalledApplicationListCommandItemsValues returns every value the Jamf API accepts for InstalledApplicationListCommandItems,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func InstalledApplicationListCommandItemsValues() []InstalledApplicationListCommandItems {
-	return []InstalledApplicationListCommandItems{
-		InstalledApplicationListCommandItemsAdHocCodeSigned,
-		InstalledApplicationListCommandItemsAppStoreVendable,
-		InstalledApplicationListCommandItemsBetaApp,
-		InstalledApplicationListCommandItemsBundleSize,
-		InstalledApplicationListCommandItemsDeviceBasedVpp,
-		InstalledApplicationListCommandItemsDistributorIdentifier,
-		InstalledApplicationListCommandItemsDynamicSize,
-		InstalledApplicationListCommandItemsExternalVersionIdentifier,
-		InstalledApplicationListCommandItemsHasUpdateAvailable,
-		InstalledApplicationListCommandItemsIdentifier,
-		InstalledApplicationListCommandItemsInstalling,
-		InstalledApplicationListCommandItemsAppClip,
-		InstalledApplicationListCommandItemsValidated,
-		InstalledApplicationListCommandItemsName,
-		InstalledApplicationListCommandItemsShortVersion,
-		InstalledApplicationListCommandItemsVersion,
 	}
 }
 
@@ -5620,31 +5346,6 @@ func SmtpServerV2AuthenticationTypeValues() []SmtpServerV2AuthenticationType {
 		SmtpServerV2AuthenticationTypeBasic,
 		SmtpServerV2AuthenticationTypeGraphApi,
 		SmtpServerV2AuthenticationTypeGoogleMail,
-	}
-}
-
-// SoftwareUpdateSettingsRecommendationCadence is the set of values accepted by SoftwareUpdateSettings.RecommendationCadence.
-type SoftwareUpdateSettingsRecommendationCadence = string
-
-// SoftwareUpdateSettingsRecommendationCadence values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	SoftwareUpdateSettingsRecommendationCadenceAllowAllUpdates             SoftwareUpdateSettingsRecommendationCadence = "ALLOW_ALL_UPDATES"
-	SoftwareUpdateSettingsRecommendationCadenceOnlyAllowLeastCurrentUpdate SoftwareUpdateSettingsRecommendationCadence = "ONLY_ALLOW_LEAST_CURRENT_UPDATE"
-	SoftwareUpdateSettingsRecommendationCadenceOnlyAllowMostCurrentUpdate  SoftwareUpdateSettingsRecommendationCadence = "ONLY_ALLOW_MOST_CURRENT_UPDATE"
-)
-
-// SoftwareUpdateSettingsRecommendationCadenceValues returns every value the Jamf API accepts for SoftwareUpdateSettingsRecommendationCadence,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func SoftwareUpdateSettingsRecommendationCadenceValues() []SoftwareUpdateSettingsRecommendationCadence {
-	return []SoftwareUpdateSettingsRecommendationCadence{
-		SoftwareUpdateSettingsRecommendationCadenceAllowAllUpdates,
-		SoftwareUpdateSettingsRecommendationCadenceOnlyAllowLeastCurrentUpdate,
-		SoftwareUpdateSettingsRecommendationCadenceOnlyAllowMostCurrentUpdate,
 	}
 }
 

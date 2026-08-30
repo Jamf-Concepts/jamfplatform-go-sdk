@@ -14,7 +14,7 @@ import (
 
 // GetComputerApplicationUsageByID finds computer application usage by computer ID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -32,7 +32,7 @@ func (c *Client) GetComputerApplicationUsageByID(ctx context.Context, id string,
 
 // GetComputerApplicationUsageByMacAddressDateRange finds computer application usage by computer MAC address.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - macaddress: MAC address to filter by.
@@ -50,7 +50,7 @@ func (c *Client) GetComputerApplicationUsageByMacAddressDateRange(ctx context.Co
 
 // GetComputerApplicationUsageByNameDateRange finds computer application usage by computer name.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -68,7 +68,7 @@ func (c *Client) GetComputerApplicationUsageByNameDateRange(ctx context.Context,
 
 // GetComputerApplicationUsageBySerialNumberDateRange finds computer application usage by computer serial number.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - serialnumber: Serial number to filter by.
@@ -86,7 +86,7 @@ func (c *Client) GetComputerApplicationUsageBySerialNumberDateRange(ctx context.
 
 // GetComputerApplicationUsageByUDIDDateRange finds computer application usage by computer UDID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - udid: UDID to filter by.

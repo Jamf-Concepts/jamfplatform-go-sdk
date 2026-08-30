@@ -17,7 +17,7 @@ import (
 
 // GetMobileDeviceGroupByID finds mobile device groups by ID.
 //
-// Required privileges: read:pro:mobile-device-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetMobileDeviceGroupByID(ctx context.Context, id string) (*Mobi
 
 // CreateMobileDeviceGroupByID creates a new mobile device group by ID.
 //
-// Required privileges: create:pro:mobile-device-groups.
+// Required privileges: device-groups:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateMobileDeviceGroupByID(ctx context.Context, id string, req
 
 // UpdateMobileDeviceGroupByID updates an existing mobile device group by ID.
 //
-// Required privileges: update:pro:mobile-device-groups.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateMobileDeviceGroupByID(ctx context.Context, id string, req
 
 // DeleteMobileDeviceGroupByID deletes a mobile device group by ID.
 //
-// Required privileges: delete:pro:mobile-device-groups.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteMobileDeviceGroupByID(ctx context.Context, id string) err
 
 // GetMobileDeviceGroupByName finds mobile device groups by name.
 //
-// Required privileges: read:pro:mobile-device-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetMobileDeviceGroupByName(ctx context.Context, name string) (*
 
 // UpdateMobileDeviceGroupByName updates an existing mobile device group by name.
 //
-// Required privileges: update:pro:mobile-device-groups.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateMobileDeviceGroupByName(ctx context.Context, name string,
 
 // DeleteMobileDeviceGroupByName deletes a mobile device group by name.
 //
-// Required privileges: delete:pro:mobile-device-groups.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteMobileDeviceGroupByName(ctx context.Context, name string)
 
 // ListMobileDeviceGroups finds all mobile device groups.
 //
-// Required privileges: read:pro:mobile-device-groups.
+// Required privileges: device-groups:read.
 func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroups, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceGroups
@@ -138,7 +138,7 @@ func (c *Client) ListMobileDeviceGroups(ctx context.Context) (*MobileDeviceGroup
 
 // CreateMobileDeviceGroupByName creates a new mobile device group by ID.
 //
-// Required privileges: create:pro:mobile-device-groups.
+// Required privileges: device-groups:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

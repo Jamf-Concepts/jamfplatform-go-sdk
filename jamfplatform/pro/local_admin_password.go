@@ -14,7 +14,7 @@ import (
 
 // GetLocalAdminPasswordSettingsV2 get the current LAPS settings.
 //
-// Required privileges: update:pro:local-admin-password-settings. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment, Update Local Admin Password Settings.
+// Required privileges: local-admin-passwords:update. Legacy Jamf Pro privilege name(s): Read User-Initiated Enrollment, Update Local Admin Password Settings.
 func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LapsSettingsResponseV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsSettingsResponseV2
@@ -27,7 +27,7 @@ func (c *Client) GetLocalAdminPasswordSettingsV2(ctx context.Context) (*LapsSett
 
 // UpdateLocalAdminPasswordSettingsV2 update settings for LAPS.
 //
-// Required privileges: update:pro:local-admin-password-settings. Legacy Jamf Pro privilege name(s): Update Local Admin Password Settings.
+// Required privileges: local-admin-passwords:update. Legacy Jamf Pro privilege name(s): Update Local Admin Password Settings.
 func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request *LapsSettingsRequestV2) (*LapsSettingsResponseV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsSettingsResponseV2
@@ -40,7 +40,7 @@ func (c *Client) UpdateLocalAdminPasswordSettingsV2(ctx context.Context, request
 
 // ListLocalAdminPasswordPendingRotationsV2 get a list of the current devices and usernames with pending LAPS rotations.
 //
-// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password.
 func (c *Client) ListLocalAdminPasswordPendingRotationsV2(ctx context.Context) (*LapsPendingRotationResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result LapsPendingRotationResponse
@@ -53,7 +53,7 @@ func (c *Client) ListLocalAdminPasswordPendingRotationsV2(ctx context.Context) (
 
 // ListLocalAdminPasswordAccountsV2 get the LAPS capable admin accounts for a device.
 //
-// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -69,7 +69,7 @@ func (c *Client) ListLocalAdminPasswordAccountsV2(ctx context.Context, clientMan
 
 // ListLocalAdminPasswordHistoryV2 get LAPS password viewed history, and rotation history.
 //
-// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -85,7 +85,7 @@ func (c *Client) ListLocalAdminPasswordHistoryV2(ctx context.Context, clientMana
 
 // GetLocalAdminPasswordV2 get current LAPS password for specified username on a client.
 //
-// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -102,7 +102,7 @@ func (c *Client) GetLocalAdminPasswordV2(ctx context.Context, clientManagementID
 
 // ListLocalAdminPasswordAuditsV2 get LAPS password viewed history.
 //
-// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -119,7 +119,7 @@ func (c *Client) ListLocalAdminPasswordAuditsV2(ctx context.Context, clientManag
 
 // ListLocalAdminPasswordAccountHistoryV2 get LAPS historical records for target device and username.
 //
-// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -136,7 +136,7 @@ func (c *Client) ListLocalAdminPasswordAccountHistoryV2(ctx context.Context, cli
 
 // GetLocalAdminPasswordByGuidV2 get current LAPS password for specified user guid on a client.
 //
-// Required privileges: read:pro:local-admin-password. Legacy Jamf Pro privilege name(s): View Local Admin Password.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -154,7 +154,7 @@ func (c *Client) GetLocalAdminPasswordByGuidV2(ctx context.Context, clientManage
 
 // ListLocalAdminPasswordAuditsByGuidV2 get LAPS password viewed history.
 //
-// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -172,7 +172,7 @@ func (c *Client) ListLocalAdminPasswordAuditsByGuidV2(ctx context.Context, clien
 
 // ListLocalAdminPasswordAccountHistoryByGuidV2 get LAPS historical records for target device and user guid.
 //
-// Required privileges: read:pro:local-admin-password-audit-history. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
+// Required privileges: local-admin-passwords:read. Legacy Jamf Pro privilege name(s): View Local Admin Password Audit History.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.
@@ -190,8 +190,7 @@ func (c *Client) ListLocalAdminPasswordAccountHistoryByGuidV2(ctx context.Contex
 
 // SetLocalAdminPasswordV2 set the LAPS password for a device.
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Local Admin Password Command.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: local-admin-passwords:execute. Legacy Jamf Pro privilege name(s): Send Local Admin Password Command.
 //
 // Parameters:
 //   - clientManagementID: client management id of target device.

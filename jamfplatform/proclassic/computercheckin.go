@@ -13,7 +13,7 @@ import (
 
 // GetComputerCheckIn finds the Jamf Pro computer checkin information.
 //
-// Required privileges: read:pro:computer-check-in.
+// Required privileges: computer-check-in:read.
 func (c *Client) GetComputerCheckIn(ctx context.Context) (*ComputerCheckIn, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCheckIn
@@ -26,7 +26,7 @@ func (c *Client) GetComputerCheckIn(ctx context.Context) (*ComputerCheckIn, erro
 
 // UpdateComputerCheckIn updates the Jamf Pro computer checkin information.
 //
-// Required privileges: update:pro:computer-check-in.
+// Required privileges: computer-check-in:update.
 func (c *Client) UpdateComputerCheckIn(ctx context.Context, request *ComputerCheckIn) error {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/computercheckin"

@@ -16,7 +16,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -34,7 +34,7 @@ func (c *Client) GetPatchSoftwareTitleByID(ctx context.Context, id string) (*Pat
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: create:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -52,7 +52,7 @@ func (c *Client) CreatePatchSoftwareTitleByID(ctx context.Context, id string, re
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: update:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:update.
 //
 // Parameters:
 //   - id: ID value to update by.
@@ -69,7 +69,7 @@ func (c *Client) UpdatePatchSoftwareTitleByID(ctx context.Context, id string, re
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: delete:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:delete.
 //
 // Parameters:
 //   - id: ID value to update by.
@@ -86,7 +86,7 @@ func (c *Client) DeletePatchSoftwareTitleByID(ctx context.Context, id string) er
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:read.
 func (c *Client) ListPatchSoftwareTitles(ctx context.Context) (*PatchSoftwareTitles, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchSoftwareTitles

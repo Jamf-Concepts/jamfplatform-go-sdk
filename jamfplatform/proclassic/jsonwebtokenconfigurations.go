@@ -14,7 +14,7 @@ import (
 
 // GetJsonWebTokenConfigurationByID find JSON Web Token configuration by ID.
 //
-// Required privileges: read:pro:json-web-token-configuration.
+// Required privileges: json-web-token-configuration:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetJsonWebTokenConfigurationByID(ctx context.Context, id string
 
 // CreateJsonWebTokenConfigurationByID creates a new JSON Web Token configuration by ID.
 //
-// Required privileges: create:pro:json-web-token-configuration.
+// Required privileges: json-web-token-configuration:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -46,7 +46,7 @@ func (c *Client) CreateJsonWebTokenConfigurationByID(ctx context.Context, id str
 
 // UpdateJsonWebTokenConfigurationByID updates an existing JSON Web Token configuration by ID.
 //
-// Required privileges: update:pro:json-web-token-configuration.
+// Required privileges: json-web-token-configuration:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -61,7 +61,7 @@ func (c *Client) UpdateJsonWebTokenConfigurationByID(ctx context.Context, id str
 
 // DeleteJsonWebTokenConfigurationByID deletes a JSON Web Token configuration by ID.
 //
-// Required privileges: delete:pro:json-web-token-configuration.
+// Required privileges: json-web-token-configuration:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -76,7 +76,7 @@ func (c *Client) DeleteJsonWebTokenConfigurationByID(ctx context.Context, id str
 
 // ListJsonWebTokenConfigurations finds all JSON Web Token configurations.
 //
-// Required privileges: read:pro:json-web-token-configuration.
+// Required privileges: json-web-token-configuration:read.
 func (c *Client) ListJsonWebTokenConfigurations(ctx context.Context) (*JsonWebTokenConfigurations, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result JsonWebTokenConfigurations

@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
@@ -1241,81 +1240,6 @@ func TestAcceptance_ResolveEbookV1IDByName_Existing(t *testing.T) {
 	t.Logf("resolved %q → %s ✓", first.Name, gotID)
 }
 
-// ─── API Integrations ──────────────────────────────────────────────────────
-
-func TestAcceptance_ResolveApiIntegrationV1_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-ai-" + runSuffix()
-
-	_, err := c.ResolveApiIntegrationV1IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-
-	// Create an API role for the integration's authorization scopes.
-	roleName := "sdk-acc-res-ai-role-" + runSuffix()
-	role, err := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: roleName, Privileges: []string{"Read Buildings"}})
-	if err != nil {
-		t.Fatalf("CreateApiRoleV1 (prereq): %v", err)
-	}
-	t.Cleanup(func() { _ = c.DeleteApiRoleV1(ctx, role.ID) })
-
-	newAI := func(n string) *pro.ApiIntegrationRequest {
-		return &pro.ApiIntegrationRequest{DisplayName: n, AuthorizationScopes: []string{roleName}}
-	}
-	resp, err := c.CreateApiIntegrationV1(ctx, newAI(name))
-	if err != nil {
-		t.Fatalf("CreateApiIntegrationV1: %v", err)
-	}
-	id1 := strconv.Itoa(resp.ID)
-	t.Cleanup(func() { _ = c.DeleteApiIntegrationV1(ctx, id1) })
-
-	gotID, err := c.ResolveApiIntegrationV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-	t.Logf("resolved %q → %s ✓", name, gotID)
-
-	got, err := c.ResolveApiIntegrationV1ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil || got.DisplayName != name {
-		t.Errorf("typed DisplayName = %v, want %q", got, name)
-	}
-
-	id2, dupCreated := tryCreateDuplicate(t, "api integration", func() (string, error) {
-		r, e := c.CreateApiIntegrationV1(ctx, newAI(name))
-		if e != nil {
-			return "", e
-		}
-		return strconv.Itoa(r.ID), nil
-	}, func(id string) error { return c.DeleteApiIntegrationV1(ctx, id) })
-
-	if dupCreated {
-		time.Sleep(2 * time.Second) // allow eventual consistency for RSQL index
-		_, err = c.ResolveApiIntegrationV1IDByName(ctx, name)
-		var amErr *jamfplatform.AmbiguousMatchError
-		if errors.As(err, &amErr) {
-			t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		} else {
-			// API integrations list endpoint has eventual consistency — dup may not
-			// appear in filtered results immediately. Log rather than fail.
-			t.Logf("NOTE: dup created (%s, %s) but resolver did not detect ambiguity (eventual consistency); err=%v", id1, id2, err)
-		}
-		_ = c.DeleteApiIntegrationV1(ctx, id2)
-	}
-
-	if err := c.DeleteApiIntegrationV1(ctx, id1); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = c.ResolveApiIntegrationV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("lifecycle complete ✓")
-}
-
 // ─── Supervision Identities ────────────────────────────────────────────────
 
 func TestAcceptance_ResolveSupervisionIdentityV1_Lifecycle(t *testing.T) {
@@ -1553,78 +1477,6 @@ func TestAcceptance_ResolveEnrollmentCustomizationV2_Lifecycle(t *testing.T) {
 	_, err = c.ResolveEnrollmentCustomizationV2IDByName(ctx, name)
 	requireNotFoundErr(t, "post-delete", err)
 	t.Log("lifecycle complete ✓")
-}
-
-// ─── ApiRoles ───────────────────────────────────────────────────────────────
-
-func TestAcceptance_ResolveApiRoleV1_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-role-" + runSuffix()
-
-	// Step 1: Not found
-	_, err := c.ResolveApiRoleV1IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-	t.Log("step 1: not-found ✓")
-
-	// Step 2: Create
-	resp, err := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: name, Privileges: []string{"Read Buildings"}})
-	if err != nil {
-		t.Fatalf("CreateApiRoleV1: %v", err)
-	}
-	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteApiRoleV1(ctx, id1) })
-	t.Logf("step 2: created %s", id1)
-
-	// Step 3: Resolve ID
-	gotID, err := c.ResolveApiRoleV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("ResolveApiRoleV1IDByName: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
-
-	// Step 4: Resolve typed
-	got, err := c.ResolveApiRoleV1ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("ResolveApiRoleV1ByName: %v", err)
-	}
-	if got == nil || got.DisplayName != name {
-		t.Errorf("typed DisplayName = %v, want %q", got, name)
-	}
-	t.Log("step 4: resolve typed ✓")
-
-	// Step 5: Attempt duplicate
-	id2, dupCreated := tryCreateDuplicate(t, "api role", func() (string, error) {
-		r, e := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: name, Privileges: []string{"Read Buildings"}})
-		if e != nil {
-			return "", e
-		}
-		return r.ID, nil
-	}, func(id string) error { return c.DeleteApiRoleV1(ctx, id) })
-
-	// Step 6: Ambiguous
-	if dupCreated {
-		_, err = c.ResolveApiRoleV1IDByName(ctx, name)
-		requireAmbiguousErr(t, "ambiguous", err)
-		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
-
-		if err := c.DeleteApiRoleV1(ctx, id2); err != nil {
-			t.Logf("early delete dup: %v", err)
-		}
-	}
-
-	// Step 7: Delete original
-	if err := c.DeleteApiRoleV1(ctx, id1); err != nil {
-		t.Fatalf("delete original: %v", err)
-	}
-
-	// Step 8: Not found after delete
-	_, err = c.ResolveApiRoleV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("step 8: not-found after delete ✓")
 }
 
 // ─── AdvancedUserContentSearches ────────────────────────────────────────────

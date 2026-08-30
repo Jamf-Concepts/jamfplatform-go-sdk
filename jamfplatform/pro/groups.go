@@ -19,8 +19,7 @@ import (
 
 // ListGroupsV2 returns group information for all Mobile Device and Computer groups.
 //
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupName:asc. Multiple sort
@@ -67,8 +66,7 @@ func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 //
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupName:asc. Multiple sort
@@ -115,8 +113,7 @@ func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string)
 
 // GetGroupV2 returns group information for the given platform UUID.
 //
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -134,8 +131,7 @@ func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaD
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 //
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -151,8 +147,7 @@ func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaD
 
 // DeleteGroupV2 delete a group by platform UUID.
 //
-// Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -169,8 +164,7 @@ func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -185,8 +179,7 @@ func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
 
 // PatchGroupV2 update a group by platform UUID.
 //
-// Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -203,8 +196,7 @@ func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpda
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 //
-// Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - id: The platform UUID of a group.

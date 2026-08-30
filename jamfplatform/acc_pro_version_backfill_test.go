@@ -211,18 +211,6 @@ func TestAcceptance_Pro_MDM_ListCommandsV1(t *testing.T) {
 	t.Logf("V1 MDM commands: %d", len(items))
 }
 
-// --- account-preferences V2 -------------------------------------------------
-
-func TestAcceptance_Pro_AccountPreferences_GetV2(t *testing.T) {
-	c := accClient(t)
-	prefs, err := pro.New(c).GetAccountPreferencesV2(context.Background())
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetAccountPreferencesV2: %v", err)
-	}
-	t.Logf("V2 account preferences fetched (language=%v)", prefs.Language)
-}
-
 // --- mobile-device-prestages V2 ---------------------------------------------
 
 func TestAcceptance_Pro_Enrollment_ListMobileDevicePrestagesV2(t *testing.T) {

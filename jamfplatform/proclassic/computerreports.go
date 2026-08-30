@@ -14,7 +14,7 @@ import (
 
 // GetComputerReportByID finds computer reports by id.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer Report ID to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetComputerReportByID(ctx context.Context, id string) (*Compute
 
 // GetComputerReportByName finds computer reports by name.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - name: Computer Report name to filter by.
@@ -46,7 +46,7 @@ func (c *Client) GetComputerReportByName(ctx context.Context, name string) (*Com
 
 // ListComputerReports finds all computer reports.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 func (c *Client) ListComputerReports(ctx context.Context) (*ComputerReports, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerReports

@@ -27,7 +27,7 @@ func (c *Client) ListNotificationsV1(ctx context.Context) ([]NotificationV1, err
 
 // DeleteNotificationV1 delete Notifications.
 //
-// Required privileges: execute:pro:dismiss-notifications. Legacy Jamf Pro privilege name(s): Dismiss Notifications.
+// Required privileges: dismiss-notifications:execute. Legacy Jamf Pro privilege name(s): Dismiss Notifications.
 //
 // Parameters:
 //   - notificationType: type of the notification.

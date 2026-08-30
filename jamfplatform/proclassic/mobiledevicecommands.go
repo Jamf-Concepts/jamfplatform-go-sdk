@@ -14,7 +14,7 @@ import (
 
 // GetMobileDeviceCommandByUUID finds a mobile device command by UUID.
 //
-// Required privileges: read:pro:mobile-device-commands.
+// Required privileges: device-actions:read.
 //
 // Parameters:
 //   - uuid: UUID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetMobileDeviceCommandByUUID(ctx context.Context, uuid string) 
 
 // IssueMobileDeviceCommand creates a new mobile device command.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
+// Required privileges: destructive-device-actions:execute, devices:create.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDeviceCommandPost) (*MobileDeviceCommand, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
@@ -44,7 +44,7 @@ func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDe
 
 // GetMobileDeviceCommandByName finds all mobile device commands by command name.
 //
-// Required privileges: read:pro:mobile-device-commands.
+// Required privileges: device-actions:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -60,7 +60,7 @@ func (c *Client) GetMobileDeviceCommandByName(ctx context.Context, name string) 
 
 // ListMobileDeviceCommands finds all mobile device commands.
 //
-// Required privileges: read:pro:mobile-device-commands.
+// Required privileges: device-actions:read.
 func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCommands, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceCommands
@@ -73,7 +73,7 @@ func (c *Client) ListMobileDeviceCommands(ctx context.Context) (*MobileDeviceCom
 
 // GetMobileDeviceCommandByCommand finds all mobile device commands for specified command.
 //
-// Required privileges: read:pro:mobile-device-commands.
+// Required privileges: device-actions:read.
 //
 // Parameters:
 //   - command: Name to filter by.
@@ -89,8 +89,7 @@ func (c *Client) GetMobileDeviceCommandByCommand(ctx context.Context, command st
 
 // CreateMobileDeviceCommandByCommandID creates a new mobile device command.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - command: Command to send device.
@@ -110,8 +109,7 @@ func (c *Client) CreateMobileDeviceCommandByCommandID(ctx context.Context, comma
 
 // CreateMobileDeviceCommandByCommand creates a new mobile device command.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - command: Command to send device.
@@ -130,8 +128,7 @@ func (c *Client) CreateMobileDeviceCommandByCommand(ctx context.Context, command
 
 // CreateMobileDeviceCommandWithParameterByIDList creates a new mobile device command.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute.
 //
 // Parameters:
 //   - command: Command to send device.
@@ -152,8 +149,7 @@ func (c *Client) CreateMobileDeviceCommandWithParameterByIDList(ctx context.Cont
 
 // CreateMobileDeviceCommandWithParameterVersionByIDList creates a new mobile device command.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute.
 //
 // Parameters:
 //   - command: Command to send device.
@@ -175,8 +171,7 @@ func (c *Client) CreateMobileDeviceCommandWithParameterVersionByIDList(ctx conte
 
 // CreateMobileDeviceCommandByName creates a new mobile device command.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:mobile-device-commands.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - name: Path parameter name.

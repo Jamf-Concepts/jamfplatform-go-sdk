@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -1193,104 +1192,85 @@ func TestAcceptance_SecurityCloudUemConnectReads(t *testing.T) {
 	}
 }
 
-// jscProUemCredentials mints a throwaway API role, API integration and client
-// credential set on the *Jamf Pro* tenant and returns the instance URL plus the
-// credentials, all through the SDK. This is what a real JAMF_PRO UEM connector
-// authenticates with, so it is the only way to build a genuine connector create
-// request without hand-carrying a secret in an env var.
+// jscProUemTenantID returns the platform tenant identifier of the Jamf Pro
+// instance a UEM connector should sync with, for the `authStrategy: M2M`
+// provisioning path.
 //
-// It needs the Jamf Pro credential set (JAMFPLATFORM_*), which is a different
-// product and a different tenant from the Security Cloud one — see
-// errAccJSCCredsUnset. Both are required, and the Pro side is what skips when
-// absent.
+// M2M is what makes this test self-sufficient: the caller supplies a tenant ID
+// and no credentials at all, and Jamf Security Cloud provisions its own API role
+// and integration ("JSC Connector") on that tenant. The previous shape used
+// `JAMF_PRO_OAUTH` and minted the role, integration and client-credential pair
+// itself through the SDK — no longer possible, because Jamf withdrew
+// /v1/api-roles, /v1/api-integrations and /v1/api-role-privileges from the
+// published spec in the GA cleanup (public-apis-oas#395, JSC-73265) with
+// credential management moving to Jamf Account. M2M reaches the same place
+// without them and without a secret in an env var.
 //
-// Everything it creates is registered for deletion. The role carries every
-// privilege the tenant offers rather than a guessed subset: UEM Connect's
-// required Pro privileges are not documented anywhere, and this is a throwaway
-// integration whose credentials never leave the test.
-func jscProUemCredentials(t *testing.T) (instanceURL, clientID, clientSecret string) {
+// Three sources, in order:
+//
+//   - JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID, when the target instance is not the
+//     one the suite's own Jamf Pro credential reaches.
+//   - GET /api/pro/v1/m2m/tenant-id, which asks the instance for its own
+//     platform tenant ID. This is the one that works whichever scope the suite
+//     settled on — an environment-scoped credential reports no tenant ID of its
+//     own (Client.Scope returns the environment), so the instance has to be
+//     asked. Needs the m2m:read capability.
+//   - the client's own scope, when it is tenant-scoped: that value is the
+//     platform tenant ID of the Jamf Pro this suite is pointed at, and costs no
+//     request. Only a fallback, for a credential without m2m:read.
+//
+// Needs the Jamf Pro credential set (JAMFPLATFORM_* or JAMFPLATFORM_ENV_*),
+// which is a different product and a different tenant from the Security Cloud
+// one — see errAccJSCCredsUnset.
+func jscProUemTenantID(t *testing.T) string {
 	t.Helper()
+
+	if id := os.Getenv("JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID"); id != "" {
+		t.Logf("Jamf Pro tenant %s (from JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID)", id)
+		return id
+	}
+
 	c := accClient(t)
-	p := pro.New(c)
-	ctx := context.Background()
-
-	serverURL, err := p.GetJamfProServerURLV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetJamfProServerURLV1 failed: %v", err)
+	info, err := pro.New(c).GetM2MTenantIDV1(context.Background())
+	if err == nil && info.TenantID != nil && *info.TenantID != "" {
+		t.Logf("Jamf Pro tenant %s (from GET /v1/m2m/tenant-id)", *info.TenantID)
+		return *info.TenantID
 	}
-	if serverURL.URL == "" {
-		t.Fatal("GetJamfProServerURLV1 returned an empty URL — a UEM connector has nothing to point at")
+	if err != nil {
+		t.Logf("GetM2MTenantIDV1: %v — falling back to the client's own scope", err)
 	}
 
-	privs, err := p.ListApiRolePrivilegesV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListApiRolePrivilegesV1 failed: %v", err)
-	}
-	if len(privs.Privileges) == 0 {
-		t.Fatal("ListApiRolePrivilegesV1 returned no privileges")
+	if kind, id := c.Scope(); kind == jamfplatform.ScopeTenant && id != "" {
+		t.Logf("Jamf Pro tenant %s (from the suite's tenant-scoped credential)", id)
+		return id
 	}
 
-	roleName := jscName("uem-role")
-	role, err := p.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{
-		DisplayName: roleName,
-		Privileges:  privs.Privileges,
-	})
-	if err != nil {
-		t.Fatalf("CreateApiRoleV1 failed: %v", err)
-	}
-	roleID := role.ID
-	cleanupDelete(t, "pro api role "+roleID, func() error {
-		return p.DeleteApiRoleV1(context.Background(), roleID)
-	})
-
-	integration, err := p.CreateApiIntegrationV1(ctx, &pro.ApiIntegrationRequest{
-		DisplayName:                jscName("uem-integration"),
-		AuthorizationScopes:        []string{roleName},
-		Enabled:                    &[]bool{true}[0],
-		AccessTokenLifetimeSeconds: &[]int{600}[0],
-	})
-	if err != nil {
-		t.Fatalf("CreateApiIntegrationV1 failed: %v", err)
-	}
-	// ApiIntegrationResponse.ID is an int; every path parameter is a string.
-	integrationID := strconv.Itoa(integration.ID)
-	cleanupDelete(t, "pro api integration "+integrationID, func() error {
-		return p.DeleteApiIntegrationV1(context.Background(), integrationID)
-	})
-
-	creds, err := p.RotateApiIntegrationClientCredentialsV1(ctx, integrationID)
-	if err != nil {
-		t.Fatalf("RotateApiIntegrationClientCredentialsV1 failed: %v", err)
-	}
-	if creds.ClientID == "" || creds.ClientSecret == "" {
-		t.Fatal("client-credentials returned an empty pair")
-	}
-	return serverURL.URL, creds.ClientID, creds.ClientSecret
+	t.Skip("cannot determine the target Jamf Pro platform tenant ID: /v1/m2m/tenant-id is unavailable (grant m2m:read) and this suite is not tenant-scoped — set JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID")
+	return ""
 }
 
 // TestAcceptance_SecurityCloudUemConnectCreate drives CreateUemConnectorV1 with
-// a real, fully-populated request: a Jamf Pro instance URL and OAuth credentials
-// minted on the Pro tenant by jscProUemCredentials. It replaces a blanket skip
-// that claimed the whole family was unreachable — most of it is, but the create
-// path is not, and it was worth finding out where exactly it stops.
+// a real, fully-populated request: `authStrategy: M2M` plus the platform tenant
+// ID of a Jamf Pro instance, which is the provisioning path that needs no
+// credentials from the caller at all (see jscProUemTenantID).
 //
-// Two things this pins that no spec states, both wire-verified 2026-08-21:
+// Three things this pins that no published spec states, all wire-verified:
 //
 //   - `authStrategy` is required, and omitting it is a **500 INTERNAL_ERROR**
-//     rather than a validation error. That matters because the published
-//     ConnectorCreateRequest declares only vendor/url/isoCountry, so a request
-//     built from the spec alone could only ever 500. authStrategy and
-//     deviceSyncAuth are restored via schemaCreations/schemaPatches, and the
-//     500 subtest is the regression guard: if it starts returning 4xx the
+//     rather than a validation error (2026-08-21). That matters because the
+//     published ConnectorCreateRequest declares only vendor/url/isoCountry, so a
+//     request built from the spec alone could only ever 500. authStrategy,
+//     tenantId and deviceSyncAuth are restored via schemaCreations/schemaPatches,
+//     and the 500 subtest is the regression guard: if it starts returning 4xx the
 //     server bug is fixed and the note in CLAUDE.md should say so.
+//   - `M2M` requires `tenantId` and rejects its absence with
+//     `422 "tenantId: must not be null"` (2026-08-28) — so field validation is
+//     reachable without supplying anything secret.
 //   - A tenant may hold **one connector, full stop**. A complete, correct
 //     request answers 409 CONNECTOR_CONFIG_ALREADY_EXISTS whenever any
 //     connector exists, whatever its vendor — the message says "incompatible
 //     UEM vendor" but INTUNE and JAMF_PRO are refused identically, and the
-//     check fires before credential validation (bogus credentials give the
-//     same 409).
+//     check fires before credential validation.
 //
 // So on a tenant that already has a connector this exercises the create path
 // right up to the singleton pre-check without provisioning anything. On a tenant
@@ -1302,18 +1282,13 @@ func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
 
-	instanceURL, clientID, clientSecret := jscProUemCredentials(t)
-	t.Logf("minted Pro OAuth credentials for %s (clientId %s)", instanceURL, clientID)
+	tenantID := jscProUemTenantID(t)
 
 	req := func() *securitycloud.ConnectorCreateRequest {
 		return &securitycloud.ConnectorCreateRequest{
 			Vendor:       securitycloud.ConnectorCreateRequestVendorJamfPro,
-			URL:          instanceURL,
-			AuthStrategy: &[]string{"JAMF_PRO_OAUTH"}[0],
-			DeviceSyncAuth: &securitycloud.DeviceSyncAuth{
-				ClientID:     &clientID,
-				ClientSecret: &clientSecret,
-			},
+			AuthStrategy: &[]string{"M2M"}[0],
+			TenantID:     &tenantID,
 		}
 	}
 
@@ -1323,7 +1298,8 @@ func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
 	t.Run("authStrategy omitted is a 500, not a validation error", func(t *testing.T) {
 		bare := req()
 		bare.AuthStrategy = nil
-		bare.DeviceSyncAuth = nil
+		bare.TenantID = nil
+		bare.URL = "https://example.jamfcloud.com"
 		_, err := sc.CreateUemConnectorV1(ctx, bare)
 		if err == nil {
 			t.Fatal("a vendor+url-only create succeeded — the server bug is fixed and a connector may now exist on the tenant")
@@ -1338,18 +1314,18 @@ func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
 		t.Logf("spec-shaped request -> %s", apiErr.Summary())
 	})
 
-	t.Run("authStrategy without credentials is a 422", func(t *testing.T) {
-		noAuth := req()
-		noAuth.DeviceSyncAuth = nil
-		_, err := sc.CreateUemConnectorV1(ctx, noAuth)
+	t.Run("M2M without a tenantId is a 422", func(t *testing.T) {
+		noTenant := req()
+		noTenant.TenantID = nil
+		_, err := sc.CreateUemConnectorV1(ctx, noTenant)
 		if err == nil {
-			t.Fatal("a create with no deviceSyncAuth succeeded — an unauthenticated connector may now exist on the tenant")
+			t.Fatal("a create with no tenantId succeeded — an unprovisioned connector may now exist on the tenant")
 		}
 		apiErr := jamfplatform.AsAPIError(err)
 		if apiErr == nil || !apiErr.HasStatus(422) {
 			t.Fatalf("want 422 VALIDATION_FAILED once authStrategy is present, got %v", err)
 		}
-		t.Logf("authStrategy without deviceSyncAuth -> %s", apiErr.Summary())
+		t.Logf("M2M without tenantId -> %s", apiErr.Summary())
 	})
 
 	t.Run("a complete request clears validation", func(t *testing.T) {
@@ -1357,7 +1333,10 @@ func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
 		if err == nil {
 			// The tenant had no connector, so this made one. Remove it before
 			// anything else observes it, then fail: the full lifecycle is now
-			// reachable here and deserves real coverage.
+			// reachable here and deserves real coverage. Note the deletion also
+			// has to undo the API role and integration M2M provisioned on the
+			// Jamf Pro side, which the SDK can no longer do — check the target
+			// instance for a leftover "JSC Connector" integration.
 			id := created.ID
 			jscCleanupDelete(t, "uem connector "+id, func() error {
 				return sc.DeleteUemConnectorV1(context.Background(), id)
@@ -1368,9 +1347,9 @@ func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
 		if apiErr == nil || !apiErr.HasStatus(409) {
 			t.Fatalf("want 409 CONNECTOR_CONFIG_ALREADY_EXISTS (validation passed, singleton refused), got %v", err)
 		}
-		// A 409 here and a 422 above together prove the credential fields were
-		// structurally accepted: the request got past field validation to a
-		// state check, which is the furthest a shared tenant allows.
+		// A 409 here and a 422 above together prove tenantId was structurally
+		// accepted: the request got past field validation to a state check,
+		// which is the furthest a shared tenant allows.
 		t.Logf("complete request -> %s", apiErr.Summary())
 	})
 }

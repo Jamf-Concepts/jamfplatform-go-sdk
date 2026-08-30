@@ -13,7 +13,7 @@ import (
 
 // GetImpactAlertNotificationSettingsV1 get Impact Alert Notification Settings.
 //
-// Required privileges: read:pro:impact-alert-notification-settings. Legacy Jamf Pro privilege name(s): Read Impact Alert Notification Settings.
+// Required privileges: impact-alert-notification-settings:read. Legacy Jamf Pro privilege name(s): Read Impact Alert Notification Settings.
 func (c *Client) GetImpactAlertNotificationSettingsV1(ctx context.Context) (*ImpactAlertNotificationSettingsV1, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ImpactAlertNotificationSettingsV1
@@ -26,7 +26,7 @@ func (c *Client) GetImpactAlertNotificationSettingsV1(ctx context.Context) (*Imp
 
 // UpdateImpactAlertNotificationSettingsV1 update Impact Alert Notification Settings.
 //
-// Required privileges: update:pro:impact-alert-notification-settings. Legacy Jamf Pro privilege name(s): Update Impact Alert Notification Settings.
+// Required privileges: impact-alert-notification-settings:update. Legacy Jamf Pro privilege name(s): Update Impact Alert Notification Settings.
 func (c *Client) UpdateImpactAlertNotificationSettingsV1(ctx context.Context, request *ImpactAlertNotificationSettingsV1) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/impact-alert-notification-settings"

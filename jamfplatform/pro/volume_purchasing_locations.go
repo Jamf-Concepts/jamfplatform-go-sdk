@@ -19,7 +19,7 @@ import (
 
 // ListVolumePurchasingLocationsV1 retrieve Volume Purchasing Locations.
 //
-// Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:read. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
@@ -60,7 +60,7 @@ func (c *Client) ListVolumePurchasingLocationsV1(ctx context.Context, sort []str
 
 // CreateVolumePurchasingLocationV1 create a Volume Purchasing Location.
 //
-// Required privileges: create:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Create Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:create. Legacy Jamf Pro privilege name(s): Create Volume Purchasing Locations.
 func (c *Client) CreateVolumePurchasingLocationV1(ctx context.Context, request *VolumePurchasingLocationPost) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -73,7 +73,7 @@ func (c *Client) CreateVolumePurchasingLocationV1(ctx context.Context, request *
 
 // GetVolumePurchasingLocationV1 retrieve a Volume Purchasing Location with the supplied id.
 //
-// Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:read. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
@@ -89,7 +89,7 @@ func (c *Client) GetVolumePurchasingLocationV1(ctx context.Context, id string) (
 
 // DeleteVolumePurchasingLocationV1 delete a Volume Purchasing Location with the supplied id.
 //
-// Required privileges: delete:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Delete Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:delete. Legacy Jamf Pro privilege name(s): Delete Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
@@ -104,7 +104,7 @@ func (c *Client) DeleteVolumePurchasingLocationV1(ctx context.Context, id string
 
 // UpdateVolumePurchasingLocationV1 update a Volume Purchasing Location.
 //
-// Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:update. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
@@ -120,7 +120,7 @@ func (c *Client) UpdateVolumePurchasingLocationV1(ctx context.Context, id string
 
 // ListVolumePurchasingLocationContentV1 retrieve the Volume Purchasing Content for the Volume Purchasing Location with the supplied id.
 //
-// Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:read. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
@@ -161,7 +161,7 @@ func (c *Client) ListVolumePurchasingLocationContentV1(ctx context.Context, id s
 
 // ListVolumePurchasingLocationHistoryV1 get specified Volume Purchasing Location history object.
 //
-// Required privileges: read:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:read. Legacy Jamf Pro privilege name(s): Read Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: instance id of Volume Purchasing Location history record.
@@ -202,7 +202,7 @@ func (c *Client) ListVolumePurchasingLocationHistoryV1(ctx context.Context, id s
 
 // CreateVolumePurchasingLocationHistoryNoteV1 add specified Volume Purchasing Location history object notes.
 //
-// Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:update. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: instance id of Volume Purchasing Location history record.
@@ -218,7 +218,7 @@ func (c *Client) CreateVolumePurchasingLocationHistoryNoteV1(ctx context.Context
 
 // ReclaimVolumePurchasingLocationLicensesV1 reclaim a Volume Purchasing Location with the supplied id.
 //
-// Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:update. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: Volume Purchasing Location identifier.
@@ -233,7 +233,7 @@ func (c *Client) ReclaimVolumePurchasingLocationLicensesV1(ctx context.Context, 
 
 // RevokeVolumePurchasingLocationLicensesV1 revoke licenses for a Volume Purchasing Location with the supplied id.
 //
-// Required privileges: update:pro:volume-purchasing-locations. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
+// Required privileges: volume-purchasing-locations:update. Legacy Jamf Pro privilege name(s): Update Volume Purchasing Locations.
 //
 // Parameters:
 //   - id: Volume Purchasing Location identifier.

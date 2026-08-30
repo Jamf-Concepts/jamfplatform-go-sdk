@@ -10,10 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"regexp"
-	"sort"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -272,144 +269,19 @@ func TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV2(t *testing.T) {
 	t.Logf("Recent MDM commands (status==Pending): %d", len(cmds))
 }
 
-func TestAcceptance_Pro_MdmUpdates_SendMdmCommandV2(t *testing.T) {
-	t.Skip("sends an MDM command to real enrolled devices — manual curl against a disposable target only")
-}
-
-// nonexistentManagementID is a syntactically valid managementId that no device
-// can hold. Sending to it exercises the request path without any command
-// reaching a device — the same trick the mdm-renewal reads below use.
-const nonexistentManagementID = "00000000-0000-0000-0000-000000000000"
-
-// knownCommandTypesRe extracts the command ids from the server's type
-// resolution failure, which enumerates every id it accepts:
+// POST /api/pro/v2/mdm/commands is no longer covered. Jamf withdrew it from
+// the published spec in the GA cleanup (public-apis-oas#395; the GET is
+// retained), so the SDK no longer generates SendMdmCommandV2 and the request
+// types MDMCommandRequest / MDMCommandClientRequest are gone with it.
 //
-//	Could not resolve type id 'X' as a subtype of ...: known type ids = [A, B, …]
-var knownCommandTypesRe = regexp.MustCompile(`known type ids = \[([^\]]*)\]`)
-
-// TestAcceptance_Pro_MdmUpdates_CommandTypeEnumMatchesServer checks the
-// generated MDMCommandType constants against the live server's own list.
-//
-// An unresolvable commandType makes the server enumerate every id it knows, so
-// one deliberately-invalid request yields the authoritative set. That makes this
-// a standing check on the generated enum rather than a snapshot: when Jamf adds
-// a command type, this fails and tells us the name.
-//
-// Nothing is sent to a device — the payload is rejected during deserialisation,
-// before the target is even considered.
-func TestAcceptance_Pro_MdmUpdates_CommandTypeEnumMatchesServer(t *testing.T) {
-	c := accClient(t)
-	managementID := nonexistentManagementID
-
-	_, err := pro.New(c).SendMdmCommandV2(context.Background(), &pro.MDMCommandRequest{
-		ClientData:  &[]pro.MDMCommandClientRequest{{ManagementID: &managementID}},
-		CommandData: map[string]any{"commandType": "SDK_ACC_NOT_A_COMMAND_TYPE"},
-	})
-	if err == nil {
-		t.Fatal("SendMdmCommandV2 accepted an unknown commandType — expected a type resolution failure")
-	}
-	apiErr := jamfplatform.AsAPIError(err)
-	if apiErr == nil {
-		skipOnServerError(t, err)
-		t.Fatalf("SendMdmCommandV2: non-HTTP error: %v", err)
-	}
-	m := knownCommandTypesRe.FindStringSubmatch(apiErr.Summary())
-	if m == nil {
-		// The server changed how it reports this; the enum is unverified rather
-		// than wrong, so say so instead of failing on a message format.
-		t.Skipf("server no longer enumerates known command types; response was: %s", apiErr.Summary())
-	}
-
-	server := make(map[string]bool)
-	for _, v := range strings.Split(m[1], ",") {
-		if v = strings.TrimSpace(v); v != "" {
-			server[v] = true
-		}
-	}
-	emitted := make(map[string]bool)
-	for _, v := range pro.MDMCommandTypeValues() {
-		emitted[v] = true
-	}
-	t.Logf("server accepts %d command types; SDK emits %d constants", len(server), len(emitted))
-
-	var missing []string
-	for v := range server {
-		if !emitted[v] {
-			missing = append(missing, v)
-		}
-	}
-	sort.Strings(missing)
-	if len(missing) > 0 {
-		t.Errorf("server accepts command types the SDK does not emit: %v — the Pro spec is behind, add them via the generator", missing)
-	}
-
-	// The reverse is expected, not an error: Jamf retains a command type in the
-	// spec after the server stops accepting it. DEVICE_LOCATION is in that state
-	// as of 11.30 (Apple deprecated the command), and the SDK deliberately keeps
-	// spec-declared values until Jamf removes them. Logged so the drift stays
-	// visible.
-	var stale []string
-	for v := range emitted {
-		if !server[v] {
-			stale = append(stale, v)
-		}
-	}
-	sort.Strings(stale)
-	if len(stale) > 0 {
-		t.Logf("SDK emits command types the server no longer accepts (spec retains them): %v", stale)
-	}
-}
-
-// TestAcceptance_Pro_MdmUpdates_EnhancedLogCollectionCommands covers the two
-// command payloads added in Jamf Pro 11.30, without triggering log collection
-// on anything: the target managementId cannot exist, so the request fails at
-// the device rather than at the payload.
-//
-// What is being verified is that the server resolves both commandType values
-// and accepts the generated struct shapes. A type resolution failure here would
-// mean the generated enum value or payload does not match the server.
-func TestAcceptance_Pro_MdmUpdates_EnhancedLogCollectionCommands(t *testing.T) {
-	c := pro.New(accClient(t))
-	managementID := nonexistentManagementID
-
-	cases := []struct {
-		name string
-		data any
-	}{
-		{"trigger", pro.TriggerEnhancedLogCollectionCommand{
-			CommandType:    pro.MDMCommandTypeTriggerEnhancedLogCollection,
-			AppleCareToken: "sdk-acc-not-a-real-applecare-token",
-		}},
-		{"cancel", pro.CancelEnhancedLogCollectionCommand{
-			CommandType: pro.MDMCommandTypeCancelEnhancedLogCollection,
-		}},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := c.SendMdmCommandV2(context.Background(), &pro.MDMCommandRequest{
-				ClientData:  &[]pro.MDMCommandClientRequest{{ManagementID: &managementID}},
-				CommandData: tc.data,
-			})
-			if err == nil {
-				// Would mean the server queued a command for a device that
-				// cannot exist. Worth knowing about.
-				t.Fatalf("SendMdmCommandV2(%s) succeeded against managementId %s", tc.name, managementID)
-			}
-			apiErr := jamfplatform.AsAPIError(err)
-			if apiErr == nil {
-				skipOnServerError(t, err)
-				t.Fatalf("SendMdmCommandV2(%s): non-HTTP error: %v", tc.name, err)
-			}
-			if knownCommandTypesRe.MatchString(apiErr.Summary()) {
-				t.Fatalf("server did not recognise the commandType — generated enum or payload is wrong: %s", apiErr.Summary())
-			}
-			// Expected: rejected on the target, which is the property being
-			// relied on to keep this test harmless.
-			t.Logf("%s: commandType resolved; rejected at the device as expected — %s", tc.name, apiErr.Summary())
-		})
-	}
-}
+// Three tests went with it, and one is a real loss worth restoring if a
+// successor appears: CommandTypeEnumMatchesServer used the server's own type
+// resolution failure ("known type ids = [A, B, …]") as an oracle for the
+// MDMCommandType enum, which is the only wire confirmation that the generated
+// constants match what the server accepts. MDMCommandType itself survives, from
+// MDMCommand on the read side, so the enum is still emitted — just unverified.
+// The other two (SendMdmCommandV2, EnhancedLogCollectionCommands) only probed
+// the withdrawn path.
 
 func TestAcceptance_Pro_MdmUpdates_SendMdmBlankPushV2(t *testing.T) {
 	t.Skip("blank push to a real enrolled device — manual curl only")

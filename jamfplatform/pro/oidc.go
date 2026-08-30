@@ -26,7 +26,7 @@ func (c *Client) GetOidcDirectIdpLoginUrlV1(ctx context.Context) (*OidcDirectIdp
 
 // GenerateOidcCertificateV1 generate a new keystore used for signing OIDC messages.
 //
-// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
+// Required privileges: sso-settings:update. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) GenerateOidcCertificateV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/oidc/generate-certificate"
@@ -71,21 +71,6 @@ func (c *Client) DispatchOidcLoginV2(ctx context.Context, request *OidcLoginDisp
 	endpoint := prefix + "/oidc/dispatch"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("DispatchOidcLoginV2: %w", err)
-	}
-	return &result, nil
-}
-
-// DispatchOidcV1 provide the url to redirect for OIDC login.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-02-17) and may be removed in a future release.
-//
-// Required privileges: none (callable by any authenticated API client).
-func (c *Client) DispatchOidcV1(ctx context.Context, request *OidcLoginDispatchRequest) (*OidcLoginDispatchResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result OidcLoginDispatchResponse
-	endpoint := prefix + "/oidc/dispatch"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("DispatchOidcV1: %w", err)
 	}
 	return &result, nil
 }

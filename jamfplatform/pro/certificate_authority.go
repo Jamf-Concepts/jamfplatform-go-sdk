@@ -53,7 +53,7 @@ func (c *Client) DownloadActiveCertificateAuthorityPemV1(ctx context.Context) ([
 
 // GetCertificateAuthorityV1 returns X.509 details of Certificate Authority (CA) with provided ID.
 //
-// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
+// Required privileges: pki:read. Legacy Jamf Pro privilege name(s): Read PKI.
 //
 // Parameters:
 //   - id: UUID of the Certificate Authority (CA).
@@ -69,7 +69,7 @@ func (c *Client) GetCertificateAuthorityV1(ctx context.Context, id string) (*Cer
 
 // DownloadCertificateAuthorityDerV1 returns X.509 current Certificate Authority (CA) with provided ID in DER format.
 //
-// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
+// Required privileges: pki:read. Legacy Jamf Pro privilege name(s): Read PKI.
 //
 // Parameters:
 //   - id: UUID of the Certificate Authority (CA).
@@ -85,7 +85,7 @@ func (c *Client) DownloadCertificateAuthorityDerV1(ctx context.Context, id strin
 
 // DownloadCertificateAuthorityPemV1 returns current Certificate Authority (CA) with provided ID in PEM format.
 //
-// Required privileges: read:pro:pki. Legacy Jamf Pro privilege name(s): Read PKI.
+// Required privileges: pki:read. Legacy Jamf Pro privilege name(s): Read PKI.
 //
 // Parameters:
 //   - id: UUID of the Certificate Authority (CA).

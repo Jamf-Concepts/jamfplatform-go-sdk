@@ -22,7 +22,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
 //
 // Parameters:
 //   - id: Id of the computer to erase.
@@ -40,7 +40,7 @@ func (c *Client) EraseComputerV1(ctx context.Context, id string, request *EraseD
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
 //
 // Parameters:
 //   - id: Id of the computer to remove the MDM profile from.
@@ -56,7 +56,7 @@ func (c *Client) RemoveMdmProfileFromComputerV1(ctx context.Context, id string) 
 
 // EraseComputerV4 erase a computer.
 //
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
 //
 // Parameters:
 //   - id: Id of the computer to erase.
@@ -72,7 +72,7 @@ func (c *Client) EraseComputerV4(ctx context.Context, id string, request *EraseD
 
 // RemoveMdmProfileFromComputerV4 remove a computer's MDM profile.
 //
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
 //
 // Parameters:
 //   - id: Id of the computer to remove the MDM profile from.
@@ -90,7 +90,7 @@ func (c *Client) RemoveMdmProfileFromComputerV4(ctx context.Context, id string) 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
@@ -171,7 +171,7 @@ func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
@@ -250,7 +250,7 @@ func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string,
 
 // ListComputersInventoryV4 return paginated Computer Inventory records.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
@@ -331,7 +331,7 @@ func (c *Client) ListComputersInventoryV4(ctx context.Context, section []string,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
@@ -412,7 +412,7 @@ func (c *Client) ListComputersInventoryV3(ctx context.Context, section []string,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
+// Required privileges: devices:create. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV1(ctx context.Context, request *ComputerInventoryCreateRequest) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -427,7 +427,7 @@ func (c *Client) CreateComputerInventoryV1(ctx context.Context, request *Compute
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
+// Required privileges: devices:create. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV2(ctx context.Context, request *ComputerInventoryCreateRequestV2) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
@@ -440,7 +440,7 @@ func (c *Client) CreateComputerInventoryV2(ctx context.Context, request *Compute
 
 // CreateComputerInventoryV4 create Computer Inventory record.
 //
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
+// Required privileges: devices:create. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV4(ctx context.Context, request *ComputerInventoryCreateRequestV4) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v4")
 	var result HrefResponse
@@ -455,7 +455,7 @@ func (c *Client) CreateComputerInventoryV4(ctx context.Context, request *Compute
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
+// Required privileges: devices:create. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV3(ctx context.Context, request *ComputerInventoryCreateRequestV2) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
@@ -470,7 +470,7 @@ func (c *Client) CreateComputerInventoryV3(ctx context.Context, request *Compute
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
@@ -498,7 +498,7 @@ func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]Compu
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
@@ -524,7 +524,7 @@ func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]Compu
 
 // ListComputerInventoryFileVaultsV4 return paginated FileVault information for all computers.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.APIPrefix("pro", "v4")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
@@ -552,7 +552,7 @@ func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]Compu
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
@@ -580,7 +580,7 @@ func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]Compu
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -608,7 +608,7 @@ func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -634,7 +634,7 @@ func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section 
 
 // GetComputerInventoryV4 return General section of a Computer.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -662,7 +662,7 @@ func (c *Client) GetComputerInventoryV4(ctx context.Context, id string, section 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -690,7 +690,7 @@ func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Delete Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -707,7 +707,7 @@ func (c *Client) DeleteComputerInventoryV1(ctx context.Context, id string) error
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Delete Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -722,7 +722,7 @@ func (c *Client) DeleteComputerInventoryV2(ctx context.Context, id string) error
 
 // DeleteComputerInventoryV4 remove specified Computer record.
 //
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Delete Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -739,7 +739,7 @@ func (c *Client) DeleteComputerInventoryV4(ctx context.Context, id string) error
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Delete Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -756,7 +756,7 @@ func (c *Client) DeleteComputerInventoryV3(ctx context.Context, id string) error
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -774,7 +774,7 @@ func (c *Client) GetComputerInventoryDetailV1(ctx context.Context, id string) (*
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -790,7 +790,7 @@ func (c *Client) GetComputerInventoryDetailV2(ctx context.Context, id string) (*
 
 // GetComputerInventoryDetailV4 return all sections of a computer.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -808,7 +808,7 @@ func (c *Client) GetComputerInventoryDetailV4(ctx context.Context, id string) (*
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -826,7 +826,7 @@ func (c *Client) GetComputerInventoryDetailV3(ctx context.Context, id string) (*
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -844,7 +844,7 @@ func (c *Client) UpdateComputerInventoryDetailV1(ctx context.Context, id string,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -859,7 +859,7 @@ func (c *Client) UpdateComputerInventoryDetailV2(ctx context.Context, id string,
 
 // UpdateComputerInventoryDetailV4 update specific fields on a computer.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -876,7 +876,7 @@ func (c *Client) UpdateComputerInventoryDetailV4(ctx context.Context, id string,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -893,7 +893,7 @@ func (c *Client) UpdateComputerInventoryDetailV3(ctx context.Context, id string,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -920,7 +920,7 @@ func (c *Client) UploadComputerInventoryAttachmentV1(ctx context.Context, id str
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -945,7 +945,7 @@ func (c *Client) UploadComputerInventoryAttachmentV2(ctx context.Context, id str
 
 // UploadComputerInventoryAttachmentV4 upload attachment and assign to computer.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -972,7 +972,7 @@ func (c *Client) UploadComputerInventoryAttachmentV4(ctx context.Context, id str
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -999,7 +999,7 @@ func (c *Client) UploadComputerInventoryAttachmentV3(ctx context.Context, id str
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1018,7 +1018,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV1(ctx context.Context, id s
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1035,7 +1035,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV2(ctx context.Context, id s
 
 // DownloadComputerInventoryAttachmentV4 download attachment file.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1054,7 +1054,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV4(ctx context.Context, id s
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1073,7 +1073,7 @@ func (c *Client) DownloadComputerInventoryAttachmentV3(ctx context.Context, id s
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1091,7 +1091,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV1(ctx context.Context, id str
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1107,7 +1107,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV2(ctx context.Context, id str
 
 // DeleteComputerInventoryAttachmentV4 remove attachment.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1125,7 +1125,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV4(ctx context.Context, id str
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1143,7 +1143,7 @@ func (c *Client) DeleteComputerInventoryAttachmentV3(ctx context.Context, id str
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1161,7 +1161,7 @@ func (c *Client) GetComputerInventoryFileVaultV1(ctx context.Context, id string)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1177,7 +1177,7 @@ func (c *Client) GetComputerInventoryFileVaultV2(ctx context.Context, id string)
 
 // GetComputerInventoryFileVaultV4 return FileVault information for a specific computer.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1195,7 +1195,7 @@ func (c *Client) GetComputerInventoryFileVaultV4(ctx context.Context, id string)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1213,7 +1213,7 @@ func (c *Client) GetComputerInventoryFileVaultV3(ctx context.Context, id string)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+// Required privileges: computer-device-lock-pin:read. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1231,7 +1231,7 @@ func (c *Client) GetComputerDeviceLockPinV1(ctx context.Context, id string) (*Co
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+// Required privileges: computer-device-lock-pin:read. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1247,7 +1247,7 @@ func (c *Client) GetComputerDeviceLockPinV2(ctx context.Context, id string) (*Co
 
 // GetComputerDeviceLockPinV4 return a computer's Device Lock PIN.
 //
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+// Required privileges: computer-device-lock-pin:read. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1265,7 +1265,7 @@ func (c *Client) GetComputerDeviceLockPinV4(ctx context.Context, id string) (*Co
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+// Required privileges: computer-device-lock-pin:read. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1283,7 +1283,7 @@ func (c *Client) GetComputerDeviceLockPinV3(ctx context.Context, id string) (*Co
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+// Required privileges: recovery-lock:read. Legacy Jamf Pro privilege name(s): View Recovery Lock.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1301,7 +1301,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV1(ctx context.Context, id strin
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
 //
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+// Required privileges: recovery-lock:read. Legacy Jamf Pro privilege name(s): View Recovery Lock.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1317,7 +1317,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV2(ctx context.Context, id strin
 
 // GetComputerRecoveryLockPasswordV4 return a Computers Recovery Lock Password.
 //
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+// Required privileges: recovery-lock:read. Legacy Jamf Pro privilege name(s): View Recovery Lock.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1335,7 +1335,7 @@ func (c *Client) GetComputerRecoveryLockPasswordV4(ctx context.Context, id strin
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
 //
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+// Required privileges: recovery-lock:read. Legacy Jamf Pro privilege name(s): View Recovery Lock.
 //
 // Parameters:
 //   - id: instance id of computer record.

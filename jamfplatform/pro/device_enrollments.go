@@ -20,7 +20,7 @@ import (
 
 // ListDeviceEnrollmentsV1 read all sorted and paged Device Enrollment instances.
 //
-// Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:read. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
@@ -53,7 +53,7 @@ func (c *Client) ListDeviceEnrollmentsV1(ctx context.Context, sort []string) ([]
 
 // GetDeviceEnrollmentPublicKeyV1 retrieve the Jamf Pro Device Enrollment public key.
 //
-// Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:read. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 func (c *Client) GetDeviceEnrollmentPublicKeyV1(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
@@ -66,7 +66,7 @@ func (c *Client) GetDeviceEnrollmentPublicKeyV1(ctx context.Context) ([]byte, er
 
 // ListAllDeviceEnrollmentSyncsV1 get all instance sync states for all Device Enrollment Instances.
 //
-// Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:read. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 func (c *Client) ListAllDeviceEnrollmentSyncsV1(ctx context.Context) ([]DeviceEnrollmentInstanceSyncStatus, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []DeviceEnrollmentInstanceSyncStatus
@@ -79,7 +79,7 @@ func (c *Client) ListAllDeviceEnrollmentSyncsV1(ctx context.Context) ([]DeviceEn
 
 // UploadDeviceEnrollmentTokenV1 create a Device Enrollment Instance with the supplied Token.
 //
-// Required privileges: create:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Create Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:create. Legacy Jamf Pro privilege name(s): Create Device Enrollment Program Instances.
 func (c *Client) UploadDeviceEnrollmentTokenV1(ctx context.Context, request *DeviceEnrollmentToken) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -92,7 +92,7 @@ func (c *Client) UploadDeviceEnrollmentTokenV1(ctx context.Context, request *Dev
 
 // GetDeviceEnrollmentV1 retrieve a Device Enrollment Instance with the supplied id.
 //
-// Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:read. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -108,7 +108,7 @@ func (c *Client) GetDeviceEnrollmentV1(ctx context.Context, id string) (*DeviceE
 
 // UpdateDeviceEnrollmentV1 update a Device Enrollment Instance with the supplied id.
 //
-// Required privileges: update:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:update. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -124,7 +124,7 @@ func (c *Client) UpdateDeviceEnrollmentV1(ctx context.Context, id string, reques
 
 // DeleteDeviceEnrollmentV1 delete a Device Enrollment Instance with the supplied id.
 //
-// Required privileges: delete:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Delete Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:delete. Legacy Jamf Pro privilege name(s): Delete Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -139,7 +139,7 @@ func (c *Client) DeleteDeviceEnrollmentV1(ctx context.Context, id string) error 
 
 // DisownDeviceEnrollmentDevicesV1 disown devices from the given Device Enrollment Instance.
 //
-// Required privileges: update:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:update. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -155,7 +155,7 @@ func (c *Client) DisownDeviceEnrollmentDevicesV1(ctx context.Context, id string,
 
 // ListDeviceEnrollmentHistoryV1 get sorted and paged Device Enrollment history objects.
 //
-// Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:read. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -197,7 +197,7 @@ func (c *Client) ListDeviceEnrollmentHistoryV1(ctx context.Context, id string, s
 
 // CreateDeviceEnrollmentHistoryNoteV1 add Device Enrollment history object notes.
 //
-// Required privileges: update:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:update. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -213,7 +213,7 @@ func (c *Client) CreateDeviceEnrollmentHistoryNoteV1(ctx context.Context, id str
 
 // ListDeviceEnrollmentSyncsV1 get all instance sync states for a single Device Enrollment Instance.
 //
-// Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:read. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -229,7 +229,7 @@ func (c *Client) ListDeviceEnrollmentSyncsV1(ctx context.Context, id string) ([]
 
 // GetLatestDeviceEnrollmentSyncV1 get the latest sync state for a single Device Enrollment Instance.
 //
-// Required privileges: read:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:read. Legacy Jamf Pro privilege name(s): Read Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.
@@ -245,7 +245,7 @@ func (c *Client) GetLatestDeviceEnrollmentSyncV1(ctx context.Context, id string)
 
 // ReplaceDeviceEnrollmentTokenV1 update a Device Enrollment Instance with the supplied Token.
 //
-// Required privileges: update:pro:device-enrollment-program-instances. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
+// Required privileges: device-enrollment-program-instances:update. Legacy Jamf Pro privilege name(s): Update Device Enrollment Program Instances.
 //
 // Parameters:
 //   - id: Device Enrollment Instance identifier.

@@ -17,7 +17,7 @@ import (
 
 // GetMobileDeviceExtensionAttributeByID finds mobile device extension attributes by ID.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetMobileDeviceExtensionAttributeByID(ctx context.Context, id s
 
 // CreateMobileDeviceExtensionAttributeByID creates a new mobile device extension attribute by ID.
 //
-// Required privileges: create:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateMobileDeviceExtensionAttributeByID(ctx context.Context, i
 
 // UpdateMobileDeviceExtensionAttributeByID updates an existing mobile device extension attribute by ID.
 //
-// Required privileges: update:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeByID(ctx context.Context, i
 
 // DeleteMobileDeviceExtensionAttributeByID deletes a mobile device extension attribute by ID.
 //
-// Required privileges: delete:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeByID(ctx context.Context, i
 
 // GetMobileDeviceExtensionAttributeByName finds mobiledeviceextensionattributes by name.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetMobileDeviceExtensionAttributeByName(ctx context.Context, na
 
 // UpdateMobileDeviceExtensionAttributeByName updates an existing mobile device extension attribute by name.
 //
-// Required privileges: update:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeByName(ctx context.Context,
 
 // DeleteMobileDeviceExtensionAttributeByName deletes a mobile device extension attribute by name.
 //
-// Required privileges: delete:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeByName(ctx context.Context,
 
 // ListMobileDeviceExtensionAttributes finds all mobile device extension attributes.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:read.
 func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*MobileDeviceExtensionAttributes, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceExtensionAttributes
@@ -138,7 +138,7 @@ func (c *Client) ListMobileDeviceExtensionAttributes(ctx context.Context) (*Mobi
 
 // CreateMobileDeviceExtensionAttributeByName creates a new mobile device extension attribute by ID.
 //
-// Required privileges: create:pro:mobile-device-extension-attributes.
+// Required privileges: extension-attributes:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

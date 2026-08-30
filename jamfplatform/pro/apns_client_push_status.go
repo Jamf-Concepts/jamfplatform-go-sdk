@@ -18,8 +18,7 @@ import (
 
 // ListApnsClientPushStatusesV1 search for clients with push notifications disabled.
 //
-// Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:read. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort
@@ -59,8 +58,7 @@ func (c *Client) ListApnsClientPushStatusesV1(ctx context.Context, sort []string
 
 // EnableAllApnsClientsV1 enable push notifications for all clients.
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
 func (c *Client) EnableAllApnsClientsV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/apns-client-push-status/enable-all-clients"
@@ -72,8 +70,7 @@ func (c *Client) EnableAllApnsClientsV1(ctx context.Context) error {
 
 // GetEnableAllApnsClientsStatusV1 get status of enable all clients request.
 //
-// Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:read. Legacy Jamf Pro privilege name(s): View MDM command information in Jamf Pro API.
 func (c *Client) GetEnableAllApnsClientsStatusV1(ctx context.Context) (*ApnsPushEnableRequest, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ApnsPushEnableRequest
@@ -86,8 +83,7 @@ func (c *Client) GetEnableAllApnsClientsStatusV1(ctx context.Context) (*ApnsPush
 
 // EnableApnsClientV1 enable push notifications for a single client.
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
 func (c *Client) EnableApnsClientV1(ctx context.Context, request *EnablePushRequest) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/apns-client-push-status/enable-client"

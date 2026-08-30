@@ -14,7 +14,7 @@ import (
 
 // GetComputerManagementByID finds computer management information by ID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetComputerManagementByID(ctx context.Context, id string) (*Com
 
 // GetComputerManagementByName finds computer management information by name.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - name: Computer Name to filter by.
@@ -46,7 +46,7 @@ func (c *Client) GetComputerManagementByName(ctx context.Context, name string) (
 
 // GetComputerManagementByUDID finds computer management information by UDID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - udid: Computer UDID to filter by.
@@ -62,7 +62,7 @@ func (c *Client) GetComputerManagementByUDID(ctx context.Context, udid string) (
 
 // GetComputerManagementBySerialNumber finds computer management information by serial number.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - serialNumber: Computer Serial Number to filter by.
@@ -78,7 +78,7 @@ func (c *Client) GetComputerManagementBySerialNumber(ctx context.Context, serial
 
 // GetComputerManagementByMacAddress finds computer management information by MAC address.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - macAddress: Computer Mac Address to filter by.
@@ -94,7 +94,7 @@ func (c *Client) GetComputerManagementByMacAddress(ctx context.Context, macAddre
 
 // GetComputerManagementByIDPatchFilter display patch management information for a computer and filter.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID to filter by.
@@ -111,7 +111,7 @@ func (c *Client) GetComputerManagementByIDPatchFilter(ctx context.Context, id st
 
 // GetComputerManagementByIDSubset finds a subset of computer management information by ID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID value to filter by.
@@ -130,7 +130,7 @@ func (c *Client) GetComputerManagementByIDSubset(ctx context.Context, id string,
 
 // GetComputerManagementByIDUsername finds management information for a computer and username.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID to filter by.
@@ -147,7 +147,7 @@ func (c *Client) GetComputerManagementByIDUsername(ctx context.Context, id strin
 
 // GetComputerManagementByIDUsernameSubset finds a subset of management information for a computer and username.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID to filter by.

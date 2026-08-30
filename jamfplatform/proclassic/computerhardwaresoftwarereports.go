@@ -14,7 +14,7 @@ import (
 
 // GetComputerHardwareSoftwareReportByIDDateRange finds hardware/software reports by computer ID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -32,7 +32,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByIDDateRange(ctx context.Cont
 
 // GetComputerHardwareSoftwareReportByIDDateRangeSubset finds a subset of hardware/software reports by computer ID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID to filter by.
@@ -52,7 +52,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByIDDateRangeSubset(ctx contex
 
 // GetComputerHardwareSoftwareReportByMacAddressDateRange finds hardware/software reports by computer MAC address.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - macaddress: MAC address to filter by.
@@ -70,7 +70,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByMacAddressDateRange(ctx cont
 
 // GetComputerHardwareSoftwareReportByNameDateRange finds hardware/software reports by computer name.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -88,7 +88,7 @@ func (c *Client) GetComputerHardwareSoftwareReportByNameDateRange(ctx context.Co
 
 // GetComputerHardwareSoftwareReportBySerialNumberDateRange finds hardware/software reports by computer serial number.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - serialnumber: Serial number to filter by.
@@ -106,7 +106,7 @@ func (c *Client) GetComputerHardwareSoftwareReportBySerialNumberDateRange(ctx co
 
 // GetComputerHardwareSoftwareReportByUDIDDateRange finds hardware/software reports by computer UDID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - udid: UDID to filter by.

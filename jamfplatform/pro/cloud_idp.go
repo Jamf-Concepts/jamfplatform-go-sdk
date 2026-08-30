@@ -19,7 +19,7 @@ import (
 
 // ListCloudIdpV1 get information about all Cloud Identity Providers configurations.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
@@ -52,7 +52,7 @@ func (c *Client) ListCloudIdpV1(ctx context.Context, sort []string) ([]CloudIDPC
 
 // ExportCloudIdpV1 export Cloud Identity Providers collection.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
@@ -95,7 +95,7 @@ func (c *Client) ExportCloudIdpV1(ctx context.Context, request *ExportParameters
 
 // GetCloudIdpV1 get Cloud Identity Provider configuration with given ID.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -111,7 +111,7 @@ func (c *Client) GetCloudIdpV1(ctx context.Context, id string) (*CloudIDPCommon,
 
 // ListCloudIdpHistoryV1 get Cloud Identity Provider history.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -152,7 +152,7 @@ func (c *Client) ListCloudIdpHistoryV1(ctx context.Context, id string, sort []st
 
 // CreateCloudIdpHistoryNoteV1 add Cloud Identity Provider history note.
 //
-// Required privileges: update:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
+// Required privileges: ldap-servers:update. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -168,7 +168,7 @@ func (c *Client) CreateCloudIdpHistoryNoteV1(ctx context.Context, id string, req
 
 // TestCloudIdpGroupV1 get group test search.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -184,7 +184,7 @@ func (c *Client) TestCloudIdpGroupV1(ctx context.Context, id string, request *Gr
 
 // TestCloudIdpUserV1 get user test search.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -200,7 +200,7 @@ func (c *Client) TestCloudIdpUserV1(ctx context.Context, id string, request *Use
 
 // TestCloudIdpUserMembershipV1 get membership test search.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.

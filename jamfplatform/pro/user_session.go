@@ -13,7 +13,7 @@ import (
 
 // GetUserSessionV1 return all Jamf Pro user acounts.
 //
-// Required privileges: read:pro:accounts. Legacy Jamf Pro privilege name(s): Read Accounts.
+// Required privileges: accounts:read. Legacy Jamf Pro privilege name(s): Read Accounts.
 func (c *Client) GetUserSessionV1(ctx context.Context) ([]Account, error) {
 	prefix := c.transport.APIPrefix("pro", "")
 	var result []Account

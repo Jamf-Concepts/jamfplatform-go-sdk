@@ -16,7 +16,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -34,7 +34,7 @@ func (c *Client) GetComputerByID(ctx context.Context, id string) (*Computer, err
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -52,7 +52,7 @@ func (c *Client) GetComputerByName(ctx context.Context, name string) (*Computer,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - serialNumber: Serial number to filter by.
@@ -68,7 +68,7 @@ func (c *Client) GetComputerBySerialNumber(ctx context.Context, serialNumber str
 
 // CreateComputerByID creates a computer.
 //
-// Required privileges: create:pro:computers, create:pro:users.
+// Required privileges: devices:create, users:create.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -86,7 +86,7 @@ func (c *Client) CreateComputerByID(ctx context.Context, id string, request *Com
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers, update:pro:users.
+// Required privileges: devices:update, users:update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -104,7 +104,7 @@ func (c *Client) UpdateComputerByID(ctx context.Context, id string, request *Com
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers, update:pro:users.
+// Required privileges: devices:update, users:update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -120,7 +120,7 @@ func (c *Client) UpdateComputerByName(ctx context.Context, name string, request 
 
 // DeleteComputerByID deletes a computer by ID.
 //
-// Required privileges: delete:pro:computers.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -137,7 +137,7 @@ func (c *Client) DeleteComputerByID(ctx context.Context, id string) error {
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computers.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -154,7 +154,7 @@ func (c *Client) DeleteComputerByName(ctx context.Context, name string) error {
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computers.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
@@ -171,7 +171,7 @@ func (c *Client) DeleteComputerBySerialNumber(ctx context.Context, serialNumber 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Computers
@@ -186,7 +186,7 @@ func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - id: ID to filter by.
@@ -207,7 +207,7 @@ func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset st
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - macaddress: Mac address to filter by.
@@ -225,7 +225,7 @@ func (c *Client) GetComputerByMacAddress(ctx context.Context, macaddress string)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - udid: UDID to filter by.
@@ -243,7 +243,7 @@ func (c *Client) GetComputerByUDID(ctx context.Context, udid string) (*Computer,
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputersBasic
@@ -258,7 +258,7 @@ func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - match: Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.
@@ -277,7 +277,7 @@ func (c *Client) MatchComputers(ctx context.Context, match string) (*Computers, 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - matchName: Name to filter by.
@@ -293,7 +293,7 @@ func (c *Client) MatchComputersByName(ctx context.Context, matchName string) (*C
 
 // CreateComputerByName creates a computer.
 //
-// Required privileges: create:pro:computers, create:pro:users.
+// Required privileges: devices:create, users:create.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -309,7 +309,7 @@ func (c *Client) CreateComputerByName(ctx context.Context, name string, request 
 
 // CreateComputerBySerialNumber creates a computer.
 //
-// Required privileges: create:pro:computers, create:pro:users.
+// Required privileges: devices:create, users:create.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -325,7 +325,7 @@ func (c *Client) CreateComputerBySerialNumber(ctx context.Context, serialNumber 
 
 // CreateComputerByMacAddress creates a computer.
 //
-// Required privileges: create:pro:computers, create:pro:users.
+// Required privileges: devices:create, users:create.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -341,7 +341,7 @@ func (c *Client) CreateComputerByMacAddress(ctx context.Context, macaddress stri
 
 // CreateComputerByUDID creates a computer.
 //
-// Required privileges: create:pro:computers, create:pro:users.
+// Required privileges: devices:create, users:create.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -359,7 +359,7 @@ func (c *Client) CreateComputerByUDID(ctx context.Context, udid string, request 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers, update:pro:users.
+// Required privileges: devices:update, users:update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -377,7 +377,7 @@ func (c *Client) UpdateComputerBySerialNumber(ctx context.Context, serialNumber 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers, update:pro:users.
+// Required privileges: devices:update, users:update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -395,7 +395,7 @@ func (c *Client) UpdateComputerByMacAddress(ctx context.Context, macaddress stri
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: update:pro:computers, update:pro:users.
+// Required privileges: devices:update, users:update.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -413,7 +413,7 @@ func (c *Client) UpdateComputerByUDID(ctx context.Context, udid string, request 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computers.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - macaddress: MAC address value to filter by.
@@ -430,7 +430,7 @@ func (c *Client) DeleteComputerByMacAddress(ctx context.Context, macaddress stri
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
-// Required privileges: delete:pro:computers.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - udid: UDID value to filter by.

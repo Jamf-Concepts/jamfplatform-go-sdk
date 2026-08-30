@@ -26,7 +26,7 @@ func (c *Client) GetCsaTenantIdV1(ctx context.Context) (*CsaTenantIDInfo, error)
 
 // GetCsaTokenV1 get details regarding the CSA token exchange.
 //
-// Required privileges: read:pro:cloud-services-settings. Legacy Jamf Pro privilege name(s): Read Cloud Services Settings.
+// Required privileges: cloud-services-settings:read. Legacy Jamf Pro privilege name(s): Read Cloud Services Settings.
 func (c *Client) GetCsaTokenV1(ctx context.Context) (*CsaToken, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CsaToken
@@ -39,7 +39,7 @@ func (c *Client) GetCsaTokenV1(ctx context.Context) (*CsaToken, error) {
 
 // DeleteCsaTokenV1 delete the CSA token exchange - This will disable Jamf Pro's ability to authenticate with cloud-hosted services.
 //
-// Required privileges: update:pro:cloud-services-settings. Legacy Jamf Pro privilege name(s): Update Cloud Services Settings.
+// Required privileges: cloud-services-settings:update. Legacy Jamf Pro privilege name(s): Update Cloud Services Settings.
 func (c *Client) DeleteCsaTokenV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/csa/token"

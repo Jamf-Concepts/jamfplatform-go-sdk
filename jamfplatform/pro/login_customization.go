@@ -26,7 +26,7 @@ func (c *Client) GetLoginCustomizationV1(ctx context.Context) (*LoginContent, er
 
 // UpdateLoginCustomizationV1 update current login disclaimer settings.
 //
-// Required privileges: update:pro:login-disclaimer. Legacy Jamf Pro privilege name(s): Update Login Disclaimer.
+// Required privileges: login-disclaimer:update. Legacy Jamf Pro privilege name(s): Update Login Disclaimer.
 func (c *Client) UpdateLoginCustomizationV1(ctx context.Context, request *LoginContentPut) (*LoginContentPut, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LoginContentPut

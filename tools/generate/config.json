@@ -3183,10 +3183,6 @@
           ]
         },
         {
-          "op": "POST /v2/mdm/commands",
-          "name": "SendMdmCommandV2"
-        },
-        {
           "op": "PATCH /v1/mdm-renewal/device-common-details",
           "name": "UpdateMdmRenewalDeviceCommonDetailsV1"
         },
@@ -3245,102 +3241,6 @@
           "op": "DELETE /v1/return-to-service/{id}",
           "name": "DeleteReturnToServiceConfigurationV1",
           "expectedStatus": 204
-        },
-        {
-          "op": "GET /v1/api-integrations",
-          "name": "ListApiIntegrationsV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "ApiIntegrationV1",
-            "nameField": "displayName",
-            "idField": "id",
-            "idNumeric": true,
-            "mode": "filtered",
-            "typedReturn": "ApiIntegrationResponse",
-            "apply": {
-              "createOp": "CreateApiIntegrationV1",
-              "updateOp": "UpdateApiIntegrationV1",
-              "deleteOp": "DeleteApiIntegrationV1",
-              "nameGoField": "DisplayName"
-            }
-          }
-        },
-        {
-          "op": "POST /v1/api-integrations",
-          "name": "CreateApiIntegrationV1",
-          "expectedStatus": 200
-        },
-        {
-          "op": "GET /v1/api-integrations/{id}",
-          "name": "GetApiIntegrationV1"
-        },
-        {
-          "op": "PUT /v1/api-integrations/{id}",
-          "name": "UpdateApiIntegrationV1"
-        },
-        {
-          "op": "DELETE /v1/api-integrations/{id}",
-          "name": "DeleteApiIntegrationV1",
-          "expectedStatus": 204
-        },
-        {
-          "op": "POST /v1/api-integrations/{id}/client-credentials",
-          "name": "RotateApiIntegrationClientCredentialsV1"
-        },
-        {
-          "op": "GET /v1/api-roles",
-          "name": "ListApiRolesV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "ApiRoleV1",
-            "nameField": "displayName",
-            "idField": "id",
-            "mode": "filtered",
-            "typedReturn": "ApiRole",
-            "apply": {
-              "createOp": "CreateApiRoleV1",
-              "updateOp": "UpdateApiRoleV1",
-              "deleteOp": "DeleteApiRoleV1",
-              "nameGoField": "DisplayName"
-            }
-          }
-        },
-        {
-          "op": "POST /v1/api-roles",
-          "name": "CreateApiRoleV1"
-        },
-        {
-          "op": "GET /v1/api-roles/{id}",
-          "name": "GetApiRoleV1"
-        },
-        {
-          "op": "PUT /v1/api-roles/{id}",
-          "name": "UpdateApiRoleV1"
-        },
-        {
-          "op": "DELETE /v1/api-roles/{id}",
-          "name": "DeleteApiRoleV1",
-          "expectedStatus": 204
-        },
-        {
-          "op": "GET /v1/api-role-privileges",
-          "name": "ListApiRolePrivilegesV1"
-        },
-        {
-          "op": "GET /v1/api-role-privileges/search",
-          "name": "SearchApiRolePrivilegesV1",
-          "params": [
-            "name",
-            "limit"
-          ]
         },
         {
           "op": "POST /v1/pki/adcs-settings",
@@ -4135,10 +4035,6 @@
           "name": "ListSmtpServerAllowedAuthTypesV2"
         },
         {
-          "op": "GET /v2/environment-type",
-          "name": "GetEnvironmentTypeV2"
-        },
-        {
           "op": "GET /v1/jamf-pro-server-url",
           "name": "GetJamfProServerURLV1"
         },
@@ -4931,16 +4827,8 @@
           "expectedStatus": 202
         },
         {
-          "op": "GET /v2/account-preferences",
-          "name": "GetAccountPreferencesV2"
-        },
-        {
           "op": "GET /v3/account-preferences",
           "name": "GetAccountPreferencesV3"
-        },
-        {
-          "op": "PATCH /v2/account-preferences",
-          "name": "UpdateAccountPreferencesV2"
         },
         {
           "op": "PATCH /v3/account-preferences",
@@ -5070,10 +4958,6 @@
         {
           "op": "POST /settings/issueTomcatSslCertificate",
           "name": "IssueTomcatSslCertificate"
-        },
-        {
-          "op": "POST /v1/oidc/dispatch",
-          "name": "DispatchOidcV1"
         },
         {
           "op": "POST /v1/system/initialize",
@@ -7464,74 +7348,6 @@
           }
         },
         {
-          "op": "GET /peripheraltypes/id/{id}",
-          "name": "GetPeripheralTypeByID",
-          "responseType": "peripheral_type",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
-          "op": "POST /peripheraltypes/id/{id}",
-          "name": "CreatePeripheralTypeByID",
-          "requestType": "peripheral_type",
-          "responseType": "peripheral_type",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "PUT /peripheraltypes/id/{id}",
-          "name": "UpdatePeripheralTypeByID",
-          "requestType": "peripheral_type",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "DELETE /peripheraltypes/id/{id}",
-          "name": "DeletePeripheralTypeByID",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
-          "op": "GET /peripherals/id/{id}",
-          "name": "GetPeripheralByID",
-          "responseType": "peripheral",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
-          "op": "POST /peripherals/id/{id}",
-          "name": "CreatePeripheralByID",
-          "requestType": "peripheral_post",
-          "responseType": "peripheral",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "PUT /peripherals/id/{id}",
-          "name": "UpdatePeripheralByID",
-          "requestType": "peripheral_post",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "DELETE /peripherals/id/{id}",
-          "name": "DeletePeripheralByID",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
           "op": "GET /diskencryptionconfigurations/id/{id}",
           "name": "GetDiskEncryptionConfigurationByID",
           "responseType": "disk_encryption_configuration",
@@ -9530,15 +9346,6 @@
           }
         },
         {
-          "op": "GET /peripherals/id/{id}/subset/{subset}",
-          "name": "GetPeripheralByIDSubset",
-          "responseType": "peripheral",
-          "pathNames": {
-            "id": "id",
-            "subset": "subset"
-          }
-        },
-        {
           "op": "GET /computercommands/name/{name}",
           "name": "GetComputerCommandByName",
           "responseType": "computer_command"
@@ -9797,16 +9604,6 @@
           "op": "GET /patchsoftwaretitles",
           "name": "ListPatchSoftwareTitles",
           "responseType": "patch_software_titles"
-        },
-        {
-          "op": "GET /peripherals",
-          "name": "ListPeripherals",
-          "responseType": "peripherals"
-        },
-        {
-          "op": "GET /peripheraltypes",
-          "name": "ListPeripheralTypes",
-          "responseType": "peripheral_types"
         },
         {
           "op": "GET /printers",

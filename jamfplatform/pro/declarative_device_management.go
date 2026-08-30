@@ -14,8 +14,7 @@ import (
 
 // ListDdmStatusItemsV1 retrieve the Status Items from the latest Status Report for a device.
 //
-// Required privileges: read:pro:mobile-devices, read:pro:computers. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
 //
 // Parameters:
 //   - clientManagementID: client management id of the target device.
@@ -31,8 +30,7 @@ func (c *Client) ListDdmStatusItemsV1(ctx context.Context, clientManagementID st
 
 // GetDdmStatusItemV1 retrieve a Status Item from the latest Status Report for a device.
 //
-// Required privileges: read:pro:mobile-devices, read:pro:computers. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
 //
 // Parameters:
 //   - clientManagementID: client management id of the target device.
@@ -49,8 +47,7 @@ func (c *Client) GetDdmStatusItemV1(ctx context.Context, clientManagementID stri
 
 // SyncDdmV1 force a device DDM sync.
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Declarative Management Command.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute. Legacy Jamf Pro privilege name(s): Send Declarative Management Command.
 //
 // Parameters:
 //   - clientManagementID: The client management id of the target device.

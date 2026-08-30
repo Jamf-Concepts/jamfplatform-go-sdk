@@ -8,7 +8,6 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"slices"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -66,37 +65,12 @@ func TestAcceptance_Pro_MiscReadsV1(t *testing.T) {
 	}
 	t.Logf("Time zones: %d", len(tzs))
 
-	// Asserted to fail, deliberately. GET /api/pro/v2/environment-type has no
-	// rule in jamf/authorization-policies and never has had one — checked across
-	// origin/main, all 60+ remote branches and all open PRs on 2026-08-29 — and
-	// every domain's _default.rego carries `default allow := false`, so the
-	// authorization service returns 403 BAD_PERMISSIONS by construction. The spec
-	// declares no required privilege, so no scope grant can clear it either, and
-	// the path was dropped from the published spec in public-apis-oas#395.
-	//
-	// A skip would report success while verifying nothing, so this asserts the
-	// 403 and fails on anything else — including a 200. If it starts passing, a
-	// policy has been authored: flip this to assert the payload and delete this
-	// comment. The reads either side of it are unaffected.
-	env, err := p.GetEnvironmentTypeV2(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if !errors.As(err, &apiErr) || !apiErr.HasStatus(403) {
-			t.Fatalf("GetEnvironmentTypeV2: want 403 BAD_PERMISSIONS (no authorization policy exists for this path), got %v", err)
-		}
-		t.Logf("GetEnvironmentTypeV2: 403 as expected — no authorization policy exists for this path")
-	} else {
-		t.Errorf("GetEnvironmentTypeV2 unexpectedly succeeded: a policy has been authored for /v2/environment-type. "+
-			"Update this test to assert the payload. Got environment=%q", env.Environment)
-		t.Logf("Cloud services environment: %s", env.Environment)
-		// Probed direct against an 11.31.0 sandbox instance (2026-08-16): returned
-		// "production", one of the three values the spec enumerates.
-		if !slices.Contains(pro.EnvironmentTypeEnvironmentValues(), env.Environment) {
-			t.Errorf("environment %q absent from the generated constants %v — spec enum has drifted",
-				env.Environment, pro.EnvironmentTypeEnvironmentValues())
-		}
-	}
+	// GET /api/pro/v2/environment-type is no longer covered. Jamf removed the
+	// operation from the published spec in public-apis-oas#395 and it has never
+	// had a rule in jamf/authorization-policies, so it answered 403
+	// BAD_PERMISSIONS for every credential this suite has ever used. With the
+	// path gone from the spec the SDK no longer generates GetEnvironmentTypeV2,
+	// and there is nothing left to assert. See the GA cleanup notes in CLAUDE.md.
 
 	cloud, err := p.GetCloudInformationV1(ctx)
 	if err != nil {

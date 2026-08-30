@@ -14,7 +14,7 @@ import (
 
 // RedeployJamfManagementFrameworkV1 redeploy Jamf Management Framework.
 //
-// Required privileges: read:pro:computer-check-in, execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Command to Install Package, Read Computer Check-In.
+// Required privileges: computer-check-in:read, device-actions:execute. Legacy Jamf Pro privilege name(s): Send Computer Remote Command to Install Package, Read Computer Check-In.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:

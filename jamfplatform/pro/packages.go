@@ -20,7 +20,7 @@ import (
 
 // ListPackagesV1 retrieve Packages.
 //
-// Required privileges: read:pro:packages. Legacy Jamf Pro privilege name(s): Read Packages.
+// Required privileges: packages:read. Legacy Jamf Pro privilege name(s): Read Packages.
 //
 // Parameters:
 //   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
@@ -60,7 +60,7 @@ func (c *Client) ListPackagesV1(ctx context.Context, sort []string, filter strin
 
 // CreatePackageV1 create package.
 //
-// Required privileges: create:pro:packages. Legacy Jamf Pro privilege name(s): Create Packages.
+// Required privileges: packages:create. Legacy Jamf Pro privilege name(s): Create Packages.
 func (c *Client) CreatePackageV1(ctx context.Context, request *Package) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -73,7 +73,7 @@ func (c *Client) CreatePackageV1(ctx context.Context, request *Package) (*HrefRe
 
 // GetPackageV1 get specified Package object.
 //
-// Required privileges: read:pro:packages. Legacy Jamf Pro privilege name(s): Read Packages.
+// Required privileges: packages:read. Legacy Jamf Pro privilege name(s): Read Packages.
 //
 // Parameters:
 //   - id: instance id of package.
@@ -89,7 +89,7 @@ func (c *Client) GetPackageV1(ctx context.Context, id string) (*Package, error) 
 
 // UpdatePackageV1 update specified package object.
 //
-// Required privileges: update:pro:packages. Legacy Jamf Pro privilege name(s): Update Packages.
+// Required privileges: packages:update. Legacy Jamf Pro privilege name(s): Update Packages.
 //
 // Parameters:
 //   - id: Instance ID of package.
@@ -105,7 +105,7 @@ func (c *Client) UpdatePackageV1(ctx context.Context, id string, request *Packag
 
 // DeletePackageV1 remove specified package.
 //
-// Required privileges: delete:pro:packages. Legacy Jamf Pro privilege name(s): Delete Packages.
+// Required privileges: packages:delete. Legacy Jamf Pro privilege name(s): Delete Packages.
 //
 // Parameters:
 //   - id: Instance ID of package.
@@ -120,7 +120,7 @@ func (c *Client) DeletePackageV1(ctx context.Context, id string) error {
 
 // UploadPackageV1 upload package.
 //
-// Required privileges: read:pro:packages, update:pro:packages. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
+// Required privileges: packages:read, packages:update. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -146,7 +146,7 @@ func (c *Client) UploadPackageV1(ctx context.Context, id string, fileFilename st
 
 // DeleteMultiplePackagesV1 delete multiple packages at once.
 //
-// Required privileges: delete:pro:packages. Legacy Jamf Pro privilege name(s): Delete Packages.
+// Required privileges: packages:delete. Legacy Jamf Pro privilege name(s): Delete Packages.
 func (c *Client) DeleteMultiplePackagesV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/packages/delete-multiple"
@@ -158,7 +158,7 @@ func (c *Client) DeleteMultiplePackagesV1(ctx context.Context, request *Ids) err
 
 // ExportPackagesV1 export Packages collection.
 //
-// Required privileges: read:pro:packages. Legacy Jamf Pro privilege name(s): Read Packages.
+// Required privileges: packages:read. Legacy Jamf Pro privilege name(s): Read Packages.
 //
 // Parameters:
 //   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
@@ -201,7 +201,7 @@ func (c *Client) ExportPackagesV1(ctx context.Context, request *ExportParameters
 
 // ListPackageHistoryV1 get specified Package History object.
 //
-// Required privileges: read:pro:packages. Legacy Jamf Pro privilege name(s): Read Packages.
+// Required privileges: packages:read. Legacy Jamf Pro privilege name(s): Read Packages.
 //
 // Parameters:
 //   - id: Instance ID of package history.
@@ -241,7 +241,7 @@ func (c *Client) ListPackageHistoryV1(ctx context.Context, id string, sort []str
 
 // CreatePackageHistoryNoteV1 add specified Package history object notes.
 //
-// Required privileges: update:pro:packages. Legacy Jamf Pro privilege name(s): Update Packages.
+// Required privileges: packages:update. Legacy Jamf Pro privilege name(s): Update Packages.
 //
 // Parameters:
 //   - id: Instance ID of package history.
@@ -257,7 +257,7 @@ func (c *Client) CreatePackageHistoryNoteV1(ctx context.Context, id string, requ
 
 // ExportPackageHistoryV1 export history object collection in specified format for specified Packages.
 //
-// Required privileges: read:pro:packages. Legacy Jamf Pro privilege name(s): Read Packages.
+// Required privileges: packages:read. Legacy Jamf Pro privilege name(s): Read Packages.
 //
 // Parameters:
 //   - id: Instance ID of package history note.
@@ -301,7 +301,7 @@ func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request 
 
 // UploadPackageManifestV1 add a manifest to a package.
 //
-// Required privileges: read:pro:packages, update:pro:packages. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
+// Required privileges: packages:read, packages:update. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -327,7 +327,7 @@ func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFil
 
 // DeletePackageManifestV1 delete the manifest for a specified package.
 //
-// Required privileges: read:pro:packages, update:pro:packages. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
+// Required privileges: packages:read, packages:update. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:

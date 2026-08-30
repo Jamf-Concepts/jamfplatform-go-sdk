@@ -19,7 +19,7 @@ import (
 
 // ListBuildingsV1 search for sorted and paged Buildings.
 //
-// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+// Required privileges: buildings:read. Legacy Jamf Pro privilege name(s): Read Buildings.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
@@ -59,7 +59,7 @@ func (c *Client) ListBuildingsV1(ctx context.Context, sort []string, filter stri
 
 // CreateBuildingV1 create Building record.
 //
-// Required privileges: create:pro:buildings. Legacy Jamf Pro privilege name(s): Create Buildings.
+// Required privileges: buildings:create. Legacy Jamf Pro privilege name(s): Create Buildings.
 func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -72,7 +72,7 @@ func (c *Client) CreateBuildingV1(ctx context.Context, request *Building) (*Href
 
 // GetBuildingV1 get specified Building object.
 //
-// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+// Required privileges: buildings:read. Legacy Jamf Pro privilege name(s): Read Buildings.
 //
 // Parameters:
 //   - id: instance id of building record.
@@ -88,7 +88,7 @@ func (c *Client) GetBuildingV1(ctx context.Context, id string) (*Building, error
 
 // UpdateBuildingV1 update specified Building object.
 //
-// Required privileges: update:pro:buildings. Legacy Jamf Pro privilege name(s): Update Buildings.
+// Required privileges: buildings:update. Legacy Jamf Pro privilege name(s): Update Buildings.
 //
 // Parameters:
 //   - id: instance id of building record.
@@ -104,7 +104,7 @@ func (c *Client) UpdateBuildingV1(ctx context.Context, id string, request *Build
 
 // DeleteBuildingV1 remove specified Building record.
 //
-// Required privileges: delete:pro:buildings. Legacy Jamf Pro privilege name(s): Delete Buildings.
+// Required privileges: buildings:delete. Legacy Jamf Pro privilege name(s): Delete Buildings.
 //
 // Parameters:
 //   - id: instance id of building record.
@@ -119,7 +119,7 @@ func (c *Client) DeleteBuildingV1(ctx context.Context, id string) error {
 
 // ExportBuildingsV1 export Buildings collection.
 //
-// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+// Required privileges: buildings:read. Legacy Jamf Pro privilege name(s): Read Buildings.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:desc. Multiple sort criteria
@@ -149,7 +149,7 @@ func (c *Client) ExportBuildingsV1(ctx context.Context, request *ExportParameter
 
 // ListBuildingHistoryV1 get specified Building History object.
 //
-// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+// Required privileges: buildings:read. Legacy Jamf Pro privilege name(s): Read Buildings.
 //
 // Parameters:
 //   - id: instance id of building history record.
@@ -190,7 +190,7 @@ func (c *Client) ListBuildingHistoryV1(ctx context.Context, id string, sort []st
 
 // DeleteMultipleBuildingsV1 delete multiple Buildings by their ids.
 //
-// Required privileges: delete:pro:buildings. Legacy Jamf Pro privilege name(s): Delete Buildings.
+// Required privileges: buildings:delete. Legacy Jamf Pro privilege name(s): Delete Buildings.
 func (c *Client) DeleteMultipleBuildingsV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/buildings/delete-multiple"
@@ -202,7 +202,7 @@ func (c *Client) DeleteMultipleBuildingsV1(ctx context.Context, request *Ids) er
 
 // CreateBuildingHistoryNoteV1 add specified Building history object notes.
 //
-// Required privileges: update:pro:buildings. Legacy Jamf Pro privilege name(s): Update Buildings.
+// Required privileges: buildings:update. Legacy Jamf Pro privilege name(s): Update Buildings.
 //
 // Parameters:
 //   - id: instance id of building history record.
@@ -218,7 +218,7 @@ func (c *Client) CreateBuildingHistoryNoteV1(ctx context.Context, id string, req
 
 // ExportBuildingHistoryV1 export history object collection in specified format for specified Buildings.
 //
-// Required privileges: read:pro:buildings. Legacy Jamf Pro privilege name(s): Read Buildings.
+// Required privileges: buildings:read. Legacy Jamf Pro privilege name(s): Read Buildings.
 //
 // Parameters:
 //   - id: instance id of buildings.

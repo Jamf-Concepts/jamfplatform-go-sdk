@@ -20,7 +20,7 @@ import (
 
 // GetAllMobileDevicePrestageScopeV2 get all Device Scope for all Mobile Device Prestages.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 func (c *Client) GetAllMobileDevicePrestageScopeV2(ctx context.Context) (*PrestageScopeV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeV2
@@ -33,7 +33,7 @@ func (c *Client) GetAllMobileDevicePrestageScopeV2(ctx context.Context) (*Presta
 
 // ListAllMobileDevicePrestageSyncsV2 get all Prestage sync States for all prestages.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 func (c *Client) ListAllMobileDevicePrestageSyncsV2(ctx context.Context) ([]PrestageSyncStatusV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []PrestageSyncStatusV2
@@ -46,7 +46,7 @@ func (c *Client) ListAllMobileDevicePrestageSyncsV2(ctx context.Context) ([]Pres
 
 // GetMobileDevicePrestageScopeV2 get Device Scope for a specific Mobile Device Prestage.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -62,7 +62,7 @@ func (c *Client) GetMobileDevicePrestageScopeV2(ctx context.Context, id string) 
 
 // ReplaceMobileDevicePrestageScopeV2 replace Device Scope for a specific Mobile Device Prestage.
 //
-// Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -78,7 +78,7 @@ func (c *Client) ReplaceMobileDevicePrestageScopeV2(ctx context.Context, id stri
 
 // AddToMobileDevicePrestageScopeV2 add Device Scope for a specific Mobile Device Prestage.
 //
-// Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -94,7 +94,7 @@ func (c *Client) AddToMobileDevicePrestageScopeV2(ctx context.Context, id string
 
 // RemoveFromMobileDevicePrestageScopeV2 remove Device Scope for a specific Mobile Device Prestage.
 //
-// Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -110,7 +110,7 @@ func (c *Client) RemoveFromMobileDevicePrestageScopeV2(ctx context.Context, id s
 
 // ListMobileDevicePrestageSyncsV2 get all prestage sync states for a single prestage.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -126,7 +126,7 @@ func (c *Client) ListMobileDevicePrestageSyncsV2(ctx context.Context, id string)
 
 // GetLatestMobileDevicePrestageSyncV2 get the latest Sync State for a single Prestage.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -144,7 +144,7 @@ func (c *Client) GetLatestMobileDevicePrestageSyncV2(ctx context.Context, id str
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
@@ -177,7 +177,7 @@ func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string)
 
 // ListMobileDevicePrestagesV3 get sorted and paged Mobile Device Prestages.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
@@ -212,7 +212,7 @@ func (c *Client) ListMobileDevicePrestagesV3(ctx context.Context, sort []string)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 func (c *Client) CreateMobileDevicePrestageV2(ctx context.Context, request *MobileDevicePrestageV2) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
@@ -225,7 +225,7 @@ func (c *Client) CreateMobileDevicePrestageV2(ctx context.Context, request *Mobi
 
 // CreateMobileDevicePrestageV3 create a Mobile Device Prestage.
 //
-// Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 func (c *Client) CreateMobileDevicePrestageV3(ctx context.Context, request *MobileDevicePrestageV3) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
@@ -240,7 +240,7 @@ func (c *Client) CreateMobileDevicePrestageV3(ctx context.Context, request *Mobi
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -256,7 +256,7 @@ func (c *Client) GetMobileDevicePrestageV2(ctx context.Context, id string) (*Get
 
 // GetMobileDevicePrestageV3 retrieve a Mobile Device Prestage with the supplied id.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -274,7 +274,7 @@ func (c *Client) GetMobileDevicePrestageV3(ctx context.Context, id string) (*Get
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -292,7 +292,7 @@ func (c *Client) UpdateMobileDevicePrestageV2(ctx context.Context, id string, re
 //
 // This endpoint requires an optimistic-lock precondition in its request body, sourced from a prior GET. The transport does NOT auto-retry a 5xx here — unlike other PUT/DELETE/GET/HEAD calls — because a blind retry would replay the now-stale precondition and could turn a successful-but-500ing write into a masked conflict on the retried attempt. See client.DoWithContentTypeNoRetry.
 //
-// Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -310,7 +310,7 @@ func (c *Client) UpdateMobileDevicePrestageV3(ctx context.Context, id string, re
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -325,7 +325,7 @@ func (c *Client) DeleteMobileDevicePrestageV2(ctx context.Context, id string) er
 
 // DeleteMobileDevicePrestageV3 delete a Mobile Device Prestage with the supplied id.
 //
-// Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -342,7 +342,7 @@ func (c *Client) DeleteMobileDevicePrestageV3(ctx context.Context, id string) er
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -358,7 +358,7 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV2(ctx context.Context, id s
 
 // ListMobileDevicePrestageAttachmentsV3 get attachments for a Mobile Device Prestage.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -376,7 +376,7 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id s
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Identifier of the Mobile Device Prestage the attachment should be assigned to.
@@ -401,7 +401,7 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV2(ctx context.Context, id 
 
 // UploadMobileDevicePrestageAttachmentV3 add an attachment to a Mobile Device Prestage.
 //
-// Required privileges: create:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Identifier of the Mobile Device Prestage the attachment should be assigned to.
@@ -428,7 +428,7 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV3(ctx context.Context, id 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -443,7 +443,7 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV2(ctx context.Con
 
 // DeleteMultipleMobileDevicePrestageAttachmentsV3 remove an attachment for a Mobile Device Prestage.
 //
-// Required privileges: delete:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -460,7 +460,7 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV3(ctx context.Con
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -495,7 +495,7 @@ func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id strin
 
 // ListMobileDevicePrestageHistoryV3 get sorted and paged Mobile Device Prestage history objects.
 //
-// Required privileges: read:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -532,7 +532,7 @@ func (c *Client) ListMobileDevicePrestageHistoryV3(ctx context.Context, id strin
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
 //
-// Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.
@@ -548,7 +548,7 @@ func (c *Client) CreateMobileDevicePrestageHistoryNoteV2(ctx context.Context, id
 
 // CreateMobileDevicePrestageHistoryNoteV3 add Mobile Device Prestage history object notes.
 //
-// Required privileges: update:pro:mobile-device-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
 //
 // Parameters:
 //   - id: Mobile Device Prestage identifier.

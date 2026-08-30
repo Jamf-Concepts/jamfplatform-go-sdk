@@ -18,7 +18,7 @@ import (
 
 // GetDeviceCommunicationSettingsV1 retrieves all settings for device communication.
 //
-// Required privileges: read:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Read Automatically Renew MDM Profile Settings.
+// Required privileges: mdm-profile-renewal-settings:read. Legacy Jamf Pro privilege name(s): Read Automatically Renew MDM Profile Settings.
 func (c *Client) GetDeviceCommunicationSettingsV1(ctx context.Context) (*DeviceCommunicationSettings, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceCommunicationSettings
@@ -31,7 +31,7 @@ func (c *Client) GetDeviceCommunicationSettingsV1(ctx context.Context) (*DeviceC
 
 // UpdateDeviceCommunicationSettingsV1 update device communication settings.
 //
-// Required privileges: update:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Update Automatically Renew MDM Profile Settings.
+// Required privileges: mdm-profile-renewal-settings:update. Legacy Jamf Pro privilege name(s): Update Automatically Renew MDM Profile Settings.
 func (c *Client) UpdateDeviceCommunicationSettingsV1(ctx context.Context, request *DeviceCommunicationSettings) (*DeviceCommunicationSettings, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result DeviceCommunicationSettings
@@ -44,7 +44,7 @@ func (c *Client) UpdateDeviceCommunicationSettingsV1(ctx context.Context, reques
 
 // ListDeviceCommunicationSettingsHistoryV1 get Device Communication settings history.
 //
-// Required privileges: read:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Read Automatically Renew MDM Profile Settings.
+// Required privileges: mdm-profile-renewal-settings:read. Legacy Jamf Pro privilege name(s): Read Automatically Renew MDM Profile Settings.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
@@ -84,7 +84,7 @@ func (c *Client) ListDeviceCommunicationSettingsHistoryV1(ctx context.Context, s
 
 // CreateDeviceCommunicationSettingsHistoryNoteV1 add Device Communication Settings history notes.
 //
-// Required privileges: update:pro:automatically-renew-mdm-profile-settings. Legacy Jamf Pro privilege name(s): Update Automatically Renew MDM Profile Settings.
+// Required privileges: mdm-profile-renewal-settings:update. Legacy Jamf Pro privilege name(s): Update Automatically Renew MDM Profile Settings.
 func (c *Client) CreateDeviceCommunicationSettingsHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory

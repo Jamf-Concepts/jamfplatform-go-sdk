@@ -18,7 +18,7 @@ import (
 
 // GetReenrollmentSettingsV1 get Re-enrollment object.
 //
-// Required privileges: read:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
+// Required privileges: re-enrollment:read. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
 func (c *Client) GetReenrollmentSettingsV1(ctx context.Context) (*Reenrollment, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Reenrollment
@@ -31,7 +31,7 @@ func (c *Client) GetReenrollmentSettingsV1(ctx context.Context) (*Reenrollment, 
 
 // UpdateReenrollmentSettingsV1 update the Re-enrollment object.
 //
-// Required privileges: update:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Update Re-enrollment.
+// Required privileges: re-enrollment:update. Legacy Jamf Pro privilege name(s): Update Re-enrollment.
 func (c *Client) UpdateReenrollmentSettingsV1(ctx context.Context, request *Reenrollment) (*Reenrollment, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Reenrollment
@@ -44,7 +44,7 @@ func (c *Client) UpdateReenrollmentSettingsV1(ctx context.Context, request *Reen
 
 // ListReenrollmentHistoryV1 get Re-enrollment history object.
 //
-// Required privileges: read:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
+// Required privileges: re-enrollment:read. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
@@ -77,7 +77,7 @@ func (c *Client) ListReenrollmentHistoryV1(ctx context.Context, sort string) ([]
 
 // CreateReenrollmentHistoryNoteV1 add specified Re-enrollment history object notes.
 //
-// Required privileges: update:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Update Re-enrollment.
+// Required privileges: re-enrollment:update. Legacy Jamf Pro privilege name(s): Update Re-enrollment.
 func (c *Client) CreateReenrollmentHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
@@ -90,7 +90,7 @@ func (c *Client) CreateReenrollmentHistoryNoteV1(ctx context.Context, request *O
 
 // ExportReenrollmentHistoryV1 export reenrollment history collection.
 //
-// Required privileges: read:pro:re-enrollment. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
+// Required privileges: re-enrollment:read. Legacy Jamf Pro privilege name(s): Read Re-enrollment.
 //
 // Parameters:
 //   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.

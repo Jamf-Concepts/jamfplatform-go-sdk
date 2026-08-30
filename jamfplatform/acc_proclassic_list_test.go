@@ -562,30 +562,6 @@ func TestAcceptance_Classic_ListPatches(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_ListPeripheralTypes(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).ListPeripheralTypes(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("ListPeripheralTypes forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("ListPeripheralTypes: %v", err)
-	}
-}
-
-func TestAcceptance_Classic_ListPeripherals(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).ListPeripherals(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("ListPeripherals forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("ListPeripherals: %v", err)
-	}
-}
-
 func TestAcceptance_Classic_ListPolicies(t *testing.T) {
 	c := accClient(t)
 	if _, err := proclassic.New(c).ListPolicies(context.Background()); err != nil {

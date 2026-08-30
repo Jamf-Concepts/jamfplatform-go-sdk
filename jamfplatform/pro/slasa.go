@@ -26,7 +26,7 @@ func (c *Client) GetSlasaAcceptanceV1(ctx context.Context) (*SlasaAcceptance, er
 
 // AcceptSlasaV1 accept the SLASA.
 //
-// Required privileges: update:pro:activation-code, read:pro:jss-information. Legacy Jamf Pro privilege name(s): Update License Information, View JSS Information.
+// Required privileges: activation-code:update, jss-information:read. Legacy Jamf Pro privilege name(s): Update License Information, View JSS Information.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 func (c *Client) AcceptSlasaV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")

@@ -20,7 +20,7 @@ import (
 
 // ParseEnrollmentCustomizationMarkdownV1 parse the given string as markdown text and return Html output.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 func (c *Client) ParseEnrollmentCustomizationMarkdownV1(ctx context.Context, request *Markdown) (*Markdown, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Markdown
@@ -33,7 +33,7 @@ func (c *Client) ParseEnrollmentCustomizationMarkdownV1(ctx context.Context, req
 
 // ListEnrollmentCustomizationPanelsV1 get all Panels for single Enrollment Customization.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -49,7 +49,7 @@ func (c *Client) ListEnrollmentCustomizationPanelsV1(ctx context.Context, id str
 
 // GetEnrollmentCustomizationPanelV1 get a single Panel for a single Enrollment Customization.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -66,7 +66,7 @@ func (c *Client) GetEnrollmentCustomizationPanelV1(ctx context.Context, id strin
 
 // DeleteEnrollmentCustomizationPanelV1 delete a single Panel from an Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -82,7 +82,7 @@ func (c *Client) DeleteEnrollmentCustomizationPanelV1(ctx context.Context, id st
 
 // CreateEnrollmentCustomizationLdapPanelV1 create an LDAP Panel for a single Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -98,7 +98,7 @@ func (c *Client) CreateEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 
 // GetEnrollmentCustomizationLdapPanelV1 get a single LDAP panel for a single Enrollment Customization.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -115,7 +115,7 @@ func (c *Client) GetEnrollmentCustomizationLdapPanelV1(ctx context.Context, id s
 
 // UpdateEnrollmentCustomizationLdapPanelV1 update a single LDAP Panel for a single Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -132,7 +132,7 @@ func (c *Client) UpdateEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 
 // DeleteEnrollmentCustomizationLdapPanelV1 delete an LDAP single panel from an Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -148,7 +148,7 @@ func (c *Client) DeleteEnrollmentCustomizationLdapPanelV1(ctx context.Context, i
 
 // CreateEnrollmentCustomizationSsoPanelV1 create an SSO Panel for a single Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -164,7 +164,7 @@ func (c *Client) CreateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 
 // GetEnrollmentCustomizationSsoPanelV1 get a single SSO Panel for a single Enrollment Customization.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -181,7 +181,7 @@ func (c *Client) GetEnrollmentCustomizationSsoPanelV1(ctx context.Context, id st
 
 // UpdateEnrollmentCustomizationSsoPanelV1 update a single SSO Panel for a single Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -198,7 +198,7 @@ func (c *Client) UpdateEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 
 // DeleteEnrollmentCustomizationSsoPanelV1 delete a single SSO Panel from an Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -214,7 +214,7 @@ func (c *Client) DeleteEnrollmentCustomizationSsoPanelV1(ctx context.Context, id
 
 // CreateEnrollmentCustomizationTextPanelV1 create a Text Panel for a single Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -230,7 +230,7 @@ func (c *Client) CreateEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 
 // GetEnrollmentCustomizationTextPanelV1 get a single Text Panel for a single Enrollment Customization.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -247,7 +247,7 @@ func (c *Client) GetEnrollmentCustomizationTextPanelV1(ctx context.Context, id s
 
 // UpdateEnrollmentCustomizationTextPanelV1 update a single Text Panel for a single Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -264,7 +264,7 @@ func (c *Client) UpdateEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 
 // DeleteEnrollmentCustomizationTextPanelV1 delete a Text single Panel from an Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -280,7 +280,7 @@ func (c *Client) DeleteEnrollmentCustomizationTextPanelV1(ctx context.Context, i
 
 // GetEnrollmentCustomizationTextPanelMarkdownV1 get the markdown output of a single Text Panel for a single Enrollment.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -297,7 +297,7 @@ func (c *Client) GetEnrollmentCustomizationTextPanelMarkdownV1(ctx context.Conte
 
 // ListEnrollmentCustomizationsV2 retrieve sorted and paged Enrollment Customizations.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
@@ -330,7 +330,7 @@ func (c *Client) ListEnrollmentCustomizationsV2(ctx context.Context, sort []stri
 
 // CreateEnrollmentCustomizationV2 create an Enrollment Customization.
 //
-// Required privileges: create:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Create Enrollment Customizations.
+// Required privileges: enrollment-customization:create. Legacy Jamf Pro privilege name(s): Create Enrollment Customizations.
 func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *EnrollmentCustomizationV2) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
@@ -343,7 +343,7 @@ func (c *Client) CreateEnrollmentCustomizationV2(ctx context.Context, request *E
 
 // UploadEnrollmentCustomizationImageV2 upload an image.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -381,7 +381,7 @@ func (c *Client) DownloadEnrollmentCustomizationImageV2(ctx context.Context, id 
 
 // GetEnrollmentCustomizationV2 retrieve an Enrollment Customization with the supplied id.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -397,7 +397,7 @@ func (c *Client) GetEnrollmentCustomizationV2(ctx context.Context, id string) (*
 
 // UpdateEnrollmentCustomizationV2 update an Enrollment Customization.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -413,7 +413,7 @@ func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string,
 
 // DeleteEnrollmentCustomizationV2 delete an Enrollment Customization with the supplied id.
 //
-// Required privileges: delete:pro:enrollment-customizations, read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Delete Enrollment Customizations, Read Enrollment Customizations.
+// Required privileges: enrollment-customization:delete, enrollment-customization:read. Legacy Jamf Pro privilege name(s): Delete Enrollment Customizations, Read Enrollment Customizations.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // Parameters:
@@ -429,7 +429,7 @@ func (c *Client) DeleteEnrollmentCustomizationV2(ctx context.Context, id string)
 
 // ListEnrollmentCustomizationHistoryV2 get sorted and paged Enrollment Customization history objects.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -464,7 +464,7 @@ func (c *Client) ListEnrollmentCustomizationHistoryV2(ctx context.Context, id st
 
 // CreateEnrollmentCustomizationHistoryNoteV2 add Enrollment Customization history object notes.
 //
-// Required privileges: update:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
+// Required privileges: enrollment-customization:update. Legacy Jamf Pro privilege name(s): Update Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.
@@ -480,7 +480,7 @@ func (c *Client) CreateEnrollmentCustomizationHistoryNoteV2(ctx context.Context,
 
 // ListEnrollmentCustomizationPrestagesV2 retrieve the list of Prestages using this Enrollment Customization.
 //
-// Required privileges: read:pro:enrollment-customizations. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
+// Required privileges: enrollment-customization:read. Legacy Jamf Pro privilege name(s): Read Enrollment Customizations.
 //
 // Parameters:
 //   - id: Enrollment Customization identifier.

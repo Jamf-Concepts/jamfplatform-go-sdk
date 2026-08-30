@@ -19,7 +19,7 @@ import (
 
 // ListMobileDeviceExtensionAttributesV1 retrieve Mobile Device Extension Attributes.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
@@ -58,7 +58,7 @@ func (c *Client) ListMobileDeviceExtensionAttributesV1(ctx context.Context, sort
 
 // CreateMobileDeviceExtensionAttributeV1 create Mobile Device Extension Attribute.
 //
-// Required privileges: create:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Create Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:create. Legacy Jamf Pro privilege name(s): Create Mobile Device Extension Attributes.
 func (c *Client) CreateMobileDeviceExtensionAttributeV1(ctx context.Context, request *MobileDeviceExtensionAttributes) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -71,7 +71,7 @@ func (c *Client) CreateMobileDeviceExtensionAttributeV1(ctx context.Context, req
 
 // GetMobileDeviceExtensionAttributeV1 get specified Mobile Device Extension Attribute object.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of Mobile Device Extension Attribute.
@@ -87,7 +87,7 @@ func (c *Client) GetMobileDeviceExtensionAttributeV1(ctx context.Context, id str
 
 // UpdateMobileDeviceExtensionAttributeV1 update specified Mobile Device Extension Attribute object.
 //
-// Required privileges: update:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Update Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:update. Legacy Jamf Pro privilege name(s): Update Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of Mobile Device Extension Attribute.
@@ -103,7 +103,7 @@ func (c *Client) UpdateMobileDeviceExtensionAttributeV1(ctx context.Context, id 
 
 // DeleteMobileDeviceExtensionAttributeV1 delete a Mobile Device Extension Attribute by ID.
 //
-// Required privileges: delete:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Delete Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of Mobile Device Extension Attribute.
@@ -118,7 +118,7 @@ func (c *Client) DeleteMobileDeviceExtensionAttributeV1(ctx context.Context, id 
 
 // GetMobileDeviceExtensionAttributeDataDependencyV1 get smart group dependent object for a specified mobile device extension attribute.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of mobile device extension attribute.
@@ -134,7 +134,7 @@ func (c *Client) GetMobileDeviceExtensionAttributeDataDependencyV1(ctx context.C
 
 // ListMobileDeviceExtensionAttributeHistoryV1 get specified Mobile Device Extension Attribute History object.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - id: Instance ID of Mobile Device Extension Attribute.
@@ -174,7 +174,7 @@ func (c *Client) ListMobileDeviceExtensionAttributeHistoryV1(ctx context.Context
 
 // CreateMobileDeviceExtensionAttributeHistoryNoteV1 add specified Mobile Device Extension Attribute history object notes.
 //
-// Required privileges: update:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Update Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:update. Legacy Jamf Pro privilege name(s): Update Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - id: Instance ID of Mobile Device Extension Attribute.
@@ -190,7 +190,7 @@ func (c *Client) CreateMobileDeviceExtensionAttributeHistoryNoteV1(ctx context.C
 
 // ListDeviceExtensionAttributesPreview get Mobile Device Extension Attribute values placed in select paramter.
 //
-// Required privileges: read:pro:mobile-device-extension-attributes. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Mobile Device Extension Attributes.
 //
 // Parameters:
 //   - selectAttr: Acceptable values currently include: * name.

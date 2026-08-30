@@ -14,7 +14,7 @@ import (
 
 // GetHealthcareListenerByID finds healthcare listener by ID.
 //
-// Required privileges: read:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetHealthcareListenerByID(ctx context.Context, id string) (*Hea
 
 // UpdateHealthcareListenerByID updates an existing healthcare listener by ID.
 //
-// Required privileges: update:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -45,7 +45,7 @@ func (c *Client) UpdateHealthcareListenerByID(ctx context.Context, id string, re
 
 // ListHealthcareListeners find all Healthcare Listeners.
 //
-// Required privileges: read:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:read.
 func (c *Client) ListHealthcareListeners(ctx context.Context) (*HealthcareListeners, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result HealthcareListeners

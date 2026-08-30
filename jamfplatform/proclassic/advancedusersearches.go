@@ -17,7 +17,7 @@ import (
 
 // GetAdvancedUserSearchByID finds user searches by ID.
 //
-// Required privileges: read:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetAdvancedUserSearchByID(ctx context.Context, id string) (*Adv
 
 // CreateAdvancedUserSearchByID creates a new advanced user search by ID.
 //
-// Required privileges: create:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateAdvancedUserSearchByID(ctx context.Context, id string, re
 
 // UpdateAdvancedUserSearchByID updates an existing advanced user search by ID.
 //
-// Required privileges: update:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateAdvancedUserSearchByID(ctx context.Context, id string, re
 
 // DeleteAdvancedUserSearchByID deletes a user search by ID.
 //
-// Required privileges: delete:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteAdvancedUserSearchByID(ctx context.Context, id string) er
 
 // GetAdvancedUserSearchByName finds user searches by name.
 //
-// Required privileges: read:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetAdvancedUserSearchByName(ctx context.Context, name string) (
 
 // DeleteAdvancedUserSearchByName deletes a user search by Name.
 //
-// Required privileges: delete:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:delete.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -110,7 +110,7 @@ func (c *Client) DeleteAdvancedUserSearchByName(ctx context.Context, name string
 
 // ListAdvancedUserSearches finds all advanced user searches.
 //
-// Required privileges: read:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:read.
 func (c *Client) ListAdvancedUserSearches(ctx context.Context) (*AdvancedUserSearches, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedUserSearches
@@ -123,7 +123,7 @@ func (c *Client) ListAdvancedUserSearches(ctx context.Context) (*AdvancedUserSea
 
 // UpdateAdvancedUserSearchByName updates an existing advanced user search by name.
 //
-// Required privileges: update:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:update.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -138,7 +138,7 @@ func (c *Client) UpdateAdvancedUserSearchByName(ctx context.Context, name string
 
 // CreateAdvancedUserSearchByName creates a new advanced user search by ID.
 //
-// Required privileges: create:pro:advanced-user-searches.
+// Required privileges: advanced-user-searches:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

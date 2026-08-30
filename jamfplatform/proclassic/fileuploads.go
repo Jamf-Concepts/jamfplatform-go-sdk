@@ -14,7 +14,7 @@ import (
 
 // UploadFileByResourceIDTypeID creates file attachments in Jamf Pro.
 //
-// Required privileges: create:pro:file-uploads.
+// Required privileges: file-uploads:create.
 //
 // Parameters:
 //   - resource: Resource to attach the file to.

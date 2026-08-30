@@ -16,7 +16,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
-// Required privileges: read:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
+// Required privileges: jamf-cloud-distribution-service-files:read. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
 func (c *Client) ListJCDSFilesV1(ctx context.Context) ([]FileData, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []FileData
@@ -31,7 +31,7 @@ func (c *Client) ListJCDSFilesV1(ctx context.Context) ([]FileData, error) {
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
-// Required privileges: create:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Create Jamf Cloud Distribution Service Files.
+// Required privileges: jamf-cloud-distribution-service-files:create. Legacy Jamf Pro privilege name(s): Create Jamf Cloud Distribution Service Files.
 func (c *Client) InitiateJCDSUploadV1(ctx context.Context) (*Credentials, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Credentials
@@ -46,7 +46,7 @@ func (c *Client) InitiateJCDSUploadV1(ctx context.Context) (*Credentials, error)
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
-// Required privileges: read:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
+// Required privileges: jamf-cloud-distribution-service-files:read. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
 //
 // Parameters:
 //   - fileName: Name of the file stored in the Jamf Cloud Distribution Service.
@@ -64,7 +64,7 @@ func (c *Client) GetJCDSFileDownloadURLV1(ctx context.Context, fileName string) 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
-// Required privileges: delete:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Delete Jamf Cloud Distribution Service Files.
+// Required privileges: jamf-cloud-distribution-service-files:delete. Legacy Jamf Pro privilege name(s): Delete Jamf Cloud Distribution Service Files.
 //
 // Parameters:
 //   - fileName: Name of the file that will be deleted from the Jamf Cloud Distribution Service.
@@ -81,7 +81,7 @@ func (c *Client) DeleteJCDSFileV1(ctx context.Context, fileName string) error {
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
-// Required privileges: read:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
+// Required privileges: jamf-cloud-distribution-service-files:read. Legacy Jamf Pro privilege name(s): Read Jamf Cloud Distribution Service Files.
 //
 // Parameters:
 //   - fileName: Name of the file to check the availability of in JCDS. If available, the inventory and status will
@@ -107,7 +107,7 @@ func (c *Client) RefreshJCDSInventoryV1(ctx context.Context, fileName string) er
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-08-28) and may be removed in a future release.
 //
-// Required privileges: create:pro:jamf-cloud-distribution-service-files. Legacy Jamf Pro privilege name(s): Create Jamf Cloud Distribution Service Files.
+// Required privileges: jamf-cloud-distribution-service-files:create. Legacy Jamf Pro privilege name(s): Create Jamf Cloud Distribution Service Files.
 func (c *Client) RenewJCDSCredentialsV1(ctx context.Context) (*Credentials, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Credentials

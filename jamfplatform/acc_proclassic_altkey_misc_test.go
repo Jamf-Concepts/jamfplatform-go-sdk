@@ -170,25 +170,6 @@ func TestAcceptance_Classic_ProbeCreate_CreatePatchSoftwareTitleByID(t *testing.
 	}
 }
 
-func TestAcceptance_Classic_ProbeCreate_CreatePeripheralByID(t *testing.T) {
-	c := accClient(t)
-	pc := proclassic.New(c)
-	ctx := context.Background()
-	created, err := pc.CreatePeripheralByID(ctx, "0", &proclassic.PeripheralPost{})
-	if probeCreateHandleErr(t, "CreatePeripheralByID", err) {
-		return
-	}
-	if created != nil && created.ID != nil {
-		id := *created.ID
-		t.Cleanup(func() {
-			if err := pc.DeletePeripheralByID(ctx, intToStr(id)); err != nil {
-				t.Logf("cleanup: DeletePeripheralByID(%d): %v", id, err)
-			}
-		})
-		t.Logf("probe-create accepted empty body; id=%d queued for cleanup", id)
-	}
-}
-
 func TestAcceptance_Classic_ProbeCreate_CreateVPPAccountByID(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)

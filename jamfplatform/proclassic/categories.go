@@ -17,7 +17,7 @@ import (
 
 // GetCategoryByID finds categories by ID.
 //
-// Required privileges: read:pro:categories.
+// Required privileges: categories:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetCategoryByID(ctx context.Context, id string) (*Category, err
 
 // CreateCategoryByID creates a new category by ID.
 //
-// Required privileges: create:pro:categories.
+// Required privileges: categories:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateCategoryByID(ctx context.Context, id string, request *Cat
 
 // UpdateCategoryByID updates an existing category by ID.
 //
-// Required privileges: update:pro:categories.
+// Required privileges: categories:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateCategoryByID(ctx context.Context, id string, request *Cat
 
 // DeleteCategoryByID deletes a category by ID.
 //
-// Required privileges: delete:pro:categories.
+// Required privileges: categories:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteCategoryByID(ctx context.Context, id string) error {
 
 // GetCategoryByName finds categories by name.
 //
-// Required privileges: read:pro:categories.
+// Required privileges: categories:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetCategoryByName(ctx context.Context, name string) (*Category,
 
 // UpdateCategoryByName updates an existing category by name.
 //
-// Required privileges: update:pro:categories.
+// Required privileges: categories:update.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateCategoryByName(ctx context.Context, name string, request 
 
 // DeleteCategoryByName deletes a category by name.
 //
-// Required privileges: delete:pro:categories.
+// Required privileges: categories:delete.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteCategoryByName(ctx context.Context, name string) error {
 
 // ListCategories finds all categories.
 //
-// Required privileges: read:pro:categories.
+// Required privileges: categories:read.
 func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Categories
@@ -138,7 +138,7 @@ func (c *Client) ListCategories(ctx context.Context) (*Categories, error) {
 
 // CreateCategoryByName creates a new category by ID.
 //
-// Required privileges: create:pro:categories.
+// Required privileges: categories:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

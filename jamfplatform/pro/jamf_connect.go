@@ -19,8 +19,7 @@ import (
 
 // GetJamfConnectSettingsV1 get the Jamf Connect settings that you have access to see.
 //
-// Required privileges: read:pro:jamf-connect-deployments, read:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings, Read Jamf Connect Deployments.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: jamf-connect-deployments:read. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings, Read Jamf Connect Deployments.
 func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/jamf-connect"
@@ -32,7 +31,7 @@ func (c *Client) GetJamfConnectSettingsV1(ctx context.Context) error {
 
 // ListJamfConnectConfigProfilesV1 search for config profiles linked to Jamf Connect.
 //
-// Required privileges: read:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
+// Required privileges: jamf-connect-deployments:read. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
@@ -74,7 +73,7 @@ func (c *Client) ListJamfConnectConfigProfilesV1(ctx context.Context, sort []str
 
 // UpdateJamfConnectConfigProfileV1 update the way the Jamf Connect app gets updated on computers within scope of the associated configuration profile.
 //
-// Required privileges: update:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Update Jamf Connect Deployments.
+// Required privileges: jamf-connect-deployments:update. Legacy Jamf Pro privilege name(s): Update Jamf Connect Deployments.
 //
 // Parameters:
 //   - id: the UUID of the profile to update.
@@ -90,7 +89,7 @@ func (c *Client) UpdateJamfConnectConfigProfileV1(ctx context.Context, id string
 
 // ListJamfConnectDeploymentTasksV1 search for deployment tasks for a config profile linked to Jamf Connect.
 //
-// Required privileges: read:pro:jamf-connect-deployments. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
+// Required privileges: jamf-connect-deployments:read. Legacy Jamf Pro privilege name(s): Read Jamf Connect Deployments.
 //
 // Parameters:
 //   - id: the UUID of the Jamf Connect deployment.
@@ -133,7 +132,7 @@ func (c *Client) ListJamfConnectDeploymentTasksV1(ctx context.Context, id string
 
 // RetryJamfConnectDeploymentTasksV1 request a retry of Connect install tasks.
 //
-// Required privileges: deploy:pro:jamf-connect-deployment-retry. Legacy Jamf Pro privilege name(s): Jamf Connect Deployment Retry.
+// Required privileges: jamf-connect-deployments:deploy. Legacy Jamf Pro privilege name(s): Jamf Connect Deployment Retry.
 //
 // Parameters:
 //   - id: the UUID of the deployment associated with the retry.
@@ -148,7 +147,7 @@ func (c *Client) RetryJamfConnectDeploymentTasksV1(ctx context.Context, id strin
 
 // ListJamfConnectHistoryV1 get Jamf Connect history.
 //
-// Required privileges: read:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings.
+// Required privileges: jamf-connect-deployments:read. Legacy Jamf Pro privilege name(s): Read Jamf Connect Settings.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort order is descending. Multiple sort
@@ -190,7 +189,7 @@ func (c *Client) ListJamfConnectHistoryV1(ctx context.Context, sort []string, fi
 
 // CreateJamfConnectHistoryNoteV1 add Jamf Connect history notes.
 //
-// Required privileges: update:pro:jamf-connect-settings. Legacy Jamf Pro privilege name(s): Update Jamf Connect Settings.
+// Required privileges: jamf-connect-deployments:update. Legacy Jamf Pro privilege name(s): Update Jamf Connect Settings.
 func (c *Client) CreateJamfConnectHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse

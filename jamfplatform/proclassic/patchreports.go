@@ -16,7 +16,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:read.
 //
 // Parameters:
 //   - id: Patch software title id to filter by.
@@ -34,7 +34,7 @@ func (c *Client) GetPatchReportByPatchSoftwareTitleID(ctx context.Context, id st
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:read.
 //
 // Parameters:
 //   - id: Patch software title ID to filter by.

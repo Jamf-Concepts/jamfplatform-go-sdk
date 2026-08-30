@@ -14,8 +14,7 @@ import (
 
 // UpdateMdmRenewalDeviceCommonDetailsV1 update device common details (partial update).
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 func (c *Client) UpdateMdmRenewalDeviceCommonDetailsV1(ctx context.Context, request *DeviceCommonDetailsRequest) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/mdm-renewal/device-common-details"
@@ -27,8 +26,7 @@ func (c *Client) UpdateMdmRenewalDeviceCommonDetailsV1(ctx context.Context, requ
 
 // GetMdmRenewalDeviceCommonDetailsV1 get device common details for a client management ID.
 //
-// Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:read. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 //
 // Parameters:
 //   - clientManagementID: The client management ID to retrieve device common details for.
@@ -44,8 +42,7 @@ func (c *Client) GetMdmRenewalDeviceCommonDetailsV1(ctx context.Context, clientM
 
 // GetMdmRenewalStrategiesV1 get MDM renewal errors and strategies for a client management ID.
 //
-// Required privileges: read:pro:computer-commands, read:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:read. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 //
 // Parameters:
 //   - clientManagementID: The client management ID to retrieve renewal strategies for.
@@ -61,8 +58,7 @@ func (c *Client) GetMdmRenewalStrategiesV1(ctx context.Context, clientManagement
 
 // DeleteMdmRenewalStrategiesV1 delete MDM renewal strategies for a client management ID.
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute. Legacy Jamf Pro privilege name(s): Send Command to Renew MDM Profile.
 //
 // Parameters:
 //   - clientManagementID: The client management ID to delete renewal strategies for.

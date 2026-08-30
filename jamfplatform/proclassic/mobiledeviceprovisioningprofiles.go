@@ -17,7 +17,7 @@ import (
 
 // GetMobileDeviceProvisioningProfileByID finds a mobile device provisioning profiles by id.
 //
-// Required privileges: read:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:read.
 //
 // Parameters:
 //   - id: Id value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetMobileDeviceProvisioningProfileByID(ctx context.Context, id 
 
 // CreateMobileDeviceProvisioningProfileByID creates a mobile device provisioning profiles by id.
 //
-// Required privileges: create:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:create.
 //
 // Parameters:
 //   - id: Id value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByID(ctx context.Context, 
 
 // UpdateMobileDeviceProvisioningProfileByID updates an existing mobile device provisioning profiles by id.
 //
-// Required privileges: update:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:update.
 //
 // Parameters:
 //   - id: Id value to filter by.
@@ -65,7 +65,7 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByID(ctx context.Context, 
 
 // DeleteMobileDeviceProvisioningProfileByID deletes a mobile device provisioning profiles by id.
 //
-// Required privileges: delete:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:delete.
 //
 // Parameters:
 //   - id: Id value to filter by.
@@ -80,7 +80,7 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByID(ctx context.Context, 
 
 // GetMobileDeviceProvisioningProfileByName finds a mobile device provisioning profiles by name.
 //
-// Required privileges: read:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:read.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -96,7 +96,7 @@ func (c *Client) GetMobileDeviceProvisioningProfileByName(ctx context.Context, n
 
 // DeleteMobileDeviceProvisioningProfileByName deletes a mobile device provisioning profiles by name.
 //
-// Required privileges: delete:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -111,7 +111,7 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByName(ctx context.Context
 
 // GetMobileDeviceProvisioningProfileByUUID finds a mobile device provisioning profiles by uuid.
 //
-// Required privileges: read:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:read.
 //
 // Parameters:
 //   - uuid: Uuid value to filter by.
@@ -127,7 +127,7 @@ func (c *Client) GetMobileDeviceProvisioningProfileByUUID(ctx context.Context, u
 
 // DeleteMobileDeviceProvisioningProfileByUUID deletes a mobile device provisioning profiles by uuid.
 //
-// Required privileges: delete:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:delete.
 //
 // Parameters:
 //   - uuid: Uuid value to filter by.
@@ -142,7 +142,7 @@ func (c *Client) DeleteMobileDeviceProvisioningProfileByUUID(ctx context.Context
 
 // ListMobileDeviceProvisioningProfiles finds all mobile device provisioning profiles.
 //
-// Required privileges: read:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:read.
 func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*MobileDeviceProvisioningProfiles, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceProvisioningProfiles
@@ -155,7 +155,7 @@ func (c *Client) ListMobileDeviceProvisioningProfiles(ctx context.Context) (*Mob
 
 // CreateMobileDeviceProvisioningProfileByName creates a mobile device provisioning profiles by name.
 //
-// Required privileges: create:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:create.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -171,7 +171,7 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByName(ctx context.Context
 
 // UpdateMobileDeviceProvisioningProfileByName updates an existing mobile device provisioning profiles by name.
 //
-// Required privileges: update:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -187,7 +187,7 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByName(ctx context.Context
 
 // CreateMobileDeviceProvisioningProfileByUUID creates a mobile device provisioning profiles by uuid.
 //
-// Required privileges: create:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:create.
 //
 // Parameters:
 //   - uuid: Uuid value to filter by.
@@ -203,7 +203,7 @@ func (c *Client) CreateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 
 // UpdateMobileDeviceProvisioningProfileByUUID updates an existing mobile device provisioning profiles by uuid.
 //
-// Required privileges: update:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:update.
 //
 // Parameters:
 //   - uuid: Uuid value to filter by.
@@ -219,7 +219,7 @@ func (c *Client) UpdateMobileDeviceProvisioningProfileByUUID(ctx context.Context
 
 // GetMobileDeviceProvisioningProfileByIDSubset finds a mobile device provisioning profiles by id.
 //
-// Required privileges: read:pro:provisioning-profiles.
+// Required privileges: provisioning-profiles:read.
 //
 // Parameters:
 //   - id: Id value to filter by.

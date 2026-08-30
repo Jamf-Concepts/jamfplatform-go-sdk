@@ -17,7 +17,7 @@ import (
 
 // GetClassicPackageByID finds packages by ID.
 //
-// Required privileges: read:pro:packages.
+// Required privileges: packages:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetClassicPackageByID(ctx context.Context, id string) (*Package
 
 // CreateClassicPackageByID creates a new package by ID.
 //
-// Required privileges: create:pro:packages.
+// Required privileges: packages:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateClassicPackageByID(ctx context.Context, id string, reques
 
 // UpdateClassicPackageByID updates an existing package by ID.
 //
-// Required privileges: update:pro:packages.
+// Required privileges: packages:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateClassicPackageByID(ctx context.Context, id string, reques
 
 // DeleteClassicPackageByID deletes a package by ID.
 //
-// Required privileges: delete:pro:packages.
+// Required privileges: packages:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteClassicPackageByID(ctx context.Context, id string) error 
 
 // ListClassicPackages finds all packages.
 //
-// Required privileges: read:pro:packages.
+// Required privileges: packages:read.
 func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Packages
@@ -92,7 +92,7 @@ func (c *Client) ListClassicPackages(ctx context.Context) (*Packages, error) {
 
 // DeleteClassicPackageByName deletes a package by name.
 //
-// Required privileges: delete:pro:packages.
+// Required privileges: packages:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -107,7 +107,7 @@ func (c *Client) DeleteClassicPackageByName(ctx context.Context, name string) er
 
 // GetClassicPackageByName finds packages by name.
 //
-// Required privileges: read:pro:packages.
+// Required privileges: packages:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -123,7 +123,7 @@ func (c *Client) GetClassicPackageByName(ctx context.Context, name string) (*Pac
 
 // UpdateClassicPackageByName updates an existing package by name.
 //
-// Required privileges: update:pro:packages.
+// Required privileges: packages:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -138,7 +138,7 @@ func (c *Client) UpdateClassicPackageByName(ctx context.Context, name string, re
 
 // CreateClassicPackageByName creates a new package by ID.
 //
-// Required privileges: create:pro:packages.
+// Required privileges: packages:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

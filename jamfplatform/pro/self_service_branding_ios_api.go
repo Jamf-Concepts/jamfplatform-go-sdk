@@ -19,7 +19,7 @@ import (
 
 // ListIOSBrandingConfigurationsV1 search for sorted and paged iOS branding configurations.
 //
-// Required privileges: read:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
+// Required privileges: self-service:read. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
@@ -52,7 +52,7 @@ func (c *Client) ListIOSBrandingConfigurationsV1(ctx context.Context, sort []str
 
 // CreateIOSBrandingConfigurationV1 create a Self Service iOS branding configuration with the supplied.
 //
-// Required privileges: create:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Create Self Service Branding Configuration.
+// Required privileges: self-service:create. Legacy Jamf Pro privilege name(s): Create Self Service Branding Configuration.
 func (c *Client) CreateIOSBrandingConfigurationV1(ctx context.Context, request *IosBrandingConfiguration) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -65,7 +65,7 @@ func (c *Client) CreateIOSBrandingConfigurationV1(ctx context.Context, request *
 
 // GetIOSBrandingConfigurationV1 read a single Self Service iOS branding configuration indicated by the provided id.
 //
-// Required privileges: read:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
+// Required privileges: self-service:read. Legacy Jamf Pro privilege name(s): Read Self Service Branding Configuration.
 //
 // Parameters:
 //   - id: id of iOS branding configuration.
@@ -81,7 +81,7 @@ func (c *Client) GetIOSBrandingConfigurationV1(ctx context.Context, id string) (
 
 // UpdateIOSBrandingConfigurationV1 update a Self Service iOS branding configuration with the supplied details.
 //
-// Required privileges: update:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Update Self Service Branding Configuration.
+// Required privileges: self-service:update. Legacy Jamf Pro privilege name(s): Update Self Service Branding Configuration.
 //
 // Parameters:
 //   - id: id of iOS branding configuration.
@@ -97,7 +97,7 @@ func (c *Client) UpdateIOSBrandingConfigurationV1(ctx context.Context, id string
 
 // DeleteIOSBrandingConfigurationV1 delete the Self Service iOS branding configuration indicated by the provided id.
 //
-// Required privileges: delete:pro:self-service-branding-configuration. Legacy Jamf Pro privilege name(s): Delete Self Service Branding Configuration.
+// Required privileges: self-service:delete. Legacy Jamf Pro privilege name(s): Delete Self Service Branding Configuration.
 //
 // Parameters:
 //   - id: id of iOS branding configuration.

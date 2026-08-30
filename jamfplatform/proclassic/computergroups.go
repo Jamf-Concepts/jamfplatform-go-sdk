@@ -17,7 +17,7 @@ import (
 
 // GetComputerGroupByID finds computer groups by ID.
 //
-// Required privileges: read:pro:computer-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetComputerGroupByID(ctx context.Context, id string) (*Computer
 
 // CreateComputerGroupByID creates a new computer group by ID.
 //
-// Required privileges: create:pro:computer-groups.
+// Required privileges: device-groups:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateComputerGroupByID(ctx context.Context, id string, request
 
 // UpdateComputerGroupByID updates an existing computer group by ID.
 //
-// Required privileges: update:pro:computer-groups.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateComputerGroupByID(ctx context.Context, id string, request
 
 // DeleteComputerGroupByID deletes a computer group by ID.
 //
-// Required privileges: delete:pro:computer-groups.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteComputerGroupByID(ctx context.Context, id string) error {
 
 // GetComputerGroupByName finds computer groups by name.
 //
-// Required privileges: read:pro:computer-groups.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetComputerGroupByName(ctx context.Context, name string) (*Comp
 
 // UpdateComputerGroupByName updates an existing computer group by name.
 //
-// Required privileges: update:pro:computer-groups.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateComputerGroupByName(ctx context.Context, name string, req
 
 // DeleteComputerGroupByName deletes a computer group by name.
 //
-// Required privileges: delete:pro:computer-groups.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteComputerGroupByName(ctx context.Context, name string) err
 
 // ListComputerGroups finds all computer groups.
 //
-// Required privileges: read:pro:computer-groups.
+// Required privileges: device-groups:read.
 func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerGroups
@@ -138,7 +138,7 @@ func (c *Client) ListComputerGroups(ctx context.Context) (*ComputerGroups, error
 
 // CreateComputerGroupByName creates a new computer group by ID.
 //
-// Required privileges: create:pro:computer-groups.
+// Required privileges: device-groups:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

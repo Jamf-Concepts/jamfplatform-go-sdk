@@ -20,7 +20,7 @@ import (
 
 // DownloadInventoryPreloadCsvV2 download all Inventory Preload records.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) DownloadInventoryPreloadCsvV2(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
@@ -33,7 +33,7 @@ func (c *Client) DownloadInventoryPreloadCsvV2(ctx context.Context) ([]byte, err
 
 // UploadInventoryPreloadCsvV2 create one or more new Inventory Preload records using CSV.
 //
-// Required privileges: create:pro:user, update:pro:user, create:pro:inventory-preload-records, update:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records, Update Inventory Preload Records, Create User, Update User.
+// Required privileges: inventory-preload-records:create, inventory-preload-records:update, users:create, users:update. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records, Update Inventory Preload Records, Create User, Update User.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
@@ -58,7 +58,7 @@ func (c *Client) UploadInventoryPreloadCsvV2(ctx context.Context, fileFilename s
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2020-04-21) and may be removed in a future release.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) DownloadInventoryPreloadCsvTemplateV1(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
@@ -71,7 +71,7 @@ func (c *Client) DownloadInventoryPreloadCsvTemplateV1(ctx context.Context) ([]b
 
 // DownloadInventoryPreloadCsvTemplateV2 download the Inventory Preload CSV template.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) DownloadInventoryPreloadCsvTemplateV2(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
@@ -84,7 +84,7 @@ func (c *Client) DownloadInventoryPreloadCsvTemplateV2(ctx context.Context) ([]b
 
 // ValidateInventoryPreloadCsvV2 validate a given CSV file.
 //
-// Required privileges: create:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records.
+// Required privileges: inventory-preload-records:create. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -106,7 +106,7 @@ func (c *Client) ValidateInventoryPreloadCsvV2(ctx context.Context, fileFilename
 
 // ListInventoryPreloadExtensionAttributeColumnsV2 retrieve a list of extension attribute columns.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 func (c *Client) ListInventoryPreloadExtensionAttributeColumnsV2(ctx context.Context) (*InventoryPreloadExtensionAttributeColumnResult, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result InventoryPreloadExtensionAttributeColumnResult
@@ -119,7 +119,7 @@ func (c *Client) ListInventoryPreloadExtensionAttributeColumnsV2(ctx context.Con
 
 // ExportInventoryPreloadV2 export a collection of inventory preload records.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
 //   - exportFields: Export fields parameter, used to change default order or ignore some of the response properties.
@@ -170,7 +170,7 @@ func (c *Client) ExportInventoryPreloadV2(ctx context.Context, request *ExportPa
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2020-04-24) and may be removed in a future release.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
@@ -203,7 +203,7 @@ func (c *Client) ListInventoryPreloadHistoryV1(ctx context.Context, sort []strin
 
 // ListInventoryPreloadHistoryV2 get Inventory Preload history entries.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `date:desc`. Multiple sort
@@ -246,7 +246,7 @@ func (c *Client) ListInventoryPreloadHistoryV2(ctx context.Context, sort []strin
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2020-04-24) and may be removed in a future release.
 //
-// Required privileges: update:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
+// Required privileges: inventory-preload-records:update. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
 func (c *Client) CreateInventoryPreloadHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
@@ -259,7 +259,7 @@ func (c *Client) CreateInventoryPreloadHistoryNoteV1(ctx context.Context, reques
 
 // CreateInventoryPreloadHistoryNoteV2 add Inventory Preload history object notes.
 //
-// Required privileges: update:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
+// Required privileges: inventory-preload-records:update. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
 func (c *Client) CreateInventoryPreloadHistoryNoteV2(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
@@ -272,7 +272,7 @@ func (c *Client) CreateInventoryPreloadHistoryNoteV2(ctx context.Context, reques
 
 // ListInventoryPreloadRecordsV2 return all Inventory Preload records.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `id:asc`. Multiple sort
@@ -317,7 +317,7 @@ func (c *Client) ListInventoryPreloadRecordsV2(ctx context.Context, sort []strin
 
 // CreateInventoryPreloadRecordV2 create a new Inventory Preload record using JSON.
 //
-// Required privileges: create:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records.
+// Required privileges: inventory-preload-records:create. Legacy Jamf Pro privilege name(s): Create Inventory Preload Records.
 func (c *Client) CreateInventoryPreloadRecordV2(ctx context.Context, request *InventoryPreloadRecordV2) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
@@ -330,7 +330,7 @@ func (c *Client) CreateInventoryPreloadRecordV2(ctx context.Context, request *In
 
 // DeleteAllInventoryPreloadRecordsV2 delete all Inventory Preload records.
 //
-// Required privileges: delete:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Delete Inventory Preload Records.
+// Required privileges: inventory-preload-records:delete. Legacy Jamf Pro privilege name(s): Delete Inventory Preload Records.
 func (c *Client) DeleteAllInventoryPreloadRecordsV2(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	endpoint := prefix + "/inventory-preload/records/delete-all"
@@ -342,7 +342,7 @@ func (c *Client) DeleteAllInventoryPreloadRecordsV2(ctx context.Context) error {
 
 // GetInventoryPreloadRecordV2 get an Inventory Preload record.
 //
-// Required privileges: read:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
+// Required privileges: inventory-preload-records:read. Legacy Jamf Pro privilege name(s): Read Inventory Preload Records.
 //
 // Parameters:
 //   - id: Inventory Preload identifier.
@@ -358,7 +358,7 @@ func (c *Client) GetInventoryPreloadRecordV2(ctx context.Context, id string) (*I
 
 // UpdateInventoryPreloadRecordV2 update an Inventory Preload record.
 //
-// Required privileges: update:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
+// Required privileges: inventory-preload-records:update. Legacy Jamf Pro privilege name(s): Update Inventory Preload Records.
 //
 // Parameters:
 //   - id: Inventory Preload identifier.
@@ -374,7 +374,7 @@ func (c *Client) UpdateInventoryPreloadRecordV2(ctx context.Context, id string, 
 
 // DeleteInventoryPreloadRecordV2 delete an Inventory Preload record.
 //
-// Required privileges: delete:pro:inventory-preload-records. Legacy Jamf Pro privilege name(s): Delete Inventory Preload Records.
+// Required privileges: inventory-preload-records:delete. Legacy Jamf Pro privilege name(s): Delete Inventory Preload Records.
 //
 // Parameters:
 //   - id: Inventory Preload identifier.

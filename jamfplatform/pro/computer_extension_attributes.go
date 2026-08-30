@@ -20,7 +20,7 @@ import (
 
 // ListComputerExtensionAttributesV1 retrieve Computer Extension Attributes.
 //
-// Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
 //   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
@@ -59,7 +59,7 @@ func (c *Client) ListComputerExtensionAttributesV1(ctx context.Context, sort []s
 
 // CreateComputerExtensionAttributeV1 create Computer Extension Attribute.
 //
-// Required privileges: create:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Create Computer Extension Attributes.
+// Required privileges: extension-attributes:create. Legacy Jamf Pro privilege name(s): Create Computer Extension Attributes.
 func (c *Client) CreateComputerExtensionAttributeV1(ctx context.Context, request *ComputerExtensionAttributes) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -72,7 +72,7 @@ func (c *Client) CreateComputerExtensionAttributeV1(ctx context.Context, request
 
 // DeleteMultipleComputerExtensionAttributesV1 delete multiple Computer Extension Attribute at once.
 //
-// Required privileges: delete:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Delete Computer Extension Attributes.
+// Required privileges: extension-attributes:delete. Legacy Jamf Pro privilege name(s): Delete Computer Extension Attributes.
 func (c *Client) DeleteMultipleComputerExtensionAttributesV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/computer-extension-attributes/delete-multiple"
@@ -84,7 +84,7 @@ func (c *Client) DeleteMultipleComputerExtensionAttributesV1(ctx context.Context
 
 // ListComputerExtensionAttributeTemplatesV1 retrieve All Computer Extension Attributes Templates.
 //
-// Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
 //   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
@@ -125,7 +125,7 @@ func (c *Client) ListComputerExtensionAttributeTemplatesV1(ctx context.Context, 
 
 // GetComputerExtensionAttributeTemplateV1 get specified Computer Extension Attribute Template object.
 //
-// Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
 //   - id: Unique Id of the Template.
@@ -141,7 +141,7 @@ func (c *Client) GetComputerExtensionAttributeTemplateV1(ctx context.Context, id
 
 // UploadComputerExtensionAttributeV1 upload Computer Extension Attribute.
 //
-// Required privileges: create:pro:computer-extension-attributes, read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Create Computer Extension Attributes, Read Computer Extension Attributes.
+// Required privileges: extension-attributes:create, extension-attributes:read. Legacy Jamf Pro privilege name(s): Create Computer Extension Attributes, Read Computer Extension Attributes.
 // The Jamf API spec does not encode whether these are required together or as alternatives.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
@@ -164,7 +164,7 @@ func (c *Client) UploadComputerExtensionAttributeV1(ctx context.Context, fileFil
 
 // GetComputerExtensionAttributeV1 get specified Computer Extension Attribute object.
 //
-// Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of Computer Extension Attribute.
@@ -180,7 +180,7 @@ func (c *Client) GetComputerExtensionAttributeV1(ctx context.Context, id string)
 
 // UpdateComputerExtensionAttributeV1 update specified Computer Extension Attribute object.
 //
-// Required privileges: update:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Update Computer Extension Attributes.
+// Required privileges: extension-attributes:update. Legacy Jamf Pro privilege name(s): Update Computer Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of Computer Extension Attribute.
@@ -196,7 +196,7 @@ func (c *Client) UpdateComputerExtensionAttributeV1(ctx context.Context, id stri
 
 // DeleteComputerExtensionAttributeV1 remove specified Computer Extension Attribute.
 //
-// Required privileges: delete:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Delete Computer Extension Attributes.
+// Required privileges: extension-attributes:delete. Legacy Jamf Pro privilege name(s): Delete Computer Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of Computer Extension Attribute.
@@ -211,7 +211,7 @@ func (c *Client) DeleteComputerExtensionAttributeV1(ctx context.Context, id stri
 
 // GetComputerExtensionAttributeDataDependencyV1 get smart group/advance search dependent objects for a specified computer extension attribute.
 //
-// Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
 //   - id: Unique ID of computer extension attribute.
@@ -227,7 +227,7 @@ func (c *Client) GetComputerExtensionAttributeDataDependencyV1(ctx context.Conte
 
 // DownloadComputerExtensionAttributeV1 download the specified Computer Extension Attribute.
 //
-// Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
 //   - id: The unique ID of the Computer Extension Attribute to be downloaded.
@@ -243,7 +243,7 @@ func (c *Client) DownloadComputerExtensionAttributeV1(ctx context.Context, id st
 
 // ListComputerExtensionAttributeHistoryV1 get specified Computer Extension Attribute History object.
 //
-// Required privileges: read:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
+// Required privileges: extension-attributes:read. Legacy Jamf Pro privilege name(s): Read Computer Extension Attributes.
 //
 // Parameters:
 //   - id: Instance ID of Computer Extension Attribute history.
@@ -283,7 +283,7 @@ func (c *Client) ListComputerExtensionAttributeHistoryV1(ctx context.Context, id
 
 // CreateComputerExtensionAttributeHistoryNoteV1 add specified Computer Extension Attribute history object notes.
 //
-// Required privileges: update:pro:computer-extension-attributes. Legacy Jamf Pro privilege name(s): Update Computer Extension Attributes.
+// Required privileges: extension-attributes:update. Legacy Jamf Pro privilege name(s): Update Computer Extension Attributes.
 //
 // Parameters:
 //   - id: Instance ID of Computer Extension Attribute history.

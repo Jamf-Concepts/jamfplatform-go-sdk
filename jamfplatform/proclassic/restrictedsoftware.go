@@ -17,7 +17,7 @@ import (
 
 // GetRestrictedSoftwareByID finds restricted software by ID.
 //
-// Required privileges: read:pro:restricted-software.
+// Required privileges: restricted-software:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetRestrictedSoftwareByID(ctx context.Context, id string) (*Res
 
 // CreateRestrictedSoftwareByID creates a new restricted software by ID.
 //
-// Required privileges: create:pro:restricted-software.
+// Required privileges: restricted-software:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateRestrictedSoftwareByID(ctx context.Context, id string, re
 
 // UpdateRestrictedSoftwareByID updates an existing restricted software by ID.
 //
-// Required privileges: update:pro:restricted-software.
+// Required privileges: restricted-software:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateRestrictedSoftwareByID(ctx context.Context, id string, re
 
 // DeleteRestrictedSoftwareByID deletes a restricted software by ID.
 //
-// Required privileges: delete:pro:restricted-software.
+// Required privileges: restricted-software:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteRestrictedSoftwareByID(ctx context.Context, id string) er
 
 // GetRestrictedSoftwareByName finds restricted software by name.
 //
-// Required privileges: read:pro:restricted-software.
+// Required privileges: restricted-software:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetRestrictedSoftwareByName(ctx context.Context, name string) (
 
 // UpdateRestrictedSoftwareByName updates an existing restricted software by name.
 //
-// Required privileges: update:pro:restricted-software.
+// Required privileges: restricted-software:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateRestrictedSoftwareByName(ctx context.Context, name string
 
 // DeleteRestrictedSoftwareByName deletes a restricted software by name.
 //
-// Required privileges: delete:pro:restricted-software.
+// Required privileges: restricted-software:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteRestrictedSoftwareByName(ctx context.Context, name string
 
 // ListRestrictedSoftware finds all restricted software.
 //
-// Required privileges: read:pro:restricted-software.
+// Required privileges: restricted-software:read.
 func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwareAll, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RestrictedSoftwareAll
@@ -138,7 +138,7 @@ func (c *Client) ListRestrictedSoftware(ctx context.Context) (*RestrictedSoftwar
 
 // CreateRestrictedSoftwareByName creates a new restricted software by ID.
 //
-// Required privileges: create:pro:restricted-software.
+// Required privileges: restricted-software:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

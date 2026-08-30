@@ -120,21 +120,3 @@ func TestListMdmCommandsV2(t *testing.T) {
 		t.Fatalf("len = %d, want 1", len(results))
 	}
 }
-
-func TestSendMdmCommandV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v2/mdm/commands", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		writeJSON(t, w, http.StatusCreated, []map[string]any{{}})
-	})
-
-	result, err := c.SendMdmCommandV2(context.Background(), &MDMCommandRequest{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}

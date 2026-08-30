@@ -17,7 +17,7 @@ import (
 
 // ListPreviewComputers return a list of Computers.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
