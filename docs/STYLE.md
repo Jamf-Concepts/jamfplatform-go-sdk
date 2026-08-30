@@ -1,0 +1,662 @@
+# Style and conventions
+
+Invariants for changing this repo. The short forms of these rules are in
+[CLAUDE.md](../CLAUDE.md); this file carries the reasoning, which is what tells
+you whether a new case falls under a rule or outside it.
+
+---
+
+## The three hard rules
+
+**Never modify the OpenAPI specs under `testing/`.** They are source-of-truth
+mirrors of Jamf's published specs and must round-trip upstream changes cleanly.
+Spec quirks — typos, wrong types, polymorphic roots, missing fields — are fixed at
+the generator level via config overrides, post-processing passes, or
+generator-emitted supplemental files.
+
+**Never hand-edit generated files.** Change the generator or its config. Every
+`.go` file in a generated sub-package (`jamfplatform/pro/`, `proclassic/`,
+`devices/`, …) is written by `make generate`, and since the generator now prunes
+files it did not write, a hand-added file there is deleted on the next run rather
+than merely being wrong.
+
+**Never add handwritten code to a generated sub-package.** Supplemental types
+needed as `fieldTypeOverrides` targets (`BigInt`, `NotificationValue`) live in the
+generator as emitted static files (`emitPkgXMLSupplements`) so they stay in
+lock-step with spec and override changes. Adding `foo.go` to a generated package
+is a correctness hazard, not a shortcut — make the generator emit it.
+
+---
+
+## File organization
+
+- Every spec **must** set `"splitByTag": true`. Methods bucket by first OpenAPI
+  tag into `<tag>.go` + `<tag>_test.go`; types pool into a shared `types.go`.
+  Splitting by path would scatter one resource's CRUD across many files.
+- Every spec **must** target a sub-package via `"package": "<name>"`. Jamf's API
+  families reuse resource names, so a flat namespace collides.
+- Sub-package names follow the namespace (kebab → snake → Go identifier). No
+  invention. The one documented exception is `account`, which holds three specs
+  (`licensing`, `partners`, `sso`) because they are one Jamf product behind one
+  tyk api-product reached with one organization credential; the namespace stays
+  per-spec so each method still builds its own URL prefix.
+- **Two specs in one package must not emit the same tag filename.**
+  `emitMethodsByTag` runs per spec and writes `<tag>.go`, so a shared tag means
+  the second spec silently overwrites the first's file and its methods disappear
+  with no error from the generator, the compiler or the tests. The generator now
+  fails on the collision; resolve it with a per-spec `"tagRenames"` entry
+  (filename only — method names, godoc and the published spec are untouched), as
+  the uem-connect spec does to keep `activation_profiles.go` free for the
+  enrollment spec.
+
+## API formats
+
+Selected per spec via `"format": "json"` (default) or `"format": "xml"`.
+
+- **JSON** — Platform + Pro. `encoding/json`, `json:"..."` tags,
+  `Content-Type: application/json`.
+- **XML** — Classic only, and XML end-to-end. The transport detects
+  `/proclassic/` in the path, switches to `encoding/xml`, and sets both `Accept`
+  and `Content-Type` to `application/xml`. Forcing JSON responses is technically
+  supported by the server and deliberately not used: Classic stays entirely XML
+  for consistency.
+
+## Field pointers — plugin-framework first
+
+Every field in an XML spec is emitted as a pointer with `,omitempty`, regardless
+of the spec's `required:` or `nullable:` markers. JSON specs keep the spec-driven
+heuristic (pointer when nullable, non-required non-scalar, or request-type
+non-required).
+
+The primary consumer is a Terraform provider on the plugin framework, where
+three-state null/value semantics are load-bearing. Without pointers:
+
+- **Write-side ambiguity.** `name = null` (no change) and `name = ""` (explicit
+  clear) collapse to the same zero string. A pointer distinguishes: `nil` → field
+  omitted from the body → server untouched; `&""` → `<name></name>` → server clears.
+- **Read-side ambiguity.** Server-omitted and server-returned-empty both decode to
+  the zero string. A pointer maps `nil` → `types.StringNull()` and `&""` →
+  `types.StringValue("")`, preventing recurring diffs when a Computed/Optional
+  attribute flips between absent and empty across refreshes.
+- **Partial updates.** `plan.Name.ValueStringPointer()` maps null → `nil` → field
+  omitted. Intent preserved with no special-casing.
+- **Nested objects.** `*ComputerGeneral` distinguishes "no `<general>` section
+  returned" from "an empty one".
+
+The cost is a pointer-deref tax for non-Terraform consumers of Classic. That is
+the accepted trade. For JSON APIs the spec marks required/nullable accurately
+enough and JSON has explicit field presence, so the heuristic suffices.
+
+---
+
+## Config mechanisms
+
+### Local spec repairs are self-expiring by design
+
+Both mechanisms exist for a spec that is *wrong*, so both are built to fail loudly
+the day upstream fixes it. Deleting the entry is then the whole fix.
+
+- **`schemaCreations`** declares a whole named component the spec no longer
+  carries. Applied before every other pass, so `schemaPatches` can point at it and
+  it is emitted as soon as a whitelisted operation reaches it. It **panics if the
+  name already exists**: the only reason to create one is that upstream deleted a
+  schema the server still returns, so the name reappearing means the spec is
+  repaired. A silent skip would leave the local definition shadowing the real one
+  forever.
+- **`schemaPatches`** silently overwrites, which is correct when *correcting* a
+  wrongly-declared property and wrong when *supplying* a missing one — the day
+  upstream adds the real property, the stand-in shadows it and discards whatever
+  enum, format or required-ness upstream declared. Listing
+  `"<Schema>.<dotted.path>"` in **`schemaPatchesRequireAbsent`** makes generation
+  panic if the path already resolves, naming the entry to delete. Use it for every
+  patch standing in for something absent; leave it off patches that deliberately
+  replace.
+
+Neither tripwire catches a **re-typed root**, and neither catches a stale
+`expectedStatus` / `responseType` override. The compliance-benchmarks repair is
+the worked example: our creation was `ODVRecommendation`, upstream shipped
+`OdvRecommendation`, so the casing difference meant no panic fired even though the
+spec had been fully repaired. **Diff config's overrides against every ingest, not
+just the schemas.** A silent override going redundant has happened three times in
+five builds.
+
+### The generator keeps its own copy of `tenantFirstNamespaces`
+
+`tools/generate/template.go` carries `testTenantFirstNamespaces`, duplicating the
+transport's `tenantFirstNamespaces` list, because the generator is its own Go
+module and cannot import the SDK. A divergence is **self-detecting rather than
+silent**: the generated httptest handlers register at a path the client never
+calls, and `make test` fails on the next run. Change both together anyway.
+
+### `"responseType": "[]T"` — bare-array responses
+
+`responseType` normally names a component schema; it also accepts a `[]T` literal
+whose element is a schema name, for when the spec declares a wrapper the server
+does not send. The account list endpoints are the reason.
+
+This is deliberately an operation-level override rather than a
+`schemaPatches`/`schemaCreations` repair: the disagreement is about *server
+behaviour*, so it belongs where the wire evidence is cited and it is one line to
+delete when either side changes. A patched schema would instead shadow the
+corrected declaration forever, with neither tripwire firing.
+
+### Endpoint versions are additive
+
+Jamf publishes new versions of Pro endpoints (V1 → V2 → V3) and keeps prior
+versions in the spec until they are physically removed. **SDK policy is to retain
+every spec version side-by-side as a typed function** —
+`ListComputersInventoryV1`, `V2`, `V3` all coexist — so downstream consumers get a
+real migration window. A version is removed only when Jamf removes it from the
+spec, never merely because a successor appeared.
+
+Each version gets its own resolver and apply sugar, with the `V<N>` suffix in
+`resourceType` to disambiguate method names. `typedReturn` falls back to the
+unsuffixed Go type when the spec hasn't suffixed the V1 schema.
+
+`python3 tools/scripts/backfill_versions.py` synthesises missing version entries
+by cloning the closest sibling and version-suffixing the names; it is idempotent.
+**It only reaches base paths that already exist at more than one version.** It
+keys on the path with `/vN` stripped, so a path the new version *introduces* is
+invisible — `len(versions) == 1` means no sibling to clone. Jamf does this when it
+relocates an operation: 11.30.0 moved erase and remove-mdm-profile from
+`/v1/…/computer-inventory/{id}/` (singular, deprecated) to
+`/v4/…/computers-inventory/{id}/` (plural), which reads as two unrelated
+single-version bases. Those need entries written by hand. **After every spec bump,
+diff the spec's operation set against config and check the additions** — do not
+trust the insert count, because a whole surface can end up deprecated with no
+successor emitted (issue #50).
+
+### Deprecation
+
+Endpoints marked `deprecated: true` are always emitted, with a `// Deprecated:`
+godoc line carrying the normalised `x-deprecation-date`. There is no
+`skipDeprecated` knob: deprecation is opt-out by retaining the config entry,
+opt-in by deleting it once Jamf drops the path.
+
+**A `// Deprecated:` marker must never ship without its successor whitelisted
+alongside it.** `staticcheck`'s SA1019 is on by default, so deprecating a surface
+with nothing to migrate to turns every consumer's build red for no reason.
+Consumers also need both versions live at once. A wire-only deprecation — a
+runtime `Deprecation` header with nothing in the spec — is covered for free:
+`logDeprecation` logs it once per method+path.
+
+### Name→ID resolvers
+
+Two generated methods per resource: `Resolve<X>IDByName` and `Resolve<X>ByName`,
+attached via a `"resolver"` block. Three modes, selected by what the API actually
+supports:
+
+- **`filtered`** — the list endpoint accepts RSQL equality
+  (`filter=name=="x"`). One GET with `page-size=2`; ambiguity from
+  `totalCount > 1`. Attaches to the List op.
+- **`clientFilter`** — no RSQL, or only a substring `search`. Fetches the list
+  (optionally narrowed via `searchParam`) and walks it in memory for an exact
+  `nameField` match. Attaches to the List op.
+- **`direct`** — Classic only. The spec already generates `Get<X>ByName`; the
+  wrappers delegate and stringify the typed `*int` ID, so no name/id field paths
+  are needed. Attaches to the by-name GET. `typedReturn` overrides only when the
+  Go struct name differs from the resource name.
+
+The error contract is identical across modes: not-found is an `*APIResponseError`
+with `HasStatus(404)`; ambiguous matches (filtered/clientFilter only) are
+`*AmbiguousMatchError`.
+
+`resultsField` names the envelope key holding the array. It is easy to get wrong
+in a way nothing catches: the Apply test templates once hardcoded `"results"`
+while the *resolver* templates already branched on it, so a generated `_Update`
+test stubbed the list under a key its own resolver never read, silently took
+Apply's **create** branch, and failed on an unstubbed create path rather than on
+the mismatch. Threading `ListResultsField` through the Apply IR fixed it. Every
+other Apply has an empty `resultsField`, which is exactly why nothing caught it —
+**watch for any hardcoded envelope key while every spec happens to use the
+default.**
+
+### Apply (upsert)
+
+`Apply<ResourceType>(ctx, request, ...) (id string, created bool, err error)`,
+emitted when a resolver block includes `"apply"`. Resolves the name; 404 →
+create, found → update. **Declared entirely in `config.json` — never hand-coded.**
+
+| mode | when |
+|---|---|
+| standard | one request type shared by create and update |
+| `updateType` | create and update take different Go types; the generator JSON-round-trips create → update |
+| `versionLock` | prestages: zeroes `VersionLock` on create, GETs current and injects `versionLock` before PATCH |
+| `tokenUploadMode` | DEP enrollment: uploads an encoded token then updates metadata; the Apply signature gains a trailing `token string` |
+| `membershipPreFetch` | resources whose PATCH must re-specify the current member list, or omitted members are removed |
+
+`membershipPreFetch` maps each current member's ID into an `Assignment`-like
+struct with `Selected=true` and injects it into the request before the patch. Set
+`assignmentFieldIsSlicePtr: true` when the request field is `*[]T`. The generated
+item always uses pointer fields.
+
+### Schema handling
+
+- **`$ref` siblings are restored on publish.** kin-openapi drops a `description`
+  (or any sibling) that sits next to a `$ref`, so marshaling the parsed document
+  would strip prose the source spec carries — visible as large, spurious doc churn
+  in `api/blueprints_api.json` and `api/compliance_benchmark_engine.json`.
+  `restoreRefSiblings` re-attaches them from the source file before writing.
+  **Do not "fix" that churn by reverting it**: a generate run without this pass
+  rewrites unrelated packages backwards.
+- **Swagger 2.0** is upconverted in-memory via `openapi2conv.ToV3`. Whitelisted
+  paths are pruned from the Swagger document *before* conversion, because
+  openapi2conv rejects some Classic operations (multiple body params) that are
+  outside any whitelist anyway.
+- **A `type: string` field whose `example` is a bare decimal** is the reliable
+  predictor of a server that sends an unquoted number, and `json.Number` is the
+  honest override target: it decodes the number, preserves the exact text, and
+  converts to the string a path param wants, so it keeps working if the server ever
+  starts quoting. Precedents: `deployment_task.id` and
+  `sso_keystore_details.serialNumber` in pro, `domain.id` and
+  `domain.verifiedTldId` in account.
+- **Untyped operations.** Classic has 444 ops but 0 typed responses and only 6
+  typed request bodies in the raw spec; `requestType`/`responseType` overrides
+  name a schema for the generator to wire through.
+- **`allOf`** is flattened — properties merged into one struct, avoiding Go
+  embedding rules for OpenAPI's base+extensions pattern.
+- **`oneOf` + discriminator** emits a union struct with one pointer field per
+  variant plus `UnmarshalJSON`/`MarshalJSON` dispatching on the discriminator.
+- **`oneOf` with no discriminator and no properties of its own** used to emit
+  **nothing at all**, failing loudly only by luck: such a union as a named
+  *response* type aborts generation with "Go type not emitted", but one reached
+  solely through a property would have silently become `any`.
+  `mergeOneOfVariants` collapses these into one struct — the union of every
+  variant's properties, with `required` **intersected** across variants, so a
+  property required by only some variants becomes an optional pointer and the
+  merged struct can represent any variant without lying about presence. A union
+  that declares its own `type: object` plus `properties` takes the pre-existing
+  path and is unaffected.
+- **OpenAPI 3.1 nullability.** `normalizeNullableUnions` rewrites
+  `type: [T, "null"]` and `oneOf: [{$ref: X}, {type: "null"}]` into 3.0's
+  `nullable: true` before anything else reads the doc. kin-openapi models 3.1
+  faithfully and `Types.Is` only matches a single-element type list, so without the
+  pass every nullable property lands as `any` — silently, and only in the 3.1
+  specs. It runs before `hoistInlineObjects` and `collectReferencedSchemas`:
+  hoisting must see the collapsed shape, and a `$ref` reachable only through a
+  nullable union has to be visible to the reference walker or its type is never
+  emitted. Unions of two or more non-null types stay `any` — there is no single Go
+  type for them. **Reach for this pass, not a `fieldTypeOverride`, when a new 3.1
+  spec produces an unexpected `any`:** an override is per-field and rots silently
+  when the spec adds another nullable property.
+- **The 3.0 `$ref`-with-siblings idiom.** `nullable: true` + `allOf: [{$ref: X}]`
+  is 3.0's only way to attach a description, `nullable` or an `example` to a
+  reference. Such a wrapper declares no type and no properties, so it used to fall
+  through to `any` — and **failed silently by construction**, since an `any` field
+  decodes anything and the transport sets no `DisallowUnknownFields`.
+  `isSingleRefAllOfWrapper` collapses it, with a deliberately tight guard: exactly
+  one `allOf` member, and no type, properties, enum, `additionalProperties`,
+  `oneOf` or `anyOf` of its own. A multi-member `allOf` is a real composition with
+  no single Go type; a wrapper carrying its own properties is a named component
+  `extractTypes` already flattens; and a bare `$ref` returns its own name before
+  the switch. Nullability is deliberately unaffected: the wrapper is inline, so
+  the field emitter reads `nullable` off the wrapper rather than off the shared
+  component — collapsing by mutating the target's `Nullable`, as
+  `collapseNullableOneOf` does for its `$ref` branch, would mark that component
+  nullable for **every** field referencing it. That latent hazard in
+  `collapseNullableOneOf` is untouched and worth fixing separately.
+
+---
+
+## Enum constants
+
+Every string enum becomes a Go type plus one constant per value, in a per-package
+`enums.go` — never `types.go`, see `partitionEnumTypes`. Two sources feed it:
+
+- **Spec-named enum schemas** keep their own name (`NotificationType`), emitted by
+  the fieldless-type branch of the schema walker via `enumConsts`.
+- **Inline property enums** are synthesised as `<Owner><Property>` by
+  `registerPropertyEnum` (`PolicyTrigger`, `AccountGroupV1AccessLevel`). Nothing
+  shorter is safe — `type` alone carries 14 distinct value sets across 18 schemas.
+  Identical value sets under different owners are **duplicated rather than folded**:
+  folding means inventing a name, and that name churns whenever Jamf changes one
+  owner's values but not the other's.
+
+### Design decisions that look wrong and are not
+
+**The alias is `=` (a type alias, not a defined type)**, so a constant typed
+`NotificationType` assigns to any existing `notificationType string` parameter
+with no cast. Promoting these to defined types, or retyping the struct fields that
+carry them (`State DeploymentState` instead of `State string`), would churn the
+whole tree and entangle with the pointer/three-state design. **Field types are
+left alone.** The one narrow exception is not a change of policy: a field that was
+`any` may end up typed as an enum alias, because the `$ref`-with-siblings collapse
+resolves such a wrapper to whatever it references. No field that was already
+`string` has been retyped.
+
+**Constant names are `<TypeName><TitleCasedValue>`:**
+`NotificationTypeApnsCertRevoked = "APNS_CERT_REVOKED"`. Title-casing each segment
+is deliberate over preserving all-caps runs — `APNS_CERT_REVOKED` is a wire-format
+artefact, not an acronym the spec is asserting. The wire value sits on the same
+line as the identifier, so no per-value godoc is emitted and the spec's own
+misspellings (`MII_UNATHORIZED_RESPONSE_NOTIFICATION`, `PATCH_EXTENTION_ATTRIBUTE`)
+stay greppable.
+
+**Classic is where this pays off most:** its values are prose, not identifiers —
+`Full Access`, `Text Field`, `Pop-up Menu`, `Current or Next User`,
+`Pending+Failed`. Callers had no way to guess the exact spacing and casing. The
+title-caser handles them with no special sanitiser because it splits on
+non-alphanumerics.
+
+**`<Type>Values() []<Type>` returns every value in spec order**, for
+`stringvalidator.OneOf(pro.PolicyTriggerValues()...)` and anything else that
+enumerates rather than names. A function, not a var: a var would let one consumer
+mutate the set for the whole process. It cannot be a method — Go forbids methods
+on an alias to a predeclared type, and that alias is what keeps constants
+assignable to plain `string`.
+
+Fields and parameters point at the type rather than re-listing values
+(`Allowed values: see the NotificationType constants.`), since godoc groups
+constants under their declared type.
+
+### Parameter-only enum schemas
+
+A named enum schema reachable **only from a parameter** is emitted too.
+Previously it was not, and its values survived solely as an inline
+`Allowed values:` list in the method godoc — readable but not referenceable, so
+every call site hard-coded string literals. `collectReferencedSchemas` walks
+request bodies and responses only, which is why these were invisible; it now also
+registers a parameter's schema **when that schema resolves to a component that is
+itself a string enum**, handling both shapes the specs use (a direct `$ref`, and
+`type: array` whose `items` are a `$ref`).
+
+This is deliberately **not** a full parameter walk. Descending into parameter
+schemas the way the body walkers do would register arbitrary object schemas
+nothing currently emits, changing the type set across every spec. Restricting
+registration to string-enum components bounds the blast radius to the enum types
+alone — **5 schemas, all in `pro`: `ComputerSection`, `ComputerSectionV2`/`V3`/`V4`
+and `MobileDeviceSection`, 106 constants between them** — with no signature change
+anywhere. Callers pass `pro.ComputerSectionV4General` where they previously wrote
+`"GENERAL"`. One case still keeps an inline list: a `$ref`'d property, where the
+field's own type already names the enum.
+
+### Skips, and why every skip still reaches the caller
+
+Skipped, each deliberately: non-string enums (constants are typed to a `= string`
+alias), single-value sets, values yielding no Go identifier, the second of any two
+values colliding on one identifier, and any synthesised name the spec already uses
+— checked for both `<Owner><Property>` and `<Owner><Property>Values`, since the
+accessor shares the namespace. Every skip logs.
+
+**The collision check must happen at registration, not when draining the collected
+enums.** Draining late still writes the field's `see the X constants` line,
+leaving it pointing at a type that carries no constants.
+
+`Deployment.State` is the only skip firing today — `DeploymentState` is already a
+struct name — and its values remain reachable through the oddly-named
+`DeploymentStateState`. A clean generate log carries exactly that one skip line.
+
+**Every skip still gets its values into the godoc.** When `registerPropertyEnum`
+declines, `inlineFieldEnumValues` lists them on the field instead:
+`// Allowed values: 300, 1800, 3600, 10800, 28800.` Without it the constraint
+reached callers nowhere at all — the spec's prose routinely says "must be one of
+the listed durations" and leaves the list to the schema, which is unreadable from
+Go. It also picked up, for free, the far larger population of **single-value**
+enums, which are the mandatory magic strings on DDM blueprint components
+(`Allowed values: "com.jamf.ddm.passcode-settings".`) — previously a required
+field with an undocumented sole legal value.
+
+It is scoped to **inline** property schemas: a `$ref`'d property (or `$ref`'d item
+schema) returns nil, because the field's Go type already names the enum and godoc
+groups the constants under it. Re-listing there would duplicate a list that then
+rots independently.
+
+`enumConsts` logs per-value drops but **silently skips a non-string or
+empty-string member of an otherwise-string enum**. Nothing in the tree hits that
+today, and it is the first path to check if a set ever comes out short.
+
+### Auditing coverage
+
+**Match on value sets, not type names.** A name-based check produces false
+positives on every acronym the generator re-cases (`Id`→`ID`, `Mdm`→`MDM`,
+`IdP`→`IDP`) and on `fieldRenames` (`date_type`→`data_type`). Five apparent gaps
+in the 2026-08-29 audit were all of that kind. Of 286 schema string-enums with ≥2
+distinct values, all were emitted and value-complete, with zero missing values,
+zero identifier failures and zero intra-set collisions.
+
+**The one genuine gap was a map-key problem, not an enum-emission problem.**
+`ParentApp.restrictedTimes` is `map[string]TimeFrame`, which is right for the
+wire, but its legal keys are the `DayOfWeek` enum and **no Go field ever carries
+that type**, so no constants were emitted and the values reached callers nowhere —
+not even in godoc. The cause is in the spec: OpenAPI cannot constrain a map's *key*
+type, so the author wrote `properties: {key: {$ref: DayOfWeek}}` beside
+`additionalProperties: {$ref: TimeFrame}`. That pseudo-property named `key` is not
+a real property, the generator correctly ignores it, and `DayOfWeek` becomes
+unreachable. Closed with a `docNotes` entry; the field type is untouched. **Any
+future `additionalProperties` map whose keys are constrained by this pseudo-`key`
+trick will have the same gap and will not be caught by a name-based audit.**
+
+---
+
+## Documentation emitted into the SDK
+
+### Parameter documentation
+
+Each method carries a `// Parameters:` list built from the spec's parameter objects
+(`parameterComment`): the description, then `Allowed values:` when the schema
+declares an enum. Ordering follows the Go signature — path params, then
+config-declared query params. Params the spec doesn't describe are skipped.
+
+**This is the only place a caller can learn what a `filter` or `sort` argument
+accepts.** Jamf documents the RSQL-filterable and sortable field lists in the
+parameter description and nowhere else, so a bare `filter string` signature is
+unusable without the block. Same for Classic's `subset` path params, whose legal
+values (`General`, `Location`, `Purchasing`, …) are a path-param enum.
+
+**A config-declared query param's `Spec` name is a hand-typed literal that is also
+the exact string sent on the wire** via `params.Set(...)`. `parameterComment`
+therefore **fails generation** if that name matches no parameter the spec declares:
+a spec rename or a config typo otherwise compiles fine and silently sends a query
+key the server ignores, with the only symptom being a method with no
+`// Parameters:` block at all. (`baselineId` was renamed to `baseline-id`
+upstream, config wasn't updated, caught 2026-08-18.) A param wire-verified to work
+despite the spec omitting it entirely opts out with a trailing `:undocumented`
+segment — reach for this only when the spec's silence is confirmed
+deliberate/wrong to the same standard as everything else here, not as a quick way
+past the check.
+
+**An operation-level parameter overrides a same-named path-level one** per the
+OpenAPI spec — **but not its *description* when the override's is a placeholder**
+(`isPlaceholderParamDoc`: empty, the bare param name, or `"<in> parameter <name>"`).
+The Platform specs declare `id` twice on every path: once at path level as a
+`$ref` carrying real prose (`The ID of the device, in UUID format`), once inline on
+the operation with an autogenerated `Path parameter id`. The literal precedence
+rule throws away the only useful sentence. A parameter carrying enum values is
+never treated as a placeholder — the values are documentation regardless of the
+prose. Only the godoc is affected, never the signature.
+
+**Parameter types stay exactly as config declares them.** The block is
+documentation, never signature. That is what makes it safe to quote enum values
+verbatim, including ones no Go identifier can spell
+(`EnableRemoteDesktop (macOS 10.14.4 and later)`) and the spec's typo `Hardwre`,
+all of which are still what the server accepts.
+
+Struct fields are documented the same way from each property's `description`, with
+the write-only note appended as trailing metadata. Both share `docParagraphs`.
+
+Spec prose is wrapped at 100 columns, paragraph by paragraph, with HTML tags
+stripped and entities decoded. Angle-bracket placeholders like `<field_name>` are
+deliberately preserved — the tag stripper matches an explicit HTML tag allowlist,
+not a generic `<...>` pattern. **Long descriptions are never truncated**: a
+half-printed RSQL field list is worse than none, since the caller can't tell
+whether their field was in the dropped tail.
+
+### Required privileges
+
+`x-required-privileges` feeds a per-package `Privileges` registry plus a
+`// Required privileges:` godoc line, and downstream a Terraform provider
+permissions table. The SDK **reports what the spec says** and does not correct it
+locally; upstream disagreements get reported, not patched. `undocumented: true` on
+a spec skips the privilege name-match check and stamps an "Unofficial:" godoc
+line — it marks a spec whose operations are in no spec Jamf publishes. It
+currently has zero users, and the bar for a new one is a published spec.
+
+---
+
+## Error surface
+
+One error type, `*APIResponseError`, for every non-success HTTP response, plus
+exactly one sentinel, `ErrUnexpectedResponse`. Non-HTTP errors (denylist refusal,
+context cancellation, IO failures) surface as plain wrapped errors.
+
+**Sentinels stay a closed set of one.** An earlier crop was removed because
+`errors.Is` on them was never honoured by the transport — a dead pattern.
+`ErrUnexpectedResponse` earns its place on two counts the removed ones failed:
+
+- **It is inferred, not reported.** A non-JSON body where JSON was expected means
+  an edge proxy, WAF, or IP allowlist answered instead of Jamf. No status code or
+  structured detail says so, so there is nothing for `*APIResponseError` to carry.
+- **Callers branch on it, they don't just print it.**
+  `terraform-provider-jamfprotect` looks up the host's public egress IP and emits a
+  support block on this condition. A branch needs a matchable error, not a message
+  to grep.
+
+It is raised today on the OAuth token exchange, where such a block surfaces first.
+A rejected credential answers with JSON (`401 invalid_client`) and never carries
+the sentinel, keeping "wrong secret" and "blocked network" distinguishable — they
+need opposite remedies. The name matches `jamfprotect-go-sdk` deliberately: the
+Protect provider's resources fold into `terraform-provider-jamfplatform` once
+Protect has Platform API support, and a shared error surface is one less thing to
+rewrite. **Prefer widening this sentinel's reach** (e.g. to response bodies, which
+needs a format guard — Classic is XML and its error pages are Tomcat HTML) **over
+adding a second one.**
+
+Accessors: `HasStatus(code)`, `Details()`, `FieldErrors()`, `Summary()`, and
+`AsAPIError(err)` for a top-level unwrap that saves callers managing `errors.As`
+target pointers. Per-family dialects are in
+[WIRE-FACTS.md](WIRE-FACTS.md#error-dialects).
+
+---
+
+## Acceptance tests
+
+Every new generated method **must** get an acceptance test in
+`jamfplatform/acc_<pkg>_test.go` (external `jamfplatform_test` package,
+`//go:build acceptance`). Read-only endpoints call directly and log shape.
+Mutating endpoints use a CRUD lifecycle: `t.Cleanup` defers the delete, the test
+verifies the round-trip.
+
+**Be clever about destructive endpoints — never run them against shared state.**
+
+- **Password changes:** don't change the OAuth client's own credential. Create a
+  test user via `/v1/accounts` and change its password, or call with clearly-wrong
+  values and assert the API rejects.
+- **Device actions** (erase, restart): target a fixture device declared via env
+  var (`JAMFPLATFORM_DEVICE_ID`), or skip when unset.
+- **Delete endpoints:** always pair with a preceding create in the same test.
+  Never delete pre-existing resources the tenant owns.
+
+When an endpoint can't be exercised safely, `t.Skip()` with a comment explaining
+why. A skipped test still documents intent; a destructive test that corrupts the
+tenant costs more than the coverage is worth.
+
+**Never silently tolerate real errors to make a test pass.** If an endpoint
+rejects a request with 400/500, fetch the full response body — not just the status
+— and understand what the server is objecting to. Acceptable reactions: fix the
+payload, add a `fieldTypeOverride` for a spec/server drift, or explicitly surface
+the bug (leave the test failing or skipped with the server's error text captured
+in a comment). **Not** acceptable: catching a category of status codes
+(`>= 400 && < 500`) as a generic escape hatch. 4xx-tolerance is justified only
+when the rejection is an expected property of the probe (bogus-id probes,
+unconfigured-integration probes) **and that property is named in the log
+message**. If a server bug blocks coverage, flag it — don't paper over it.
+
+**Never reintroduce a blanket-403 skip.** `skipOnGatewayUnrouted` existed for
+exactly two endpoints, both of which later became routed; it was deleted rather
+than kept, so those tests now *fail* on a 403. That is the point — a 403
+resurfacing means routing regressed or the region in use lags. Name the endpoint
+and fail; a blanket tolerance is what hid the device-groups `/v2` gap for weeks.
+Where a refusal is genuinely structural (no policy rule exists on any branch),
+assert the 403 and fail if it ever succeeds, with a comment saying to invert the
+test at that point.
+
+**Prefer a self-provisioning fixture over a skip.** Four ZTNA tests needed a real
+dedicated gateway ID and used to skip whenever the tenant had none — which is
+exactly the state a clean tenant starts in, so their create paths went unexercised
+precisely when coverage mattered most. `jscEnsureGateways(t, sc, n)` returns the
+existing gateways or creates the shortfall (`enabled: false` with `dedicatedIps`
+and no `ipsec`, the cheapest form the server accepts) and registers each for
+deletion. Pre-existing gateways are used as-is and never deleted. The skip message
+now names the variable that would fix it instead of an absent fixture the reader
+cannot act on.
+
+**Assert response *shape*, not just "did I get an ID".** The three ZTNA creates
+silently changed what they returned; an assertion on shape caught it, and nothing
+in the spec diff could have.
+
+### Scope, credentials and gates
+
+The suite prefers **environment** scope when a complete
+`JAMFPLATFORM_ENV_*` set is configured, falling back to the tenant set — a
+credential is minted against one scope and the header must match it, so this is a
+choice between two integrations rather than two IDs for one. `accScopeInUse`
+records which it settled on, because a silent switch between scopes is
+indistinguishable from the tenant's data changing underneath the suite.
+
+Security Cloud tests use their own credential set (`JAMFPLATFORM_JSC_CLIENT_ID`,
+`JAMFPLATFORM_JSC_CLIENT_SECRET`, `JAMFPLATFORM_JSC_TENANT_ID`, and optionally
+`JAMFPLATFORM_JSC_BASE_URL`) via
+`accSecurityCloudClient`, because a Security Cloud client answers 403 on
+`/api/pro` and vice versa — a second tenant ID alone is not enough. The tenant is
+passed through `WithSecurityCloudTenantID` rather than `WithTenantID` so the suite
+exercises the per-namespace override a dual-product consumer relies on. Unset
+credentials skip; supplied-but-rejected credentials fail.
+
+Opt-in gates exist where a write provisions real infrastructure:
+`JAMFPLATFORM_JSC_GATEWAY_WRITE_OK` (creating a ZTNA gateway provisions real
+network egress; deleting one severs traffic for every access policy routed through
+it) and `JAMFPLATFORM_AIGOV_WRITE_OK` (every create leaves a permanent row,
+because archive is not a readable soft delete). IPSec *rejection* cases are
+ungated: they omit required top-level fields, so nothing can be provisioned even
+if a server-side rule stops being enforced.
+
+### Diagnostics
+
+Every acceptance client constructor spreads `accTraceOpts()`, so one variable
+applies to the whole suite.
+
+- **`JAMFPLATFORM_ACC_TRACE=1`** prints each request and response to stderr —
+  method, URL, an allowlisted set of response headers (traceId, `Deprecation`,
+  `Link`, `Content-Encoding`) and indented bodies, capped by
+  `JAMFPLATFORM_ACC_TRACE_MAX`. **`-v` is required**: without it `go test` buffers
+  the binary's output and shows it only for a failing test, so a passing test's
+  trace is swallowed. Headers print from a fixed allowlist rather than being
+  filtered, so `Authorization` — which `LogResponse` receives in full, carrying a
+  token live for 900 seconds — can never leak by accident, and a header added
+  upstream later cannot either. Bodies have credential-shaped members replaced by
+  name, which is best-effort: **treat a trace as sensitive.**
+- **`JAMFPLATFORM_ACC_FAST_RETRY=1`** installs `WithRetryPolicy(50ms, 500ms, 2)`.
+  A trace makes the retry policy look like a hang, because retries happen inside
+  `retryablehttp`, *below* the SDK's `Logger`: a trace shows one request line and
+  then silence for minutes. The production policy is `RetryMax=4`,
+  `RetryWaitMin=1s`, `RetryWaitMax=60s`, and `RateLimitLinearJitterBackoff` treats
+  the two durations as the **jitter range, not (initial, cap)**: the wait is
+  `(1s + rand×59s) × attemptNum`, capped at 60s. So the *first* retry alone waits a
+  median of ~30 s and four retries total a median of ~184 s. Worth considering
+  separately: anyone reading `RetryWaitMin = 1s` expects the first retry to wait
+  about a second, not thirty. That is a production-timing question, not a test one,
+  and has deliberately not been changed.
+
+`tools/acctargets` scopes a run per test function. Package-level scoping cannot
+work — there is only one test package.
+
+---
+
+## Commit hygiene
+
+- **Before every commit**, run `go fmt ./...` and `go fix ./...` on the tree.
+  `go fmt` normalises whitespace; `go fix` rewrites deprecated stdlib usages
+  (e.g. old `rand.Seed` → `math/rand/v2`). Both are idempotent on a clean tree;
+  any diff they produce is hygiene that belongs **with** the functional change,
+  not as a follow-up "lint" commit.
+- **Run `go vet -tags acceptance ./jamfplatform/` after any config or generator
+  change that alters a type or a return type.** The acceptance file is behind
+  `//go:build acceptance`, so `make test` and CI never compile it and a signature
+  change can break it silently and stay broken. This is not hypothetical: the
+  gateway/connector envelope change left seven call sites uncompilable and its
+  commit message asserted the opposite, and the `$ref`-with-siblings collapse
+  caught four `%q`/`%v` verbs that had been formatting `any` and were suddenly
+  formatting a `*string`.
+- MIT licence; copyright headers managed by HashiCorp `copywrite` (uses `--plan`,
+  not `--check`).
+- CI enforces that generated output is current (`git diff --exit-code -- jamfplatform/`).
