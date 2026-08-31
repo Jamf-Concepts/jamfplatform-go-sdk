@@ -3807,19 +3807,6 @@ type ImpactAlertNotificationSettingsV1 struct {
 	ScopeableObjectsConfirmationCodeEnabled  bool `json:"scopeableObjectsConfirmationCodeEnabled"`
 }
 
-// InitializeV1 Initial Jamf Pro setup data.
-type InitializeV1 struct {
-	ActivationCode  string  `json:"activationCode"`
-	Email           *string `json:"email,omitempty"`
-	EulaAccepted    bool    `json:"eulaAccepted"`
-	InstitutionName string  `json:"institutionName"`
-	JssURL          string  `json:"jssUrl"`
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
-	// can supply a value on update.
-	Password string `json:"password"`
-	Username string `json:"username"`
-}
-
 // InstallPackage Either devices or groupId must be provided.
 type InstallPackage struct {
 	Devices          *[]int          `json:"devices,omitempty"`
@@ -6350,18 +6337,6 @@ type PlanStatus struct {
 	ErrorReasons *[]string `json:"errorReasons,omitempty"`
 	// Allowed values: see the PlanStatusState constants.
 	State string `json:"state"`
-}
-
-// PlatformInitializeV1 Platform Initial Jamf Pro setup data.
-type PlatformInitializeV1 struct {
-	ActivationCode string `json:"activationCode"`
-	// Federated user OIDC email to create.
-	Email           string `json:"email"`
-	EulaAccepted    bool   `json:"eulaAccepted"`
-	InstitutionName string `json:"institutionName"`
-	JssURL          string `json:"jssUrl"`
-	// Federated user OIDC username to create.
-	Username string `json:"username"`
 }
 
 // PluginPath represents a plugin path.

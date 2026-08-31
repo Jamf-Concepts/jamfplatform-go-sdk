@@ -4961,14 +4961,6 @@
           "name": "IssueTomcatSslCertificate"
         },
         {
-          "op": "POST /v1/system/initialize",
-          "name": "InitializeSystemV1"
-        },
-        {
-          "op": "POST /v1/system/platform-initialize",
-          "name": "PlatformInitializeSystemV1"
-        },
-        {
           "op": "PUT /v1/accounts/{id}",
           "name": "UpdateAccountV1"
         },

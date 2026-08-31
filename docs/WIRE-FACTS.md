@@ -218,14 +218,40 @@ the tenant. Classic's two dialects also make the layer unmistakable: XML for a
 success, a Tomcat HTML status page for an error, neither confusable with the
 gateway's compact JSON.
 
-**Still pending, both open PRs as of 2026-08-29:** `POST /v1/system/initialize`
+**Both landed 2026-08-31, and the SDK dropped them:** `POST /v1/system/initialize`
 and `POST /v1/system/platform-initialize` (`public-apis-oas#400`,
-`authorization-policies#260`, API-364) — they bootstrap an on-prem server and
-neither applies to cloud. Both currently answer `400 INVALID_FIELD` on
-`eulaAccepted` to an ordinary tenant credential, i.e. routed and validating. The
-PR also names why they were reachable: every rule in `jamf_pro_m2m_only.rego`
-ends in `lib.has_access(...)`, which `lib.rego` defines as `permissions != null`
-— **no permission check whatsoever**.
+`authorization-policies#260`, API-364) — they bootstrap an on-prem server from an
+activation code and neither applies to cloud. v1897 removed both paths and their
+`InitializeV1` / `PlatformInitializeV1` schemas from `external/jpapi`; `cdd734b`
+deleted both allow blocks from `jamf_pro_m2m_only.rego`, returning them to the
+package default `allow := false`. `InitializeSystemV1` and
+`PlatformInitializeSystemV1` are gone from the SDK — a breaking change with no
+downstream consumer in either provider.
+
+**The spec and the policy are ahead of the deployed gateway, and a 400 is not a
+reason to re-add them.** Re-probed 2026-08-31 with `GET /pro/v1/jamf-pro-version`
+→ 200 as the control in the same invocation: `{}` to `/pro/v1/system/initialize`
+answers `400 INVALID_FIELD` on `jssUrl` and `password`, and to
+`/pro/v1/system/platform-initialize` `400 INVALID_FIELD` on `eulaAccepted` and
+`email` — Jamf Pro's own field validation, so both were still routed and unrefused
+hours after the policy merged. `main` is not `deployed`; the deny arrives with the
+next bundle, and until then a probe only dates the rollout.
+
+`cdd734b` also names why they were reachable at all: every rule in
+`jamf_pro_m2m_only.rego` ends in `lib.has_access(...)`, which `lib.rego` defines
+as `permissions != null` — **no permission check whatsoever**. It cites the same
+decision that dropped `/v1/system/initialize-database-connection` and
+`/v2/environment-type` in `public-apis-oas#395`; neither was ever whitelisted here.
+
+**`ebb2253` (`#259`) removed the policies for four further deprecated jpapi
+operations, and the SDK was already clear of all four**:
+`GET /v1/macos-managed-software-updates/available-updates`,
+`GET`+`PATCH /v2/account-preferences` and `POST /v1/oidc/dispatch`. `config.json`
+whitelists only their non-deprecated successors
+(`/v1/managed-software-updates/available-updates`, `/v3/account-preferences`,
+`/v2/oidc/dispatch`), so the deprecated four had already left the spec in an
+earlier build with nothing to migrate. Worth re-checking per bundle: a policy
+deletion for a path the SDK *does* whitelist is a coming 403, not a diff.
 
 ### Privileges
 
@@ -300,7 +326,8 @@ membership is modelled as a read on the title, not a delete on it.
 
 ### The remaining 38 jpapi paths (whitelisted 2026-08-31)
 
-The `pro` whitelist now covers all 790 operations in `openapi-jpapi.json`. The
+The `pro` whitelist covered all 790 operations in `openapi-jpapi.json` as of that
+date; v1897 withdrew two, leaving 788. The
 last 38 were probed against `eu.api.jamfcloud.com` with a control
 (`GET /pro/v1/jamf-pro-version`) in every invocation. Five disagreements with the
 spec, all recorded in `config.json`:

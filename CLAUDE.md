@@ -288,7 +288,7 @@ a method that ignores the cursor fails.
 
 **Security Cloud provenance, and the one trap that silently replaces a spec:**
 
-| `testing/` file | v1882 source |
+| `testing/` file | v1897 source |
 |---|---|
 | `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` |
 | `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` |
@@ -343,10 +343,48 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1882** (2026-08-31), except:
+Ingested through **v1897** (2026-08-31), except:
 
-**The `pro` whitelist is now complete**: the last 38 `openapi-jpapi.json` paths
-were added 2026-08-31, taking it from 752 to all 790 operations. 21 of the 38 are
+**v1897 changed one spec, `external/jpapi`, and the change was two deletions.**
+`POST /v1/system/initialize` and `POST /v1/system/platform-initialize` are gone,
+along with their `InitializeV1` / `PlatformInitializeV1` schemas — API-364 landing
+`public-apis-oas#400` at last. Everything else outside `internal/dev` was
+byte-identical to v1882, `_permissions/{routes,scopes}.yaml` included; the only
+other diffs were the manifest and the two unified rollups (867 → 865 paths).
+
+**This is the first time the additive-versions rule has been overridden, and the
+reason it does not apply.** The rule protects a *version* whose successor
+appeared; these two have no successor and are not being superseded — they are
+being withdrawn. `authorization-policies#260` (`cdd734b`, merged 2026-08-31)
+deletes both allow blocks, returning them to `allow := false`, and states the
+grounds: each bootstraps a Jamf Pro server from an activation code, neither is
+applicable to a cloud instance, and neither appears in the capability map. So the
+paths are not merely undocumented, they are about to be refused. Removing
+`InitializeSystemV1` and `PlatformInitializeSystemV1` is a **breaking change** with
+**no downstream consumer** — neither provider referenced either method or either
+type.
+
+**The wire still accepts both**, so the SDK is briefly stricter than the gateway.
+Probed 2026-08-31 with `GET /pro/v1/jamf-pro-version` → 200 as the control in the
+same invocation: `{}` to each path returns `400 INVALID_FIELD` attributed to
+`jssUrl`/`password` and `eulaAccepted`/`email` respectively — Jamf Pro's own field
+validation, i.e. routed and unrefused. `main` is not `deployed`, as always; the
+deny will arrive with the next policy bundle. **Do not re-add them when a probe
+shows 400** — the spec and the policy both say withdrawn, and a 400 only dates the
+rollout.
+
+Two guards proved themselves here, and neither needed prompting: `pruneStale`
+deleted `jamf_pro_initialization.go` and its test, which whitelist removal alone
+would have left compiling against types `types.go` no longer declares — the exact
+failure mode CI's `git diff --exit-code` cannot see. And the byte-exact
+reproduction of the previous YAML→JSON conversion
+(`json.dumps(yaml.safe_load(f), indent=2, ensure_ascii=False)`, no trailing
+newline) confirmed `testing/openapi-jpapi.json` was semantically identical to
+v1882's `openapi.yaml` before the copy, so the generated diff is exactly the
+delta: 298 deletions, zero insertions, nothing outside `pro`.
+
+**The `pro` whitelist remains complete at 788 operations** — it reached all 790
+on 2026-08-31 and v1897 took two away. 21 of the 38 added that day are
 deprecated, which is no bar — the whitelist already carried 111 deprecated
 operations and 9 unversioned paths, and the additive-versions rule keeps them
 until Jamf removes the path. Every one has an acceptance test.
@@ -433,10 +471,6 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | `securitycloud-enrollment`, `ai/governance/visibility` | No published spec in any environment. Not ingestable. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 
-Also pending upstream, both open PRs: `POST /v1/system/initialize` and
-`POST /v1/system/platform-initialize` are being removed from the specs and the
-policies (API-364). Both are whitelisted here and both currently work.
-
 **A verbatim copy of the bundle YAML into `testing/` is safe and worth adopting.**
 The account files previously carried re-emitted indentation, making every diff
 against `external/` look like hundreds of lines of churn; copying the bundle YAML
@@ -503,7 +537,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 
 | package | namespace(s) | scope | notes |
 |---|---|---|---|
-| `pro` | `pro` | tenant or environment | 790 ops — the whole spec |
+| `pro` | `pro` | tenant or environment | 788 ops — the whole spec |
 | `proclassic` | `proclassic` | tenant | 606 ops, XML end-to-end |
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
