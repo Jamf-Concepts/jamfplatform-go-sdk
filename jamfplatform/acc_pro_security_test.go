@@ -119,6 +119,24 @@ func TestAcceptance_Pro_Security_CloudAzureDefaultsV1(t *testing.T) {
 	t.Logf("Cloud Azure defaults: %+v", cfg)
 }
 
+// The deprecated sibling of the defaults endpoint above. Upstream marked it
+// deprecated without publishing a successor anywhere in the spec, so it is
+// carried as-is; it is a static catalogue of the Azure AD attribute names Jamf
+// maps by default.
+func TestAcceptance_Pro_Security_CloudAzureDefaultMappingsV1(t *testing.T) {
+	c := accClient(t)
+
+	mappings, err := pro.New(c).GetCloudAzureDefaultMappingsV1(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetCloudAzureDefaultMappingsV1: %v", err)
+	}
+	if mappings.UserID == "" || mappings.UserName == "" {
+		t.Errorf("default mappings are missing the identity attributes: userId=%q userName=%q", mappings.UserID, mappings.UserName)
+	}
+	t.Logf("Cloud Azure default mappings: %+v", mappings)
+}
+
 func TestAcceptance_Pro_Security_ListCloudIdpV1(t *testing.T) {
 	c := accClient(t)
 

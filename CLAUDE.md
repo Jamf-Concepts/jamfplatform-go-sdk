@@ -345,6 +345,39 @@ tenant routes reference is present under `environment`.
 
 Ingested through **v1882** (2026-08-31), except:
 
+**The `pro` whitelist is now complete**: the last 38 `openapi-jpapi.json` paths
+were added 2026-08-31, taking it from 752 to all 790 operations. 21 of the 38 are
+deprecated, which is no bar — the whitelist already carried 111 deprecated
+operations and 9 unversioned paths, and the additive-versions rule keeps them
+until Jamf removes the path. Every one has an acceptance test.
+
+Five spec/wire disagreements came out of it, all corrected in `config.json` and
+evidenced in [WIRE-FACTS.md](docs/WIRE-FACTS.md#the-remaining-38-jpapi-paths-whitelisted-2026-08-31):
+two `expectedStatus` values (one of which fixes `CreateInventoryPreloadHistoryNoteV1`,
+**already shipping broken** — it has expected 201 against a server that answers
+200 since the day it was whitelisted), a `pageSizeParam` that is `pagesize` on
+exactly one operation, a double-wrapped response schema, and two schemaless
+`text/csv` request bodies. Four operations are generated-but-refused — two
+unrouted at the gateway, `PUT /v1/cache-settings` refused on any hosted tenant,
+and the deprecated macOS send-updates endpoint refused whenever Managed Software
+Update Plans is on — each pinned by a test that fails when the block lifts.
+
+Two generator fixes came with it:
+
+- **`detectPaginatedItemType` iterated the response's `Content` map directly**, so
+  an operation declaring several content types got an item type that depended on
+  Go's map order. `GET /inventory-preload` declares the pagination envelope under
+  `text/csv` and an *array of* that envelope under `application/json`, so it
+  generated either `InventoryPreloadRecord` or `InventoryPreloadRecordSearchResults`
+  from run to run — the latter compiling fine and decoding into empty structs. Now
+  two deterministic passes, envelope before raw-array, pinned by
+  `TestDetectPaginatedItemTypePrefersEnvelopeOverArrayOfEnvelope`.
+- **An operation-level `"requestType": "[]byte"` now works on operations that
+  return a body.** The `update` template already honoured it; `create` did not, so
+  a schemaless non-JSON body (both `validate-csv` operations) generated
+  `request *map[string]any` and would have sent JSON to an endpoint that answers
+  415 for it. The transport already passes `[]byte` through unmarshaled.
+
 v1882 changed **one spec**: `internal/stage/uem-connect`. Everything else outside
 `internal/dev` was byte-identical to v1877, `_permissions/{routes,scopes}.yaml`
 included; the only other diffs were the manifest and the two unified rollups.
@@ -470,7 +503,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 
 | package | namespace(s) | scope | notes |
 |---|---|---|---|
-| `pro` | `pro` | tenant or environment | 752 ops |
+| `pro` | `pro` | tenant or environment | 790 ops — the whole spec |
 | `proclassic` | `proclassic` | tenant | 606 ops, XML end-to-end |
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |

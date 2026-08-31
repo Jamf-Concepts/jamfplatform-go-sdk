@@ -177,6 +177,21 @@ func TestAcceptance_Pro_Settings_JamfProServerURLV1Read(t *testing.T) {
 	t.Logf("Jamf Pro server URL: %s", url.URL)
 }
 
+// The history sub-resource is read-only from the SDK's point of view: GET is
+// routed and answers 200, but POST is not routed at the gateway even though the
+// credential holds jss-url:update — pinned by
+// TestAcceptance_Pro_JamfProServerURLHistoryNoteUnroutedAtGateway.
+func TestAcceptance_Pro_Settings_JamfProServerURLHistoryV1(t *testing.T) {
+	c := accClient(t)
+
+	entries, err := pro.New(c).ListJamfProServerURLHistoryV1(context.Background(), nil)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListJamfProServerURLHistoryV1: %v", err)
+	}
+	t.Logf("Jamf Pro server URL history: %d entries", len(entries))
+}
+
 // --- device-communication settings ------------------------------------
 
 func TestAcceptance_Pro_Settings_DeviceCommunicationV1(t *testing.T) {

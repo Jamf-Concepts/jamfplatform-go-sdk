@@ -9,6 +9,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetJamfProServerURLV1 get Jamf Pro Server URL settings.
@@ -33,6 +38,52 @@ func (c *Client) UpdateJamfProServerURLV1(ctx context.Context, request *JamfProS
 	endpoint := prefix + "/jamf-pro-server-url"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("UpdateJamfProServerURLV1: %w", err)
+	}
+	return &result, nil
+}
+
+// ListJamfProServerURLHistoryV1 get Jamf Pro Server URL settings history.
+//
+// Required privileges: jss-url:read. Legacy Jamf Pro privilege name(s): Read JSS URL.
+//
+// Parameters:
+//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
+//     are supported and must be separated with a comma. Example: sort=date:desc,name:asc.
+func (c *Client) ListJamfProServerURLHistoryV1(ctx context.Context, sort []string) ([]ObjectHistory, error) {
+	prefix := c.transport.APIPrefix("pro", "v1")
+	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
+		params := url.Values{}
+		params.Set("page", strconv.Itoa(page))
+		params.Set("page-size", strconv.Itoa(pageSize))
+		if len(sort) > 0 {
+			params.Set("sort", strings.Join(sort, ","))
+		}
+
+		endpoint := prefix + "/jamf-pro-server-url/history"
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+		var result struct {
+			TotalCount int             `json:"totalCount"`
+			Results    []ObjectHistory `json:"results"`
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, false, err
+		}
+		hasNext := (page+1)*pageSize < result.TotalCount
+		return result.Results, hasNext, nil
+	})
+}
+
+// CreateJamfProServerURLHistoryNoteV1 add Jamf Pro Server URL settings history notes.
+//
+// Required privileges: jss-url:update. Legacy Jamf Pro privilege name(s): Update JSS URL.
+func (c *Client) CreateJamfProServerURLHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
+	prefix := c.transport.APIPrefix("pro", "v1")
+	var result ObjectHistory
+	endpoint := prefix + "/jamf-pro-server-url/history"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateJamfProServerURLHistoryNoteV1: %w", err)
 	}
 	return &result, nil
 }

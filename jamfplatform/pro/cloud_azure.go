@@ -84,3 +84,18 @@ func (c *Client) DeleteCloudAzureV1(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
+// GetCloudAzureDefaultMappingsV1 get default mappings.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-05-21) and may be removed in a future release.
+//
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+func (c *Client) GetCloudAzureDefaultMappingsV1(ctx context.Context) (*AzureMappings, error) {
+	prefix := c.transport.APIPrefix("pro", "v1")
+	var result AzureMappings
+	endpoint := prefix + "/cloud-azure/defaults/mappings"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetCloudAzureDefaultMappingsV1: %w", err)
+	}
+	return &result, nil
+}

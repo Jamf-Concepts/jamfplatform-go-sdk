@@ -298,6 +298,76 @@ membership is modelled as a read on the title, not a delete on it.
   contrary to the never-tolerate-real-errors rule — and because a 500 on a GET is
   retryable the test spends ~153 s in the retry loop first.
 
+### The remaining 38 jpapi paths (whitelisted 2026-08-31)
+
+The `pro` whitelist now covers all 790 operations in `openapi-jpapi.json`. The
+last 38 were probed against `eu.api.jamfcloud.com` with a control
+(`GET /pro/v1/jamf-pro-version`) in every invocation. Five disagreements with the
+spec, all recorded in `config.json`:
+
+| finding | evidence |
+|---|---|
+| `PUT /settings/obj/policyProperties` answers **200**, spec declares 201 | write-back of the tenant's own values returned 200 |
+| `POST /v1/inventory-preload/history` and `POST /inventory-preload/history/notes` answer **200**, spec declares 201 | same call against `/v2/inventory-preload/history` and `/v1/self-service/settings/history` returns 201, so this is per-endpoint, not a dialect |
+| unversioned `GET /inventory-preload` honours **`pagesize` only** — `page-size` is ignored | with four seeded records, `pagesize=2` → 2 rows, `page-size=2` → all 4. `/v1/inventory-preload` honours both |
+| unversioned `GET /inventory-preload` sends the bare `{totalCount, results}` envelope, not the *array of* envelopes its `application/json` schema declares | identical body from the `/v1/` twin, which declares it correctly |
+| `text/csv` request bodies are schemaless in the spec (`{"type":"object"}`) | `application/json` on `validate-csv` → **415** `Content-Type 'application/json' is not supported`; raw CSV → 412 with per-row codes |
+
+The `expectedStatus` correction on `CreateInventoryPreloadHistoryNoteV1` fixes a
+**method that was already shipping broken** — it has expected 201 since it was
+whitelisted, so every call failed with "unexpected status code" while the write
+itself succeeded.
+
+Two paths are **unrouted at the gateway** while being present in
+`_permissions/routes.yaml`. Both are generated and both are pinned by a test
+that fails when the block lifts (`acc_pro_gateway_and_hosted_limits_test.go`):
+
+- `GET /v1/dss-declarations/{declarationId}`. Declared with `declarations:read`,
+  and the credential holds it — the two `ddmreport` operations requiring the same
+  string (`ListDeclarationReportClients`, `GetDeviceDeclarationReport`) both
+  answer 200 for it.
+- `POST /v1/jamf-pro-server-url/history`, while **GET on the same path is routed
+  and answers 200** — a method-level gap. Declared with `jss-url:update`, and the
+  credential holds it: `PUT /pro/v1/jamf-pro-server-url` reaches Jamf Pro and
+  answers 415 for an unsupported media type, which the gateway would have
+  pre-empted.
+
+The tell for both is response shape: the gateway emits compact JSON with a
+`traceId` and `errors[].code == BAD_PERMISSIONS`, byte-identical to a
+deliberately bogus path (`GET /pro/v1/zzz-not-a-real-endpoint`), whereas Jamf
+Pro's own responses are pretty-printed. **That is a cheaper discriminator than a
+second credential** for separating an unrouted path from a denied privilege —
+but only in one direction: a compact 403 rules out Jamf Pro having answered, it
+does not distinguish an unmapped path from an ungranted gateway capability.
+
+Two more are routed and structurally refused, each pinned the same way:
+
+- `PUT /v1/cache-settings` → **403 `HOSTED_ENVIRONMENT`**, "PUT command is not
+  available in hosted environments". Pretty-printed, so Jamf Pro's own refusal.
+  The GET is fine. Permanently unusable on Jamf Cloud.
+- `POST /v1/macos-managed-software-updates/send-updates` → **503**, "This
+  endpoint cannot be used if the Managed Software Update Plans toggle is on."
+  The toggle check runs **before** field validation, which is what makes an
+  empty-body probe safe on either kind of tenant.
+
+**`GET /inventory-preload/csv-template` is not broken — an `Accept` header breaks
+it.** An earlier pass here recorded it as server-broken on the strength of a 400
+`INVALID_REQUEST_PARAMETER_TYPE` complaining that "csv-template" is not an
+integer. The cause was the probe: Jamf Pro maps both
+`/inventory-preload/{id}` (produces JSON) and `/inventory-preload/csv-template`
+(produces `text/csv`) under one prefix, so `Accept: application/json` is
+content-negotiated onto the `{id}` handler. The SDK sends no `Accept` on these
+and gets a 200 `text/csv` template. Both header forms were run against the same
+tenant to establish it. This is the "SDK-mediated observation is not wire truth"
+rule inverted: **curl was the misleading observer**, and the disagreement was
+still resolved by diffing the requests.
+
+TeamViewer Remote Administration path parameters are typed `string` in the spec
+and the server requires **a positive integer or `-1`** — a UUID gives
+`400 INVALID_ID` naming `pathId`, `integrationID` or `configurationId` depending
+on the operation. The generated `string` parameters are right; the constraint is
+on the value.
+
 ### The gateway-bypass technique
 
 When a gateway 403 blocks verification, separate "Jamf Pro can't do this" from
@@ -363,6 +433,16 @@ as narrowly as the evidence.
   and 29 History operations. No skip or overlap at any 2000/2001 boundary. Hence
   `defaultMaxPageSize` bakes 2000 in for the whole pro+totalCount combination
   (110 of 112 pro list operations).
+  - Re-confirmed 2026-08-31 on `/inventory-preload/history` (both the `/v1/` and
+    unversioned forms) against a tenant holding 2052 rows: `page-size=5000`
+    returned exactly 2000, and pages 0 and 1 at `page-size=2000` had **zero
+    overlap and a union of exactly 2052**. `TestAcceptance_Pro_InventoryPreload_HistoryUnversioned`
+    keeps a duplicate check on the walk while the tenant stays over 2000 rows.
+  - **The page-size parameter name is not uniform.** Unversioned
+    `GET /inventory-preload` reads `pagesize` and ignores `page-size`; every other
+    pro list reads `page-size`. Configured via `pageSizeParam`, and load-bearing:
+    a list whose page size is silently dropped returns the server's own default
+    while `ListAllPages` multiplies offsets by 2000.
 - **Deliberately excluded:** `ListUsersV1` (`hasNext`) and `ListSiteObjectsV1`
   (`rawArray`) were not in the verified sample and fail differently under a wrong
   cap — `hasNext` can skip a chunk between pages, `sizeCheck` can stop early and

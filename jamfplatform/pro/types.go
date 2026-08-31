@@ -556,6 +556,21 @@ type BuildingSearchResults struct {
 	TotalCount int        `json:"totalCount"`
 }
 
+// CacheSettings represents a cache settings.
+type CacheSettings struct {
+	CacheType string `json:"cacheType"`
+	// The default is for Jamf Pro to generate a UUID, so we can only give an example instead.
+	CacheUniqueID              string               `json:"cacheUniqueId"`
+	DirectoryTimeToLiveSeconds *int                 `json:"directoryTimeToLiveSeconds,omitempty"`
+	EhcacheMaxBytesLocalHeap   *string              `json:"ehcacheMaxBytesLocalHeap,omitempty"`
+	Elasticache                *bool                `json:"elasticache,omitempty"`
+	ID                         *string              `json:"id,omitempty"`
+	MemcachedEndpoints         []MemcachedEndpoints `json:"memcachedEndpoints"`
+	Name                       *string              `json:"name,omitempty"`
+	TimeToIdleSeconds          *int                 `json:"timeToIdleSeconds,omitempty"`
+	TimeToLiveSeconds          int                  `json:"timeToLiveSeconds"`
+}
+
 // CategoriesSearchResults represents a categories search results.
 type CategoriesSearchResults struct {
 	Results    []Category `json:"results"`
@@ -2344,6 +2359,52 @@ type ConfigurationSearchResults struct {
 	TotalCount int                      `json:"totalCount"`
 }
 
+// ConnectionConfigurationCandidateRequest Request that creates configuration and initialize connection between Jamf Pro and Team Viewer.
+type ConnectionConfigurationCandidateRequest struct {
+	// Name for Team Viewer Connection Configuration.
+	DisplayName string `json:"displayName"`
+	// Defines the intent to enable or disable Team Viewer connection.
+	Enabled bool `json:"enabled"`
+	// Token which is used for connecting to Team Viewer.
+	ScriptToken string `json:"scriptToken"`
+	// Number of minutes before the session expires.
+	SessionTimeout int `json:"sessionTimeout"`
+	// An identifier of a site which Team Viewer Remote Administration will be configured on.
+	SiteID string `json:"siteId"`
+}
+
+// ConnectionConfigurationResponse Response that contains information about connection configuration for Team Viewer.
+type ConnectionConfigurationResponse struct {
+	// Name for Team Viewer Connection Configuration.
+	DisplayName string `json:"displayName"`
+	// Describes if Team Viewer connection is enabled or disabled.
+	Enabled bool `json:"enabled"`
+	// An identifier of connection configuration for Team Viewer Remote Administration.
+	ID string `json:"id"`
+	// Number of minutes before the session expires.
+	SessionTimeout *int `json:"sessionTimeout,omitempty"`
+	// An identifier of a site which Team Viewer Remote Administration is configured on.
+	SiteID string `json:"siteId"`
+}
+
+// ConnectionConfigurationStatusResponse Response that contains connection configuration status for Team Viewer.
+type ConnectionConfigurationStatusResponse struct {
+	// connection configuration status for Team Viewer.
+	ConnectionVerificationResult string `json:"connectionVerificationResult"`
+}
+
+// ConnectionConfigurationUpdateRequest Request that updates configuration connection between Jamf Pro and Team Viewer.
+type ConnectionConfigurationUpdateRequest struct {
+	// Name for Team Viewer Connection Configuration.
+	DisplayName *string `json:"displayName,omitempty"`
+	// Defines the intent to enable or disable Team Viewer connection.
+	Enabled *bool `json:"enabled,omitempty"`
+	// Number of minutes before the session expires.
+	SessionTimeout *int `json:"sessionTimeout,omitempty"`
+	// Script token for Team Viewer Connection Configuration.
+	Token *string `json:"token,omitempty"`
+}
+
 // Country represents a country.
 type Country struct {
 	Code string `json:"code"`
@@ -3913,6 +3974,18 @@ type InventoryListMobileDeviceSearchResults struct {
 	TotalCount int                         `json:"totalCount"`
 }
 
+// InventoryPreloadCsvError represents a inventory preload csv error.
+type InventoryPreloadCsvError struct {
+	Code         string `json:"code"`
+	Description  string `json:"description"`
+	DeviceType   string `json:"deviceType"`
+	Field        string `json:"field"`
+	FieldSize    int    `json:"fieldSize"`
+	Line         int    `json:"line"`
+	SerialNumber string `json:"serialNumber"`
+	Value        string `json:"value"`
+}
+
 // InventoryPreloadCsvValidationError represents a inventory preload csv validation error.
 type InventoryPreloadCsvValidationError struct {
 	Errors []InventoryPreloadCsvValidationErrorCause `json:"errors"`
@@ -3959,6 +4032,48 @@ type InventoryPreloadExtensionAttributeColumn struct {
 type InventoryPreloadExtensionAttributeColumnResult struct {
 	Results    []InventoryPreloadExtensionAttributeColumn `json:"results"`
 	TotalCount int                                        `json:"totalCount"`
+}
+
+// InventoryPreloadInvalidCsvResponse represents a inventory preload invalid csv response.
+type InventoryPreloadInvalidCsvResponse struct {
+	Errors      []InventoryPreloadCsvError `json:"errors"`
+	HttpsStatus int                        `json:"httpsStatus"`
+}
+
+// InventoryPreloadRecord represents a inventory preload record.
+type InventoryPreloadRecord struct {
+	AppleCareID *string `json:"appleCareId,omitempty"`
+	AssetTag    *string `json:"assetTag,omitempty"`
+	BarCode1    *string `json:"barCode1,omitempty"`
+	BarCode2    *string `json:"barCode2,omitempty"`
+	Building    *string `json:"building,omitempty"`
+	Department  *string `json:"department,omitempty"`
+	// Allowed values: see the InventoryPreloadRecordDeviceType constants.
+	DeviceType          string                                `json:"deviceType"`
+	EmailAddress        *string                               `json:"emailAddress,omitempty"`
+	ExtensionAttributes *[]InventoryPreloadExtensionAttribute `json:"extensionAttributes,omitempty"`
+	FullName            *string                               `json:"fullName,omitempty"`
+	ID                  *int                                  `json:"id,omitempty"`
+	LeaseExpiration     *string                               `json:"leaseExpiration,omitempty"`
+	LifeExpectancy      *string                               `json:"lifeExpectancy,omitempty"`
+	PhoneNumber         *string                               `json:"phoneNumber,omitempty"`
+	PoDate              *string                               `json:"poDate,omitempty"`
+	PoNumber            *string                               `json:"poNumber,omitempty"`
+	Position            *string                               `json:"position,omitempty"`
+	PurchasePrice       *string                               `json:"purchasePrice,omitempty"`
+	PurchasingAccount   *string                               `json:"purchasingAccount,omitempty"`
+	PurchasingContact   *string                               `json:"purchasingContact,omitempty"`
+	Room                *string                               `json:"room,omitempty"`
+	SerialNumber        string                                `json:"serialNumber"`
+	Username            *string                               `json:"username,omitempty"`
+	Vendor              *string                               `json:"vendor,omitempty"`
+	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
+}
+
+// InventoryPreloadRecordSearchResults represents a inventory preload record search results.
+type InventoryPreloadRecordSearchResults struct {
+	Results    []InventoryPreloadRecord `json:"results"`
+	TotalCount int                      `json:"totalCount"`
 }
 
 // InventoryPreloadRecordSearchResultsV2 represents a inventory preload record search results v2.
@@ -4401,6 +4516,44 @@ type MacOsBrandingSearchResults struct {
 	TotalCount int                          `json:"totalCount"`
 }
 
+// MacOsManagedSoftwareUpdate represents a mac os managed software update.
+type MacOsManagedSoftwareUpdate struct {
+	// ApplyMajorUpdate setting is available only when updating to the latest version based on device
+	// eligibility. If no value is provided, the calculated latest version will only include minor version
+	// updates. If a value is provided, the calculated latest version will include minor and major version
+	// updates.
+	ApplyMajorUpdate *bool     `json:"applyMajorUpdate,omitempty"`
+	DeviceIds        *[]string `json:"deviceIds,omitempty"`
+	// If not set, forceRestart will default to false. Can only be true if using the DownloadAndInstall
+	// install action and the devices the command is sent to are on macOs 11 or higher. If true, the
+	// DownloadAndInstall action is performed, a restart will be forced. MaxDeferral will be ignored if
+	// defined.
+	ForceRestart *bool   `json:"forceRestart,omitempty"`
+	GroupID      *string `json:"groupId,omitempty"`
+	// Allow users to defer the update the provided number of times before macOS forces the update. If a
+	// value is provided, the Software Update will use the InstallLater install action.
+	MaxDeferrals *int `json:"maxDeferrals,omitempty"`
+	// Priority can only be configured on macOS 12.3 and above, for minor updates only. Any version below
+	// 12.3 is always Low and cannot be changed until prerequisites are met. When qualified, if not
+	// explicitly set, priority will default to High.
+	// Allowed values: see the MacOsManagedSoftwareUpdatePriority constants.
+	Priority *string `json:"priority,omitempty"`
+	// If no value is provided, the skipVersionVerification will default to false. If a value is provided,
+	// the specified version will be forced to complete DownloadAndInstall install action.
+	SkipVersionVerification *bool `json:"skipVersionVerification,omitempty"`
+	// MaxDeferral is ignored if using the DownloadOnly install action.
+	// Allowed values: see the MacOsManagedSoftwareUpdateUpdateAction constants.
+	UpdateAction *string `json:"updateAction,omitempty"`
+	// If no value is provided, the version will default to latest version based on device eligibility.
+	Version *string `json:"version,omitempty"`
+}
+
+// MacOsManagedSoftwareUpdateResponse represents a mac os managed software update response.
+type MacOsManagedSoftwareUpdateResponse struct {
+	Errors              []ApiErrorCause `json:"errors"`
+	ProcessManagerUuids []string        `json:"processManagerUuids"`
+}
+
 // ManagedSoftwareUpdatePlan represents a managed software update plan.
 type ManagedSoftwareUpdatePlan struct {
 	// Optional. Indicates the build version to update to. Only available when the version type is set to
@@ -4621,6 +4774,16 @@ type MembershipTestSearchResponse struct {
 	IsMember       bool   `json:"isMember"`
 	IsMemberByUUID bool   `json:"isMemberByUuid"`
 	Username       string `json:"username"`
+}
+
+// MemcachedEndpoints represents a memcached endpoints.
+type MemcachedEndpoints struct {
+	Enabled                 *bool   `json:"enabled,omitempty"`
+	HostName                *string `json:"hostName,omitempty"`
+	ID                      *string `json:"id,omitempty"`
+	JssCacheConfigurationID *int    `json:"jssCacheConfigurationId,omitempty"`
+	Name                    *string `json:"name,omitempty"`
+	Port                    *int    `json:"port,omitempty"`
 }
 
 // MobileDeviceApplication represents a mobile device application.
@@ -6208,6 +6371,13 @@ type PluginPath struct {
 	Path string `json:"path"`
 }
 
+// PolicyProperties represents a policy properties.
+type PolicyProperties struct {
+	IsAllowNetworkStateChangeTriggers *bool `json:"isAllowNetworkStateChangeTriggers,omitempty"`
+	// This field always returns false.
+	IsPoliciesRequireNetworkStateChange *bool `json:"isPoliciesRequireNetworkStateChange,omitempty"`
+}
+
 // PolicyPropertiesV1 represents a policy properties v1.
 type PolicyPropertiesV1 struct {
 	AllowNetworkStateChangeTriggers *bool `json:"allowNetworkStateChangeTriggers,omitempty"`
@@ -6622,6 +6792,21 @@ type Reenrollment struct {
 	IsFlushSoftwareUpdatePlansEnabled        *bool  `json:"isFlushSoftwareUpdatePlansEnabled,omitempty"`
 }
 
+// RemoteAdministrationResponse A Remote administration response.
+type RemoteAdministrationResponse struct {
+	DisplayName string `json:"displayName"`
+	ID          string `json:"id"`
+	SiteID      string `json:"siteId"`
+	// Allowed values: "team-viewer".
+	Type string `json:"type"`
+}
+
+// RemoteAdministrationSearchResults A list with Remote administration configurations.
+type RemoteAdministrationSearchResults struct {
+	Results    []RemoteAdministrationResponse `json:"results"`
+	TotalCount int                            `json:"totalCount"`
+}
+
 // RemoveComputerMDMProfileResponse represents a remove computer m d m profile response.
 type RemoveComputerMDMProfileResponse struct {
 	// Uuid of the command queued that removes the MDM profile.
@@ -6828,6 +7013,53 @@ type Session struct {
 	CurrentSiteID *int `json:"currentSiteId,omitempty"`
 }
 
+// SessionCandidateRequest Request to crate new remote session. Ultimately this allows connection between an admin and an end-user.
+type SessionCandidateRequest struct {
+	// Session description. To be used for additional context on the reason of the session.
+	Description string `json:"description"`
+	// Device identifier.
+	DeviceID string `json:"deviceId"`
+	// Device type.
+	// Allowed values: "COMPUTER".
+	DeviceType string `json:"deviceType"`
+}
+
+// SessionDetails Session details.
+type SessionDetails struct {
+	// Sessions code.
+	Code string `json:"code"`
+	// Session creation time.
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	// ID of session creator if session created by Jamf Pro local user, null otherwise.
+	CreatorID string `json:"creatorId"`
+	// Username of the session creator.
+	CreatorName string `json:"creatorName"`
+	// Session description. To be used for additional context on the reason of the session.
+	Description string `json:"description"`
+	// Device identifier.
+	DeviceID string `json:"deviceId"`
+	// Device name if found - null otherwise.
+	DeviceName string `json:"deviceName"`
+	// Device type.
+	// Allowed values: "COMPUTER".
+	DeviceType string `json:"deviceType"`
+	// End user session URL.
+	EndUserLink string `json:"endUserLink"`
+	// Session identifier.
+	ID string `json:"id"`
+	// Session state.
+	// Allowed values: see the SessionDetailsState constants.
+	State string `json:"state"`
+	// Supporter session URL.
+	SupporterLink string `json:"supporterLink"`
+}
+
+// SessionDetailsSearchResults Sessions search result.
+type SessionDetailsSearchResults struct {
+	Results    []SessionDetails `json:"results"`
+	TotalCount int              `json:"totalCount"`
+}
+
 // SessionHistoryItem represents a session history item.
 type SessionHistoryItem struct {
 	Comment                 string     `json:"comment"`
@@ -6868,6 +7100,15 @@ type SessionHistoryItemWithDetails struct {
 type SessionHistorySearchResults struct {
 	Results    []SessionHistoryItem `json:"results"`
 	TotalCount int                  `json:"totalCount"`
+}
+
+// SessionStatus Session status.
+type SessionStatus struct {
+	// Defines if the end user is online.
+	Online bool `json:"online"`
+	// Session state.
+	// Allowed values: see the SessionStatusSessionState constants.
+	SessionState string `json:"sessionState"`
 }
 
 // SharedDeviceComplianceFeatureToggle represents a shared device compliance feature toggle.

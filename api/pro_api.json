@@ -1823,6 +1823,66 @@
         },
         "type": "object"
       },
+      "CacheSettings": {
+        "properties": {
+          "cacheType": {
+            "example": "ehcache",
+            "type": "string"
+          },
+          "cacheUniqueId": {
+            "description": "The default is for Jamf Pro to generate a UUID, so we can only give an example instead.",
+            "example": "24864549-94ea-4cc1-bb80-d7fb392c6556",
+            "type": "string"
+          },
+          "directoryTimeToLiveSeconds": {
+            "example": 120,
+            "format": "int32",
+            "type": "integer"
+          },
+          "ehcacheMaxBytesLocalHeap": {
+            "default": "null",
+            "type": "string"
+          },
+          "elasticache": {
+            "default": false,
+            "type": "boolean"
+          },
+          "id": {
+            "default": "0",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "memcachedEndpoints": {
+            "example": [],
+            "items": {
+              "$ref": "#/components/schemas/MemcachedEndpoints"
+            },
+            "type": "array"
+          },
+          "name": {
+            "default": "cache configuration",
+            "type": "string"
+          },
+          "timeToIdleSeconds": {
+            "example": 120,
+            "format": "int32",
+            "type": "integer"
+          },
+          "timeToLiveSeconds": {
+            "example": 120,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cacheType",
+          "cacheUniqueId",
+          "memcachedEndpoints",
+          "timeToLiveSeconds"
+        ],
+        "type": "object"
+      },
       "CategoriesSearchResults": {
         "properties": {
           "results": {
@@ -7683,6 +7743,135 @@
         },
         "type": "object"
       },
+      "ConnectionConfigurationCandidateRequest": {
+        "description": "Request that creates configuration and initialize connection between Jamf Pro and Team Viewer",
+        "properties": {
+          "displayName": {
+            "description": "Name for Team Viewer Connection Configuration",
+            "example": "teamViewerConfiguration",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "enabled": {
+            "description": "Defines the intent to enable or disable Team Viewer connection",
+            "example": true,
+            "type": "boolean"
+          },
+          "scriptToken": {
+            "description": "Token which is used for connecting to Team Viewer",
+            "example": "12847340-nPAX96bsaADH4Gz6K6i2",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "sessionTimeout": {
+            "description": "Number of minutes before the session expires",
+            "example": 15,
+            "maximum": 1440,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "siteId": {
+            "description": "An identifier of a site which Team Viewer Remote Administration will be configured on",
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "displayName",
+          "enabled",
+          "scriptToken",
+          "sessionTimeout",
+          "siteId"
+        ],
+        "type": "object"
+      },
+      "ConnectionConfigurationResponse": {
+        "description": "Response that contains information about connection configuration for Team Viewer",
+        "properties": {
+          "displayName": {
+            "description": "Name for Team Viewer Connection Configuration",
+            "example": "teamViewerConfiguration",
+            "type": "string"
+          },
+          "enabled": {
+            "description": "Describes if Team Viewer connection is enabled or disabled",
+            "example": true,
+            "type": "boolean"
+          },
+          "id": {
+            "description": "An identifier of connection configuration for Team Viewer Remote Administration",
+            "example": "1",
+            "type": "string"
+          },
+          "sessionTimeout": {
+            "description": "Number of minutes before the session expires",
+            "example": 15,
+            "maximum": 1440,
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "siteId": {
+            "description": "An identifier of a site which Team Viewer Remote Administration is configured on",
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "displayName",
+          "enabled",
+          "id",
+          "sessionTimeout",
+          "siteId"
+        ],
+        "type": "object"
+      },
+      "ConnectionConfigurationStatusResponse": {
+        "description": "Response that contains connection configuration status for Team Viewer",
+        "properties": {
+          "connectionVerificationResult": {
+            "description": "connection configuration status for Team Viewer",
+            "example": "VALID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "connectionVerificationResult"
+        ],
+        "type": "object"
+      },
+      "ConnectionConfigurationUpdateRequest": {
+        "description": "Request that updates configuration connection between Jamf Pro and Team Viewer",
+        "properties": {
+          "displayName": {
+            "description": "Name for Team Viewer Connection Configuration",
+            "example": "teamViewerConfiguration",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "enabled": {
+            "description": "Defines the intent to enable or disable Team Viewer connection",
+            "example": true,
+            "type": "boolean"
+          },
+          "sessionTimeout": {
+            "description": "Number of minutes before the session expires",
+            "example": 15,
+            "maximum": 1440,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "token": {
+            "description": "Script token for Team Viewer Connection Configuration",
+            "example": "12843140-nPAX96bsaADH4Gz6K6i2",
+            "maxLength": 255,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Country": {
         "properties": {
           "code": {
@@ -12108,6 +12297,43 @@
         },
         "type": "object"
       },
+      "InventoryPreloadCsvError": {
+        "properties": {
+          "code": {
+            "example": "SIZE_EXCEEDED",
+            "type": "string"
+          },
+          "description": {
+            "example": "Field 'vendor' exceeds max size 60",
+            "type": "string"
+          },
+          "deviceType": {
+            "example": "Computer",
+            "type": "string"
+          },
+          "field": {
+            "example": "vendor",
+            "type": "string"
+          },
+          "fieldSize": {
+            "example": 60,
+            "type": "integer"
+          },
+          "line": {
+            "example": 5,
+            "type": "integer"
+          },
+          "serialNumber": {
+            "example": "R7QFDE2YCFN4",
+            "type": "string"
+          },
+          "value": {
+            "example": "abcdefghijklmnopqrstuwxyzabcdefghijklmnopqrstuwxyzabcdefghijklmnopqrstuwxyz",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "InventoryPreloadCsvValidationError": {
         "properties": {
           "errors": {
@@ -12199,6 +12425,154 @@
           "results": {
             "items": {
               "$ref": "#/components/schemas/InventoryPreloadExtensionAttributeColumn"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 10,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryPreloadInvalidCsvResponse": {
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryPreloadCsvError"
+            },
+            "type": "array"
+          },
+          "httpsStatus": {
+            "example": 400,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "InventoryPreloadRecord": {
+        "properties": {
+          "appleCareId": {
+            "example": "5678",
+            "type": "string"
+          },
+          "assetTag": {
+            "example": "ABCDEFG12345",
+            "type": "string"
+          },
+          "barCode1": {
+            "example": "123456789",
+            "type": "string"
+          },
+          "barCode2": {
+            "example": "123456789",
+            "type": "string"
+          },
+          "building": {
+            "example": "Eau Claire",
+            "type": "string"
+          },
+          "department": {
+            "example": "IT",
+            "type": "string"
+          },
+          "deviceType": {
+            "enum": [
+              "Computer",
+              "Mobile Device",
+              "Unknown"
+            ],
+            "example": "Computer",
+            "type": "string"
+          },
+          "emailAddress": {
+            "example": "ITBob@jamf.com",
+            "type": "string"
+          },
+          "extensionAttributes": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryPreloadExtensionAttribute"
+            },
+            "type": "array"
+          },
+          "fullName": {
+            "example": "Name",
+            "type": "string"
+          },
+          "id": {
+            "example": 1,
+            "readOnly": true,
+            "type": "integer"
+          },
+          "leaseExpiration": {
+            "example": "2015-06-19",
+            "type": "string"
+          },
+          "lifeExpectancy": {
+            "example": "5 years",
+            "type": "string"
+          },
+          "phoneNumber": {
+            "example": "555-555-5555",
+            "type": "string"
+          },
+          "poDate": {
+            "example": "2019-02-04T21:09:31.661Z",
+            "type": "string"
+          },
+          "poNumber": {
+            "example": "8675309",
+            "type": "string"
+          },
+          "position": {
+            "example": "IT Team Lead",
+            "type": "string"
+          },
+          "purchasePrice": {
+            "example": "$399",
+            "type": "string"
+          },
+          "purchasingAccount": {
+            "example": "IT Budget",
+            "type": "string"
+          },
+          "purchasingContact": {
+            "example": "Nick in IT",
+            "type": "string"
+          },
+          "room": {
+            "example": "4th Floor - Quad 3",
+            "type": "string"
+          },
+          "serialNumber": {
+            "example": "C02L29ECF8J1",
+            "type": "string"
+          },
+          "username": {
+            "example": "admin",
+            "type": "string"
+          },
+          "vendor": {
+            "example": "Apple",
+            "type": "string"
+          },
+          "warrantyExpiration": {
+            "example": "2012-07-21",
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceType",
+          "serialNumber"
+        ],
+        "type": "object"
+      },
+      "InventoryPreloadRecordSearchResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryPreloadRecord"
             },
             "type": "array"
           },
@@ -13456,6 +13830,96 @@
         },
         "type": "object"
       },
+      "MacOsManagedSoftwareUpdate": {
+        "properties": {
+          "applyMajorUpdate": {
+            "default": false,
+            "description": "ApplyMajorUpdate setting is available only when updating to the latest version based on device eligibility. If no value is provided, the calculated latest version will only include minor version updates. If a value is provided, the calculated latest version will include minor and major version updates.",
+            "example": false,
+            "type": "boolean"
+          },
+          "deviceIds": {
+            "example": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "forceRestart": {
+            "default": false,
+            "description": "If not set, forceRestart will default to false. Can only be true if using the DownloadAndInstall install action and the devices the command is sent to are on macOs 11 or higher. If true, the DownloadAndInstall action is performed, a restart will be forced. MaxDeferral will be ignored if defined. ",
+            "example": false,
+            "type": "boolean"
+          },
+          "groupId": {
+            "example": "1",
+            "type": "string"
+          },
+          "maxDeferrals": {
+            "description": "Allow users to defer the update the provided number of times before macOS forces the update. If a value is provided, the Software Update will use the InstallLater install action.",
+            "example": 7,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "priority": {
+            "default": "HIGH",
+            "description": "Priority can only be configured on macOS 12.3 and above, for minor updates only. Any version below 12.3 is always Low and cannot be changed until prerequisites are met. When qualified, if not explicitly set, priority will default to High",
+            "enum": [
+              "HIGH",
+              "LOW"
+            ],
+            "example": "HIGH",
+            "type": "string"
+          },
+          "skipVersionVerification": {
+            "default": false,
+            "description": "If no value is provided, the skipVersionVerification will default to false. If a value is provided, the specified version will be forced to complete DownloadAndInstall install action.",
+            "example": false,
+            "type": "boolean"
+          },
+          "updateAction": {
+            "description": "MaxDeferral is ignored if using the DownloadOnly install action.",
+            "enum": [
+              "DOWNLOAD_AND_INSTALL",
+              "DOWNLOAD_ONLY"
+            ],
+            "example": "DOWNLOAD_AND_INSTALL",
+            "type": "string"
+          },
+          "version": {
+            "description": "If no value is provided, the version will default to latest version based on device eligibility.",
+            "example": "12.0.1",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MacOsManagedSoftwareUpdateResponse": {
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ApiErrorCause"
+            },
+            "type": "array"
+          },
+          "processManagerUuids": {
+            "example": [
+              "6E47EF55-5318-494F-A09E-70F613E0AFD1",
+              "6E73EF55-5318-494F-A09E-70G613E0AFD1"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ManagedSoftwareUpdatePlan": {
         "properties": {
           "buildVersion": {
@@ -14169,6 +14633,37 @@
           "username": {
             "example": "admin",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MemcachedEndpoints": {
+        "properties": {
+          "enabled": {
+            "example": true,
+            "type": "boolean"
+          },
+          "hostName": {
+            "example": "https://memcache.jamf.com",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minLength": 1,
+            "readOnly": true,
+            "type": "string"
+          },
+          "jssCacheConfigurationId": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Jamf Fake Example Memcache",
+            "type": "string"
+          },
+          "port": {
+            "example": 9001,
+            "type": "integer"
           }
         },
         "type": "object"
@@ -18354,6 +18849,20 @@
         ],
         "type": "object"
       },
+      "PolicyProperties": {
+        "properties": {
+          "isAllowNetworkStateChangeTriggers": {
+            "default": true,
+            "type": "boolean"
+          },
+          "isPoliciesRequireNetworkStateChange": {
+            "default": false,
+            "description": "This field always returns false.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "PolicyPropertiesV1": {
         "properties": {
           "allowNetworkStateChangeTriggers": {
@@ -18975,6 +19484,48 @@
         ],
         "type": "object"
       },
+      "RemoteAdministrationResponse": {
+        "description": "A Remote administration response",
+        "properties": {
+          "displayName": {
+            "example": "Remote administration",
+            "type": "string"
+          },
+          "id": {
+            "example": "1",
+            "minimum": 1,
+            "type": "string"
+          },
+          "siteId": {
+            "example": "1",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "team-viewer"
+            ],
+            "example": "team-viewer",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RemoteAdministrationSearchResults": {
+        "description": "A list with Remote administration configurations",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/RemoteAdministrationResponse"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "RemoveComputerMdmProfileResponse": {
         "properties": {
           "commandUuid": {
@@ -19569,6 +20120,127 @@
         },
         "type": "object"
       },
+      "SessionCandidateRequest": {
+        "description": "Request to crate new remote session. Ultimately this allows connection between an admin and an end-user",
+        "properties": {
+          "description": {
+            "description": "Session description. To be used for additional context on the reason of the session",
+            "example": "Customer reported that he cannot install application X",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "deviceId": {
+            "description": "Device identifier",
+            "example": "1",
+            "type": "string"
+          },
+          "deviceType": {
+            "description": "Device type",
+            "enum": [
+              "COMPUTER"
+            ],
+            "example": "COMPUTER",
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "deviceId",
+          "deviceType"
+        ],
+        "type": "object"
+      },
+      "SessionDetails": {
+        "description": "Session details",
+        "properties": {
+          "code": {
+            "description": "Sessions code",
+            "example": "s1234-5678",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "Session creation time",
+            "example": "2021-06-10T12:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "creatorId": {
+            "description": "ID of session creator if session created by Jamf Pro local user, null otherwise",
+            "example": "1",
+            "type": "string"
+          },
+          "creatorName": {
+            "description": "Username of the session creator",
+            "example": "creator",
+            "type": "string"
+          },
+          "description": {
+            "description": "Session description. To be used for additional context on the reason of the session",
+            "example": "Customer reported that he cannot install application X",
+            "type": "string"
+          },
+          "deviceId": {
+            "description": "Device identifier",
+            "example": "1",
+            "type": "string"
+          },
+          "deviceName": {
+            "description": "Device name if found - null otherwise",
+            "example": "Przemek MacBook Pro",
+            "type": "string"
+          },
+          "deviceType": {
+            "description": "Device type",
+            "enum": [
+              "COMPUTER"
+            ],
+            "example": "COMPUTER",
+            "type": "string"
+          },
+          "endUserLink": {
+            "description": "End user session URL",
+            "example": "https://get.teamviewer.com/v15/en/s12345678",
+            "type": "string"
+          },
+          "id": {
+            "description": "Session identifier",
+            "example": "1",
+            "type": "string"
+          },
+          "state": {
+            "description": "Session state",
+            "enum": [
+              "OPEN",
+              "CLOSED",
+              "UNKNOWN"
+            ],
+            "example": "OPEN",
+            "type": "string"
+          },
+          "supporterLink": {
+            "description": "Supporter session URL",
+            "example": "https://get.teamviewer.com/v15/en/s12345678-a1b2c3d4e5f6",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SessionDetailsSearchResults": {
+        "description": "Sessions search result",
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SessionDetails"
+            },
+            "type": "array"
+          },
+          "totalCount": {
+            "example": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "SessionHistoryItem": {
         "properties": {
           "comment": {
@@ -19704,6 +20376,27 @@
           "results",
           "totalCount"
         ],
+        "type": "object"
+      },
+      "SessionStatus": {
+        "description": "Session status",
+        "properties": {
+          "online": {
+            "description": "Defines if the end user is online",
+            "example": true,
+            "type": "boolean"
+          },
+          "sessionState": {
+            "description": "Session state",
+            "enum": [
+              "OPEN",
+              "CLOSED",
+              "UNKNOWN"
+            ],
+            "example": "OPEN",
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "SharedDeviceComplianceFeatureToggle": {
@@ -22788,6 +23481,602 @@
         ]
       }
     },
+    "/inventory-preload": {
+      "delete": {
+        "deprecated": true,
+        "description": "Deletes all Inventory Preload records.\n\n**Required Permissions:** `inventory-preload-records:delete`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:delete"
+            ]
+          }
+        ],
+        "summary": "Delete all Inventory Preload records\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-jamf-expected-status": 204,
+        "x-required-privileges": [
+          "inventory-preload-records:delete"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Inventory Preload Records"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "Returns all Inventory Preload records.\n\n**Required Permissions:** `inventory-preload-records:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/pagesize"
+          },
+          {
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "ASC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "explode": true,
+            "in": "query",
+            "name": "sortBy",
+            "schema": {
+              "default": "id",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryPreloadRecordSearchResults"
+                  },
+                  "type": "array"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecordSearchResults"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:read"
+            ]
+          }
+        ],
+        "summary": "Return all Inventory Preload records\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-required-privileges": [
+          "inventory-preload-records:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "Create a new Inventory Preload record using JSON or CSV.\nA CSV template can be downloaded from /api/inventory-preload/csv-template.\nSerial number and device type are required. All other fields are optional.\nWhen a matching serial number exists in the Inventory Preload data, the record will be overwritten with the CSV data.\nIf the CSV file contains a new username and an email address is provided, the new user is created in Jamf Pro.\nIf the CSV file contains an existing username, the following user-related fields are updated in Jamf Pro.\nFull Name,\nEmail Address,\nPhone Number,\nPosition.\nThis endpoint does not do full validation of each record in the CSV data.\nTo do full validation, use the /inventory-preload/validate-csv endpoint first.\n\n\n**Required Permissions:** `inventory-preload-records:create`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecord"
+              }
+            },
+            "text/csv": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecord"
+              }
+            }
+          },
+          "description": "Inventory Preload record or records to be created",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecord"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:create"
+            ]
+          }
+        ],
+        "summary": "Create a new Inventory Preload record using JSON or CSV\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "inventory-preload-records:create"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Inventory Preload Records"
+        ]
+      }
+    },
+    "/inventory-preload/csv-template": {
+      "get": {
+        "deprecated": true,
+        "description": "Retrieves the Inventory Preload CSV template.\n\n**Required Permissions:** `inventory-preload-records:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:read"
+            ]
+          }
+        ],
+        "summary": "Get the Inventory Preload CSV template\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-required-privileges": [
+          "inventory-preload-records:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Inventory Preload Records"
+        ]
+      }
+    },
+    "/inventory-preload/history": {
+      "get": {
+        "deprecated": true,
+        "description": "Gets Inventory Preload history entries.\n\n**Required Permissions:** `inventory-preload-records:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/pagesize"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "date:desc",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:read"
+            ]
+          }
+        ],
+        "summary": "Get Inventory Preload history entries\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-required-privileges": [
+          "inventory-preload-records:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Inventory Preload Records"
+        ]
+      }
+    },
+    "/inventory-preload/history/notes": {
+      "post": {
+        "deprecated": true,
+        "description": "Adds Inventory Preload history object notes.\n\n**Required Permissions:** `inventory-preload-records:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes of Inventory Preload history were added"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload history can not be saved"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:update"
+            ]
+          }
+        ],
+        "summary": "Add Inventory Preload history object notes\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-jamf-expected-status": 200,
+        "x-required-privileges": [
+          "inventory-preload-records:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Inventory Preload Records"
+        ]
+      }
+    },
+    "/inventory-preload/validate-csv": {
+      "post": {
+        "deprecated": true,
+        "description": "Validate a given CSV file.\nSerial number and device type are required. All other fields are optional.\nA CSV template can be downloaded from /api/inventory-preload/csv-template.\n\n\n**Required Permissions:** `inventory-preload-records:create`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/csv": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "description": "Inventory Preload records to be validated. A CSV template can be downloaded from /api/inventory-preload/csv-template",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadCsvValidationSuccess"
+                }
+              }
+            },
+            "description": "Ok"
+          },
+          "412": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadInvalidCsvResponse"
+                }
+              }
+            },
+            "description": "Precondition Failed"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:create"
+            ]
+          }
+        ],
+        "summary": "Validate a given CSV file\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-action": true,
+        "x-deprecation-date": "2020-01-01",
+        "x-required-privileges": [
+          "inventory-preload-records:create"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Inventory Preload Records"
+        ]
+      }
+    },
+    "/inventory-preload/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "Deletes an Inventory Preload record.\n\n**Required Permissions:** `inventory-preload-records:delete`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:delete"
+            ]
+          }
+        ],
+        "summary": "Delete an Inventory Preload record\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-jamf-expected-status": 204,
+        "x-required-privileges": [
+          "inventory-preload-records:delete"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Inventory Preload Records"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "Retrieves an Inventory Preload record.\n\n**Required Permissions:** `inventory-preload-records:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecord"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:read"
+            ]
+          }
+        ],
+        "summary": "Get an Inventory Preload record\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-required-privileges": [
+          "inventory-preload-records:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Updates an Inventory Preload record.\n\n**Required Permissions:** `inventory-preload-records:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecord"
+              }
+            }
+          },
+          "description": "Inventory Preload record to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecord"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:update"
+            ]
+          }
+        ],
+        "summary": "Update an Inventory Preload record\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-01-01",
+        "x-required-privileges": [
+          "inventory-preload-records:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Inventory Preload Records"
+        ]
+      }
+    },
     "/ldap/groups": {
       "get": {
         "description": "Retrieves the configured access groups that contain the text in the searchParam.\n\n**Required Permissions:** `ldap-servers:read`",
@@ -22942,6 +24231,845 @@
         ]
       }
     },
+    "/preview/remote-administration-configurations": {
+      "get": {
+        "description": "Remote administration feature creates a secure screen-sharing experience between Jamf Pro administrators and their end-users.\n\n**Required Permissions:** `remote-administration:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoteAdministrationSearchResults"
+                }
+              }
+            },
+            "description": "Remote administration configurations returned."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Remote Administration feature is not available."
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:read"
+            ]
+          }
+        ],
+        "summary": "Get information about all remote administration configurations.",
+        "tags": [
+          "remote-administration"
+        ],
+        "x-required-privileges": [
+          "remote-administration:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer": {
+      "post": {
+        "description": "Creates Team Viewer Remote Administration connection configuration\n\n**Required Permissions:** `remote-administration:create`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionConfigurationCandidateRequest"
+              }
+            }
+          },
+          "description": "Team Viewer connection configuration create definition",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Team Viewer connection configuration created successfully"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid field for Team Viewer connection configuration"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges or site not found for Team Viewer connection configuration"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Site limit exceeded for Team Viewer connection configuration"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:create"
+            ]
+          }
+        ],
+        "summary": "Create Team Viewer Remote Administration connection configuration",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "remote-administration:create"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer/{configurationId}/sessions": {
+      "get": {
+        "description": "Returns a paginated list of sessions for a given configuration ID\n\n**Required Permissions:** `remote-administration:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "configurationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Query in the RSQL format, allowing to filter sessions collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `deviceId`, `deviceType`, `state`\n\nThis param can be combined with paging.\n",
+            "example": "deviceId==1 and deviceType==\"COMPUTER\" and state==\"OPEN\"",
+            "explode": true,
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "default": "",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetailsSearchResults"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:read"
+            ]
+          }
+        ],
+        "summary": "Get a paginated list of sessions\n",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-required-privileges": [
+          "remote-administration:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Remote Administration"
+        ]
+      },
+      "post": {
+        "description": "Creates a new Team Viewer session to be used to establish a remote connection\n\n**Required Permissions:** `remote-administration:create`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "configurationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCandidateRequest"
+              }
+            }
+          },
+          "description": "Team Viewer session attributes",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HrefResponse"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid attributes for Team Viewer session"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Connection configuration is not active or there is an active session for the device"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:create"
+            ]
+          }
+        ],
+        "summary": "Create a new session",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "remote-administration:create"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}": {
+      "get": {
+        "description": "Returns a session details if found.\n\n**Required Permissions:** `remote-administration:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "configurationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "ID of the Team Viewer session",
+            "explode": false,
+            "in": "path",
+            "name": "sessionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetails"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:read"
+            ]
+          }
+        ],
+        "summary": "Get a session by its ID\n",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-required-privileges": [
+          "remote-administration:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/close": {
+      "post": {
+        "description": "Changes the session state from open to close. Closing a session means it is not possible to establish new remote connection between devices\n\n**Required Permissions:** `remote-administration:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "configurationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "ID of the Team Viewer session",
+            "explode": false,
+            "in": "path",
+            "name": "sessionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Connection configuration is not active"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:update"
+            ]
+          }
+        ],
+        "summary": "Close a session",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-action": true,
+        "x-jamf-expected-status": 204,
+        "x-required-privileges": [
+          "remote-administration:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/resend-notification": {
+      "post": {
+        "description": "Resends configured notifications (e.g. Self Service push notifications).\n\n**Required Permissions:** `remote-administration:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "configurationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "ID of the Team Viewer session",
+            "explode": false,
+            "in": "path",
+            "name": "sessionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Connection configuration is not active or session is already closed"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:update"
+            ]
+          }
+        ],
+        "summary": "Resend nofications for a session",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-action": true,
+        "x-jamf-expected-status": 204,
+        "x-required-privileges": [
+          "remote-administration:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/status": {
+      "get": {
+        "description": "Returns a session status if found.\n\n**Required Permissions:** `remote-administration:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "configurationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "ID of the Team Viewer session",
+            "explode": false,
+            "in": "path",
+            "name": "sessionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStatus"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Team Viewer session status not found"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:read"
+            ]
+          }
+        ],
+        "summary": "Get a session status by its ID\n",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-required-privileges": [
+          "remote-administration:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer/{id}": {
+      "delete": {
+        "description": "Deletes Team Viewer Remote Administration connection configuration\n\n**Required Permissions:** `remote-administration:delete`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Team Viewer connection configuration deleted successfully"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:delete"
+            ]
+          }
+        ],
+        "summary": "Delete Team Viewer Remote Administration connection configuration",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-jamf-expected-status": 204,
+        "x-required-privileges": [
+          "remote-administration:delete"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Remote Administration"
+        ]
+      },
+      "get": {
+        "description": "Returns Team Viewer Remote Administration connection configuration\n\n**Required Permissions:** `remote-administration:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionConfigurationResponse"
+                }
+              }
+            },
+            "description": "Returns Team Viewer connection configuration response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Team Viewer connection configuration does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:read"
+            ]
+          }
+        ],
+        "summary": "Get Team Viewer Remote Administration connection configuration",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-required-privileges": [
+          "remote-administration:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Remote Administration"
+        ]
+      },
+      "patch": {
+        "description": "Updates Team Viewer Remote Administration connection configuration\n\n**Required Permissions:** `remote-administration:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionConfigurationUpdateRequest"
+              }
+            }
+          },
+          "description": "Team Viewer connection configuration update request",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionConfigurationResponse"
+                }
+              }
+            },
+            "description": "Team Viewer connection configuration updated successfully"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid field for Team Viewer connection configuration update request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Team Viewer connection configuration does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:update"
+            ]
+          }
+        ],
+        "summary": "Update Team Viewer Remote Administration connection configuration",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-required-privileges": [
+          "remote-administration:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Remote Administration"
+        ]
+      }
+    },
+    "/preview/remote-administration-configurations/team-viewer/{id}/status": {
+      "get": {
+        "description": "Returns Team Viewer Remote Administration connection status\n\n**Required Permissions:** `remote-administration:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID of the Team Viewer connection configuration",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionConfigurationStatusResponse"
+                }
+              }
+            },
+            "description": "Returns Team Viewer connection status response"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "remote-administration:read"
+            ]
+          }
+        ],
+        "summary": "Get Team Viewer Remote Administration connection status",
+        "tags": [
+          "team-viewer-remote-administration"
+        ],
+        "x-required-privileges": [
+          "remote-administration:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Remote Administration"
+        ]
+      }
+    },
     "/self-service/branding/images": {
       "post": {
         "description": "Uploads an image\n\n**Required Permissions:** `self-service:update`",
@@ -23032,6 +25160,98 @@
         ],
         "x-required-privileges-legacy": [
           "Update Apache Tomcat Settings"
+        ]
+      }
+    },
+    "/settings/obj/policyProperties": {
+      "get": {
+        "deprecated": true,
+        "description": "Gets `Policy Properties` object.\n\n\n**Required Permissions:** `policies:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyProperties"
+                }
+              }
+            },
+            "description": "Successful response"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "policies:read"
+            ]
+          }
+        ],
+        "summary": "Get Policy Properties object\n",
+        "tags": [
+          "policies-preview"
+        ],
+        "x-deprecation-date": "2021-11-07",
+        "x-required-privileges": [
+          "policies:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Policies"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Update Policy Properties object\n\n\n**Required Permissions:** `policies:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyProperties"
+              }
+            }
+          },
+          "description": "Policy Properties object to update",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyProperties"
+                }
+              }
+            },
+            "description": "Policy Properties was updated"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "policies:update"
+            ]
+          }
+        ],
+        "summary": "Update Policy Properties object\n",
+        "tags": [
+          "policies-preview"
+        ],
+        "x-deprecation-date": "2021-11-07",
+        "x-jamf-expected-status": 200,
+        "x-required-privileges": [
+          "policies:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Policies"
         ]
       }
     },
@@ -26134,6 +28354,102 @@
         ]
       }
     },
+    "/v1/cache-settings": {
+      "get": {
+        "description": "gets cache settings\n\n**Required Permissions:** `cache:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheSettings"
+                }
+              }
+            },
+            "description": "cache settings"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "cache:read"
+            ]
+          }
+        ],
+        "summary": "Get Cache Settings\n",
+        "tags": [
+          "cache-settings"
+        ],
+        "x-required-privileges": [
+          "cache:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Cache"
+        ]
+      },
+      "put": {
+        "description": "updates cache settings\n\n\n**Required Permissions:** `cache:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheSettings"
+                }
+              }
+            },
+            "description": "cache has been updated"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "The following code is returned by this call:\nHOSTED_ENVIRONMENT - PUT command is not available in hosted environments.\n"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "cache:update"
+            ]
+          }
+        ],
+        "summary": "Update Cache Settings\n",
+        "tags": [
+          "cache-settings"
+        ],
+        "x-required-privileges": [
+          "cache:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Cache"
+        ]
+      }
+    },
     "/v1/categories": {
       "get": {
         "description": "Gets `Category` objects.\n\n\n**Required Permissions:** `categories:read`, `self-service:read`",
@@ -26781,6 +29097,67 @@
         ],
         "x-required-privileges-legacy": [
           "Create LDAP Servers"
+        ]
+      }
+    },
+    "/v1/cloud-azure/defaults/mappings": {
+      "get": {
+        "deprecated": true,
+        "description": "This is the default set of attributes that allows you to return the data you need from Azure AD. Some fields may be empty and may be edited when creating a new configuration.\n\n**Required Permissions:** `ldap-servers:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AzureMappings"
+                }
+              }
+            },
+            "description": "Default mappings returned."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Files cannot be loaded."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "This endpoint is not available for your environment."
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "ldap-servers:read"
+            ]
+          }
+        ],
+        "summary": "Get default mappings",
+        "tags": [
+          "cloud-azure"
+        ],
+        "x-deprecation-date": "2025-05-21",
+        "x-required-privileges": [
+          "ldap-servers:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read LDAP Servers"
         ]
       }
     },
@@ -33742,6 +36119,88 @@
         ]
       }
     },
+    "/v1/dss-declarations/{declarationId}": {
+      "get": {
+        "description": "Retrieves a stored declaration based on the provided declaration id\n\n**Required Permissions:** `declarations:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Declaration UUID",
+            "example": "538F90D7-9383-4A2B-B1C8-81E845A9CFD7",
+            "explode": false,
+            "in": "path",
+            "name": "declarationId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DssDeclarations"
+                }
+              }
+            },
+            "description": "The Declaration request was sent successfully."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Insufficient privileges to perform this action."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Existing declaration not found."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Server Error, unable to complete Declaration request."
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "declarations:read"
+            ]
+          }
+        ],
+        "summary": "Retrieve an existing declaration",
+        "tags": [
+          "declarative-device-management"
+        ],
+        "x-required-privileges": [
+          "declarations:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Mobile Devices",
+          "Read Computers"
+        ]
+      }
+    },
     "/v1/ebooks": {
       "get": {
         "description": "Gets ebook object\n\n**Required Permissions:** `ebooks:read`",
@@ -36172,6 +38631,174 @@
         ]
       }
     },
+    "/v1/inventory-preload": {
+      "delete": {
+        "deprecated": true,
+        "description": "Deletes all Inventory Preload records.\n\n**Required Permissions:** `inventory-preload-records:delete`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:delete"
+            ]
+          }
+        ],
+        "summary": "Delete all Inventory Preload records\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-04-24",
+        "x-jamf-expected-status": 204,
+        "x-required-privileges": [
+          "inventory-preload-records:delete"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Inventory Preload Records"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "Returns all Inventory Preload records.\n\n**Required Permissions:** `inventory-preload-records:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/pagesize"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "id:asc",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecordSearchResults"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecordSearchResults"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:read"
+            ]
+          }
+        ],
+        "summary": "Return all Inventory Preload records\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-04-22",
+        "x-required-privileges": [
+          "inventory-preload-records:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "Create a new Inventory Preload record using JSON or CSV.\nA CSV template can be downloaded from /api/inventory-preload/csv-template.\nSerial number and device type are required. All other fields are optional.\nWhen a matching serial number exists in the Inventory Preload data, the record will be overwritten with the CSV data.\nIf the CSV file contains a new username and an email address is provided, the new user is created in Jamf Pro.\nIf the CSV file contains an existing username, the following user-related fields are updated in Jamf Pro.\nFull Name,\nEmail Address,\nPhone Number,\nPosition.\nThis endpoint does not do full validation of each record in the CSV data.\nTo do full validation, use the /inventory-preload/validate-csv endpoint first.\n\n\n**Required Permissions:** `inventory-preload-records:create`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecord"
+              }
+            },
+            "text/csv": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecord"
+              }
+            }
+          },
+          "description": "Inventory Preload record or records to be created",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecord"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:create"
+            ]
+          }
+        ],
+        "summary": "Create a new Inventory Preload record using JSON or CSV\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-04-21",
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "inventory-preload-records:create"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Inventory Preload Records"
+        ]
+      }
+    },
     "/v1/inventory-preload/csv-template": {
       "get": {
         "deprecated": true,
@@ -36329,6 +38956,257 @@
           "inventory-preload"
         ],
         "x-deprecation-date": "2020-04-24",
+        "x-jamf-expected-status": 200,
+        "x-required-privileges": [
+          "inventory-preload-records:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update Inventory Preload Records"
+        ]
+      }
+    },
+    "/v1/inventory-preload/validate-csv": {
+      "post": {
+        "deprecated": true,
+        "description": "Validate a given CSV file.\nSerial number and device type are required. All other fields are optional.\nA CSV template can be downloaded from /api/inventory-preload/csv-template.\n\n\n**Required Permissions:** `inventory-preload-records:create`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/csv": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "description": "Inventory Preload records to be validated. A CSV template can be downloaded from /api/inventory-preload/csv-template",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadCsvValidationSuccess"
+                }
+              }
+            },
+            "description": "Ok"
+          },
+          "412": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadInvalidCsvResponse"
+                }
+              }
+            },
+            "description": "Precondition Failed"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:create"
+            ]
+          }
+        ],
+        "summary": "Validate a given CSV file\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-action": true,
+        "x-deprecation-date": "2020-04-21",
+        "x-required-privileges": [
+          "inventory-preload-records:create"
+        ],
+        "x-required-privileges-legacy": [
+          "Create Inventory Preload Records"
+        ]
+      }
+    },
+    "/v1/inventory-preload/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "Deletes an Inventory Preload record.\n\n**Required Permissions:** `inventory-preload-records:delete`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:delete"
+            ]
+          }
+        ],
+        "summary": "Delete an Inventory Preload record\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-04-24",
+        "x-jamf-expected-status": 204,
+        "x-required-privileges": [
+          "inventory-preload-records:delete"
+        ],
+        "x-required-privileges-legacy": [
+          "Delete Inventory Preload Records"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "Retrieves an Inventory Preload record.\n\n**Required Permissions:** `inventory-preload-records:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecord"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:read"
+            ]
+          }
+        ],
+        "summary": "Get an Inventory Preload record\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-04-23",
+        "x-required-privileges": [
+          "inventory-preload-records:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read Inventory Preload Records"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Updates an Inventory Preload record.\n\n**Required Permissions:** `inventory-preload-records:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Inventory Preload identifier",
+            "explode": false,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryPreloadRecord"
+              }
+            }
+          },
+          "description": "Inventory Preload record to update",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryPreloadRecord"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Inventory Preload record with specified id does not exist"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "inventory-preload-records:update"
+            ]
+          }
+        ],
+        "summary": "Update an Inventory Preload record\n",
+        "tags": [
+          "inventory-preload"
+        ],
+        "x-deprecation-date": "2020-04-23",
         "x-required-privileges": [
           "inventory-preload-records:update"
         ],
@@ -36959,6 +39837,137 @@
         "tags": [
           "jamf-pro-server-url-preview"
         ],
+        "x-required-privileges": [
+          "jss-url:update"
+        ],
+        "x-required-privileges-legacy": [
+          "Update JSS URL"
+        ]
+      }
+    },
+    "/v1/jamf-pro-server-url/history": {
+      "get": {
+        "description": "Gets Jamf Pro Server URL settings history\n\n**Required Permissions:** `jss-url:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          },
+          {
+            "$ref": "#/components/parameters/pagesize"
+          },
+          {
+            "$ref": "#/components/parameters/page-size"
+          },
+          {
+            "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+            "explode": true,
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "date:desc",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResults"
+                }
+              }
+            },
+            "description": "Details of Jamf Pro Server URL settings history were found"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "jss-url:read"
+            ]
+          }
+        ],
+        "summary": "Get Jamf Pro Server URL settings history\n",
+        "tags": [
+          "jamf-pro-server-url-preview"
+        ],
+        "x-required-privileges": [
+          "jss-url:read"
+        ],
+        "x-required-privileges-legacy": [
+          "Read JSS URL"
+        ]
+      },
+      "post": {
+        "description": "Adds Jamf Pro Server URL settings history notes\n\n**Required Permissions:** `jss-url:update`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectHistoryNote"
+              }
+            }
+          },
+          "description": "History notes to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectHistory"
+                }
+              }
+            },
+            "description": "Notes to Jamf Pro Server URL settings history were added"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro Server URL is managed by Jamf Cloud"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Jamf Pro Server URL history does not exist."
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "jss-url:update"
+            ]
+          }
+        ],
+        "summary": "Add Jamf Pro Server URL settings history notes\n",
+        "tags": [
+          "jamf-pro-server-url-preview"
+        ],
+        "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "jss-url:update"
         ],
@@ -38605,6 +41614,100 @@
         ],
         "x-required-privileges": [
           "m2m:read"
+        ]
+      }
+    },
+    "/v1/macos-managed-software-updates/send-updates": {
+      "post": {
+        "deprecated": true,
+        "description": "Sends MacOs Managed Software Updates\n\n**Required Permissions:** `device-actions:execute`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "MacOsManagedSoftwareUpdateDeviceIds": {
+                  "value": {
+                    "applyMajorUpdate": false,
+                    "deviceIds": [
+                      "1",
+                      "2",
+                      "3",
+                      "4"
+                    ],
+                    "forceRestart": false,
+                    "maxDeferrals": 7,
+                    "priority": "HIGH",
+                    "skipVersionVerification": false,
+                    "updateAction": "DOWNLOAD_AND_INSTALL",
+                    "version": "12.0.1"
+                  }
+                },
+                "MacOsManagedSoftwareUpdateGroupId": {
+                  "value": {
+                    "applyMajorUpdate": false,
+                    "forceRestart": false,
+                    "groupId": 1,
+                    "maxDeferrals": 7,
+                    "priority": "HIGH",
+                    "skipVersionVerification": false,
+                    "updateAction": "DOWNLOAD_AND_INSTALL",
+                    "version": "12.0.1"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/MacOsManagedSoftwareUpdate"
+              }
+            }
+          },
+          "description": "MacOs Managed Software Update to send",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MacOsManagedSoftwareUpdateResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "device-actions:execute"
+            ]
+          }
+        ],
+        "summary": "Send MacOs Managed Software Updates",
+        "tags": [
+          "macos-managed-software-updates"
+        ],
+        "x-action": true,
+        "x-deprecation-date": "2022-10-17",
+        "x-required-privileges": [
+          "device-actions:execute"
+        ],
+        "x-required-privileges-legacy": [
+          "Send Computer Remote Command to Download and Install OS X Update"
         ]
       }
     },

@@ -482,18 +482,18 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "create" }}
 // {{ .Comment }}
 {{- if .ReturnsSlice }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
 {{- else }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 {{- if .ContentType }}
-	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
+	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
 {{- else }}
-	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, {{ statusConst .ExpectedStatus }}, &result); err != nil {
+	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, {{ statusConst .ExpectedStatus }}, &result); err != nil {
 {{- end }}
 		return nil, fmt.Errorf({{ errWrap . }})
 	}

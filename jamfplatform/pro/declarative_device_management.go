@@ -61,3 +61,20 @@ func (c *Client) SyncDdmV1(ctx context.Context, clientManagementID string) error
 	}
 	return nil
 }
+
+// GetDssDeclarationsV1 retrieve an existing declaration.
+//
+// Required privileges: declarations:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
+//
+// Parameters:
+//   - declarationID: Declaration UUID.
+func (c *Client) GetDssDeclarationsV1(ctx context.Context, declarationID string) (*DssDeclarations, error) {
+	prefix := c.transport.APIPrefix("pro", "v1")
+	var result DssDeclarations
+	endpoint := fmt.Sprintf("%s/dss-declarations/%s", prefix, url.PathEscape(declarationID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDssDeclarationsV1(%s): %w", declarationID, err)
+	}
+	return &result, nil
+}

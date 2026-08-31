@@ -48,6 +48,49 @@ func TestAcceptance_Pro_Patch_PolicyPropertiesV1(t *testing.T) {
 	}
 }
 
+// TestAcceptance_Pro_Patch_PolicyPropertiesSettings covers the deprecated
+// unversioned alias at /settings/obj/policyProperties, whose successor is the
+// /v1/policy-properties pair above.
+//
+// The spec declares 201 on the PUT and the server answers 200 (wire-verified
+// 2026-08-31), so config pins expectedStatus to 200; a regression there surfaces
+// here as an "unexpected status code" error rather than a wrong value.
+func TestAcceptance_Pro_Patch_PolicyPropertiesSettings(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	props, err := p.GetPolicyPropertiesSettings(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetPolicyPropertiesSettings: %v", err)
+	}
+	t.Logf("Got policy properties (settings alias): %+v", props)
+
+	// The alias and its successor must report the same tenant state. They do
+	// not share a schema — the alias sends isAllowNetworkStateChangeTriggers,
+	// the successor allowNetworkStateChangeTriggers — so the comparison is on
+	// the value, not the struct.
+	canonical, err := p.GetPolicyPropertiesV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetPolicyPropertiesV1: %v", err)
+	}
+	switch {
+	case props.IsAllowNetworkStateChangeTriggers == nil || canonical.AllowNetworkStateChangeTriggers == nil:
+		t.Errorf("allowNetworkStateChangeTriggers omitted by one surface: alias=%v v1=%v",
+			props.IsAllowNetworkStateChangeTriggers, canonical.AllowNetworkStateChangeTriggers)
+	case *props.IsAllowNetworkStateChangeTriggers != *canonical.AllowNetworkStateChangeTriggers:
+		t.Errorf("allowNetworkStateChangeTriggers: settings alias says %v, /v1/policy-properties says %v",
+			*props.IsAllowNetworkStateChangeTriggers, *canonical.AllowNetworkStateChangeTriggers)
+	}
+
+	if _, err := p.UpdatePolicyPropertiesSettings(ctx, props); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdatePolicyPropertiesSettings: %v", err)
+	}
+}
+
 // --- patch-management ---------------------------------------------------
 
 // AcceptPatchManagementDisclaimerV2 is a tenant-wide one-way setting.

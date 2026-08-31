@@ -1351,14 +1351,25 @@ func detectPaginatedItemType(op *openapi3.Operation, resultsField string) string
 	if resp == nil || resp.Value == nil {
 		return "any"
 	}
-	for _, content := range resp.Value.Content {
-		if content.Schema == nil {
+	// Two passes over deterministically ordered content types, because an
+	// operation can declare several and they need not agree. Iterating the
+	// Content map directly made the item type depend on Go's randomised map
+	// order: pro's GET /inventory-preload declares the envelope under
+	// text/csv but an *array of* that envelope under application/json (a spec
+	// bug — the wire sends the bare envelope, confirmed 2026-08-31), so the
+	// same config generated either InventoryPreloadRecord or
+	// InventoryPreloadRecordSearchResults from run to run.
+	//
+	// The envelope form wins over the raw-array form for the same reason: a
+	// resultsField match is positive evidence of the pagination wrapper this
+	// function exists to see through, whereas the array branch is a fallback
+	// for the "rawArray" style that cannot tell a genuine top-level array
+	// from a mis-declared wrapper.
+	for _, content := range sortedContentEntries(resp.Value.Content) {
+		if content.Schema == nil || content.Schema.Value == nil {
 			continue
 		}
 		schema := content.Schema.Value
-		if schema == nil {
-			continue
-		}
 		// allOf composition (pagination wrapper)
 		for _, part := range schema.AllOf {
 			if part.Value == nil {
@@ -1372,9 +1383,14 @@ func detectPaginatedItemType(op *openapi3.Operation, resultsField string) string
 		if r := schema.Properties[resultsField]; r != nil && r.Value != nil && r.Value.Items != nil {
 			return refName(r.Value.Items)
 		}
-		// Raw array response — no wrapper, items live at the top level.
-		// Paired with pagination style "rawArray" in config.
-		if schema.Type.Is("array") && schema.Items != nil {
+	}
+	// Raw array response — no wrapper, items live at the top level.
+	// Paired with pagination style "rawArray" in config.
+	for _, content := range sortedContentEntries(resp.Value.Content) {
+		if content.Schema == nil || content.Schema.Value == nil {
+			continue
+		}
+		if schema := content.Schema.Value; schema.Type.Is("array") && schema.Items != nil {
 			return refName(schema.Items)
 		}
 	}

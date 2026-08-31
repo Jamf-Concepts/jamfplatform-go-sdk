@@ -240,3 +240,62 @@ func TestSchemaToDiscriminatorTypeGroupsSharedVariants(t *testing.T) {
 		}
 	}
 }
+
+// pro's GET /inventory-preload declares two content types that disagree:
+// text/csv carries the pagination envelope directly, while application/json
+// carries an *array of* that envelope. The wire sends the bare envelope
+// (probed 2026-08-31), so the envelope form is the correct reading.
+//
+// Two failures are pinned here. Iterating the Content map directly made the
+// answer depend on Go's randomised map order, so the same config generated
+// either element type from run to run — and the array branch winning at all
+// produced a list method returning []InventoryPreloadRecordSearchResults, one
+// level of nesting off, which compiles and decodes into empty structs.
+func TestDetectPaginatedItemTypePrefersEnvelopeOverArrayOfEnvelope(t *testing.T) {
+	envelope := openapi3.NewObjectSchema()
+	envelope.Properties = openapi3.Schemas{
+		"totalCount": {Value: openapi3.NewIntegerSchema()},
+		"results": {Value: &openapi3.Schema{
+			Type:  types("array"),
+			Items: &openapi3.SchemaRef{Ref: "#/components/schemas/InventoryPreloadRecord", Value: openapi3.NewObjectSchema()},
+		}},
+	}
+	envelopeRef := &openapi3.SchemaRef{Ref: "#/components/schemas/InventoryPreloadRecordSearchResults", Value: envelope}
+
+	resp := openapi3.NewResponse().WithDescription("OK")
+	resp.Content = openapi3.Content{
+		// Alphabetically first, and the mis-declared one — so a fix that only
+		// sorted the keys without preferring the envelope would still fail.
+		"application/json": &openapi3.MediaType{Schema: &openapi3.SchemaRef{Value: &openapi3.Schema{
+			Type:  types("array"),
+			Items: envelopeRef,
+		}}},
+		"text/csv": &openapi3.MediaType{Schema: envelopeRef},
+	}
+	op := &openapi3.Operation{Responses: openapi3.NewResponses(openapi3.WithStatus(200, &openapi3.ResponseRef{Value: resp}))}
+
+	// Run repeatedly: a single pass can pick the right answer by luck when the
+	// selection depends on map order.
+	for i := range 50 {
+		if got := detectPaginatedItemType(op, ""); got != "InventoryPreloadRecord" {
+			t.Fatalf("iteration %d: detectPaginatedItemType = %q, want InventoryPreloadRecord", i, got)
+		}
+	}
+}
+
+// The raw-array fallback must survive the envelope-first reordering: pagination
+// style "rawArray" exists for endpoints that really do return a bare array.
+func TestDetectPaginatedItemTypeStillHandlesRawArray(t *testing.T) {
+	resp := openapi3.NewResponse().WithDescription("OK")
+	resp.Content = openapi3.Content{
+		"application/json": &openapi3.MediaType{Schema: &openapi3.SchemaRef{Value: &openapi3.Schema{
+			Type:  types("array"),
+			Items: &openapi3.SchemaRef{Ref: "#/components/schemas/SiteObject", Value: openapi3.NewObjectSchema()},
+		}}},
+	}
+	op := &openapi3.Operation{Responses: openapi3.NewResponses(openapi3.WithStatus(200, &openapi3.ResponseRef{Value: resp}))}
+
+	if got := detectPaginatedItemType(op, ""); got != "SiteObject" {
+		t.Fatalf("detectPaginatedItemType = %q, want SiteObject", got)
+	}
+}

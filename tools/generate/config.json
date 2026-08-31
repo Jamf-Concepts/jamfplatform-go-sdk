@@ -2364,7 +2364,8 @@
         },
         {
           "op": "POST /v1/inventory-preload/history",
-          "name": "CreateInventoryPreloadHistoryNoteV1"
+          "name": "CreateInventoryPreloadHistoryNoteV1",
+          "expectedStatus": 200
         },
         {
           "op": "POST /v2/inventory-preload/history",
@@ -5006,6 +5007,199 @@
         {
           "op": "GET /v1/user-sessions/count",
           "name": "GetActiveUsersCountV1"
+        },
+        {
+          "op": "GET /preview/remote-administration-configurations",
+          "name": "ListRemoteAdministrationConfigurationsPreview",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "POST /preview/remote-administration-configurations/team-viewer",
+          "name": "CreateTeamViewerConfigurationPreview",
+          "expectedStatus": 201
+        },
+        {
+          "op": "GET /preview/remote-administration-configurations/team-viewer/{id}",
+          "name": "GetTeamViewerConfigurationPreview"
+        },
+        {
+          "op": "PATCH /preview/remote-administration-configurations/team-viewer/{id}",
+          "name": "UpdateTeamViewerConfigurationPreview"
+        },
+        {
+          "op": "DELETE /preview/remote-administration-configurations/team-viewer/{id}",
+          "name": "DeleteTeamViewerConfigurationPreview",
+          "expectedStatus": 204
+        },
+        {
+          "op": "GET /preview/remote-administration-configurations/team-viewer/{id}/status",
+          "name": "GetTeamViewerConfigurationStatusPreview"
+        },
+        {
+          "op": "GET /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions",
+          "name": "ListTeamViewerSessionsPreview",
+          "pagination": "totalCount",
+          "params": [
+            "filter"
+          ]
+        },
+        {
+          "op": "POST /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions",
+          "name": "CreateTeamViewerSessionPreview",
+          "expectedStatus": 201
+        },
+        {
+          "op": "GET /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}",
+          "name": "GetTeamViewerSessionPreview"
+        },
+        {
+          "op": "GET /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/status",
+          "name": "GetTeamViewerSessionStatusPreview"
+        },
+        {
+          "op": "POST /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/close",
+          "name": "CloseTeamViewerSessionPreview",
+          "expectedStatus": 204
+        },
+        {
+          "op": "POST /preview/remote-administration-configurations/team-viewer/{configurationId}/sessions/{sessionId}/resend-notification",
+          "name": "ResendTeamViewerSessionNotificationPreview",
+          "expectedStatus": 204
+        },
+        {
+          "op": "GET /v1/cache-settings",
+          "name": "GetCacheSettingsV1"
+        },
+        {
+          "op": "PUT /v1/cache-settings",
+          "name": "UpdateCacheSettingsV1"
+        },
+        {
+          "op": "GET /v1/dss-declarations/{declarationId}",
+          "name": "GetDssDeclarationsV1"
+        },
+        {
+          "op": "GET /v1/jamf-pro-server-url/history",
+          "name": "ListJamfProServerURLHistoryV1",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string"
+          ]
+        },
+        {
+          "op": "POST /v1/jamf-pro-server-url/history",
+          "name": "CreateJamfProServerURLHistoryNoteV1",
+          "expectedStatus": 201
+        },
+        {
+          "op": "GET /v1/inventory-preload",
+          "name": "ListInventoryPreloadRecordsV1",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string"
+          ]
+        },
+        {
+          "op": "GET /v1/inventory-preload/{id}",
+          "name": "GetInventoryPreloadRecordV1"
+        },
+        {
+          "op": "POST /v1/inventory-preload",
+          "name": "CreateInventoryPreloadRecordV1",
+          "expectedStatus": 201
+        },
+        {
+          "op": "PUT /v1/inventory-preload/{id}",
+          "name": "UpdateInventoryPreloadRecordV1"
+        },
+        {
+          "op": "DELETE /v1/inventory-preload/{id}",
+          "name": "DeleteInventoryPreloadRecordV1",
+          "expectedStatus": 204
+        },
+        {
+          "op": "DELETE /v1/inventory-preload",
+          "name": "DeleteAllInventoryPreloadRecordsV1",
+          "expectedStatus": 204
+        },
+        {
+          "op": "POST /v1/inventory-preload/validate-csv",
+          "name": "ValidateInventoryPreloadCsvV1",
+          "contentType": "text/csv",
+          "requestType": "[]byte"
+        },
+        {
+          "op": "GET /inventory-preload",
+          "name": "ListInventoryPreloadRecords",
+          "pagination": "totalCount",
+          "pageSizeParam": "pagesize",
+          "params": [
+            "sort:[]string",
+            "sortBy"
+          ]
+        },
+        {
+          "op": "GET /inventory-preload/{id}",
+          "name": "GetInventoryPreloadRecord"
+        },
+        {
+          "op": "POST /inventory-preload",
+          "name": "CreateInventoryPreloadRecord",
+          "expectedStatus": 201
+        },
+        {
+          "op": "PUT /inventory-preload/{id}",
+          "name": "UpdateInventoryPreloadRecord"
+        },
+        {
+          "op": "DELETE /inventory-preload/{id}",
+          "name": "DeleteInventoryPreloadRecord",
+          "expectedStatus": 204
+        },
+        {
+          "op": "DELETE /inventory-preload",
+          "name": "DeleteAllInventoryPreloadRecords",
+          "expectedStatus": 204
+        },
+        {
+          "op": "POST /inventory-preload/validate-csv",
+          "name": "ValidateInventoryPreloadCsv",
+          "contentType": "text/csv",
+          "requestType": "[]byte"
+        },
+        {
+          "op": "GET /inventory-preload/csv-template",
+          "name": "DownloadInventoryPreloadCsvTemplate"
+        },
+        {
+          "op": "GET /inventory-preload/history",
+          "name": "ListInventoryPreloadHistory",
+          "pagination": "totalCount",
+          "params": [
+            "sort:[]string"
+          ]
+        },
+        {
+          "op": "POST /inventory-preload/history/notes",
+          "name": "CreateInventoryPreloadHistoryNote",
+          "expectedStatus": 200
+        },
+        {
+          "op": "GET /settings/obj/policyProperties",
+          "name": "GetPolicyPropertiesSettings"
+        },
+        {
+          "op": "PUT /settings/obj/policyProperties",
+          "name": "UpdatePolicyPropertiesSettings",
+          "expectedStatus": 200
+        },
+        {
+          "op": "GET /v1/cloud-azure/defaults/mappings",
+          "name": "GetCloudAzureDefaultMappingsV1"
+        },
+        {
+          "op": "POST /v1/macos-managed-software-updates/send-updates",
+          "name": "SendMacOsManagedSoftwareUpdatesV1"
         }
       ]
     },

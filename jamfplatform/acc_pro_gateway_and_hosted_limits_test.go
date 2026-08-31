@@ -1,0 +1,197 @@
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+//go:build acceptance
+
+package jamfplatform_test
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
+)
+
+// Four pro operations that are correct as generated and structurally refused on
+// a Jamf Cloud tenant. Each test pins the *refusal*, and each is written to fail
+// the day it lifts — at which point replace it with the real assertion rather
+// than deleting it.
+//
+// All four were classified on 2026-08-31 against eu.api.jamfcloud.com with a
+// known-good control (GET /pro/v1/jamf-pro-version) in the same invocation.
+//
+// The two gateway cases are distinguishable from a privilege denial by response
+// shape: the gateway emits compact JSON carrying a traceId and
+// errors[].code == BAD_PERMISSIONS, byte-for-byte the same as a deliberately
+// bogus path (GET /pro/v1/zzz-not-a-real-endpoint), whereas Jamf Pro's own
+// responses are pretty-printed. Both were additionally shown *not* to be
+// privilege denials by exercising a different, already-shipping operation that
+// requires the same privilege and succeeds — see each test.
+
+// gatewayUnrouted reports whether err is the gateway refusing to route a path
+// at all, as opposed to Jamf Pro denying an authenticated request.
+func gatewayUnrouted(t *testing.T, method string, err error) bool {
+	t.Helper()
+	if err == nil {
+		return false
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("%s: non-API error, the request did not reach the gateway: %v", method, err)
+	}
+	if !apiErr.HasStatus(403) {
+		t.Fatalf("%s: want the gateway's 403 BAD_PERMISSIONS, got status %d: %v", method, apiErr.StatusCode, err)
+	}
+	for _, d := range apiErr.Details() {
+		if d.Code == "BAD_PERMISSIONS" {
+			t.Logf("%s: still unrouted at the gateway (403 BAD_PERMISSIONS)", method)
+			return true
+		}
+	}
+	t.Fatalf("%s: 403 but not BAD_PERMISSIONS, so the failure is not the documented one: %v", method, err)
+	return false
+}
+
+// TestAcceptance_Pro_DssDeclarationsUnroutedAtGateway pins
+// GET /v1/dss-declarations/{declarationId}.
+//
+// routes.yaml declares it with declarations:read, and this credential holds that
+// privilege — the ddmreport operations that require the same string
+// (ListDeclarationReportClients, GetDeviceDeclarationReport) both answer 200 for
+// it. So the 403 is the path, not the grant.
+func TestAcceptance_Pro_DssDeclarationsUnroutedAtGateway(t *testing.T) {
+	c := accClient(t)
+
+	_, err := pro.New(c).GetDssDeclarationsV1(context.Background(), "00000000-0000-0000-0000-000000000000")
+	if err == nil {
+		t.Fatal("GetDssDeclarationsV1 now answers — the gateway has started routing " +
+			"GET /pro/v1/dss-declarations/{declarationId}. Replace this test with real coverage: " +
+			"list declarations via the ddmreport package, then assert the returned Declarations payload.")
+	}
+	skipOnServerError(t, err)
+	if !gatewayUnrouted(t, "GetDssDeclarationsV1", err) {
+		t.Fatalf("GetDssDeclarationsV1 failed for an unexpected reason: %v", err)
+	}
+}
+
+// TestAcceptance_Pro_JamfProServerURLHistoryNoteUnroutedAtGateway pins
+// POST /v1/jamf-pro-server-url/history.
+//
+// GET on the very same path is routed and answers 200 (see
+// TestAcceptance_Pro_Settings_JamfProServerURLHistoryV1), so this is a
+// method-level gap rather than a path-level one. The privilege is jss-url:update
+// and this credential holds it: PUT /pro/v1/jamf-pro-server-url reaches Jamf Pro
+// and returns 415 for an unsupported media type, which cannot happen if the
+// gateway had refused the request.
+func TestAcceptance_Pro_JamfProServerURLHistoryNoteUnroutedAtGateway(t *testing.T) {
+	c := accClient(t)
+
+	_, err := pro.New(c).CreateJamfProServerURLHistoryNoteV1(context.Background(), &pro.ObjectHistoryNote{
+		Note: "sdk-acc jamf-pro-server-url history probe",
+	})
+	if err == nil {
+		t.Fatal("CreateJamfProServerURLHistoryNoteV1 now answers — the gateway has started routing " +
+			"POST /pro/v1/jamf-pro-server-url/history. Replace this test with a real round-trip: " +
+			"create the note, then find it via ListJamfProServerURLHistoryV1.")
+	}
+	skipOnServerError(t, err)
+	if !gatewayUnrouted(t, "CreateJamfProServerURLHistoryNoteV1", err) {
+		t.Fatalf("CreateJamfProServerURLHistoryNoteV1 failed for an unexpected reason: %v", err)
+	}
+}
+
+// --- cache-settings ----------------------------------------------------
+
+func TestAcceptance_Pro_CacheSettings_GetV1(t *testing.T) {
+	c := accClient(t)
+
+	settings, err := pro.New(c).GetCacheSettingsV1(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetCacheSettingsV1: %v", err)
+	}
+	if settings.CacheType == "" {
+		t.Error("GetCacheSettingsV1 returned an empty cacheType")
+	}
+	t.Logf("Cache settings: cacheType=%q ttl=%ds directoryTtl=%v endpoints=%d",
+		settings.CacheType, settings.TimeToLiveSeconds, settings.DirectoryTimeToLiveSeconds, len(settings.MemcachedEndpoints))
+}
+
+// TestAcceptance_Pro_CacheSettings_UpdateV1RefusedOnHostedTenant pins the fact
+// that PUT /v1/cache-settings is routed but permanently unavailable on Jamf
+// Cloud: the endpoint itself answers 403 HOSTED_ENVIRONMENT ("PUT command is not
+// available in hosted environments"), pretty-printed by Jamf Pro rather than the
+// gateway. The body sent is the tenant's current settings read back unchanged,
+// so the call cannot alter anything even on an on-premise tenant where it works.
+func TestAcceptance_Pro_CacheSettings_UpdateV1RefusedOnHostedTenant(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	current, err := p.GetCacheSettingsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetCacheSettingsV1: %v", err)
+	}
+
+	_, err = p.UpdateCacheSettingsV1(ctx, current)
+	if err == nil {
+		t.Log("UpdateCacheSettingsV1 succeeded — this tenant is not a hosted environment, " +
+			"so the write-back round-trip is the real assertion here")
+		return
+	}
+	skipOnServerError(t, err)
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("UpdateCacheSettingsV1: non-API error: %v", err)
+	}
+	if !apiErr.HasStatus(403) {
+		t.Fatalf("UpdateCacheSettingsV1: want 403 HOSTED_ENVIRONMENT on a hosted tenant, got status %d: %v", apiErr.StatusCode, err)
+	}
+	for _, d := range apiErr.Details() {
+		if d.Code == "HOSTED_ENVIRONMENT" {
+			t.Logf("UpdateCacheSettingsV1: refused by Jamf Pro as a hosted environment, as documented")
+			return
+		}
+	}
+	t.Fatalf("UpdateCacheSettingsV1: 403 but not HOSTED_ENVIRONMENT: %v", err)
+}
+
+// --- macos-managed-software-updates (deprecated) -----------------------
+
+// TestAcceptance_Pro_SendMacOsManagedSoftwareUpdatesV1SupersededByPlans pins
+// POST /v1/macos-managed-software-updates/send-updates, the deprecated
+// predecessor of the managed-software-updates plans API.
+//
+// The empty request body is deliberate and is what makes this safe to run: the
+// tenant-level toggle check runs before field validation, so a tenant with
+// Managed Software Update Plans enabled answers 503 without looking at the body,
+// and a tenant with it disabled rejects the empty body on field validation
+// before any device is targeted. Neither path can send an update to a real
+// device.
+func TestAcceptance_Pro_SendMacOsManagedSoftwareUpdatesV1SupersededByPlans(t *testing.T) {
+	c := accClient(t)
+
+	_, err := pro.New(c).SendMacOsManagedSoftwareUpdatesV1(context.Background(), &pro.MacOsManagedSoftwareUpdate{})
+	if err == nil {
+		t.Fatal("SendMacOsManagedSoftwareUpdatesV1 accepted an empty request body — it must be rejected, " +
+			"either by the Managed Software Update Plans toggle (503) or by field validation (400)")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("SendMacOsManagedSoftwareUpdatesV1: non-API error: %v", err)
+	}
+	switch {
+	case apiErr.HasStatus(503):
+		t.Logf("SendMacOsManagedSoftwareUpdatesV1: refused because Managed Software Update Plans is enabled, " +
+			"which is the expected state for a modern tenant — use CreateManagedSoftwareUpdatePlanV1 instead")
+	case apiErr.HasStatus(400):
+		t.Logf("SendMacOsManagedSoftwareUpdatesV1: Managed Software Update Plans is disabled on this tenant and " +
+			"the empty body was rejected by field validation, which is the other documented outcome")
+	default:
+		t.Fatalf("SendMacOsManagedSoftwareUpdatesV1: want 503 (plans toggle on) or 400 (field validation), got status %d: %v",
+			apiErr.StatusCode, err)
+	}
+}

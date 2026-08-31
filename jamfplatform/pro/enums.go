@@ -3088,6 +3088,31 @@ func InventoryListMobileDeviceBatteryHealthValues() []InventoryListMobileDeviceB
 	}
 }
 
+// InventoryPreloadRecordDeviceType is the set of values accepted by InventoryPreloadRecord.DeviceType.
+type InventoryPreloadRecordDeviceType = string
+
+// InventoryPreloadRecordDeviceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	InventoryPreloadRecordDeviceTypeComputer     InventoryPreloadRecordDeviceType = "Computer"
+	InventoryPreloadRecordDeviceTypeMobileDevice InventoryPreloadRecordDeviceType = "Mobile Device"
+	InventoryPreloadRecordDeviceTypeUnknown      InventoryPreloadRecordDeviceType = "Unknown"
+)
+
+// InventoryPreloadRecordDeviceTypeValues returns every value the Jamf API accepts for InventoryPreloadRecordDeviceType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func InventoryPreloadRecordDeviceTypeValues() []InventoryPreloadRecordDeviceType {
+	return []InventoryPreloadRecordDeviceType{
+		InventoryPreloadRecordDeviceTypeComputer,
+		InventoryPreloadRecordDeviceTypeMobileDevice,
+		InventoryPreloadRecordDeviceTypeUnknown,
+	}
+}
+
 // InventoryPreloadRecordV2DeviceType is the set of values accepted by InventoryPreloadRecordV2.DeviceType.
 type InventoryPreloadRecordV2DeviceType = string
 
@@ -3241,6 +3266,52 @@ func LinkedConnectProfileAutoDeploymentTypeValues() []LinkedConnectProfileAutoDe
 		LinkedConnectProfileAutoDeploymentTypeMinorAndPatchUpdates,
 		LinkedConnectProfileAutoDeploymentTypeInitialInstallationOnly,
 		LinkedConnectProfileAutoDeploymentTypeNone,
+	}
+}
+
+// MacOsManagedSoftwareUpdatePriority is the set of values accepted by MacOsManagedSoftwareUpdate.Priority.
+type MacOsManagedSoftwareUpdatePriority = string
+
+// MacOsManagedSoftwareUpdatePriority values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MacOsManagedSoftwareUpdatePriorityHigh MacOsManagedSoftwareUpdatePriority = "HIGH"
+	MacOsManagedSoftwareUpdatePriorityLow  MacOsManagedSoftwareUpdatePriority = "LOW"
+)
+
+// MacOsManagedSoftwareUpdatePriorityValues returns every value the Jamf API accepts for MacOsManagedSoftwareUpdatePriority,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func MacOsManagedSoftwareUpdatePriorityValues() []MacOsManagedSoftwareUpdatePriority {
+	return []MacOsManagedSoftwareUpdatePriority{
+		MacOsManagedSoftwareUpdatePriorityHigh,
+		MacOsManagedSoftwareUpdatePriorityLow,
+	}
+}
+
+// MacOsManagedSoftwareUpdateUpdateAction is the set of values accepted by MacOsManagedSoftwareUpdate.UpdateAction.
+type MacOsManagedSoftwareUpdateUpdateAction = string
+
+// MacOsManagedSoftwareUpdateUpdateAction values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MacOsManagedSoftwareUpdateUpdateActionDownloadAndInstall MacOsManagedSoftwareUpdateUpdateAction = "DOWNLOAD_AND_INSTALL"
+	MacOsManagedSoftwareUpdateUpdateActionDownloadOnly       MacOsManagedSoftwareUpdateUpdateAction = "DOWNLOAD_ONLY"
+)
+
+// MacOsManagedSoftwareUpdateUpdateActionValues returns every value the Jamf API accepts for MacOsManagedSoftwareUpdateUpdateAction,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func MacOsManagedSoftwareUpdateUpdateActionValues() []MacOsManagedSoftwareUpdateUpdateAction {
+	return []MacOsManagedSoftwareUpdateUpdateAction{
+		MacOsManagedSoftwareUpdateUpdateActionDownloadAndInstall,
+		MacOsManagedSoftwareUpdateUpdateActionDownloadOnly,
 	}
 }
 
@@ -5034,6 +5105,31 @@ func SelfServiceLoginSettingsUserLoginLevelValues() []SelfServiceLoginSettingsUs
 	}
 }
 
+// SessionDetailsState is the set of values accepted by SessionDetails.State.
+type SessionDetailsState = string
+
+// SessionDetailsState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionDetailsStateOpen    SessionDetailsState = "OPEN"
+	SessionDetailsStateClosed  SessionDetailsState = "CLOSED"
+	SessionDetailsStateUnknown SessionDetailsState = "UNKNOWN"
+)
+
+// SessionDetailsStateValues returns every value the Jamf API accepts for SessionDetailsState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SessionDetailsStateValues() []SessionDetailsState {
+	return []SessionDetailsState{
+		SessionDetailsStateOpen,
+		SessionDetailsStateClosed,
+		SessionDetailsStateUnknown,
+	}
+}
+
 // SessionHistoryItemSessionType is the set of values accepted by SessionHistoryItem.SessionType.
 type SessionHistoryItemSessionType = string
 
@@ -5127,6 +5223,31 @@ func SessionHistoryItemWithDetailsStatusTypeValues() []SessionHistoryItemWithDet
 		SessionHistoryItemWithDetailsStatusTypeStarted,
 		SessionHistoryItemWithDetailsStatusTypeFinished,
 		SessionHistoryItemWithDetailsStatusTypeError,
+	}
+}
+
+// SessionStatusSessionState is the set of values accepted by SessionStatus.SessionState.
+type SessionStatusSessionState = string
+
+// SessionStatusSessionState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionStatusSessionStateOpen    SessionStatusSessionState = "OPEN"
+	SessionStatusSessionStateClosed  SessionStatusSessionState = "CLOSED"
+	SessionStatusSessionStateUnknown SessionStatusSessionState = "UNKNOWN"
+)
+
+// SessionStatusSessionStateValues returns every value the Jamf API accepts for SessionStatusSessionState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SessionStatusSessionStateValues() []SessionStatusSessionState {
+	return []SessionStatusSessionState{
+		SessionStatusSessionStateOpen,
+		SessionStatusSessionStateClosed,
+		SessionStatusSessionStateUnknown,
 	}
 }
 
