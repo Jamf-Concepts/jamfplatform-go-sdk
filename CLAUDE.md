@@ -120,10 +120,17 @@ work and **the failure lands on authentication**, because `TokenURL` is
 `baseURL + "/auth/token"` — which is why `annotateTokenError` special-cases 404 on
 the token exchange and names the base URL.
 
-**Every published spec's `servers` block is wrong about this**, and about
-AI Governance's namespace, and about the Security Cloud stage host. The gateway is
-the authority. The SDK never reads `servers`, so specs are ingested verbatim and
-the disagreement reported upstream — **do not patch the transport to follow them.**
+**`servers` is never the authority — the gateway is.** The SDK never reads it, so
+specs are ingested verbatim and any disagreement is reported upstream; **do not
+patch the transport to follow them.** As of v1877 the disagreement has largely
+closed: every `external/` spec now declares the gateway root with no `/api`
+segment, and v1877 fixed the last one — AI Governance's namespace, from
+`/ai-governance/policies` to `/ai/governance/policies`, which the SDK had been
+generating with slashes since the ingest. The `internal/stage` specs still declare
+`https://{region}.api.stage.platform.jamflabs.com/api/...`, which is correct for
+stage and wrong for a prod caller — and that is the variant the five Security
+Cloud specs and the two held account specs are sourced from, so a stage-sourced
+`servers` block still must not be followed.
 
 ### The tenant is a request header, not a path segment
 
@@ -281,7 +288,7 @@ a method that ignores the cursor fails.
 
 **Security Cloud provenance, and the one trap that silently replaces a spec:**
 
-| `testing/` file | v1872 source |
+| `testing/` file | v1877 source |
 |---|---|
 | `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` |
 | `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` |
@@ -329,7 +336,18 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1872** (2026-08-29), except:
+Ingested through **v1877** (2026-08-30), except:
+
+v1877 moved **one line**: AI Governance's `servers` URL (and the matching
+`_permissions/routes.yaml` domain key). Every other file outside `internal/dev`
+was byte-identical to v1872 — 9 changed files, of which 4 were manifests and the
+unified rollup. The archive was 8 bytes smaller. Nothing in `jamfplatform/`
+changed; the only generated diff was the URL string in
+`api/ai_governance_policies_api.json`. The ingest also replaced
+`testing/ai-governance-api.yaml`'s **re-emitted** YAML with the bundle file
+verbatim, so future AI Governance bundle diffs are exact — the same repair the
+account files got.
+
 
 | held | why |
 |---|---|
@@ -413,7 +431,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
 | `securitycloud` | `securitycloud` | tenant (own identifier) | 47 ops across five specs |
 | `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** |
-| `aigovernance` | `ai/governance/policies` | environment | slashes, not the spec's hyphens |
+| `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
 | `audit` | `audit` | environment | compiles; every call 403s pending an `audit:read` grant |
 
 `account` is the documented exception to package-follows-namespace. It is also the

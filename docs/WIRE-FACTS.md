@@ -734,11 +734,17 @@ region the server itself returns.
 
 ## AI Governance (`aigovernance`) — environment scope
 
-**The published path is wrong in every variant and the gateway is the authority.**
-Every spec declares `servers: …/api/ai-governance/policies`; the tyk listen_path is
-`/api/ai/governance/policies`, with slashes. The generated form returns 200 with
-real data and the spec's hyphenated form returns `404 page not found`. Do not
-"fix" this by following the spec.
+**The published path was wrong in every variant and the gateway was the
+authority — ~~fixed upstream at v1877~~.** The spec declared
+`servers: …/api/ai-governance/policies` while the tyk listen_path is
+`/api/ai/governance/policies`, with slashes: the generated form returned 200 with
+real data and the spec's hyphenated form `404 page not found`. Reported upstream
+and corrected in v1877 (`external/ai-governance`, and `_permissions/routes.yaml`'s
+domain key with it) — the whole build was that one line. **Nothing in the SDK
+changed**, because the transport never reads `servers`; the only generated diff
+was the URL string inside the published `api/ai_governance_policies_api.json`.
+The lesson stands even though the instance is closed: the gateway is the
+authority, and a `servers` block is not evidence.
 
 **The package is `aigovernance`, not `aigovernancepolicies`, and the gateway
 settles that too:** `…/ai/governance/visibility/v1/policies` answers **403**

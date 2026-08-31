@@ -1380,7 +1380,7 @@
   "servers": [
     {
       "description": "Jamf Beta API Gateway - prod",
-      "url": "https://{region}.api.jamfcloud.com/ai-governance/policies",
+      "url": "https://{region}.api.jamfcloud.com/ai/governance/policies",
       "variables": {
         "region": {
           "default": "us",
