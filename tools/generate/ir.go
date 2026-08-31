@@ -97,14 +97,16 @@ type GoMethod struct {
 	// buildMethod); it stays false on synthetic resolver/apply methods, which
 	// compose underlying endpoints rather than mapping to one operation. A
 	// spec-derived method with no declared privileges has PrivilegesKnown=true
-	// and empty slices — that means the endpoint needs no special privilege
-	// (any authenticated API client may call it), which is distinct from
-	// "unknown". ScopedPrivileges and LegacyPrivileges are INDEPENDENT SETS,
-	// never to be paired by position: their lengths differ on 29 pro
-	// operations and their orders disagree on 9 more. The legacy form is
-	// published only for the Pro family. See privilegeSetsAreNotPairs.
+	// and empty slices — that means the *spec* declares none, which is
+	// distinct from both "unknown" and "none required": the 18 account
+	// methods are empty because the licensing/partners/sso specs carry no
+	// x-required-privileges, while the gateway policy still gates them.
+	// ScopedPrivileges and LegacyPrivileges are INDEPENDENT SETS, never to be
+	// paired by position: their lengths differ on 29 pro operations and their
+	// orders disagree on 9 more. The legacy form is published only for the Pro
+	// family. See privilegeSetsAreNotPairs.
 	PrivilegesKnown  bool
-	ScopedPrivileges []string // modern scoped privilege IDs, e.g. "create:pro:buildings"
+	ScopedPrivileges []string // GA capability permissions, {capability}:{action}, e.g. "buildings:create"
 	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"
 }
 

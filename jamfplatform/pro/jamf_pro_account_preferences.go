@@ -13,7 +13,7 @@ import (
 
 // GetAccountPreferencesV3 get Jamf Pro account preferences.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferencesV6, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result AccountPreferencesV6
@@ -26,7 +26,7 @@ func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferenc
 
 // UpdateAccountPreferencesV3 update Jamf Pro account preferences.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) UpdateAccountPreferencesV3(ctx context.Context, request *AccountPreferencesV6) error {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := prefix + "/account-preferences"

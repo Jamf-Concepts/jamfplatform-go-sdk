@@ -693,14 +693,14 @@ func privilegeComment(m GoMethod) string {
 		return ""
 	}
 	if len(m.ScopedPrivileges) == 0 {
-		return "\n//\n// Required privileges: none (callable by any authenticated API client)."
+		return "\n//\n// Required privileges: the spec declares none."
 	}
 	line := "\n//\n// Required privileges: " + strings.Join(m.ScopedPrivileges, ", ") + "."
 	if len(m.LegacyPrivileges) > 0 {
 		line += " Legacy Jamf Pro privilege name(s): " + strings.Join(m.LegacyPrivileges, ", ") + "."
 	}
 	if len(m.ScopedPrivileges) > 1 {
-		line += "\n// The Jamf API spec does not encode whether these are required together or as alternatives."
+		line += "\n// All of them are required, not alternatives."
 	}
 	// Say so wherever a reader could mistake the two lists for parallel arrays.
 	// They are independent sets: the spec's own ordering differs between them

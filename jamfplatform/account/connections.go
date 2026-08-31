@@ -14,7 +14,7 @@ import (
 
 // ListConnections list Connections.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListConnections(ctx context.Context) ([]ConnectionSummary, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	var result []ConnectionSummary
@@ -27,7 +27,7 @@ func (c *Client) ListConnections(ctx context.Context) ([]ConnectionSummary, erro
 
 // CreateConnection add Connection.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) CreateConnection(ctx context.Context, request *ConnectionRequest) (*Connection, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	var result Connection
@@ -40,7 +40,7 @@ func (c *Client) CreateConnection(ctx context.Context, request *ConnectionReques
 
 // GetConnection get Connection.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - connectionID: Identifier of the connection, as returned in the `id` field of a connection.
@@ -56,7 +56,7 @@ func (c *Client) GetConnection(ctx context.Context, connectionID string) (*Conne
 
 // UpdateConnection update Connection.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - connectionID: Identifier of the connection, as returned in the `id` field of a connection.
@@ -72,7 +72,7 @@ func (c *Client) UpdateConnection(ctx context.Context, connectionID string, requ
 
 // DeleteConnection delete Connection.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - connectionID: Identifier of the connection, as returned in the `id` field of a connection.

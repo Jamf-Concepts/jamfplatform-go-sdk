@@ -32,7 +32,7 @@ func (c *Client) CreateAdcsSettingsV1(ctx context.Context, request *AdcsSettings
 // ValidateAdcsCertificateV1 validate AD CS Settings server certificate.
 //
 // Required privileges: ad-cs-settings:create, ad-cs-settings:update. Legacy Jamf Pro privilege name(s): Update AD CS Settings, Create AD CS Settings.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ValidateAdcsCertificateV1(ctx context.Context, request *AdcsCertificate) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
@@ -46,7 +46,7 @@ func (c *Client) ValidateAdcsCertificateV1(ctx context.Context, request *AdcsCer
 // ValidateAdcsClientCertificateV1 validate AD CS Settings client certificate.
 //
 // Required privileges: ad-cs-settings:create, ad-cs-settings:update. Legacy Jamf Pro privilege name(s): Update AD CS Settings, Create AD CS Settings.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ValidateAdcsClientCertificateV1(ctx context.Context, request *AdcsCertificate) error {
 	prefix := c.transport.APIPrefix("pro", "v1")

@@ -13,7 +13,7 @@ import (
 
 // ListDealRegistrations list Deal Registrations.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListDealRegistrations(ctx context.Context) ([]DealRegistration, error) {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	var result []DealRegistration

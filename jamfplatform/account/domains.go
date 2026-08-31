@@ -14,7 +14,7 @@ import (
 
 // ListDomains list Domains.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListDomains(ctx context.Context) ([]Domain, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	var result []Domain
@@ -27,7 +27,7 @@ func (c *Client) ListDomains(ctx context.Context) ([]Domain, error) {
 
 // CreateDomain add Domain.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) CreateDomain(ctx context.Context, request *DomainRequest) (*Domain, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	var result Domain
@@ -40,7 +40,7 @@ func (c *Client) CreateDomain(ctx context.Context, request *DomainRequest) (*Dom
 
 // GetDomainAllocation get Domain Allocation.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - domain: The domain name itself, as returned in the `domain` field of a domain. Domains have no separate
@@ -57,7 +57,7 @@ func (c *Client) GetDomainAllocation(ctx context.Context, domain string) (*Domai
 
 // DeleteDomain delete Domain.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - domainID: Jamf-assigned identifier of the domain, as returned in the `id` field of a domain. Treat it as an
@@ -73,7 +73,7 @@ func (c *Client) DeleteDomain(ctx context.Context, domainID string) error {
 
 // VerifyDomain verify Domain.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - domainID: Jamf-assigned identifier of the domain, as returned in the `id` field of a domain. Treat it as an

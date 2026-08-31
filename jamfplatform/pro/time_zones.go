@@ -13,7 +13,7 @@ import (
 
 // ListTimeZonesV1 return information about the currently supported Time Zones.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListTimeZonesV1(ctx context.Context) ([]TimeZone, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []TimeZone

@@ -19,7 +19,7 @@ import (
 // GetGSXConnectionV1 finds the Jamf Pro GSX Connection information.
 //
 // Required privileges: gsx-connection:read, push-certificates:read. Legacy Jamf Pro privilege name(s): Read GSX Connection, Read Push Certificates.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) GetGSXConnectionV1(ctx context.Context) (*GsxConnection, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
@@ -34,7 +34,7 @@ func (c *Client) GetGSXConnectionV1(ctx context.Context) (*GsxConnection, error)
 // UpdateGSXConnectionV1 updates Jamf Pro GSX Connection information.
 //
 // Required privileges: gsx-connection:update, push-certificates:update. Legacy Jamf Pro privilege name(s): Update GSX Connection, Update Push Certificates.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) UpdateGSXConnectionV1(ctx context.Context, request *GsxConnection) (*GsxConnection, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
@@ -49,7 +49,7 @@ func (c *Client) UpdateGSXConnectionV1(ctx context.Context, request *GsxConnecti
 // PatchGSXConnectionV1 updates Jamf Pro GSX Connection information.
 //
 // Required privileges: gsx-connection:update, push-certificates:update. Legacy Jamf Pro privilege name(s): Update GSX Connection, Update Push Certificates.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) PatchGSXConnectionV1(ctx context.Context, request *GsxConnectionUpdate) (*GsxConnection, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")

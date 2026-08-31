@@ -282,7 +282,7 @@ func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) 
 // ListSmartMobileDeviceGroupMembershipV2 get Smart Group Membership by Id.
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -376,7 +376,7 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -700,7 +700,7 @@ func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, 
 // ListStaticMobileDeviceGroupMembershipV2 get Static Group Membership by Id.
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -794,7 +794,7 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:

@@ -14,7 +14,7 @@ import (
 
 // GetActiveCertificateAuthorityV1 returns X.509 details of the active Certificate Authority (CA).
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetActiveCertificateAuthorityV1(ctx context.Context) (*CertificateRecord, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CertificateRecord
@@ -27,7 +27,7 @@ func (c *Client) GetActiveCertificateAuthorityV1(ctx context.Context) (*Certific
 
 // DownloadActiveCertificateAuthorityDerV1 returns X.509 of active Certificate Authority (CA) in DER format.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) DownloadActiveCertificateAuthorityDerV1(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
@@ -40,7 +40,7 @@ func (c *Client) DownloadActiveCertificateAuthorityDerV1(ctx context.Context) ([
 
 // DownloadActiveCertificateAuthorityPemV1 returns active Certificate Authority (CA) in PEM format.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) DownloadActiveCertificateAuthorityPemV1(ctx context.Context) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte

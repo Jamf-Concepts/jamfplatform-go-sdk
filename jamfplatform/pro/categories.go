@@ -20,7 +20,7 @@ import (
 // ListCategoriesV1 get Category objects.
 //
 // Required privileges: categories:read, self-service:read. Legacy Jamf Pro privilege name(s): Read Categories, Read Self Service.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:

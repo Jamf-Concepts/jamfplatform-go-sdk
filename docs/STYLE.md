@@ -670,10 +670,37 @@ for parallel arrays (43 methods): *"The scoped and legacy lists are independent
 sets, not pairs: do not match them by position."*
 
 **Upstream ask:** Jamf publishes no scoped→legacy mapping in the specs. Its
-"Jamf Pro permissions map" article is the only artefact carrying it, and until
-that is machine-readable a correct label per scoped identifier cannot be derived
-here — so a consumer wanting labelled rows has to label from `Scoped` alone, or
-present the two lists separately.
+"Jamf Pro permissions map" article is the only artefact carrying it, and it gives
+the mapping only at *capability* level (which legacy privileges a capability
+absorbed), never per operation — so a consumer wanting labelled rows still has to
+label from `Scoped` alone, or present the two lists separately.
+
+What the article does settle, and what now depends on it:
+
+- **The identifier form is `{capability}:{action}`** — kebab-case capability with
+  no product name, one of six lowercase actions (`create`, `read`, `update`,
+  `delete`, `deploy`, `execute`). The three-part beta slug `create:pro:buildings`
+  is retired; the `MethodPrivileges` godoc claimed that form until 2026-08-31
+  while the data had been two-part since v1824.
+- **A multi-entry `Scoped` slice means all of them are required.** The deployed
+  allowlist expresses every multi-capability route in the SDK's surface with
+  `has_all_permissions`; its one cross-capability OR (`DELETE /proclassic/logflush`
+  — `flush-policy-logs:execute` *or* `policies:delete`) reaches the registry as a
+  single identifier because the spec declares only the first. Evidence:
+  [WIRE-FACTS.md](WIRE-FACTS.md#the-whole-registry-cross-checked-against-the-allowlist-2026-08-31).
+- **An empty `Scoped` slice means the spec declares none, not that none is
+  required.** The 18 `account` methods are empty only because the licensing,
+  partners and sso specs ship no `x-required-privileges`, while the gateway
+  policy gates every one of them. Both the struct godoc and `privilegeComment`
+  say "the spec declares none" rather than the old "callable by any authenticated
+  API client".
+- **The capability reference is a closed vocabulary, so it is a tripwire.**
+  `gaCapabilityActions` in `tools/generate/privileges_test.go` transcribes it and
+  `TestScopedPrivilegesUseGAVocabulary` asserts all 314 distinct generated
+  identifiers against it: unknown capability, an action the capability does not
+  offer, or a return to the three-part form each fail. A new capability upstream
+  is expected — extend the table in the ingest that introduces it, and never
+  delete the assertion to make an ingest pass.
 
 `x-required-privileges` feeds a per-package `Privileges` registry plus a
 `// Required privileges:` godoc line, and downstream a Terraform provider

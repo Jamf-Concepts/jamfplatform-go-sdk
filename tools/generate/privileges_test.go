@@ -269,3 +269,244 @@ func verbOrdersAgree(scoped, legacy []string) bool {
 	}
 	return true
 }
+
+// gaCapabilityActions is the closed vocabulary of GA capability permissions,
+// transcribed from Jamf's "Jamf Pro permissions map" documentation article
+// (capability reference section, action codes c/r/u/d/dep/x). It is the only
+// published artefact that enumerates them.
+//
+// It exists so that a capability or action arriving from a spec ingest cannot
+// land silently in the generated registry — and from there in a consumer's
+// permissions table — without a human checking it against the article. A new
+// capability is a legitimate and frequent upstream event; the test failing is
+// the notification, not an accusation. Extend the table in the same change that
+// ingests the spec.
+//
+// The table is a superset of what the SDK generates: it includes the Jamf
+// Protect capabilities (reached through the Protect GraphQL API, not covered
+// here) and a handful the whitelist does not yet reach, so ingesting one of
+// those does not produce a spurious failure.
+var gaCapabilityActions = map[string][]string{
+	// Organization management scope.
+	"licensing": {"read"}, "deal-registration": {"create", "read"},
+	"distributor-actions": {"create", "read", "update"},
+	"sso-connections":     {"create", "read", "update", "delete"},
+	"sso-domains":         {"create", "read", "update", "delete"},
+	// Inventory.
+	"devices": {"create", "read", "update", "delete"}, "device-groups": {"create", "read", "update", "delete"},
+	"users": {"create", "read", "update", "delete"}, "user-groups": {"create", "read", "update", "delete"},
+	"extension-attributes":      {"create", "read", "update", "delete"},
+	"user-extension-attributes": {"create", "read", "update", "delete"},
+	"advanced-device-searches":  {"create", "read", "update", "delete"},
+	"advanced-user-searches":    {"create", "read", "update", "delete"},
+	"device-history":            {"read"},
+	// Organizational context.
+	"sites": {"create", "read", "update", "delete"}, "buildings": {"create", "read", "update", "delete"},
+	"departments": {"create", "read", "update", "delete"}, "categories": {"create", "read", "update", "delete"},
+	"classes": {"create", "read", "update", "delete"}, "network-segments": {"create", "read", "update", "delete"},
+	"ibeacon": {"create", "read", "update", "delete"},
+	// Device actions. The split is deliberate: erase, unmanage and remove-MDM
+	// destroy data or end management, so they sit under their own capability.
+	"device-actions": {"read", "delete", "execute"}, "destructive-device-actions": {"execute"},
+	// Device secrets.
+	"disk-encryption-recovery-key": {"read"}, "recovery-lock": {"read"},
+	"computer-device-lock-pin": {"read"}, "local-admin-passwords": {"read", "update", "execute"},
+	// Deployment.
+	"blueprints": {"create", "read", "update", "delete", "deploy"}, "declarations": {"read"},
+	"configuration-profiles": {"create", "read", "update", "delete"},
+	"policies":               {"create", "read", "update", "delete"}, "scripts": {"create", "read", "update", "delete"},
+	"packages": {"create", "read", "update", "delete"}, "printers": {"create", "read", "update", "delete"},
+	"dock-items": {"create", "read", "update", "delete"}, "managed-software-updates": {"create", "read", "update"},
+	"disk-encryption-configurations": {"create", "read", "update", "delete"},
+	"directory-bindings":             {"create", "read", "update", "delete"},
+	"jamf-connect-deployments":       {"read", "update", "deploy"},
+	"jamf-protect-deployments":       {"read", "update", "deploy"},
+	// Enrollment.
+	"prestage-enrollments":   {"create", "read", "update", "delete"},
+	"enrollment-profiles":    {"create", "read", "update", "delete"},
+	"enrollment-invitations": {"create", "read", "update", "delete"},
+	"activation-profiles":    {"create", "read", "update", "delete"},
+	// App lifecycle management.
+	"applications": {"create", "read", "update", "delete"}, "jamf-packages-action": {"read"},
+	"volume-purchasing-locations":      {"create", "read", "update", "delete"},
+	"ebooks":                           {"create", "read", "update", "delete"},
+	"provisioning-profiles":            {"create", "read", "update", "delete"},
+	"licensed-software":                {"create", "read", "update", "delete"},
+	"restricted-software":              {"create", "read", "update", "delete"},
+	"patch-policies":                   {"create", "read", "update", "delete"},
+	"patch-management-software-titles": {"create", "read", "update", "delete"},
+	"patch-external-source":            {"create", "read", "update", "delete"},
+	"patch-internal-source":            {"read"},
+	// Compliance. compliance-benchmarks has no update action.
+	"ai-policies":                   {"create", "read", "update", "delete"},
+	"compliance-benchmarks":         {"create", "read", "delete"},
+	"device-compliance-information": {"read"},
+	// Endpoint security — Jamf Protect GraphQL, not generated here.
+	"protection-plans": {"read", "update"}, "detection-analytics": {"read", "update"},
+	"threat-alerts": {"read", "update"}, "prevent-lists": {"create", "read", "update", "delete"},
+	"threat-definition-versions": {"read"},
+	"unified-logging-filters":    {"create", "read", "update", "delete"},
+	"security-audit-log":         {"read"},
+	// Secure enterprise access.
+	"ztna": {"create", "read", "update", "delete"}, "search-domains": {"read", "update", "delete"},
+	"custom-hostname-mappings": {"read", "update", "delete"}, "content-categories": {"read"},
+	// Admin identity and access.
+	"audit": {"read"}, "accounts": {"create", "read", "update", "delete"},
+	"change-password": {"execute"}, "account-groups": {"read"},
+	"ldap-servers": {"create", "read", "update", "delete"}, "sso-settings": {"read", "update"},
+	"access-management": {"read", "update"}, "user-sessions": {"read"},
+	// Admin file uploads.
+	"file-uploads": {"create"},
+	// Global settings.
+	"uem-connect": {"create", "read", "update", "delete"}, "conditional-access": {"read"},
+	"self-service": {"create", "read", "update", "delete"}, "app-request": {"read", "update"},
+	"onboarding": {"read", "update"}, "re-enrollment": {"read", "update"},
+	"return-to-service": {"read", "update", "delete"}, "user-initiated-enrollment": {"read", "update"},
+	"apple-configurator-enrollment": {"read", "update"},
+	"enrollment-customization":      {"create", "read", "update", "delete"},
+	"teacher-app":                   {"read", "update"}, "parent-app": {"read", "update"},
+	"remote-assist": {"read"}, "remote-administration": {"create", "read", "update", "delete"},
+	"computer-check-in":                      {"read", "update"},
+	"computer-inventory-collection-settings": {"read", "update"},
+	"custom-paths":                           {"create", "delete"},
+	"removable-mac-address":                  {"create", "read", "update", "delete"},
+	"inventory-preload-records":              {"create", "read", "update", "delete"},
+	"mdm-profile-renewal-settings":           {"read", "update"},
+	"impact-alert-notification-settings":     {"read", "update"},
+	"dismiss-notifications":                  {"execute"}, "login-disclaimer": {"update"},
+	"webhooks":               {"create", "read", "update", "delete"},
+	"allowed-file-extension": {"create", "read", "delete"},
+	// Infrastructure.
+	"device-enrollment-program-instances": {"create", "read", "update", "delete"},
+	"pki":                                 {"read", "update"}, "ad-cs-settings": {"create", "read", "update", "delete"},
+	"digicert-settings": {"create", "read", "update", "delete"},
+	"push-certificates": {"read", "update"}, "gsx-connection": {"read", "update"},
+	"distribution-points":                   {"create", "read", "update", "delete"},
+	"cloud-distribution-point":              {"read", "update"},
+	"jamf-cloud-distribution-service-files": {"create", "read", "delete"},
+	"json-web-token-configuration":          {"create", "read", "update", "delete"},
+	"software-update-servers":               {"create", "read", "update", "delete"},
+	"smtp-server":                           {"read", "update"}, "cache": {"read", "update"},
+	"cloud-services-settings": {"read", "update"}, "apache-tomcat-settings": {"update"},
+	"infrastructure-managers": {"create", "read", "update", "delete"},
+	"retention-policy":        {"read", "update"}, "flush-policy-logs": {"execute"},
+	"activation-code": {"read", "update"}, "jss-information": {"read"},
+	"m2m": {"read"}, "jss-url": {"read", "update"},
+}
+
+// gaActions is the closed set of actions. Six exist, lowercase and
+// case-sensitive. Anything else in a generated registry is a spec defect or a
+// generator bug, never a new action to absorb quietly.
+var gaActions = map[string]bool{
+	"create": true, "read": true, "update": true,
+	"delete": true, "deploy": true, "execute": true,
+}
+
+// generatedScopedPrivileges returns every distinct Scoped identifier in every
+// generated per-package registry, mapped to the packages it appears in.
+//
+// It reads the generated registries rather than the specs for the same reason
+// TestLegacyPrivilegesAreNotSorted does: the registry is what a consumer
+// actually reads, it is committed so CI can see it, and testing/ is gitignored.
+func generatedScopedPrivileges(t *testing.T) map[string][]string {
+	t.Helper()
+	dirs, err := filepath.Glob(filepath.Join("..", "..", "jamfplatform", "*", "permissions.go"))
+	if err != nil {
+		t.Fatalf("globbing generated registries: %v", err)
+	}
+	if len(dirs) == 0 {
+		t.Fatal("no generated permissions.go found — the emitted layout has changed")
+	}
+	scopedLiteral := regexp.MustCompile(`Scoped: \[\]string\{([^}]*)\}`)
+	out := map[string][]string{}
+	for _, f := range dirs {
+		raw, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatalf("reading %s: %v", f, err)
+		}
+		pkg := filepath.Base(filepath.Dir(f))
+		for _, m := range scopedLiteral.FindAllStringSubmatch(string(raw), -1) {
+			for _, id := range splitGoStringLiteralList(m[1]) {
+				out[id] = append(out[id], pkg)
+			}
+		}
+	}
+	return out
+}
+
+// TestScopedPrivilegesUseGAVocabulary asserts every generated identifier is a
+// {capability}:{action} pair the permissions-map article declares.
+//
+// Three failure modes it catches, none of which has any other tripwire:
+// a mistyped capability or action in an ingested spec; an action applied to a
+// capability that does not offer it (compliance-benchmarks:update, say, which
+// the article says does not exist); and a regression to the retired three-part
+// beta slug, which would silently change the meaning of every consumer's table.
+func TestScopedPrivilegesUseGAVocabulary(t *testing.T) {
+	ids := generatedScopedPrivileges(t)
+	if len(ids) == 0 {
+		t.Fatal("no Scoped identifiers found in the generated registries")
+	}
+
+	var unknownCap, badAction, badForm []string
+	for id, pkgs := range ids {
+		sort.Strings(pkgs)
+		where := strings.Join(uniqueStrings(pkgs), ",")
+		parts := strings.Split(id, ":")
+		if len(parts) != 2 {
+			badForm = append(badForm, id+" ("+where+")")
+			continue
+		}
+		cap, action := parts[0], parts[1]
+		actions, ok := gaCapabilityActions[cap]
+		if !ok {
+			unknownCap = append(unknownCap, id+" ("+where+")")
+			continue
+		}
+		if !gaActions[action] || !slicesContains(actions, action) {
+			badAction = append(badAction, id+" ("+where+")")
+		}
+	}
+	sort.Strings(unknownCap)
+	sort.Strings(badAction)
+	sort.Strings(badForm)
+
+	t.Logf("%d distinct scoped identifiers across the generated registries", len(ids))
+	if len(badForm) > 0 {
+		t.Errorf("identifiers are not {capability}:{action}: %s\n"+
+			"The three-part beta slug (create:pro:buildings) is retired; a return to it changes "+
+			"the meaning of every consumer's permissions table.", strings.Join(badForm, ", "))
+	}
+	if len(unknownCap) > 0 {
+		t.Errorf("capabilities absent from the permissions-map article: %s\n"+
+			"Check each against the article's capability reference and add it to "+
+			"gaCapabilityActions in the same change that ingested the spec. Do not delete "+
+			"this assertion to make an ingest pass.", strings.Join(unknownCap, ", "))
+	}
+	if len(badAction) > 0 {
+		t.Errorf("actions the article does not grant on that capability: %s\n"+
+			"Either the spec is wrong (report upstream, do not patch locally) or the "+
+			"article's action set for that capability has widened.", strings.Join(badAction, ", "))
+	}
+}
+
+// uniqueStrings collapses a sorted slice to its distinct elements.
+func uniqueStrings(in []string) []string {
+	var out []string
+	for i, s := range in {
+		if i == 0 || in[i-1] != s {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+// slicesContains is a local spelling to keep this file's Go version floor low.
+func slicesContains(hay []string, needle string) bool {
+	for _, s := range hay {
+		if s == needle {
+			return true
+		}
+	}
+	return false
+}

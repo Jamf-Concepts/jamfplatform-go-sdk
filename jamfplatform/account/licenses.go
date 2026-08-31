@@ -13,7 +13,7 @@ import (
 
 // ListLicenses list Licenses.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListLicenses(ctx context.Context) ([]License, error) {
 	prefix := c.transport.APIPrefix("licensing", "v1")
 	var result []License

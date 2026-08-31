@@ -31,7 +31,7 @@ func (c *Client) GetMobileDeviceCommandByUUID(ctx context.Context, uuid string) 
 // IssueMobileDeviceCommand creates a new mobile device command.
 //
 // Required privileges: destructive-device-actions:execute, devices:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 func (c *Client) IssueMobileDeviceCommand(ctx context.Context, request *MobileDeviceCommandPost) (*MobileDeviceCommand, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceCommand

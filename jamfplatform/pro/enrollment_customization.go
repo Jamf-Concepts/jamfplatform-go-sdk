@@ -365,7 +365,7 @@ func (c *Client) UploadEnrollmentCustomizationImageV2(ctx context.Context, fileF
 
 // DownloadEnrollmentCustomizationImageV2 download an enrollment customization image.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - id: id of the enrollment customization image.
@@ -414,7 +414,7 @@ func (c *Client) UpdateEnrollmentCustomizationV2(ctx context.Context, id string,
 // DeleteEnrollmentCustomizationV2 delete an Enrollment Customization with the supplied id.
 //
 // Required privileges: enrollment-customization:delete, enrollment-customization:read. Legacy Jamf Pro privilege name(s): Delete Enrollment Customizations, Read Enrollment Customizations.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:

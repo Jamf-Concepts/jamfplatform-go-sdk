@@ -2246,8 +2246,11 @@ import "%s/jamfplatform"
 
 // Privileges maps each %s SDK method name to the Jamf API privileges it
 // requires, sourced from the x-required-privileges vendor extensions in the
-// Jamf OpenAPI specs. Methods that require no special privilege have an empty
-// Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
+// Jamf OpenAPI specs. Identifiers are GA capability permissions in
+// {capability}:{action} form and a multi-entry Scoped slice means all of them
+// are required. An empty Scoped slice means the spec declares none — see
+// jamfplatform.MethodPrivileges for why that is not the same as none being
+// required. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
 `, pkgName, cfg.Module, pkgName)
@@ -2597,13 +2600,31 @@ type MethodPrivileges struct {
 	// Path is the endpoint's resource path relative to the tenant prefix,
 	// e.g. "/buildings/{id}".
 	Path string
-	// Scoped lists the modern scoped privilege identifiers in
-	// action:scope:resource form, e.g. "create:pro:buildings". An empty
-	// slice means the endpoint requires no special privilege: any
-	// authenticated API client may call it. Where more than one identifier
-	// is present, the Jamf spec does not encode whether they are required
-	// together (AND) or as alternatives (OR); consumers should present the
-	// full set and avoid asserting a relationship.
+	// Scoped lists the GA capability permissions the endpoint requires, in
+	// {capability}:{action} form, e.g. "buildings:create". The capability is
+	// kebab-case and carries no product name — one capability is reached by
+	// endpoints across several products — and the action is one of exactly
+	// six, lowercase and case-sensitive: create, read, update, delete,
+	// deploy, execute. The three-part beta slug ("create:pro:buildings") is
+	// the retired form and never appears here.
+	//
+	// Where more than one identifier is present, ALL of them are required.
+	// The platform has exactly one route that accepts either of two
+	// capabilities rather than both — DELETE /proclassic/logflush takes
+	// flush-policy-logs:execute or policies:delete — and its specs declare
+	// only the first, so no entry in this registry is an alternatives set. A
+	// consumer can therefore render a multi-entry Scoped slice as "grant all
+	// of these".
+	//
+	// An empty slice means the spec declares no privilege for the endpoint,
+	// which is not the same as none being required. Most such endpoints are
+	// genuinely unauthenticated (/v1/jamf-pro-version, /v2/jamf-pro-information,
+	// the /v1/notifications list), but the account package's 18 methods are
+	// empty only because the licensing, partners and sso specs ship no
+	// x-required-privileges at all: the gateway's authorization policy gates
+	// them on licensing:read, deal-registration:read, distributor-actions:{c,r,u}
+	// and sso-connections / sso-domains:{c,r,u,d}. Reported upstream; the SDK
+	// reports what the spec says and does not patch it locally.
 	Scoped []string
 	// Legacy lists the human-readable Jamf Pro privilege names, e.g.
 	// "Create Buildings". It is populated for the Pro API family only —

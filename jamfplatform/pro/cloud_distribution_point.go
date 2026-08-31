@@ -226,7 +226,7 @@ func (c *Client) TestCloudDistributionPointConnectionV1(ctx context.Context) (*C
 
 // GetCloudDistributionPointUploadCapabilityV1 finds specific information for the currently configured cloud distribution point.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetCloudDistributionPointUploadCapabilityV1(ctx context.Context) (*CloudDistributionPointUploadCapability, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudDistributionPointUploadCapability

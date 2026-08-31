@@ -13,7 +13,7 @@ import (
 
 // ListLocalesV1 return locales that can be used in other features.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListLocalesV1(ctx context.Context) ([]Locale, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []Locale

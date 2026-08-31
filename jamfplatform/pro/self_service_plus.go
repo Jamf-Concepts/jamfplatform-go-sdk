@@ -13,7 +13,7 @@ import (
 
 // GetSelfServicePlusFeatureToggleEnabledV1 determines if Self Service Plus feature toggle is enabled.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetSelfServicePlusFeatureToggleEnabledV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/self-service-plus/feature-toggle/enabled"

@@ -13,7 +13,7 @@ import (
 
 // GetJamfProInformationV2 get basic information about the Jamf Pro Server.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetJamfProInformationV2(ctx context.Context) (*JamfProInformationV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result JamfProInformationV2

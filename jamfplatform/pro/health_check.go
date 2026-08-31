@@ -13,7 +13,7 @@ import (
 
 // HealthCheckV1 get Jamf Pro API status.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) HealthCheckV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/health-check"
@@ -25,7 +25,7 @@ func (c *Client) HealthCheckV1(ctx context.Context) error {
 
 // GetHealthStatusV1 retrieve request acceptance ratios for this Jamf Pro node.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetHealthStatusV1(ctx context.Context) (*HealthStatus, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HealthStatus

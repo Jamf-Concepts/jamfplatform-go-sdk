@@ -13,7 +13,7 @@ import (
 
 // GetInventoryInformationV1 get statistics about managed/unmanaged devices and computers in the inventory.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetInventoryInformationV1(ctx context.Context) (*InventoryInformation, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result InventoryInformation

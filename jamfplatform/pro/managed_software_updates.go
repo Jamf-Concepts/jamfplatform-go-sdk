@@ -18,7 +18,7 @@ import (
 
 // ListAvailableOsUpdatesV1 retrieve available macOS and iOS Managed Software Updates.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListAvailableOsUpdatesV1(ctx context.Context) (*AvailableOsUpdates, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AvailableOsUpdates
@@ -32,7 +32,7 @@ func (c *Client) ListAvailableOsUpdatesV1(ctx context.Context) (*AvailableOsUpda
 // ListManagedSoftwareUpdatePlansV1 retrieve Managed Software Update Plans.
 //
 // Required privileges: devices:read, managed-software-updates:read. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -76,7 +76,7 @@ func (c *Client) ListManagedSoftwareUpdatePlansV1(ctx context.Context, sort []st
 // This endpoint is rate-limited. The transport automatically retries a 429 with backoff (honoring a server-supplied Retry-After when present, clamped to a ceiling), giving up only after exhausting its retry budget — at which point the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
 //
 // Required privileges: device-actions:execute, devices:read, managed-software-updates:create. Legacy Jamf Pro privilege name(s): Create Managed Software Updates, Read Computers, Read Mobile Devices, Send Computer Remote Command to Download and Install OS X Update, Send Mobile Device Remote Command to Download and Install iOS Update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) CreateManagedSoftwareUpdatePlanV1(ctx context.Context, request *ManagedSoftwareUpdatePlanPost) (*ManagedSoftwareUpdatePlanPostResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
@@ -104,7 +104,7 @@ func (c *Client) GetManagedSoftwareUpdateFeatureToggleV1(ctx context.Context) (*
 // UpdateManagedSoftwareUpdateFeatureToggleV1 updates Feature Toggle Value.
 //
 // Required privileges: managed-software-updates:create, managed-software-updates:read, managed-software-updates:update. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Create Managed Software Updates, Update Managed Software Updates.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) UpdateManagedSoftwareUpdateFeatureToggleV1(ctx context.Context, request *ManagedSoftwareUpdatePlanToggle) (*ManagedSoftwareUpdatePlanToggle, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
@@ -119,7 +119,7 @@ func (c *Client) UpdateManagedSoftwareUpdateFeatureToggleV1(ctx context.Context,
 // AbandonManagedSoftwareUpdateFeatureToggleV1 force stops any ongoing or stalled feature-toggle processes.
 //
 // Required privileges: managed-software-updates:create, managed-software-updates:read, managed-software-updates:update. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Create Managed Software Updates, Update Managed Software Updates.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) AbandonManagedSoftwareUpdateFeatureToggleV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
@@ -148,7 +148,7 @@ func (c *Client) GetManagedSoftwareUpdateFeatureToggleStatusV1(ctx context.Conte
 // This endpoint is rate-limited. The transport automatically retries a 429 with backoff (honoring a server-supplied Retry-After when present, clamped to a ceiling), giving up only after exhausting its retry budget — at which point the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
 //
 // Required privileges: device-actions:execute, device-groups:read, devices:read, managed-software-updates:create. Legacy Jamf Pro privilege name(s): Create Managed Software Updates, Read Computers, Read Mobile Devices, Read Smart Computer Groups, Read Static Computer Groups, Read Smart Mobile Device Groups, Read Static Mobile Device Groups, Send Computer Remote Command to Download and Install OS X Update, Send Mobile Device Remote Command to Download and Install iOS Update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) CreateManagedSoftwareUpdateGroupPlanV1(ctx context.Context, request *ManagedSoftwareUpdatePlanGroupPost) (*ManagedSoftwareUpdatePlanPostResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
@@ -163,7 +163,7 @@ func (c *Client) CreateManagedSoftwareUpdateGroupPlanV1(ctx context.Context, req
 // GetManagedSoftwareUpdateGroupPlansV1 retrieve Managed Software Update Plans for a Group.
 //
 // Required privileges: device-groups:read, devices:read, managed-software-updates:read. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Smart Computer Groups, Read Static Computer Groups, Read Mobile Devices, Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -190,7 +190,7 @@ func (c *Client) GetManagedSoftwareUpdateGroupPlansV1(ctx context.Context, id st
 // GetManagedSoftwareUpdatePlanV1 retrieve a Managed Software Update Plan.
 //
 // Required privileges: devices:read, managed-software-updates:read. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -208,7 +208,7 @@ func (c *Client) GetManagedSoftwareUpdatePlanV1(ctx context.Context, id string) 
 // GetManagedSoftwareUpdatePlanDeclarationsV1 retrieve all Declarations associated with a Managed Software Update Plan.
 //
 // Required privileges: devices:read, managed-software-updates:read. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -226,7 +226,7 @@ func (c *Client) GetManagedSoftwareUpdatePlanDeclarationsV1(ctx context.Context,
 // GetManagedSoftwareUpdatePlanEventsV1 retrieve a Managed Software Update Plan Event Store.
 //
 // Required privileges: devices:read, managed-software-updates:read. Legacy Jamf Pro privilege name(s): Read Managed Software Updates, Read Computers, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -271,7 +271,7 @@ func (c *Client) ListManagedSoftwareUpdateStatusesV1(ctx context.Context, filter
 // GetManagedSoftwareUpdateStatusesForComputerGroupV1 retrieve Managed Software Update Statuses for Computer Groups.
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Computers, Read Smart Computer Groups, Read Static Computer Groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -305,7 +305,7 @@ func (c *Client) GetManagedSoftwareUpdateStatusesForComputerV1(ctx context.Conte
 // GetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1 retrieve Managed Software Update Statuses for Mobile Device Groups.
 //
 // Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:

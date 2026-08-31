@@ -95,7 +95,7 @@ func (c *Client) GetMobileDeviceByMacAddress(ctx context.Context, macAddress str
 // CreateMobileDeviceByID creates a new mobile device by ID.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -112,7 +112,7 @@ func (c *Client) CreateMobileDeviceByID(ctx context.Context, id string, request 
 // UpdateMobileDeviceByID updates an existing mobile device by ID.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -128,7 +128,7 @@ func (c *Client) UpdateMobileDeviceByID(ctx context.Context, id string, request 
 // UpdateMobileDeviceByName updates an existing mobile device by name.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -144,7 +144,7 @@ func (c *Client) UpdateMobileDeviceByName(ctx context.Context, name string, requ
 // UpdateMobileDeviceBySerialNumber updates an existing mobile device by serial number.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
@@ -160,7 +160,7 @@ func (c *Client) UpdateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 // UpdateMobileDeviceByUDID updates an existing mobile device by UDID.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - udid: UDID value to filter by.
@@ -176,7 +176,7 @@ func (c *Client) UpdateMobileDeviceByUDID(ctx context.Context, udid string, requ
 // UpdateMobileDeviceByMacAddress updates an existing mobile device by Mac address.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - macAddress: Mac address value to filter by.
@@ -316,7 +316,7 @@ func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*Mob
 // CreateMobileDeviceByName creates a new mobile device by ID.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - name: ID value to filter by.
@@ -332,7 +332,7 @@ func (c *Client) CreateMobileDeviceByName(ctx context.Context, name string, requ
 // CreateMobileDeviceBySerialNumber creates a new mobile device by ID.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - serialNumber: ID value to filter by.
@@ -348,7 +348,7 @@ func (c *Client) CreateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 // CreateMobileDeviceByMacAddress creates a new mobile device by ID.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - macaddress: ID value to filter by.
@@ -364,7 +364,7 @@ func (c *Client) CreateMobileDeviceByMacAddress(ctx context.Context, macaddress 
 // CreateMobileDeviceByUDID creates a new mobile device by ID.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - udid: ID value to filter by.

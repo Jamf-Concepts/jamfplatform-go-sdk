@@ -69,7 +69,7 @@ func (c *Client) GetComputerBySerialNumber(ctx context.Context, serialNumber str
 // CreateComputerByID creates a computer.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -87,7 +87,7 @@ func (c *Client) CreateComputerByID(ctx context.Context, id string, request *Com
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -105,7 +105,7 @@ func (c *Client) UpdateComputerByID(ctx context.Context, id string, request *Com
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -294,7 +294,7 @@ func (c *Client) MatchComputersByName(ctx context.Context, matchName string) (*C
 // CreateComputerByName creates a computer.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - name: ID value to filter by.
@@ -310,7 +310,7 @@ func (c *Client) CreateComputerByName(ctx context.Context, name string, request 
 // CreateComputerBySerialNumber creates a computer.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - serialNumber: ID value to filter by.
@@ -326,7 +326,7 @@ func (c *Client) CreateComputerBySerialNumber(ctx context.Context, serialNumber 
 // CreateComputerByMacAddress creates a computer.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - macaddress: ID value to filter by.
@@ -342,7 +342,7 @@ func (c *Client) CreateComputerByMacAddress(ctx context.Context, macaddress stri
 // CreateComputerByUDID creates a computer.
 //
 // Required privileges: devices:create, users:create.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - udid: ID value to filter by.
@@ -360,7 +360,7 @@ func (c *Client) CreateComputerByUDID(ctx context.Context, udid string, request 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
@@ -378,7 +378,7 @@ func (c *Client) UpdateComputerBySerialNumber(ctx context.Context, serialNumber 
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - macaddress: MAC address value to filter by.
@@ -396,7 +396,7 @@ func (c *Client) UpdateComputerByMacAddress(ctx context.Context, macaddress stri
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
 //
 // Required privileges: devices:update, users:update.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - udid: UDID value to filter by.

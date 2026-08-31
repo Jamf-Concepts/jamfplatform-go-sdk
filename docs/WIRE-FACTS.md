@@ -98,6 +98,70 @@ answer 200, so a missing route entry is not the mechanism behind any 403.
 A stale local checkout of either repo shows old config and looks authoritative.
 Use `git show origin/master:<path>` after a fetch, not the working tree.
 
+### The whole registry cross-checked against the allowlist (2026-08-31)
+
+Every generated `Privileges` entry was matched against every `allow` rule in
+`jamf/authorization-policies` — 1483 SDK operations against 1861 rules in 275
+non-test `.rego` files, keyed on HTTP method plus path template with the
+package's namespace prefixed under `"api"`. **1475 matched a policy route and
+1454 of those agree with it exactly**, so the specs' `x-required-privileges` are
+corroborated by an oracle that is not derived from them. The 29 that do not
+agree, and the 8 with no matching rule, are each one of five things:
+
+- **18 `account` operations: the spec declares nothing and the policy requires a
+  capability.** `account_api.rego` gates them on `licensing:read`,
+  `deal-registration:read`, `distributor-actions:{create,read,update}`,
+  `sso-connections:{c,r,u,d}` and `sso-domains:{c,r,u,d}` — exactly the five
+  capabilities the permissions-map article lists under organization scope. The
+  licensing, partners and sso specs carry no `x-required-privileges` at all, so
+  the registry reports an empty set and **the SDK is the one under-reporting**.
+  Report upstream; do not hand-supply the names, and do not read an empty
+  `Scoped` slice as "no privilege required" — the godoc says so.
+- **3 `/logflush` DELETEs: the policy keeps an alternative the spec dropped.**
+  `has_any_of_permissions([…policies:delete, flush-policy-logs:execute])`, so
+  either capability still admits the caller. This is the platform's **only**
+  cross-capability OR — every other multi-capability route uses
+  `has_all_permissions` — and because the spec declares only
+  `flush-policy-logs:execute`, no registry entry is an alternatives set. That is
+  what licenses the godoc's "all of them are required".
+- **4 `audit` operations, 1 `proclassic` file upload: matched by hand, agree.**
+  Not parser gaps in the policy. `audit_service_api.rego` gates on a path
+  *predicate* (`path[0..3] == api/audit/v1/audit`) rather than a literal array,
+  requiring `audit:read` on `environmentPermissions` — consistent with the
+  package's known blocker and with environment scope.
+  `jamf_proclassic_file_uploads.rego` enumerates the resource segment as
+  literals (`computers`, `mobiledevices`, `policies`, …), so the SDK's one
+  templated `POST //fileuploads/{resource}/{idType}/{id}` maps to several rules,
+  all `file-uploads:create`.
+- **1 `securitycloud` `PUT /v2/groups/{groupId}`: no rule.** Already recorded
+  below — the v2 rule was never authored.
+- **2 `proclassic` parameterised mobile-device-command forms: no rule at any
+  arity.** `POST //mobiledevicecommands/command/{command}/{parameter}/id/{id_list}`
+  and its `/{version}/` sibling. The policy authors
+  `command/{command}/id/{id_list}` plus hand-written rules for the two commands
+  that actually take a parameter (`DeviceName`, `ScheduleOSUpdate`), so the
+  generic parameterised shape the SDK emits has no `allow` rule and is a 403 by
+  construction for any other command. **Unproven on the wire**, and honestly so:
+  the probe credential 403s on the parameterised form *and* on the
+  `command/{command}/id/{id_list}` form that does have a rule, and on the
+  `DeviceName` rule too, so it holds neither `device-actions:execute` nor
+  `destructive-device-actions:execute` and cannot discriminate policy-absence
+  from a missing grant. Needs a credential holding both.
+
+Two probes worth keeping from the same invocation (EU, 2026-08-31): the control
+`GET /pro/v1/jamf-pro-version` → 200 (`11.31.1-t1787060595569`), and
+`GET /pro/v1/gsx-connection` → 200, which is the two-capability AND
+(`gsx-connection:read` + `push-certificates:read`) actually being satisfied
+rather than inferred. Twelve requests total, per the edge-block volume rule.
+
+The permissions-map article's capability reference is now transcribed into
+`gaCapabilityActions` in `tools/generate/privileges_test.go` and asserted against
+every generated identifier, so a capability or action arriving from an ingest
+cannot land in a consumer's table unchecked. One deliberate difference: the
+article's table lists `devices:{c,r,u,d}` while **no route uses `devices:delete`**
+— device deletes are `destructive-device-actions:execute`. The table keeps the
+article's superset; the absence is the fact.
+
 ---
 
 ## Jamf Pro (`pro`) and Classic (`proclassic`)

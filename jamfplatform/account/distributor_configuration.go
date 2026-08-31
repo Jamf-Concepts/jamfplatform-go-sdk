@@ -13,7 +13,7 @@ import (
 
 // GetDistributorConfiguration get Distributor Configuration.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetDistributorConfiguration(ctx context.Context) (*DistributorConfiguration, error) {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	var result DistributorConfiguration
@@ -26,7 +26,7 @@ func (c *Client) GetDistributorConfiguration(ctx context.Context) (*DistributorC
 
 // UpdateDistributorConfiguration update Distributor Configuration.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) UpdateDistributorConfiguration(ctx context.Context, request *DistributorConfiguration) error {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	endpoint := prefix + "/distributor/configuration"

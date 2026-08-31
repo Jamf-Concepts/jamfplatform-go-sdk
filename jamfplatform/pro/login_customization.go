@@ -13,7 +13,7 @@ import (
 
 // GetLoginCustomizationV1 get current login disclaimer settings.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetLoginCustomizationV1(ctx context.Context) (*LoginContent, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LoginContent

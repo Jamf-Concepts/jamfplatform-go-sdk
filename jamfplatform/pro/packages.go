@@ -121,7 +121,7 @@ func (c *Client) DeletePackageV1(ctx context.Context, id string) error {
 // UploadPackageV1 upload package.
 //
 // Required privileges: packages:read, packages:update. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -303,7 +303,7 @@ func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request 
 // UploadPackageManifestV1 add a manifest to a package.
 //
 // Required privileges: packages:read, packages:update. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
@@ -330,7 +330,7 @@ func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFil
 // DeletePackageManifestV1 delete the manifest for a specified package.
 //
 // Required privileges: packages:read, packages:update. Legacy Jamf Pro privilege name(s): Update Packages, Read Packages.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:

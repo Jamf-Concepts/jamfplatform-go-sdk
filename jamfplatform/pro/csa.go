@@ -13,7 +13,7 @@ import (
 
 // GetCsaTenantIdV1 returns the CSA tenant ID.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetCsaTenantIdV1(ctx context.Context) (*CsaTenantIDInfo, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CsaTenantIDInfo

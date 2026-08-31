@@ -26,7 +26,7 @@ func (c *Client) GetUserSessionV1(ctx context.Context) ([]Account, error) {
 
 // UpdateUserSessionV1 update values in the User's current session.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) UpdateUserSessionV1(ctx context.Context, request *Session) (*Session, error) {
 	prefix := c.transport.APIPrefix("pro", "")
 	var result Session

@@ -14,7 +14,7 @@ import (
 
 // CreateDistributorPurchaseOrder submit Distributor Purchase Order.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) CreateDistributorPurchaseOrder(ctx context.Context, request *DistributorPurchaseOrder) error {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	endpoint := prefix + "/distributor/purchase-orders"
@@ -26,7 +26,7 @@ func (c *Client) CreateDistributorPurchaseOrder(ctx context.Context, request *Di
 
 // GetDistributorPurchaseOrder get Distributor Purchase Order.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - jamfPoNumber: Jamf-assigned purchase order number, as returned in the `jamfPoNumber` field of a purchase order.
@@ -43,7 +43,7 @@ func (c *Client) GetDistributorPurchaseOrder(ctx context.Context, jamfPoNumber s
 
 // ValidateDistributorPurchaseOrder validate Distributor Purchase Order.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ValidateDistributorPurchaseOrder(ctx context.Context, request *DistributorPurchaseOrder) (*PurchaseOrderValidationResult, error) {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	var result PurchaseOrderValidationResult

@@ -9,8 +9,11 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 
 // Privileges maps each aigovernance SDK method name to the Jamf API privileges it
 // requires, sourced from the x-required-privileges vendor extensions in the
-// Jamf OpenAPI specs. Methods that require no special privilege have an empty
-// Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
+// Jamf OpenAPI specs. Identifiers are GA capability permissions in
+// {capability}:{action} form and a multi-entry Scoped slice means all of them
+// are required. An empty Scoped slice means the spec declares none — see
+// jamfplatform.MethodPrivileges for why that is not the same as none being
+// required. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
 	"ArchivePolicy":       {Method: "ArchivePolicy", HTTPMethod: "DELETE", Path: "/v1/policies/{policyId}", Scoped: []string{"ai-policies:delete"}, Legacy: nil},

@@ -14,7 +14,7 @@ import (
 
 // GetDistributorQuote get Distributor Quote.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - quoteNumber: Jamf-assigned quote number, as returned in the `quoteNumber` field of a quote.

@@ -14,7 +14,7 @@ import (
 
 // ListNotificationsV1 get Notifications for user and site.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) ListNotificationsV1(ctx context.Context) ([]NotificationV1, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []NotificationV1

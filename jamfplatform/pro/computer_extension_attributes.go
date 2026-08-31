@@ -142,7 +142,7 @@ func (c *Client) GetComputerExtensionAttributeTemplateV1(ctx context.Context, id
 // UploadComputerExtensionAttributeV1 upload Computer Extension Attribute.
 //
 // Required privileges: extension-attributes:create, extension-attributes:read. Legacy Jamf Pro privilege name(s): Create Computer Extension Attributes, Read Computer Extension Attributes.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// All of them are required, not alternatives.
 // The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
