@@ -113,10 +113,35 @@ agree, and the 8 with no matching rule, are each one of five things:
   `deal-registration:read`, `distributor-actions:{create,read,update}`,
   `sso-connections:{c,r,u,d}` and `sso-domains:{c,r,u,d}` — exactly the five
   capabilities the permissions-map article lists under organization scope. The
-  licensing, partners and sso specs carry no `x-required-privileges` at all, so
-  the registry reports an empty set and **the SDK is the one under-reporting**.
-  Report upstream; do not hand-supply the names, and do not read an empty
-  `Scoped` slice as "no privilege required" — the godoc says so.
+  published licensing, partners and sso specs carry no `x-required-privileges` at
+  all, so the registry reports an empty set and **the SDK is the one
+  under-reporting**. Do not hand-supply the names — a local privilege table is
+  the same shadowing liability `schemaPatches` is, with nothing to panic when
+  upstream fixes it — and do not read an empty `Scoped` slice as "no privilege
+  required"; the godoc says so.
+
+  **The cause is a bundle-pipeline coupling, not missing authorship** (traced
+  2026-08-31, `public-apis-oas` at `959591e`, the commit v1877 was built from).
+  All 18 privileges *are* declared upstream, twice: inline in
+  `teams/account-{licensing,partners,sso}/openapi.yaml` (1 + 7 + 10) and again in
+  each `config.yaml` under `requiredPrivileges.operations`. The build injects
+  them into the published artifact only when `betaApiConfig.enabled: true`, and
+  the correlation is exact — those three specs are the only ones without that
+  block and the only three whose privileges are stripped; all 19 others have it
+  and publish theirs intact. `teams/account-sso/config.yaml` documents the
+  consequence in its own comment. The account APIs opt out of `betaApiConfig`
+  correctly: it drives the beta `/{scopeType}/{scopeId}` path transform, which
+  cannot apply to an organization-scoped API that resolves the org from the
+  token. Privilege injection and path-prefix transformation simply share one
+  switch.
+
+  So the values are corroborated three ways — source spec, source config, and
+  `account_api.rego`, which the config cites by name — and the published artifact
+  is the only dissenter. **The upstream ask is to decouple `requiredPrivileges`
+  injection from `betaApiConfig`**, not to add the privileges: any future API
+  that opts out of the beta transform loses its privilege metadata the same way,
+  silently. Re-check this when the account holds are lifted; if the coupling is
+  fixed, the 18 empty sets fill in with no SDK change beyond the ingest.
 - **3 `/logflush` DELETEs: the policy keeps an alternative the spec dropped.**
   `has_any_of_permissions([…policies:delete, flush-policy-logs:execute])`, so
   either capability still admits the caller. This is the platform's **only**

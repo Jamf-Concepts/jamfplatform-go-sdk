@@ -314,9 +314,16 @@ five Security Cloud specs now carry their own prefix and none sets the key.
 
 **Never fall back to the source specs in
 `public-apis-oas/redocly-implementation/teams/`.** They carry no tenant segment, no
-version prefix, no `x-required-privileges` and no servers, so a spec taken from
-there produces methods whose URLs the gateway rejects and whose privilege metadata
-is empty — a difference invisible in the generated code until it is called. **A
+version prefix and no servers, so a spec taken from there produces methods whose
+URLs the gateway rejects — a difference invisible in the generated code until it
+is called. Privileges are the one thing they are *not* short of, and the earlier
+wording here claimed otherwise: `requiredPrivileges` in each `config.yaml` is
+where the build sources `x-required-privileges` from, and for the three account
+specs the source carries all 18 while the published artifact carries none. That
+is a pipeline coupling, diagnosed in
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#the-whole-registry-cross-checked-against-the-allowlist-2026-08-31)
+— read it there rather than concluding upstream never declared them, and still
+do not ingest from `teams/`. **A
 spec absent from the build is a spec the SDK does not cover**, and the gap gets
 reported upstream.
 
