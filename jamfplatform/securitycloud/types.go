@@ -5,7 +5,10 @@
 
 package securitycloud
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // ApiError Standard Jamf error response body returned for non-2xx/3xx responses.
 type ApiError struct {
@@ -883,13 +886,14 @@ type ConnectorConfig struct {
 	DeviceFieldMappings *DeviceFieldMappings `json:"deviceFieldMappings,omitempty"`
 	// Whether device risk levels are sent back to the UEM platform.
 	DeviceRiskTagging bool `json:"deviceRiskTagging"`
-	// Credentials the connector uses to authenticate against the UEM instance. Absent from the published
-	// spec, which declares only `vendor`/`url`/`isoCountry` on the create request and defers the rest to
-	// an undocumented "vendor-specific fields may also be included". Restored here from the wire (probed
-	// 2026-08-21): a GET on a live JAMF_PRO connector returns `deviceSyncAuth` alongside `authStrategy`,
-	// and a create carrying both is accepted. Which members apply depends on `authStrategy` — OAuth
-	// strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`. Secrets
-	// are write-only and never returned; a GET reports only `clientId`, `username` and an `empty` flag.
+	// Credentials the connector authenticates to the UEM instance with, as read back off a connector.
+	// Restored from the wire (probed 2026-08-21, re-verified 2026-08-31) because the published spec omits
+	// `deviceSyncAuth` from the *response* schema; the request side is upstream's own `JamfProCredentials`
+	// as of v1882, which carries the same four members. Which of them apply depends on `authStrategy` —
+	// OAuth strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`.
+	// Secrets are write-only and never returned; a read reports only `clientId`, `username` and an `empty`
+	// flag, and for an `M2M`-provisioned connector the `clientId` is the one Jamf Security Cloud minted
+	// for itself.
 	DeviceSyncAuth *DeviceSyncAuth `json:"deviceSyncAuth,omitempty"`
 	// Number of consecutive syncs a device may be absent from the UEM platform before it is treated as
 	// unmanaged. `0` disables the grace period.
@@ -948,49 +952,69 @@ type ConnectorConfig struct {
 	Vendor string `json:"vendor"`
 }
 
-// ConnectorCreateRequest Request to create a connector. Contains the UEM server connection details. Vendor-specific fields may also be included; the `vendor` field determines which are applicable. Secret fields (credentials) are write-only and are never returned in responses.
+// ConnectorCreateRequest Request to create a connector. Contains the UEM server connection details. Vendor-specific fields may also be included; the `vendor` field determines which are applicable. Secret fields (credentials) are write-only and are never returned in responses. `JAMF_PRO` is not accepted here — it has a dedicated fully typed contract, see `JamfProConnectorCreateRequest`.
+// This is the generic contract, and `JAMF_PRO` is deliberately not among its vendors — v1882 gave
+// Jamf Pro its own fully typed `JamfProConnectorCreateRequest` and removed `JAMF_PRO` from the enum
+// here. Build a Jamf Pro connector through `ConnectorCreateRequestBody` and that variant.
+// The `authStrategy`, `deviceSyncAuth` and `tenantId` properties the SDK used to graft onto this
+// schema were removed in the same ingest. They were only ever wire-verified against `JAMF_PRO`, which
+// now declares them upstream where they belong; leaving them here would assert three unverified fields
+// across nine other vendors and offer a second way to build a Jamf Pro create that the spec calls
+// invalid. The server itself still resolves `vendor` to a per-vendor subtype whichever shape the JSON
+// arrived in — its 422 for an unknown vendor enumerates the lot — so the removal costs no
+// reachability, only the redundant path.
+// What the other nine vendors need beyond `vendor`/`url`/`isoCountry` is still undocumented, and
+// `additionalProperties` is open here for exactly that reason. None of them is wire-verified.
 type ConnectorCreateRequest struct {
-	// How the connector authenticates to the UEM instance. Required on create despite the published spec
-	// omitting it: without it the server answers `500 INTERNAL_ERROR` rather than a validation error
-	// (wire-verified 2026-08-21), so a request built from the spec alone can only fail. With it present
-	// but the credentials it implies absent, the server answers a proper `422 VALIDATION_FAILED`.
-	// The accepted set is enumerated by the server itself: sending an unknown value returns `422` naming
-	// every member of `JamfProAuthStrategy` (wire-verified 2026-08-28). Two are usable for a Jamf Pro
-	// connector, and they need different fields:
-	// - `JAMF_PRO_OAUTH` — the caller supplies `deviceSyncAuth.clientId` and `.clientSecret` for an API
-	// integration they created on the target Jamf Pro themselves, plus the `url` of that instance. - `M2M`
-	// — the caller supplies `tenantId` and no credentials at all; Jamf Security Cloud provisions its own
-	// API role and integration (named "JSC Connector") on that tenant. `url` is ignored on this path and
-	// may be omitted — the server derives it from the tenant.
-	// This field is a *provisioning instruction*, not stored state: a connector created with `M2M` reads
-	// back as `JAMF_PRO_OAUTH`, because that is the steady state the provisioning produced. Callers must
-	// not treat the value as round-tripping.
-	// Allowed values: see the ConnectorCreateRequestAuthStrategy constants.
-	AuthStrategy *string `json:"authStrategy,omitempty"`
-	// Credentials the connector uses to authenticate against the UEM instance. Absent from the published
-	// spec, which declares only `vendor`/`url`/`isoCountry` on the create request and defers the rest to
-	// an undocumented "vendor-specific fields may also be included". Restored here from the wire (probed
-	// 2026-08-21): a GET on a live JAMF_PRO connector returns `deviceSyncAuth` alongside `authStrategy`,
-	// and a create carrying both is accepted. Which members apply depends on `authStrategy` — OAuth
-	// strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`. Secrets
-	// are write-only and never returned; a GET reports only `clientId`, `username` and an `empty` flag.
-	DeviceSyncAuth *DeviceSyncAuth `json:"deviceSyncAuth,omitempty"`
 	// ISO country code for the UEM instance, when applicable.
 	IsoCountry *string `json:"isoCountry,omitempty"`
-	// Platform tenant identifier of the target Jamf Pro instance. Required by `authStrategy: M2M` and
-	// rejected-as-null without it (`422 "tenantId: must not be null"`); unused by the credential-bearing
-	// strategies.
-	// Absent from the published spec, which declares only `vendor`/`url`/`isoCountry` on the create
-	// request and defers the rest to an undocumented "vendor-specific fields may also be included".
-	// Restored here from the wire (probed 2026-08-28): a create carrying `authStrategy: M2M` and this
-	// field returns `201`, and the resulting connector reports the tenant's own URL rather than whatever
-	// `url` the request carried.
-	TenantID *string `json:"tenantId,omitempty"`
 	// UEM server URL.
 	URL string `json:"url"`
 	// UEM vendor name.
 	// Allowed values: see the ConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
+}
+
+// ConnectorCreateRequestBody The connector to create. The `vendor` field selects the contract: `JAMF_PRO` uses the fully typed `JamfProConnectorCreateRequest`; every other vendor uses the generic `ConnectorCreateRequest`.
+type ConnectorCreateRequestBody struct {
+	// Allowed values: see the ConnectorCreateRequestBodyVendor constants.
+	Vendor                 string                         `json:"vendor"`
+	ConnectorCreateRequest *ConnectorCreateRequest        `json:"-"`
+	JAMFPRO                *JamfProConnectorCreateRequest `json:"-"`
+}
+
+// UnmarshalJSON dispatches the payload to the variant matching the
+// vendor discriminator. Unknown values leave the variant
+// pointers nil but preserve the discriminator string.
+func (m *ConnectorCreateRequestBody) UnmarshalJSON(data []byte) error {
+	var d struct {
+		Vendor string `json:"vendor"`
+	}
+	if err := json.Unmarshal(data, &d); err != nil {
+		return err
+	}
+	m.Vendor = d.Vendor
+	switch d.Vendor {
+	case "AIRWATCH", "GOOGLE", "INTUNE", "JAMF_SCHOOL", "MAAS360", "MOBILEIRONCLOUD", "MOBILEIRONCORE", "WIZY", "XENMOBILE":
+		m.ConnectorCreateRequest = new(ConnectorCreateRequest)
+		return json.Unmarshal(data, m.ConnectorCreateRequest)
+	case "JAMF_PRO":
+		m.JAMFPRO = new(JamfProConnectorCreateRequest)
+		return json.Unmarshal(data, m.JAMFPRO)
+	}
+	return nil
+}
+
+// MarshalJSON emits the active variant's JSON. If the matching variant
+// pointer is nil, emits a minimal object carrying only the discriminator.
+func (m ConnectorCreateRequestBody) MarshalJSON() ([]byte, error) {
+	switch m.Vendor {
+	case "AIRWATCH", "GOOGLE", "INTUNE", "JAMF_SCHOOL", "MAAS360", "MOBILEIRONCLOUD", "MOBILEIRONCORE", "WIZY", "XENMOBILE":
+		return json.Marshal(m.ConnectorCreateRequest)
+	case "JAMF_PRO":
+		return json.Marshal(m.JAMFPRO)
+	}
+	return json.Marshal(map[string]string{"vendor": m.Vendor})
 }
 
 // ConnectorPage A page of connectors.
@@ -1034,21 +1058,21 @@ type DeviceFieldMappings struct {
 	UserNameMapping *string `json:"userNameMapping,omitempty"`
 }
 
-// DeviceSyncAuth Credentials the connector uses to authenticate against the UEM instance. Absent from the published spec, which declares only `vendor`/`url`/`isoCountry` on the create request and defers the rest to an undocumented "vendor-specific fields may also be included". Restored here from the wire (probed 2026-08-21): a GET on a live JAMF_PRO connector returns `deviceSyncAuth` alongside `authStrategy`, and a create carrying both is accepted. Which members apply depends on `authStrategy` — OAuth strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`. Secrets are write-only and never returned; a GET reports only `clientId`, `username` and an `empty` flag.
+// DeviceSyncAuth Credentials the connector authenticates to the UEM instance with, as read back off a connector. Restored from the wire (probed 2026-08-21, re-verified 2026-08-31) because the published spec omits `deviceSyncAuth` from the *response* schema; the request side is upstream's own `JamfProCredentials` as of v1882, which carries the same four members. Which of them apply depends on `authStrategy` — OAuth strategies use `clientId`/`clientSecret`, basic-auth strategies use `username`/`password`. Secrets are write-only and never returned; a read reports only `clientId`, `username` and an `empty` flag, and for an `M2M`-provisioned connector the `clientId` is the one Jamf Security Cloud minted for itself.
 type DeviceSyncAuth struct {
 	// OAuth client ID. For `JAMF_PRO_OAUTH`, the client ID of an API integration on the target Jamf Pro
 	// instance.
-	ClientID *string `json:"clientId,omitempty"`
+	ClientID string `json:"clientId"`
 	// OAuth client secret paired with `clientId`. Write-only — never returned on a read.
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
-	ClientSecret *string `json:"clientSecret,omitempty"`
+	ClientSecret string `json:"clientSecret"`
 	// Password paired with `username`. Write-only — never returned on a read.
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
-	Password *string `json:"password,omitempty"`
+	Password string `json:"password"`
 	// Username, for the basic-auth strategies.
-	Username *string `json:"username,omitempty"`
+	Username string `json:"username"`
 }
 
 // EmailMapping How the device email is derived. `EMAIL_ADDRESS` uses the UEM email attribute directly; any other type reads from that attribute and optionally decorates it into an address. Vendors that support the `CUSTOM` type carry an additional `fieldName` property naming the UEM attribute to read. It is not documented as a property here because the vendors that do not support `CUSTOM` do not emit it at all, and ADG-125 requires every documented field to be present in every response.
@@ -1088,6 +1112,46 @@ type GroupSettings struct {
 	// Explicit UEM-group-to-JSC-group assignments. Replaces the existing set on update; send an empty
 	// array to clear all mappings.
 	GroupMappings *[]GroupMapping `json:"groupMappings,omitempty"`
+}
+
+// JamfProConnectorCreateRequest Connector creation request for Jamf Pro. The `authStrategy` field selects how JSC authenticates to Jamf Pro and determines which further fields are required: - `JAMF_PRO_OAUTH` — provide `deviceSyncAuth.clientId` and `deviceSyncAuth.clientSecret` (Jamf Pro API-role OAuth client credentials). - `BASIC` — provide `deviceSyncAuth.username` and `deviceSyncAuth.password`. - `M2M` — provide `tenantId`; `deviceSyncAuth` must be omitted (JSC authenticates through the shared machine-to-machine trust rather than per-connector credentials). The credential fields (`deviceSyncAuth.password`, `deviceSyncAuth.clientSecret`) are write-only. `tenantId` is likewise write-only: it is accepted on creation but not returned in responses. Write-only fields are never echoed back in any response.
+type JamfProConnectorCreateRequest struct {
+	// Authentication strategy used to connect to Jamf Pro. See the schema description for the fields each
+	// strategy requires.
+	// Allowed values: see the JamfProConnectorCreateRequestAuthStrategy constants.
+	AuthStrategy string `json:"authStrategy"`
+	// Jamf Pro connection credentials. Provide the OAuth pair (`clientId` + `clientSecret`) when
+	// `authStrategy` is `JAMF_PRO_OAUTH`, or the basic pair (`username` + `password`) when `authStrategy`
+	// is `BASIC`. Omit entirely for `M2M`.
+	DeviceSyncAuth *JamfProCredentials `json:"deviceSyncAuth,omitempty"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// Jamf Pro tenant identifier. Required when `authStrategy` is `M2M`; must be omitted for the other
+	// strategies.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	TenantID *string `json:"tenantId,omitempty"`
+	// Jamf Pro server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "JAMF_PRO".
+	Vendor string `json:"vendor"`
+}
+
+// JamfProCredentials Jamf Pro connection credentials. Provide the OAuth pair (`clientId` + `clientSecret`) when `authStrategy` is `JAMF_PRO_OAUTH`, or the basic pair (`username` + `password`) when `authStrategy` is `BASIC`. Omit entirely for `M2M`.
+type JamfProCredentials struct {
+	// Jamf Pro API-role OAuth client id (JAMF_PRO_OAUTH strategy).
+	ClientID *string `json:"clientId,omitempty"`
+	// Jamf Pro API-role OAuth client secret (JAMF_PRO_OAUTH strategy).
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	ClientSecret *string `json:"clientSecret,omitempty"`
+	// Jamf Pro password (BASIC strategy).
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	Password *string `json:"password,omitempty"`
+	// Jamf Pro username (BASIC strategy).
+	Username *string `json:"username,omitempty"`
 }
 
 // LatestSync Summary of the connector's most recent sync run, embedded in `ConnectorConfig`. The containing `latestSync` property is `null` until the connector has run its first sync. This is **not** the same shape as the `SyncRun` entries returned by `GET /connectors/{configId}/sync/runs`: it carries `lastSeen` and `errorDetails`, and has no per-run device counters, because the connector record keeps only the current transaction's state and not its tallies. Use the sync-runs endpoint for run history and counts. `startedUtcMs` and `finishedUtcMs` are retained, deprecated epoch-millisecond duplicates of the ISO-8601 `started` and `finished`. They are still emitted for existing consumers; new consumers should read the ISO-8601 fields.

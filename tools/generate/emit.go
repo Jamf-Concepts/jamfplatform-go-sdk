@@ -719,9 +719,14 @@ import (
 			continue
 		}
 		if t.Discriminator != nil {
-			// Per-variant round-trip test for discriminator (union) types.
+			// Per-variant round-trip test for discriminator (union) types —
+			// one per discriminator *value*, not per variant, so a variant
+			// serving several values has every case covered. A per-variant
+			// test passes while the other values marshal to nothing but the
+			// discriminator, which is exactly how that bug stayed hidden.
 			for _, v := range t.Discriminator.Variants {
-				fmt.Fprintf(&buf, `
+				for _, dv := range v.Values {
+					fmt.Fprintf(&buf, `
 func TestRoundTrip_%s_%s(t *testing.T) {
 	original := %s{%s: "%s", %s: &%s{}}
 	data, err := json.Marshal(original)
@@ -739,11 +744,12 @@ func TestRoundTrip_%s_%s(t *testing.T) {
 		t.Fatal("expected variant %s to be non-nil")
 	}
 }
-`, t.Name, v.FieldName,
-					t.Name, t.Discriminator.GoFieldName, v.Value, v.FieldName, v.TypeName,
-					t.Name,
-					t.Discriminator.GoFieldName, v.Value, t.Discriminator.GoFieldName, v.Value,
-					v.FieldName, v.FieldName)
+`, t.Name, exportedGoName(dv),
+						t.Name, t.Discriminator.GoFieldName, dv, v.FieldName, v.TypeName,
+						t.Name,
+						t.Discriminator.GoFieldName, dv, t.Discriminator.GoFieldName, dv,
+						v.FieldName, v.FieldName)
+				}
 			}
 			continue
 		}

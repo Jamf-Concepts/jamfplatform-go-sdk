@@ -37,10 +37,27 @@ type GoDiscriminator struct {
 	PropertyName string // JSON property name of the discriminator field (e.g. "deviceType")
 	GoFieldName  string // Go exported name for the discriminator field (e.g. "DeviceType")
 	Variants     []GoDiscriminatorVariant
+	// EnumTypeName names the generated enum carrying every discriminator value,
+	// when one was emitted. The mapping keys are the authoritative set of values
+	// the union accepts, and without constants for them the set is reachable
+	// only by reading the generated switch. It matters most when a spec moves a
+	// value out of a variant's own enum and into the mapping — uem-connect
+	// dropped JAMF_PRO from ConnectorCreateRequest.vendor when it gained a
+	// dedicated variant, which would otherwise have left the SDK with no
+	// constant for the commonest vendor.
+	EnumTypeName string
 }
 
 type GoDiscriminatorVariant struct {
-	Value     string // discriminator value as seen on the wire (e.g. "iOS")
+	// Values holds every discriminator value routing to this variant, in the
+	// order the mapping declares them. Usually one, but a spec may point
+	// several values at a single schema — uem-connect maps nine UEM vendors at
+	// the generic ConnectorCreateRequest and only JAMF_PRO at its own type.
+	// Every value must become a case in the generated marshal and unmarshal
+	// switches: collapsing them to one loses the others silently, and a
+	// caller setting an unlisted discriminator would marshal to nothing but
+	// the discriminator itself.
+	Values    []string
 	TypeName  string // Go type name (e.g. "MobileDeviceIosInventory")
 	FieldName string // exported Go field name in the union struct (e.g. "IOS")
 }

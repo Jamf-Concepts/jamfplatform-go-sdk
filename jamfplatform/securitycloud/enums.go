@@ -668,28 +668,42 @@ func ConnectorConfigVendorValues() []ConnectorConfigVendor {
 	}
 }
 
-// ConnectorCreateRequestAuthStrategy is the set of values accepted by ConnectorCreateRequest.AuthStrategy.
-type ConnectorCreateRequestAuthStrategy = string
+// ConnectorCreateRequestBodyVendor is the set of values accepted by ConnectorCreateRequestBody.Vendor.
+type ConnectorCreateRequestBodyVendor = string
 
-// ConnectorCreateRequestAuthStrategy values accepted by the Jamf API. The alias above is a string, so
+// ConnectorCreateRequestBodyVendor values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	ConnectorCreateRequestAuthStrategyM2m          ConnectorCreateRequestAuthStrategy = "M2M"
-	ConnectorCreateRequestAuthStrategyJamfProOauth ConnectorCreateRequestAuthStrategy = "JAMF_PRO_OAUTH"
-	ConnectorCreateRequestAuthStrategyBasic        ConnectorCreateRequestAuthStrategy = "BASIC"
+	ConnectorCreateRequestBodyVendorAirwatch        ConnectorCreateRequestBodyVendor = "AIRWATCH"
+	ConnectorCreateRequestBodyVendorGoogle          ConnectorCreateRequestBodyVendor = "GOOGLE"
+	ConnectorCreateRequestBodyVendorIntune          ConnectorCreateRequestBodyVendor = "INTUNE"
+	ConnectorCreateRequestBodyVendorJamfSchool      ConnectorCreateRequestBodyVendor = "JAMF_SCHOOL"
+	ConnectorCreateRequestBodyVendorMaas360         ConnectorCreateRequestBodyVendor = "MAAS360"
+	ConnectorCreateRequestBodyVendorMobileironcloud ConnectorCreateRequestBodyVendor = "MOBILEIRONCLOUD"
+	ConnectorCreateRequestBodyVendorMobileironcore  ConnectorCreateRequestBodyVendor = "MOBILEIRONCORE"
+	ConnectorCreateRequestBodyVendorWizy            ConnectorCreateRequestBodyVendor = "WIZY"
+	ConnectorCreateRequestBodyVendorXenmobile       ConnectorCreateRequestBodyVendor = "XENMOBILE"
+	ConnectorCreateRequestBodyVendorJamfPro         ConnectorCreateRequestBodyVendor = "JAMF_PRO"
 )
 
-// ConnectorCreateRequestAuthStrategyValues returns every value the Jamf API accepts for ConnectorCreateRequestAuthStrategy,
+// ConnectorCreateRequestBodyVendorValues returns every value the Jamf API accepts for ConnectorCreateRequestBodyVendor,
 // in the order the spec declares them. Returns a fresh slice per call, so no
 // caller can corrupt the set for the rest of the process — which a package
 // level var would allow. Suits attribute validation (Terraform's
 // stringvalidator.OneOf, say) and anything that needs to enumerate the set
 // rather than name one member.
-func ConnectorCreateRequestAuthStrategyValues() []ConnectorCreateRequestAuthStrategy {
-	return []ConnectorCreateRequestAuthStrategy{
-		ConnectorCreateRequestAuthStrategyM2m,
-		ConnectorCreateRequestAuthStrategyJamfProOauth,
-		ConnectorCreateRequestAuthStrategyBasic,
+func ConnectorCreateRequestBodyVendorValues() []ConnectorCreateRequestBodyVendor {
+	return []ConnectorCreateRequestBodyVendor{
+		ConnectorCreateRequestBodyVendorAirwatch,
+		ConnectorCreateRequestBodyVendorGoogle,
+		ConnectorCreateRequestBodyVendorIntune,
+		ConnectorCreateRequestBodyVendorJamfSchool,
+		ConnectorCreateRequestBodyVendorMaas360,
+		ConnectorCreateRequestBodyVendorMobileironcloud,
+		ConnectorCreateRequestBodyVendorMobileironcore,
+		ConnectorCreateRequestBodyVendorWizy,
+		ConnectorCreateRequestBodyVendorXenmobile,
+		ConnectorCreateRequestBodyVendorJamfPro,
 	}
 }
 
@@ -703,7 +717,6 @@ const (
 	ConnectorCreateRequestVendorXenmobile       ConnectorCreateRequestVendor = "XENMOBILE"
 	ConnectorCreateRequestVendorMaas360         ConnectorCreateRequestVendor = "MAAS360"
 	ConnectorCreateRequestVendorAirwatch        ConnectorCreateRequestVendor = "AIRWATCH"
-	ConnectorCreateRequestVendorJamfPro         ConnectorCreateRequestVendor = "JAMF_PRO"
 	ConnectorCreateRequestVendorJamfSchool      ConnectorCreateRequestVendor = "JAMF_SCHOOL"
 	ConnectorCreateRequestVendorMobileironcloud ConnectorCreateRequestVendor = "MOBILEIRONCLOUD"
 	ConnectorCreateRequestVendorMobileironcore  ConnectorCreateRequestVendor = "MOBILEIRONCORE"
@@ -723,7 +736,6 @@ func ConnectorCreateRequestVendorValues() []ConnectorCreateRequestVendor {
 		ConnectorCreateRequestVendorXenmobile,
 		ConnectorCreateRequestVendorMaas360,
 		ConnectorCreateRequestVendorAirwatch,
-		ConnectorCreateRequestVendorJamfPro,
 		ConnectorCreateRequestVendorJamfSchool,
 		ConnectorCreateRequestVendorMobileironcloud,
 		ConnectorCreateRequestVendorMobileironcore,
@@ -776,6 +788,31 @@ func EmailMappingTypeValues() []EmailMappingType {
 		EmailMappingTypeExternalUserID,
 		EmailMappingTypeName,
 		EmailMappingTypeCustom,
+	}
+}
+
+// JamfProConnectorCreateRequestAuthStrategy is the set of values accepted by JamfProConnectorCreateRequest.AuthStrategy.
+type JamfProConnectorCreateRequestAuthStrategy = string
+
+// JamfProConnectorCreateRequestAuthStrategy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	JamfProConnectorCreateRequestAuthStrategyJamfProOauth JamfProConnectorCreateRequestAuthStrategy = "JAMF_PRO_OAUTH"
+	JamfProConnectorCreateRequestAuthStrategyBasic        JamfProConnectorCreateRequestAuthStrategy = "BASIC"
+	JamfProConnectorCreateRequestAuthStrategyM2m          JamfProConnectorCreateRequestAuthStrategy = "M2M"
+)
+
+// JamfProConnectorCreateRequestAuthStrategyValues returns every value the Jamf API accepts for JamfProConnectorCreateRequestAuthStrategy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func JamfProConnectorCreateRequestAuthStrategyValues() []JamfProConnectorCreateRequestAuthStrategy {
+	return []JamfProConnectorCreateRequestAuthStrategy{
+		JamfProConnectorCreateRequestAuthStrategyJamfProOauth,
+		JamfProConnectorCreateRequestAuthStrategyBasic,
+		JamfProConnectorCreateRequestAuthStrategyM2m,
 	}
 }
 

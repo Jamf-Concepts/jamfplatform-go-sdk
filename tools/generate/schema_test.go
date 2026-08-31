@@ -141,3 +141,102 @@ func TestSingleRefAllOfCollapseDoesNotMutateTarget(t *testing.T) {
 		t.Fatal("collapse marked the shared referenced component nullable")
 	}
 }
+
+// A discriminator mapping may point several wire values at one variant schema.
+// uem-connect does: nine UEM vendors share the generic ConnectorCreateRequest
+// and only JAMF_PRO gets its own type. Deduping by Go type — which is right for
+// the struct field, since nine identical pointers would be nonsense — used to
+// drop the other eight values entirely, and with them their cases in the
+// generated marshal switch. The failure mode is silence: a caller setting
+// Vendor to one of the dropped values marshals to `{"vendor":"INTUNE"}` with
+// every other field gone, and no error at any layer.
+func TestSchemaToDiscriminatorTypeGroupsSharedVariants(t *testing.T) {
+	ref := func(name string) *openapi3.SchemaRef {
+		return &openapi3.SchemaRef{Ref: "#/components/schemas/" + name}
+	}
+	schema := &openapi3.Schema{
+		OneOf: openapi3.SchemaRefs{ref("JamfProConnectorCreateRequest"), ref("ConnectorCreateRequest")},
+		Discriminator: &openapi3.Discriminator{
+			PropertyName: "vendor",
+			Mapping: map[string]openapi3.MappingRef{
+				"JAMF_PRO":    {Ref: "#/components/schemas/JamfProConnectorCreateRequest"},
+				"INTUNE":      {Ref: "#/components/schemas/ConnectorCreateRequest"},
+				"AIRWATCH":    {Ref: "#/components/schemas/ConnectorCreateRequest"},
+				"JAMF_SCHOOL": {Ref: "#/components/schemas/ConnectorCreateRequest"},
+			},
+		},
+	}
+
+	// schemaToDiscriminatorType registers the discriminator's enum into the
+	// per-spec property-enum registry, which a real run initialises.
+	currentPropertyEnums = map[string]GoType{}
+	currentSpecTypeNames = map[string]bool{}
+	t.Cleanup(func() { currentPropertyEnums, currentSpecTypeNames = nil, nil })
+
+	gt := schemaToDiscriminatorType("ConnectorCreateRequestBody", schema)
+	if gt.Discriminator == nil {
+		t.Fatal("no discriminator emitted")
+	}
+	if got := len(gt.Discriminator.Variants); got != 2 {
+		t.Fatalf("variants = %d, want 2 (one field per Go type)", got)
+	}
+
+	byType := map[string]GoDiscriminatorVariant{}
+	for _, v := range gt.Discriminator.Variants {
+		byType[v.TypeName] = v
+	}
+
+	// Every mapped value must survive as a case, or it marshals to nothing.
+	generic, ok := byType["ConnectorCreateRequest"]
+	if !ok {
+		t.Fatal("no variant for ConnectorCreateRequest")
+	}
+	wantValues := map[string]bool{"AIRWATCH": true, "INTUNE": true, "JAMF_SCHOOL": true}
+	if len(generic.Values) != len(wantValues) {
+		t.Fatalf("generic variant values = %v, want the three sharing it", generic.Values)
+	}
+	for _, v := range generic.Values {
+		if !wantValues[v] {
+			t.Errorf("unexpected value %q on the generic variant", v)
+		}
+	}
+	// Naming the shared field after one arbitrary member implies the variant is
+	// only reachable through it, so it takes the schema name instead.
+	if generic.FieldName != "ConnectorCreateRequest" {
+		t.Errorf("shared variant field = %q, want the schema name ConnectorCreateRequest", generic.FieldName)
+	}
+
+	// A single-value variant keeps the value-derived name, so existing unions
+	// (pro's MobileDeviceResponse, blueprints' BookmarkItem) do not churn.
+	jamfPro, ok := byType["JamfProConnectorCreateRequest"]
+	if !ok {
+		t.Fatal("no variant for JamfProConnectorCreateRequest")
+	}
+	if len(jamfPro.Values) != 1 || jamfPro.Values[0] != "JAMF_PRO" {
+		t.Errorf("JAMF_PRO variant values = %v, want exactly [JAMF_PRO]", jamfPro.Values)
+	}
+	if jamfPro.FieldName != exportedGoName("JAMF_PRO") {
+		t.Errorf("single-value variant field = %q, want %q", jamfPro.FieldName, exportedGoName("JAMF_PRO"))
+	}
+
+	// The mapping is the only complete list of accepted values once a spec moves
+	// a value out of a variant's own enum, so the union has to carry constants
+	// for all of them — JAMF_PRO included, which ConnectorCreateRequest.vendor
+	// no longer declares.
+	if gt.Discriminator.EnumTypeName != "ConnectorCreateRequestBodyVendor" {
+		t.Fatalf("EnumTypeName = %q, want ConnectorCreateRequestBodyVendor", gt.Discriminator.EnumTypeName)
+	}
+	enum, ok := currentPropertyEnums["ConnectorCreateRequestBodyVendor"]
+	if !ok {
+		t.Fatal("discriminator enum was not registered")
+	}
+	got := map[string]bool{}
+	for _, c := range enum.EnumValues {
+		got[c.Value] = true
+	}
+	for _, want := range []string{"JAMF_PRO", "INTUNE", "AIRWATCH", "JAMF_SCHOOL"} {
+		if !got[want] {
+			t.Errorf("discriminator enum missing %q", want)
+		}
+	}
+}

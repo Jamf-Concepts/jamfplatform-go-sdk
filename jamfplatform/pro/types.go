@@ -5254,6 +5254,7 @@ type MobileDevicePurchasing struct {
 
 // MobileDeviceResponse is a polymorphic response keyed by deviceType. Exactly one variant pointer is populated after unmarshaling.
 type MobileDeviceResponse struct {
+	// Allowed values: see the MobileDeviceResponseDeviceType constants.
 	DeviceType string                         `json:"deviceType"`
 	IOS        *MobileDeviceIosInventory      `json:"-"`
 	TvOS       *MobileDeviceTvOsInventory     `json:"-"`

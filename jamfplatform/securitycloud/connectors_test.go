@@ -54,7 +54,7 @@ func TestCreateUemConnectorV1(t *testing.T) {
 		writeJSON(t, w, http.StatusCreated, map[string]any{})
 	})
 
-	result, err := c.CreateUemConnectorV1(context.Background(), &ConnectorCreateRequest{})
+	result, err := c.CreateUemConnectorV1(context.Background(), &ConnectorCreateRequestBody{})
 	if err != nil {
 		t.Fatal(err)
 	}

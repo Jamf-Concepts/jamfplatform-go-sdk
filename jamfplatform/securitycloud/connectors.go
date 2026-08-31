@@ -28,7 +28,7 @@ func (c *Client) ListUemConnectorsV1(ctx context.Context) (*ConnectorPage, error
 // CreateUemConnectorV1 create connector.
 //
 // Required privileges: uem-connect:create.
-func (c *Client) CreateUemConnectorV1(ctx context.Context, request *ConnectorCreateRequest) (*CreatedResource, error) {
+func (c *Client) CreateUemConnectorV1(ctx context.Context, request *ConnectorCreateRequestBody) (*CreatedResource, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "")
 	var result CreatedResource
 	endpoint := prefix + "/uem-connect/v1/connectors"

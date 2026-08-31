@@ -569,10 +569,50 @@ itself, verified with both `--compressed` and `identity`.
 ### UEM Connect
 
 - **`authStrategy` is required and its absence is a 500** (`500 INTERNAL_ERROR`,
-  stable across repeats), not a validation error. Supply it and a request without
-  credentials returns a proper `422 VALIDATION_FAILED`. A request built from the
-  published spec alone could only ever fail, which is why `authStrategy`,
-  `tenantId` and `deviceSyncAuth` are patched in.
+  stable across repeats, re-verified 2026-08-31), not a validation error. Supply
+  it and a request without credentials returns a proper `422 VALIDATION_FAILED`.
+  A request built from the published spec alone could only ever fail, which is
+  why `authStrategy`, `tenantId` and `deviceSyncAuth` were patched in — **until
+  v1882, which declares all three** on its new `JamfProConnectorCreateRequest`
+  and let the request-side patches go.
+- **The 500 is no longer reachable through the typed request, and that is the
+  point.** v1882 makes `authStrategy` required, so it generates as a non-pointer
+  `string` and absence cannot be expressed. What a forgetful caller now sends is
+  the empty string, which the enum coercion refuses properly:
+  `422 "Cannot coerce empty String (\"\") to JamfProAuthStrategy"`, field
+  unattributed (2026-08-31). Required-ness converts an unactionable 500 into a
+  diagnosable 422.
+- **Deserialization and field validation run ahead of the singleton pre-check**
+  (2026-08-31). An unknown `vendor` is `422` where a well-formed request is
+  `409`. This is what makes field-level probing possible at all on a tenant that
+  already holds a connector, and every UEM Connect create subtest depends on it.
+- **`url` is not required for `M2M`, though v1882 lists it in the variant's
+  `required` set.** Omitted *and* empty-string both clear field validation and
+  reach the 409; a connector created with `url` absent reads back carrying the
+  URL the server derived from the named tenant (`https://nmartin.jamfcloud.com`
+  from tenant `ff584e5b…`, 2026-08-31). That is what makes the generated
+  non-pointer `URL string` safe — an M2M caller who never sets it sends
+  `"url": ""` and is accepted. For the credential strategies `url` genuinely is
+  required: `JAMF_PRO_OAUTH` without one is `422 ": invalid auth configuration
+  for Jamf PRO"`, unattributed. **Report upstream:** the flat
+  `required: [vendor, url, authStrategy]` cannot express a per-strategy
+  requirement and is wrong for one of the three.
+- **v1882 claims `tenantId` is never echoed back; the wire echoes it.** The
+  schema prose says write-only fields "are never echoed back in any response",
+  but a GET on an `M2M`-created connector returns
+  `"tenantId": "ff584e5b-d9f8-4c1c-8752-449d8c5e45d5"` (2026-08-31, re-confirming
+  2026-08-28). The marker itself is on the *request* schema and so is harmless,
+  but the prose is false and `ConnectorConfig.tenantId` stays patched — it is the
+  only field distinguishing an M2M connector from an OAuth one, since
+  `authStrategy` reads back as `JAMF_PRO_OAUTH` either way. **Report upstream.**
+- **`additionalProperties: false` is not enforced.** An unknown property on a
+  `JAMF_PRO` create reaches the 409 (2026-08-31). The spec is stricter than the
+  server; harmless for the SDK, which sends no unknown fields.
+- **Three response fields are still undeclared anywhere**, observed on an
+  `M2M`-created Jamf Pro connector (2026-08-31): `tokenAuthenticationSupported`
+  (`true`), `uemRiskStateExtAttrs` (`null`) and `deployedProfiles` (`null`). Only
+  the first is typeable from the observation — a null column proves nothing about
+  its type — so none is patched in yet. **Report upstream.**
 - **Two usable strategies for a Jamf Pro connector, needing different fields.**
   `JAMF_PRO_OAUTH` takes `deviceSyncAuth.clientId`/`.clientSecret` for an API
   integration the caller created themselves, plus the instance `url`. **`M2M`
@@ -580,7 +620,8 @@ itself, verified with both `--compressed` and `identity`.
   its own role and integration ("JSC Connector") on that tenant, and `url` is
   ignored. Missing `tenantId` under M2M is `422 "tenantId: must not be null"`.
   This is what keeps the create path testable now that the SDK can no longer mint
-  a Pro credential.
+  a Pro credential. Both strategies, and `BASIC`, are declared upstream as of
+  v1882 and agree with what was probed.
 - **`authStrategy` is a provisioning instruction, not stored state:** a connector
   created with `M2M` reads back as `JAMF_PRO_OAUTH`. It does not round-trip.
 - **A tenant may hold exactly one connector, whatever its vendor.** A complete,
@@ -597,9 +638,21 @@ itself, verified with both `--compressed` and `identity`.
   EmmServerConfig]` — less `EmmServerConfig`, which is Jackson's base-class name
   leaking. Do not generalise ZTNA's unhelpfulness to the rest of Security Cloud.
 - Secrets are genuinely write-only: a read returns only `clientId`, `username`
-  and an `empty` flag. Combined with the singleton rule, that is why the tenant's
-  existing connector cannot be deleted and recreated, and why every other write in
-  the family needs a tenant whose *only* connector is disposable.
+  and an `empty` flag. Combined with the singleton rule, that is why a
+  credential-bearing connector cannot be deleted and recreated, and why every
+  other write in the family needs a tenant whose *only* connector is disposable.
+- **An `M2M` connector is the disposable one, and that unblocks the write
+  suite.** It is recreatable from `tenantId` alone — no secret to lose — so
+  unlike a credential-bearing connector it can be deleted and remade at will.
+  The JSC sandbox tenant `928260f5…` now holds exactly such a connector
+  (`6a95614fa7d64061069424cf`, `JAMF_PRO`/`M2M` against
+  `nmartin.jamfcloud.com`), created 2026-08-31 in place of the MaaS360 one that
+  was there before. So `TestAcceptance_SecurityCloudUemConnectWrites`, whose skip
+  reason is that the tenant's connector is unrestorable, is now stale: enablement,
+  the sync-settings full-replacement round-trip, trigger/cancel sync and the
+  activation-profile deploy are all reachable. Note the deletion must also clear
+  the "JSC Connector" API role and integration `M2M` provisions on the Jamf Pro
+  side, which the SDK cannot do.
 - `EmailMapping`'s `CUSTOM` type returns an extra `fieldName` naming the UEM
   attribute to read, **deliberately undocumented** because ADG-125 requires every
   documented field to be present in every response. The transport decodes

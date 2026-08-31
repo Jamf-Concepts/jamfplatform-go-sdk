@@ -1712,14 +1712,30 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 		PropertyName: schema.Discriminator.PropertyName,
 		GoFieldName:  exportedGoName(schema.Discriminator.PropertyName),
 	}
-	seen := make(map[string]bool)
+	// Group by Go type rather than dropping repeats: several discriminator
+	// values may legitimately share one variant schema, and each still needs
+	// its own case in the generated switches. Deduping the *field* is right —
+	// nine identical pointers would be nonsense — but deduping the *value*
+	// silently strips the cases, and a caller setting one of the dropped
+	// discriminators marshals to a lone discriminator with every other field
+	// gone. Variant order follows first appearance, so it stays deterministic.
+	byType := make(map[string]int)
 	addVariant := func(value, typeName string) {
-		if value == "" || typeName == "" || seen[typeName] {
+		if value == "" || typeName == "" {
 			return
 		}
-		seen[typeName] = true
+		if i, ok := byType[typeName]; ok {
+			v := &gt.Discriminator.Variants[i]
+			v.Values = append(v.Values, value)
+			// The field can no longer be named after a single value without
+			// implying this variant is only reachable through it. Name it
+			// after the schema instead, which covers every value equally.
+			v.FieldName = typeName
+			return
+		}
+		byType[typeName] = len(gt.Discriminator.Variants)
 		gt.Discriminator.Variants = append(gt.Discriminator.Variants, GoDiscriminatorVariant{
-			Value:     value,
+			Values:    []string{value},
 			TypeName:  typeName,
 			FieldName: exportedGoName(value),
 		})
@@ -1739,7 +1755,49 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 			addVariant(tn, exportedGoName(tn))
 		}
 	}
+	gt.Discriminator.EnumTypeName = registerDiscriminatorEnum(name, gt.Discriminator)
 	return gt
+}
+
+// registerDiscriminatorEnum emits an enum type for the union's discriminator
+// values, so the accepted set is nameable rather than only readable off the
+// generated switch. The mapping is the authoritative list: a variant's own
+// `enum` covers just the values routing to that variant, and a spec that
+// splits one schema into several moves values out of those enums altogether.
+//
+// Registered through currentPropertyEnums so it lands in enums.go beside every
+// other property enum, and skipped — rather than shadowing — when a spec schema
+// already claims either spelling, matching propertyEnumTypeName's rule.
+func registerDiscriminatorEnum(unionName string, d *GoDiscriminator) string {
+	var values []any
+	for _, v := range d.Variants {
+		for _, dv := range v.Values {
+			values = append(values, dv)
+		}
+	}
+	if len(values) < 2 {
+		return ""
+	}
+	typeName := unionName + d.GoFieldName
+	if currentSpecTypeNames[typeName] || currentSpecTypeNames[typeName+"Values"] {
+		log.Printf("discriminator enum %s.%s: skipping — %s is already declared by a spec schema",
+			unionName, d.GoFieldName, typeName)
+		return ""
+	}
+	if _, exists := currentPropertyEnums[typeName]; exists {
+		return typeName
+	}
+	consts := enumConsts(typeName, values)
+	if len(consts) == 0 {
+		return ""
+	}
+	currentPropertyEnums[typeName] = GoType{
+		Name: typeName,
+		Comment: fmt.Sprintf("%s is the set of values accepted by %s.%s.",
+			typeName, unionName, d.GoFieldName),
+		EnumValues: consts,
+	}
+	return typeName
 }
 
 // sortedMapKeys returns deterministically-ordered keys for a string-keyed map.

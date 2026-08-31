@@ -1256,16 +1256,26 @@ func jscProUemTenantID(t *testing.T) string {
 //
 // Three things this pins that no published spec states, all wire-verified:
 //
-//   - `authStrategy` is required, and omitting it is a **500 INTERNAL_ERROR**
-//     rather than a validation error (2026-08-21). That matters because the
-//     published ConnectorCreateRequest declares only vendor/url/isoCountry, so a
-//     request built from the spec alone could only ever 500. authStrategy,
-//     tenantId and deviceSyncAuth are restored via schemaCreations/schemaPatches,
-//     and the 500 subtest is the regression guard: if it starts returning 4xx the
-//     server bug is fixed and the note in CLAUDE.md should say so.
+//   - Deserialization and field validation run **ahead of** the singleton
+//     pre-check, which is what makes any of this probeable on an occupied
+//     tenant: an unknown `vendor` answers 422 where a well-formed request
+//     answers 409 (2026-08-31).
+//   - `authStrategy` is required. v1882 finally declares it, so the generated
+//     field is a non-pointer string and absence is no longer expressible — the
+//     empty string a forgetful caller sends is refused by the enum coercion with
+//     a 422. Absence itself is still a **500 INTERNAL_ERROR** on the wire
+//     (2026-08-21, re-verified 2026-08-31), reachable only by hand-rolled JSON.
 //   - `M2M` requires `tenantId` and rejects its absence with
 //     `422 "tenantId: must not be null"` (2026-08-28) — so field validation is
 //     reachable without supplying anything secret.
+//   - `url` is **not** required for `M2M`, though v1882 lists it in the
+//     variant's `required` set. Omitted and empty-string both clear field
+//     validation and the server derives the real URL from the named tenant
+//     (2026-08-31). That is what makes the generated non-pointer `URL string`
+//     safe: an M2M caller who never sets it sends `"url": ""` and is accepted.
+//     For the credential strategies `url` genuinely is required —
+//     `JAMF_PRO_OAUTH` without one answers `422 ": invalid auth configuration
+//     for Jamf PRO"`, unattributed.
 //   - A tenant may hold **one connector, full stop**. A complete, correct
 //     request answers 409 CONNECTOR_CONFIG_ALREADY_EXISTS whenever any
 //     connector exists, whatever its vendor — the message says "incompatible
@@ -1284,39 +1294,75 @@ func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
 
 	tenantID := jscProUemTenantID(t)
 
-	req := func() *securitycloud.ConnectorCreateRequest {
-		return &securitycloud.ConnectorCreateRequest{
-			Vendor:       securitycloud.ConnectorCreateRequestVendorJamfPro,
-			AuthStrategy: &[]string{"M2M"}[0],
-			TenantID:     &tenantID,
+	// v1882 split the create body into a vendor-discriminated union, so the
+	// Jamf Pro contract is its own schema and the request is built in two
+	// halves: the discriminator on the envelope, and the typed variant behind
+	// it. The vendor has to be set in both — the envelope routes on it, the
+	// variant is what actually serialises.
+	req := func() *securitycloud.ConnectorCreateRequestBody {
+		return &securitycloud.ConnectorCreateRequestBody{
+			Vendor: securitycloud.ConnectorCreateRequestBodyVendorJamfPro,
+			JAMFPRO: &securitycloud.JamfProConnectorCreateRequest{
+				Vendor:       securitycloud.ConnectorCreateRequestBodyVendorJamfPro,
+				AuthStrategy: securitycloud.JamfProConnectorCreateRequestAuthStrategyM2m,
+				TenantID:     &tenantID,
+			},
 		}
 	}
 
 	// Ordered deliberately: prove the spec-shaped request is unusable, then that
 	// authStrategy alone promotes the failure to real validation, then that a
 	// complete request clears validation entirely.
-	t.Run("authStrategy omitted is a 500, not a validation error", func(t *testing.T) {
+	t.Run("an empty authStrategy is a 422, not the 500 an absent one gives", func(t *testing.T) {
+		// v1882 makes authStrategy required, so it generates as a non-pointer
+		// string and the typed request can no longer express absence — which is
+		// the point. Absent still returns 500 INTERNAL_ERROR on the wire
+		// (re-verified 2026-08-31); the empty string a caller who forgets the
+		// field now sends is refused properly, by the enum coercion, with the
+		// field unattributed. So the required-ness converts an unactionable 500
+		// into a diagnosable 422, and the 500 is only reachable by hand-rolling
+		// the JSON.
 		bare := req()
-		bare.AuthStrategy = nil
-		bare.TenantID = nil
-		bare.URL = "https://example.jamfcloud.com"
+		bare.JAMFPRO.AuthStrategy = ""
+		bare.JAMFPRO.TenantID = nil
+		bare.JAMFPRO.URL = "https://example.jamfcloud.com"
 		_, err := sc.CreateUemConnectorV1(ctx, bare)
 		if err == nil {
-			t.Fatal("a vendor+url-only create succeeded — the server bug is fixed and a connector may now exist on the tenant")
+			t.Fatal("a create with an empty authStrategy succeeded — a connector may now exist on the tenant")
 		}
 		apiErr := jamfplatform.AsAPIError(err)
 		if apiErr == nil {
 			t.Fatalf("want an API error, got %v", err)
 		}
-		if !apiErr.HasStatus(500) {
-			t.Fatalf("want 500 INTERNAL_ERROR for a spec-shaped request, got %d (%s) — if this is now a 4xx the server bug is fixed; update CLAUDE.md and this assertion", apiErr.StatusCode, apiErr.Summary())
+		if !apiErr.HasStatus(422) {
+			t.Fatalf("want 422 VALIDATION_FAILED for an empty authStrategy, got %d (%s)", apiErr.StatusCode, apiErr.Summary())
 		}
-		t.Logf("spec-shaped request -> %s", apiErr.Summary())
+		t.Logf("empty authStrategy -> %s", apiErr.Summary())
+	})
+
+	t.Run("an unknown vendor is a 422, and it precedes the singleton check", func(t *testing.T) {
+		// Load-bearing for every other subtest here: a tenant holds one
+		// connector at most, so a well-formed create answers 409 whatever else
+		// is wrong with it. This proves deserialization runs first, which is
+		// what makes field-level probing possible on an occupied tenant. The
+		// 422 also quotes the server's own subtype registry, so it is the
+		// authoritative vendor list — and it is where the drift between the
+		// spec's enum and the server's would first show.
+		unknown := &securitycloud.ConnectorCreateRequestBody{Vendor: "BOGUS_VENDOR"}
+		_, err := sc.CreateUemConnectorV1(ctx, unknown)
+		if err == nil {
+			t.Fatal("a create with an unknown vendor succeeded")
+		}
+		apiErr := jamfplatform.AsAPIError(err)
+		if apiErr == nil || !apiErr.HasStatus(422) {
+			t.Fatalf("want 422 ahead of the 409 singleton check, got %v", err)
+		}
+		t.Logf("unknown vendor -> %s", apiErr.Summary())
 	})
 
 	t.Run("M2M without a tenantId is a 422", func(t *testing.T) {
 		noTenant := req()
-		noTenant.TenantID = nil
+		noTenant.JAMFPRO.TenantID = nil
 		_, err := sc.CreateUemConnectorV1(ctx, noTenant)
 		if err == nil {
 			t.Fatal("a create with no tenantId succeeded — an unprovisioned connector may now exist on the tenant")
@@ -1328,7 +1374,34 @@ func TestAcceptance_SecurityCloudUemConnectCreate(t *testing.T) {
 		t.Logf("M2M without tenantId -> %s", apiErr.Summary())
 	})
 
+	t.Run("JAMF_PRO_OAUTH without a url is a 422", func(t *testing.T) {
+		// The mirror of the M2M case below: url is optional for M2M and
+		// required here, which the spec's flat `required: [vendor, url,
+		// authStrategy]` cannot express. Credentials are deliberately bogus —
+		// the auth-configuration check fires on shape, before anything is
+		// dialled, so nothing is provisioned and no real secret is needed.
+		oauth := req()
+		oauth.JAMFPRO.AuthStrategy = securitycloud.JamfProConnectorCreateRequestAuthStrategyJamfProOauth
+		oauth.JAMFPRO.TenantID = nil
+		oauth.JAMFPRO.DeviceSyncAuth = &securitycloud.JamfProCredentials{
+			ClientID:     &[]string{"not-a-real-client"}[0],
+			ClientSecret: &[]string{"not-a-real-secret"}[0],
+		}
+		_, err := sc.CreateUemConnectorV1(ctx, oauth)
+		if err == nil {
+			t.Fatal("a JAMF_PRO_OAUTH create with no url succeeded — a connector may now exist on the tenant")
+		}
+		apiErr := jamfplatform.AsAPIError(err)
+		if apiErr == nil || !apiErr.HasStatus(422) {
+			t.Fatalf("want 422 for a credential strategy with no url, got %v", err)
+		}
+		t.Logf("JAMF_PRO_OAUTH without url -> %s", apiErr.Summary())
+	})
+
 	t.Run("a complete request clears validation", func(t *testing.T) {
+		// req() leaves URL unset, so this also pins that the required-but-unused
+		// `url` reaches the server as "" on the M2M path and is accepted: the
+		// request gets past field validation to the singleton check.
 		created, err := sc.CreateUemConnectorV1(ctx, req())
 		if err == nil {
 			// The tenant had no connector, so this made one. Remove it before

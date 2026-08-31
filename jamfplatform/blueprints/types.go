@@ -222,6 +222,7 @@ type BookmarkGroup struct {
 
 // BookmarkItem is a polymorphic response keyed by Type. Exactly one variant pointer is populated after unmarshaling.
 type BookmarkItem struct {
+	// Allowed values: see the BookmarkItemType constants.
 	Type     string              `json:"Type"`
 	BOOKMARK *URLBookmarkItem    `json:"-"`
 	FOLDER   *FolderBookmarkItem `json:"-"`
@@ -1088,6 +1089,7 @@ type SupportedOs struct {
 
 // SwUpdateAutomaticConfiguration Automatic software update enforcement configuration. Automatically enforces updates based on strategy (LATEST or SEMANTIC).
 type SwUpdateAutomaticConfiguration struct {
+	// Allowed values: see the SwUpdateAutomaticConfigurationStrategy constants.
 	Strategy string                         `json:"strategy"`
 	LATEST   *SwUpdateLatestConfiguration   `json:"-"`
 	SEMANTIC *SwUpdateSemanticConfiguration `json:"-"`

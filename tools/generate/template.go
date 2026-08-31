@@ -284,6 +284,9 @@ type {{ .Name }} = json.RawMessage
 {{- else if .Discriminator }}
 // {{ .Comment }}
 type {{ .Name }} struct {
+{{- if .Discriminator.EnumTypeName }}
+	// Allowed values: see the {{ .Discriminator.EnumTypeName }} constants.
+{{- end }}
 	{{ .Discriminator.GoFieldName }} string ` + "`" + `json:"{{ .Discriminator.PropertyName }}"` + "`" + `
 {{- range .Discriminator.Variants }}
 	{{ .FieldName }} *{{ .TypeName }} ` + "`" + `json:"-"` + "`" + `
@@ -303,7 +306,7 @@ func (m *{{ .Name }}) UnmarshalJSON(data []byte) error {
 	m.{{ .Discriminator.GoFieldName }} = d.{{ .Discriminator.GoFieldName }}
 	switch d.{{ .Discriminator.GoFieldName }} {
 {{- range .Discriminator.Variants }}
-	case "{{ .Value }}":
+	case {{ range $i, $v := .Values }}{{ if $i }}, {{ end }}"{{ $v }}"{{ end }}:
 		m.{{ .FieldName }} = new({{ .TypeName }})
 		return json.Unmarshal(data, m.{{ .FieldName }})
 {{- end }}
@@ -316,7 +319,7 @@ func (m *{{ .Name }}) UnmarshalJSON(data []byte) error {
 func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
 	switch m.{{ .Discriminator.GoFieldName }} {
 {{- range .Discriminator.Variants }}
-	case "{{ .Value }}":
+	case {{ range $i, $v := .Values }}{{ if $i }}, {{ end }}"{{ $v }}"{{ end }}:
 		return json.Marshal(m.{{ .FieldName }})
 {{- end }}
 	}

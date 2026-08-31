@@ -288,7 +288,7 @@ a method that ignores the cursor fails.
 
 **Security Cloud provenance, and the one trap that silently replaces a spec:**
 
-| `testing/` file | v1877 source |
+| `testing/` file | v1882 source |
 |---|---|
 | `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` |
 | `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` |
@@ -343,17 +343,55 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1877** (2026-08-30), except:
+Ingested through **v1882** (2026-08-31), except:
 
-v1877 moved **one line**: AI Governance's `servers` URL (and the matching
-`_permissions/routes.yaml` domain key). Every other file outside `internal/dev`
-was byte-identical to v1872 — 9 changed files, of which 4 were manifests and the
-unified rollup. The archive was 8 bytes smaller. Nothing in `jamfplatform/`
-changed; the only generated diff was the URL string in
-`api/ai_governance_policies_api.json`. The ingest also replaced
-`testing/ai-governance-api.yaml`'s **re-emitted** YAML with the bundle file
-verbatim, so future AI Governance bundle diffs are exact — the same repair the
-account files got.
+v1882 changed **one spec**: `internal/stage/uem-connect`. Everything else outside
+`internal/dev` was byte-identical to v1877, `_permissions/{routes,scopes}.yaml`
+included; the only other diffs were the manifest and the two unified rollups.
+
+It split the create body into a vendor-discriminated `oneOf`
+(`ConnectorCreateRequestBody`), gave Jamf Pro its own
+`JamfProConnectorCreateRequest` + `JamfProCredentials`, and **removed `JAMF_PRO`
+from the generic `ConnectorCreateRequest`'s vendor enum**. That adopts all three
+fields the SDK had been restoring from the wire since 2026-08-21 —
+`authStrategy`, `deviceSyncAuth`, `tenantId` — so those `schemaPatches` were
+deleted; the `ConnectorConfig` response patches stay, upstream having fixed only
+the request side. Details and the two claims the wire contradicts:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#uem-connect).
+
+**The `oneOf` is faithful to the server, not just documentation.** An unknown
+vendor returns `422` quoting Jackson's own subtype registry for
+`EmmServerConfig`, with `JAMF_PRO` a first-class member — so the split models a
+real per-vendor type hierarchy and was taken rather than collapsed. It is a
+**breaking change**: `CreateUemConnectorV1` now takes
+`*ConnectorCreateRequestBody`, and `ConnectorCreateRequestVendorJamfPro` is gone
+(the union's own `ConnectorCreateRequestBodyVendor` enum replaces it and is the
+only complete vendor list — see below). `terraform-provider-jamfplatform`'s
+`uem_connect` resource needs migrating: `input_builders.go`, `mappings.go`, and
+its three test files.
+
+**A discriminated union now also emits an enum for its discriminator values.**
+The mapping is the authoritative set once a spec moves a value out of a variant's
+own `enum`, which is exactly what v1882 did to `JAMF_PRO`; without this the SDK
+would have had no constant for the commonest vendor. Purely additive for the
+three existing unions (`MobileDeviceResponse`, `BookmarkItem`,
+`SwUpdateAutomaticConfiguration`).
+
+**The generator's discriminator handling had a silent-data-loss bug**, latent
+because every previous union mapped 1:1. `schemaToDiscriminatorType` deduped
+variants by Go type, so nine of uem-connect's ten mapping keys were dropped along
+with their cases in the generated switches, and a caller setting `Vendor:
+"INTUNE"` would have marshaled `{"vendor":"INTUNE"}` with every other field gone.
+The field is still deduped — nine identical pointers would be nonsense — but each
+value now gets its own case, and a variant serving several values is named after
+its schema rather than one arbitrary member. `emitTypesOnlyTest` emits a
+round-trip test per *value* for the same reason. Pinned by
+`TestSchemaToDiscriminatorTypeGroupsSharedVariants`.
+
+The ingest also replaced `testing/securitycloud-uem-connect-api.yaml`'s
+**re-emitted** YAML with the bundle file verbatim — the same repair the account
+and AI Governance files got. Confirmed inert first: the verbatim v1877 file
+regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 
 
 | held | why |
