@@ -491,7 +491,7 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 						Title:           "SDK Test Bookmarks",
 						GroupIdentifier: "sdk-acc-test-group",
 						Bookmarks: []blueprints.BookmarkItem{
-							{Type: "BOOKMARK", BOOKMARK: &blueprints.URLBookmarkItem{Type: "BOOKMARK", Title: "Jamf", URL: "https://www.jamf.com"}},
+							{Type: blueprints.BookmarkItemTypeBookmark, BOOKMARK: &blueprints.URLBookmarkItem{Type: blueprints.BookmarkItemTypeBookmark, Title: "Jamf", URL: "https://www.jamf.com"}},
 						},
 					},
 				},
@@ -565,10 +565,10 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 			name:       "SwUpdate",
 			identifier: "com.jamf.ddm.sw-updates",
 			config: blueprints.SwUpdateAutomaticConfiguration{
-				Strategy: "SEMANTIC",
+				Strategy: blueprints.SwUpdateAutomaticConfigurationStrategySemantic,
 				SEMANTIC: &blueprints.SwUpdateSemanticConfiguration{
 					EnforcementType: "AUTOMATIC",
-					Strategy:        "SEMANTIC",
+					Strategy:        blueprints.SwUpdateAutomaticConfigurationStrategySemantic,
 					Rules: blueprints.UpdateRules{
 						Minor: blueprints.UpdateRule{
 							DeploymentTime:   "13:10",

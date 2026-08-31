@@ -31,9 +31,16 @@ func TestAcceptance_Pro_GetStartupStatus(t *testing.T) {
 
 // TestAcceptance_Pro_ListMobileDevicesDetail exercises the oneOf/discriminator
 // path: the response carries a paginated slice of MobileDeviceResponse where
-// each element is one of iOS / tvOS / watchOS variants keyed by the
-// deviceType discriminator. The generated UnmarshalJSON dispatches each
+// each element is one of the iOS / tvOS / visionOS / watchOS variants keyed by
+// the deviceType discriminator. The generated UnmarshalJSON dispatches each
 // element to the matching variant pointer.
+//
+// The switch is keyed on the generated constants rather than string literals so
+// that a value the spec renames or drops fails the build, instead of quietly
+// becoming a case that can never match. It covers every member of
+// MobileDeviceResponseDeviceTypeValues(), and the default arm is what stops a
+// newly-added variant from going unnoticed — visionOS was already in the union
+// and absent from this switch before the constants existed.
 func TestAcceptance_Pro_ListMobileDevicesDetail(t *testing.T) {
 	c := accClient(t)
 
@@ -48,18 +55,24 @@ func TestAcceptance_Pro_ListMobileDevicesDetail(t *testing.T) {
 			break
 		}
 		switch d.DeviceType {
-		case "iOS":
+		case pro.MobileDeviceResponseDeviceTypeIOS:
 			if d.IOS == nil {
-				t.Errorf("device[%d] DeviceType=iOS but IOS variant is nil", i)
+				t.Errorf("device[%d] DeviceType=%s but IOS variant is nil", i, d.DeviceType)
 			}
-		case "tvOS":
+		case pro.MobileDeviceResponseDeviceTypeTvOS:
 			if d.TvOS == nil {
-				t.Errorf("device[%d] DeviceType=tvOS but TvOS variant is nil", i)
+				t.Errorf("device[%d] DeviceType=%s but TvOS variant is nil", i, d.DeviceType)
 			}
-		case "watchOS":
+		case pro.MobileDeviceResponseDeviceTypeVisionOS:
+			if d.VisionOS == nil {
+				t.Errorf("device[%d] DeviceType=%s but VisionOS variant is nil", i, d.DeviceType)
+			}
+		case pro.MobileDeviceResponseDeviceTypeWatchOS:
 			if d.WatchOS == nil {
-				t.Errorf("device[%d] DeviceType=watchOS but WatchOS variant is nil", i)
+				t.Errorf("device[%d] DeviceType=%s but WatchOS variant is nil", i, d.DeviceType)
 			}
+		default:
+			t.Errorf("device[%d] DeviceType=%q is outside MobileDeviceResponseDeviceTypeValues() — the spec gained a variant this test does not dispatch", i, d.DeviceType)
 		}
 		t.Logf("device[%d] type=%s", i, d.DeviceType)
 	}
