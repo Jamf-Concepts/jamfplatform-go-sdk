@@ -243,13 +243,22 @@ func WithMinRequestInterval(d time.Duration) Option {
 
 // WithRetryPolicy overrides the transport's automatic-retry timing for
 // transient failures (see retry.go's isRetryableWriteStatus for what gets
-// retried). Exists primarily for test harnesses that mock a
-// persistently-failing transient status (e.g. an always-500 GET) and need
-// the retry loop to run in milliseconds rather than the production 1s-60s
-// window with up to 5 total attempts — without this, such a test would hang
-// for the full backoff duration on every run. maxRetries follows
-// retryablehttp's own semantics: total attempts = maxRetries+1, so 0 means
-// no retries at all.
+// retried, and jamfBackoff for the curve). waitMin seeds an exponential
+// backoff and waitMax caps it; maxRetries follows retryablehttp's own
+// semantics, so total attempts = maxRetries+1 and 0 disables retrying
+// entirely.
+//
+// Two distinct uses, both legitimate:
+//
+//   - A test harness mocking a persistently-failing transient status (e.g.
+//     an always-500 GET) wants the loop to run in milliseconds rather than
+//     the production window. Pass a few milliseconds and a low maxRetries.
+//   - An interactive caller (a CLI) wants a bound far tighter than the
+//     production default, so a transient failure surfaces promptly instead
+//     of appearing to hang.
+//
+// An overall time bound is better expressed as a context deadline, which
+// bounds the whole call including every retry and needs no policy change.
 func WithRetryPolicy(waitMin, waitMax time.Duration, maxRetries int) Option {
 	return func(c *Transport) {
 		c.retry.RetryWaitMin = waitMin
@@ -285,6 +294,10 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 		throttle:     throttle,
 		retry:        retry,
 	}
+	// Installed here rather than in newRetryClient because the hook is a
+	// method on c, which does not exist yet at that point. It reads c.logger
+	// at call time, so it works regardless of when a logger is installed.
+	retry.RequestLogHook = c.logRetryAttempt
 	for _, opt := range opts {
 		opt(c)
 	}

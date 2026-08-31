@@ -388,3 +388,99 @@ func TestRetryAfter_OverCapIsClampedNotAbandoned(t *testing.T) {
 	}
 	_ = srv
 }
+
+// TestJamfBackoff_Exponential pins the curve the SDK gets from
+// retryablehttp.DefaultBackoff, and is the regression guard for the reason
+// jamfBackoff no longer uses RateLimitLinearJitterBackoff: that function
+// sampled uniformly over the entire [min,max] window and multiplied by
+// attempt number, so with these same 1s/60s bounds the FIRST retry waited
+// ~30s on average and a four-retry sequence averaged over three minutes. The
+// exponential curve bounds the same sequence at 1+2+4+8 = 15s.
+func TestJamfBackoff_Exponential(t *testing.T) {
+	for attempt, want := range map[int]time.Duration{
+		0: 1 * time.Second,
+		1: 2 * time.Second,
+		2: 4 * time.Second,
+		3: 8 * time.Second,
+	} {
+		if got := jamfBackoff(1*time.Second, 60*time.Second, attempt, nil); got != want {
+			t.Errorf("jamfBackoff(1s, 60s, %d, nil) = %v, want %v", attempt, got, want)
+		}
+	}
+}
+
+// TestJamfBackoff_ExponentialCappedAtMax covers a caller who raises
+// maxRetries via WithRetryPolicy far enough that the doubling would overshoot
+// the ceiling.
+func TestJamfBackoff_ExponentialCappedAtMax(t *testing.T) {
+	if got := jamfBackoff(1*time.Second, 10*time.Second, 20, nil); got != 10*time.Second {
+		t.Errorf("jamfBackoff(1s, 10s, 20, nil) = %v, want 10s (capped)", got)
+	}
+}
+
+// TestJamfBackoff_RetryAfterDateForm pins that the date form of Retry-After
+// is honored, not just delay-seconds. A seconds-only parser treats a date as
+// absent and silently discards the only backpressure the server sent.
+func TestJamfBackoff_RetryAfterDateForm(t *testing.T) {
+	resp := &http.Response{
+		StatusCode: http.StatusTooManyRequests,
+		Header: http.Header{"Retry-After": []string{
+			time.Now().Add(3 * time.Second).UTC().Format(time.RFC1123),
+		}},
+	}
+	got := jamfBackoff(1*time.Second, 60*time.Second, 0, resp)
+	if got < 1*time.Second || got > 4*time.Second {
+		t.Errorf("jamfBackoff with Retry-After date ~3s away = %v, want ~3s", got)
+	}
+}
+
+// TestJamfBackoff_RetryAfterIgnoredOnOther5xx pins that Retry-After only
+// steers the wait for 429/503. A 500 carrying the header stays on the
+// exponential curve — the header is a rate-limit signal, and honoring it on
+// an arbitrary 5xx would let one confused upstream dictate client timing.
+func TestJamfBackoff_RetryAfterIgnoredOnOther5xx(t *testing.T) {
+	resp := &http.Response{
+		StatusCode: http.StatusInternalServerError,
+		Header:     http.Header{"Retry-After": []string{"30"}},
+	}
+	if got := jamfBackoff(1*time.Second, 60*time.Second, 0, resp); got != 1*time.Second {
+		t.Errorf("jamfBackoff(500 + Retry-After: 30) = %v, want 1s (exponential curve)", got)
+	}
+}
+
+// TestRetryAttemptsAreLogged is the visibility guard. Before the
+// RequestLogHook existed, execute() logged one request, handed the whole
+// retry loop to a single httpClient.Do, and handleResponse logged only the
+// surviving response — so a four-retry sequence and a single slow call
+// produced identical output, which is what made a multi-minute retry
+// sequence read as a hang.
+func TestRetryAttemptsAreLogged(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 1*time.Millisecond, 2*time.Millisecond)
+
+	var logged atomic.Int32
+	c.SetLogger(&testLogger{onRequest: func() { logged.Add(1) }})
+
+	var calls atomic.Int32
+	mux.HandleFunc("/api/flaky-logged", func(w http.ResponseWriter, _ *http.Request) {
+		if calls.Add(1) < 3 {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	if err := c.Do(context.Background(), http.MethodGet, "/api/flaky-logged", nil, nil); err != nil {
+		t.Fatalf("Do: %v", err)
+	}
+	if got := calls.Load(); got != 3 {
+		t.Fatalf("expected 3 attempts (500, 500, 200), got %d", got)
+	}
+	// One line from execute() for attempt 1, one from the hook for each of
+	// the two retries. The hook skips attempt 0 precisely so it does not
+	// double-log the request execute() already emitted.
+	if got := logged.Load(); got != 3 {
+		t.Errorf("expected 3 logged requests (one per attempt), got %d", got)
+	}
+}

@@ -322,17 +322,28 @@ func WithMinRequestInterval(d time.Duration) Option {
 // WithRetryPolicy overrides the SDK's automatic retry timing for transient
 // failures (429, 503, and 500/502/504 on GET/DELETE/PUT/HEAD — see
 // isRetryableWriteStatus's godoc in the SDK's internal transport for the
-// exact policy). The production default is a 1s-60s backoff window with up
-// to 5 total attempts per request.
+// exact policy).
 //
-// This exists primarily for test harnesses: a unit test that mocks a
-// persistently-failing transient status (e.g. an always-500 GET, used to
-// exercise a caller's error-handling path) will otherwise hang for the full
-// production backoff window on every run, since the SDK retries it several
-// times before giving up. Pass a small waitMin/waitMax (e.g. a few
-// milliseconds) and/or a small maxRetries to make such tests fast.
-// maxRetries follows retryablehttp's own semantics: total attempts per
-// request = maxRetries+1, so 0 means no automatic retry at all.
+// waitMin seeds an exponential backoff and waitMax caps it; maxRetries
+// follows retryablehttp's own semantics, so total attempts per request =
+// maxRetries+1 and 0 disables automatic retrying entirely. The production
+// default is waitMin 1s, waitMax 60s, maxRetries 4 — bounding a full retry
+// sequence at 1+2+4+8 = 15s of waiting.
+//
+// Two distinct uses, both supported:
+//
+//   - Tests. A unit test mocking a persistently-failing transient status
+//     (e.g. an always-500 GET, to exercise a caller's error-handling path)
+//     otherwise waits out the full production backoff on every run. Pass a
+//     few milliseconds and a low maxRetries.
+//   - Interactive callers. A CLI generally wants a tighter bound than the
+//     default so a transient failure surfaces promptly rather than looking
+//     like a hang — e.g. WithRetryPolicy(200*time.Millisecond,
+//     2*time.Second, 2).
+//
+// To bound total time rather than retry timing, prefer a context deadline:
+// it covers the whole call including every retry attempt and the waits
+// between them, and needs no policy change.
 func WithRetryPolicy(waitMin, waitMax time.Duration, maxRetries int) Option {
 	return func(cfg *clientConfig) {
 		cfg.retryWaitMin = waitMin

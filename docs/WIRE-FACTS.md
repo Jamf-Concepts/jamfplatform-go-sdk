@@ -958,6 +958,88 @@ every family.
 
 ---
 
+## Rate limiting
+
+**No Jamf path rate-limits as of 2026-08-31. This is a fact with an expiry date
+— rate limiting is planned — so treat it as a snapshot, not a standing
+property, and re-probe before relying on it.**
+
+Wire evidence, `us` prod, one `pro` GET plus a 30-request burst shaped like
+Terraform's default parallelism (3 rounds x 10 concurrent, no client pacing):
+all 30 returned 200, and every response carried
+
+```
+x-ratelimit-limit: 0
+x-ratelimit-remaining: 0
+x-ratelimit-reset: 0
+```
+
+Tyk reports the limit as `0` when rate limiting is disabled for the key. **No
+response carried a `Retry-After` header.**
+
+Corroborated in `jamf/tyk-gateway-management` @ `92c06467`: both prod plans
+(`prod/plans/default.yaml`, `default-external.yaml`) carry `rate: -1`,
+`per: -1`, `quota_max: -1`. The only `global_rate_limit` anywhere in `prod/` is
+on the m2m Auth0 client-registration path (`rate: 2, per: 3`), which the SDK
+never calls. `Retry-After` appears nowhere in the gateway config or in
+`jamf/tyk-custom-plugins`.
+
+Two consequences for the transport:
+
+- **429 is currently unreachable on SDK paths**, so `jamfBackoff`'s
+  `Retry-After` branch is untested against the real gateway. It is written to
+  be correct when rate limiting arrives rather than tuned to the present
+  absence — `retryablehttp.DefaultBackoff` supplies the parsing, and the SDK
+  adds only a clamp to `retryWaitMax`.
+- **When rate limiting does land, the shape matters.** If it emits
+  `Retry-After`, the transport already honors it and nothing needs changing. If
+  it does not, the exponential curve is the only backpressure response, and
+  jittering it becomes worth adding — retries are routinely concurrent and a
+  deterministic curve makes requests that failed together collide again. Worth
+  asking the gateway team to emit `Retry-After` on 429 and to populate the
+  `x-ratelimit-*` headers that currently return `0`; that removes the guessing
+  entirely.
+
+### Tyk enforced timeouts on smart-group writes
+
+Not rate limiting, but found in the same config pass and shares the
+retry-amplification concern. `prod/api-products/pro/api-definitions-*.yaml`
+sets `hard_timeouts` on exactly two operations, in all three regions:
+
+```yaml
+hard_timeouts:
+- method: POST
+  path: "/v2/computer-groups/smart-groups"
+  timeout: 180
+- method: PUT
+  path: "/v2/computer-groups/smart-groups/{id}"
+  timeout: 180
+```
+
+These are *raised* ceilings — someone hit Tyk's default enforced timeout on
+smart-group writes and pushed it to 180s, which is itself evidence the endpoint
+struggles.
+
+The PUT is in the transport's retryable set (idempotent method, see
+`isRetryableWriteStatus`) and the POST is not. Retrying the PUT is **safe** —
+`UpdateSmartComputerGroupV2`/`V3` carry no `VersionLock`, `If-Match` or ETag, so
+there is no stale precondition to replay and the final state converges. But it
+is expensive: the method expects `202 Accepted`, so the write is asynchronous
+and a Tyk timeout means Tyk stopped waiting, not that the upstream declined the
+work. A retry re-queues a recomputation that is probably still running, and
+because each attempt can burn 180s of upstream work before Tyk cuts it, an
+exhausted sequence is ~15 minutes of wall clock.
+
+**This is the one endpoint the 2026-08-31 backoff change does not help.** That
+change shortened the *waits* (1+2+4+8 = 15s); it did not shorten the attempts.
+Not flagged `noRetry`, because the retry is correct and a genuine transient 504
+on this path is worth recovering — and the transport cannot tell an enforced-timeout
+504 from a transient one by status alone. Recorded so the latency is not a
+surprise; revisit if the deterministic-timeout case turns out to be the common
+one.
+
+---
+
 ## Transport details established by probing
 
 - **Credentials in the base URL's userinfo (`https://user:pass@host/path`) never
