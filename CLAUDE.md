@@ -528,11 +528,14 @@ each pinned by a test that fails when it closes:
   `POST /patchsoftwaretitles/id/0` is the **only** way to mint an id the Pro v3
   patch-configuration endpoints address, so withdrawing it makes patch software
   titles unseedable end to end: `/pro/v{1,2}/patch-software-titles` are
-  unrouted (403, probed 2026-09-01), Classic's `patchavailabletitles` `name_id`
-  is not a `softwareTitleId` (`400 SOFTWARE_TITLE_ID_NOT_FOUND` for `376` and
-  for `1`; `Firefox` → `400 INVALID_ID` *"must be string of positive numeric
-  value or -1"*), and no `*softwaretitles*` path exists in any spec in any
-  environment other than the Classic ones. That breaks
+  unrouted (403, probed 2026-09-01), and Classic's `patchavailabletitles` cannot
+  supply one: **916 of its 1552 `name_id` values are non-numeric** (`0F5`, `2DE`,
+  `41D`…) while `softwareTitleId` must be a positive numeric string, and the 636
+  all-digit ones are rejected anyway (`400 SOFTWARE_TITLE_ID_NOT_FOUND` for
+  `376`, `518`, `575`; `Firefox` → `400 INVALID_ID`). `name_id` names *what to
+  subscribe*, `softwareTitleId` names *a subscription* — different identifier
+  spaces — and no `*softwaretitles*` path exists in any spec in any environment
+  other than the Classic ones. That breaks
   `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves
   `terraform-provider-jamfplatform`'s `patch_software_title` resource with no
   create path at all. Second, `GET` and `PUT /computers/id/{id}` go while `POST`

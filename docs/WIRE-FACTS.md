@@ -493,11 +493,22 @@ Pro v3 configuration endpoints address was Classic's
 
 | probe | result |
 |---|---|
-| `GET /proclassic/patchavailabletitles/sourceid/1` | 200, `size: 1551`, entries carry `name_id`, `app_name`, `publisher` |
-| `POST /pro/v3/patch-software-title-configurations` with `softwareTitleId` = a catalogue `name_id` (`"376"`) | `400` `SOFTWARE_TITLE_ID_NOT_FOUND` attributed to `softwareTitleId` — the catalogue's `name_id` is **not** a `softwareTitleId` |
+| `GET /proclassic/patchavailabletitles/sourceid/1` | 200, `size: 1552`; every entry is `{name_id, last_modified, current_version, app_name, publisher}` — **no numeric id field of any kind**, in JSON or XML |
+| `POST /pro/v3/patch-software-title-configurations` with `softwareTitleId` = a catalogue `name_id` (`376`, `518`, `575`) | `400 SOFTWARE_TITLE_ID_NOT_FOUND` attributed to `softwareTitleId`, all three |
+| … with `softwareTitleId: "Firefox"` | `400 INVALID_ID`, *"id field must be string of positive numeric value or -1"* |
 | `GET /pro/v1/patch-software-titles` | `403 BAD_PERMISSIONS` (unrouted) |
 | `GET /pro/v2/patch-software-titles` | `403 BAD_PERMISSIONS` (unrouted) |
 | `GET /pro/v3/patch-software-title-configurations` | 200 `[ ]` — nothing pre-existing to borrow, and borrowing would mean mutating a tenant's own configuration |
+
+**`patchavailabletitles` cannot supply a `softwareTitleId`, and the reason is
+structural rather than empirical.** Of the 1552 `name_id` values in the Jamf
+source catalogue, **916 are non-numeric** — `0F5`, `0F6`, `2B8`, `2DE`, `41D`,
+`62C` and so on, hex-ish patch-*definition* keys — while `softwareTitleId` must be
+a positive numeric string. So 59% of the catalogue cannot even be expressed as a
+`softwareTitleId`, and the 636 that happen to be all-digits are rejected anyway
+(`376`, `518`, `575` above). The two are different identifier spaces:
+`name_id` names *what to subscribe*, `softwareTitleId` names *a subscription*, and
+only Classic's `POST /patchsoftwaretitles/id/0` creates one.
 
 `softwareTitleId` must be a **positive numeric string** naming a Jamf Pro
 software-title record — `Firefox` returns `400 INVALID_ID` *"id field must be
