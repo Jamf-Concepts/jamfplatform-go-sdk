@@ -1572,8 +1572,98 @@ covered as calls, not as outcomes.
 
 ## Jamf Account (`account`) — organization scope
 
+### Re-probed 2026-09-01: three of the recorded faults have flipped, and two of them broke the SDK
+
+Two organization credentials, two different organizations
+(`8a2d0ff2-4336-44ca-bd61-1e7e88258740` and
+`5d58972b-57f6-4686-8654-c7ae7a2f7e00`), a bogus-path 403 control in every run.
+Read the older sections below as history, not as current behaviour.
+
+| recorded fault | 2026-09-01 | consequence |
+|---|---|---|
+| `GET /sso/v1/connections` → 502 | **200** on both credentials | fixed upstream; the 502 branch is now a regression guard |
+| list endpoints send a **bare array**, not `{totalCount, results}` | **all four send the envelope** the spec declares | **every account list method failed to decode.** Fixed: `responseType: "[]T"` → `unwrapResults: "[]T"`, which keeps the `([]T, error)` signature |
+| `Domain.id`/`verifiedTldId` are **bare numbers** declared as strings | **quoted strings**, as declared | inert — `json.Number` accepts both forms, which is why it was the right target. Keep it |
+| distributor `400 invalid_scope: skyway-use2-product` | `400 [UPSTREAM_ERROR] Failed to … via Skyway distributor service` | same surface still dead, new text; `isSkywayScopeFault` widened to match both |
+| `Region` enum omits `RAMP` | **still true** | see below — now seen in *both* organizations |
+
+**The envelope flip is the one that mattered, and nothing caught it.** Four
+methods — `ListLicenses`, `ListDomains`, `ListConnections`,
+`ListDealRegistrations` — returned
+`json: cannot unmarshal object into Go value of type []account.License` and had
+been doing so since the server changed. The generated httptest handlers assert
+whatever shape config declares, so they passed throughout; only an acceptance run
+against the wire could see it. **A `responseType` override that contradicts the
+spec is a standing liability: it is right only until the server agrees with its
+own spec, and nothing fails when that happens.** Prefer `unwrapResults`, which
+follows the spec's envelope and still hands the caller a slice.
+
+**Widening `isSkywayScopeFault` exposed a false pass.**
+`TestAcceptance_AccountPurchaseOrderValidation` had been logging
+"correctly rejected the bogus order (400)" for both distributor POSTs when the
+400 was the Skyway fault, not a validation verdict — nothing had validated the
+payload. It now fails, correctly.
+
+**`RAMP` is a fifth `Region` the spec's enum omits**, and it is no longer a
+single sighting: it appears on `ConnectionSummary.region` in **both**
+organizations (1 of 5 and 1 of 24) and on `DomainAllocationConnection.authZeroRegion`
+for `ramp.mockingbirduat.com`. `type Region = string`, so nothing mis-decodes,
+but `RegionValues()` exists to feed `stringvalidator.OneOf` and would refuse a
+region the server itself returns. **Not patchable locally:** `schemaPatches`
+addresses properties under a schema by dotted path, and `Region` is a bare
+top-level enum with no properties — patching every *usage* would inline the enum
+and lose the shared type. Fix belongs upstream.
+
+**`POST /sso/v1/connections` cannot succeed.** Every well-formed body answers
+`500 [UPSTREAM_ERROR] "The request could not be completed"` — probed across a
+PENDING domain, a nonexistent domain, a VERIFIED domain, and a body omitting the
+oneOf variant's own required members. Only the checks *ahead* of the upstream call
+answer anything else, which also fixes the validation ordering: JSON parse
+(`MALFORMED_REQUEST_BODY` for an unknown `connectionType` or `product` — Jackson's
+subtype registry, the same tell as uem-connect) → top-level bean validation
+(`FIELD_VALIDATION` on `connectionType`/`connection`/`domains`/`enabledProducts`)
+→ `400 BAD_REQUEST "Unsupported region: MARS"` → upstream 500. **The oneOf
+variant's fields are never validated.** So the spec's "every domain must already
+be verified" is unobservable, and there is no create to test. Report upstream.
+
+**Domains are the one complete CRUD surface, and delete is a hard delete.**
+Full lifecycle wire-verified: `POST /sso/v1/domains` → **201** with a full
+`Domain` body and no `Location` header; the row appears in the collection;
+`GET /sso/v1/domains/allocation/{domain}` → 200 `{connections: [], jamfIdEnabled:
+true}`; `DELETE` → **204**; then the allocation 404s, a second `DELETE` 404s (so
+**delete is not idempotent**) and the collection is back to its prior count.
+Unlike Security Cloud enrollment's soft delete, nothing is left behind. A
+duplicate create is `409 CONFLICT "Domain is already added to your organization"`,
+and **domain matching is case-insensitive** — `JAMFSDKPROBE-…CLICK` collided with
+the lower-cased row, confirming the spec's "lower-cased on storage".
+`.invalid` domains are accepted; `"not a domain"` is `400 BAD_REQUEST
+"Invalid domain provided"`.
+
+**Verification is rate-limited from `lastModifiedDate`, and `CreateDomain` sets
+it — so create-then-verify can never reach a verification verdict.**
+`POST /sso/v1/domains/{id}/actions/verify` answered
+`400 BAD_REQUEST "Can only verify once every five minutes"` on a domain that had
+never been verified, both immediately after the create and again 3m24s later.
+`TestAcceptance_AccountDomainLifecycle` now reports that case separately instead
+of logging it as a correct rejection. One unexplained observation alongside it:
+`lastModifiedDate` and `verificationExpirationDate` advanced 37 seconds after the
+create with only GETs in between, which pushes the rate-limit window out further;
+cause not identified.
+
+**The rest of the read surface is faithful.** `Connection` matched the wire
+exactly across all five connections in one organization and all four
+`connectionType` variants (`WAAD`, `OKTA`, `OIDC`, `GOOGLE_APPS`): zero wire-only
+keys, zero spec-only keys, at top level and through every nested
+`azureOptions`/`extOptions`/`googleOptions`/`oidcOptions`/`oktaOptions`/`sessionInfo`.
+Item-level 404s are coherent too — `NOT_FOUND` for a bogus connection id, domain
+id and allocation domain alike. `License.assetId` is **nullable** (8 null rows in
+one organization), so it is not a dedupe key.
+
+### The 2026-08-27 baseline
+
 Wire-verified 2026-08-27 with a real organization credential, URLs exactly as
-generated:
+generated. **Note the `/api` prefix in this table is historical** — it now
+answers `404 page not found`:
 
 | endpoint | result |
 |---|---|
@@ -1644,6 +1734,13 @@ same invocation:
 | `GET /sso/v1/domains/allocation/{domain}` × all 5 | 200 — **`authZeroRegion` on 5/5, `authRegion` on 0/5** |
 | `GET /licensing/v1/licenses` | 200, 16 rows — **`type` populated on 16/16** |
 
+**Re-probed 2026-09-01 across two organizations — both holds stand.**
+`License.type` is non-null on **261/261** rows (16 + 245) with 14 distinct values;
+`licenseType` is a separate field, non-null on only 8/16 and 711/735, so it is not
+the successor. `authZeroRegion` is the wire name on **12/12** connection objects
+across 17 domains in both organizations; `authRegion` appears nowhere. Keep
+`account-licensing` and `account-sso` at v1865.
+
 So `DomainAllocationConnection.authZeroRegion` → `authRegion` and the removal of
 `License.type` would both be **silent** regressions: nothing sets
 `DisallowUnknownFields`, so a renamed field the server does not send decodes to
@@ -1658,9 +1755,11 @@ row is `type: JAMF_SECURITY_CLOUD` with `addOnType: JAMF_TRUST`,
 `productTopLine: TRUST` and `productParent: SECURITY_CLOUD`, all four different.
 
 **Report upstream: the `Region` enum is incomplete.** It declares `[US, EU, AU, JP]`
-and the wire returned **`RAMP`**. Nothing breaks today because the field is `any`,
-but `RegionValues()` exists to feed `stringvalidator.OneOf` and would refuse a
-region the server itself returns.
+and the wire returned **`RAMP`**. Nothing breaks today because `Region` is a
+`string` alias, but `RegionValues()` exists to feed `stringvalidator.OneOf` and
+would refuse a region the server itself returns. Re-confirmed 2026-09-01 in a
+*second* organization — see the re-probe at the top of this section for why it
+cannot be patched locally.
 
 ---
 

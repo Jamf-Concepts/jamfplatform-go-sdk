@@ -1286,7 +1286,7 @@ func Test<% .Name %>(t *testing.T) {
 <%- if isStringSlice .UnwrapResults %>
 		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []string{"item-1"}})
 <%- else %>
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{"id": "item-1"}}})
+		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{}}})
 <%- end %>
 	})
 
@@ -1296,6 +1296,22 @@ func Test<% .Name %>(t *testing.T) {
 	}
 	if len(results) != 1 {
 		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
+func Test<% .Name %>_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }
 <% end %>

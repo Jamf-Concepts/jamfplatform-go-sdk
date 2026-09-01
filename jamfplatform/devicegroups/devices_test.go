@@ -17,7 +17,7 @@ func TestListDeviceGroupsForDevice(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{"id": "item-1"}}})
+		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{}}})
 	})
 
 	results, err := c.ListDeviceGroupsForDevice(context.Background(), "test-id")
@@ -26,5 +26,21 @@ func TestListDeviceGroupsForDevice(t *testing.T) {
 	}
 	if len(results) != 1 {
 		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
+func TestListDeviceGroupsForDevice_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/device-groups/v1/devices/test-id/device-groups", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.ListDeviceGroupsForDevice(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }

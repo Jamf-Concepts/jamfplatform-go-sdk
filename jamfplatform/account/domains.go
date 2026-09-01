@@ -17,12 +17,16 @@ import (
 // Required privileges: the spec declares none.
 func (c *Client) ListDomains(ctx context.Context) ([]Domain, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
-	var result []Domain
 	endpoint := prefix + "/domains"
+
+	var result struct {
+		TotalCount int      `json:"totalCount"`
+		Results    []Domain `json:"results"`
+	}
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("ListDomains: %w", err)
 	}
-	return result, nil
+	return result.Results, nil
 }
 
 // CreateDomain add Domain.

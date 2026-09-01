@@ -44,9 +44,14 @@ func TestAcceptance_AccountReads(t *testing.T) {
 	}
 	t.Logf("organization has %d domains", len(domains))
 	for _, d := range domains {
-		// Domain.ID is json.Number: the spec declares it a string and the server
-		// sends a bare number. Asserting it converts is the point — a consumer
-		// has to pass it back as a string to DeleteDomain/VerifyDomain.
+		// Domain.ID is json.Number because the two wire forms have to both decode:
+		// the spec declares a string, the server sent a bare number until at least
+		// 2026-08-27, and as of 2026-09-01 it sends the quoted string the spec
+		// declares. json.Number accepts either — a plain string would have failed
+		// the first form and *int64 the second — so keep it even now that the
+		// server agrees with the spec, until a bundle has held that shape for a
+		// while. Asserting it converts is the point: a consumer has to pass it back
+		// as a string to DeleteDomain/VerifyDomain.
 		if domainID(d) == "" {
 			t.Errorf("domain %q has an empty ID", d.Domain)
 		}
@@ -73,13 +78,24 @@ func TestAcceptance_AccountReads(t *testing.T) {
 }
 
 // isSkywayScopeFault reports whether err is the known upstream fault behind every
-// distributor endpoint: the Jamf Account partners backend calls Skyway with the
-// scope `skyway-use2-product`, which exists only in the dev environment. Prod
-// declares `skyway-use1-product` and the region-independent `skyway-product`
-// (added by tyk-gateway-management e2f54c1c, EAI-4327) — so prod's auth server
-// rejects the request and the 400 surfaces to us as an OAuth error on an API path.
+// distributor endpoint: the Jamf Account partners backend cannot reach Skyway, so
+// the whole surface answers 400 for a reason that has nothing to do with the
+// caller's request.
 //
-// Matched on the scope name rather than the status code: a 400 from these
+// It has surfaced in two forms, and both are matched because the second replaced
+// the first without the underlying surface becoming usable:
+//
+//   - Until at least 2026-08-27, an OAuth error on an API path:
+//     `{"error":"invalid_scope","error_description":"Invalid scopes:
+//     skyway-use2-product"}`. That scope exists only in dev; prod declares
+//     `skyway-use1-product` and the region-independent `skyway-product` (added by
+//     tyk-gateway-management e2f54c1c, EAI-4327).
+//   - As of 2026-09-01, the account service's own envelope:
+//     `[UPSTREAM_ERROR] Failed to <verb> ... via Skyway distributor service`,
+//     wire-verified identical on two different organization credentials, which
+//     rules out a per-credential grant problem.
+//
+// Matched on the fault text rather than the status code alone: a 400 from these
 // endpoints could equally be a real validation verdict, which must not be
 // swallowed.
 func isSkywayScopeFault(err error) bool {
@@ -90,13 +106,18 @@ func isSkywayScopeFault(err error) bool {
 	if !errors.As(err, &apiErr) {
 		return false
 	}
-	return apiErr.HasStatus(400) && strings.Contains(apiErr.Body, "skyway-use2-product")
+	if !apiErr.HasStatus(400) {
+		return false
+	}
+	return strings.Contains(apiErr.Body, "skyway-use2-product") ||
+		strings.Contains(apiErr.Body, "Skyway distributor service")
 }
 
-const skywayFaultReport = "the Jamf Account partners backend requests the Skyway scope %q, which exists only in dev — " +
-	"prod declares skyway-use1-product and the region-independent skyway-product. " +
-	"Report to Jamf: the account service needs repointing at skyway-product (tyk-gateway-management e2f54c1c, EAI-4327). " +
-	"The SDK URL is confirmed correct; every non-distributor endpoint on the same credential returns 200"
+const skywayFaultReport = "the Jamf Account partners backend cannot reach Skyway, so every distributor endpoint answers 400 (%s). " +
+	"Report to Jamf: the account service needs repointing at the region-independent skyway-product " +
+	"(tyk-gateway-management e2f54c1c, EAI-4327). " +
+	"The SDK URL is confirmed correct; every non-distributor endpoint on the same credential returns 200, " +
+	"and the same 400 appears on two different organization credentials"
 
 // TestAcceptance_AccountDistributorReads is separated from the other account
 // reads because the whole distributor surface is currently unreachable for a
@@ -109,7 +130,7 @@ func TestAcceptance_AccountDistributorReads(t *testing.T) {
 	cfg, err := ac.GetDistributorConfiguration(ctx)
 	switch {
 	case isSkywayScopeFault(err):
-		t.Fatalf("GetDistributorConfiguration: "+skywayFaultReport, "skyway-use2-product")
+		t.Fatalf("GetDistributorConfiguration: "+skywayFaultReport, err)
 	case err != nil:
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
@@ -128,7 +149,7 @@ func TestAcceptance_AccountDistributorReads(t *testing.T) {
 		var apiErr *jamfplatform.APIResponseError
 		switch {
 		case isSkywayScopeFault(err):
-			t.Errorf("GetDistributorQuote: "+skywayFaultReport, "skyway-use2-product")
+			t.Errorf("GetDistributorQuote: "+skywayFaultReport, err)
 		case errors.As(err, &apiErr) && apiErr.HasStatus(404):
 			t.Log("GetDistributorQuote correctly 404s for a quote that does not exist")
 		default:
@@ -142,7 +163,7 @@ func TestAcceptance_AccountDistributorReads(t *testing.T) {
 		var apiErr *jamfplatform.APIResponseError
 		switch {
 		case isSkywayScopeFault(err):
-			t.Errorf("GetDistributorPurchaseOrder: "+skywayFaultReport, "skyway-use2-product")
+			t.Errorf("GetDistributorPurchaseOrder: "+skywayFaultReport, err)
 		case errors.As(err, &apiErr) && apiErr.HasStatus(404):
 			t.Log("GetDistributorPurchaseOrder correctly 404s for a PO that does not exist")
 		default:
@@ -153,12 +174,13 @@ func TestAcceptance_AccountDistributorReads(t *testing.T) {
 	}
 }
 
-// TestAcceptance_AccountListConnections is separated from the other reads because
-// the endpoint currently answers 502 from an upstream service. It is a real fault
-// rather than a shape problem — every sibling endpoint on the same credential
-// returns 200 — and it fails here rather than skipping so the suite reports the
-// day it is fixed. Note the 502 is retryable, so this test spends the client's
-// full retry budget before returning.
+// TestAcceptance_AccountListConnections stays separated from the other reads
+// because this endpoint answered 502 from an upstream service for weeks while
+// every sibling on the same credential returned 200. **It returns 200 as of
+// 2026-09-01**, wire-verified on two different organization credentials, so the
+// 502 branch below is now a regression guard rather than the expected path. Keep
+// it: the 502 is retryable, so a recurrence spends the client's full retry budget
+// and the bare error would not say why the test took so long.
 func TestAcceptance_AccountListConnections(t *testing.T) {
 	ac := account.New(accOrgClient(t))
 
@@ -166,7 +188,7 @@ func TestAcceptance_AccountListConnections(t *testing.T) {
 	if err != nil {
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.HasStatus(502) {
-			t.Fatalf("ListConnections still returns 502 from upstream — report to Jamf, the URL is confirmed correct: %v", err)
+			t.Fatalf("ListConnections has regressed to 502 from upstream (it returned 200 on 2026-09-01) — report to Jamf, the URL is confirmed correct: %v", err)
 		}
 		t.Fatalf("ListConnections: %v", err)
 	}
@@ -229,13 +251,27 @@ func TestAcceptance_AccountDomainLifecycle(t *testing.T) {
 		t.Logf("allocation for %s: %+v", name, *alloc)
 	}
 
-	// VerifyDomain must fail: .invalid can never carry the TXT record. Pinning
-	// the failure is what proves verification is really checked server-side
-	// rather than being a no-op that returns the domain unchanged.
+	// VerifyDomain must fail: .invalid can never carry the TXT record. A 2xx here
+	// would mean verification is not enforced at all, which is the assertion worth
+	// keeping.
+	//
+	// But note what this can and cannot prove. The server rate-limits verification
+	// to once every five minutes measured from lastModifiedDate, and CreateDomain
+	// sets lastModifiedDate — so a create-then-verify flow *always* draws
+	// `400 BAD_REQUEST "Can only verify once every five minutes"` rather than a
+	// verification verdict (wire-verified 2026-09-01: still rate-limited 3m24s
+	// after the create). The rate limit is therefore reported separately rather
+	// than logged as a success, because treating it as "correctly rejected" is
+	// exactly the kind of pass-for-the-wrong-reason this suite is not allowed to
+	// take. Covering a genuine DNS refusal needs a domain claimed more than five
+	// minutes earlier, which a self-contained lifecycle test cannot arrange.
 	verified, err := ac.VerifyDomain(ctx, id)
-	if err == nil {
+	switch {
+	case err == nil:
 		t.Errorf("VerifyDomain succeeded for an unresolvable .invalid domain (status=%q) — verification is not being enforced", derefStr(verified.DomainStatus))
-	} else {
+	case strings.Contains(err.Error(), "once every five minutes"):
+		t.Logf("VerifyDomain rejected %s with the five-minute rate limit, not a verification verdict — the call is routed and refusing, but a real DNS refusal is not covered here: %v", name, err)
+	default:
 		t.Logf("VerifyDomain correctly rejected %s: %v", name, err)
 	}
 }
@@ -294,6 +330,14 @@ func TestAcceptance_AccountDistributorConfigRoundTrip(t *testing.T) {
 //
 // ValidateDistributorPurchaseOrder is the endpoint's own dry run — a POST that
 // deliberately changes nothing — so it is called with the same body.
+//
+// This test used to pass and was passing for the wrong reason. Both POSTs answer
+// `400 [UPSTREAM_ERROR] Failed to {validate,add} purchase order via Skyway
+// distributor service`, which the old, narrower isSkywayScopeFault did not match
+// — so a bare "rejected the bogus order (400)" was logged as success when in fact
+// nothing had validated the payload at all. Widening the matcher turned that into
+// the failure it always was. It fails until the Skyway fault is fixed; do not
+// narrow the matcher to get it green again.
 func TestAcceptance_AccountPurchaseOrderValidation(t *testing.T) {
 	ac := account.New(accOrgClient(t))
 	ctx := context.Background()
@@ -311,7 +355,7 @@ func TestAcceptance_AccountPurchaseOrderValidation(t *testing.T) {
 	result, err := ac.ValidateDistributorPurchaseOrder(ctx, order)
 	switch {
 	case isSkywayScopeFault(err):
-		t.Fatalf("ValidateDistributorPurchaseOrder: "+skywayFaultReport, "skyway-use2-product")
+		t.Fatalf("ValidateDistributorPurchaseOrder: "+skywayFaultReport, err)
 	case err == nil:
 		t.Logf("ValidateDistributorPurchaseOrder returned a result for a bogus quote: %+v", *result)
 	default:
@@ -332,7 +376,7 @@ func TestAcceptance_AccountPurchaseOrderValidation(t *testing.T) {
 	// an undeletable purchase order and the test needs redesigning, not relaxing.
 	err = ac.CreateDistributorPurchaseOrder(ctx, order)
 	if isSkywayScopeFault(err) {
-		t.Fatalf("CreateDistributorPurchaseOrder: "+skywayFaultReport, "skyway-use2-product")
+		t.Fatalf("CreateDistributorPurchaseOrder: "+skywayFaultReport, err)
 	}
 	if err == nil {
 		t.Fatalf("CreateDistributorPurchaseOrder ACCEPTED an order referencing quote %q — an unremovable record may have been created; investigate before re-running", quote)
@@ -352,15 +396,23 @@ func TestAcceptance_AccountPurchaseOrderValidation(t *testing.T) {
 // CreateConnection/UpdateConnection/DeleteConnection configure the identity
 // provider a real organization's users authenticate through: a bad or abandoned
 // connection can lock people out of Jamf Account, and the blast radius is the
-// whole organization rather than one record. Two things would have to be true
-// before this is safe, and neither is today: ListConnections has to work (it
-// answers 502, so a leaked connection cannot even be found to clean up), and the
-// organization has to be one reserved for the suite rather than a live UAT tenant.
+// whole organization rather than one record. ListConnections working was one of
+// the two preconditions and it now does (2026-09-01); the remaining one is an
+// organization reserved for the suite rather than a live UAT tenant.
+//
+// A third fact makes the gap moot for now: CreateConnection cannot succeed on the
+// wire. Every well-formed body answers `500 UPSTREAM_ERROR "The request could not
+// be completed"`, wire-verified 2026-09-01 across four shapes — a PENDING domain,
+// a nonexistent domain, a VERIFIED domain, and a body missing the variant's own
+// required members. Only the checks ahead of the upstream call return anything
+// else (`400 BAD_REQUEST "Unsupported region: MARS"`, and
+// `MALFORMED_REQUEST_BODY` for an unknown `connectionType` or `product`), so the
+// oneOf variant's fields are never validated. Report upstream.
 //
 // The request shape is still partly covered — CreateConnection with an invalid
 // body is exercised below, which reaches validation without creating anything.
 func TestAcceptance_AccountSsoConnectionWrites(t *testing.T) {
-	t.Skip("SSO connection writes reconfigure how a real organization's users log in, and ListConnections currently 502s so a leaked connection could not be found to delete. Needs an organization reserved for the suite.")
+	t.Skip("SSO connection writes reconfigure how a real organization's users log in, and CreateConnection answers 500 UPSTREAM_ERROR for every well-formed body (2026-09-01). Needs an organization reserved for the suite, and a working create.")
 }
 
 func TestAcceptance_AccountCreateConnectionRejected(t *testing.T) {

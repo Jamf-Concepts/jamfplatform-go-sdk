@@ -133,6 +133,22 @@ func TestListDeviceGroupMembers(t *testing.T) {
 	}
 }
 
+func TestListDeviceGroupMembers_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/device-groups/v1/device-groups/test-id/members", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.ListDeviceGroupMembers(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestUpdateDeviceGroupMembers(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/device-groups/v1/device-groups/test-id/members", func(w http.ResponseWriter, r *http.Request) {

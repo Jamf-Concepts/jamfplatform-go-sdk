@@ -16,10 +16,14 @@ import (
 // Required privileges: the spec declares none.
 func (c *Client) ListDealRegistrations(ctx context.Context) ([]DealRegistration, error) {
 	prefix := c.transport.APIPrefix("partners", "v1")
-	var result []DealRegistration
 	endpoint := prefix + "/deal-registrations"
+
+	var result struct {
+		TotalCount int                `json:"totalCount"`
+		Results    []DealRegistration `json:"results"`
+	}
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("ListDealRegistrations: %w", err)
 	}
-	return result, nil
+	return result.Results, nil
 }

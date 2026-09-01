@@ -17,15 +17,15 @@ func TestListConnections(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
+		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{}}})
 	})
 
-	result, err := c.ListConnections(context.Background())
+	results, err := c.ListConnections(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
 	}
 }
 

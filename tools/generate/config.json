@@ -10441,7 +10441,7 @@
         {
           "op": "GET /v1/licenses",
           "name": "ListLicenses",
-          "responseType": "[]License"
+          "unwrapResults": "[]License"
         }
       ]
     },
@@ -10455,7 +10455,7 @@
         {
           "op": "GET /v1/deal-registrations",
           "name": "ListDealRegistrations",
-          "responseType": "[]DealRegistration"
+          "unwrapResults": "[]DealRegistration"
         },
         {
           "op": "GET /v1/distributor/configuration",
@@ -10497,7 +10497,7 @@
         {
           "op": "GET /v1/connections",
           "name": "ListConnections",
-          "responseType": "[]ConnectionSummary"
+          "unwrapResults": "[]ConnectionSummary"
         },
         {
           "op": "POST /v1/connections",
@@ -10518,7 +10518,7 @@
         {
           "op": "GET /v1/domains",
           "name": "ListDomains",
-          "responseType": "[]Domain"
+          "unwrapResults": "[]Domain"
         },
         {
           "op": "POST /v1/domains",

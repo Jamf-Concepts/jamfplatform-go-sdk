@@ -17,12 +17,16 @@ import (
 // Required privileges: the spec declares none.
 func (c *Client) ListConnections(ctx context.Context) ([]ConnectionSummary, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
-	var result []ConnectionSummary
 	endpoint := prefix + "/connections"
+
+	var result struct {
+		TotalCount int                 `json:"totalCount"`
+		Results    []ConnectionSummary `json:"results"`
+	}
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("ListConnections: %w", err)
 	}
-	return result, nil
+	return result.Results, nil
 }
 
 // CreateConnection add Connection.

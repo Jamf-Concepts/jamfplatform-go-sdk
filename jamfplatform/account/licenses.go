@@ -16,10 +16,14 @@ import (
 // Required privileges: the spec declares none.
 func (c *Client) ListLicenses(ctx context.Context) ([]License, error) {
 	prefix := c.transport.APIPrefix("licensing", "v1")
-	var result []License
 	endpoint := prefix + "/licenses"
+
+	var result struct {
+		TotalCount int       `json:"totalCount"`
+		Results    []License `json:"results"`
+	}
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("ListLicenses: %w", err)
 	}
-	return result, nil
+	return result.Results, nil
 }
