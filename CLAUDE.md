@@ -389,9 +389,13 @@ follows it.
 **What the removal cost, beyond the 146 methods.** Three real capability gaps,
 each pinned by a test that fails when it closes:
 
-- **Security Cloud has no working device-group update.** `PUT /v1/groups/{groupId}`
-  is gone and its declared successor `PUT /v2/groups/{groupId}` is unrouted —
-  403 `BAD_PERMISSIONS`, 7/7 on 2026-08-29. `ApplyDeviceGroupV2` previously used
+- **Security Cloud has no working device-group update, and the removal is what
+  caused that.** `PUT /v1/groups/{groupId}` is gone from the spec but **still
+  answers 200 on the wire** — re-probed 2026-09-01 on the JSC sandbox tenant,
+  where it renamed a real group and the rename read back — while its declared
+  successor `PUT /v2/groups/{groupId}` is unrouted: 403 `BAD_PERMISSIONS` 3/3 on
+  a real id, again on a bogus uuid, and `GET /v2/groups/{groupId}` fails the same
+  way, so no verb on that path is routed. `ApplyDeviceGroupV2` previously used
   the v1 write for its update branch and now uses the v2 one, so Apply's
   update branch cannot succeed. `TestAcceptance_SecurityCloudApplyDeviceGroup`
   asserts the create branch and pins the 403 on the update branch;

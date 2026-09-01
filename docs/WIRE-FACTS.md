@@ -685,13 +685,36 @@ the same invocation:
 `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` asserts the 403 and **fails when
 routing lands** — invert it then, and do not weaken it to a skip.
 
-**v1942 made this a live gap rather than a documented curiosity.** It withdrew
-`PUT /v1/groups/{groupId}` from the spec, so the unrouted v2 PUT is now the
-package's *only* device-group update: `ApplyDeviceGroupV2` was repointed onto it
-and its update branch can no longer succeed
-(`TestAcceptance_SecurityCloudApplyDeviceGroup` pins that 403 too). The v1 write
-that served as this probe's control is gone, so the control is now a v1 *read* —
-weaker, and worth restoring the moment either path works.
+**Re-probed 2026-09-01 with the JSC sandbox tenant `928260f5…` on eu. Nothing has
+moved, and the v1 write still works.** Full sequence in one invocation:
+
+| request | result |
+|---|---|
+| `GET /securitycloud/v2/groups` (list, control) | **200**, the `{groups: []}` envelope |
+| `POST /securitycloud/v1/groups` | **201** `{href, id, name}` |
+| `GET /securitycloud/v1/groups/{real-id}` (control) | **200** |
+| `PUT /securitycloud/v2/groups/{real-id}` | **403** `BAD_PERMISSIONS`, 3/3 |
+| `PUT /securitycloud/v2/groups/{bogus-uuid}` | **403** `BAD_PERMISSIONS` |
+| `GET /securitycloud/v2/groups/{real-id}` | **403** `BAD_PERMISSIONS` |
+| `PUT /securitycloud/v1/groups/{real-id}` | **200**, body carries the new name |
+| `GET /securitycloud/v1/groups/{real-id}` (read-back) | **200**, rename persisted |
+| `DELETE /securitycloud/v1/groups/{real-id}` | **204**, then GET → 404 |
+
+Two things this pins down. The 403 is **not** id-shaped or permission-shaped — a
+bogus uuid gets the same answer as a real one, and the same credential drives the
+v1 write to 200 in the same invocation, so it is the unrouted-path tell, not a
+capability gap. And **no `/v2/groups/{groupId}` verb is routed**: the `GET` fails
+the same way the `PUT` does, matching `securitycloud_api_devices.rego` having no
+rule for that path at all.
+
+**v1942 therefore removed the only working device-group update and kept the broken
+one.** It withdrew `PUT /v1/groups/{groupId}` from the spec — the call that answers
+200 above — leaving the unrouted v2 PUT as the package's sole update method.
+`ApplyDeviceGroupV2` was repointed onto it, so its update branch can no longer
+succeed (`TestAcceptance_SecurityCloudApplyDeviceGroup` pins that 403 too), and
+this probe's control had to weaken from a v1 *write* to a v1 read because the SDK
+no longer generates the write. Restore `UpdateDeviceGroupV1` if the gap needs
+closing before Jamf authors the v2 rule — the wire still serves it.
 
 Two methodological warnings from this probe. The first attempt returned **500 on
 both v1 and v2**, which reads as "v2 is routed and merely faulting" — the opposite
