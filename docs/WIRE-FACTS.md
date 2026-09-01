@@ -707,24 +707,34 @@ the same invocation:
 
 | request | result |
 |---|---|
-| `PUT`/`GET`/`DELETE /securitycloud/v2/groups/{real-id}` | **403**, 4/4 attempts |
+| `PUT /securitycloud/v2/groups/{real-id}` | **403**, repeated |
 | `PUT /securitycloud/v2/groups/{bogus-uuid}` | **403**, 3/3 |
 | `PUT /securitycloud/v1/groups/{real-id}` (control) | **200** with the `Group` body |
 | `PUT /securitycloud/v1/groups/{bogus-uuid}` | `404 GROUP_NOT_FOUND`, `field: groupId` |
+
+**`PUT` is the only verb that matters here, because it is the only item-level v2
+verb the spec declares.** The device-groups spec splits the resource across
+versions: `POST /v1/groups`, `GET /v1/groups/{groupId}` and
+`DELETE /v1/groups/{groupId}` stay on v1, `GET /v2/groups` and
+`PUT /v2/groups/{groupId}` are v2. `GET` and `DELETE` on `/v2/groups/{groupId}`
+are **not declared in any build**, so their 403s are expected and prove nothing
+about routing — earlier revisions of this section cited them as if they widened
+the finding. They do not. The missing OPA rule is exactly one,
+`PUT /v2/groups/{groupId}`, which is precisely the gap in
+`securitycloud_api_devices.rego`'s six.
 
 `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` asserts the 403 and **fails when
 routing lands** — invert it then, and do not weaken it to a skip.
 
 **Re-probed twice on 2026-09-01 with the JSC sandbox tenant `928260f5…` on eu —
 09:36 and 13:30, the second after v1981 published the Security Cloud specs to
-`external/`. Nothing has moved either time, and the v1 write still works.** The
-13:30 run added `DELETE /securitycloud/v2/groups/{real-id}` → **403**
-(`e742fd0cc80e1ccffd98f55c6191ffa6`), so all three verbs on
-`/v2/groups/{groupId}` are confirmed unrouted, with
-`GET /v2/groups/{id}` → 403 (`9135ce7e…`), `PUT` → 403 twice (`0829d86a…`,
-`9c0d378d…`), `PUT /v1/groups/{id}` → 200 and `DELETE /v1/groups/{id}` → 204 in
-the same invocation. Promotion of the specs to prod did not come with the OPA
-rule.
+`external/`. Nothing has moved either time, and the v1 write still works.** At
+13:30 `PUT /securitycloud/v2/groups/{real-id}` → **403** twice (`0829d86a…`,
+`9c0d378d…`) with `PUT /v1/groups/{id}` → 200 and `DELETE /v1/groups/{id}` → 204
+in the same invocation. Promotion of the specs to prod did not come with the OPA
+rule. (`GET` and `DELETE` on the v2 item path were probed too and also 403, but
+the spec declares neither, so those results carry no weight — see the note
+above.)
 
 **A third run classified the 403 from the wire alone, using two credentials
 rather than two paths.** On the same real group, in one invocation with both
@@ -733,16 +743,18 @@ tokens proven live (`GET /securitycloud/v2/groups` → 200 on the JSC credential
 
 | request | JSC credential | `pro` credential |
 |---|---|---|
-| `GET /securitycloud/v2/groups/{id}` | 403 `55fef538a4b2f0c81665dea059c9d7b0` | 403 `bbc5a3146958a8f3636b9ec865ee8d50` |
-| `PUT /securitycloud/v2/groups/{id}` | 403 `ab3e25bf65c2fed35faa25588a7afe81` | 403 `5526799f5087c641aa8ea97881aab254` |
-| `DELETE /securitycloud/v2/groups/{id}` | 403 `584fd8ec537b1311a47fc502fd0a13b4` | 403 `78520b00290262f616d23d8e3fb268de` |
+| `PUT /securitycloud/v2/groups/{id}` (the declared successor) | 403 `ab3e25bf65c2fed35faa25588a7afe81` | 403 `5526799f5087c641aa8ea97881aab254` |
 | `PUT /securitycloud/v1/groups/{id}` | **200**, rename applied | 403 `96faad136dcae9351590ce3961f369ad` |
+| `GET /securitycloud/v2/groups/{id}` — undeclared | 403 `55fef538a4b2f0c81665dea059c9d7b0` | 403 `bbc5a3146958a8f3636b9ec865ee8d50` |
+| `DELETE /securitycloud/v2/groups/{id}` — undeclared | 403 `584fd8ec537b1311a47fc502fd0a13b4` | 403 `78520b00290262f616d23d8e3fb268de` |
 
-v1 **varies** by credential; v2 is **constant** across both. A 403 that varies is
-a capability grant, one constant across credentials is a missing authorization
-rule — so `/v2/groups/{groupId}` has no rule authored, established from the wire
-without reading `securitycloud_api_devices.rego`. The two sources now agree
-independently.
+The v1 `PUT` **varies** by credential; the v2 `PUT` is **constant** across both. A
+403 that varies is a capability grant, one constant across credentials is a
+missing authorization rule — so `PUT /v2/groups/{groupId}` has no rule authored,
+established from the wire without reading `securitycloud_api_devices.rego`. The
+two sources now agree independently. The last two rows are the undeclared verbs,
+included only to show they behave no differently; they are not part of the
+argument.
 
 The 09:36 sequence in full:
 

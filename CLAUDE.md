@@ -509,9 +509,16 @@ each pinned by a test that fails when it closes:
   `PUT /v2/groups/{groupId}` as the package's sole update method and killing
   `ApplyDeviceGroupV2`'s update branch. The v1 write **answers 200 on the wire**,
   re-probed 2026-09-01 on the JSC sandbox tenant, where it renamed a real group
-  and the rename read back; the v2 successor is 403 `BAD_PERMISSIONS` on a real
-  id (4 attempts across two sessions), on a bogus uuid, and on `GET` too, so no
-  verb on that path is routed. Full evidence — including the third URL shape the
+  and the rename read back; `PUT /v2/groups/{groupId}` — the declared successor,
+  and the *only* item-level v2 verb the spec has — is 403 `BAD_PERMISSIONS` on a
+  real id across three sessions and on a bogus uuid, and **constant across two
+  different credentials while the v1 write varies**, which classifies it as a
+  missing authorization rule rather than a capability gap. Note the resource is
+  split across versions by design: `POST /v1/groups`,
+  `GET`/`DELETE /v1/groups/{groupId}`, `GET /v2/groups`,
+  `PUT /v2/groups/{groupId}` — so `GET` and `DELETE` on the v2 item path are
+  undeclared and their 403s are not evidence of anything. Full evidence —
+  including the third URL shape the
   runtime `Link` header names, and the scope-header tells — in
   [WIRE-FACTS.md](docs/WIRE-FACTS.md#device-groups-v2id-the-rule-has-not-been-authored).
   So `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their resolver and both Applies
