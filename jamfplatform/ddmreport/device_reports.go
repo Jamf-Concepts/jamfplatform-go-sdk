@@ -32,9 +32,7 @@ func (c *Client) GetDeviceDeclarationReportFiltered(ctx context.Context, deviceI
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("size", strconv.Itoa(pageSize))
-		if filter != "" {
-			params.Set("filter", filter)
-		}
+		params.Set("filter", filter)
 		if len(sort) > 0 {
 			params.Set("sort", strings.Join(sort, ","))
 		}

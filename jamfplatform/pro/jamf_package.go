@@ -23,9 +23,7 @@ func (c *Client) ListJamfPackagesV1(ctx context.Context, application string) ([]
 	var result []JamfPackageResponse
 	endpoint := prefix + "/jamf-package"
 	params := url.Values{}
-	if application != "" {
-		params.Set("application", application)
-	}
+	params.Set("application", application)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}
@@ -46,9 +44,7 @@ func (c *Client) GetJamfPackageV2(ctx context.Context, application string) (*Jam
 	var result JamfApplicationResponse
 	endpoint := prefix + "/jamf-package"
 	params := url.Values{}
-	if application != "" {
-		params.Set("application", application)
-	}
+	params.Set("application", application)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}

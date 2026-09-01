@@ -20,6 +20,9 @@ func TestListAuditEvents(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if !r.URL.Query().Has("since") {
+			t.Errorf("required query param since not sent: %q", r.URL.RawQuery)
+		}
 		switch r.URL.Query().Get("cursor") {
 		case "":
 			writeJSON(t, w, http.StatusOK, map[string]any{

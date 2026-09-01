@@ -210,6 +210,9 @@ func TestGetManagedSoftwareUpdateGroupPlansV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if !r.URL.Query().Has("group-type") {
+			t.Errorf("required query param group-type not sent: %q", r.URL.RawQuery)
+		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 

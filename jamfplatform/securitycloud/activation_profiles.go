@@ -24,9 +24,7 @@ func (c *Client) ListActivationProfilesV1(ctx context.Context, origin string) (*
 	var result ActivationProfilesResponse
 	endpoint := prefix + "/activation-profiles"
 	params := url.Values{}
-	if origin != "" {
-		params.Set("origin", origin)
-	}
+	params.Set("origin", origin)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}

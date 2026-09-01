@@ -731,27 +731,12 @@ func defaultMethodComment(name string, spec SpecDef) string {
 	return name + " calls a Jamf Platform API endpoint."
 }
 
-// parameterComment renders a godoc block documenting the parameters a method
-// takes, sourced from the spec's parameter objects. Ordering follows the Go
-// signature — path params first, then the config-declared query params — so
-// the block reads against the call the consumer is writing. Without it the
-// only place a caller can learn which fields a `filter` or `sort` argument
-// accepts is the raw spec: those RSQL field lists live in the parameter
-// description and nowhere else in the SDK.
-//
-// Documentation only: parameter types stay exactly as config declares them.
-// That is what makes it safe to quote enum values verbatim — Jamf's Classic
-// path enums include values that are unusable as Go identifiers
-// ("Pending+Failed", "EnableRemoteDesktop (macOS 10.14.4 and later)") and one
-// outright typo ("Hardwre"), all of which are still what the server accepts.
-//
-// Params the spec doesn't describe are skipped. A config-declared query
-// param absent from the spec is an error unless marked ":undocumented" in
-// config.json (see parseParams) — that marker is reserved for a param
-// wire-verified to work despite the spec's silence; anything else absent is
-// almost always a typo or a spec rename the config wasn't updated for.
-// Returns "" when nothing is documentable.
-func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Operation, enumTypes map[string]bool) (string, error) {
+// collectSpecParams keys an operation's spec parameter objects by wire name.
+// It is the single point at which a config-declared param is matched to what
+// the spec says about it: both resolveQueryParams (behaviour) and
+// parameterComment (documentation) read the map this returns, so the two
+// cannot disagree about which spec parameter a config entry refers to.
+func collectSpecParams(pathItem *openapi3.PathItem, op *openapi3.Operation) map[string]*openapi3.Parameter {
 	specParams := make(map[string]*openapi3.Parameter)
 	collect := func(params openapi3.Parameters) {
 		for _, ref := range params {
@@ -780,23 +765,49 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 	if op != nil {
 		collect(op.Parameters)
 	}
+	return specParams
+}
 
-	// config.json's "params" entries hand-type the wire query-parameter name
-	// as a literal string with nothing else cross-checking it against the
-	// spec. If Jamf renames or drops the parameter, or the entry was simply
-	// mistyped, the generated method keeps compiling and keeps sending a
-	// query key the server silently ignores — the GetBaselineRules
-	// baselineId/baseline-id incident. Catch it at generate time instead,
-	// unless the entry opts out via ":undocumented" (a param that is
-	// wire-verified to work but that the spec doesn't declare at all).
+// resolveQueryParams cross-checks every config-declared query param against
+// the spec and records on the ExtraParam what the spec says about it. Two
+// things come out of this one resolution, and they are here together
+// deliberately — the first check shipped alone and the second was the gap it
+// left:
+//
+//   - The name-match check. config.json's "params" entries hand-type the wire
+//     query-parameter name as a literal string with nothing else
+//     cross-checking it against the spec. If Jamf renames or drops the
+//     parameter, or the entry was simply mistyped, the generated method keeps
+//     compiling and keeps sending a query key the server silently ignores —
+//     the GetBaselineRules baselineId/baseline-id incident. Caught at generate
+//     time, unless the entry opts out via ":undocumented" (a param that is
+//     wire-verified to work but that the spec doesn't declare at all).
+//
+//   - AlwaysSend. Every query param used to be emitted behind a zero-value
+//     guard, spec-required ones included, so a caller passing "" for a
+//     required param sent a request with it silently omitted and got back a
+//     400 whose wording reads like a server or auth fault rather than a
+//     caller error. Required params are emitted unguarded instead. Deriving
+//     the flag here rather than accepting a ":required" suffix in config.json
+//     is what keeps it correct across ingests: required-ness lives in the
+//     spec, so a second declaration of it would rot the first time a bundle
+//     flips a param from optional to required.
+//
+// An ":undocumented" param has no spec parameter to read, so it keeps its
+// guard — that is the only safe emission for something the spec is silent
+// about.
+func resolveQueryParams(m *GoMethod, specParams map[string]*openapi3.Parameter) error {
 	var unmatched []string
-	for _, q := range m.QueryParams {
-		if q.Undocumented {
+	for i := range m.QueryParams {
+		q := &m.QueryParams[i]
+		sp, ok := specParams[q.Spec]
+		if !ok {
+			if !q.Undocumented {
+				unmatched = append(unmatched, q.Spec)
+			}
 			continue
 		}
-		if _, ok := specParams[q.Spec]; !ok {
-			unmatched = append(unmatched, q.Spec)
-		}
+		q.AlwaysSend = sp.Required && !hasSpecDefault(sp.Schema)
 	}
 	if len(unmatched) > 0 {
 		known := make([]string, 0, len(specParams))
@@ -804,12 +815,72 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 			known = append(known, name)
 		}
 		sort.Strings(known)
-		return "", fmt.Errorf("%s %s: config declares query param(s) %v not found in spec (spec declares: %v) — the spec may have renamed or removed it, fix config.json; if this is a wire-verified param the spec genuinely omits, mark the entry \":undocumented\"",
+		return fmt.Errorf("%s %s: config declares query param(s) %v not found in spec (spec declares: %v) — the spec may have renamed or removed it, fix config.json; if this is a wire-verified param the spec genuinely omits, mark the entry \":undocumented\"",
 			m.HTTPMethod, m.SpecPath, unmatched, known)
 	}
+	return nil
+}
 
+// hasSpecDefault reports whether a parameter schema declares a default that
+// gives its own absence a defined meaning. Such a parameter keeps the
+// zero-value guard even when the spec marks it required, and the reasoning is
+// the mirror image of the guard's removal rather than an exception to it:
+// dropping a required param is wrong because the server can do nothing
+// sensible without it, but where the spec publishes a default the server can
+// and does — so sending an empty value replaces a documented default with
+// nothing, which is the same harm pointed the other way.
+//
+// OpenAPI forbids the combination ("default SHALL NOT be used with required"),
+// so any parameter reaching the true branch here is a malformed declaration
+// and the choice of which half to follow is evidence-led, not textual. Pro's
+// `columns-to-export` on GET /v3/patch-software-title-configurations/{id}/export-report
+// is the only live case — required: true with a nine-column default — and the
+// wire settles it. Probed 2026-09-01 against a config whose patch report has
+// zero rows, so the baseline answer is 400 either way: omitting the parameter
+// and passing a valid two-column list both return that same 400, while
+// `columns-to-export=` returns **500**. Sending the empty value is strictly
+// worse than omitting it, which is the opposite of every other required param
+// here. See WIRE-FACTS.md.
+//
+// If a bundle ever drops that default, this stops applying to the param and it
+// starts travelling unguarded on the next generate — the correct response to
+// the spec no longer defining its absence.
+//
+// An empty default (`""`, `[]`) states nothing and does not count.
+func hasSpecDefault(ref *openapi3.SchemaRef) bool {
+	if ref == nil || ref.Value == nil || ref.Value.Default == nil {
+		return false
+	}
+	switch d := ref.Value.Default.(type) {
+	case string:
+		return d != ""
+	case []any:
+		return len(d) > 0
+	case map[string]any:
+		return len(d) > 0
+	}
+	return true
+}
+
+// parameterComment renders a godoc block documenting the parameters a method
+// takes, sourced from the spec's parameter objects (see collectSpecParams).
+// Ordering follows the Go signature — path params first, then the
+// config-declared query params — so the block reads against the call the
+// consumer is writing. Without it the only place a caller can learn which
+// fields a `filter` or `sort` argument accepts is the raw spec: those RSQL
+// field lists live in the parameter description and nowhere else in the SDK.
+//
+// Documentation only: parameter types stay exactly as config declares them.
+// That is what makes it safe to quote enum values verbatim — Jamf's Classic
+// path enums include values that are unusable as Go identifiers
+// ("Pending+Failed", "EnableRemoteDesktop (macOS 10.14.4 and later)") and one
+// outright typo ("Hardwre"), all of which are still what the server accepts.
+//
+// Params the spec doesn't describe are skipped. Returns "" when nothing is
+// documentable.
+func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enumTypes map[string]bool) string {
 	if len(specParams) == 0 {
-		return "", nil
+		return ""
 	}
 
 	type docParam struct{ goName, specName string }
@@ -837,9 +908,9 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 		}
 	}
 	if len(lines) == 0 {
-		return "", nil
+		return ""
 	}
-	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n"), nil
+	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n")
 }
 
 // isPlaceholderParamDoc reports whether a parameter's description says nothing
@@ -1036,14 +1107,17 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	m.PathParams = extractPathParams(m.ResourcePath, opDef.PathNames)
 
+	// One resolution of the spec's parameter objects feeds both the
+	// required-ness the templates emit against and the godoc below.
+	specParams := collectSpecParams(pathItem, op)
+	if err := resolveQueryParams(&m, specParams); err != nil {
+		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
+	}
+
 	// Parameter docs come last so the block sits below the summary and the
 	// privilege/deprecation lines, matching how godoc reads: prose, then
 	// metadata, then the per-argument list.
-	pc, err := parameterComment(m, pathItem, op, enumTypes)
-	if err != nil {
-		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
-	}
-	if pc != "" {
+	if pc := parameterComment(m, specParams, enumTypes); pc != "" {
 		if m.Comment == "" {
 			m.Comment = defaultMethodComment(opDef.Name, spec)
 		}

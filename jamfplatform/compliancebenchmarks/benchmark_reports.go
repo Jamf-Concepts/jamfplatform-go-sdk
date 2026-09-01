@@ -70,9 +70,7 @@ func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
-		if ruleID != "" {
-			params.Set("rule-id", ruleID)
-		}
+		params.Set("rule-id", ruleID)
 		if sort != "" {
 			params.Set("sort", sort)
 		}

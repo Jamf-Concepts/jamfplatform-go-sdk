@@ -39,6 +39,9 @@ func TestListBenchmarkRuleDevices(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if !r.URL.Query().Has("rule-id") {
+			t.Errorf("required query param rule-id not sent: %q", r.URL.RawQuery)
+		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results":    []map[string]any{{}},
 			"totalCount": 1,

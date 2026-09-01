@@ -17,6 +17,9 @@ func TestListActivationProfilesV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if !r.URL.Query().Has("origin") {
+			t.Errorf("required query param origin not sent: %q", r.URL.RawQuery)
+		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 

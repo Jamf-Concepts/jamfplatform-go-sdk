@@ -375,7 +375,9 @@ func TestAcceptance_APIError_DdmReport_NotFound(t *testing.T) {
 	c := accClient(t)
 	dr := ddmreport.New(c)
 
-	report, err := dr.GetDeviceDeclarationReportFiltered(context.Background(), "00000000-0000-0000-0000-000000000000", "", nil)
+	// filter is required: true, so it travels even when empty; pass a real
+	// expression so the only unknown under test is the device id.
+	report, err := dr.GetDeviceDeclarationReportFiltered(context.Background(), "00000000-0000-0000-0000-000000000000", "active==true", nil)
 	if err != nil {
 		apiErr := jamfplatform.AsAPIError(err)
 		if apiErr != nil {

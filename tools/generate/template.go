@@ -84,6 +84,66 @@ var funcMap = template.FuncMap{
 		return ", " + strings.Join(args, ", ")
 	},
 	"isStringSlice": func(s string) bool { return s == "[]string" },
+	// queryValue is the expression that converts one query parameter's Go
+	// argument into the string sent on the wire; queryGuard is the zero-value
+	// condition deciding whether an optional one is sent at all.
+	//
+	// They are functions rather than a type switch inside the templates
+	// because that switch was written out three times — in
+	// "buildQueryParams", "paginated" and "paginatedCursor" — and every
+	// branch of all three had to honour required-ness. Three copies of a
+	// nine-branch switch is how a required param came to be emitted behind an
+	// optional param's guard in the first place; one copy is one place to be
+	// wrong.
+	"queryValue": func(qp ExtraParam) string {
+		switch qp.Type {
+		case "[]string":
+			return "strings.Join(" + qp.Go + `, ",")`
+		case "bool":
+			// An optional bool is only ever emitted when true, so the literal
+			// is exact. A required one has to carry a false the caller meant:
+			// omitting it is what this whole path exists to stop, and sending
+			// "true" for a false argument would be worse still.
+			if qp.AlwaysSend {
+				return "strconv.FormatBool(" + qp.Go + ")"
+			}
+			return `"true"`
+		case "int":
+			return "strconv.Itoa(" + qp.Go + ")"
+		case "int64":
+			return "strconv.FormatInt(" + qp.Go + ", 10)"
+		}
+		return qp.Go
+	},
+	"queryGuard": func(qp ExtraParam) string {
+		switch qp.Type {
+		case "[]string":
+			return "len(" + qp.Go + ") > 0"
+		case "bool":
+			return qp.Go
+		case "int", "int64":
+			return qp.Go + " != 0"
+		}
+		return qp.Go + ` != ""`
+	},
+	// requiredQueryAsserts emits, for each spec-required query param, a check
+	// that the generated method actually put it on the wire. The unit-test
+	// stubs call every method with zero-value arguments, so a required param
+	// emitted behind an optional param's zero-value guard is *absent* from
+	// the request and these fail — which makes each of them a standing
+	// regression test for the bug class, not just for the param it names.
+	// url.Values.Has is true for a present-but-empty key, which is exactly
+	// the distinction that matters here.
+	"requiredQueryAsserts": func(m GoMethod) string {
+		var b strings.Builder
+		for _, qp := range m.QueryParams {
+			if !qp.AlwaysSend {
+				continue
+			}
+			fmt.Fprintf(&b, "\n\t\tif !r.URL.Query().Has(%q) {\n\t\t\tt.Errorf(\"required query param %s not sent: %%q\", r.URL.RawQuery)\n\t\t}", qp.Spec, qp.Spec)
+		}
+		return b.String()
+	},
 	"requestArg": func(t string) string {
 		// Test stub's zero-value literal for the request parameter.
 		// Primitives can't be composite-literal'd (e.g. `&string{}`
@@ -426,29 +486,21 @@ func {{ .Name }}Values() []{{ $enumType }} {
 
 {{/* ---- Shared sub-templates ---- */}}
 
+{{/* AlwaysSend (a spec-required param declaring no default — see
+     resolveQueryParams) is set unconditionally: dropping it because the caller
+     passed the zero value produces a request the server rejects with a 400
+     that reads like a fault rather than a caller error. Everything else keeps
+     the zero-value guard — omitting an unset optional param is correct and
+     load-bearing. */}}
 {{- define "buildQueryParams" -}}
 {{- if .QueryParams }}
 	params := url.Values{}
 {{- range .QueryParams }}
-{{- if eq .Type "[]string" }}
-	if len({{ .Go }}) > 0 {
-		params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
-	}
-{{- else if eq .Type "bool" }}
-	if {{ .Go }} {
-		params.Set("{{ .Spec }}", "true")
-	}
-{{- else if eq .Type "int" }}
-	if {{ .Go }} != 0 {
-		params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
-	}
-{{- else if eq .Type "int64" }}
-	if {{ .Go }} != 0 {
-		params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
-	}
+{{- if .AlwaysSend }}
+	params.Set("{{ .Spec }}", {{ queryValue . }})
 {{- else }}
-	if {{ .Go }} != "" {
-		params.Set("{{ .Spec }}", {{ .Go }})
+	if {{ queryGuard . }} {
+		params.Set("{{ .Spec }}", {{ queryValue . }})
 	}
 {{- end }}
 {{- end }}
@@ -676,25 +728,11 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 		params.Set("page", strconv.Itoa(page))
 		params.Set("{{ .PageSizeParam }}", strconv.Itoa(pageSize))
 {{- range .QueryParams }}
-{{- if eq .Type "[]string" }}
-		if len({{ .Go }}) > 0 {
-			params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
-		}
-{{- else if eq .Type "bool" }}
-		if {{ .Go }} {
-			params.Set("{{ .Spec }}", "true")
-		}
-{{- else if eq .Type "int" }}
-		if {{ .Go }} != 0 {
-			params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
-		}
-{{- else if eq .Type "int64" }}
-		if {{ .Go }} != 0 {
-			params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
-		}
+{{- if .AlwaysSend }}
+		params.Set("{{ .Spec }}", {{ queryValue . }})
 {{- else }}
-		if {{ .Go }} != "" {
-			params.Set("{{ .Spec }}", {{ .Go }})
+		if {{ queryGuard . }} {
+			params.Set("{{ .Spec }}", {{ queryValue . }})
 		}
 {{- end }}
 {{- end }}
@@ -754,25 +792,11 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 			params.Set("{{ .CursorParam }}", cursor)
 		}
 {{- range .QueryParams }}
-{{- if eq .Type "[]string" }}
-		if len({{ .Go }}) > 0 {
-			params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
-		}
-{{- else if eq .Type "bool" }}
-		if {{ .Go }} {
-			params.Set("{{ .Spec }}", "true")
-		}
-{{- else if eq .Type "int" }}
-		if {{ .Go }} != 0 {
-			params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
-		}
-{{- else if eq .Type "int64" }}
-		if {{ .Go }} != 0 {
-			params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
-		}
+{{- if .AlwaysSend }}
+		params.Set("{{ .Spec }}", {{ queryValue . }})
 {{- else }}
-		if {{ .Go }} != "" {
-			params.Set("{{ .Spec }}", {{ .Go }})
+		if {{ queryGuard . }} {
+			params.Set("{{ .Spec }}", {{ queryValue . }})
 		}
 {{- end }}
 {{- end }}
@@ -1082,7 +1106,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		<%- if eq .Format "xml" %>
 		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
 		<%- else if .ResponseIsJSONArray %>
@@ -1128,7 +1152,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 <%- if eq .Format "xml" %>
 		writeXML(t, w, <% statusConst .ExpectedStatus %>, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
 <%- else if .ResponseIsJSONArray %>
@@ -1154,7 +1178,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
@@ -1171,7 +1195,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
@@ -1188,7 +1212,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
 			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
 		}
@@ -1223,7 +1247,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		<%- if .ResponseType %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 		_, _ = w.Write([]byte("<ok/>"))
@@ -1258,7 +1282,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 <%- if isStringSlice .UnwrapResults %>
 		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []string{"item-1"}})
 <%- else %>
@@ -1282,7 +1306,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 <%- if .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 <%- else %>
@@ -1306,7 +1330,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 <%- if eq .PaginationStyle "rawArray" %>
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 <%- else %>
@@ -1337,7 +1361,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		switch r.URL.Query().Get("<% .CursorParam %>") {
 		case "":
 			writeJSON(t, w, http.StatusOK, map[string]any{

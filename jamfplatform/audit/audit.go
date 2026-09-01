@@ -35,9 +35,7 @@ func (c *Client) ListAuditEvents(ctx context.Context, since string, until string
 		if cursor != "" {
 			params.Set("cursor", cursor)
 		}
-		if since != "" {
-			params.Set("since", since)
-		}
+		params.Set("since", since)
 		if until != "" {
 			params.Set("until", until)
 		}

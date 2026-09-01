@@ -149,7 +149,7 @@ deliberately kept three of them for exactly that reason.
 | `responseType` | 320 | explicit response schema name, for an untyped spec body. Also accepts a `[]T` literal — see [bare-array responses](#responsetype-t--bare-array-responses) |
 | `pathNames` | 313 | spec path param → Go param name |
 | `requestType` | 229 | explicit request schema name |
-| `params` | 161 | query params, compact: `"name"`, `"name:type"`, `"spec:type:goName"`, plus a trailing `:undocumented` to opt out of the spec name-match check |
+| `params` | 161 | query params, compact: `"name"`, `"name:type"`, `"spec:type:goName"`, plus a trailing `:undocumented` to opt out of the spec name-match check. **Required-ness is not declarable here** — it is derived from the spec, see [query parameter emission](#query-parameter-emission-a-required-param-carries-no-guard) |
 | `pagination` | 127 | one of the five styles below |
 | `resolver` | 108 | one name→ID resolver, optionally with `apply` |
 | `contentType` | 8 | request Content-Type override. Every current user is `application/merge-patch+json` |
@@ -287,6 +287,59 @@ This is deliberately an operation-level override rather than a
 behaviour*, so it belongs where the wire evidence is cited and it is one line to
 delete when either side changes. A patched schema would instead shadow the
 corrected declaration forever, with neither tripwire firing.
+
+### Query parameter emission: a required param carries no guard
+
+An optional query param is emitted behind a zero-value guard — `!= ""`,
+`len(x) > 0`, `!= 0`, truthiness for `bool` — so an argument the caller never set
+does not travel. **A spec-required one is emitted unconditionally.** Guarding it
+means a caller passing the zero value sends a request with a required parameter
+missing, and the rejection reads like a fault rather than a caller error:
+Security Cloud's `ListActivationProfilesV1` shipped that way, `origin=""`
+producing `400 BAD_REQUEST` "Required parameter 'origin' is not present." in the
+service's own envelope, with no `errors[]` and nothing naming the caller's
+mistake. Sent empty, the same call comes back `400 INVALID_FIELD "Unknown origin
+value."` — the declared shape, attributable. Pro's `GET /v1/jamf-package` is the
+same story: omitted is `400` with an **empty** `errors` array, `application=` is
+`400 INVALID_FORMAT` explaining that the name must be alphanumeric.
+
+**Required-ness is derived from the spec, never declared in config.json**, in
+`resolveQueryParams` — the same pass that runs the name-match check, so one
+resolution of the spec's parameter objects feeds both. A `:required` suffix
+alongside `:undocumented` was rejected: `:undocumented` exists only because that
+flag genuinely is not in the spec, whereas required-ness is, so a manual suffix
+would be a second source of truth that rots the first time a bundle flips a
+param from optional to required. Derived, the next `make generate` picks the flip
+up. An `:undocumented` param has no spec parameter to read and keeps its guard.
+
+**One carve-out: a required param whose schema declares a substantive default
+keeps its guard.** OpenAPI forbids the combination outright ("default SHALL NOT
+be used with required"), so such a parameter is a malformed declaration and the
+choice of which half to follow is settled by the wire, not the text. Pro's
+`columns-to-export` on `GET /v3/patch-software-title-configurations/{id}/export-report`
+is the only live case — `required: true` with a nine-column default — and
+sending it empty is *worse* than omitting it: on a config whose patch report has
+zero rows, omitting it and passing a valid two-column list both answer 400,
+while `columns-to-export=` answers **500**. An empty default (`""`, `[]`) states
+nothing and does not earn the carve-out. `hasSpecDefault` is the predicate; if a
+bundle drops the default, the param starts travelling unguarded on the next
+generate, which is the right response to the spec no longer defining its
+absence.
+
+The guard logic lives in two template funcs, `queryValue` and `queryGuard`, not
+in the templates. The type switch had been written out three times — in
+`buildQueryParams`, `paginated` and `paginatedCursor` — and every branch of all
+three had to honour required-ness; three copies of a nine-branch switch is how
+the bug survived the `fb2c38e9` hardening that covered the parameter *name*
+dimension and left this one alone. Two layers pin it: a generator test renders
+every category × every type and asserts the guard's presence exactly on the
+optional side, and each generated httptest stub calls its method with zero-value
+arguments and asserts `r.URL.Query().Has(...)` for every required param, which
+fails if the guard ever comes back.
+
+One conversion is not mechanical. An optional `bool` is only ever emitted when
+true, so `"true"` as a literal is exact; a required one uses
+`strconv.FormatBool` so it can carry a false the caller meant.
 
 ### Endpoint versions are additive
 

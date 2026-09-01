@@ -72,7 +72,10 @@ func TestAcceptance_ListDeclarationReportClientsFiltered(t *testing.T) {
 		t.Skip("No devices available")
 	}
 
-	report, err := dr.GetDeviceDeclarationReportFiltered(ctx, d[0].ID, "", nil)
+	// filter is required: true with no default, so the generated method sends
+	// it whatever the caller passes — "" would travel as filter= rather than
+	// being dropped. Supply the same expression the sibling test uses.
+	report, err := dr.GetDeviceDeclarationReportFiltered(ctx, d[0].ID, "active==true", nil)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetDeviceDeclarationReportFiltered failed: %v", err)

@@ -175,9 +175,7 @@ func (c *Client) GetManagedSoftwareUpdateGroupPlansV1(ctx context.Context, id st
 	var result ManagedSoftwareUpdatePlans
 	endpoint := fmt.Sprintf("%s/managed-software-updates/plans/group/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
-	if groupType != "" {
-		params.Set("group-type", groupType)
-	}
+	params.Set("group-type", groupType)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}

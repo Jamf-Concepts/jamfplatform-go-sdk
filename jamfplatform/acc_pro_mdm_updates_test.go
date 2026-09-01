@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"testing"
@@ -170,6 +171,61 @@ func TestAcceptance_Pro_MdmUpdates_ListManagedSoftwareUpdatePlansV1(t *testing.T
 		t.Fatalf("ListManagedSoftwareUpdatePlansV1: %v", err)
 	}
 	t.Logf("Managed software update plans: %d", len(plans))
+}
+
+// TestAcceptance_Pro_MdmUpdates_GetGroupPlansV1 covers the one
+// managed-software-update read that takes a spec-required query parameter.
+// group-type is required: true with a two-value enum, so the generated method
+// sends it unconditionally rather than dropping an empty one — see
+// resolveQueryParams in tools/generate.
+//
+// The server does NOT enforce it, which is the finding worth recording:
+// probed 2026-09-01 against group id 1 on Jamf Pro 11.31.1, all of
+// group-type=COMPUTER_GROUP, group-type=MOBILE_DEVICE_GROUP, group-type= and
+// the parameter omitted entirely answer 200 with the same body, while
+// group-type=BOGUS is 400 INVALID_REQUEST_PARAMETER_TYPE naming the Java enum.
+// So required-ness here is documentation, not validation, and the two group
+// types are not distinguished on a group that has no plans. A 400 for the
+// empty value appearing later means the server started enforcing it.
+func TestAcceptance_Pro_MdmUpdates_GetGroupPlansV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	groups, err := p.ListComputerGroupsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputerGroupsV1: %v", err)
+	}
+	if len(groups) == 0 {
+		t.Skip("no computer groups on this tenant")
+	}
+	id := groups[0].ID
+
+	plans, err := p.GetManagedSoftwareUpdateGroupPlansV1(ctx, id, "COMPUTER_GROUP")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetManagedSoftwareUpdateGroupPlansV1(%s, COMPUTER_GROUP): %v", id, err)
+	}
+	t.Logf("Group %s has %d managed software update plans", id, len(plans.Results))
+
+	// An out-of-enum value is the only rejection this endpoint has.
+	_, err = p.GetManagedSoftwareUpdateGroupPlansV1(ctx, id, "BOGUS")
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusBadRequest) {
+		skipOnServerError(t, err)
+		t.Fatalf("GetManagedSoftwareUpdateGroupPlansV1(%s, BOGUS) = %v, want 400", id, err)
+	}
+	if d := apiErr.Details(); len(d) == 0 || d[0].Code != "INVALID_REQUEST_PARAMETER_TYPE" {
+		t.Errorf("details = %+v, want INVALID_REQUEST_PARAMETER_TYPE", d)
+	}
+
+	// The empty value travels (that is the point of the required-param
+	// emission) and the server accepts it, same as COMPUTER_GROUP.
+	if _, err := p.GetManagedSoftwareUpdateGroupPlansV1(ctx, id, ""); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("GetManagedSoftwareUpdateGroupPlansV1(%s, \"\") = %v, want nil: an empty group-type is accepted, so a failure here means the server began enforcing required-ness", id, err)
+	}
 }
 
 // TestAcceptance_Pro_MdmUpdates_FeatureToggleRoundTripV1 reads the

@@ -61,9 +61,7 @@ func (c *Client) ListAdvancedMobileDeviceSearchChoicesV1(ctx context.Context, cr
 	var result AdvancedSearchCriteriaChoices
 	endpoint := prefix + "/advanced-mobile-device-searches/choices"
 	params := url.Values{}
-	if criteria != "" {
-		params.Set("criteria", criteria)
-	}
+	params.Set("criteria", criteria)
 	if site != "" {
 		params.Set("site", site)
 	}

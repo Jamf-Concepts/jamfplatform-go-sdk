@@ -90,10 +90,7 @@ func TestParameterComment(t *testing.T) {
 		param("ignored", "Not in the Go signature, must not appear"),
 	}}
 
-	got, err := parameterComment(m, pathItem, op, nil)
-	if err != nil {
-		t.Fatalf("parameterComment: %v", err)
-	}
+	got := parameterComment(m, collectSpecParams(pathItem, op), nil)
 	wantLines := []string{
 		"\n//\n// Parameters:",
 		"//   - id: ID to filter by.",
@@ -115,36 +112,133 @@ func TestParameterComment(t *testing.T) {
 	// single-line godoc.
 	bare := GoMethod{PathParams: []GoPathParam{{SpecName: "id", GoName: "id"}}}
 	bareItem := &openapi3.PathItem{Parameters: openapi3.Parameters{param("id", "")}}
-	if got, err := parameterComment(bare, bareItem, &openapi3.Operation{}, nil); err != nil || got != "" {
-		t.Errorf("undescribed param produced (%q, %v), want (\"\", nil)", got, err)
+	if got := parameterComment(bare, collectSpecParams(bareItem, &openapi3.Operation{}), nil); got != "" {
+		t.Errorf("undescribed param produced %q, want empty", got)
 	}
 }
 
-func TestParameterCommentRejectsUnmatchedQueryParam(t *testing.T) {
+// TestResolveQueryParamsRejectsUnmatchedQueryParam pins the name-match half of
+// resolveQueryParams: the GetBaselineRules baselineId/baseline-id incident, in
+// which a mistyped config entry generated a method that sent a query key the
+// server ignored and kept compiling.
+func TestResolveQueryParamsRejectsUnmatchedQueryParam(t *testing.T) {
 	m := GoMethod{
 		HTTPMethod:  "GET",
 		SpecPath:    "/v1/tenant/{tenantId}/rules",
 		QueryParams: []ExtraParam{{Spec: "baselineId", Go: "baselineID"}},
 	}
 	op := &openapi3.Operation{Parameters: openapi3.Parameters{
-		{Value: &openapi3.Parameter{Name: "baseline-id", Description: "Given baseline ID"}},
+		{Value: &openapi3.Parameter{Name: "baseline-id", Description: "Given baseline ID", Required: true}},
 	}}
+	specParams := collectSpecParams(nil, op)
 
-	got, err := parameterComment(m, nil, op, nil)
+	err := resolveQueryParams(&m, specParams)
 	if err == nil {
 		t.Fatal("expected an error for a config param absent from the spec, got nil")
 	}
 	if !strings.Contains(err.Error(), "baselineId") || !strings.Contains(err.Error(), "baseline-id") {
 		t.Errorf("error %q should name both the unmatched config param and the spec's actual param", err)
 	}
-	if got != "" {
-		t.Errorf("got %q, want empty string alongside the error", got)
+
+	// Marking the same mismatch ":undocumented" opts it out of the check. It
+	// stays OPTIONAL: there is no spec parameter to read required-ness from,
+	// and the zero-value guard is the only safe emission for a param the spec
+	// is silent about.
+	m.QueryParams[0].Undocumented = true
+	if err := resolveQueryParams(&m, specParams); err != nil {
+		t.Errorf("undocumented opt-out should suppress the error, got %v", err)
+	}
+	if m.QueryParams[0].AlwaysSend {
+		t.Error("an undocumented param must not be marked required")
+	}
+}
+
+// TestResolveQueryParamsDerivesRequired pins the other half: required-ness is
+// read off the spec parameter, never declared in config.json. A required param
+// emitted behind the optional zero-value guard is silently dropped when the
+// caller passes the zero value, and the server's 400 reads like a fault rather
+// than a caller error — Security Cloud's ListActivationProfilesV1 `origin`
+// shipped that way.
+func TestResolveQueryParamsDerivesRequired(t *testing.T) {
+	m := GoMethod{
+		HTTPMethod: "GET",
+		SpecPath:   "/v1/activation-profiles",
+		QueryParams: []ExtraParam{
+			{Spec: "origin", Go: "origin", Type: "string"},
+			{Spec: "sort", Go: "sort", Type: "[]string"},
+		},
+	}
+	op := &openapi3.Operation{Parameters: openapi3.Parameters{
+		{Value: &openapi3.Parameter{Name: "origin", Required: true, Description: "Origin."}},
+		{Value: &openapi3.Parameter{Name: "sort", Description: "Sort."}},
+	}}
+	if err := resolveQueryParams(&m, collectSpecParams(nil, op)); err != nil {
+		t.Fatalf("resolveQueryParams: %v", err)
+	}
+	if !m.QueryParams[0].AlwaysSend {
+		t.Error("origin is required: true in the spec but was not marked required")
+	}
+	if m.QueryParams[1].AlwaysSend {
+		t.Error("sort carries no required flag but was marked required")
 	}
 
-	// Marking the same mismatch ":undocumented" opts it out of the check.
-	m.QueryParams[0].Undocumented = true
-	if _, err := parameterComment(m, nil, op, nil); err != nil {
-		t.Errorf("undocumented opt-out should suppress the error, got %v", err)
+	// An operation-level declaration overriding a path-level one supplies the
+	// required flag too — the same precedence collectSpecParams applies to
+	// descriptions.
+	m2 := GoMethod{QueryParams: []ExtraParam{{Spec: "filter", Go: "filter", Type: "string"}}}
+	pathItem := &openapi3.PathItem{Parameters: openapi3.Parameters{
+		{Value: &openapi3.Parameter{Name: "filter", Description: "Path-level filter."}},
+	}}
+	opOverride := &openapi3.Operation{Parameters: openapi3.Parameters{
+		{Value: &openapi3.Parameter{Name: "filter", Required: true, Description: "Operation-level filter."}},
+	}}
+	if err := resolveQueryParams(&m2, collectSpecParams(pathItem, opOverride)); err != nil {
+		t.Fatalf("resolveQueryParams: %v", err)
+	}
+	if !m2.QueryParams[0].AlwaysSend {
+		t.Error("an operation-level required override did not reach the ExtraParam")
+	}
+}
+
+// TestResolveQueryParamsKeepsGuardWhenSpecDeclaresDefault pins the one
+// carve-out. A required param that also declares a default is a malformed
+// declaration (OpenAPI: "default SHALL NOT be used with required"), and where
+// the default is substantive the server has something to fall back on — so
+// absence is defined and the guard stays. Pro's columns-to-export is the live
+// case. An empty default states nothing and does not earn the carve-out;
+// Pro's FailCloudDistributionPointUploadV1 `type` is that case, default "".
+func TestResolveQueryParamsKeepsGuardWhenSpecDeclaresDefault(t *testing.T) {
+	param := func(name string, def any) *openapi3.ParameterRef {
+		return &openapi3.ParameterRef{Value: &openapi3.Parameter{
+			Name: name, Required: true, Description: name + ".",
+			Schema: &openapi3.SchemaRef{Value: &openapi3.Schema{Default: def}},
+		}}
+	}
+	m := GoMethod{QueryParams: []ExtraParam{
+		{Spec: "columns", Go: "columns", Type: "[]string"},
+		{Spec: "emptyList", Go: "emptyList", Type: "[]string"},
+		{Spec: "emptyStr", Go: "emptyStr", Type: "string"},
+		{Spec: "noDefault", Go: "noDefault", Type: "string"},
+	}}
+	op := &openapi3.Operation{Parameters: openapi3.Parameters{
+		param("columns", []any{"computerName", "deviceId"}),
+		param("emptyList", []any{}),
+		param("emptyStr", ""),
+		param("noDefault", nil),
+	}}
+	if err := resolveQueryParams(&m, collectSpecParams(nil, op)); err != nil {
+		t.Fatalf("resolveQueryParams: %v", err)
+	}
+	want := map[string]bool{
+		"columns":   false, // substantive default → absence is defined, keep the guard
+		"emptyList": true,
+		"emptyStr":  true,
+		"noDefault": true,
+	}
+	for _, q := range m.QueryParams {
+		if q.AlwaysSend != want[q.Spec] {
+			t.Errorf("%s: AlwaysSend = %v, want %v", q.Spec, q.AlwaysSend, want[q.Spec])
+		}
 	}
 }
 
@@ -162,10 +256,7 @@ func TestParameterCommentNamesEmittedEnumTypes(t *testing.T) {
 	m := GoMethod{PathParams: []GoPathParam{{SpecName: "notificationType", GoName: "notificationType"}}}
 	op := &openapi3.Operation{Parameters: openapi3.Parameters{refd}}
 
-	got, err := parameterComment(m, nil, op, map[string]bool{"NotificationType": true})
-	if err != nil {
-		t.Fatalf("parameterComment: %v", err)
-	}
+	got := parameterComment(m, collectSpecParams(nil, op), map[string]bool{"NotificationType": true})
 	if !strings.Contains(got, "Allowed values: see the NotificationType constants.") {
 		t.Errorf("expected a pointer to the emitted type, got:\n%s", got)
 	}
@@ -175,10 +266,7 @@ func TestParameterCommentNamesEmittedEnumTypes(t *testing.T) {
 
 	// The same schema when NO type is emitted for it (enum reachable only from
 	// a parameter) must fall back to the inline list.
-	got, err = parameterComment(m, nil, op, nil)
-	if err != nil {
-		t.Fatalf("parameterComment: %v", err)
-	}
+	got = parameterComment(m, collectSpecParams(nil, op), nil)
 	if !strings.Contains(got, `"APNS_CERT_REVOKED", "GSX_CERT_EXPIRED"`) {
 		t.Errorf("expected an inline list with no emitted type, got:\n%s", got)
 	}

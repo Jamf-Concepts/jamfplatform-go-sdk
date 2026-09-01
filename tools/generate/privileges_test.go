@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -189,7 +190,7 @@ func TestSpecLegacyArraysStillUnsorted(t *testing.T) {
 // produced by goStringSliceLiteral and contain no escaped quotes.
 func splitGoStringLiteralList(body string) []string {
 	var out []string
-	for _, part := range strings.Split(body, ",") {
+	for part := range strings.SplitSeq(body, ",") {
 		part = strings.TrimSpace(part)
 		if len(part) >= 2 && strings.HasPrefix(part, `"`) && strings.HasSuffix(part, `"`) {
 			out = append(out, part[1:len(part)-1])
@@ -463,7 +464,7 @@ func TestScopedPrivilegesUseGAVocabulary(t *testing.T) {
 			unknownCap = append(unknownCap, id+" ("+where+")")
 			continue
 		}
-		if !gaActions[action] || !slicesContains(actions, action) {
+		if !gaActions[action] || !slices.Contains(actions, action) {
 			badAction = append(badAction, id+" ("+where+")")
 		}
 	}
@@ -499,14 +500,4 @@ func uniqueStrings(in []string) []string {
 		}
 	}
 	return out
-}
-
-// slicesContains is a local spelling to keep this file's Go version floor low.
-func slicesContains(hay []string, needle string) bool {
-	for _, s := range hay {
-		if s == needle {
-			return true
-		}
-	}
-	return false
 }

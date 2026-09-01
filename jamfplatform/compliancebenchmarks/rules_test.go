@@ -17,6 +17,9 @@ func TestGetBaselineRules(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if !r.URL.Query().Has("baseline-id") {
+			t.Errorf("required query param baseline-id not sent: %q", r.URL.RawQuery)
+		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 

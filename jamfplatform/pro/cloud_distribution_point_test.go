@@ -102,6 +102,12 @@ func TestFailCloudDistributionPointUploadV1(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
+		if !r.URL.Query().Has("file-name") {
+			t.Errorf("required query param file-name not sent: %q", r.URL.RawQuery)
+		}
+		if !r.URL.Query().Has("type") {
+			t.Errorf("required query param type not sent: %q", r.URL.RawQuery)
+		}
 		w.WriteHeader(http.StatusNoContent)
 	})
 

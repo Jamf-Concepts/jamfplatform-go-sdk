@@ -355,6 +355,13 @@ type ExtraParam struct {
 	Go           string
 	Type         string
 	Undocumented bool // set via a trailing ":undocumented" in config.json; skips the spec name-match check
+
+	// AlwaysSend suppresses the zero-value guard the optional params get, so
+	// the parameter travels whatever the caller passed. It is derived from
+	// the spec, never declared in config.json — see resolveQueryParams for
+	// the derivation and for why a ":required" suffix would have been the
+	// wrong shape.
+	AlwaysSend bool
 }
 
 // validateConfig rejects misconfigured specs before generation runs.

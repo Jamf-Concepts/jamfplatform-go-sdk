@@ -819,6 +819,53 @@ exists at all**), `mdm/commands` (needs a device with a live push channel).
 
 ---
 
+## Required query parameters (2026-09-01)
+
+The generator emitted every query param behind a zero-value guard, spec-required
+ones included, so a caller passing the zero value sent a request with the
+parameter missing. Twelve call sites across five packages were affected; the
+emission rule and the one carve-out are in
+[STYLE.md](STYLE.md#query-parameter-emission-a-required-param-carries-no-guard).
+Probed on the EU gateway, tenant-scoped for Security Cloud and
+environment-scoped for the rest, each with a 200 control in the same
+invocation. **Absent and empty are different requests on every endpoint here,
+and the empty one is the better error in every case but one.**
+
+| endpoint | param omitted | param sent empty | valid value |
+|---|---|---|---|
+| `GET /securitycloud/v1/activation-profiles` | `400 BAD_REQUEST` "Required parameter 'origin' is not present." — the service's own envelope, no `errors[]` | `400 INVALID_FIELD` "Unknown origin value." — the declared `ApiError` shape | `origin=PUBLIC_API` → 200 |
+| `GET /ddm/report/v1/devices/{id}/declarations` | `400`, `field: "filter"`, "Required request parameter 'filter' for method parameter type String is not present", `code: null` | `400`, `field: null`, "Unable to parse RSQL filter" | `filter=active==true` → 200, 28 rows |
+| `GET /pro/v1/jamf-package` | `400` with an **empty** `errors` array — nothing at all to act on | `400 INVALID_FORMAT` "Please ensure your application name is alphanumeric" | `application=protect` → 200 |
+| `GET /pro/v1/managed-software-updates/plans/group/{id}` | **200** | **200** | `group-type=COMPUTER_GROUP` → 200 |
+| `GET /pro/v3/patch-software-title-configurations/{id}/export-report` | `400` (report has 0 rows) | **500** | two-column list → `400`, same as omitted, for the 0-row report |
+
+Three findings in that table.
+
+**`group-type` is `required: true` and the server does not enforce it.** All four
+of `COMPUTER_GROUP`, `MOBILE_DEVICE_GROUP`, empty, and omitted answer 200 with
+the same body on group id 1 (Jamf Pro 11.31.1); only `group-type=BOGUS` is
+refused, `400 INVALID_REQUEST_PARAMETER_TYPE` quoting the Java enum
+`com.jamfsoftware.managedsoftwareupdates.web.dto…`. So required-ness there is
+documentation, not validation. `TestAcceptance_Pro_MdmUpdates_GetGroupPlansV1`
+pins all three behaviours and fails if the server starts enforcing it — that
+method had no acceptance test at all before this change.
+
+**`columns-to-export` is the one case where sending the parameter is worse than
+omitting it, and it is the reason for the carve-out.** It is `required: true`
+*with* a nine-column default, which OpenAPI forbids. Against a config whose
+patch report has zero rows, omitting it and passing a valid two-column list both
+answer `400` with an empty `errors` array — the "empty report is a 400 here"
+behaviour `assertPatchExportReport` already documents — while
+`columns-to-export=` answers **500**. Substantive default ⇒ absence is defined
+⇒ keep the guard.
+
+**`GET /pro/v1/jamf-package` rejects an underscore.** `application=JAMF_PROTECT`
+is `400 INVALID_FORMAT` on the same "must be alphanumeric" rule as the empty
+value; `protect` and `PROTECT` both answer 200. The spec constrains the param to
+no enum, so the vocabulary is wire-only.
+
+---
+
 ## Jamf Security Cloud (`securitycloud`)
 
 ### URL shape

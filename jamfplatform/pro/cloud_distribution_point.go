@@ -80,12 +80,8 @@ func (c *Client) FailCloudDistributionPointUploadV1(ctx context.Context, id stri
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := fmt.Sprintf("%s/cloud-distribution-point/fail-upload/%s", prefix, url.PathEscape(id))
 	params := url.Values{}
-	if fileName != "" {
-		params.Set("file-name", fileName)
-	}
-	if uploadType != "" {
-		params.Set("type", uploadType)
-	}
+	params.Set("file-name", fileName)
+	params.Set("type", uploadType)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}

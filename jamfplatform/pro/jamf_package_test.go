@@ -17,6 +17,9 @@ func TestListJamfPackagesV1(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if !r.URL.Query().Has("application") {
+			t.Errorf("required query param application not sent: %q", r.URL.RawQuery)
+		}
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
@@ -50,6 +53,9 @@ func TestGetJamfPackageV2(t *testing.T) {
 	mux.HandleFunc("/pro/v2/jamf-package", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if !r.URL.Query().Has("application") {
+			t.Errorf("required query param application not sent: %q", r.URL.RawQuery)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})

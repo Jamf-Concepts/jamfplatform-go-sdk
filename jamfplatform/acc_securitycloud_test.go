@@ -1332,14 +1332,31 @@ func TestAcceptance_SecurityCloudActivationProfileRejections(t *testing.T) {
 		}
 	})
 
-	t.Run("list/origin omitted", func(t *testing.T) {
-		// origin is a required query parameter, and the generated method drops
-		// an empty one from the URL rather than sending origin= — so passing ""
-		// reaches the endpoint with the parameter absent. That is refused in
-		// the framework's envelope, not ApiError, which is why this asserts on
-		// the raw body.
+	t.Run("list/origin empty", func(t *testing.T) {
+		// origin is required: true, so the generated method sends it
+		// unconditionally — `origin=` with an empty value, not a URL with the
+		// parameter missing. That distinction is the whole point of the
+		// required-param emission: an absent origin is refused in the
+		// framework's own envelope ("Required parameter 'origin' is not
+		// present.", no ApiError details, nothing naming the caller's
+		// mistake), while an empty one reaches the endpoint's own validation
+		// and comes back in the declared shape.
+		//
+		// So this test doubles as the wire-side guard on the zero-value guard
+		// being gone: if a future generator change reintroduces it, the error
+		// reverts to the raw envelope and the details assertion here fails.
 		_, err := sc.ListActivationProfilesV1(ctx, "")
-		jscAssertRawError(t, err, http.StatusBadRequest, "Required parameter 'origin' is not present.")
+		var apiErr *jamfplatform.APIResponseError
+		if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusBadRequest) {
+			t.Fatalf("ListActivationProfilesV1(\"\") = %v, want 400", err)
+		}
+		if strings.Contains(apiErr.Body, "is not present") {
+			t.Fatalf("origin was dropped from the URL instead of sent empty — the required-param zero-value guard is back: %q", apiErr.Body)
+		}
+		details := apiErr.Details()
+		if len(details) != 1 || details[0].Code != "INVALID_FIELD" {
+			t.Errorf("details = %+v, want one INVALID_FIELD: an empty origin is a value the endpoint rejects, same as an out-of-enum one", details)
+		}
 	})
 
 	t.Run("get/unknown code", func(t *testing.T) {
