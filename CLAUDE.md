@@ -288,17 +288,17 @@ a method that ignores the cursor fails.
 
 **Security Cloud provenance, and the one trap that silently replaces a spec:**
 
-| `testing/` file | v1897 source |
-|---|---|
-| `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` |
-| `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` |
-| `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories` |
-| `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` |
-| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` |
-| `ai-governance-api.yaml` | `external/ai-governance` |
-| `audit-api.yaml` | `external/audit` |
-| `openapi-jpapi.json` | `external/jpapi` |
-| `Classic-openapi.json` | `external/capi` |
+| `testing/` file | bundle source | at |
+|---|---|---|
+| `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` | v1897 |
+| `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` | v1897 |
+| `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories` | v1897 |
+| `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` | **v1942** |
+| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 |
+| `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
+| `audit-api.yaml` | `external/audit` | v1897 |
+| `openapi-jpapi.json` | `external/jpapi` | v1897 |
+| `Classic-openapi.json` | `external/capi` | v1897 |
 
 The last Security Cloud row is named for its *tag* (`device-groups`) but the spec
 is the **Security Cloud Devices API**. `internal/stage/device-groups` is the
@@ -343,7 +343,79 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1897** (2026-08-31), except:
+Ingested through **v1897** (2026-08-31), plus `internal/stage/uem-connect` at
+**v1942** (2026-09-01). Exceptions and the v1942 hold below.
+
+**v1942 deletes 146 deprecated-but-live operations from the published specs, and
+the deletions are not being taken.** Every one of the 146 was `deprecated: true`
+in v1897, and every one has a successor version that already existed — so this is
+precisely the case the additive-versions hard rule exists to refuse, and unlike
+v1897 nothing supports an override:
+
+| spec | ops | what went |
+|---|---|---|
+| `external/jpapi` | 788 → 666 | computers-inventory `v1`/`v2`/`v3` (v4 survives), inventory-preload `v1` + unversioned (v2 survives), computer-groups `v2`, mobile-device-groups `v1`, mobile-device-prestages `v2`, patch-software-title-configurations `v2`, computer-inventory-collection-settings `v1`, groups `v1`, `GET /v1/mdm/commands` |
+| `external/capi` | 606 → 586 | `/computers` collection + `/computers/id/{id}`, the `/patches`, `/patchsoftwaretitles` and `/patchpolicies` families |
+| `external/declaration-reporting` | 5 → 3 | `GET /v1/declarations/{declarationIdentifier}`, `GET /v1/devices/{deviceId}` |
+| `external/securitycloud-devices` | 7 → 5 | `GET /v1/groups`, `PUT /v1/groups/{groupId}` |
+
+Four independent reasons it is a publish-stage filter and not a withdrawal:
+
+- **The same bundle's own privilege oracle still declares all 146.**
+  `external/_permissions/routes.yaml` is byte-different from v1897 but
+  `sort`-identical — a pure reordering, 1474 route-method entries both sides, zero
+  removed, zero added, zero permission changes. `/computers`, `/patches` and
+  `/v1/computers-inventory` are all still in it. Since `routes.yaml` is generated
+  from the specs' own `x-required-privileges`, that generation must run *before*
+  the filter.
+- **`authorization-policies` has nothing.** `origin/main` is still `cdd734b`
+  (v1897's `/v1/system/initialize` deny) with no successor commit; the hand-written
+  OPA allow blocks for `v1`, `v2` and `v3` `computers-inventory` are all intact.
+- **The wire serves every one of them.** Probed 2026-09-01 against 11.31.1 with
+  `GET /pro/v1/jamf-pro-version` → 200 as the control in the same invocation:
+  `v1`/`v2`/`v3`/`v4` `computers-inventory` all 200 with the same 4 rows, `v1` and
+  `v2` `groups` both 200 with the same 382, `v1` and `v2`
+  `computer-inventory-collection-settings` both 200, `v1/inventory-preload` and
+  `v2/inventory-preload/records` both 200, `v1/mobile-device-groups`,
+  `v2/patch-software-title-configurations` and `v2/mobile-device-prestages` all
+  200, and `proclassic` `/computers`, `/computers/subset/basic`, `/patches`,
+  `/patchsoftwaretitles`, `/patchpolicies` all 200. Only
+  `GET /v1/mdm/commands` answered non-2xx — `400` with an empty `errors` array,
+  its required-filter validation, i.e. routed and unrefused.
+- **`internal/stage/` carries the identical removals**, same counts, so it is not
+  an environment rollout that prod is lagging.
+
+Nothing else in those four specs moved: 666 surviving jpapi operations byte-equal,
+675 schemas byte-equal, 586 capi operations byte-equal, 169 schemas byte-equal.
+capi's OAuth scope list dropped `patch-management-software-titles:{create,update,delete}`,
+which is derivative — those three were referenced only by the removed operations.
+**So taking v1942 for those four specs would buy nothing and cost 146 methods**;
+copying the specs in would instead fail generation outright with
+`path %s not found in spec`, which is the correct hard error. Report the filter
+upstream and re-diff on the next bundle.
+
+**`internal/stage/uem-connect` was taken — the change is documentation only.**
+Generated diff is two doc blocks in `jamfplatform/securitycloud/types.go`:
+`GroupMapping.EmmGroupID` now says the `computer_<id>` / `mobile_<id>` prefix is
+**required** and a bare ID is rejected, while
+`ActivationProfileDeployRequest.UemGroups` says a bare numeric ID *is* accepted
+there, that a present prefix must match the `platform`'s device type, and that
+scoping is **additive** — the IDs merge into the profile's existing scope, so a
+later deploy can widen it but never narrow or clear it, and an omitted or empty
+array leaves the existing scope untouched rather than meaning "all groups". Those
+are upstream's behavioural claims carried through as godoc; none is wire-verified
+here, and the same text points callers at `GET /v1/mobile-device-groups` — one of
+the paths v1942 just deleted from `jpapi`.
+
+**The three `account` specs changed too, inertly.** Each dropped `eu` and `apac`
+from its `servers` region-variable enum, leaving `us` — which documents the
+US-only fact already recorded below. The SDK never reads `servers`, so there is no
+Go diff and the holds are unaffected.
+
+Everything else outside `internal/dev` was byte-identical to v1897,
+`_permissions/scopes.yaml` included.
+
+**v1897 position, retained:**
 
 **v1897 changed one spec, `external/jpapi`, and the change was two deletions.**
 `POST /v1/system/initialize` and `POST /v1/system/platform-initialize` are gone,
@@ -468,6 +540,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | held | why |
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
+| `jpapi`, `capi`, `declaration-reporting`, `securitycloud-devices` at v1897 | v1942 deletes 146 deprecated operations that the wire, the OPA allowlist and the bundle's own `routes.yaml` all still carry. See above. Re-diff each bundle; take the removals only once a policy commit or a wire refusal backs them. |
 | `securitycloud-enrollment`, `ai/governance/visibility` | No published spec in any environment. Not ingestable. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 

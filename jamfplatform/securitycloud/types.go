@@ -856,7 +856,16 @@ type ActivationProfileDeployRequest struct {
 	// The UEM platform to deploy profiles to.
 	// Allowed values: "JAMF".
 	Uem string `json:"uem"`
-	// Optional UEM groups to scope the deployment to. If omitted or empty, deploys to all UEM groups.
+	// Optional UEM group IDs to scope the deployment to.
+	// Group names are not accepted. These are the UEM's own group IDs — for Jamf Pro, obtain them from
+	// the Jamf Pro API (`GET /v1/computer-groups`, `GET /v1/mobile-device-groups`). An ID is either bare
+	// numeric (`"123"`) or device-type-prefixed (`"computer_123"`, `"mobile_456"`); a prefix, when
+	// present, must match the device type the `platform` deploys to. IDs are scoped to a single UEM
+	// instance.
+	// Scoping is additive: the IDs are merged into the configuration profile's existing scope, so a later
+	// deploy can widen the scope but cannot narrow or clear it. Omitting the field or sending an empty
+	// array leaves any existing scope untouched — on the first deploy of a profile it means no group
+	// scope is set, not that the profile is scoped to every group.
 	UemGroups *[]string `json:"uemGroups,omitempty"`
 }
 
@@ -1097,7 +1106,10 @@ type EnablementRequest struct {
 
 // GroupMapping A single UEM-group-to-JSC-group assignment. Both property names retain legacy internal product names (`emm` for UEM, `wandera` for JSC). They are the names the service serializes and accepts today, so they are documented as-is; renaming them would break existing callers.
 type GroupMapping struct {
-	// Group identifier in the UEM platform.
+	// Group ID in the UEM platform. Group names are not accepted.
+	// For Jamf Pro the device-type prefix is **required** here — `computer_<id>` or `mobile_<id>` —
+	// unlike `ActivationProfileDeployRequest.uemGroups`, where a bare numeric ID is also accepted. A value
+	// without the prefix is rejected.
 	EmmGroupID string `json:"emmGroupId"`
 	// JSC group identifier devices in the UEM group are assigned to.
 	WanderaGroupID string `json:"wanderaGroupId"`

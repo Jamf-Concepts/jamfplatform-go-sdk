@@ -395,6 +395,69 @@ and the server requires **a positive integer or `-1`** — a UUID gives
 on the operation. The generated `string` parameters are right; the constraint is
 on the value.
 
+### v1942 dropped 146 deprecated operations from the specs; every one is live (2026-09-01)
+
+Build v1942 removed, from both `external/` and `internal/stage/`, every deprecated
+operation that had a surviving successor version — 122 from `jpapi`, 20 from
+`capi`, 2 from `declaration-reporting`, 2 from `securitycloud-devices`. Nothing
+was added, no schema changed, and the 666 surviving `jpapi` operations and 675
+schemas were byte-equal to v1897's. The SDK did **not** take the removals; the
+evidence, all gathered 2026-09-01 against Jamf Pro `11.31.1-t1787060595569`:
+
+Probed with a `pro` credential on `eu`, `X-Tenant-Id` header form, with
+`GET /pro/v1/jamf-pro-version` → `200 {"version":"11.31.1-…"}` as the control in
+the same invocation. Every path below is one v1942 deleted:
+
+| path | status | payload |
+|---|---|---|
+| `GET /pro/v1/computers-inventory?page-size=1` | 200 | `totalCount: 4`, first row `id 5` |
+| `GET /pro/v2/computers-inventory?page-size=1` | 200 | identical body to v1 |
+| `GET /pro/v3/computers-inventory?page-size=1` | 200 | identical body to v1 |
+| `GET /pro/v4/computers-inventory?page-size=1` | 200 | identical body — the successor, as a second control |
+| `GET /pro/v1/groups?page-size=1` | 200 | `totalCount: 382` |
+| `GET /pro/v2/groups?page-size=1` | 200 | identical body — successor |
+| `GET /pro/v1/inventory-preload?page-size=1` | 200 | `totalCount: 0` |
+| `GET /pro/v2/inventory-preload/records?page-size=1` | 200 | identical — successor |
+| `GET /pro/v1/computer-inventory-collection-settings` | 200 | preferences object |
+| `GET /pro/v2/computer-inventory-collection-settings` | 200 | identical — successor |
+| `GET /pro/v1/mobile-device-groups?page-size=1` | 200 | bare array, 2+ groups |
+| `GET /pro/v2/patch-software-title-configurations` | 200 | `[ ]` |
+| `GET /pro/v2/mobile-device-prestages?page-size=1` | 200 | `totalCount: 6` |
+| `GET /pro/v1/mdm/commands?page-size=1` | 400 | `{"httpStatus":400,"errors":[]}` — its required-filter validation, i.e. routed and unrefused |
+| `GET /proclassic/computers` | 200 | 4 computers |
+| `GET /proclassic/computers/subset/basic` | 200 | 4 computers, basic subset |
+| `GET /proclassic/patches` | 200 | `{"patch_management_software_titles":[]}` |
+| `GET /proclassic/patchsoftwaretitles` | 200 | `{"patch_software_titles":[]}` |
+| `GET /proclassic/patchpolicies` | 200 | `{"patch_policies":[]}` |
+
+The deprecated version and its successor return **byte-identical bodies** wherever
+both were sampled, so these are aliases at the gateway, not a legacy shape being
+wound down.
+
+Two further checks, each independent of the specs:
+
+- **`authorization-policies`** `origin/main` is still `cdd734b` — v1897's
+  `/v1/system/initialize` deny — with no successor commit. The hand-written OPA
+  allow blocks for `v1`, `v2` and `v3` `computers-inventory` (including the
+  capability and wrong-token-guard variants) are all present.
+- **The bundle's own `_permissions/routes.yaml`** is byte-different from v1897 and
+  `sort`-identical: a pure reordering. 1474 route-method entries on both sides,
+  zero removed, zero added, zero permission changes — `/computers`, `/patches`,
+  `/patchpolicies` and `/v1/computers-inventory` all still declared with their
+  capabilities. Since `routes.yaml` is generated from the specs'
+  `x-required-privileges`, its generation must precede the filter, which places
+  the deletion at the publish stage.
+
+The only derivative change: `capi`'s OAuth scope list went 188 → 185, losing
+`patch-management-software-titles:{create,update,delete}` — referenced solely by
+the removed operations. `patch-management-software-titles:read` survives, on
+`GET /patches/name/{name}`.
+
+**Report upstream, and re-diff every subsequent bundle.** Take the removals only
+when a policy commit or a wire refusal backs them; until then, copying these specs
+into `testing/` fails generation with `path %s not found in spec`, which is the
+correct hard error.
+
 ### The gateway-bypass technique
 
 When a gateway 403 blocks verification, separate "Jamf Pro can't do this" from
@@ -765,6 +828,21 @@ itself, verified with both `--compressed` and `identity`.
   documented field to be present in every response. The transport decodes
   leniently so nothing breaks, but `fieldName` is unreachable from Go. Worth
   reporting: a documentation policy is costing generated clients a real field.
+- **v1942's `uemGroups` documentation is upstream's claim, not wire truth
+  (2026-09-01).** It is the only substantive v1942 change the SDK took, and it is
+  doc-only, but it asserts four behaviours nothing here has probed: that
+  `GroupMapping.emmGroupId` **requires** the `computer_<id>` / `mobile_<id>`
+  prefix for Jamf Pro and rejects a bare ID; that
+  `ActivationProfileDeployRequest.uemGroups` accepts a bare numeric ID as well;
+  that a present prefix must match the device type the `platform` deploys to; and
+  that scoping is **additive** — the IDs merge into the configuration profile's
+  existing scope, so a deploy can widen but never narrow or clear it, and an
+  omitted or empty array leaves the existing scope untouched rather than meaning
+  "all groups". The last is the one that would bite a caller who read the old
+  wording ("If omitted or empty, deploys to all UEM groups"), so it is worth
+  confirming against the sandbox connector above before a consumer relies on it.
+  The same text sends callers to `GET /v1/mobile-device-groups`, which v1942
+  deleted from `jpapi` in the same build.
 
 ### PUT response shapes
 

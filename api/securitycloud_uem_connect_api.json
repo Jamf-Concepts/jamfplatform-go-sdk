@@ -248,11 +248,13 @@
             "type": "string"
           },
           "uemGroups": {
-            "description": "Optional UEM groups to scope the deployment to. If omitted or empty, deploys to all UEM groups.",
+            "description": "Optional UEM group IDs to scope the deployment to.\n\nGroup names are not accepted. These are the UEM's own group IDs — for Jamf Pro, obtain\nthem from the Jamf Pro API (`GET /v1/computer-groups`, `GET /v1/mobile-device-groups`).\nAn ID is either bare numeric (`\"123\"`) or device-type-prefixed (`\"computer_123\"`,\n`\"mobile_456\"`); a prefix, when present, must match the device type the `platform`\ndeploys to. IDs are scoped to a single UEM instance.\n\nScoping is additive: the IDs are merged into the configuration profile's existing scope,\nso a later deploy can widen the scope but cannot narrow or clear it. Omitting the field\nor sending an empty array leaves any existing scope untouched — on the first deploy of a\nprofile it means no group scope is set, not that the profile is scoped to every group.\n",
             "example": [
-              "All Managed Devices"
+              "mobile_456",
+              "789"
             ],
             "items": {
+              "example": "mobile_456",
               "minLength": 1,
               "type": "string"
             },
@@ -690,8 +692,8 @@
         "description": "A single UEM-group-to-JSC-group assignment.\n\nBoth property names retain legacy internal product names (`emm` for UEM, `wandera` for\nJSC). They are the names the service serializes and accepts today, so they are documented\nas-is; renaming them would break existing callers.\n",
         "properties": {
           "emmGroupId": {
-            "description": "Group identifier in the UEM platform",
-            "example": "uem-group-1",
+            "description": "Group ID in the UEM platform. Group names are not accepted.\n\nFor Jamf Pro the device-type prefix is **required** here — `computer_\u003cid\u003e` or\n`mobile_\u003cid\u003e` — unlike `ActivationProfileDeployRequest.uemGroups`, where a bare numeric\nID is also accepted. A value without the prefix is rejected.\n",
+            "example": "computer_123",
             "minLength": 1,
             "type": "string"
           },
@@ -1184,7 +1186,11 @@
             "application/json": {
               "example": {
                 "platform": "SUPERVISED_IOS",
-                "uem": "JAMF"
+                "uem": "JAMF",
+                "uemGroups": [
+                  "mobile_456",
+                  "789"
+                ]
               },
               "schema": {
                 "$ref": "#/components/schemas/ActivationProfileDeployRequest"
