@@ -140,41 +140,6 @@ func (c *Client) GetLatestMobileDevicePrestageSyncV2(ctx context.Context, id str
 	return &result, nil
 }
 
-// ListMobileDevicePrestagesV2 get sorted and paged Mobile Device Prestages.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
-//     separated with a comma. Example: sort=date:desc,name:asc.
-func (c *Client) ListMobileDevicePrestagesV2(ctx context.Context, sort []string) ([]GetMobileDevicePrestageV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GetMobileDevicePrestageV2, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-
-		endpoint := prefix + "/mobile-device-prestages"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                         `json:"totalCount"`
-			Results    []GetMobileDevicePrestageV2 `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // ListMobileDevicePrestagesV3 get sorted and paged Mobile Device Prestages.
 //
 // Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
@@ -208,21 +173,6 @@ func (c *Client) ListMobileDevicePrestagesV3(ctx context.Context, sort []string)
 	})
 }
 
-// CreateMobileDevicePrestageV2 create a Mobile Device Prestage.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
-func (c *Client) CreateMobileDevicePrestageV2(ctx context.Context, request *MobileDevicePrestageV2) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result HrefResponse
-	endpoint := prefix + "/mobile-device-prestages"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateMobileDevicePrestageV2: %w", err)
-	}
-	return &result, nil
-}
-
 // CreateMobileDevicePrestageV3 create a Mobile Device Prestage.
 //
 // Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
@@ -232,24 +182,6 @@ func (c *Client) CreateMobileDevicePrestageV3(ctx context.Context, request *Mobi
 	endpoint := prefix + "/mobile-device-prestages"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
 		return nil, fmt.Errorf("CreateMobileDevicePrestageV3: %w", err)
-	}
-	return &result, nil
-}
-
-// GetMobileDevicePrestageV2 retrieve a Mobile Device Prestage with the supplied id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Mobile Device Prestage identifier.
-func (c *Client) GetMobileDevicePrestageV2(ctx context.Context, id string) (*GetMobileDevicePrestageV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result GetMobileDevicePrestageV2
-	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetMobileDevicePrestageV2(%s): %w", id, err)
 	}
 	return &result, nil
 }
@@ -266,24 +198,6 @@ func (c *Client) GetMobileDevicePrestageV3(ctx context.Context, id string) (*Get
 	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetMobileDevicePrestageV3(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// UpdateMobileDevicePrestageV2 update a Mobile Device Prestage.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Mobile Device Prestage identifier.
-func (c *Client) UpdateMobileDevicePrestageV2(ctx context.Context, id string, request *PutMobileDevicePrestageV2) (*GetMobileDevicePrestageV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result GetMobileDevicePrestageV2
-	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateMobileDevicePrestageV2(%s): %w", id, err)
 	}
 	return &result, nil
 }
@@ -306,23 +220,6 @@ func (c *Client) UpdateMobileDevicePrestageV3(ctx context.Context, id string, re
 	return &result, nil
 }
 
-// DeleteMobileDevicePrestageV2 delete a Mobile Device Prestage with the supplied id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Mobile Device Prestage identifier.
-func (c *Client) DeleteMobileDevicePrestageV2(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteMobileDevicePrestageV2(%s): %w", id, err)
-	}
-	return nil
-}
-
 // DeleteMobileDevicePrestageV3 delete a Mobile Device Prestage with the supplied id.
 //
 // Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
@@ -336,24 +233,6 @@ func (c *Client) DeleteMobileDevicePrestageV3(ctx context.Context, id string) er
 		return fmt.Errorf("DeleteMobileDevicePrestageV3(%s): %w", id, err)
 	}
 	return nil
-}
-
-// ListMobileDevicePrestageAttachmentsV2 get attachments for a Mobile Device Prestage.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Mobile Device Prestage identifier.
-func (c *Client) ListMobileDevicePrestageAttachmentsV2(ctx context.Context, id string) ([]FileAttachmentV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result []FileAttachmentV2
-	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListMobileDevicePrestageAttachmentsV2(%s): %w", id, err)
-	}
-	return result, nil
 }
 
 // ListMobileDevicePrestageAttachmentsV3 get attachments for a Mobile Device Prestage.
@@ -370,33 +249,6 @@ func (c *Client) ListMobileDevicePrestageAttachmentsV3(ctx context.Context, id s
 		return nil, fmt.Errorf("ListMobileDevicePrestageAttachmentsV3(%s): %w", id, err)
 	}
 	return result, nil
-}
-
-// UploadMobileDevicePrestageAttachmentV2 add an attachment to a Mobile Device Prestage.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Identifier of the Mobile Device Prestage the attachment should be assigned to.
-//
-// For file parts, pass an *os.File or *bytes.Reader (anything that
-// implements io.Seeker) so the SDK can precompute an exact
-// Content-Length and retry once on a 429/Retry-After. A plain
-// io.Reader is accepted too but the upload falls back to chunked
-// transfer encoding and is not retried on 429.
-func (c *Client) UploadMobileDevicePrestageAttachmentV2(ctx context.Context, id string, fileFilename string, file io.Reader) (*PrestageFileAttachmentV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result PrestageFileAttachmentV2
-	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments", prefix, url.PathEscape(id))
-	parts := []client.MultipartField{
-		{Name: "file", Filename: fileFilename, Content: file},
-	}
-	if err := c.transport.DoMultipart(ctx, http.MethodPost, endpoint, parts, http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("UploadMobileDevicePrestageAttachmentV2(%s): %w", id, err)
-	}
-	return &result, nil
 }
 
 // UploadMobileDevicePrestageAttachmentV3 add an attachment to a Mobile Device Prestage.
@@ -424,23 +276,6 @@ func (c *Client) UploadMobileDevicePrestageAttachmentV3(ctx context.Context, id 
 	return &result, nil
 }
 
-// DeleteMultipleMobileDevicePrestageAttachmentsV2 remove an attachment for a Mobile Device Prestage.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Mobile Device Prestage identifier.
-func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV2(ctx context.Context, id string, request *Ids) error {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/attachments/delete-multiple", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteMultipleMobileDevicePrestageAttachmentsV2(%s): %w", id, err)
-	}
-	return nil
-}
-
 // DeleteMultipleMobileDevicePrestageAttachmentsV3 remove an attachment for a Mobile Device Prestage.
 //
 // Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Mobile Device PreStage Enrollments.
@@ -454,43 +289,6 @@ func (c *Client) DeleteMultipleMobileDevicePrestageAttachmentsV3(ctx context.Con
 		return fmt.Errorf("DeleteMultipleMobileDevicePrestageAttachmentsV3(%s): %w", id, err)
 	}
 	return nil
-}
-
-// ListMobileDevicePrestageHistoryV2 get sorted and paged Mobile Device Prestage history objects.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Mobile Device Prestage identifier.
-//   - sort: Sorting criteria in the format: property,asc/desc. Default sort order is descending. Multiple sort
-//     criteria are supported and must be entered on separate lines in Swagger UI. In the URI the 'sort'
-//     query param is duplicated for each sort criterion, e.g., ...&sort=name%2Casc&sort=date%2Cdesc.
-func (c *Client) ListMobileDevicePrestageHistoryV2(ctx context.Context, id string, sort []string) ([]ObjectHistory, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ObjectHistory, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-
-		endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/history", prefix, url.PathEscape(id))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int             `json:"totalCount"`
-			Results    []ObjectHistory `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
 }
 
 // ListMobileDevicePrestageHistoryV3 get sorted and paged Mobile Device Prestage history objects.
@@ -528,24 +326,6 @@ func (c *Client) ListMobileDevicePrestageHistoryV3(ctx context.Context, id strin
 	})
 }
 
-// CreateMobileDevicePrestageHistoryNoteV2 add Mobile Device Prestage history object notes.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
-//
-// Parameters:
-//   - id: Mobile Device Prestage identifier.
-func (c *Client) CreateMobileDevicePrestageHistoryNoteV2(ctx context.Context, id string, request *ObjectHistoryNote) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result HrefResponse
-	endpoint := fmt.Sprintf("%s/mobile-device-prestages/%s/history", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateMobileDevicePrestageHistoryNoteV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // CreateMobileDevicePrestageHistoryNoteV3 add Mobile Device Prestage history object notes.
 //
 // Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Mobile Device PreStage Enrollments.
@@ -560,32 +340,6 @@ func (c *Client) CreateMobileDevicePrestageHistoryNoteV3(ctx context.Context, id
 		return nil, fmt.Errorf("CreateMobileDevicePrestageHistoryNoteV3(%s): %w", id, err)
 	}
 	return &result, nil
-}
-
-// ResolveMobileDevicePrestageV2IDByName looks up a MobileDevicePrestageV2 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveMobileDevicePrestageV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/mobile-device-prestages"
-	id, _, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveMobileDevicePrestageV2IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveMobileDevicePrestageV2ByName looks up a MobileDevicePrestageV2 by its displayName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveMobileDevicePrestageV2ByName(ctx context.Context, name string) (*MobileDevicePrestageV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/mobile-device-prestages"
-	_, raw, err := c.transport.ResolveByNameClientPaged(ctx, listPath, "", "", "displayName", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveMobileDevicePrestageV2ByName(%s): %w", name, err)
-	}
-	var out MobileDevicePrestageV2
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveMobileDevicePrestageV2ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
 }
 
 // ResolveMobileDevicePrestageV3IDByName looks up a MobileDevicePrestageV3 by its displayName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
@@ -612,42 +366,6 @@ func (c *Client) ResolveMobileDevicePrestageV3ByName(ctx context.Context, name s
 		return nil, fmt.Errorf("ResolveMobileDevicePrestageV3ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
-}
-
-// ApplyMobileDevicePrestageV2 creates or updates a MobileDevicePrestageV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
-func (c *Client) ApplyMobileDevicePrestageV2(ctx context.Context, request *MobileDevicePrestageV2) (string, bool, error) {
-	name := request.DisplayName
-	if name == "" {
-		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV2: DisplayName must not be empty")
-	}
-	id, err := c.ResolveMobileDevicePrestageV2IDByName(ctx, name)
-	if err != nil {
-		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
-			zeroVersionLock(request)
-			resp, createErr := c.CreateMobileDevicePrestageV2(ctx, request)
-			if createErr != nil {
-				return "", false, fmt.Errorf("ApplyMobileDevicePrestageV2: create: %w", createErr)
-			}
-			return resp.ID, true, nil
-		}
-		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV2: resolve: %w", err)
-	}
-	// Fetch current resource to extract versionLock values for optimistic locking.
-	current, getErr := c.GetMobileDevicePrestageV2(ctx, id)
-	if getErr != nil {
-		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV2: get for versionLock(%s): %w", id, getErr)
-	}
-	// Convert create request to update type via JSON round-trip,
-	// then inject current versionLock values from the fetched resource.
-	updateReq, convErr := convertAndInjectVersionLock[PutMobileDevicePrestageV2, GetMobileDevicePrestageV2](request, current)
-	if convErr != nil {
-		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV2: convert for update(%s): %w", id, convErr)
-	}
-	_, err = c.UpdateMobileDevicePrestageV2(ctx, id, updateReq)
-	if err != nil {
-		return "", false, fmt.Errorf("ApplyMobileDevicePrestageV2: update(%s): %w", id, err)
-	}
-	return id, false, nil
 }
 
 // ApplyMobileDevicePrestageV3 creates or updates a MobileDevicePrestageV3 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.

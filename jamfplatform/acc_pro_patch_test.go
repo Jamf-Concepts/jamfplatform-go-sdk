@@ -8,13 +8,11 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
-	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
 )
 
 // Batch 5 — patch policies, patch policy logs, patch software title
@@ -280,175 +278,37 @@ func TestAcceptance_Pro_Patch_RetryAllPatchPolicyLogsV2(t *testing.T) {
 
 // --- patch-software-title-configurations --------------------------------
 
-func TestAcceptance_Pro_Patch_ListSoftwareTitleConfigurationsV2(t *testing.T) {
-	c := accClient(t)
-
-	configs, err := pro.New(c).ListPatchSoftwareTitleConfigurationsV2(context.Background())
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
-	}
-	t.Logf("Found %d patch software title configurations", len(configs))
-}
-
-// TestAcceptance_Pro_Patch_SoftwareTitleConfigSubresources exercises every
-// read sub-resource on the first configuration (if any) the tenant has.
-// Patch software title configurations can't be created without a real
-// external patch source, so this test is read-only against existing data.
-func TestAcceptance_Pro_Patch_SoftwareTitleConfigSubresources(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	configs, err := p.ListPatchSoftwareTitleConfigurationsV2(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
-	}
-	if len(configs) == 0 {
-		t.Skip("tenant has no patch software title configurations — no read probes possible")
-	}
-	id := configs[0].ID
-
-	// Get
-	got, err := p.GetPatchSoftwareTitleConfigurationV2(ctx, id)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetPatchSoftwareTitleConfigurationV2(%s): %v", id, err)
-	}
-	t.Logf("Config %s: displayName=%q", id, got.DisplayName)
-
-	// Dashboard status
-	if _, err := p.GetPatchSoftwareTitleDashboardStatusV2(ctx, id); err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("GetPatchSoftwareTitleDashboardStatusV2(%s): %v", id, err)
-	}
-
-	// Definitions (paginated)
-	defs, err := p.ListPatchSoftwareTitleDefinitionsV2(ctx, id, nil, "")
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("ListPatchSoftwareTitleDefinitionsV2(%s): %v", id, err)
-	} else {
-		t.Logf("Config %s has %d definitions", id, len(defs))
-	}
-
-	// Dependencies
-	if _, err := p.GetPatchSoftwareTitleDependenciesV2(ctx, id); err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("GetPatchSoftwareTitleDependenciesV2(%s): %v", id, err)
-	}
-
-	// Extension attributes (array of EAs tied to the title)
-	eas, err := p.ListPatchSoftwareTitleExtensionAttributesV2(ctx, id)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("ListPatchSoftwareTitleExtensionAttributesV2(%s): %v", id, err)
-	} else {
-		t.Logf("Config %s has %d extension attributes", id, len(eas))
-	}
-
-	// History — read + write a note + re-read.
-	hist, err := p.ListPatchSoftwareTitleHistoryV2(ctx, id, nil, "")
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("ListPatchSoftwareTitleHistoryV2(%s): %v", id, err)
-	} else {
-		t.Logf("Config %s history: %d entries", id, len(hist))
-	}
-	if _, err := p.CreatePatchSoftwareTitleHistoryNoteV2(ctx, id, &pro.ObjectHistoryNote{
-		Note: "sdk-acc test history entry",
-	}); err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("CreatePatchSoftwareTitleHistoryNoteV2(%s): %v", id, err)
-	}
-
-	// Patch report (paginated)
-	report, err := p.ListPatchSoftwareTitlePatchReportV2(ctx, id, nil, "")
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("ListPatchSoftwareTitlePatchReportV2(%s): %v", id, err)
-	} else {
-		t.Logf("Config %s patch report: %d rows", id, len(report))
-	}
-
-	// Patch summary
-	if _, err := p.GetPatchSoftwareTitlePatchSummaryV2(ctx, id); err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("GetPatchSoftwareTitlePatchSummaryV2(%s): %v", id, err)
-	}
-
-	// Patch summary / versions (array)
-	versions, err := p.ListPatchSoftwareTitlePatchSummaryVersionsV2(ctx, id)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Errorf("ListPatchSoftwareTitlePatchSummaryVersionsV2(%s): %v", id, err)
-	} else {
-		t.Logf("Config %s patch summary has %d versions", id, len(versions))
-	}
-
-	// Export report — text/csv response body, 400 when the report is empty.
-	assertPatchExportReport(t, "ExportPatchSoftwareTitleReportV2", id, len(report), func() ([]byte, error) {
-		return p.ExportPatchSoftwareTitleReportV2(ctx, id, "", nil)
-	})
-}
-
-// seedPatchSoftwareTitleFixture creates a test-owned patch software title and
-// returns its id, or skips the test when the tenant can't supply one.
+// seedPatchSoftwareTitleFixture returns a test-owned patch software title
+// configuration id, and currently always skips.
 //
 // The Pro create endpoint (POST patch-software-title-configurations) needs a
 // softwareTitleId that already exists in the tenant's patch source, and Pro
 // exposes no way to list the source catalogue — only Classic's
-// patchavailabletitles does. Classic's POST patchsoftwaretitles/id/0 accepts a
-// source id plus a catalogue name_id and mints exactly that record: the id it
-// returns is the same id the Pro v2/v3 configuration endpoints address, and
-// deleting via Pro also removes the Classic record (verified on 11.30.2).
-// That makes it a legitimate fixture rather than a second resource to track.
+// patchavailabletitles does, and its name_id is not a softwareTitleId
+// (POST /pro/v3/patch-software-title-configurations answers
+// 400 SOFTWARE_TITLE_ID_NOT_FOUND for one, wire-verified 2026-09-01).
 //
-// Cleanup is registered by the caller so the id stays visible for assertions.
+// The one path that minted a usable id was Classic's
+// POST /patchsoftwaretitles/id/0, whose returned id is the same id the Pro v3
+// configuration endpoints address. v1942 withdrew that operation from the spec
+// along with the whole /patchsoftwaretitles family, so the SDK no longer
+// generates it and there is no seeding path left. The Pro catalogue endpoints
+// that would replace it — /pro/v{1,2}/patch-software-titles — are unrouted
+// (403 BAD_PERMISSIONS, probed 2026-09-01 with a 200 control in the same
+// invocation).
+//
+// Consequence: the three tests that depend on this fixture —
+// TestAcceptance_Pro_Patch_SoftwareTitleConfigV3Lifecycle,
+// TestAcceptance_ApplyPatchSoftwareTitleConfigurationV3 and
+// TestAcceptance_ResolvePatchSoftwareTitleConfigurationV3IDByName_Existing —
+// now skip. Restore real seeding as soon as either the Classic operation
+// returns to the spec or a routed Pro catalogue endpoint is whitelisted; do
+// not paper over it by pointing the fixture at a pre-existing tenant
+// configuration, which the tests would then mutate and delete.
 func seedPatchSoftwareTitleFixture(t *testing.T) string {
 	t.Helper()
-	c := accClient(t)
-	ctx := context.Background()
-
-	titles, err := proclassic.New(c).ListPatchAvailableTitlesBySourceID(ctx, "1")
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Skipf("cannot list available patch titles (source 1) — no fixture possible: %v", err)
-	}
-	if titles.AvailableTitles == nil || titles.AvailableTitles.AvailableTitle == nil || len(*titles.AvailableTitles.AvailableTitle) == 0 {
-		t.Skip("patch source 1 offers no available titles — no fixture possible")
-	}
-
-	// Any title works; the sub-resources under test don't depend on which
-	// software it is. Take the first with both fields populated.
-	for _, at := range *titles.AvailableTitles.AvailableTitle {
-		if at.AppName == nil || at.NameID == nil {
-			continue
-		}
-		seeded, err := proclassic.New(c).CreatePatchSoftwareTitleByID(ctx, "0", &proclassic.PatchSoftwareTitle{
-			Name:     at.AppName,
-			NameID:   at.NameID,
-			SourceID: ptr(1),
-		})
-		if err != nil {
-			// A title already configured on the tenant is rejected as a
-			// duplicate; try the next one rather than failing the suite.
-			var apiErr *jamfplatform.APIResponseError
-			if errors.As(err, &apiErr) && apiErr.StatusCode == 409 {
-				continue
-			}
-			skipOnServerError(t, err)
-			t.Fatalf("CreatePatchSoftwareTitleByID(%q): %v", *at.AppName, err)
-		}
-		if seeded.ID == nil {
-			t.Fatalf("CreatePatchSoftwareTitleByID(%q) returned no id", *at.AppName)
-		}
-		id := strconv.Itoa(*seeded.ID)
-		t.Logf("seeded patch software title %q (nameId=%s) as configuration id=%s", *at.AppName, *at.NameID, id)
-		return id
-	}
-	t.Skip("every available patch title is already configured on the tenant — no fixture possible")
+	t.Skip("no patch-software-title seeding path: v1942 withdrew Classic POST /patchsoftwaretitles/id/{id}, " +
+		"and Pro exposes no routed software-title catalogue to source a valid softwareTitleId from")
 	return ""
 }
 
@@ -708,62 +568,4 @@ func TestAcceptance_Pro_Patch_UpdateConfigV3(t *testing.T) {
 		t.Fatalf("UpdatePatchSoftwareTitleConfigurationV3(bogus): want 404, got %v", err)
 	}
 	t.Log("UpdatePatchSoftwareTitleConfigurationV3(bogus) rejected with 404 ✓")
-}
-
-// TestAcceptance_Pro_Patch_DeleteConfigV2 probes DELETE against a bogus
-// id. Never delete a real patch software title configuration without an
-// explicit test-owned fixture.
-func TestAcceptance_Pro_Patch_DeleteConfigV2(t *testing.T) {
-	c := accClient(t)
-
-	err := pro.New(c).DeletePatchSoftwareTitleConfigurationV2(context.Background(), "99999999")
-	if err == nil {
-		t.Fatal("DeletePatchSoftwareTitleConfigurationV2 against bogus id succeeded — expected 4xx")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-		t.Logf("DeletePatchSoftwareTitleConfigurationV2(bogus) rejected: status=%d", apiErr.StatusCode)
-		return
-	}
-	skipOnServerError(t, err)
-	t.Logf("DeletePatchSoftwareTitleConfigurationV2(bogus) rejected: %v", err)
-}
-
-// TestAcceptance_Pro_Patch_UpdateConfigV2 probes PATCH (merge-patch+json
-// content type) against a bogus id. Never mutate a real patch software
-// title configuration from this test.
-func TestAcceptance_Pro_Patch_UpdateConfigV2(t *testing.T) {
-	c := accClient(t)
-
-	_, err := pro.New(c).UpdatePatchSoftwareTitleConfigurationV2(context.Background(), "99999999", &pro.PatchSoftwareTitleConfigurationPatch{})
-	if err == nil {
-		t.Fatal("UpdatePatchSoftwareTitleConfigurationV2 against bogus id succeeded — expected 4xx")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-		t.Logf("UpdatePatchSoftwareTitleConfigurationV2(bogus) rejected: status=%d", apiErr.StatusCode)
-		return
-	}
-	skipOnServerError(t, err)
-	t.Logf("UpdatePatchSoftwareTitleConfigurationV2(bogus) rejected: %v", err)
-}
-
-// TestAcceptance_Pro_Patch_CreateConfigV2 probes the create endpoint with
-// a clearly-bogus body expecting a 4xx rejection. A real create would
-// require an external patch source integration that this test can't set
-// up; a well-formed rejection still exercises the transport path.
-func TestAcceptance_Pro_Patch_CreateConfigV2(t *testing.T) {
-	c := accClient(t)
-
-	_, err := pro.New(c).CreatePatchSoftwareTitleConfigurationV2(context.Background(), &pro.PatchSoftwareTitleConfigurationBase{})
-	if err == nil {
-		t.Fatal("CreatePatchSoftwareTitleConfigurationV2 with empty body succeeded — expected 4xx")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-		t.Logf("CreatePatchSoftwareTitleConfigurationV2(empty) rejected: status=%d", apiErr.StatusCode)
-		return
-	}
-	skipOnServerError(t, err)
-	t.Logf("CreatePatchSoftwareTitleConfigurationV2(empty) rejected: %v", err)
 }

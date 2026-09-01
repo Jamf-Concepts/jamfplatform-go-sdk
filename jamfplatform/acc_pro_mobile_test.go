@@ -230,24 +230,24 @@ func TestAcceptance_Pro_Mobile_MDEACRUD(t *testing.T) {
 
 // --- mobile device groups ----------------------------------------------
 
-func TestAcceptance_Pro_Mobile_ListDeviceGroupsV1(t *testing.T) {
+func TestAcceptance_Pro_Mobile_ListDeviceGroupsV2(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := pro.New(c).ListMobileDeviceGroupsV1(context.Background())
+	groups, err := pro.New(c).ListMobileDeviceGroupsV2(context.Background())
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListMobileDeviceGroupsV1: %v", err)
+		t.Fatalf("ListMobileDeviceGroupsV2: %v", err)
 	}
 	t.Logf("Found %d mobile device groups (legacy list)", len(groups))
 }
 
-func TestAcceptance_Pro_Mobile_ListSmartGroupsV1(t *testing.T) {
+func TestAcceptance_Pro_Mobile_ListSmartGroupsV2(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := pro.New(c).ListSmartMobileDeviceGroupsV1(context.Background(), nil, "")
+	groups, err := pro.New(c).ListSmartMobileDeviceGroupsV2(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListSmartMobileDeviceGroupsV1: %v", err)
+		t.Fatalf("ListSmartMobileDeviceGroupsV2: %v", err)
 	}
 	t.Logf("Found %d smart mobile device groups", len(groups))
 }
@@ -264,47 +264,47 @@ func TestAcceptance_Pro_Mobile_SmartGroupCRUD(t *testing.T) {
 	// denied" when the field is omitted for clients without all-sites
 	// privilege. Same applies to static groups below.
 	siteID := "-1"
-	created, err := p.CreateSmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{
+	created, err := p.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{
 		GroupName:        name,
 		GroupDescription: &desc,
 		SiteID:           &siteID,
 	}, false)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("CreateSmartMobileDeviceGroupV1: %v", err)
+		t.Fatalf("CreateSmartMobileDeviceGroupV2: %v", err)
 	}
 	if created.ID == "" {
-		t.Fatalf("CreateSmartMobileDeviceGroupV1 returned no ID")
+		t.Fatalf("CreateSmartMobileDeviceGroupV2 returned no ID")
 	}
-	cleanupDelete(t, "DeleteSmartMobileDeviceGroupV1", func() error { return p.DeleteSmartMobileDeviceGroupV1(ctx, created.ID) })
+	cleanupDelete(t, "DeleteSmartMobileDeviceGroupV2", func() error { return p.DeleteSmartMobileDeviceGroupV2(ctx, created.ID) })
 
-	got, err := p.GetSmartMobileDeviceGroupV1(ctx, created.ID)
+	got, err := p.GetSmartMobileDeviceGroupV2(ctx, created.ID)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetSmartMobileDeviceGroupV1(%s): %v", created.ID, err)
+		t.Fatalf("GetSmartMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 	t.Logf("Created smart mobile group %s (name=%q)", created.ID, got.GroupName)
 
-	update := &pro.SmartGroupAssignment{
+	update := &pro.SmartGroupAssignmentV2{
 		GroupName:        got.GroupName,
 		GroupDescription: ptr(desc + " (updated)"),
 		SiteID:           &siteID,
 	}
-	if _, err := p.UpdateSmartMobileDeviceGroupV1(ctx, created.ID, update); err != nil {
+	if _, err := p.UpdateSmartMobileDeviceGroupV2(ctx, created.ID, update); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("UpdateSmartMobileDeviceGroupV1(%s): %v", created.ID, err)
+		t.Fatalf("UpdateSmartMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 
-	members, err := p.ListSmartMobileDeviceGroupMembershipV1(ctx, created.ID, nil, "")
+	members, err := p.ListSmartMobileDeviceGroupMembershipV2(ctx, created.ID, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListSmartMobileDeviceGroupMembershipV1(%s): %v", created.ID, err)
+		t.Fatalf("ListSmartMobileDeviceGroupMembershipV2(%s): %v", created.ID, err)
 	}
 	t.Logf("Smart mobile group %s has %d members", created.ID, len(members))
 
-	if err := p.DeleteSmartMobileDeviceGroupV1(ctx, created.ID); err != nil {
+	if err := p.DeleteSmartMobileDeviceGroupV2(ctx, created.ID); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("DeleteSmartMobileDeviceGroupV1(%s): %v", created.ID, err)
+		t.Fatalf("DeleteSmartMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 }
 
@@ -320,7 +320,7 @@ func TestAcceptance_Pro_Mobile_StaticGroupCRUD(t *testing.T) {
 	// Explicit siteId — same 403-avoidance as smart groups above.
 	emptyAssignments := []pro.Assignment{}
 	siteID := "-1"
-	created, err := p.CreateStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{
+	created, err := p.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{
 		GroupName:        name,
 		GroupDescription: &desc,
 		Assignments:      &emptyAssignments,
@@ -328,18 +328,18 @@ func TestAcceptance_Pro_Mobile_StaticGroupCRUD(t *testing.T) {
 	}, false)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("CreateStaticMobileDeviceGroupV1: %v", err)
+		t.Fatalf("CreateStaticMobileDeviceGroupV2: %v", err)
 	}
 	if created.ID == "" {
-		t.Fatalf("CreateStaticMobileDeviceGroupV1 returned no ID")
+		t.Fatalf("CreateStaticMobileDeviceGroupV2 returned no ID")
 	}
-	cleanupDelete(t, "DeleteStaticMobileDeviceGroupV1", func() error { return p.DeleteStaticMobileDeviceGroupV1(ctx, created.ID) })
+	cleanupDelete(t, "DeleteStaticMobileDeviceGroupV2", func() error { return p.DeleteStaticMobileDeviceGroupV2(ctx, created.ID) })
 	t.Logf("Created static mobile group %s", created.ID)
 
-	got, err := p.GetStaticMobileDeviceGroupV1(ctx, created.ID)
+	got, err := p.GetStaticMobileDeviceGroupV2(ctx, created.ID)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetStaticMobileDeviceGroupV1(%s): %v", created.ID, err)
+		t.Fatalf("GetStaticMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 	if got.GroupName != name {
 		t.Errorf("GroupName = %q, want %q", got.GroupName, name)
@@ -352,43 +352,43 @@ func TestAcceptance_Pro_Mobile_StaticGroupCRUD(t *testing.T) {
 		Assignments:      &emptyAssignments,
 		SiteID:           &siteID,
 	}
-	if _, err := p.PatchStaticMobileDeviceGroupV1(ctx, created.ID, patch); err != nil {
+	if _, err := p.PatchStaticMobileDeviceGroupV2(ctx, created.ID, patch); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("PatchStaticMobileDeviceGroupV1(%s): %v", created.ID, err)
+		t.Fatalf("PatchStaticMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 
-	members, err := p.ListStaticMobileDeviceGroupMembershipV1(ctx, created.ID, nil, "")
+	members, err := p.ListStaticMobileDeviceGroupMembershipV2(ctx, created.ID, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListStaticMobileDeviceGroupMembershipV1(%s): %v", created.ID, err)
+		t.Fatalf("ListStaticMobileDeviceGroupMembershipV2(%s): %v", created.ID, err)
 	}
 	t.Logf("Static mobile group %s has %d members", created.ID, len(members))
 
-	if err := p.DeleteStaticMobileDeviceGroupV1(ctx, created.ID); err != nil {
+	if err := p.DeleteStaticMobileDeviceGroupV2(ctx, created.ID); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("DeleteStaticMobileDeviceGroupV1(%s): %v", created.ID, err)
+		t.Fatalf("DeleteStaticMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 }
 
-// TestAcceptance_Pro_Mobile_EraseMobileDeviceGroupV1 is a destructive
+// TestAcceptance_Pro_Mobile_EraseMobileDeviceGroupV2 is a destructive
 // bulk-wipe against every device in a group. Never run for real — probe
 // with a bogus group id and verify the transport rejects rather than
 // targeting real tenant devices.
-func TestAcceptance_Pro_Mobile_EraseMobileDeviceGroupV1(t *testing.T) {
+func TestAcceptance_Pro_Mobile_EraseMobileDeviceGroupV2(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 
-	err := pro.New(c).EraseMobileDeviceGroupV1(ctx, "99999999", &pro.GroupResetRequest{})
+	err := pro.New(c).EraseMobileDeviceGroupV2(ctx, "99999999", &pro.GroupResetRequest{})
 	if err == nil {
-		t.Fatal("EraseMobileDeviceGroupV1 against bogus id succeeded — expected 4xx")
+		t.Fatal("EraseMobileDeviceGroupV2 against bogus id succeeded — expected 4xx")
 	}
 	var apiErr *jamfplatform.APIResponseError
 	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-		t.Logf("EraseMobileDeviceGroupV1(bogus) rejected as expected: status=%d", apiErr.StatusCode)
+		t.Logf("EraseMobileDeviceGroupV2(bogus) rejected as expected: status=%d", apiErr.StatusCode)
 		return
 	}
 	skipOnServerError(t, err)
-	t.Logf("EraseMobileDeviceGroupV1(bogus) rejected: %v", err)
+	t.Logf("EraseMobileDeviceGroupV2(bogus) rejected: %v", err)
 }
 
 // --- mobile devices v2 -------------------------------------------------

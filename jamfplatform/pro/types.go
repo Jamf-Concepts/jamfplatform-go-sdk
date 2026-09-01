@@ -994,20 +994,6 @@ type ComplianceVendorDeviceInformation struct {
 	DeviceIds []string `json:"deviceIds"`
 }
 
-// ComputerApplication represents a computer application.
-type ComputerApplication struct {
-	BundleID string `json:"bundleId"`
-	// The app's external version ID. It can be used in the iTunes Search API to decide if the app needs to
-	// be updated.
-	ExternalVersionID string `json:"externalVersionId"`
-	MacAppStore       bool   `json:"macAppStore"`
-	Name              string `json:"name"`
-	Path              string `json:"path"`
-	SizeMegabytes     int    `json:"sizeMegabytes"`
-	UpdateAvailable   bool   `json:"updateAvailable"`
-	Version           string `json:"version"`
-}
-
 // ComputerApplicationCreate represents a computer application create.
 type ComputerApplicationCreate struct {
 	Name    *string `json:"name,omitempty"`
@@ -1331,86 +1317,6 @@ type ComputerExtensionAttributes struct {
 	ScriptContents *string `json:"scriptContents,omitempty"`
 }
 
-// ComputerFont represents a computer font.
-type ComputerFont struct {
-	Name    string `json:"name"`
-	Path    string `json:"path"`
-	Version string `json:"version"`
-}
-
-// ComputerFontCreate represents a computer font create.
-type ComputerFontCreate struct {
-	Name    *string `json:"name,omitempty"`
-	Path    *string `json:"path,omitempty"`
-	Version *string `json:"version,omitempty"`
-}
-
-// ComputerGeneral represents a computer general.
-type ComputerGeneral struct {
-	AssetTag                                 string                       `json:"assetTag"`
-	Barcode1                                 string                       `json:"barcode1"`
-	Barcode2                                 string                       `json:"barcode2"`
-	DeclarativeDeviceManagementEnabled       bool                         `json:"declarativeDeviceManagementEnabled"`
-	DistributionPoint                        string                       `json:"distributionPoint"`
-	EnrolledViaAutomatedDeviceEnrollment     bool                         `json:"enrolledViaAutomatedDeviceEnrollment"`
-	EnrollmentMethod                         *EnrollmentMethod            `json:"enrollmentMethod,omitempty"`
-	ExtensionAttributes                      []ComputerExtensionAttribute `json:"extensionAttributes"`
-	InitialEntryDate                         string                       `json:"initialEntryDate"`
-	ItunesStoreAccountActive                 bool                         `json:"itunesStoreAccountActive"`
-	JamfBinaryVersion                        string                       `json:"jamfBinaryVersion"`
-	LastCloudBackupDate                      *time.Time                   `json:"lastCloudBackupDate,omitempty"`
-	LastContactTime                          *time.Time                   `json:"lastContactTime,omitempty"`
-	LastEnrolledDate                         *time.Time                   `json:"lastEnrolledDate,omitempty"`
-	LastIPAddress                            string                       `json:"lastIpAddress"`
-	LastLoggedInUsernameBinary               *string                      `json:"lastLoggedInUsernameBinary,omitempty"`
-	LastLoggedInUsernameBinaryTimestamp      *time.Time                   `json:"lastLoggedInUsernameBinaryTimestamp,omitempty"`
-	LastLoggedInUsernameMDM                  *string                      `json:"lastLoggedInUsernameMdm,omitempty"`
-	LastLoggedInUsernameMDMTimestamp         *time.Time                   `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
-	LastLoggedInUsernameSelfService          *string                      `json:"lastLoggedInUsernameSelfService,omitempty"`
-	LastLoggedInUsernameSelfServiceTimestamp *time.Time                   `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
-	// Last reported IPv4 address (Deprecated. Use lastReportedIpV4 instead.).
-	LastReportedIp string `json:"lastReportedIp"`
-	// Last reported IPv4 address.
-	LastReportedIPV4     string                    `json:"lastReportedIpV4"`
-	LastReportedIPV6     string                    `json:"lastReportedIpV6"`
-	ManagementID         string                    `json:"managementId"`
-	MDMCapable           *ComputerMDMCapability    `json:"mdmCapable,omitempty"`
-	MDMProfileExpiration *time.Time                `json:"mdmProfileExpiration,omitempty"`
-	Name                 string                    `json:"name"`
-	Platform             string                    `json:"platform"`
-	RemoteManagement     *ComputerRemoteManagement `json:"remoteManagement,omitempty"`
-	ReportDate           *time.Time                `json:"reportDate,omitempty"`
-	Site                 *ComputerSite             `json:"site,omitempty"`
-	Supervised           bool                      `json:"supervised"`
-	UserApprovedMDM      bool                      `json:"userApprovedMdm"`
-}
-
-// ComputerGeneralCreate represents a computer general create.
-type ComputerGeneralCreate struct {
-	AssetTag                             *string    `json:"assetTag,omitempty"`
-	Barcode1                             *string    `json:"barcode1,omitempty"`
-	Barcode2                             *string    `json:"barcode2,omitempty"`
-	DeclarativeDeviceManagementEnabled   *bool      `json:"declarativeDeviceManagementEnabled,omitempty"`
-	DistributionPointID                  *string    `json:"distributionPointId,omitempty"`
-	EnrolledViaAutomatedDeviceEnrollment *bool      `json:"enrolledViaAutomatedDeviceEnrollment,omitempty"`
-	ItunesStoreAccountActive             *bool      `json:"itunesStoreAccountActive,omitempty"`
-	JamfBinaryVersion                    *string    `json:"jamfBinaryVersion,omitempty"`
-	LastCloudBackupDate                  *time.Time `json:"lastCloudBackupDate,omitempty"`
-	LastContactTime                      *time.Time `json:"lastContactTime,omitempty"`
-	LastEnrolledDate                     *time.Time `json:"lastEnrolledDate,omitempty"`
-	LastIPAddress                        *string    `json:"lastIpAddress,omitempty"`
-	LastReportedIp                       *string    `json:"lastReportedIp,omitempty"`
-	MDMCapable                           *bool      `json:"mdmCapable,omitempty"`
-	Name                                 string     `json:"name"`
-	// Allowed values: see the ComputerGeneralCreatePlatform constants.
-	Platform         *string                         `json:"platform,omitempty"`
-	RemoteManagement *ComputerRemoteManagementCreate `json:"remoteManagement,omitempty"`
-	ReportDate       *time.Time                      `json:"reportDate,omitempty"`
-	SiteID           *string                         `json:"siteId,omitempty"`
-	Supervised       *bool                           `json:"supervised,omitempty"`
-	UserApprovedMDM  *bool                           `json:"userApprovedMdm,omitempty"`
-}
-
 // ComputerGeneralCreateV4 represents a computer general create v4.
 type ComputerGeneralCreateV4 struct {
 	AssetTag                             *string    `json:"assetTag,omitempty"`
@@ -1594,58 +1500,6 @@ type ComputerIbeacon struct {
 	Name string `json:"name"`
 }
 
-// ComputerInventory represents a computer inventory.
-type ComputerInventory struct {
-	Applications          []ComputerApplication          `json:"applications"`
-	Attachments           []ComputerAttachment           `json:"attachments"`
-	Certificates          []ComputerCertificate          `json:"certificates"`
-	ConfigurationProfiles []ComputerConfigurationProfile `json:"configurationProfiles"`
-	ContentCaching        *ComputerContentCaching        `json:"contentCaching,omitempty"`
-	DiskEncryption        *ComputerDiskEncryption        `json:"diskEncryption,omitempty"`
-	ExtensionAttributes   []ComputerExtensionAttribute   `json:"extensionAttributes"`
-	Fonts                 []ComputerFont                 `json:"fonts"`
-	General               *ComputerGeneral               `json:"general,omitempty"`
-	GroupMemberships      []GroupMembership              `json:"groupMemberships"`
-	Hardware              *ComputerHardware              `json:"hardware,omitempty"`
-	Ibeacons              []ComputerIbeacon              `json:"ibeacons"`
-	ID                    string                         `json:"id"`
-	LicensedSoftware      []ComputerLicensedSoftware     `json:"licensedSoftware"`
-	LocalUserAccounts     []ComputerLocalUserAccount     `json:"localUserAccounts"`
-	OperatingSystem       *ComputerOperatingSystem       `json:"operatingSystem,omitempty"`
-	// All package receipts are listed by their package name.
-	PackageReceipts *ComputerPackageReceipts `json:"packageReceipts,omitempty"`
-	Plugins         []map[string]any         `json:"plugins"`
-	Printers        []ComputerPrinter        `json:"printers"`
-	Purchasing      *ComputerPurchase        `json:"purchasing,omitempty"`
-	Security        *ComputerSecurity        `json:"security,omitempty"`
-	Services        []ComputerService        `json:"services"`
-	SoftwareUpdates []ComputerSoftwareUpdate `json:"softwareUpdates"`
-	Storage         *ComputerStorage         `json:"storage,omitempty"`
-	UDID            string                   `json:"udid"`
-	UserAndLocation *ComputerUserAndLocation `json:"userAndLocation,omitempty"`
-}
-
-// ComputerInventoryCollectionPreferences represents a computer inventory collection preferences.
-type ComputerInventoryCollectionPreferences struct {
-	AllowChangingUserAndLocation                 *bool `json:"allowChangingUserAndLocation,omitempty"`
-	CalculateSizes                               *bool `json:"calculateSizes,omitempty"`
-	CollectSyncedMobileDeviceInfo                *bool `json:"collectSyncedMobileDeviceInfo,omitempty"`
-	CollectUnmanagedCertificates                 *bool `json:"collectUnmanagedCertificates,omitempty"`
-	IncludeAccounts                              *bool `json:"includeAccounts,omitempty"`
-	IncludeFonts                                 *bool `json:"includeFonts,omitempty"`
-	IncludeHiddenAccounts                        *bool `json:"includeHiddenAccounts,omitempty"`
-	IncludePackages                              *bool `json:"includePackages,omitempty"`
-	IncludePlugins                               *bool `json:"includePlugins,omitempty"`
-	IncludePrinters                              *bool `json:"includePrinters,omitempty"`
-	IncludeServices                              *bool `json:"includeServices,omitempty"`
-	IncludeSoftwareID                            *bool `json:"includeSoftwareId,omitempty"`
-	IncludeSoftwareUpdates                       *bool `json:"includeSoftwareUpdates,omitempty"`
-	MonitorApplicationUsage                      *bool `json:"monitorApplicationUsage,omitempty"`
-	MonitorBeacons                               *bool `json:"monitorBeacons,omitempty"`
-	UpdateLdapInfoOnComputerInventorySubmissions *bool `json:"updateLdapInfoOnComputerInventorySubmissions,omitempty"`
-	UseUnixUserPaths                             *bool `json:"useUnixUserPaths,omitempty"`
-}
-
 // ComputerInventoryCollectionPreferencesV2 represents a computer inventory collection preferences v2.
 type ComputerInventoryCollectionPreferencesV2 struct {
 	AllowChangingUserAndLocation                 *bool `json:"allowChangingUserAndLocation,omitempty"`
@@ -1665,62 +1519,10 @@ type ComputerInventoryCollectionPreferencesV2 struct {
 	UseUnixUserPaths                             *bool `json:"useUnixUserPaths,omitempty"`
 }
 
-// ComputerInventoryCollectionSettings represents a computer inventory collection settings.
-type ComputerInventoryCollectionSettings struct {
-	ApplicationPaths                       *[]AppPath                              `json:"applicationPaths,omitempty"`
-	ComputerInventoryCollectionPreferences *ComputerInventoryCollectionPreferences `json:"computerInventoryCollectionPreferences,omitempty"`
-	FontPaths                              *[]FontPath                             `json:"fontPaths,omitempty"`
-	PluginPaths                            *[]PluginPath                           `json:"pluginPaths,omitempty"`
-}
-
 // ComputerInventoryCollectionSettingsV2 represents a computer inventory collection settings v2.
 type ComputerInventoryCollectionSettingsV2 struct {
 	ApplicationPaths                       *[]AppPath                                `json:"applicationPaths,omitempty"`
 	ComputerInventoryCollectionPreferences *ComputerInventoryCollectionPreferencesV2 `json:"computerInventoryCollectionPreferences,omitempty"`
-}
-
-// ComputerInventoryCreateRequest represents a computer inventory create request.
-type ComputerInventoryCreateRequest struct {
-	Applications          *[]ComputerApplicationCreate          `json:"applications,omitempty"`
-	Certificates          *[]ComputerCertificateCreate          `json:"certificates,omitempty"`
-	ConfigurationProfiles *[]ComputerConfigurationProfileCreate `json:"configurationProfiles,omitempty"`
-	Fonts                 *[]ComputerFontCreate                 `json:"fonts,omitempty"`
-	General               *ComputerGeneralCreate                `json:"general,omitempty"`
-	Hardware              *ComputerHardwareCreate               `json:"hardware,omitempty"`
-	LocalUserAccounts     *[]ComputerLocalUserAccountCreate     `json:"localUserAccounts,omitempty"`
-	OperatingSystem       *ComputerOperatingSystemCreate        `json:"operatingSystem,omitempty"`
-	// All package receipts are listed by their package name.
-	PackageReceipts *ComputerPackageReceiptsCreate  `json:"packageReceipts,omitempty"`
-	Plugins         *[]map[string]any               `json:"plugins,omitempty"`
-	Printers        *[]ComputerPrinterCreate        `json:"printers,omitempty"`
-	Purchasing      *ComputerPurchaseCreate         `json:"purchasing,omitempty"`
-	Security        *ComputerSecurityCreate         `json:"security,omitempty"`
-	Services        *[]ComputerServiceCreate        `json:"services,omitempty"`
-	SoftwareUpdates *[]ComputerSoftwareUpdateCreate `json:"softwareUpdates,omitempty"`
-	Storage         *ComputerStorageCreate          `json:"storage,omitempty"`
-	UDID            *string                         `json:"udid,omitempty"`
-	UserAndLocation *ComputerUserAndLocationCreate  `json:"userAndLocation,omitempty"`
-}
-
-// ComputerInventoryCreateRequestV2 represents a computer inventory create request v2.
-type ComputerInventoryCreateRequestV2 struct {
-	Applications          *[]ComputerApplicationCreate          `json:"applications,omitempty"`
-	Certificates          *[]ComputerCertificateCreate          `json:"certificates,omitempty"`
-	ConfigurationProfiles *[]ComputerConfigurationProfileCreate `json:"configurationProfiles,omitempty"`
-	General               *ComputerGeneralCreate                `json:"general,omitempty"`
-	Hardware              *ComputerHardwareCreate               `json:"hardware,omitempty"`
-	LocalUserAccounts     *[]ComputerLocalUserAccountCreate     `json:"localUserAccounts,omitempty"`
-	OperatingSystem       *ComputerOperatingSystemCreate        `json:"operatingSystem,omitempty"`
-	// All package receipts are listed by their package name.
-	PackageReceipts *ComputerPackageReceiptsCreate  `json:"packageReceipts,omitempty"`
-	Printers        *[]ComputerPrinterCreate        `json:"printers,omitempty"`
-	Purchasing      *ComputerPurchaseCreate         `json:"purchasing,omitempty"`
-	Security        *ComputerSecurityCreate         `json:"security,omitempty"`
-	Services        *[]ComputerServiceCreate        `json:"services,omitempty"`
-	SoftwareUpdates *[]ComputerSoftwareUpdateCreate `json:"softwareUpdates,omitempty"`
-	Storage         *ComputerStorageCreate          `json:"storage,omitempty"`
-	UDID            *string                         `json:"udid,omitempty"`
-	UserAndLocation *ComputerUserAndLocationCreate  `json:"userAndLocation,omitempty"`
 }
 
 // ComputerInventoryCreateRequestV4 represents a computer inventory create request v4.
@@ -1774,24 +1576,6 @@ type ComputerInventoryRecoveryLockPasswordResponse struct {
 	RecoveryLockPassword string `json:"recoveryLockPassword"`
 }
 
-// ComputerInventorySearchResults represents a computer inventory search results.
-type ComputerInventorySearchResults struct {
-	Results    []ComputerInventory `json:"results"`
-	TotalCount int                 `json:"totalCount"`
-}
-
-// ComputerInventorySearchResultsV2 represents a computer inventory search results v2.
-type ComputerInventorySearchResultsV2 struct {
-	Results    []ComputerInventoryV2 `json:"results"`
-	TotalCount int                   `json:"totalCount"`
-}
-
-// ComputerInventorySearchResultsV3 represents a computer inventory search results v3.
-type ComputerInventorySearchResultsV3 struct {
-	Results    []ComputerInventoryV3 `json:"results"`
-	TotalCount int                   `json:"totalCount"`
-}
-
 // ComputerInventorySearchResultsV4 represents a computer inventory search results v4.
 type ComputerInventorySearchResultsV4 struct {
 	Results    []ComputerInventoryV4 `json:"results"`
@@ -1807,64 +1591,6 @@ type ComputerInventoryUpdateRequest struct {
 	Purchasing          *ComputerPurchase              `json:"purchasing,omitempty"`
 	UDID                *string                        `json:"udid,omitempty"`
 	UserAndLocation     *ComputerUserAndLocation       `json:"userAndLocation,omitempty"`
-}
-
-// ComputerInventoryV2 represents a computer inventory v2.
-type ComputerInventoryV2 struct {
-	Applications          []ComputerApplication          `json:"applications"`
-	Attachments           []ComputerAttachment           `json:"attachments"`
-	Certificates          []ComputerCertificate          `json:"certificates"`
-	ConfigurationProfiles []ComputerConfigurationProfile `json:"configurationProfiles"`
-	ContentCaching        *ComputerContentCaching        `json:"contentCaching,omitempty"`
-	DiskEncryption        *ComputerDiskEncryption        `json:"diskEncryption,omitempty"`
-	ExtensionAttributes   []ComputerExtensionAttribute   `json:"extensionAttributes"`
-	General               *ComputerGeneral               `json:"general,omitempty"`
-	GroupMemberships      []GroupMembership              `json:"groupMemberships"`
-	Hardware              *ComputerHardware              `json:"hardware,omitempty"`
-	Ibeacons              []ComputerIbeacon              `json:"ibeacons"`
-	ID                    string                         `json:"id"`
-	LicensedSoftware      []ComputerLicensedSoftware     `json:"licensedSoftware"`
-	LocalUserAccounts     []ComputerLocalUserAccount     `json:"localUserAccounts"`
-	OperatingSystem       *ComputerOperatingSystem       `json:"operatingSystem,omitempty"`
-	// All package receipts are listed by their package name.
-	PackageReceipts *ComputerPackageReceipts `json:"packageReceipts,omitempty"`
-	Printers        []ComputerPrinter        `json:"printers"`
-	Purchasing      *ComputerPurchase        `json:"purchasing,omitempty"`
-	Security        *ComputerSecurity        `json:"security,omitempty"`
-	Services        []ComputerService        `json:"services"`
-	SoftwareUpdates []ComputerSoftwareUpdate `json:"softwareUpdates"`
-	Storage         *ComputerStorage         `json:"storage,omitempty"`
-	UDID            string                   `json:"udid"`
-	UserAndLocation *ComputerUserAndLocation `json:"userAndLocation,omitempty"`
-}
-
-// ComputerInventoryV3 represents a computer inventory v3.
-type ComputerInventoryV3 struct {
-	Applications          []ComputerApplicationV3        `json:"applications"`
-	Attachments           []ComputerAttachment           `json:"attachments"`
-	Certificates          []ComputerCertificate          `json:"certificates"`
-	ConfigurationProfiles []ComputerConfigurationProfile `json:"configurationProfiles"`
-	ContentCaching        *ComputerContentCaching        `json:"contentCaching,omitempty"`
-	DiskEncryption        *ComputerDiskEncryption        `json:"diskEncryption,omitempty"`
-	ExtensionAttributes   []ComputerExtensionAttribute   `json:"extensionAttributes"`
-	General               *ComputerGeneral               `json:"general,omitempty"`
-	GroupMemberships      []GroupMembership              `json:"groupMemberships"`
-	Hardware              *ComputerHardware              `json:"hardware,omitempty"`
-	Ibeacons              []ComputerIbeacon              `json:"ibeacons"`
-	ID                    string                         `json:"id"`
-	LicensedSoftware      []ComputerLicensedSoftware     `json:"licensedSoftware"`
-	LocalUserAccounts     []ComputerLocalUserAccount     `json:"localUserAccounts"`
-	OperatingSystem       *ComputerOperatingSystem       `json:"operatingSystem,omitempty"`
-	// All package receipts are listed by their package name.
-	PackageReceipts *ComputerPackageReceipts `json:"packageReceipts,omitempty"`
-	Printers        []ComputerPrinter        `json:"printers"`
-	Purchasing      *ComputerPurchase        `json:"purchasing,omitempty"`
-	Security        *ComputerSecurity        `json:"security,omitempty"`
-	Services        []ComputerService        `json:"services"`
-	SoftwareUpdates []ComputerSoftwareUpdate `json:"softwareUpdates"`
-	Storage         *ComputerStorage         `json:"storage,omitempty"`
-	UDID            string                   `json:"udid"`
-	UserAndLocation *ComputerUserAndLocation `json:"userAndLocation,omitempty"`
 }
 
 // ComputerInventoryV4 represents a computer inventory v4.
@@ -2414,13 +2140,6 @@ type Country struct {
 // CountryCodes represents a country codes.
 type CountryCodes struct {
 	CountryCodes []Country `json:"countryCodes"`
-}
-
-// CreatePath represents a create path.
-type CreatePath struct {
-	Path string `json:"path"`
-	// Allowed values: see the CreatePathScope constants.
-	Scope string `json:"scope"`
 }
 
 // CreatePathV2 represents a create path v2.
@@ -3330,12 +3049,6 @@ type ExternalRecipient struct {
 	Name  string `json:"name"`
 }
 
-// FileAttachmentV2 represents a file attachment v2.
-type FileAttachmentV2 struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
 // FileAttachmentV3 represents a file attachment v3.
 type FileAttachmentV3 struct {
 	ID   string `json:"id"`
@@ -3362,13 +3075,6 @@ type FileTransferItem struct {
 	// Allowed values: see the FileTransferItemFileTransferType constants.
 	FileTransferType  string     `json:"fileTransferType"`
 	TransferTimestamp *time.Time `json:"transferTimestamp,omitempty"`
-}
-
-// FontPath represents a font path.
-type FontPath struct {
-	// A "-1" id indicates a built-in path that cannot be deleted or modified.
-	ID   string `json:"id"`
-	Path string `json:"path"`
 }
 
 // GetComputerPrestageV3 represents a get computer prestage v3.
@@ -3480,61 +3186,6 @@ type GetEnrollmentCustomizationPanelText struct {
 	Subtext            string `json:"subtext"`
 	Title              string `json:"title"`
 	Type               string `json:"type"`
-}
-
-// GetMobileDevicePrestageV2 represents a get mobile device prestage v2.
-type GetMobileDevicePrestageV2 struct {
-	AllowPairing bool `json:"allowPairing"`
-	// The Base64 encoded PEM Certificate.
-	AnchorCertificates                  []string                     `json:"anchorCertificates"`
-	AuthenticationPrompt                string                       `json:"authenticationPrompt"`
-	AutoAdvanceSetup                    bool                         `json:"autoAdvanceSetup"`
-	ConfigureDeviceBeforeSetupAssistant bool                         `json:"configureDeviceBeforeSetupAssistant"`
-	DefaultPrestage                     bool                         `json:"defaultPrestage"`
-	Department                          string                       `json:"department"`
-	DeviceEnrollmentProgramInstanceID   string                       `json:"deviceEnrollmentProgramInstanceId"`
-	DisplayName                         string                       `json:"displayName"`
-	EnableDeviceBasedActivationLock     bool                         `json:"enableDeviceBasedActivationLock"`
-	EnforceTemporarySessionTimeout      bool                         `json:"enforceTemporarySessionTimeout"`
-	EnforceUserSessionTimeout           bool                         `json:"enforceUserSessionTimeout"`
-	EnrollmentCustomizationID           string                       `json:"enrollmentCustomizationId"`
-	EnrollmentSiteID                    string                       `json:"enrollmentSiteId"`
-	ID                                  string                       `json:"id"`
-	KeepExistingLocationInformation     bool                         `json:"keepExistingLocationInformation"`
-	KeepExistingSiteMembership          bool                         `json:"keepExistingSiteMembership"`
-	Language                            string                       `json:"language"`
-	LocationInformation                 *LocationInformationV2       `json:"locationInformation,omitempty"`
-	Mandatory                           bool                         `json:"mandatory"`
-	MaximumSharedAccounts               int                          `json:"maximumSharedAccounts"`
-	MDMRemovable                        bool                         `json:"mdmRemovable"`
-	MinimumOsSpecificVersionIos         string                       `json:"minimumOsSpecificVersionIos"`
-	MinimumOsSpecificVersionIpad        string                       `json:"minimumOsSpecificVersionIpad"`
-	MultiUser                           bool                         `json:"multiUser"`
-	Names                               *MobileDevicePrestageNamesV2 `json:"names,omitempty"`
-	// Allowed values: see the GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos constants.
-	PrestageMinimumOsTargetVersionTypeIos string `json:"prestageMinimumOsTargetVersionTypeIos"`
-	// Allowed values: see the GetMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad constants.
-	PrestageMinimumOsTargetVersionTypeIpad string                           `json:"prestageMinimumOsTargetVersionTypeIpad"`
-	PreventActivationLock                  bool                             `json:"preventActivationLock"`
-	ProfileUUID                            string                           `json:"profileUuid"`
-	PurchasingInformation                  *PrestagePurchasingInformationV2 `json:"purchasingInformation,omitempty"`
-	Region                                 string                           `json:"region"`
-	RequireAuthentication                  bool                             `json:"requireAuthentication"`
-	RtsConfigProfileID                     string                           `json:"rtsConfigProfileId"`
-	RtsEnabled                             bool                             `json:"rtsEnabled"`
-	SendTimezone                           bool                             `json:"sendTimezone"`
-	SiteID                                 string                           `json:"siteId"`
-	SkipSetupItems                         map[string]bool                  `json:"skipSetupItems"`
-	StorageQuotaSizeMegabytes              int                              `json:"storageQuotaSizeMegabytes"`
-	Supervised                             bool                             `json:"supervised"`
-	SupportEmailAddress                    string                           `json:"supportEmailAddress"`
-	SupportPhoneNumber                     string                           `json:"supportPhoneNumber"`
-	TemporarySessionOnly                   bool                             `json:"temporarySessionOnly"`
-	TemporarySessionTimeout                int                              `json:"temporarySessionTimeout"`
-	Timezone                               string                           `json:"timezone"`
-	UseStorageQuotaSize                    bool                             `json:"useStorageQuotaSize"`
-	UserSessionTimeout                     int                              `json:"userSessionTimeout"`
-	VersionLock                            int                              `json:"versionLock"`
 }
 
 // GetMobileDevicePrestageV3 represents a get mobile device prestage v3.
@@ -3665,14 +3316,6 @@ type GroupTestSearchRequest struct {
 type GroupTestSearchResponse struct {
 	Results    []GroupTestSearch `json:"results"`
 	TotalCount int               `json:"totalCount"`
-}
-
-// GroupUpdateDtoV1 represents a group update dto v1.
-type GroupUpdateDtoV1 struct {
-	Assignments      *[]AssignmentDtoV1    `json:"assignments,omitempty"`
-	Criteria         *[]SmartGroupCriteria `json:"criteria,omitempty"`
-	GroupDescription *string               `json:"groupDescription,omitempty"`
-	GroupName        *string               `json:"groupName,omitempty"`
 }
 
 // GroupUpdateDtoV2 represents a group update dto v2.
@@ -3961,18 +3604,6 @@ type InventoryListMobileDeviceSearchResults struct {
 	TotalCount int                         `json:"totalCount"`
 }
 
-// InventoryPreloadCsvError represents a inventory preload csv error.
-type InventoryPreloadCsvError struct {
-	Code         string `json:"code"`
-	Description  string `json:"description"`
-	DeviceType   string `json:"deviceType"`
-	Field        string `json:"field"`
-	FieldSize    int    `json:"fieldSize"`
-	Line         int    `json:"line"`
-	SerialNumber string `json:"serialNumber"`
-	Value        string `json:"value"`
-}
-
 // InventoryPreloadCsvValidationError represents a inventory preload csv validation error.
 type InventoryPreloadCsvValidationError struct {
 	Errors []InventoryPreloadCsvValidationErrorCause `json:"errors"`
@@ -4019,48 +3650,6 @@ type InventoryPreloadExtensionAttributeColumn struct {
 type InventoryPreloadExtensionAttributeColumnResult struct {
 	Results    []InventoryPreloadExtensionAttributeColumn `json:"results"`
 	TotalCount int                                        `json:"totalCount"`
-}
-
-// InventoryPreloadInvalidCsvResponse represents a inventory preload invalid csv response.
-type InventoryPreloadInvalidCsvResponse struct {
-	Errors      []InventoryPreloadCsvError `json:"errors"`
-	HttpsStatus int                        `json:"httpsStatus"`
-}
-
-// InventoryPreloadRecord represents a inventory preload record.
-type InventoryPreloadRecord struct {
-	AppleCareID *string `json:"appleCareId,omitempty"`
-	AssetTag    *string `json:"assetTag,omitempty"`
-	BarCode1    *string `json:"barCode1,omitempty"`
-	BarCode2    *string `json:"barCode2,omitempty"`
-	Building    *string `json:"building,omitempty"`
-	Department  *string `json:"department,omitempty"`
-	// Allowed values: see the InventoryPreloadRecordDeviceType constants.
-	DeviceType          string                                `json:"deviceType"`
-	EmailAddress        *string                               `json:"emailAddress,omitempty"`
-	ExtensionAttributes *[]InventoryPreloadExtensionAttribute `json:"extensionAttributes,omitempty"`
-	FullName            *string                               `json:"fullName,omitempty"`
-	ID                  *int                                  `json:"id,omitempty"`
-	LeaseExpiration     *string                               `json:"leaseExpiration,omitempty"`
-	LifeExpectancy      *string                               `json:"lifeExpectancy,omitempty"`
-	PhoneNumber         *string                               `json:"phoneNumber,omitempty"`
-	PoDate              *string                               `json:"poDate,omitempty"`
-	PoNumber            *string                               `json:"poNumber,omitempty"`
-	Position            *string                               `json:"position,omitempty"`
-	PurchasePrice       *string                               `json:"purchasePrice,omitempty"`
-	PurchasingAccount   *string                               `json:"purchasingAccount,omitempty"`
-	PurchasingContact   *string                               `json:"purchasingContact,omitempty"`
-	Room                *string                               `json:"room,omitempty"`
-	SerialNumber        string                                `json:"serialNumber"`
-	Username            *string                               `json:"username,omitempty"`
-	Vendor              *string                               `json:"vendor,omitempty"`
-	WarrantyExpiration  *string                               `json:"warrantyExpiration,omitempty"`
-}
-
-// InventoryPreloadRecordSearchResults represents a inventory preload record search results.
-type InventoryPreloadRecordSearchResults struct {
-	Results    []InventoryPreloadRecord `json:"results"`
-	TotalCount int                      `json:"totalCount"`
 }
 
 // InventoryPreloadRecordSearchResultsV2 represents a inventory preload record search results v2.
@@ -5211,29 +4800,11 @@ type MobileDeviceNetwork struct {
 	VoiceRoamingEnabled    bool   `json:"voiceRoamingEnabled"`
 }
 
-// MobileDevicePrestageNameV2 represents a mobile device prestage name v2.
-type MobileDevicePrestageNameV2 struct {
-	DeviceName *string `json:"deviceName,omitempty"`
-	ID         *string `json:"id,omitempty"`
-	Used       *bool   `json:"used,omitempty"`
-}
-
 // MobileDevicePrestageNameV3 represents a mobile device prestage name v3.
 type MobileDevicePrestageNameV3 struct {
 	DeviceName *string `json:"deviceName,omitempty"`
 	ID         *string `json:"id,omitempty"`
 	Used       *bool   `json:"used,omitempty"`
-}
-
-// MobileDevicePrestageNamesV2 represents a mobile device prestage names v2.
-type MobileDevicePrestageNamesV2 struct {
-	AssignNamesUsing       *string                       `json:"assignNamesUsing,omitempty"`
-	DeviceNamePrefix       *string                       `json:"deviceNamePrefix,omitempty"`
-	DeviceNameSuffix       *string                       `json:"deviceNameSuffix,omitempty"`
-	DeviceNamingConfigured *bool                         `json:"deviceNamingConfigured,omitempty"`
-	ManageNames            *bool                         `json:"manageNames,omitempty"`
-	PrestageDeviceNames    *[]MobileDevicePrestageNameV2 `json:"prestageDeviceNames,omitempty"`
-	SingleDeviceName       *string                       `json:"singleDeviceName,omitempty"`
 }
 
 // MobileDevicePrestageNamesV3 represents a mobile device prestage names v3.
@@ -5247,67 +4818,10 @@ type MobileDevicePrestageNamesV3 struct {
 	SingleDeviceName       *string                       `json:"singleDeviceName,omitempty"`
 }
 
-// MobileDevicePrestageSearchResultsV2 represents a mobile device prestage search results v2.
-type MobileDevicePrestageSearchResultsV2 struct {
-	Results    []GetMobileDevicePrestageV2 `json:"results"`
-	TotalCount int                         `json:"totalCount"`
-}
-
 // MobileDevicePrestageSearchResultsV3 represents a mobile device prestage search results v3.
 type MobileDevicePrestageSearchResultsV3 struct {
 	Results    []GetMobileDevicePrestageV3 `json:"results"`
 	TotalCount int                         `json:"totalCount"`
-}
-
-// MobileDevicePrestageV2 represents a mobile device prestage v2.
-type MobileDevicePrestageV2 struct {
-	AllowPairing bool `json:"allowPairing"`
-	// The Base64 encoded PEM Certificate.
-	AnchorCertificates                  *[]string                    `json:"anchorCertificates,omitempty"`
-	AuthenticationPrompt                string                       `json:"authenticationPrompt"`
-	AutoAdvanceSetup                    bool                         `json:"autoAdvanceSetup"`
-	ConfigureDeviceBeforeSetupAssistant bool                         `json:"configureDeviceBeforeSetupAssistant"`
-	DefaultPrestage                     bool                         `json:"defaultPrestage"`
-	Department                          string                       `json:"department"`
-	DeviceEnrollmentProgramInstanceID   string                       `json:"deviceEnrollmentProgramInstanceId"`
-	DisplayName                         string                       `json:"displayName"`
-	EnableDeviceBasedActivationLock     bool                         `json:"enableDeviceBasedActivationLock"`
-	EnforceTemporarySessionTimeout      *bool                        `json:"enforceTemporarySessionTimeout,omitempty"`
-	EnforceUserSessionTimeout           *bool                        `json:"enforceUserSessionTimeout,omitempty"`
-	EnrollmentCustomizationID           *string                      `json:"enrollmentCustomizationId,omitempty"`
-	EnrollmentSiteID                    string                       `json:"enrollmentSiteId"`
-	KeepExistingLocationInformation     bool                         `json:"keepExistingLocationInformation"`
-	KeepExistingSiteMembership          bool                         `json:"keepExistingSiteMembership"`
-	Language                            *string                      `json:"language,omitempty"`
-	LocationInformation                 LocationInformationV2        `json:"locationInformation"`
-	Mandatory                           bool                         `json:"mandatory"`
-	MaximumSharedAccounts               int                          `json:"maximumSharedAccounts"`
-	MDMRemovable                        bool                         `json:"mdmRemovable"`
-	MinimumOsSpecificVersionIos         *string                      `json:"minimumOsSpecificVersionIos,omitempty"`
-	MinimumOsSpecificVersionIpad        *string                      `json:"minimumOsSpecificVersionIpad,omitempty"`
-	MultiUser                           bool                         `json:"multiUser"`
-	Names                               *MobileDevicePrestageNamesV2 `json:"names,omitempty"`
-	// Allowed values: see the MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos constants.
-	PrestageMinimumOsTargetVersionTypeIos *string `json:"prestageMinimumOsTargetVersionTypeIos,omitempty"`
-	// Allowed values: see the MobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad constants.
-	PrestageMinimumOsTargetVersionTypeIpad *string                         `json:"prestageMinimumOsTargetVersionTypeIpad,omitempty"`
-	PreventActivationLock                  bool                            `json:"preventActivationLock"`
-	PurchasingInformation                  PrestagePurchasingInformationV2 `json:"purchasingInformation"`
-	Region                                 *string                         `json:"region,omitempty"`
-	RequireAuthentication                  bool                            `json:"requireAuthentication"`
-	RtsConfigProfileID                     *string                         `json:"rtsConfigProfileId,omitempty"`
-	RtsEnabled                             *bool                           `json:"rtsEnabled,omitempty"`
-	SendTimezone                           bool                            `json:"sendTimezone"`
-	SkipSetupItems                         *map[string]bool                `json:"skipSetupItems,omitempty"`
-	StorageQuotaSizeMegabytes              int                             `json:"storageQuotaSizeMegabytes"`
-	Supervised                             bool                            `json:"supervised"`
-	SupportEmailAddress                    string                          `json:"supportEmailAddress"`
-	SupportPhoneNumber                     string                          `json:"supportPhoneNumber"`
-	TemporarySessionOnly                   *bool                           `json:"temporarySessionOnly,omitempty"`
-	TemporarySessionTimeout                *int                            `json:"temporarySessionTimeout,omitempty"`
-	Timezone                               string                          `json:"timezone"`
-	UseStorageQuotaSize                    bool                            `json:"useStorageQuotaSize"`
-	UserSessionTimeout                     *int                            `json:"userSessionTimeout,omitempty"`
 }
 
 // MobileDevicePrestageV3 represents a mobile device prestage v3.
@@ -6233,25 +5747,6 @@ type PatchSoftwareTitlePackages struct {
 	Version     *string `json:"version,omitempty"`
 }
 
-// PatchSoftwareTitleReport represents a patch software title report.
-type PatchSoftwareTitleReport struct {
-	BuildingName           string     `json:"buildingName"`
-	ComputerName           string     `json:"computerName"`
-	DepartmentName         string     `json:"departmentName"`
-	DeviceID               string     `json:"deviceId"`
-	LastContactTime        *time.Time `json:"lastContactTime,omitempty"`
-	OperatingSystemVersion string     `json:"operatingSystemVersion"`
-	SiteName               string     `json:"siteName"`
-	Username               string     `json:"username"`
-	Version                string     `json:"version"`
-}
-
-// PatchSoftwareTitleReportSearchResult represents a patch software title report search result.
-type PatchSoftwareTitleReportSearchResult struct {
-	Results    []PatchSoftwareTitleReport `json:"results"`
-	TotalCount int                        `json:"totalCount"`
-}
-
 // PatchSoftwareTitleReportV3SearchResult represents a patch software title report v3 search result.
 type PatchSoftwareTitleReportV3SearchResult struct {
 	Results    []PatchReportV3 `json:"results"`
@@ -6337,13 +5832,6 @@ type PlanStatus struct {
 	ErrorReasons *[]string `json:"errorReasons,omitempty"`
 	// Allowed values: see the PlanStatusState constants.
 	State string `json:"state"`
-}
-
-// PluginPath represents a plugin path.
-type PluginPath struct {
-	// A "-1" id indicates a built-in path that cannot be deleted or modified.
-	ID   string `json:"id"`
-	Path string `json:"path"`
 }
 
 // PolicyProperties represents a policy properties.
@@ -6432,13 +5920,6 @@ type PrestageDependency struct {
 	HumanReadableName string `json:"humanReadableName"`
 	Hyperlink         string `json:"hyperlink"`
 	Name              string `json:"name"`
-}
-
-// PrestageFileAttachmentV2 represents a prestage file attachment v2.
-type PrestageFileAttachmentV2 struct {
-	FileType string `json:"fileType"`
-	ID       string `json:"id"`
-	Name     string `json:"name"`
 }
 
 // PrestageFileAttachmentV3 represents a prestage file attachment v3.
@@ -6632,58 +6113,6 @@ type PutComputerPrestageV3 struct {
 	SupportEmailAddress        string           `json:"supportEmailAddress"`
 	SupportPhoneNumber         string           `json:"supportPhoneNumber"`
 	VersionLock                *int             `json:"versionLock,omitempty"`
-}
-
-// PutMobileDevicePrestageV2 represents a put mobile device prestage v2.
-type PutMobileDevicePrestageV2 struct {
-	AllowPairing bool `json:"allowPairing"`
-	// The Base64 encoded PEM Certificate.
-	AnchorCertificates                  *[]string                    `json:"anchorCertificates,omitempty"`
-	AuthenticationPrompt                string                       `json:"authenticationPrompt"`
-	AutoAdvanceSetup                    bool                         `json:"autoAdvanceSetup"`
-	ConfigureDeviceBeforeSetupAssistant bool                         `json:"configureDeviceBeforeSetupAssistant"`
-	DefaultPrestage                     bool                         `json:"defaultPrestage"`
-	Department                          string                       `json:"department"`
-	DeviceEnrollmentProgramInstanceID   string                       `json:"deviceEnrollmentProgramInstanceId"`
-	DisplayName                         string                       `json:"displayName"`
-	EnableDeviceBasedActivationLock     bool                         `json:"enableDeviceBasedActivationLock"`
-	EnforceTemporarySessionTimeout      *bool                        `json:"enforceTemporarySessionTimeout,omitempty"`
-	EnforceUserSessionTimeout           *bool                        `json:"enforceUserSessionTimeout,omitempty"`
-	EnrollmentCustomizationID           *string                      `json:"enrollmentCustomizationId,omitempty"`
-	EnrollmentSiteID                    string                       `json:"enrollmentSiteId"`
-	KeepExistingLocationInformation     bool                         `json:"keepExistingLocationInformation"`
-	KeepExistingSiteMembership          bool                         `json:"keepExistingSiteMembership"`
-	Language                            *string                      `json:"language,omitempty"`
-	LocationInformation                 LocationInformationV2        `json:"locationInformation"`
-	Mandatory                           bool                         `json:"mandatory"`
-	MaximumSharedAccounts               int                          `json:"maximumSharedAccounts"`
-	MDMRemovable                        bool                         `json:"mdmRemovable"`
-	MinimumOsSpecificVersionIos         *string                      `json:"minimumOsSpecificVersionIos,omitempty"`
-	MinimumOsSpecificVersionIpad        *string                      `json:"minimumOsSpecificVersionIpad,omitempty"`
-	MultiUser                           bool                         `json:"multiUser"`
-	Names                               *MobileDevicePrestageNamesV2 `json:"names,omitempty"`
-	// Allowed values: see the PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIos constants.
-	PrestageMinimumOsTargetVersionTypeIos *string `json:"prestageMinimumOsTargetVersionTypeIos,omitempty"`
-	// Allowed values: see the PutMobileDevicePrestageV2PrestageMinimumOsTargetVersionTypeIpad constants.
-	PrestageMinimumOsTargetVersionTypeIpad *string                         `json:"prestageMinimumOsTargetVersionTypeIpad,omitempty"`
-	PreventActivationLock                  bool                            `json:"preventActivationLock"`
-	PurchasingInformation                  PrestagePurchasingInformationV2 `json:"purchasingInformation"`
-	Region                                 *string                         `json:"region,omitempty"`
-	RequireAuthentication                  bool                            `json:"requireAuthentication"`
-	RtsConfigProfileID                     *string                         `json:"rtsConfigProfileId,omitempty"`
-	RtsEnabled                             *bool                           `json:"rtsEnabled,omitempty"`
-	SendTimezone                           bool                            `json:"sendTimezone"`
-	SkipSetupItems                         *map[string]bool                `json:"skipSetupItems,omitempty"`
-	StorageQuotaSizeMegabytes              int                             `json:"storageQuotaSizeMegabytes"`
-	Supervised                             bool                            `json:"supervised"`
-	SupportEmailAddress                    string                          `json:"supportEmailAddress"`
-	SupportPhoneNumber                     string                          `json:"supportPhoneNumber"`
-	TemporarySessionOnly                   *bool                           `json:"temporarySessionOnly,omitempty"`
-	TemporarySessionTimeout                *int                            `json:"temporarySessionTimeout,omitempty"`
-	Timezone                               string                          `json:"timezone"`
-	UseStorageQuotaSize                    bool                            `json:"useStorageQuotaSize"`
-	UserSessionTimeout                     *int                            `json:"userSessionTimeout,omitempty"`
-	VersionLock                            *int                            `json:"versionLock,omitempty"`
 }
 
 // PutMobileDevicePrestageV3 represents a put mobile device prestage v3.
@@ -7121,14 +6550,6 @@ type SmartComputerGroupSearch struct {
 	SiteID          string `json:"siteId"`
 }
 
-// SmartComputerGroupV2 represents a smart computer group v2.
-type SmartComputerGroupV2 struct {
-	Criteria    *[]SmartSearchCriterion `json:"criteria,omitempty"`
-	Description *string                 `json:"description,omitempty"`
-	Name        string                  `json:"name"`
-	SiteID      *string                 `json:"siteId,omitempty"`
-}
-
 // SmartComputerGroupV3 represents a smart computer group v3.
 type SmartComputerGroupV3 struct {
 	Criteria    *[]ComputerSmartGroupCriteriaV2 `json:"criteria,omitempty"`
@@ -7147,16 +6568,6 @@ type SmartGroup struct {
 	SiteID           string `json:"siteId"`
 }
 
-// SmartGroupAssignment represents a smart group assignment.
-type SmartGroupAssignment struct {
-	Criteria         *[]SmartGroupCriteria `json:"criteria,omitempty"`
-	GroupDescription *string               `json:"groupDescription,omitempty"`
-	// The unique identifier of the smart group.
-	GroupID   *string `json:"groupId,omitempty"`
-	GroupName string  `json:"groupName"`
-	SiteID    *string `json:"siteId,omitempty"`
-}
-
 // SmartGroupAssignmentV2 represents a smart group assignment v2.
 type SmartGroupAssignmentV2 struct {
 	Criteria         *[]MobileDeviceSmartGroupCriteriaV2 `json:"criteria,omitempty"`
@@ -7172,29 +6583,17 @@ type SmartGroupCriteria struct {
 	// Whether this criterion should be ANDed or ORed with the previous criterion.
 	AndOr string `json:"andOr"`
 	// Whether to add a closing parenthesis after this criterion.
-	ClosingParen *bool `json:"closingParen,omitempty"`
+	ClosingParen bool `json:"closingParen"`
 	// The field to search on (e.g., Model, OS Version, etc.).
 	Name string `json:"name"`
 	// Whether to add an opening parenthesis before this criterion.
-	OpeningParen *bool `json:"openingParen,omitempty"`
+	OpeningParen bool `json:"openingParen"`
 	// The priority order of this criterion.
 	Priority int `json:"priority"`
 	// The type of search to perform (e.g., is, is not, like, etc.).
 	SearchType string `json:"searchType"`
 	// The value to search for.
 	Value string `json:"value"`
-}
-
-// SmartGroupDetail represents a smart group detail.
-type SmartGroupDetail struct {
-	// membership count.
-	Count int `json:"count"`
-	// The criteria used to define the smart group.
-	Criteria         []SmartGroupCriteria `json:"criteria"`
-	GroupDescription string               `json:"groupDescription"`
-	GroupID          string               `json:"groupId"`
-	GroupName        string               `json:"groupName"`
-	SiteID           string               `json:"siteId"`
 }
 
 // SmartGroupDetailV2 represents a smart group detail v2.

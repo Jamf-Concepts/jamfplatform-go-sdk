@@ -202,28 +202,28 @@ func TestAcceptance_Pro_User_UserCRUD(t *testing.T) {
 // which is read-only for listing + patching existing groups. These tests
 // cover list + read-only probes; PATCH is exercised only if a group exists.
 
-func TestAcceptance_Pro_User_ListGroupsV1(t *testing.T) {
+func TestAcceptance_Pro_User_ListGroupsV2(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := pro.New(c).ListGroupsV1(context.Background(), nil, "")
+	groups, err := pro.New(c).ListGroupsV2(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListGroupsV1: %v", err)
+		t.Fatalf("ListGroupsV2: %v", err)
 	}
 	t.Logf("Found %d groups (unified groups surface)", len(groups))
 	if len(groups) > 0 {
 		// Probe GET by platform id — unified groups expose a platformId
 		// distinct from the per-API (computer/mobile) Jamf Pro numeric id.
 		// Any group is fine for a read probe.
-		got, err := pro.New(c).GetGroupV1(context.Background(), groups[0].GroupPlatformID)
+		got, err := pro.New(c).GetGroupV2(context.Background(), groups[0].GroupPlatformID)
 		if err != nil {
 			skipOnServerError(t, err)
 			var apiErr *jamfplatform.APIResponseError
 			if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
-				t.Logf("GetGroupV1(%s): 404 — group shape not round-trippable via this surface", groups[0].GroupPlatformID)
+				t.Logf("GetGroupV2(%s): 404 — group shape not round-trippable via this surface", groups[0].GroupPlatformID)
 				return
 			}
-			t.Fatalf("GetGroupV1(%s): %v", groups[0].GroupPlatformID, err)
+			t.Fatalf("GetGroupV2(%s): %v", groups[0].GroupPlatformID, err)
 		}
 		t.Logf("Group %s: name=%q type=%s members=%d", got.GroupJamfProID, got.GroupName, got.GroupType, got.MembershipCount)
 	}

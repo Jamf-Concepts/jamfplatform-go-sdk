@@ -17,9 +17,7 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // document the privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
 	"GetDeviceChannels":                    {Method: "GetDeviceChannels", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/channels", Scoped: []string{"declarations:read"}, Legacy: nil},
-	"GetDeviceDeclarationReport":           {Method: "GetDeviceDeclarationReport", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}", Scoped: []string{"declarations:read"}, Legacy: nil},
 	"GetDeviceDeclarationReportFiltered":   {Method: "GetDeviceDeclarationReportFiltered", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/declarations", Scoped: []string{"declarations:read"}, Legacy: nil},
-	"ListDeclarationReportClients":         {Method: "ListDeclarationReportClients", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}", Scoped: []string{"declarations:read"}, Legacy: nil},
 	"ListDeclarationReportClientsFiltered": {Method: "ListDeclarationReportClientsFiltered", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}/devices", Scoped: []string{"declarations:read"}, Legacy: nil},
 }
 

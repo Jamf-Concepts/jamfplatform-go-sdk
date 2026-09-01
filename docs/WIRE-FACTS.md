@@ -401,8 +401,10 @@ Build v1942 removed, from both `external/` and `internal/stage/`, every deprecat
 operation that had a surviving successor version — 122 from `jpapi`, 20 from
 `capi`, 2 from `declaration-reporting`, 2 from `securitycloud-devices`. Nothing
 was added, no schema changed, and the 666 surviving `jpapi` operations and 675
-schemas were byte-equal to v1897's. The SDK did **not** take the removals; the
-evidence, all gathered 2026-09-01 against Jamf Pro `11.31.1-t1787060595569`:
+schemas were byte-equal to v1897's. The SDK **took** the removals, as a deliberate decision to follow the specs —
+so it is now stricter than the gateway on all 146. The evidence that the server
+has withdrawn none of them, gathered 2026-09-01 against Jamf Pro
+`11.31.1-t1787060595569`:
 
 Probed with a `pro` credential on `eu`, `X-Tenant-Id` header form, with
 `GET /pro/v1/jamf-pro-version` → `200 {"version":"11.31.1-…"}` as the control in
@@ -453,10 +455,62 @@ The only derivative change: `capi`'s OAuth scope list went 188 → 185, losing
 the removed operations. `patch-management-software-titles:read` survives, on
 `GET /patches/name/{name}`.
 
-**Report upstream, and re-diff every subsequent bundle.** Take the removals only
-when a policy commit or a wire refusal backs them; until then, copying these specs
-into `testing/` fails generation with `path %s not found in spec`, which is the
-correct hard error.
+A fourth signal came out of the ingest itself: the withdrawn Security Cloud v1
+group operations carried **`x-sunset-date: 2027-08-25`** next to
+`x-successor-endpoint`, in the very build that deleted them — a spec deleting a
+path a year before its own declared sunset.
+
+**Report upstream, and re-diff every subsequent bundle.** The removal is a
+publish-stage filter, not a withdrawal, and the SDK following it is a decision
+rather than a corroboration.
+
+### What v1942's removal cost, probed the same day
+
+Three capability gaps opened, each now pinned by a test that fails when it
+closes. All probed 2026-09-01 with `GET /pro/v1/jamf-pro-version` → 200 as the
+control in the same invocation.
+
+**Security Cloud has no working device-group update.**
+`PUT /v1/groups/{groupId}` is gone and its declared successor
+`PUT /v2/groups/{groupId}` is unrouted — 403 `BAD_PERMISSIONS`, 7/7 on
+2026-08-29, unchanged. `ApplyDeviceGroupV2` used the v1 write for its update
+branch and now uses the v2 one, so Apply cannot update. The standalone pin
+`TestAcceptance_SecurityCloudUpdateDeviceGroupV2` survives but its control had
+to weaken from a v1 *write* to a v1 read: no working write remains to control
+with.
+
+**Patch software titles are unseedable.** The only path that minted an id the
+Pro v3 configuration endpoints address was Classic's
+`POST /patchsoftwaretitles/id/0`, now withdrawn. The alternatives do not work:
+
+| probe | result |
+|---|---|
+| `GET /proclassic/patchavailabletitles/sourceid/1` | 200, `size: 1551`, entries carry `name_id`, `app_name`, `publisher` |
+| `POST /pro/v3/patch-software-title-configurations` with `softwareTitleId` = a catalogue `name_id` (`"376"`) | `400` `SOFTWARE_TITLE_ID_NOT_FOUND` attributed to `softwareTitleId` — the catalogue's `name_id` is **not** a `softwareTitleId` |
+| `GET /pro/v1/patch-software-titles` | `403 BAD_PERMISSIONS` (unrouted) |
+| `GET /pro/v2/patch-software-titles` | `403 BAD_PERMISSIONS` (unrouted) |
+| `GET /pro/v3/patch-software-title-configurations` | 200 `[ ]` — nothing pre-existing to borrow, and borrowing would mean mutating a tenant's own configuration |
+
+So `seedPatchSoftwareTitleFixture` skips, and with it the V3 lifecycle, Apply
+and resolve-by-name tests. Restore real seeding when either the Classic
+operation returns to the spec or a routed Pro catalogue endpoint is whitelisted.
+
+**`GET /patches/name/{name}` answers 500, not 404.** One of the few patch
+operations to survive, and it is broken: `500` for an obviously-absent name 3/3,
+and `500` again for a plausible one (`Firefox`), on a tenant whose
+`/patchsoftwaretitles` list is empty. Server defect, pinned by
+`TestAcceptance_Classic_GetPatchByName`, which fails when it starts answering
+404.
+
+**Classic computer enumeration and reads moved keys.** `GET` and
+`PUT /computers/id/{id}` went while `POST` and `DELETE` on the same path
+survived. `GET /proclassic/computers/match/*` answers 200 with `id`, `name`,
+`udid`, `serial_number` and `mac_address` per row, and `MatchComputers` returns
+the same `*Computers` type `ListComputers` did — so it is a drop-in enumeration
+replacement. Reads move to `GetComputerByName` / `…BySerialNumber`;
+`GET /computers/subset/basic` and `/computers/id/{id}/subset/{subset}` have no
+surviving equivalent at all.
+`GET /proclassic/patchpolicies/id/99999999/subset/General` → 404, as expected.
 
 ### The gateway-bypass technique
 
@@ -630,6 +684,14 @@ the same invocation:
 
 `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` asserts the 403 and **fails when
 routing lands** — invert it then, and do not weaken it to a skip.
+
+**v1942 made this a live gap rather than a documented curiosity.** It withdrew
+`PUT /v1/groups/{groupId}` from the spec, so the unrouted v2 PUT is now the
+package's *only* device-group update: `ApplyDeviceGroupV2` was repointed onto it
+and its update branch can no longer succeed
+(`TestAcceptance_SecurityCloudApplyDeviceGroup` pins that 403 too). The v1 write
+that served as this probe's control is gone, so the control is now a v1 *read* —
+weaker, and worth restoring the moment either path works.
 
 Two methodological warnings from this probe. The first attempt returned **500 on
 both v1 and v2**, which reads as "v2 is routed and merely faulting" — the opposite
@@ -876,12 +938,15 @@ exist**: `/v2/customers/{tenantId}/groups` is a third URL shape and answers 403,
 as does every `/v2/groups/{id}` form. The server is telling callers to migrate a
 write to a path that is neither published nor routed.
 
-`ListDeviceGroupsV1` returns a **bare JSON array** and `ListDeviceGroupsV2` wraps
-it in `{groups: []}`, so `ResolveDeviceGroupV1ByName` and `…V2ByName` differ in
-exactly the way most likely to rot silently — v2 is the SDK's only `resultsField`
-user. Both resolvers and both Applies exist side by side per the
-additive-versioning rule; they share the v1 create/update/delete ops, since v2 is
-list-only.
+`ListDeviceGroupsV1` returned a **bare JSON array** and `ListDeviceGroupsV2` wraps
+it in `{groups: []}`. Both resolvers and both Applies existed side by side, sharing
+the v1 create/update/delete ops. **v1942 withdrew `GET /v1/groups` and
+`PUT /v1/groups/{groupId}`**, so only the v2 resolver and Apply remain — and the
+`{groups: []}` unwrap is now the SDK's *only* `resultsField` user with no
+bare-array sibling to contrast against, which is exactly the shape most likely to
+rot silently. `POST /v1/groups`, `GET /v1/groups/{groupId}` and
+`DELETE /v1/groups/{groupId}` all survived, so Apply's create branch and the
+lifecycle test still work.
 
 `Default Group` comes back with **no `id`** on both v1 and v2 — the reason
 `GroupListItem` requires only `name`, and the reason `ResolveDeviceGroupV1ByName`

@@ -19,36 +19,39 @@ import (
 func classicStrPtr(s string) *string { return &s }
 func intToStr(i int) string          { return strconv.Itoa(i) }
 
-// TestAcceptance_Classic_GetComputerByID exercises the Classic XML path
-// end-to-end. Uses JAMFPLATFORM_CLASSIC_COMPUTER_ID if set; otherwise
-// pulls the first id from ListComputers. Skips only when the tenant
+// TestAcceptance_Classic_GetComputerByName exercises the Classic XML path
+// end-to-end. Uses JAMFPLATFORM_CLASSIC_COMPUTER_NAME if set; otherwise
+// pulls the first name from MatchComputers. Skips only when the tenant
 // has no computers enrolled.
-func TestAcceptance_Classic_GetComputerByID(t *testing.T) {
+//
+// This was a by-ID read until v1942 withdrew GET /computers/id/{id} from the
+// spec; name is the cheapest surviving alternate key.
+func TestAcceptance_Classic_GetComputerByName(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
-	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
-	if id == "" {
-		list, err := pc.ListComputers(ctx)
+	name := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_NAME")
+	if name == "" {
+		list, err := pc.MatchComputers(ctx, "*")
 		if err != nil {
 			skipOnServerError(t, err)
-			t.Fatalf("ListComputers: %v", err)
+			t.Fatalf("MatchComputers: %v", err)
 		}
 		if list == nil || len(list.Computers) == 0 {
-			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_ID to override")
+			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_NAME to override")
 		}
 		first := list.Computers[0]
-		if first.ID == nil {
-			t.Fatalf("first computer has no ID: %+v", first)
+		if first.Name == nil {
+			t.Fatalf("first computer has no name: %+v", first)
 		}
-		id = intToStr(*first.ID)
+		name = *first.Name
 	}
 
-	comp, err := pc.GetComputerByID(ctx, id)
+	comp, err := pc.GetComputerByName(ctx, name)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetComputerByID(%s): %v", id, err)
+		t.Fatalf("GetComputerByName(%s): %v", name, err)
 	}
 	if comp == nil || comp.General == nil {
 		t.Fatalf("expected Computer.General populated, got %+v", comp)
@@ -105,38 +108,42 @@ func TestAcceptance_Classic_ComputerCRUD(t *testing.T) {
 		t.Errorf("Computer.General.Name = %v, want %q", got.General.Name, name)
 	}
 
-	// Update — rename the record via id.
+	// Update — rename the record. v1942 withdrew PUT and GET
+	// /computers/id/{id}, so the write goes by name and the read-back by
+	// serial number, which is stable across the rename.
 	newName := name + "-updated"
-	if err := pc.UpdateComputerByID(ctx, intToStr(id), &proclassic.ComputerPost{
+	if err := pc.UpdateComputerByName(ctx, name, &proclassic.ComputerPost{
 		General: &proclassic.ComputerPostGeneral{Name: classicStrPtr(newName)},
 	}); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("UpdateComputerByID(%d): %v", id, err)
+		t.Fatalf("UpdateComputerByName(%q): %v", name, err)
 	}
 
-	afterUpdate, err := pc.GetComputerByID(ctx, intToStr(id))
+	afterUpdate, err := pc.GetComputerBySerialNumber(ctx, serial)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetComputerByID(%d) after update: %v", id, err)
+		t.Fatalf("GetComputerBySerialNumber(%q) after update: %v", serial, err)
 	}
 	if afterUpdate.General == nil || afterUpdate.General.Name == nil || *afterUpdate.General.Name != newName {
-		t.Errorf("after UpdateComputerByID Name = %v, want %q", afterUpdate.General.Name, newName)
+		t.Errorf("after UpdateComputerByName Name = %v, want %q", afterUpdate.General.Name, newName)
 	}
 
-	// Delete.
+	// Delete. DELETE /computers/id/{id} survived v1942 even though GET and PUT
+	// on the same path did not, so the numeric id recovered above is still the
+	// key here.
 	if err := pc.DeleteComputerByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("DeleteComputerByID(%d): %v", id, err)
 	}
 
 	// Verify gone.
-	_, err = pc.GetComputerByID(ctx, intToStr(id))
+	_, err = pc.GetComputerBySerialNumber(ctx, serial)
 	if err == nil {
-		t.Fatalf("GetComputerByID(%d) after delete should 404, succeeded", id)
+		t.Fatalf("GetComputerBySerialNumber(%q) after delete should 404, succeeded", serial)
 	}
 	var apiErr *jamfplatform.APIResponseError
 	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("GetComputerByID(%d) after delete: want 404, got %v", id, err)
+		t.Fatalf("GetComputerBySerialNumber(%q) after delete: want 404, got %v", serial, err)
 	}
 }
 
@@ -2145,10 +2152,10 @@ func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {
 
 	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
 	if id == "" {
-		list, err := pc.ListComputers(ctx)
+		list, err := pc.MatchComputers(ctx, "*")
 		if err != nil {
 			skipOnServerError(t, err)
-			t.Fatalf("ListComputers: %v", err)
+			t.Fatalf("MatchComputers: %v", err)
 		}
 		if list == nil || len(list.Computers) == 0 {
 			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_ID to override")

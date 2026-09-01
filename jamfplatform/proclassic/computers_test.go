@@ -11,36 +11,6 @@ import (
 	"testing"
 )
 
-func TestGetComputerByID(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers/id/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeXML(t, w, http.StatusOK, "<computer></computer>")
-	})
-
-	result, err := c.GetComputerByID(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetComputerByID_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.GetComputerByID(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestGetComputerByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/proclassic/computers/name/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -116,21 +86,6 @@ func TestCreateComputerByID(t *testing.T) {
 	}
 }
 
-func TestUpdateComputerByID(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers/id/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPut {
-			t.Errorf("method = %s, want PUT", r.Method)
-		}
-		w.WriteHeader(http.StatusCreated)
-	})
-
-	err := c.UpdateComputerByID(context.Background(), "test-id", &ComputerPost{})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestUpdateComputerByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/proclassic/computers/name/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -191,66 +146,6 @@ func TestDeleteComputerBySerialNumber(t *testing.T) {
 	}
 }
 
-func TestListComputers(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeXML(t, w, http.StatusOK, "<computers></computers>")
-	})
-
-	result, err := c.ListComputers(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestListComputers_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.ListComputers(context.Background())
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
-func TestGetComputerByIDSubset(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeXML(t, w, http.StatusOK, "<computer></computer>")
-	})
-
-	result, err := c.GetComputerByIDSubset(context.Background(), "test-id", "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetComputerByIDSubset_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.GetComputerByIDSubset(context.Background(), "test-id", "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestGetComputerByMacAddress(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/proclassic/computers/macaddress/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -306,36 +201,6 @@ func TestGetComputerByUDID_NotFound(t *testing.T) {
 	})
 
 	_, err := c.GetComputerByUDID(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
-func TestGetComputersBasic(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers/subset/basic", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeXML(t, w, http.StatusOK, "<computers></computers>")
-	})
-
-	result, err := c.GetComputersBasic(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetComputersBasic_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/proclassic/computers/subset/basic", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.GetComputersBasic(context.Background())
 	if err == nil {
 		t.Fatal("expected error")
 	}

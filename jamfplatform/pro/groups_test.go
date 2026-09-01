@@ -33,28 +33,6 @@ func TestListGroupsV2(t *testing.T) {
 	}
 }
 
-func TestListGroupsV1(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListGroupsV1(context.Background(), nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
 func TestGetGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v2/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -89,40 +67,6 @@ func TestGetGroupV2_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetGroupV1(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetGroupV1(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetGroupV1_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetGroupV1(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestDeleteGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v2/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -138,21 +82,6 @@ func TestDeleteGroupV2(t *testing.T) {
 	}
 }
 
-func TestDeleteGroupV1(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Errorf("method = %s, want DELETE", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.DeleteGroupV1(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestPatchGroupV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v2/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -163,21 +92,6 @@ func TestPatchGroupV2(t *testing.T) {
 	})
 
 	err := c.PatchGroupV2(context.Background(), "test-id", &GroupUpdateDtoV2{})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestPatchGroupV1(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("method = %s, want PATCH", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.PatchGroupV1(context.Background(), "test-id", &GroupUpdateDtoV1{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -221,52 +135,6 @@ func TestResolveGroupV2ByName(t *testing.T) {
 	})
 
 	result, err := c.ResolveGroupV2ByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestResolveGroupV1IDByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"groupPlatformId": "resolved-id", "groupName": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	id, err := c.ResolveGroupV1IDByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if id != "resolved-id" {
-		t.Errorf("id = %q, want resolved-id", id)
-	}
-}
-
-func TestResolveGroupV1ByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"groupPlatformId": "resolved-id", "groupName": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	result, err := c.ResolveGroupV1ByName(context.Background(), "target")
 	if err != nil {
 		t.Fatal(err)
 	}

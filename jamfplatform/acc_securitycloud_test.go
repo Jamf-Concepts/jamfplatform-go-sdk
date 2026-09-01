@@ -1031,40 +1031,30 @@ func TestAcceptance_SecurityCloudDeviceGroupLifecycle(t *testing.T) {
 		t.Errorf("group name = %q, want %q", got.Name, jscName("group"))
 	}
 
-	// ListDeviceGroupsV1 is deprecated (2026-08-12) and v2 is routed as of
-	// 2026-08-20, but v1 stays in the SDK — and stays covered — until Jamf
-	// removes the path, so consumers get a real migration window. Both
-	// versions' resolvers and Apply methods exist side by side for the same
-	// reason (see the pro packages, where V1/V2/V3 coexist).
-	groups, err := sc.ListDeviceGroupsV1(ctx)
+	// v1942 withdrew GET /v1/groups from the spec, so v2's {groups: []}
+	// envelope is the only list left. The item type is deliberately not Group:
+	// the implicit "Default Group" entry comes back with no id, so the list
+	// schema cannot require one (build v1865).
+	groups, err := sc.ListDeviceGroupsV2(ctx)
 	if err != nil {
-		t.Fatalf("ListDeviceGroupsV1 failed: %v", err)
+		t.Fatalf("ListDeviceGroupsV2 failed: %v", err)
 	}
-	// GroupListResponse is an alias for []GroupListItem, so the method returns
-	// a pointer to a slice — the shape any bare-array response takes. The item
-	// type is deliberately not Group: the implicit "Default Group" entry comes
-	// back with no id, so the list schema cannot require one (build v1865).
 	var found bool
-	for _, g := range *groups {
+	for _, g := range groups.Groups {
 		if g.ID == created.ID {
 			found = true
 		}
 	}
 	if !found {
-		t.Errorf("created group %s missing from ListDeviceGroupsV1 (%d groups)", created.ID, len(*groups))
+		t.Errorf("created group %s missing from ListDeviceGroupsV2 (%d groups)", created.ID, len(groups.Groups))
 	}
 
-	// The update answers 200 with the updated group. This was a config-level
-	// expectedStatus/responseType override against a spec that wrongly declared
-	// 204; build v1865 corrected the spec, so the override was deleted and the
-	// signature is now spec-derived. An empty name back means that regressed.
-	updated, err := sc.UpdateDeviceGroupV1(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: jscName("group") + "-renamed"})
-	if err != nil {
-		t.Fatalf("UpdateDeviceGroupV1(%s) failed: %v", created.ID, err)
-	}
-	if updated.Name != jscName("group")+"-renamed" {
-		t.Errorf("UpdateDeviceGroupV1 returned name %q, want %q", updated.Name, jscName("group")+"-renamed")
-	}
+	// No update step here. v1942 withdrew PUT /v1/groups/{groupId}, and its
+	// declared successor PUT /v2/groups/{groupId} is not routed — 403
+	// BAD_PERMISSIONS, wire-verified 7/7 on 2026-08-29. So the package has no
+	// working device-group update at all; that gap is pinned on its own by
+	// TestAcceptance_SecurityCloudUpdateDeviceGroupV2, which fails when routing
+	// lands.
 
 	if err := sc.DeleteDeviceGroupV1(ctx, created.ID); err != nil {
 		t.Fatalf("DeleteDeviceGroupV1(%s) failed: %v", created.ID, err)
@@ -1125,10 +1115,13 @@ func TestAcceptance_SecurityCloudUpdateDeviceGroupV2(t *testing.T) {
 		return sc.DeleteDeviceGroupV1(context.Background(), created.ID)
 	})
 
-	// Control: the deprecated v1 write works on this exact group, so a v2
-	// failure below cannot be blamed on the group, the credential or the tenant.
-	if _, err := sc.UpdateDeviceGroupV1(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v1ok"}); err != nil {
-		t.Fatalf("control UpdateDeviceGroupV1(%s) failed, so the v2 result below is not interpretable: %v", created.ID, err)
+	// Control: a v1 read of this exact group succeeds, so a v2 failure below
+	// cannot be blamed on the group, the credential or the tenant. This used to
+	// be the deprecated v1 *write*, which is the stronger control — v1942
+	// withdrew PUT /v1/groups/{groupId} from the spec, so no working write
+	// remains to use as one.
+	if _, err := sc.GetDeviceGroupV1(ctx, created.ID); err != nil {
+		t.Fatalf("control GetDeviceGroupV1(%s) failed, so the v2 result below is not interpretable: %v", created.ID, err)
 	}
 
 	err = sc.UpdateDeviceGroupV2(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v2"})
@@ -1539,13 +1532,10 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 	if _, err := sc.ResolveDnsZoneV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
 		t.Errorf("resolving an absent DNS zone: want 404 APIResponseError, got %v", err)
 	}
-	// Both device-group resolver versions are live and hit different endpoints:
-	// v1 walks the deprecated bare-array list, v2 the {groups: []} envelope.
-	// Cover both — the envelope unwrap is the only resultsField in the package,
-	// so a regression there would otherwise be invisible.
-	if _, err := sc.ResolveDeviceGroupV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
-		t.Errorf("resolving an absent device group (v1): want 404 APIResponseError, got %v", err)
-	}
+	// v1942 withdrew GET /v1/groups, taking ResolveDeviceGroupV1IDByName with
+	// it, so v2 is the only device-group resolver left. It unwraps the
+	// {groups: []} envelope — the package's only resultsField, so a regression
+	// there would otherwise be invisible.
 	if _, err := sc.ResolveDeviceGroupV2IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
 		t.Errorf("resolving an absent device group (v2): want 404 APIResponseError, got %v", err)
 	}
@@ -1558,59 +1548,53 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 	}
 }
 
-// TestAcceptance_SecurityCloudApplyDeviceGroup exercises both Apply branches on
-// the cheapest resource in the family: create-when-absent, then
-// update-when-present with the same name.
+// TestAcceptance_SecurityCloudApplyDeviceGroup exercises Apply's create branch,
+// and pins the update branch as broken.
 //
-// Run once per endpoint version. Both Apply methods share the v1 create,
-// update and delete ops — only the resolve step differs, and it differs in the
-// way most likely to break silently: v1 walks a bare JSON array, v2 unwraps a
-// {groups: []} envelope. Covering only one version would leave the other's
-// resolve path untested while it stayed exported and callable, which is the
-// cost of the SDK's additive-versioning rule and the reason to pay it here.
+// v1942 withdrew both GET /v1/groups and PUT /v1/groups/{groupId} from the spec,
+// which took ApplyDeviceGroupV1 with it and left ApplyDeviceGroupV2 resolving
+// over the v2 envelope and updating over PUT /v2/groups/{groupId}. That path is
+// not routed — 403 BAD_PERMISSIONS, wire-verified 7/7 on 2026-08-29 — so Apply's
+// update branch cannot currently succeed. It used to, because both Apply
+// versions shared the v1 write.
+//
+// The create branch is asserted normally. The update branch asserts the 403, so
+// this test FAILS when routing lands: on that day, restore the
+// resolve-to-the-same-ID assertions below and drop this note.
 func TestAcceptance_SecurityCloudApplyDeviceGroup(t *testing.T) {
 	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+	name := jscName("apply-group-v2")
 
-	for _, tc := range []struct {
-		version string
-		apply   func(context.Context, *securitycloud.CreateGroupRequest) (string, bool, error)
-	}{
-		{"v1", sc.ApplyDeviceGroupV1},
-		{"v2", sc.ApplyDeviceGroupV2},
-	} {
-		t.Run(tc.version, func(t *testing.T) {
-			ctx := context.Background()
-			name := jscName("apply-group-" + tc.version)
+	id, created, err := sc.ApplyDeviceGroupV2(ctx, &securitycloud.CreateGroupRequest{Name: name})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ApplyDeviceGroupV2 (create branch) failed: %v", err)
+	}
+	jscCleanupDelete(t, "device group "+id, func() error {
+		return sc.DeleteDeviceGroupV1(context.Background(), id)
+	})
+	if !created {
+		t.Errorf("first Apply of %q reported created=false; nothing owned that name", name)
+	}
+	if id == "" {
+		t.Fatal("ApplyDeviceGroupV2 returned an empty ID on the create branch")
+	}
 
-			id, created, err := tc.apply(ctx, &securitycloud.CreateGroupRequest{Name: name})
-			if err != nil {
-				skipOnServerError(t, err)
-				t.Fatalf("ApplyDeviceGroup%s (create branch) failed: %v", tc.version, err)
-			}
-			jscCleanupDelete(t, "device group "+id, func() error {
-				return sc.DeleteDeviceGroupV1(context.Background(), id)
-			})
-			if !created {
-				t.Errorf("first Apply of %q reported created=false; nothing owned that name", name)
-			}
-			if id == "" {
-				t.Fatalf("ApplyDeviceGroup%s returned an empty ID on the create branch", tc.version)
-			}
-
-			// Second Apply with the same name must resolve to the same resource
-			// and take the update path — a create here would leave a duplicate
-			// behind, which is the failure mode Apply exists to prevent.
-			sameID, created, err := tc.apply(ctx, &securitycloud.CreateGroupRequest{Name: name})
-			if err != nil {
-				t.Fatalf("ApplyDeviceGroup%s (update branch) failed: %v", tc.version, err)
-			}
-			if created {
-				t.Error("second Apply reported created=true; it should have resolved the existing group")
-			}
-			if sameID != id {
-				t.Errorf("second Apply returned ID %q, want %q", sameID, id)
-			}
-		})
+	// Second Apply with the same name resolves to the existing group and takes
+	// the update path, which is the unrouted v2 PUT.
+	_, _, err = sc.ApplyDeviceGroupV2(ctx, &securitycloud.CreateGroupRequest{Name: name})
+	if err == nil {
+		t.Fatal("ApplyDeviceGroupV2 (update branch) succeeded — the gateway now routes " +
+			"PUT /v2/groups/{groupId}. That is the outcome this test is waiting for: restore the " +
+			"same-ID assertions and update CLAUDE.md.")
+	}
+	var applyErr *jamfplatform.APIResponseError
+	if !errors.As(err, &applyErr) {
+		t.Fatalf("ApplyDeviceGroupV2 (update branch) failed with a non-API error, want 403 BAD_PERMISSIONS: %v", err)
+	}
+	if !applyErr.HasStatus(403) {
+		t.Fatalf("ApplyDeviceGroupV2 (update branch) returned %v, want 403 BAD_PERMISSIONS (the unrouted-path tell)", err)
 	}
 }
 

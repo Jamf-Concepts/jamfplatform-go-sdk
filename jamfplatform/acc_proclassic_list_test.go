@@ -188,18 +188,6 @@ func TestAcceptance_Classic_ListComputerReports(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_ListComputers(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).ListComputers(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("ListComputers forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("ListComputers: %v", err)
-	}
-}
-
 func TestAcceptance_Classic_ListDepartments(t *testing.T) {
 	c := accClient(t)
 	if _, err := proclassic.New(c).ListDepartments(context.Background()); err != nil {
@@ -525,43 +513,6 @@ func TestAcceptance_Classic_ListPatchInternalSources(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_ListPatchPolicies(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).ListPatchPolicies(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("ListPatchPolicies forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("ListPatchPolicies: %v", err)
-	}
-}
-
-// ListPatchPoliciesBySoftwareTitleConfigID: // needs a patch software title config id fixture; skip
-func TestAcceptance_Classic_ListPatchSoftwareTitles(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).ListPatchSoftwareTitles(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("ListPatchSoftwareTitles forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("ListPatchSoftwareTitles: %v", err)
-	}
-}
-
-func TestAcceptance_Classic_ListPatches(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).ListPatches(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("ListPatches forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("ListPatches: %v", err)
-	}
-}
-
 func TestAcceptance_Classic_ListPolicies(t *testing.T) {
 	c := accClient(t)
 	if _, err := proclassic.New(c).ListPolicies(context.Background()); err != nil {
@@ -739,17 +690,5 @@ func TestAcceptance_Classic_ListSavedSearches(t *testing.T) {
 			t.Skipf("ListSavedSearches forbidden on this tenant/credentials: %v", err)
 		}
 		t.Fatalf("ListSavedSearches: %v", err)
-	}
-}
-
-func TestAcceptance_Classic_GetComputersBasic(t *testing.T) {
-	c := accClient(t)
-	if _, err := proclassic.New(c).GetComputersBasic(context.Background()); err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("GetComputersBasic forbidden on this tenant/credentials: %v", err)
-		}
-		t.Fatalf("GetComputersBasic: %v", err)
 	}
 }

@@ -232,10 +232,10 @@ func TestAcceptance_Pro_MdmUpdates_UpdateStatusesForRealComputer(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	computers, err := p.ListComputersInventoryV3(ctx, nil, nil, "")
+	computers, err := p.ListComputersInventoryV4(ctx, nil, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListComputersInventoryV3: %v", err)
+		t.Fatalf("ListComputersInventoryV4: %v", err)
 	}
 	if len(computers) == 0 {
 		t.Skip("tenant has no computers")

@@ -294,11 +294,11 @@ a method that ignores the cursor fails.
 | `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` | v1897 |
 | `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories` | v1897 |
 | `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` | **v1942** |
-| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 |
+| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | **v1942** |
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
 | `audit-api.yaml` | `external/audit` | v1897 |
-| `openapi-jpapi.json` | `external/jpapi` | v1897 |
-| `Classic-openapi.json` | `external/capi` | v1897 |
+| `openapi-jpapi.json` | `external/jpapi` | **v1942** |
+| `Classic-openapi.json` | `external/capi` | **v1942** |
 
 The last Security Cloud row is named for its *tag* (`device-groups`) but the spec
 is the **Security Cloud Devices API**. `internal/stage/device-groups` is the
@@ -343,74 +343,116 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1897** (2026-08-31), plus `internal/stage/uem-connect` at
-**v1942** (2026-09-01). Exceptions and the v1942 hold below.
+Ingested through **v1942** (2026-09-01).
 
-**v1942 deletes 146 deprecated-but-live operations from the published specs, and
-the deletions are not being taken.** Every one of the 146 was `deprecated: true`
-in v1897, and every one has a successor version that already existed — so this is
-precisely the case the additive-versions hard rule exists to refuse, and unlike
-v1897 nothing supports an override:
+**v1942 deleted 146 deprecated operations from the published specs and the SDK
+took the deletions.** Every one was `deprecated: true` in v1897 with a successor
+version that already existed. This is the second override of the
+additive-versions rule, and unlike v1897 it was **not** evidence-led — the
+evidence pointed the other way and the removal was taken as a deliberate
+decision to follow the specs. Record both halves.
 
 | spec | ops | what went |
 |---|---|---|
-| `external/jpapi` | 788 → 666 | computers-inventory `v1`/`v2`/`v3` (v4 survives), inventory-preload `v1` + unversioned (v2 survives), computer-groups `v2`, mobile-device-groups `v1`, mobile-device-prestages `v2`, patch-software-title-configurations `v2`, computer-inventory-collection-settings `v1`, groups `v1`, `GET /v1/mdm/commands` |
-| `external/capi` | 606 → 586 | `/computers` collection + `/computers/id/{id}`, the `/patches`, `/patchsoftwaretitles` and `/patchpolicies` families |
+| `external/jpapi` | 788 → 666 | computers-inventory `v1`/`v2`/`v3` (v4 survives), inventory-preload `v1` + unversioned (v2 survives), computer-groups `v2` (v3), mobile-device-groups `v1` (v2), mobile-device-prestages `v2` (v3), patch-software-title-configurations `v2` (v3), computer-inventory-collection-settings `v1` (v2), groups `v1` (v2), `GET /v1/mdm/commands` (v2) |
+| `external/capi` | 606 → 586 | `/computers` collection, `GET`+`PUT /computers/id/{id}`, `/computers/subset/basic`, and the whole `/patches`, `/patchsoftwaretitles`, `/patchpolicies` (collection) and `/patchreports` families |
 | `external/declaration-reporting` | 5 → 3 | `GET /v1/declarations/{declarationIdentifier}`, `GET /v1/devices/{deviceId}` |
 | `external/securitycloud-devices` | 7 → 5 | `GET /v1/groups`, `PUT /v1/groups/{groupId}` |
 
-Four independent reasons it is a publish-stage filter and not a withdrawal:
+**Four independent signals say the server has not withdrawn any of them**, so
+the SDK is now materially stricter than the gateway:
 
 - **The same bundle's own privilege oracle still declares all 146.**
   `external/_permissions/routes.yaml` is byte-different from v1897 but
-  `sort`-identical — a pure reordering, 1474 route-method entries both sides, zero
-  removed, zero added, zero permission changes. `/computers`, `/patches` and
+  `sort`-identical — a pure reordering, 1474 route-method entries both sides,
+  zero removed, zero permission changes. `/computers`, `/patches` and
   `/v1/computers-inventory` are all still in it. Since `routes.yaml` is generated
   from the specs' own `x-required-privileges`, that generation must run *before*
   the filter.
 - **`authorization-policies` has nothing.** `origin/main` is still `cdd734b`
-  (v1897's `/v1/system/initialize` deny) with no successor commit; the hand-written
-  OPA allow blocks for `v1`, `v2` and `v3` `computers-inventory` are all intact.
-- **The wire serves every one of them.** Probed 2026-09-01 against 11.31.1 with
-  `GET /pro/v1/jamf-pro-version` → 200 as the control in the same invocation:
-  `v1`/`v2`/`v3`/`v4` `computers-inventory` all 200 with the same 4 rows, `v1` and
-  `v2` `groups` both 200 with the same 382, `v1` and `v2`
-  `computer-inventory-collection-settings` both 200, `v1/inventory-preload` and
-  `v2/inventory-preload/records` both 200, `v1/mobile-device-groups`,
-  `v2/patch-software-title-configurations` and `v2/mobile-device-prestages` all
-  200, and `proclassic` `/computers`, `/computers/subset/basic`, `/patches`,
-  `/patchsoftwaretitles`, `/patchpolicies` all 200. Only
-  `GET /v1/mdm/commands` answered non-2xx — `400` with an empty `errors` array,
-  its required-filter validation, i.e. routed and unrefused.
-- **`internal/stage/` carries the identical removals**, same counts, so it is not
-  an environment rollout that prod is lagging.
+  (v1897's `/v1/system/initialize` deny) with no successor commit; the
+  hand-written OPA allow blocks for `v1`, `v2` and `v3` `computers-inventory`
+  are intact.
+- **The wire serves every one probed.** 2026-09-01 against 11.31.1, control in
+  the same invocation; deprecated and successor return byte-identical bodies.
+  Full table: [WIRE-FACTS.md](docs/WIRE-FACTS.md#v1942-dropped-146-deprecated-operations-from-the-specs-every-one-is-live-2026-09-01).
+- **The withdrawn specs' own sunset dates are a year out** — the Security Cloud
+  v1 group ops carry `x-sunset-date: 2027-08-25` alongside
+  `x-successor-endpoint`, in the very build that deleted them.
 
-Nothing else in those four specs moved: 666 surviving jpapi operations byte-equal,
-675 schemas byte-equal, 586 capi operations byte-equal, 169 schemas byte-equal.
-capi's OAuth scope list dropped `patch-management-software-titles:{create,update,delete}`,
-which is derivative — those three were referenced only by the removed operations.
-**So taking v1942 for those four specs would buy nothing and cost 146 methods**;
-copying the specs in would instead fail generation outright with
-`path %s not found in spec`, which is the correct hard error. Report the filter
-upstream and re-diff on the next bundle.
+**`internal/stage/` carries the identical removals**, so it is not an
+environment rollout prod is lagging. Report the filter upstream: a spec that
+deletes a path a year before its own declared sunset, while the same bundle's
+permission map still grants it, is a pipeline defect whichever way the SDK
+follows it.
 
-**`internal/stage/uem-connect` was taken — the change is documentation only.**
-Generated diff is two doc blocks in `jamfplatform/securitycloud/types.go`:
-`GroupMapping.EmmGroupID` now says the `computer_<id>` / `mobile_<id>` prefix is
-**required** and a bare ID is rejected, while
-`ActivationProfileDeployRequest.UemGroups` says a bare numeric ID *is* accepted
-there, that a present prefix must match the `platform`'s device type, and that
-scoping is **additive** — the IDs merge into the profile's existing scope, so a
-later deploy can widen it but never narrow or clear it, and an omitted or empty
-array leaves the existing scope untouched rather than meaning "all groups". Those
-are upstream's behavioural claims carried through as godoc; none is wire-verified
-here, and the same text points callers at `GET /v1/mobile-device-groups` — one of
-the paths v1942 just deleted from `jpapi`.
+**What the removal cost, beyond the 146 methods.** Three real capability gaps,
+each pinned by a test that fails when it closes:
 
-**The three `account` specs changed too, inertly.** Each dropped `eu` and `apac`
-from its `servers` region-variable enum, leaving `us` — which documents the
-US-only fact already recorded below. The SDK never reads `servers`, so there is no
-Go diff and the holds are unaffected.
+- **Security Cloud has no working device-group update.** `PUT /v1/groups/{groupId}`
+  is gone and its declared successor `PUT /v2/groups/{groupId}` is unrouted —
+  403 `BAD_PERMISSIONS`, 7/7 on 2026-08-29. `ApplyDeviceGroupV2` previously used
+  the v1 write for its update branch and now uses the v2 one, so Apply's
+  update branch cannot succeed. `TestAcceptance_SecurityCloudApplyDeviceGroup`
+  asserts the create branch and pins the 403 on the update branch;
+  `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` keeps the standalone pin but
+  its control had to drop from a v1 *write* to a v1 read, which is weaker.
+- **Patch software titles are unseedable.** Classic's
+  `POST /patchsoftwaretitles/id/0` was the only way to mint an id the Pro v3
+  configuration endpoints address; Pro exposes no routed catalogue
+  (`/pro/v{1,2}/patch-software-titles` are 403, probed 2026-09-01) and Classic's
+  `patchavailabletitles` `name_id` is not a `softwareTitleId`
+  (400 `SOFTWARE_TITLE_ID_NOT_FOUND`). `seedPatchSoftwareTitleFixture` now skips,
+  taking three tests with it — the V3 lifecycle, Apply and resolver-by-name.
+- **Classic computers lost by-id read and write.** `GET` and `PUT
+  /computers/id/{id}` are gone while `POST` and `DELETE` on the same path
+  survive. Enumeration moved to `MatchComputers(ctx, "*")`, which returns the
+  same `*Computers` type `ListComputers` did; reads moved to the by-name and
+  by-serial keys.
+
+`GET /patches/name/{name}` — one of the few patch operations to survive —
+**answers 500, not 404, for any name**, wire-verified 3/3 plus a plausible name
+on 2026-09-01 with a control. `TestAcceptance_Classic_GetPatchByName` pins it.
+
+**Acceptance coverage is at parity**: no surviving generated method lost its
+only test. 146 operations went, 21 test functions were deleted as superseded by
+their successor-version equivalents, two whole files went
+(`acc_pro_version_backfill_test.go`, `acc_pro_inventory_preload_legacy_test.go`
+— both existed only to cover withdrawn versions), the rest were repointed at the
+successor, and two replacement tests were written for the surviving patch
+endpoints that lost their enumeration fixture.
+
+**Downstream breakage** (report only — do not migrate from this repo).
+`terraform-provider-jamfplatform`, 21 files: the whole
+`internal/resources/pro/patch_software_title` package (Classic
+`PatchSoftwareTitle*` types and `{Get,Create,Update,Delete}PatchSoftwareTitleByID`
+all gone, with no replacement — see the seeding gap above),
+`internal/resources/pro/patch_policy` (`ListPatchPolicies`),
+`internal/resources/pro/computer_inventory_collection_settings`
+(`ComputerInventoryCollectionPreferences` → `…V2`),
+`internal/resources/security_cloud/device_group` (`UpdateDeviceGroupV1`,
+`ListDeviceGroupsV1`), `internal/common/computertarget` and
+`internal/testhelpers/acceptance_assertions.go`
+(`ListComputersInventoryV3`, `ResolveComputerInventoryV3ID*`).
+`terraform-provider-jamfplatform-internal`, 3 files, all `UpdateDeviceGroupV1`.
+`jamf-cli-internal` is unaffected — it uses the SDK for transport only.
+
+**`internal/stage/uem-connect` also moved to v1942, and that change is
+documentation only.** `GroupMapping.EmmGroupID` now says the
+`computer_<id>` / `mobile_<id>` prefix is **required** and a bare ID rejected,
+while `ActivationProfileDeployRequest.UemGroups` says a bare numeric ID *is*
+accepted there, that a present prefix must match the `platform`'s device type,
+and that scoping is **additive** — the IDs merge into the profile's existing
+scope, so a later deploy can widen it but never narrow or clear it, and an
+omitted or empty array leaves the existing scope untouched rather than meaning
+"all groups". Those are upstream's behavioural claims carried through as godoc,
+none wire-verified here, and the same text points callers at
+`GET /v1/mobile-device-groups` — one of the paths v1942 deleted from `jpapi`.
+
+**The three `account` specs changed inertly** and were not re-ingested. Each
+dropped `eu` and `apac` from its `servers` region-variable enum, leaving `us`,
+which documents the US-only fact recorded below. The SDK never reads `servers`,
+so there is no Go diff and the holds are unaffected.
 
 Everything else outside `internal/dev` was byte-identical to v1897,
 `_permissions/scopes.yaml` included.
@@ -455,11 +497,12 @@ newline) confirmed `testing/openapi-jpapi.json` was semantically identical to
 v1882's `openapi.yaml` before the copy, so the generated diff is exactly the
 delta: 298 deletions, zero insertions, nothing outside `pro`.
 
-**The `pro` whitelist remains complete at 788 operations** — it reached all 790
-on 2026-08-31 and v1897 took two away. 21 of the 38 added that day are
-deprecated, which is no bar — the whitelist already carried 111 deprecated
-operations and 9 unversioned paths, and the additive-versions rule keeps them
-until Jamf removes the path. Every one has an acceptance test.
+**The `pro` whitelist remains complete at 666 operations** — it reached all 790
+on 2026-08-31, v1897 took two away, and v1942 took 122 more. 21 of the 38 added
+on 2026-08-31 were deprecated, which was no bar at the time: the whitelist
+carried 111 deprecated operations, and until v1942 the additive-versions rule
+kept them until Jamf removed the path. v1942 removed the paths. Every surviving
+operation has an acceptance test.
 
 Five spec/wire disagreements came out of it, all corrected in `config.json` and
 evidenced in [WIRE-FACTS.md](docs/WIRE-FACTS.md#the-remaining-38-jpapi-paths-whitelisted-2026-08-31):
@@ -540,7 +583,6 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | held | why |
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
-| `jpapi`, `capi`, `declaration-reporting`, `securitycloud-devices` at v1897 | v1942 deletes 146 deprecated operations that the wire, the OPA allowlist and the bundle's own `routes.yaml` all still carry. See above. Re-diff each bundle; take the removals only once a policy commit or a wire refusal backs them. |
 | `securitycloud-enrollment`, `ai/governance/visibility` | No published spec in any environment. Not ingestable. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 
@@ -557,10 +599,15 @@ formatting is inert to the generator, and bundle diffs become exact.
 - **Never hand-edit generated files**, and **never add handwritten code to a
   generated sub-package** — make the generator emit it. The prune step now deletes
   such a file on the next run.
-- **Endpoint versions are additive.** Retain every spec version side-by-side
-  (`ListComputersInventoryV1`, `V2`, `V3` all coexist) so consumers get a migration
-  window. A version goes only when Jamf removes the path — never merely because a
-  successor appeared.
+- **Endpoint versions are additive — but the spec now wins when it drops a
+  path.** Retain every version the spec still declares, side by side, so
+  consumers get a migration window; a version goes when the spec removes it.
+  Never remove one merely because a successor appeared while both are still
+  declared. v1942 made this concrete: it deleted 146 deprecated-with-successor
+  operations that the wire, the OPA allowlist and the bundle's own `routes.yaml`
+  all still carried, and the SDK followed the spec anyway. Record that
+  disagreement when it recurs (see the v1942 section above) — following the
+  spec is the decision, not evidence that the server agrees.
 - **A `// Deprecated:` marker must never ship without its successor whitelisted
   alongside it.** `staticcheck`'s SA1019 is on by default, so deprecating a surface
   with nothing to migrate to turns every consumer's build red for no reason.
@@ -610,11 +657,11 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 
 | package | namespace(s) | scope | notes |
 |---|---|---|---|
-| `pro` | `pro` | tenant or environment | 788 ops — the whole spec |
-| `proclassic` | `proclassic` | tenant | 606 ops, XML end-to-end |
+| `pro` | `pro` | tenant or environment | 666 ops — the whole spec |
+| `proclassic` | `proclassic` | tenant | 586 ops, XML end-to-end |
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
-| `securitycloud` | `securitycloud` | tenant (own identifier) | 47 ops across five specs |
+| `securitycloud` | `securitycloud` | tenant (own identifier) | 46 ops across five specs |
 | `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** |
 | `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
 | `audit` | `audit` | environment | compiles; every call 403s pending an `audit:read` grant |

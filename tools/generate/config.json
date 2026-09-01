@@ -248,10 +248,6 @@
       "specFile": "declaration_reporting_service.json",
       "operations": [
         {
-          "op": "GET /v1/devices/{deviceId}",
-          "name": "GetDeviceDeclarationReport"
-        },
-        {
           "op": "GET /v1/devices/{deviceId}/declarations",
           "name": "GetDeviceDeclarationReportFiltered",
           "pagination": "totalCount",
@@ -264,15 +260,6 @@
         {
           "op": "GET /v1/devices/{deviceId}/channels",
           "name": "GetDeviceChannels"
-        },
-        {
-          "op": "GET /v1/declarations/{declarationIdentifier}",
-          "name": "ListDeclarationReportClients",
-          "pagination": "totalCount",
-          "pageSizeParam": "size",
-          "params": [
-            "sort:[]string"
-          ]
         },
         {
           "op": "GET /v1/declarations/{declarationIdentifier}/devices",
@@ -854,37 +841,8 @@
           }
         },
         {
-          "op": "GET /v2/computer-groups/smart-groups",
-          "name": "ListSmartComputerGroupsV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "SmartComputerGroupV2",
-            "nameField": "name",
-            "idField": "id",
-            "mode": "filtered",
-            "typedReturn": "SmartComputerGroupSearch",
-            "apply": {
-              "createOp": "CreateSmartComputerGroupV2",
-              "updateOp": "UpdateSmartComputerGroupV2",
-              "deleteOp": "DeleteSmartComputerGroupV2",
-              "nameGoField": "Name"
-            }
-          }
-        },
-        {
           "op": "POST /v3/computer-groups/smart-groups",
           "name": "CreateSmartComputerGroupV3",
-          "params": [
-            "platform:bool"
-          ]
-        },
-        {
-          "op": "POST /v2/computer-groups/smart-groups",
-          "name": "CreateSmartComputerGroupV2",
           "params": [
             "platform:bool"
           ]
@@ -894,34 +852,16 @@
           "name": "GetSmartComputerGroupV3"
         },
         {
-          "op": "GET /v2/computer-groups/smart-groups/{id}",
-          "name": "GetSmartComputerGroupV2"
-        },
-        {
           "op": "PUT /v3/computer-groups/smart-groups/{id}",
           "name": "UpdateSmartComputerGroupV3"
-        },
-        {
-          "op": "PUT /v2/computer-groups/smart-groups/{id}",
-          "name": "UpdateSmartComputerGroupV2",
-          "expectedStatus": 202
         },
         {
           "op": "DELETE /v3/computer-groups/smart-groups/{id}",
           "name": "DeleteSmartComputerGroupV3"
         },
         {
-          "op": "DELETE /v2/computer-groups/smart-groups/{id}",
-          "name": "DeleteSmartComputerGroupV2",
-          "expectedStatus": 204
-        },
-        {
           "op": "GET /v3/computer-groups/smart-group-membership/{id}",
           "name": "GetSmartComputerGroupMembershipV3"
-        },
-        {
-          "op": "GET /v2/computer-groups/smart-group-membership/{id}",
-          "name": "GetSmartComputerGroupMembershipV2"
         },
         {
           "op": "GET /v3/computer-groups/static-groups",
@@ -946,37 +886,8 @@
           }
         },
         {
-          "op": "GET /v2/computer-groups/static-groups",
-          "name": "ListStaticComputerGroupsV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "StaticComputerGroupV2",
-            "nameField": "name",
-            "idField": "id",
-            "mode": "filtered",
-            "typedReturn": "StaticComputerGroupSummary",
-            "apply": {
-              "createOp": "CreateStaticComputerGroupV2",
-              "updateOp": "UpdateStaticComputerGroupV2",
-              "deleteOp": "DeleteStaticComputerGroupV2",
-              "nameGoField": "Name"
-            }
-          }
-        },
-        {
           "op": "POST /v3/computer-groups/static-groups",
           "name": "CreateStaticComputerGroupV3",
-          "params": [
-            "platform:bool"
-          ]
-        },
-        {
-          "op": "POST /v2/computer-groups/static-groups",
-          "name": "CreateStaticComputerGroupV2",
           "params": [
             "platform:bool"
           ]
@@ -986,26 +897,12 @@
           "name": "GetStaticComputerGroupV3"
         },
         {
-          "op": "GET /v2/computer-groups/static-groups/{id}",
-          "name": "GetStaticComputerGroupV2"
-        },
-        {
           "op": "PUT /v3/computer-groups/static-groups/{id}",
           "name": "UpdateStaticComputerGroupV3"
         },
         {
-          "op": "PUT /v2/computer-groups/static-groups/{id}",
-          "name": "UpdateStaticComputerGroupV2",
-          "expectedStatus": 202
-        },
-        {
           "op": "DELETE /v3/computer-groups/static-groups/{id}",
           "name": "DeleteStaticComputerGroupV3"
-        },
-        {
-          "op": "DELETE /v2/computer-groups/static-groups/{id}",
-          "name": "DeleteStaticComputerGroupV2",
-          "expectedStatus": 204
         },
         {
           "op": "GET /v1/computer-extension-attributes",
@@ -1204,18 +1101,6 @@
           }
         },
         {
-          "op": "GET /v1/mobile-device-groups",
-          "name": "ListMobileDeviceGroupsV1",
-          "resolver": {
-            "resourceType": "MobileDeviceGroupV1",
-            "nameField": "name",
-            "idField": "id",
-            "idNumeric": true,
-            "mode": "clientFilter",
-            "typedReturn": "MobileDeviceGroup"
-          }
-        },
-        {
           "op": "GET /v2/mobile-device-groups/smart-groups",
           "name": "ListSmartMobileDeviceGroupsV2",
           "pagination": "totalCount",
@@ -1238,37 +1123,8 @@
           }
         },
         {
-          "op": "GET /v1/mobile-device-groups/smart-groups",
-          "name": "ListSmartMobileDeviceGroupsV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "SmartMobileDeviceGroupV1",
-            "nameField": "groupName",
-            "idField": "groupId",
-            "mode": "filtered",
-            "typedReturn": "SmartGroup",
-            "apply": {
-              "createOp": "CreateSmartMobileDeviceGroupV1",
-              "updateOp": "UpdateSmartMobileDeviceGroupV1",
-              "deleteOp": "DeleteSmartMobileDeviceGroupV1",
-              "nameGoField": "GroupName"
-            }
-          }
-        },
-        {
           "op": "POST /v2/mobile-device-groups/smart-groups",
           "name": "CreateSmartMobileDeviceGroupV2",
-          "params": [
-            "platform:bool"
-          ]
-        },
-        {
-          "op": "POST /v1/mobile-device-groups/smart-groups",
-          "name": "CreateSmartMobileDeviceGroupV1",
           "params": [
             "platform:bool"
           ]
@@ -1278,17 +1134,8 @@
           "name": "GetSmartMobileDeviceGroupV2"
         },
         {
-          "op": "GET /v1/mobile-device-groups/smart-groups/{id}",
-          "name": "GetSmartMobileDeviceGroupV1"
-        },
-        {
           "op": "PUT /v2/mobile-device-groups/smart-groups/{id}",
           "name": "UpdateSmartMobileDeviceGroupV2",
-          "expectedStatus": 200
-        },
-        {
-          "op": "PUT /v1/mobile-device-groups/smart-groups/{id}",
-          "name": "UpdateSmartMobileDeviceGroupV1",
           "expectedStatus": 200
         },
         {
@@ -1296,22 +1143,8 @@
           "name": "DeleteSmartMobileDeviceGroupV2"
         },
         {
-          "op": "DELETE /v1/mobile-device-groups/smart-groups/{id}",
-          "name": "DeleteSmartMobileDeviceGroupV1",
-          "expectedStatus": 204
-        },
-        {
           "op": "GET /v2/mobile-device-groups/smart-group-membership/{id}",
           "name": "ListSmartMobileDeviceGroupMembershipV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ]
-        },
-        {
-          "op": "GET /v1/mobile-device-groups/smart-group-membership/{id}",
-          "name": "ListSmartMobileDeviceGroupMembershipV1",
           "pagination": "totalCount",
           "params": [
             "sort:[]string",
@@ -1349,45 +1182,8 @@
           }
         },
         {
-          "op": "GET /v1/mobile-device-groups/static-groups",
-          "name": "ListStaticMobileDeviceGroupsV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "StaticMobileDeviceGroupV1",
-            "nameField": "groupName",
-            "idField": "groupId",
-            "mode": "filtered",
-            "typedReturn": "StaticGroup",
-            "apply": {
-              "createOp": "CreateStaticMobileDeviceGroupV1",
-              "updateOp": "PatchStaticMobileDeviceGroupV1",
-              "deleteOp": "DeleteStaticMobileDeviceGroupV1",
-              "nameGoField": "GroupName",
-              "membershipPreFetch": {
-                "fetchOp": "ListStaticMobileDeviceGroupMembershipV1",
-                "sourceIdField": "MobileDeviceID",
-                "assignmentType": "Assignment",
-                "assignmentIdField": "MobileDeviceID",
-                "requestField": "Assignments",
-                "assignmentFieldIsSlicePtr": true
-              }
-            }
-          }
-        },
-        {
           "op": "POST /v2/mobile-device-groups/static-groups",
           "name": "CreateStaticMobileDeviceGroupV2",
-          "params": [
-            "platform:bool"
-          ]
-        },
-        {
-          "op": "POST /v1/mobile-device-groups/static-groups",
-          "name": "CreateStaticMobileDeviceGroupV1",
           "params": [
             "platform:bool"
           ]
@@ -1397,25 +1193,12 @@
           "name": "GetStaticMobileDeviceGroupV2"
         },
         {
-          "op": "GET /v1/mobile-device-groups/static-groups/{id}",
-          "name": "GetStaticMobileDeviceGroupV1"
-        },
-        {
           "op": "DELETE /v2/mobile-device-groups/static-groups/{id}",
           "name": "DeleteStaticMobileDeviceGroupV2"
         },
         {
-          "op": "DELETE /v1/mobile-device-groups/static-groups/{id}",
-          "name": "DeleteStaticMobileDeviceGroupV1",
-          "expectedStatus": 204
-        },
-        {
           "op": "PATCH /v2/mobile-device-groups/static-groups/{id}",
           "name": "PatchStaticMobileDeviceGroupV2"
-        },
-        {
-          "op": "PATCH /v1/mobile-device-groups/static-groups/{id}",
-          "name": "PatchStaticMobileDeviceGroupV1"
         },
         {
           "op": "GET /v2/mobile-device-groups/static-group-membership/{id}",
@@ -1427,21 +1210,8 @@
           ]
         },
         {
-          "op": "GET /v1/mobile-device-groups/static-group-membership/{id}",
-          "name": "ListStaticMobileDeviceGroupMembershipV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ]
-        },
-        {
           "op": "POST /v2/mobile-device-groups/{id}/erase",
           "name": "EraseMobileDeviceGroupV2"
-        },
-        {
-          "op": "POST /v1/mobile-device-groups/{id}/erase",
-          "name": "EraseMobileDeviceGroupV1"
         },
         {
           "op": "GET /v2/mobile-devices",
@@ -1532,45 +1302,16 @@
           }
         },
         {
-          "op": "GET /v1/groups",
-          "name": "ListGroupsV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "GroupV1",
-            "nameField": "groupName",
-            "idField": "groupPlatformId",
-            "mode": "filtered",
-            "typedReturn": "GroupDtoV1"
-          }
-        },
-        {
           "op": "GET /v2/groups/{id}",
           "name": "GetGroupV2"
-        },
-        {
-          "op": "GET /v1/groups/{id}",
-          "name": "GetGroupV1"
         },
         {
           "op": "DELETE /v2/groups/{id}",
           "name": "DeleteGroupV2"
         },
         {
-          "op": "DELETE /v1/groups/{id}",
-          "name": "DeleteGroupV1",
-          "expectedStatus": 204
-        },
-        {
           "op": "PATCH /v2/groups/{id}",
           "name": "PatchGroupV2"
-        },
-        {
-          "op": "PATCH /v1/groups/{id}",
-          "name": "PatchGroupV1"
         },
         {
           "op": "GET /v1/users",
@@ -1717,47 +1458,16 @@
           }
         },
         {
-          "op": "GET /v2/patch-software-title-configurations",
-          "name": "ListPatchSoftwareTitleConfigurationsV2",
-          "resolver": {
-            "resourceType": "PatchSoftwareTitleConfigurationV2",
-            "nameField": "displayName",
-            "idField": "id",
-            "mode": "clientFilter",
-            "typedReturn": "PatchSoftwareTitleConfiguration",
-            "apply": {
-              "createOp": "CreatePatchSoftwareTitleConfigurationV2",
-              "updateOp": "UpdatePatchSoftwareTitleConfigurationV2",
-              "deleteOp": "DeletePatchSoftwareTitleConfigurationV2",
-              "nameGoField": "DisplayName",
-              "updateType": "PatchSoftwareTitleConfigurationPatch"
-            }
-          }
-        },
-        {
           "op": "POST /v3/patch-software-title-configurations",
           "name": "CreatePatchSoftwareTitleConfigurationV3"
-        },
-        {
-          "op": "POST /v2/patch-software-title-configurations",
-          "name": "CreatePatchSoftwareTitleConfigurationV2"
         },
         {
           "op": "GET /v3/patch-software-title-configurations/{id}",
           "name": "GetPatchSoftwareTitleConfigurationV3"
         },
         {
-          "op": "GET /v2/patch-software-title-configurations/{id}",
-          "name": "GetPatchSoftwareTitleConfigurationV2"
-        },
-        {
           "op": "DELETE /v3/patch-software-title-configurations/{id}",
           "name": "DeletePatchSoftwareTitleConfigurationV3"
-        },
-        {
-          "op": "DELETE /v2/patch-software-title-configurations/{id}",
-          "name": "DeletePatchSoftwareTitleConfigurationV2",
-          "expectedStatus": 204
         },
         {
           "op": "PATCH /v3/patch-software-title-configurations/{id}",
@@ -1765,33 +1475,16 @@
           "contentType": "application/merge-patch+json"
         },
         {
-          "op": "PATCH /v2/patch-software-title-configurations/{id}",
-          "name": "UpdatePatchSoftwareTitleConfigurationV2",
-          "contentType": "application/merge-patch+json"
-        },
-        {
           "op": "GET /v3/patch-software-title-configurations/{id}/dashboard",
           "name": "GetPatchSoftwareTitleDashboardStatusV3"
-        },
-        {
-          "op": "GET /v2/patch-software-title-configurations/{id}/dashboard",
-          "name": "GetPatchSoftwareTitleDashboardStatusV2"
         },
         {
           "op": "POST /v3/patch-software-title-configurations/{id}/dashboard",
           "name": "AddPatchSoftwareTitleToDashboardV3"
         },
         {
-          "op": "POST /v2/patch-software-title-configurations/{id}/dashboard",
-          "name": "AddPatchSoftwareTitleToDashboardV2"
-        },
-        {
           "op": "DELETE /v3/patch-software-title-configurations/{id}/dashboard",
           "name": "RemovePatchSoftwareTitleFromDashboardV3"
-        },
-        {
-          "op": "DELETE /v2/patch-software-title-configurations/{id}/dashboard",
-          "name": "RemovePatchSoftwareTitleFromDashboardV2"
         },
         {
           "op": "GET /v3/patch-software-title-configurations/{id}/definitions",
@@ -1803,21 +1496,8 @@
           ]
         },
         {
-          "op": "GET /v2/patch-software-title-configurations/{id}/definitions",
-          "name": "ListPatchSoftwareTitleDefinitionsV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ]
-        },
-        {
           "op": "GET /v3/patch-software-title-configurations/{id}/dependencies",
           "name": "GetPatchSoftwareTitleDependenciesV3"
-        },
-        {
-          "op": "GET /v2/patch-software-title-configurations/{id}/dependencies",
-          "name": "GetPatchSoftwareTitleDependenciesV2"
         },
         {
           "op": "GET /v3/patch-software-title-configurations/{id}/export-report",
@@ -1828,20 +1508,8 @@
           ]
         },
         {
-          "op": "GET /v2/patch-software-title-configurations/{id}/export-report",
-          "name": "ExportPatchSoftwareTitleReportV2",
-          "params": [
-            "filter",
-            "columns-to-export:[]string:columnsToExport"
-          ]
-        },
-        {
           "op": "GET /v3/patch-software-title-configurations/{id}/extension-attributes",
           "name": "ListPatchSoftwareTitleExtensionAttributesV3"
-        },
-        {
-          "op": "GET /v2/patch-software-title-configurations/{id}/extension-attributes",
-          "name": "ListPatchSoftwareTitleExtensionAttributesV2"
         },
         {
           "op": "GET /v3/patch-software-title-configurations/{id}/history",
@@ -1853,21 +1521,8 @@
           ]
         },
         {
-          "op": "GET /v2/patch-software-title-configurations/{id}/history",
-          "name": "ListPatchSoftwareTitleHistoryV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ]
-        },
-        {
           "op": "POST /v3/patch-software-title-configurations/{id}/history",
           "name": "CreatePatchSoftwareTitleHistoryNoteV3"
-        },
-        {
-          "op": "POST /v2/patch-software-title-configurations/{id}/history",
-          "name": "CreatePatchSoftwareTitleHistoryNoteV2"
         },
         {
           "op": "GET /v3/patch-software-title-configurations/{id}/patch-report",
@@ -1879,37 +1534,12 @@
           ]
         },
         {
-          "op": "GET /v2/patch-software-title-configurations/{id}/patch-report",
-          "name": "ListPatchSoftwareTitlePatchReportV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string",
-            "filter"
-          ]
-        },
-        {
           "op": "GET /v3/patch-software-title-configurations/{id}/patch-summary",
           "name": "GetPatchSoftwareTitlePatchSummaryV3"
         },
         {
-          "op": "GET /v2/patch-software-title-configurations/{id}/patch-summary",
-          "name": "GetPatchSoftwareTitlePatchSummaryV2"
-        },
-        {
           "op": "GET /v3/patch-software-title-configurations/{id}/patch-summary/versions",
           "name": "ListPatchSoftwareTitlePatchSummaryVersionsV3"
-        },
-        {
-          "op": "GET /v2/patch-software-title-configurations/{id}/patch-summary/versions",
-          "name": "ListPatchSoftwareTitlePatchSummaryVersionsV2"
-        },
-        {
-          "op": "POST /v1/computer-inventory/{id}/erase",
-          "name": "EraseComputerV1"
-        },
-        {
-          "op": "POST /v1/computer-inventory/{id}/remove-mdm-profile",
-          "name": "RemoveMdmProfileFromComputerV1"
         },
         {
           "op": "POST /v4/computers-inventory/{id}/erase",
@@ -1918,80 +1548,6 @@
         {
           "op": "POST /v4/computers-inventory/{id}/remove-mdm-profile",
           "name": "RemoveMdmProfileFromComputerV4"
-        },
-        {
-          "op": "GET /v1/computers-inventory",
-          "name": "ListComputersInventoryV1",
-          "pagination": "totalCount",
-          "params": [
-            "section:[]string",
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "ComputerInventoryV1",
-            "nameField": "general.name",
-            "idField": "id",
-            "mode": "filtered",
-            "extraParams": "section=GENERAL",
-            "typedReturn": "ComputerInventory"
-          },
-          "resolvers": [
-            {
-              "resourceType": "ComputerInventoryV1",
-              "nameField": "hardware.serialNumber",
-              "idField": "id",
-              "mode": "filtered",
-              "extraParams": "section=HARDWARE",
-              "typedReturn": "ComputerInventory",
-              "byField": "BySerialNumber"
-            },
-            {
-              "resourceType": "ComputerInventoryV1",
-              "nameField": "udid",
-              "idField": "id",
-              "mode": "filtered",
-              "typedReturn": "ComputerInventory",
-              "byField": "ByUDID"
-            }
-          ]
-        },
-        {
-          "op": "GET /v2/computers-inventory",
-          "name": "ListComputersInventoryV2",
-          "pagination": "totalCount",
-          "params": [
-            "section:[]string",
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "ComputerInventoryV2",
-            "nameField": "general.name",
-            "idField": "id",
-            "mode": "filtered",
-            "extraParams": "section=GENERAL",
-            "typedReturn": "ComputerInventoryV2"
-          },
-          "resolvers": [
-            {
-              "resourceType": "ComputerInventoryV2",
-              "nameField": "hardware.serialNumber",
-              "idField": "id",
-              "mode": "filtered",
-              "extraParams": "section=HARDWARE",
-              "typedReturn": "ComputerInventoryV2",
-              "byField": "BySerialNumber"
-            },
-            {
-              "resourceType": "ComputerInventoryV2",
-              "nameField": "udid",
-              "idField": "id",
-              "mode": "filtered",
-              "typedReturn": "ComputerInventoryV2",
-              "byField": "ByUDID"
-            }
-          ]
         },
         {
           "op": "GET /v4/computers-inventory",
@@ -2031,91 +1587,13 @@
           ]
         },
         {
-          "op": "GET /v3/computers-inventory",
-          "name": "ListComputersInventoryV3",
-          "pagination": "totalCount",
-          "params": [
-            "section:[]string",
-            "sort:[]string",
-            "filter"
-          ],
-          "resolver": {
-            "resourceType": "ComputerInventoryV3",
-            "nameField": "general.name",
-            "idField": "id",
-            "mode": "filtered",
-            "extraParams": "section=GENERAL",
-            "typedReturn": "ComputerInventoryV3"
-          },
-          "resolvers": [
-            {
-              "resourceType": "ComputerInventoryV3",
-              "nameField": "hardware.serialNumber",
-              "idField": "id",
-              "mode": "filtered",
-              "extraParams": "section=HARDWARE",
-              "typedReturn": "ComputerInventoryV3",
-              "byField": "BySerialNumber"
-            },
-            {
-              "resourceType": "ComputerInventoryV3",
-              "nameField": "udid",
-              "idField": "id",
-              "mode": "filtered",
-              "typedReturn": "ComputerInventoryV3",
-              "byField": "ByUDID"
-            }
-          ]
-        },
-        {
-          "op": "POST /v1/computers-inventory",
-          "name": "CreateComputerInventoryV1"
-        },
-        {
-          "op": "POST /v2/computers-inventory",
-          "name": "CreateComputerInventoryV2"
-        },
-        {
           "op": "POST /v4/computers-inventory",
           "name": "CreateComputerInventoryV4"
-        },
-        {
-          "op": "POST /v3/computers-inventory",
-          "name": "CreateComputerInventoryV3"
-        },
-        {
-          "op": "GET /v1/computers-inventory/filevault",
-          "name": "ListComputerInventoryFileVaultsV1",
-          "pagination": "totalCount"
-        },
-        {
-          "op": "GET /v2/computers-inventory/filevault",
-          "name": "ListComputerInventoryFileVaultsV2",
-          "pagination": "totalCount"
         },
         {
           "op": "GET /v4/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV4",
           "pagination": "totalCount"
-        },
-        {
-          "op": "GET /v3/computers-inventory/filevault",
-          "name": "ListComputerInventoryFileVaultsV3",
-          "pagination": "totalCount"
-        },
-        {
-          "op": "GET /v1/computers-inventory/{id}",
-          "name": "GetComputerInventoryV1",
-          "params": [
-            "section:[]string"
-          ]
-        },
-        {
-          "op": "GET /v2/computers-inventory/{id}",
-          "name": "GetComputerInventoryV2",
-          "params": [
-            "section:[]string"
-          ]
         },
         {
           "op": "GET /v4/computers-inventory/{id}",
@@ -2125,186 +1603,52 @@
           ]
         },
         {
-          "op": "GET /v3/computers-inventory/{id}",
-          "name": "GetComputerInventoryV3",
-          "params": [
-            "section:[]string"
-          ]
-        },
-        {
-          "op": "DELETE /v1/computers-inventory/{id}",
-          "name": "DeleteComputerInventoryV1"
-        },
-        {
-          "op": "DELETE /v2/computers-inventory/{id}",
-          "name": "DeleteComputerInventoryV2"
-        },
-        {
           "op": "DELETE /v4/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV4"
-        },
-        {
-          "op": "DELETE /v3/computers-inventory/{id}",
-          "name": "DeleteComputerInventoryV3",
-          "expectedStatus": 204
-        },
-        {
-          "op": "GET /v1/computers-inventory-detail/{id}",
-          "name": "GetComputerInventoryDetailV1"
-        },
-        {
-          "op": "GET /v2/computers-inventory-detail/{id}",
-          "name": "GetComputerInventoryDetailV2"
         },
         {
           "op": "GET /v4/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV4"
         },
         {
-          "op": "GET /v3/computers-inventory-detail/{id}",
-          "name": "GetComputerInventoryDetailV3"
-        },
-        {
-          "op": "PATCH /v1/computers-inventory-detail/{id}",
-          "name": "UpdateComputerInventoryDetailV1"
-        },
-        {
-          "op": "PATCH /v2/computers-inventory-detail/{id}",
-          "name": "UpdateComputerInventoryDetailV2"
-        },
-        {
           "op": "PATCH /v4/computers-inventory-detail/{id}",
           "name": "UpdateComputerInventoryDetailV4"
-        },
-        {
-          "op": "PATCH /v3/computers-inventory-detail/{id}",
-          "name": "UpdateComputerInventoryDetailV3",
-          "expectedStatus": 204
-        },
-        {
-          "op": "POST /v1/computers-inventory/{id}/attachments",
-          "name": "UploadComputerInventoryAttachmentV1"
-        },
-        {
-          "op": "POST /v2/computers-inventory/{id}/attachments",
-          "name": "UploadComputerInventoryAttachmentV2"
         },
         {
           "op": "POST /v4/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV4"
         },
         {
-          "op": "POST /v3/computers-inventory/{id}/attachments",
-          "name": "UploadComputerInventoryAttachmentV3"
-        },
-        {
-          "op": "GET /v1/computers-inventory/{id}/attachments/{attachmentId}",
-          "name": "DownloadComputerInventoryAttachmentV1"
-        },
-        {
-          "op": "GET /v2/computers-inventory/{id}/attachments/{attachmentId}",
-          "name": "DownloadComputerInventoryAttachmentV2"
-        },
-        {
           "op": "GET /v4/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV4"
-        },
-        {
-          "op": "GET /v3/computers-inventory/{id}/attachments/{attachmentId}",
-          "name": "DownloadComputerInventoryAttachmentV3"
-        },
-        {
-          "op": "DELETE /v1/computers-inventory/{id}/attachments/{attachmentId}",
-          "name": "DeleteComputerInventoryAttachmentV1"
-        },
-        {
-          "op": "DELETE /v2/computers-inventory/{id}/attachments/{attachmentId}",
-          "name": "DeleteComputerInventoryAttachmentV2"
         },
         {
           "op": "DELETE /v4/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DeleteComputerInventoryAttachmentV4"
         },
         {
-          "op": "DELETE /v3/computers-inventory/{id}/attachments/{attachmentId}",
-          "name": "DeleteComputerInventoryAttachmentV3",
-          "expectedStatus": 204
-        },
-        {
-          "op": "GET /v1/computers-inventory/{id}/filevault",
-          "name": "GetComputerInventoryFileVaultV1"
-        },
-        {
-          "op": "GET /v2/computers-inventory/{id}/filevault",
-          "name": "GetComputerInventoryFileVaultV2"
-        },
-        {
           "op": "GET /v4/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV4"
-        },
-        {
-          "op": "GET /v3/computers-inventory/{id}/filevault",
-          "name": "GetComputerInventoryFileVaultV3"
-        },
-        {
-          "op": "GET /v1/computers-inventory/{id}/view-device-lock-pin",
-          "name": "GetComputerDeviceLockPinV1"
-        },
-        {
-          "op": "GET /v2/computers-inventory/{id}/view-device-lock-pin",
-          "name": "GetComputerDeviceLockPinV2"
         },
         {
           "op": "GET /v4/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV4"
         },
         {
-          "op": "GET /v3/computers-inventory/{id}/view-device-lock-pin",
-          "name": "GetComputerDeviceLockPinV3"
-        },
-        {
-          "op": "GET /v1/computers-inventory/{id}/view-recovery-lock-password",
-          "name": "GetComputerRecoveryLockPasswordV1"
-        },
-        {
-          "op": "GET /v2/computers-inventory/{id}/view-recovery-lock-password",
-          "name": "GetComputerRecoveryLockPasswordV2"
-        },
-        {
           "op": "GET /v4/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV4"
-        },
-        {
-          "op": "GET /v3/computers-inventory/{id}/view-recovery-lock-password",
-          "name": "GetComputerRecoveryLockPasswordV3"
-        },
-        {
-          "op": "GET /v1/computer-inventory-collection-settings",
-          "name": "GetComputerInventoryCollectionSettingsV1"
         },
         {
           "op": "GET /v2/computer-inventory-collection-settings",
           "name": "GetComputerInventoryCollectionSettingsV2"
         },
         {
-          "op": "PATCH /v1/computer-inventory-collection-settings",
-          "name": "UpdateComputerInventoryCollectionSettingsV1"
-        },
-        {
           "op": "PATCH /v2/computer-inventory-collection-settings",
           "name": "UpdateComputerInventoryCollectionSettingsV2"
         },
         {
-          "op": "POST /v1/computer-inventory-collection-settings/custom-path",
-          "name": "CreateComputerInventoryCollectionCustomPathV1"
-        },
-        {
           "op": "POST /v2/computer-inventory-collection-settings/custom-path",
           "name": "CreateComputerInventoryCollectionCustomPathV2"
-        },
-        {
-          "op": "DELETE /v1/computer-inventory-collection-settings/custom-path/{id}",
-          "name": "DeleteComputerInventoryCollectionCustomPathV1"
         },
         {
           "op": "DELETE /v2/computer-inventory-collection-settings/custom-path/{id}",
@@ -2318,10 +1662,6 @@
         {
           "op": "POST /v2/inventory-preload/csv",
           "name": "UploadInventoryPreloadCsvV2"
-        },
-        {
-          "op": "GET /v1/inventory-preload/csv-template",
-          "name": "DownloadInventoryPreloadCsvTemplateV1"
         },
         {
           "op": "GET /v2/inventory-preload/csv-template",
@@ -2346,14 +1686,6 @@
           ]
         },
         {
-          "op": "GET /v1/inventory-preload/history",
-          "name": "ListInventoryPreloadHistoryV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string"
-          ]
-        },
-        {
           "op": "GET /v2/inventory-preload/history",
           "name": "ListInventoryPreloadHistoryV2",
           "pagination": "totalCount",
@@ -2361,11 +1693,6 @@
             "sort:[]string",
             "filter"
           ]
-        },
-        {
-          "op": "POST /v1/inventory-preload/history",
-          "name": "CreateInventoryPreloadHistoryNoteV1",
-          "expectedStatus": 200
         },
         {
           "op": "POST /v2/inventory-preload/history",
@@ -2595,29 +1922,6 @@
           "name": "GetLatestMobileDevicePrestageSyncV2"
         },
         {
-          "op": "GET /v2/mobile-device-prestages",
-          "name": "ListMobileDevicePrestagesV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string"
-          ],
-          "resolver": {
-            "resourceType": "MobileDevicePrestageV2",
-            "nameField": "displayName",
-            "idField": "id",
-            "mode": "clientFilter",
-            "apply": {
-              "createOp": "CreateMobileDevicePrestageV2",
-              "updateOp": "UpdateMobileDevicePrestageV2",
-              "deleteOp": "DeleteMobileDevicePrestageV2",
-              "nameGoField": "DisplayName",
-              "updateType": "PutMobileDevicePrestageV2",
-              "getOp": "GetMobileDevicePrestageV2",
-              "versionLock": true
-            }
-          }
-        },
-        {
           "op": "GET /v3/mobile-device-prestages",
           "name": "ListMobileDevicePrestagesV3",
           "pagination": "totalCount",
@@ -2641,24 +1945,12 @@
           }
         },
         {
-          "op": "POST /v2/mobile-device-prestages",
-          "name": "CreateMobileDevicePrestageV2"
-        },
-        {
           "op": "POST /v3/mobile-device-prestages",
           "name": "CreateMobileDevicePrestageV3"
         },
         {
-          "op": "GET /v2/mobile-device-prestages/{id}",
-          "name": "GetMobileDevicePrestageV2"
-        },
-        {
           "op": "GET /v3/mobile-device-prestages/{id}",
           "name": "GetMobileDevicePrestageV3"
-        },
-        {
-          "op": "PUT /v2/mobile-device-prestages/{id}",
-          "name": "UpdateMobileDevicePrestageV2"
         },
         {
           "op": "PUT /v3/mobile-device-prestages/{id}",
@@ -2666,45 +1958,21 @@
           "noRetry": true
         },
         {
-          "op": "DELETE /v2/mobile-device-prestages/{id}",
-          "name": "DeleteMobileDevicePrestageV2"
-        },
-        {
           "op": "DELETE /v3/mobile-device-prestages/{id}",
           "name": "DeleteMobileDevicePrestageV3",
           "expectedStatus": 204
-        },
-        {
-          "op": "GET /v2/mobile-device-prestages/{id}/attachments",
-          "name": "ListMobileDevicePrestageAttachmentsV2"
         },
         {
           "op": "GET /v3/mobile-device-prestages/{id}/attachments",
           "name": "ListMobileDevicePrestageAttachmentsV3"
         },
         {
-          "op": "POST /v2/mobile-device-prestages/{id}/attachments",
-          "name": "UploadMobileDevicePrestageAttachmentV2"
-        },
-        {
           "op": "POST /v3/mobile-device-prestages/{id}/attachments",
           "name": "UploadMobileDevicePrestageAttachmentV3"
         },
         {
-          "op": "POST /v2/mobile-device-prestages/{id}/attachments/delete-multiple",
-          "name": "DeleteMultipleMobileDevicePrestageAttachmentsV2"
-        },
-        {
           "op": "POST /v3/mobile-device-prestages/{id}/attachments/delete-multiple",
           "name": "DeleteMultipleMobileDevicePrestageAttachmentsV3"
-        },
-        {
-          "op": "GET /v2/mobile-device-prestages/{id}/history",
-          "name": "ListMobileDevicePrestageHistoryV2",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string"
-          ]
         },
         {
           "op": "GET /v3/mobile-device-prestages/{id}/history",
@@ -2713,10 +1981,6 @@
           "params": [
             "sort:[]string"
           ]
-        },
-        {
-          "op": "POST /v2/mobile-device-prestages/{id}/history",
-          "name": "CreateMobileDevicePrestageHistoryNoteV2"
         },
         {
           "op": "POST /v3/mobile-device-prestages/{id}/history",
@@ -3165,14 +2429,6 @@
         {
           "op": "POST /v2/mdm/blank-push",
           "name": "SendMdmBlankPushV2"
-        },
-        {
-          "op": "GET /v1/mdm/commands",
-          "name": "ListMdmCommandsV1",
-          "params": [
-            "uuids:[]string",
-            "client-management-id:string:clientManagementID"
-          ]
         },
         {
           "op": "GET /v2/mdm/commands",
@@ -5084,99 +4340,6 @@
           "expectedStatus": 201
         },
         {
-          "op": "GET /v1/inventory-preload",
-          "name": "ListInventoryPreloadRecordsV1",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string"
-          ]
-        },
-        {
-          "op": "GET /v1/inventory-preload/{id}",
-          "name": "GetInventoryPreloadRecordV1"
-        },
-        {
-          "op": "POST /v1/inventory-preload",
-          "name": "CreateInventoryPreloadRecordV1",
-          "expectedStatus": 201
-        },
-        {
-          "op": "PUT /v1/inventory-preload/{id}",
-          "name": "UpdateInventoryPreloadRecordV1"
-        },
-        {
-          "op": "DELETE /v1/inventory-preload/{id}",
-          "name": "DeleteInventoryPreloadRecordV1",
-          "expectedStatus": 204
-        },
-        {
-          "op": "DELETE /v1/inventory-preload",
-          "name": "DeleteAllInventoryPreloadRecordsV1",
-          "expectedStatus": 204
-        },
-        {
-          "op": "POST /v1/inventory-preload/validate-csv",
-          "name": "ValidateInventoryPreloadCsvV1",
-          "contentType": "text/csv",
-          "requestType": "[]byte"
-        },
-        {
-          "op": "GET /inventory-preload",
-          "name": "ListInventoryPreloadRecords",
-          "pagination": "totalCount",
-          "pageSizeParam": "pagesize",
-          "params": [
-            "sort:[]string",
-            "sortBy"
-          ]
-        },
-        {
-          "op": "GET /inventory-preload/{id}",
-          "name": "GetInventoryPreloadRecord"
-        },
-        {
-          "op": "POST /inventory-preload",
-          "name": "CreateInventoryPreloadRecord",
-          "expectedStatus": 201
-        },
-        {
-          "op": "PUT /inventory-preload/{id}",
-          "name": "UpdateInventoryPreloadRecord"
-        },
-        {
-          "op": "DELETE /inventory-preload/{id}",
-          "name": "DeleteInventoryPreloadRecord",
-          "expectedStatus": 204
-        },
-        {
-          "op": "DELETE /inventory-preload",
-          "name": "DeleteAllInventoryPreloadRecords",
-          "expectedStatus": 204
-        },
-        {
-          "op": "POST /inventory-preload/validate-csv",
-          "name": "ValidateInventoryPreloadCsv",
-          "contentType": "text/csv",
-          "requestType": "[]byte"
-        },
-        {
-          "op": "GET /inventory-preload/csv-template",
-          "name": "DownloadInventoryPreloadCsvTemplate"
-        },
-        {
-          "op": "GET /inventory-preload/history",
-          "name": "ListInventoryPreloadHistory",
-          "pagination": "totalCount",
-          "params": [
-            "sort:[]string"
-          ]
-        },
-        {
-          "op": "POST /inventory-preload/history/notes",
-          "name": "CreateInventoryPreloadHistoryNote",
-          "expectedStatus": 200
-        },
-        {
           "op": "GET /settings/obj/policyProperties",
           "name": "GetPolicyPropertiesSettings"
         },
@@ -6304,14 +5467,6 @@
       },
       "operations": [
         {
-          "op": "GET /computers/id/{id}",
-          "name": "GetComputerByID",
-          "responseType": "computer",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
           "op": "GET /computers/name/{name}",
           "name": "GetComputerByName",
           "responseType": "computer"
@@ -6327,15 +5482,6 @@
         {
           "op": "POST /computers/id/{id}",
           "name": "CreateComputerByID",
-          "requestType": "computer_post",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "PUT /computers/id/{id}",
-          "name": "UpdateComputerByID",
           "requestType": "computer_post",
           "pathNames": {
             "id": "id"
@@ -7957,40 +7103,6 @@
           }
         },
         {
-          "op": "GET /patches/id/{id}",
-          "name": "GetPatchByID",
-          "responseType": "software_title",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
-          "op": "POST /patches/id/{id}",
-          "name": "CreatePatchByID",
-          "requestType": "software_title",
-          "responseType": "software_title",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "PUT /patches/id/{id}",
-          "name": "UpdatePatchByID",
-          "requestType": "software_title",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "DELETE /patches/id/{id}",
-          "name": "DeletePatchByID",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
           "op": "GET /patchexternalsources/id/{id}",
           "name": "GetPatchExternalSourceByID",
           "responseType": "patch_external_source",
@@ -8062,48 +7174,6 @@
         {
           "op": "DELETE /patchpolicies/id/{id}",
           "name": "DeletePatchPolicyByID",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
-          "op": "GET /patchreports/patchsoftwaretitleid/{id}",
-          "name": "GetPatchReportByPatchSoftwareTitleID",
-          "responseType": "patch_report",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
-          "op": "GET /patchsoftwaretitles/id/{id}",
-          "name": "GetPatchSoftwareTitleByID",
-          "responseType": "patch_software_title",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
-          "op": "POST /patchsoftwaretitles/id/{id}",
-          "name": "CreatePatchSoftwareTitleByID",
-          "requestType": "patch_software_title",
-          "responseType": "patch_software_title",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "PUT /patchsoftwaretitles/id/{id}",
-          "name": "UpdatePatchSoftwareTitleByID",
-          "requestType": "patch_software_title",
-          "pathNames": {
-            "id": "id"
-          },
-          "expectedStatus": 201
-        },
-        {
-          "op": "DELETE /patchsoftwaretitles/id/{id}",
-          "name": "DeletePatchSoftwareTitleByID",
           "pathNames": {
             "id": "id"
           }
@@ -9524,14 +8594,6 @@
           }
         },
         {
-          "op": "GET /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}",
-          "name": "ListPatchPoliciesBySoftwareTitleConfigID",
-          "responseType": "patch_policy",
-          "pathNames": {
-            "softwaretitleconfigid": "softwareTitleConfigID"
-          }
-        },
-        {
           "op": "GET /computercommands/name/{name}",
           "name": "GetComputerCommandByName",
           "responseType": "computer_command"
@@ -9575,11 +8637,6 @@
           "op": "GET /classes",
           "name": "ListClasses",
           "responseType": "classes"
-        },
-        {
-          "op": "GET /computers",
-          "name": "ListComputers",
-          "responseType": "computers"
         },
         {
           "op": "GET /mobiledevices",
@@ -9775,21 +8832,6 @@
           "op": "GET /patchinternalsources",
           "name": "ListPatchInternalSources",
           "responseType": "patch_internal_sources"
-        },
-        {
-          "op": "GET /patches",
-          "name": "ListPatches",
-          "responseType": "patch_management_software_titles"
-        },
-        {
-          "op": "GET /patchpolicies",
-          "name": "ListPatchPolicies",
-          "responseType": "patch_policies"
-        },
-        {
-          "op": "GET /patchsoftwaretitles",
-          "name": "ListPatchSoftwareTitles",
-          "responseType": "patch_software_titles"
         },
         {
           "op": "GET /printers",
@@ -10396,14 +9438,6 @@
           "name": "DeleteComputerInvitationByName"
         },
         {
-          "op": "GET /computers/id/{id}/subset/{subset}",
-          "name": "GetComputerByIDSubset",
-          "responseType": "computer",
-          "pathNames": {
-            "id": "id"
-          }
-        },
-        {
           "op": "GET /computers/macaddress/{macaddress}",
           "name": "GetComputerByMacAddress",
           "responseType": "computer"
@@ -10412,11 +9446,6 @@
           "op": "GET /computers/udid/{udid}",
           "name": "GetComputerByUDID",
           "responseType": "computer"
-        },
-        {
-          "op": "GET /computers/subset/basic",
-          "name": "GetComputersBasic",
-          "responseType": "computers_basic"
         },
         {
           "op": "GET /computers/match/{match}",
@@ -10697,21 +9726,8 @@
           "responseType": "software_title"
         },
         {
-          "op": "GET /patches/id/{id}/version/{version}",
-          "name": "GetPatchComputersByIDVersion",
-          "responseType": "computers"
-        },
-        {
           "op": "DELETE /patchexternalsources/name/{name}",
           "name": "DeletePatchExternalSourceByName"
-        },
-        {
-          "op": "GET /patchreports/patchsoftwaretitleid/{id}/version/{version}",
-          "name": "GetPatchReportByTitleIDVersion",
-          "responseType": "patch_report",
-          "pathNames": {
-            "id": "id"
-          }
         },
         {
           "op": "POST /policies/name/{name}",
@@ -11029,24 +10045,6 @@
       "splitByTag": true,
       "operations": [
         {
-          "op": "GET /v1/groups",
-          "name": "ListDeviceGroupsV1",
-          "resolver": {
-            "resourceType": "DeviceGroupV1",
-            "nameField": "name",
-            "idField": "id",
-            "mode": "clientFilter",
-            "typedReturn": "GroupListItem",
-            "apply": {
-              "createOp": "CreateDeviceGroupV1",
-              "updateOp": "UpdateDeviceGroupV1",
-              "deleteOp": "DeleteDeviceGroupV1",
-              "nameGoField": "Name",
-              "updateType": "UpdateGroupRequest"
-            }
-          }
-        },
-        {
           "op": "POST /v1/groups",
           "name": "CreateDeviceGroupV1"
         },
@@ -11062,7 +10060,7 @@
             "typedReturn": "GroupListItem",
             "apply": {
               "createOp": "CreateDeviceGroupV1",
-              "updateOp": "UpdateDeviceGroupV1",
+              "updateOp": "UpdateDeviceGroupV2",
               "deleteOp": "DeleteDeviceGroupV1",
               "nameGoField": "Name",
               "updateType": "UpdateGroupRequest"
@@ -11072,10 +10070,6 @@
         {
           "op": "GET /v1/groups/{groupId}",
           "name": "GetDeviceGroupV1"
-        },
-        {
-          "op": "PUT /v1/groups/{groupId}",
-          "name": "UpdateDeviceGroupV1"
         },
         {
           "op": "PUT /v2/groups/{groupId}",

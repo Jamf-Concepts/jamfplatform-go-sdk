@@ -12,21 +12,6 @@ import (
 	"net/url"
 )
 
-// GetComputerInventoryCollectionSettingsV1 returns computer inventory settings.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: computer-inventory-collection-settings:read. Legacy Jamf Pro privilege name(s): Read Computer Inventory Collection Settings.
-func (c *Client) GetComputerInventoryCollectionSettingsV1(ctx context.Context) (*ComputerInventoryCollectionSettings, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventoryCollectionSettings
-	endpoint := prefix + "/computer-inventory-collection-settings"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryCollectionSettingsV1: %w", err)
-	}
-	return &result, nil
-}
-
 // GetComputerInventoryCollectionSettingsV2 returns computer inventory settings.
 //
 // Required privileges: computer-inventory-collection-settings:read. Legacy Jamf Pro privilege name(s): Read Computer Inventory Collection Settings.
@@ -36,21 +21,6 @@ func (c *Client) GetComputerInventoryCollectionSettingsV2(ctx context.Context) (
 	endpoint := prefix + "/computer-inventory-collection-settings"
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetComputerInventoryCollectionSettingsV2: %w", err)
-	}
-	return &result, nil
-}
-
-// UpdateComputerInventoryCollectionSettingsV1 update computer inventory settings.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: computer-inventory-collection-settings:update. Legacy Jamf Pro privilege name(s): Update Computer Inventory Collection Settings.
-func (c *Client) UpdateComputerInventoryCollectionSettingsV1(ctx context.Context, request *ComputerInventoryCollectionSettings) (*ComputerInventoryCollectionSettings, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventoryCollectionSettings
-	endpoint := prefix + "/computer-inventory-collection-settings"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateComputerInventoryCollectionSettingsV1: %w", err)
 	}
 	return &result, nil
 }
@@ -67,21 +37,6 @@ func (c *Client) UpdateComputerInventoryCollectionSettingsV2(ctx context.Context
 	return nil
 }
 
-// CreateComputerInventoryCollectionCustomPathV1 create Computer Inventory Collection Settings Custom Path.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: custom-paths:create. Legacy Jamf Pro privilege name(s): Create Custom Paths.
-func (c *Client) CreateComputerInventoryCollectionCustomPathV1(ctx context.Context, request *CreatePath) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result HrefResponse
-	endpoint := prefix + "/computer-inventory-collection-settings/custom-path"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateComputerInventoryCollectionCustomPathV1: %w", err)
-	}
-	return &result, nil
-}
-
 // CreateComputerInventoryCollectionCustomPathV2 create Computer Inventory Collection Settings Custom Path.
 //
 // Required privileges: custom-paths:create. Legacy Jamf Pro privilege name(s): Create Custom Paths.
@@ -93,23 +48,6 @@ func (c *Client) CreateComputerInventoryCollectionCustomPathV2(ctx context.Conte
 		return nil, fmt.Errorf("CreateComputerInventoryCollectionCustomPathV2: %w", err)
 	}
 	return &result, nil
-}
-
-// DeleteComputerInventoryCollectionCustomPathV1 delete Custom Path from Computer Inventory Collection Settings.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: custom-paths:delete. Legacy Jamf Pro privilege name(s): Delete Custom Paths.
-//
-// Parameters:
-//   - id: id of Custom Path.
-func (c *Client) DeleteComputerInventoryCollectionCustomPathV1(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/computer-inventory-collection-settings/custom-path/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteComputerInventoryCollectionCustomPathV1(%s): %w", id, err)
-	}
-	return nil
 }
 
 // DeleteComputerInventoryCollectionCustomPathV2 delete Custom Path from Computer Inventory Collection Settings.

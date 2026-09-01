@@ -16,24 +16,6 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// GetDeviceDeclarationReport get device report declarations.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
-//
-// Required privileges: declarations:read.
-//
-// Parameters:
-//   - deviceID: The platform deviceId.
-func (c *Client) GetDeviceDeclarationReport(ctx context.Context, deviceID string) (*DeviceReportDto, error) {
-	prefix := c.transport.APIPrefix("ddm/report", "v1")
-	var result DeviceReportDto
-	endpoint := fmt.Sprintf("%s/devices/%s", prefix, url.PathEscape(deviceID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetDeviceDeclarationReport(%s): %w", deviceID, err)
-	}
-	return &result, nil
-}
-
 // GetDeviceDeclarationReportFiltered get filtered device report declarations.
 //
 // Required privileges: declarations:read.
