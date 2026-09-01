@@ -484,6 +484,83 @@ path a year before its own declared sunset.
 publish-stage filter, not a withdrawal, and the SDK following it is a decision
 rather than a corroboration.
 
+### v1988 dropped 12 more `capi` operations; all twelve are live (2026-09-01)
+
+Build v1988 removed, from both `external/capi` and `internal/stage/capi`, the
+alternate-identifier computer lookups — `GET`, `PUT` and `DELETE` on each of
+`/computers/macaddress/{macaddress}`, `/computers/name/{name}`,
+`/computers/serialnumber/{serialnumber}` and `/computers/udid/{udid}`. 586 → 574
+operations. `POST` survives on all four paths, so the paths themselves remain and
+the unified rollups' path counts did not move. Nothing else in the spec changed:
+a semantic diff with `description`/`example`/`title`/`summary` stripped reports
+zero changed operations and zero changed schemas across all 169, and the OAuth
+scope list is unchanged at 185. Nothing else in the bundle changed outside
+`internal/dev`, the manifest and the two rollups.
+
+The SDK **held** `capi` at v1897, so these twelve remain generated. The evidence
+that the server has withdrawn none of them, gathered 2026-09-01 against Jamf Pro
+`11.31.1-t1787060595569` with a `pro` credential on `eu`, `X-Tenant-Id` header
+form, and `GET /pro/v1/jamf-pro-version` → `200` as the control in the same
+invocation — twice, once before the reads and once after the writes:
+
+| request | status | payload |
+|---|---|---|
+| `GET /proclassic/computers/serialnumber/Z4HDVQQPQ6` | 200 | `computer.general.id 31`, full General subset |
+| `GET /proclassic/computers/udid/5F4308BD-…-45E83C06AED6` | 200 | same computer, byte-identical body |
+| `GET /proclassic/computers/macaddress/CA:13:8A:B9:B5:10` | 200 | same computer |
+| `GET /proclassic/computers/name/FVFZCAK0LYWH` | 200 | `id 4` — the name is not unique on this tenant, and the server resolves it to the lowest id |
+| `GET /proclassic/computers/serialnumber/NOSUCHSERIAL0` | 404 | Jamf Pro's HTML `Status page` / `Not Found` |
+| `GET /proclassic/computers/udid/00000000-0000-0000-0000-000000000000` | 404 | same HTML |
+| `GET /proclassic/computers/macaddress/00:00:00:00:00:00` | 404 | same HTML |
+| `GET /proclassic/computers/name/zzz-no-such-computer-probe` | 404 | same HTML |
+| `PUT` on each of the four bogus identifiers, `text/xml` body | 404 | same HTML, 4/4 |
+| `DELETE` on each of the four bogus identifiers | 404 | same HTML, 4/4 |
+
+**The 404 is the routed tell, and it is the application's, not the gateway's.** An
+unrouted gateway path answers a *repeated* `403 BAD_PERMISSIONS`; a wrong base
+path answers plain-text `404 page not found`. This is Jamf Pro's own styled HTML
+error page, which means the gateway routed the request and the application looked
+the computer up and did not find it. Probing the destructive verbs against a
+nonexistent identifier is what makes them safe to probe at all: there is nothing
+to mutate or delete, and resource resolution answers before anything else runs.
+The tenant is unchanged — `GET /proclassic/computers` returns the same four
+computers before and after.
+
+Three further signals, none of them the wire:
+
+- **`internal/dev/capi` in the same bundle carries all 606 operations** — the
+  v1897 `external/` set, op-for-op — while `external/` and `internal/stage/` carry
+  574. The publish-stage filter caught in the act again.
+- **The same bundle's privilege oracle still declares all twelve.**
+  `external/_permissions/routes.yaml` is byte-different from v1981 but
+  `sort`-identical: 6244 lines both sides, zero entries removed, and each of the
+  four paths still lists `POST`, `GET`, `PUT` and `DELETE` with
+  `devices:create`/`users:create`, `devices:read`, `devices:update`/`users:update`
+  and `destructive-device-actions:execute` respectively. `_permissions/scopes.yaml`
+  is byte-identical.
+- **`authorization-policies` has nothing.** `origin/main` is still `cdd734b`, and
+  `policies/tyk_external/jamf_pro_external/jamf_proclassic_computers.rego` retains
+  every allow block for all four verbs on all four paths.
+
+**Unlike v1942's removals, none of these declares a successor.** Each carries
+`deprecated: true` and `x-deprecation-date: 2025-02-11T00:00:00.000Z`, and no
+`x-successor-endpoint`. The functional replacement is an RSQL filter on Pro
+`GET /v1/computers-inventory` — a capability, not a declared migration path. Note
+also that `GET /computers/match/{match}` and `GET /computers/match/name/{matchname}`
+carry the identical deprecation date and were **not** removed, so the filter is not
+even consistent within the family.
+
+All twelve are pinned by
+`TestAcceptance_Classic_AltIdentifierComputersStillRouted`, which asserts the 404
+on a nonexistent identifier for every verb and fails on a 403 — the day the
+withdrawal reaches the gateway, that test names the hold to lift.
+`TestAcceptance_Classic_GetComputerByName` covers the one withdrawn read that had
+no acceptance test of its own.
+
+**Report upstream** alongside the v1942 finding: same defect, same bundle
+generation stage, and this time the deleted operations have no successor to
+migrate to.
+
 ### What v1942's removal cost, probed the same day
 
 Three capability gaps opened, each now pinned by a test that fails when it
@@ -894,6 +971,57 @@ the unrouted v2 PUT as the package's sole update method and repointed
 then reverted on that evidence: `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their
 resolver and both Applies all remain, and this probe's v1 *write* control remains
 available. Take the removal once the v2 rule is authored, not before.
+
+**Fourth re-probe, 2026-09-01 17:1x on the JSC sandbox `928260f5…`/eu. Nothing
+has moved, and the picture upstream got worse.** With
+`GET /securitycloud/v2/groups` → 200 as the control in the same invocation, on a
+group minted for the probe (`POST /securitycloud/v1/groups` → 201
+`590248ea-ed40-4ed6-bf1b-6bbf21d7f598`):
+
+| request | result |
+|---|---|
+| `PUT /securitycloud/v2/groups/{real-id}` | **403** `BAD_PERMISSIONS`, twice (`f6c11939…`, `ddf429e6…`) |
+| `PUT /securitycloud/v2/groups/{bogus-uuid}` | **403** `BAD_PERMISSIONS` (`f2bee095…`) — same answer as a real id |
+| `PUT /securitycloud/v1/groups/{real-id}` (control) | **200**, `{id, name}` with the new name |
+| `GET /securitycloud/v1/groups/{real-id}` (read-back) | **200**, rename persisted |
+| `DELETE /securitycloud/v1/groups/{real-id}` | **204**, then `GET` → `404 GROUP_NOT_FOUND` `field: groupId` |
+
+Tenant left clean — the group list is the same 8 entries before and after.
+`securitycloud_api_devices.rego` on `origin/main` still carries exactly the same
+six rules and `origin/main` is still `cdd734b`, so nothing has been authored.
+
+**Two open PRs now look like they bear on this, and only one of them does.**
+
+- **`authorization-policies#263` "PFE-1210 Add policies for DELETE
+  device-enrollments/{id} and GET v2/groups/{id}" (OPEN, 2026-09-01) is not
+  Security Cloud.** Its `v2/groups/{groupId}` rule is for
+  `/ui/jamfpro/v2/groups/{groupId}` in
+  `policies/tyk_external/jamf_pro/jamf_pro_groups_ui.rego` — the Jamf Pro UI
+  namespace. The PR touches four files, none under
+  `policies/tyk_external/securitycloud/`. A title search for `v2/groups` finds it
+  and means nothing here; check the file path, not the title.
+- **`authorization-policies#264` "API-364 Deny manifest-listed deprecated
+  endpoints at the external gateway" (DRAFT, 2026-09-01) would remove the working
+  update outright.** It deletes the `GET /api/securitycloud/v1/groups` and
+  `PUT /api/securitycloud/v1/groups/{groupId}` allow blocks from
+  `securitycloud_api_devices.rego`, leaving four rules — `POST /v1/groups`,
+  `GET /v2/groups`, `GET /v1/groups/{groupId}`, `DELETE /v1/groups/{groupId}` —
+  and **adds no `PUT /v2/groups/{groupId}` rule**. So if it merges and deploys as
+  drafted, device groups become create/read/delete-only: the v1 update is denied
+  and the declared v2 successor is still unauthored. **This is the enforcement
+  half of v1942's spec filter arriving without the successor rule that filter
+  presupposed** — report it before it merges. It also means the
+  `securitycloud-devices` hold stops protecting the capability at that point: the
+  SDK would keep a method the gateway refuses, which is the honest state but not a
+  working update.
+
+`#264` is also the deny half of v1942's `capi` withdrawals — it strips
+`GET /api/proclassic/computers`, `/computers/subset/basic`, and `GET`/`PUT`
+`/computers/id/{computerid}` from `jamf_proclassic_computers.rego`. It does **not**
+touch the twelve alternate-identifier rules v1988 deleted from the spec; all twelve
+remain in the branch's version of that file. The PR was opened at 14:09 and the
+v1988 bundle generated at 14:15, so the policy side has not caught up with the
+newer removal yet. Re-check both when `#264` moves out of draft.
 
 Two methodological warnings from this probe. The first attempt returned **500 on
 both v1 and v2**, which reads as "v2 is routed and merely faulting" — the opposite

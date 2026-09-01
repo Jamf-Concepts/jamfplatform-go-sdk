@@ -350,9 +350,52 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1981** (2026-09-01), except `capi` and `securitycloud-devices`,
+Ingested through **v1988** (2026-09-01), except `capi` and `securitycloud-devices`,
 both **held at v1897** — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
+
+**v1988 changed one spec — `capi` — so nothing was ingested.** It is the held
+spec, and the change is twelve more deletions of the same kind v1942 made: the
+alternate-identifier computer lookups, `GET`, `PUT` and `DELETE` on each of
+`/computers/{macaddress,name,serialnumber,udid}/{value}`. `external/capi` goes
+586 → 574 operations, `internal/stage/capi` identically, and every surviving
+operation and all 169 schemas are semantically byte-equal to v1981's — zero
+changed operations, zero changed schemas, no `servers` or scope-list churn (the
+185 OAuth scopes are unchanged, the removed privileges still being referenced by
+the surviving `POST`s). Everything else in the bundle outside `internal/dev` was
+byte-identical: the only other diffs were the manifest and the two unified
+rollups, whose path counts did not move because **the paths survive — only
+methods went**.
+
+**The same three signals as v1942 say the server has withdrawn none of them**,
+re-established 2026-09-01 against Jamf Pro `11.31.1`: `internal/dev/capi` still
+carries all 606 operations; the same bundle's `external/_permissions/routes.yaml`
+is a pure reordering (6244 lines, `sort`-identical, zero removed) and still
+grants `POST`, `GET`, `PUT` **and** `DELETE` on all four paths; and
+`authorization-policies` is still `cdd734b` with every alt-identifier allow block
+intact. The wire serves all twelve — four `GET`s returned the real computer, and
+`PUT`/`DELETE` against a nonexistent identifier returned Jamf Pro's **own HTML
+404**, not the gateway's `403 BAD_PERMISSIONS`, which is the routed tell. Table:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#v1988-dropped-12-more-capi-operations-all-twelve-are-live-2026-09-01).
+
+**The deny side is in flight but has not caught up.**
+`authorization-policies#264` (DRAFT, opened 2026-09-01 14:09 — six minutes before
+this bundle generated) is the enforcement half of v1942's filter: it strips the
+OPA allow blocks for `GET /proclassic/computers`, `/computers/subset/basic` and
+`GET`/`PUT /computers/id/{computerid}`, and for Security Cloud's
+`GET /v1/groups` + `PUT /v1/groups/{groupId}`. It leaves all twelve
+alternate-identifier rules intact, so v1988's removal has no policy counterpart
+yet. Watch that PR: it is where a withdrawal stops being a spec claim and starts
+returning 403.
+
+**None of the twelve declares a successor.** They carry `deprecated: true` and
+`x-deprecation-date: 2025-02-11` and no `x-successor-endpoint` — so unlike
+v1942's removals these are not deprecated-with-successor, and the additive-versions
+rule's override does not reach them. The functional replacement is an RSQL filter
+on Pro `GET /v1/computers-inventory`, which is not a declared migration path.
+And v1988 leaves `POST` on each of the four paths while removing the other three
+verbs, reproducing exactly the incoherent surface that was the second reason
+`capi` was held at v1897.
 
 **v1981 published four Security Cloud specs to `external/` for the first time**,
 and the SDK now sources them from there: `jsc-dns`, `jsc-ztna`, `jsc-categories`
@@ -749,8 +792,8 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | held | why |
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
-| `capi` at v1897 | v1942 withdraws 20 operations including all of `/patchsoftwaretitles`. `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints, so taking it makes patch software titles unseedable and leaves the provider's `patch_software_title` resource with no create path; it also removes `GET`/`PUT /computers/id/{id}` while leaving `POST`/`DELETE`. Take it when Jamf publishes a routed software-title catalogue. |
-| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire 2026-09-01 — and its declared successor `PUT /v2/groups/{groupId}` is unrouted (403 `BAD_PERMISSIONS`; no OPA rule authored). Taking the removal would leave the package with no working update and break `ApplyDeviceGroupV2`. Take it once the v2 rule lands. |
+| `capi` at v1897 | Now 32 operations behind. v1942 withdraws 20 including all of `/patchsoftwaretitles`: `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints, so taking it makes patch software titles unseedable and leaves the provider's `patch_software_title` resource with no create path; it also removes `GET`/`PUT /computers/id/{id}` while leaving `POST`/`DELETE`. v1988 withdraws 12 more — `GET`/`PUT`/`DELETE` on each of `/computers/{macaddress,name,serialnumber,udid}/{value}`, again leaving `POST` — none of which declares a successor, and all of which are live on the wire. Take it when Jamf publishes a routed software-title catalogue. |
+| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-01 17:1x — and its declared successor `PUT /v2/groups/{groupId}` is still unrouted (403 `BAD_PERMISSIONS` on a real id and a bogus uuid alike; no OPA rule authored). Taking the removal would leave the package with no working update and break `ApplyDeviceGroupV2`. Take it once the v2 rule lands — but note `authorization-policies#264` (DRAFT) would **deny the v1 update without adding the v2 rule**, at which point the hold preserves a method the gateway refuses rather than a working capability. |
 | `securitycloud-enrollment`, `ai/governance/visibility` | No published spec in any environment. Not ingestable. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 
