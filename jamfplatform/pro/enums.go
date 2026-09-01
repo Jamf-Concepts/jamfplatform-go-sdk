@@ -2032,6 +2032,27 @@ func ComputerSmartGroupCriteriaV2AndOrValues() []ComputerSmartGroupCriteriaV2And
 	}
 }
 
+// CreatePathV2Scope is the set of values accepted by CreatePathV2.Scope.
+type CreatePathV2Scope = string
+
+// CreatePathV2Scope values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CreatePathV2ScopeApp CreatePathV2Scope = "APP"
+)
+
+// CreatePathV2ScopeValues returns every value the Jamf API accepts for CreatePathV2Scope,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func CreatePathV2ScopeValues() []CreatePathV2Scope {
+	return []CreatePathV2Scope{
+		CreatePathV2ScopeApp,
+	}
+}
+
 // DashboardItemMetricsItemTag is the set of values accepted by DashboardItemMetricsItem.Tag.
 type DashboardItemMetricsItemTag = string
 
@@ -2251,6 +2272,56 @@ func DetailsV2BatteryHealthValues() []DetailsV2BatteryHealth {
 		DetailsV2BatteryHealthServiceRecommended,
 		DetailsV2BatteryHealthUnknown,
 		DetailsV2BatteryHealthUnsupported,
+	}
+}
+
+// DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays is the set of values accepted by DeviceCommunicationSettings.MDMProfileComputerExpirationLimitInDays.
+type DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays = int
+
+// DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays90  DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays = 90
+	DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays120 DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays = 120
+	DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays180 DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays = 180
+)
+
+// DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDaysValues returns every value the Jamf API accepts for DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDaysValues() []DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays {
+	return []DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays{
+		DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays90,
+		DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays120,
+		DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays180,
+	}
+}
+
+// DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays is the set of values accepted by DeviceCommunicationSettings.MDMProfileMobileDeviceExpirationLimitInDays.
+type DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays = int
+
+// DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays90  DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays = 90
+	DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays120 DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays = 120
+	DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays180 DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays = 180
+)
+
+// DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDaysValues returns every value the Jamf API accepts for DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDaysValues() []DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays {
+	return []DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays{
+		DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays90,
+		DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays120,
+		DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays180,
 	}
 }
 
@@ -2755,6 +2826,27 @@ func GroupWithCriteriaDtoV1GroupTypeValues() []GroupWithCriteriaDtoV1GroupType {
 	return []GroupWithCriteriaDtoV1GroupType{
 		GroupWithCriteriaDtoV1GroupTypeMobile,
 		GroupWithCriteriaDtoV1GroupTypeComputer,
+	}
+}
+
+// InternalRecipientFrequency is the set of values accepted by InternalRecipient.Frequency.
+type InternalRecipientFrequency = string
+
+// InternalRecipientFrequency values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	InternalRecipientFrequencyDaily InternalRecipientFrequency = "DAILY"
+)
+
+// InternalRecipientFrequencyValues returns every value the Jamf API accepts for InternalRecipientFrequency,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func InternalRecipientFrequencyValues() []InternalRecipientFrequency {
+	return []InternalRecipientFrequency{
+		InternalRecipientFrequencyDaily,
 	}
 }
 
@@ -4422,6 +4514,27 @@ func ReenrollmentFlushMDMQueueValues() []ReenrollmentFlushMDMQueue {
 	}
 }
 
+// RemoteAdministrationResponseType is the set of values accepted by RemoteAdministrationResponse.Type.
+type RemoteAdministrationResponseType = string
+
+// RemoteAdministrationResponseType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	RemoteAdministrationResponseTypeTeamViewer RemoteAdministrationResponseType = "team-viewer"
+)
+
+// RemoteAdministrationResponseTypeValues returns every value the Jamf API accepts for RemoteAdministrationResponseType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func RemoteAdministrationResponseTypeValues() []RemoteAdministrationResponseType {
+	return []RemoteAdministrationResponseType{
+		RemoteAdministrationResponseTypeTeamViewer,
+	}
+}
+
 // SamlSettingsIdpProviderType is the set of values accepted by SamlSettings.IdpProviderType.
 type SamlSettingsIdpProviderType = string
 
@@ -4660,6 +4773,48 @@ func SelfServiceLoginSettingsUserLoginLevelValues() []SelfServiceLoginSettingsUs
 		SelfServiceLoginSettingsUserLoginLevelNotRequired,
 		SelfServiceLoginSettingsUserLoginLevelAnonymous,
 		SelfServiceLoginSettingsUserLoginLevelRequired,
+	}
+}
+
+// SessionCandidateRequestDeviceType is the set of values accepted by SessionCandidateRequest.DeviceType.
+type SessionCandidateRequestDeviceType = string
+
+// SessionCandidateRequestDeviceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionCandidateRequestDeviceTypeComputer SessionCandidateRequestDeviceType = "COMPUTER"
+)
+
+// SessionCandidateRequestDeviceTypeValues returns every value the Jamf API accepts for SessionCandidateRequestDeviceType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SessionCandidateRequestDeviceTypeValues() []SessionCandidateRequestDeviceType {
+	return []SessionCandidateRequestDeviceType{
+		SessionCandidateRequestDeviceTypeComputer,
+	}
+}
+
+// SessionDetailsDeviceType is the set of values accepted by SessionDetails.DeviceType.
+type SessionDetailsDeviceType = string
+
+// SessionDetailsDeviceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SessionDetailsDeviceTypeComputer SessionDetailsDeviceType = "COMPUTER"
+)
+
+// SessionDetailsDeviceTypeValues returns every value the Jamf API accepts for SessionDetailsDeviceType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SessionDetailsDeviceTypeValues() []SessionDetailsDeviceType {
+	return []SessionDetailsDeviceType{
+		SessionDetailsDeviceTypeComputer,
 	}
 }
 
@@ -5349,6 +5504,27 @@ func StartupStatusStepCodeValues() []StartupStatusStepCode {
 		StartupStatusStepCodeServerInitMemcachedEndpointsCheck,
 		StartupStatusStepCodeServerInitCacheFlushing,
 		StartupStatusStepCodeServerInitComplete,
+	}
+}
+
+// StartupStatusWarningCode is the set of values accepted by StartupStatus.WarningCode.
+type StartupStatusWarningCode = string
+
+// StartupStatusWarningCode values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	StartupStatusWarningCodeServerInitWarningDbTableEncoding StartupStatusWarningCode = "SERVER_INIT_WARNING_DB_TABLE_ENCODING"
+)
+
+// StartupStatusWarningCodeValues returns every value the Jamf API accepts for StartupStatusWarningCode,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func StartupStatusWarningCodeValues() []StartupStatusWarningCode {
+	return []StartupStatusWarningCode{
+		StartupStatusWarningCodeServerInitWarningDbTableEncoding,
 	}
 }
 

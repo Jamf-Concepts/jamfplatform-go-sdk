@@ -438,6 +438,18 @@ wound down.
 
 Two further checks, each independent of the specs:
 
+- **Four more confirmations on 11.31.1 (2026-09-01), control in the same
+  invocation.** `GET /pro/v3/computers-inventory` → 200 with the same 4 records
+  v4 returns. `GET /pro/v2/patch-software-title-configurations` → 200 **carrying
+  a `deprecation` response header**, `date="Tue, 14 Jul 2026 00:00:00 GMT"` — the
+  server is announcing the deprecation it has not enacted.
+  `GET /pro/v1/computer-inventory-collection-settings` → 200 still exposing
+  `applicationPaths`, `pluginPaths` and `fontPaths` as three sibling collections;
+  the v2 response exposes only `applicationPaths`, which is why a v1-created FONT
+  or PLUGIN path is invisible to a v2 reader and has to be cleaned up by id.
+  And the sharpest: **`POST /pro/v1/…/custom-path` with `{"scope":"FONT"}` → 201**,
+  the full three-scope vocabulary alive in the very build whose spec deleted the
+  `CreatePathScope` enum. See the scope section below.
 - **`internal/dev` in the same bundle carries every removed operation.**
   `internal/dev/jpapi` has all 788 and `internal/dev/capi` all 606 — op-for-op
   the v1897 `external/` sets — while `external/` and `internal/stage/` carry 666
@@ -520,17 +532,36 @@ the only endpoint that does it is the withdrawn Classic POST. A grep of the whol
 v1942 bundle — `internal/dev` included — finds no `*softwaretitles*` path other
 than the two Classic ones.
 
-**This is why `capi` is held at v1897.** Taking the withdrawal would leave patch
-software titles unseedable end to end and
-`terraform-provider-jamfplatform`'s `patch_software_title` resource with no
-create path. Pro v3 is otherwise a superset of the Classic resource —
-`displayName`, `softwareTitleNameId`, `uiNotifications`/`emailNotifications`,
-`categoryId`, `siteId`, `extensionAttributes`, and `packages[] {packageId,
-version, displayName}` covering the provider's `version_packages`, plus seven
+**`softwareTitleId` IS the Classic title id, and the only call that mints one
+creates the v3 configuration in the same act.** Proved end to end 2026-09-01 with
+a control in the same invocation:
+
+| step | result |
+|---|---|
+| `POST /pro/v3/patch-software-title-configurations` `softwareTitleId: "575"` (a catalogue `name_id`) | `400 SOFTWARE_TITLE_ID_NOT_FOUND` |
+| `POST /proclassic/patchsoftwaretitles/id/0` `{name, name_id: 575, source_id: 1}` | **201**, `<id>146</id>` |
+| `GET /pro/v3/patch-software-title-configurations` | shows `id=146`, **`softwareTitleId=146`**, `softwareTitleNameId=575` — the same object |
+| `POST /pro/v3/…` `softwareTitleId: "146"` | `400 ALREADY_EXISTS_FOR_SITE` (`field: displayName`) |
+| `DELETE /pro/v3/patch-software-title-configurations/146` | 204, and the **Classic list is empty too** |
+
+So the v3 create requires an id that only exists once the object exists. **There
+is nothing for a create to migrate onto** — this is not "no usable create path
+yet", it is structurally impossible on the current surface.
+
+**Therefore the `capi` hold is permanent, not provisional.** It lifts only if
+Jamf gives the configurations surface an id-minting create (or publishes a routed
+catalogue endpoint that hands out `softwareTitleId`s) — not on the next bundle,
+and not on a policy change. Record it that way.
+
+Pro v3 is otherwise a superset of the Classic resource — `displayName`,
+`softwareTitleNameId`, `uiNotifications`/`emailNotifications`, `categoryId`,
+`siteId`, `extensionAttributes`, and `packages[] {packageId, version,
+displayName}` covering the provider's `version_packages`, plus seven
 sub-resources Classic never had; only `source_id` lacks an equivalent (v3 has
-`patchSourceName` / `patchSourceEnabled`). So the migration is blocked on one
-identifier, not on the model. Take the withdrawal when Jamf publishes a routed
-software-title catalogue.
+`patchSourceName` / `patchSourceEnabled`). The blocker is the identifier alone.
+
+Also re-confirmed on 11.31.1: `GET /pro/v4/patch-software-title-configurations`
+→ **403**, unchanged from the 11.30.2 observation.
 
 **`GET /patches/name/{name}` answers 500, not 404.** `500` for an
 obviously-absent name 3/3, and `500` again for a plausible one (`Firefox`), on a
@@ -552,6 +583,47 @@ equivalent anywhere. If it is ever taken, the migration is known and works:
 replacement; reads move to `GetComputerByName` / `…BySerialNumber`. The two
 subset reads have no replacement and would simply be lost.
 `GET /proclassic/patchpolicies/id/99999999/subset/General` → 404, as expected.
+
+### Custom inventory paths: the scope vocabulary narrowed at v2, v1 still serves all three
+
+`computer-inventory-collection-settings/custom-path` takes a `scope`, and the two
+versions do not accept the same set. Probed 2026-09-01 on 11.31.1 with
+`GET /pro/v1/jamf-pro-version` → 200 as the control:
+
+| request | result |
+|---|---|
+| `POST /pro/v1/…/custom-path` `{"scope":"APP"}` | **201** |
+| `POST /pro/v1/…/custom-path` `{"scope":"FONT"}` | **201** |
+| `POST /pro/v1/…/custom-path` `{"scope":"PLUGIN"}` | **201** |
+| `POST /pro/v2/…/custom-path` `{"scope":"APP"}` | **201** |
+| `POST /pro/v2/…/custom-path` `{"scope":"FONT"}` | **400 `INVALID_FIELD`** |
+| `POST /pro/v2/…/custom-path` `{"scope":"PLUGIN"}` | **400 `INVALID_FIELD`** |
+| `POST /pro/v2/…/custom-path` `{"scope":"BOGUS"}` | **400 `INVALID_FIELD`** |
+| `POST /pro/v2/…/custom-path` `{"scope":"app"}` | **400 `INVALID_FIELD`** |
+
+**So v2 accepts exactly `[APP]`, and it is case-sensitive** — lowercase `app` is
+refused identically to `BOGUS`. The 400 is **field-attributed** (`field: "scope"`,
+unlike the jsc-dns/jsc-ztna `INVALID_FIELD` shape which names nothing) and it
+**names the whole accepted set while leaking the Java DTO class**:
+
+```
+Cannot deserialize value of type
+`com.jamfsoftware.jamfmanagementframework.web.computerinventorycollectionsettings.dto.PathScopeV2Dto`
+from String "FONT": not one of the values accepted for Enum class: [APP]
+```
+
+Two things follow. **The narrowing is a real v2 API change, not a publish
+artifact** — v1 serves `FONT` and `PLUGIN` on the same instance, minutes apart.
+And v1942 deleting the multi-value `CreatePathScope` enum along with the V1 type
+left the surviving `CreatePathV2.Scope` a bare `string` with its one legal value
+recorded only in prose; that is one of the three cases that forced the generator
+to start emitting single-value and numeric enum constants (see
+[STYLE.md](STYLE.md#skips-and-why-every-skip-still-reaches-the-caller)).
+
+Cleanup note: a `FONT` or `PLUGIN` path created through v1 does **not** appear in
+the v2 settings response, so a probe that tidies up by reading v2 will leave them
+behind. Read `/pro/v1/computer-inventory-collection-settings`, which lists all
+three collections, and delete by id.
 
 ### The gateway-bypass technique
 
@@ -1060,18 +1132,65 @@ itself, verified with both `--compressed` and `identity`.
   spec also newly claims the field is **not applicable to `JAMF_PRO`** — silently
   ignored for that vendor.
 
-  **Unverifiable right now, for two reasons worth remembering.** The JSC sandbox
-  has no connector (`GET /uem-connect/v1/connectors` → `totalCount: 0`; the
-  `M2M` one at `6a95614fa7d64061069424cf` recorded in v1882 is gone), and the
-  sync-settings PUT is the only surface carrying these fields. And the
-  doomed-request trick fails here: five PUTs to a bogus `configId` carrying
-  in-enum (`1440`, `3`), out-of-enum (`90`, `2`) and below-minimum (`1`) values
-  all returned the identical `404 NOT_FOUND` "Config with ID … doesn't exist"
-  (traces `01cfd20f…`, `e58717b4…`, `bc45a8e6…`, `a59d41eb…`, `e6425dab…`) with
-  `GET /connectors` → 200 as the control. **Resource resolution runs before field
-  validation on this PUT**, so a bogus id reaches no validator — the reverse of
-  the ordering that makes the technique work elsewhere. Re-probe when a
-  disposable connector exists.
+  **Both are now wire-verified — create a connector, do not try to shortcut it.**
+  The doomed-request trick does not work here: five PUTs to a bogus `configId`
+  carrying in-enum (`1440`, `3`), out-of-enum (`90`, `2`) and below-minimum (`1`)
+  values all returned the identical `404 NOT_FOUND` "Config with ID … doesn't
+  exist" with `GET /connectors` → 200 as the control. **Resource resolution runs
+  before field validation on this PUT**, so a bogus id reaches no validator — the
+  reverse of the ordering that makes the technique work elsewhere. The only route
+  is a real connector, and creating one is cheap (below). Probed 2026-09-01 on
+  the JSC sandbox against a freshly created `JAMF_PRO`/`M2M` connector:
+
+  **`deviceUnmanagedThreshold` is silently ignored for `JAMF_PRO` — confirmed.**
+  PUT sync-settings carrying `3`, `7`, `14`, `1` and `0` each answered **204**,
+  and the readback was **`0` every time**. A freshly created connector starts at
+  `0`. So the v1958 godoc is right, and the field is inert for this vendor.
+
+  This **refutes an earlier probe** (2026-08-28) that recorded it as stored on
+  create, reset to `0` when omitted, and accepting `-1`. The service changed
+  between those dates. The consequence downstream was severe rather than
+  cosmetic: `terraform-provider-jamfplatform` defaulted the attribute to `3` and
+  sent it, so *every* create failed with "Provider produced inconsistent result
+  after apply" — fixed in its PR #358 by making the attribute Computed and not
+  sending it. Treat a stored-value claim about this field as stale unless it
+  carries a date after 2026-09-01.
+
+  **`refreshRateMinutes` enforces the enum — confirmed.** `60` and `1440` → 204.
+  `360`, `59`, `1`, `100000` and `0` → **422 `VALIDATION_FAILED`**. So the
+  `minimum: 60` / `maximum: 1440` plus enum from v1958 is live, and the older
+  "no ceiling, 100000 accepted" observation is dead.
+
+  **The 422 leaks the accepted set in `description` and leaves `field` null:**
+  `"Invalid refreshRateMinutes: 360. Allowed values: 60, 120, 240, 480, 720, 1440"`,
+  `field: null`. Same shape as uem-connect leaking Jackson's own message
+  elsewhere — the useful content is in the prose, not the structured fields, so
+  `FieldErrors()` gets nothing here.
+
+  **`M2M` create self-provisions — confirmed, and it leaks.** `POST /connectors`
+  with `{vendor: JAMF_PRO, authStrategy: M2M, url, tenantId}` → **201**. The
+  readback shows `authStrategy` flipped to `JAMF_PRO_OAUTH`, `connected: true`,
+  `uemVersion` resolved to the live Jamf Pro version, and a
+  `deviceSyncAuth.clientId` Jamf Security Cloud minted for itself. `tenantId` is
+  returned despite the spec calling it write-only, which is why the SDK patches
+  it back into `ConnectorConfig`. `DELETE` → 204 and the list returns to
+  `totalCount: 0`.
+
+  **But the Jamf Pro side is not cleaned up, and it accumulates.** Each create
+  provisions an API integration on the target Jamf Pro instance named
+  `JSC Connector`, and the connector DELETE does **not** remove it. Verified
+  2026-09-01 with a control: immediately after deleting the connector,
+  `GET /pro/v1/api-integrations/2438` still returned `200` for the integration
+  whose `clientId` matched the connector's own `deviceSyncAuth.clientId`, still
+  `enabled: true`. The tenant carried **97 `JSC Connector` integrations against
+  zero live connectors** — 88% of all 110 integrations on the instance — with the
+  display names degenerating to `JSC Connector (10) (96)` as the uniquifier
+  recursed. One shared API role (`JSC Connector`, id 2174) serves all of them.
+  This is worth reporting upstream: 97 enabled OAuth client credentials with no
+  owner is a security finding, not untidiness. Delete them by hand from the Pro
+  side; the SDK has no way to correlate an integration back to a connector once
+  the connector is gone.
+
 - **v1942's `uemGroups` documentation is upstream's claim, not wire truth
   (2026-09-01).** It is the only substantive v1942 change the SDK took, and it is
   doc-only, but it asserts four behaviours nothing here has probed: that

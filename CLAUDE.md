@@ -524,10 +524,18 @@ each pinned by a test that fails when it closes:
   So `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their resolver and both Applies
   all stay, and `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` keeps its v1
   *write* control.
-- **`capi` is held at v1897 for two reasons, both evidenced.** First, Classic's
+- **`capi` is held at v1897, and the first reason is permanent.** Classic's
   `POST /patchsoftwaretitles/id/0` is the **only** way to mint an id the Pro v3
-  patch-configuration endpoints address, so withdrawing it makes patch software
-  titles unseedable end to end: `/pro/v{1,2}/patch-software-titles` are
+  patch-configuration endpoints address — and `softwareTitleId` *is* the Classic
+  title id, with that one call creating the v3 configuration in the same act
+  (proved end to end 2026-09-01: Classic POST returns id 146, v3 immediately
+  lists `id=146 softwareTitleId=146`, and a v3 create against 146 answers
+  `400 ALREADY_EXISTS_FOR_SITE`). **The v3 create needs an id that only exists
+  once the object exists, so there is nothing for a create to migrate onto.**
+  This is structurally impossible on the current surface, not merely unshipped:
+  the hold lifts only if Jamf gives the configurations surface an id-minting
+  create, not on the next bundle and not on a policy change. Withdrawing it makes
+  patch software titles unseedable end to end: `/pro/v{1,2}/patch-software-titles` are
   unrouted (403, probed 2026-09-01), and Classic's `patchavailabletitles` cannot
   supply one: **916 of its 1552 `name_id` values are non-numeric** (`0F5`, `2DE`,
   `41D`…) while `softwareTitleId` must be a positive numeric string, and the 636
@@ -535,7 +543,8 @@ each pinned by a test that fails when it closes:
   `376`, `518`, `575`; `Firefox` → `400 INVALID_ID`). `name_id` names *what to
   subscribe*, `softwareTitleId` names *a subscription* — different identifier
   spaces — and no `*softwaretitles*` path exists in any spec in any environment
-  other than the Classic ones. That breaks
+  other than the Classic ones. Full proof:
+  [WIRE-FACTS.md](docs/WIRE-FACTS.md#what-v1942s-removal-cost-probed-the-same-day). That breaks
   `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves
   `terraform-provider-jamfplatform`'s `patch_software_title` resource with no
   create path at all. Second, `GET` and `PUT /computers/id/{id}` go while `POST`
@@ -550,7 +559,8 @@ each pinned by a test that fails when it closes:
   export-report, history, patch-report and patch-summary sub-resources. Only
   `source_id` has no equivalent (v3 offers `patchSourceName` /
   `patchSourceEnabled`) and only `softwareTitleId` is unobtainable. So the
-  migration is blocked on one identifier, not on the model.
+  migration is blocked on one identifier, not on the model — and that identifier
+  cannot be obtained without the call being withdrawn.
 
 `GET /patches/name/{name}` **answers 500, not 404, for a name the tenant does not
 have**, wire-verified 3/3 plus a plausible name (`Firefox`) on 2026-09-01 with a
@@ -567,17 +577,29 @@ successor, and two replacement tests were written for the surviving patch
 endpoints that lost their enumeration fixture.
 
 **Downstream breakage** (report only — do not migrate from this repo). Holding
-`capi` and `securitycloud-devices` removed most of it. What remains in
-`terraform-provider-jamfplatform` is the pro inventory surface:
-`internal/resources/pro/computer_inventory_collection_settings`
-(`ComputerInventoryCollectionPreferences` → `…V2`),
-`internal/common/computertarget` and
-`internal/testhelpers/acceptance_assertions.go`
-(`ListComputersInventoryV3` → `…V4`, `ResolveComputerInventoryV3ID*` →
-`…V4ID*`). `internal/resources/pro/patch_software_title`,
-`internal/resources/pro/patch_policy` and
-`internal/resources/security_cloud/device_group` are **unaffected** — the holds
-keep the Classic patch family and the v1 device-group ops.
+`capi` and `securitycloud-devices` removed most of it, but **an earlier version of
+this note said `patch_software_title` was unaffected and that was wrong** — it
+cost `terraform-provider-jamfplatform` a build break the note had promised would
+not happen. The lesson is general: **a hold on one spec does not protect a
+downstream resource that reaches the same product through another spec.** Check
+every package a resource imports, not just the one whose withdrawal you reverted.
+
+- `internal/resources/pro/patch_software_title` **is** broken, through its Pro
+  **v2 extension-attribute side-channel**: `ListPatchSoftwareTitleExtensionAttributesV2`
+  is a `jpapi` operation, `pro` is at v1942, and reverting `capi` does not restore
+  it. Its Classic types and `{Get,Create,Update,Delete}PatchSoftwareTitleByID` are
+  all back; the v2 EA call is not. Migrate that one call to
+  `ListPatchSoftwareTitleExtensionAttributesV3`.
+- `internal/resources/pro/computer_inventory_collection_settings` —
+  `ComputerInventoryCollectionPreferences` → `…V2`. Note the v2 response exposes
+  only `applicationPaths`, and `CreatePathV2.Scope` accepts only `APP`, so any
+  `FONT`/`PLUGIN` handling has to stay on v1 or be dropped.
+- `internal/common/computertarget` and
+  `internal/testhelpers/acceptance_assertions.go` —
+  `ListComputersInventoryV3` → `…V4`, `ResolveComputerInventoryV3ID*` → `…V4ID*`.
+- `internal/resources/pro/patch_policy` and
+  `internal/resources/security_cloud/device_group` are unaffected — the holds keep
+  the Classic patch-policy family and the v1 device-group ops.
 `terraform-provider-jamfplatform-internal` is **unaffected**. `jamf-cli-internal`
 is unaffected too: transport only.
 

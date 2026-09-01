@@ -78,6 +78,27 @@ func AcceptCookiesValueValues() []AcceptCookiesValue {
 	}
 }
 
+// AudioAccessorySettingsComponentIdentifier is the set of values accepted by AudioAccessorySettingsComponent.Identifier.
+type AudioAccessorySettingsComponentIdentifier = string
+
+// AudioAccessorySettingsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AudioAccessorySettingsComponentIdentifierComJamfDdmAudioAccessorySettings AudioAccessorySettingsComponentIdentifier = "com.jamf.ddm.audio-accessory-settings"
+)
+
+// AudioAccessorySettingsComponentIdentifierValues returns every value the Jamf API accepts for AudioAccessorySettingsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AudioAccessorySettingsComponentIdentifierValues() []AudioAccessorySettingsComponentIdentifier {
+	return []AudioAccessorySettingsComponentIdentifier{
+		AudioAccessorySettingsComponentIdentifierComJamfDdmAudioAccessorySettings,
+	}
+}
+
 // AutomaticActionValue is the set of values accepted by AutomaticAction.Value.
 type AutomaticActionValue = string
 
@@ -151,6 +172,48 @@ func BookmarkItemTypeValues() []BookmarkItemType {
 	}
 }
 
+// ConfigurationProfileIdentifier is the set of values accepted by ConfigurationProfile.Identifier.
+type ConfigurationProfileIdentifier = string
+
+// ConfigurationProfileIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ConfigurationProfileIdentifierComJamfDdmConfigurationProfile ConfigurationProfileIdentifier = "com.jamf.ddm-configuration-profile"
+)
+
+// ConfigurationProfileIdentifierValues returns every value the Jamf API accepts for ConfigurationProfileIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConfigurationProfileIdentifierValues() []ConfigurationProfileIdentifier {
+	return []ConfigurationProfileIdentifier{
+		ConfigurationProfileIdentifierComJamfDdmConfigurationProfile,
+	}
+}
+
+// CustomDeclarationsComponentIdentifier is the set of values accepted by CustomDeclarationsComponent.Identifier.
+type CustomDeclarationsComponentIdentifier = string
+
+// CustomDeclarationsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CustomDeclarationsComponentIdentifierComJamfDdmCustomDeclarations CustomDeclarationsComponentIdentifier = "com.jamf.ddm.custom-declarations"
+)
+
+// CustomDeclarationsComponentIdentifierValues returns every value the Jamf API accepts for CustomDeclarationsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func CustomDeclarationsComponentIdentifierValues() []CustomDeclarationsComponentIdentifier {
+	return []CustomDeclarationsComponentIdentifier{
+		CustomDeclarationsComponentIdentifierComJamfDdmCustomDeclarations,
+	}
+}
+
 // DeploymentStateState is the set of values accepted by DeploymentState.State.
 type DeploymentStateState = string
 
@@ -173,6 +236,90 @@ func DeploymentStateStateValues() []DeploymentStateState {
 		DeploymentStateStateNotDeployed,
 		DeploymentStateStateDeployed,
 		DeploymentStateStateOutOfDate,
+	}
+}
+
+// DiskManagementComponentIdentifier is the set of values accepted by DiskManagementComponent.Identifier.
+type DiskManagementComponentIdentifier = string
+
+// DiskManagementComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DiskManagementComponentIdentifierComJamfDdmDiskManagement DiskManagementComponentIdentifier = "com.jamf.ddm.disk-management"
+)
+
+// DiskManagementComponentIdentifierValues returns every value the Jamf API accepts for DiskManagementComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DiskManagementComponentIdentifierValues() []DiskManagementComponentIdentifier {
+	return []DiskManagementComponentIdentifier{
+		DiskManagementComponentIdentifierComJamfDdmDiskManagement,
+	}
+}
+
+// DiskManagementSettingsConfigurationVersion is the set of values accepted by DiskManagementSettingsConfiguration.Version.
+type DiskManagementSettingsConfigurationVersion = int
+
+// DiskManagementSettingsConfigurationVersion values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	DiskManagementSettingsConfigurationVersion2 DiskManagementSettingsConfigurationVersion = 2
+)
+
+// DiskManagementSettingsConfigurationVersionValues returns every value the Jamf API accepts for DiskManagementSettingsConfigurationVersion,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DiskManagementSettingsConfigurationVersionValues() []DiskManagementSettingsConfigurationVersion {
+	return []DiskManagementSettingsConfigurationVersion{
+		DiskManagementSettingsConfigurationVersion2,
+	}
+}
+
+// FolderBookmarkItemType is the set of values accepted by FolderBookmarkItem.Type.
+type FolderBookmarkItemType = string
+
+// FolderBookmarkItemType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	FolderBookmarkItemTypeFolder FolderBookmarkItemType = "FOLDER"
+)
+
+// FolderBookmarkItemTypeValues returns every value the Jamf API accepts for FolderBookmarkItemType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func FolderBookmarkItemTypeValues() []FolderBookmarkItemType {
+	return []FolderBookmarkItemType{
+		FolderBookmarkItemTypeFolder,
+	}
+}
+
+// ManagedAppComponentIdentifier is the set of values accepted by ManagedAppComponent.Identifier.
+type ManagedAppComponentIdentifier = string
+
+// ManagedAppComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppComponentIdentifierComJamfDdmAppManaged ManagedAppComponentIdentifier = "com.jamf.ddm.app-managed"
+)
+
+// ManagedAppComponentIdentifierValues returns every value the Jamf API accepts for ManagedAppComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppComponentIdentifierValues() []ManagedAppComponentIdentifier {
+	return []ManagedAppComponentIdentifier{
+		ManagedAppComponentIdentifierComJamfDdmAppManaged,
 	}
 }
 
@@ -299,6 +446,27 @@ func ManagedExtensionStateValues() []ManagedExtensionState {
 	}
 }
 
+// MathSettingsComponentIdentifier is the set of values accepted by MathSettingsComponent.Identifier.
+type MathSettingsComponentIdentifier = string
+
+// MathSettingsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MathSettingsComponentIdentifierComJamfDdmMathSettings MathSettingsComponentIdentifier = "com.jamf.ddm.math-settings"
+)
+
+// MathSettingsComponentIdentifierValues returns every value the Jamf API accepts for MathSettingsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func MathSettingsComponentIdentifierValues() []MathSettingsComponentIdentifier {
+	return []MathSettingsComponentIdentifier{
+		MathSettingsComponentIdentifierComJamfDdmMathSettings,
+	}
+}
+
 // NewTabStartPagePageType is the set of values accepted by NewTabStartPage.PageType.
 type NewTabStartPagePageType = string
 
@@ -324,6 +492,48 @@ func NewTabStartPagePageTypeValues() []NewTabStartPagePageType {
 	}
 }
 
+// PasscodeSettingsComponentIdentifier is the set of values accepted by PasscodeSettingsComponent.Identifier.
+type PasscodeSettingsComponentIdentifier = string
+
+// PasscodeSettingsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PasscodeSettingsComponentIdentifierComJamfDdmPasscodeSettings PasscodeSettingsComponentIdentifier = "com.jamf.ddm.passcode-settings"
+)
+
+// PasscodeSettingsComponentIdentifierValues returns every value the Jamf API accepts for PasscodeSettingsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func PasscodeSettingsComponentIdentifierValues() []PasscodeSettingsComponentIdentifier {
+	return []PasscodeSettingsComponentIdentifier{
+		PasscodeSettingsComponentIdentifierComJamfDdmPasscodeSettings,
+	}
+}
+
+// PasscodeSettingsConfigurationVersion is the set of values accepted by PasscodeSettingsConfiguration.Version.
+type PasscodeSettingsConfigurationVersion = int
+
+// PasscodeSettingsConfigurationVersion values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	PasscodeSettingsConfigurationVersion2 PasscodeSettingsConfigurationVersion = 2
+)
+
+// PasscodeSettingsConfigurationVersionValues returns every value the Jamf API accepts for PasscodeSettingsConfigurationVersion,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func PasscodeSettingsConfigurationVersionValues() []PasscodeSettingsConfigurationVersion {
+	return []PasscodeSettingsConfigurationVersion{
+		PasscodeSettingsConfigurationVersion2,
+	}
+}
+
 // RecommendedCadenceValue is the set of values accepted by RecommendedCadence.Value.
 type RecommendedCadenceValue = string
 
@@ -346,6 +556,90 @@ func RecommendedCadenceValueValues() []RecommendedCadenceValue {
 		RecommendedCadenceValueAll,
 		RecommendedCadenceValueOldest,
 		RecommendedCadenceValueNewest,
+	}
+}
+
+// SafariBookmarksComponentIdentifier is the set of values accepted by SafariBookmarksComponent.Identifier.
+type SafariBookmarksComponentIdentifier = string
+
+// SafariBookmarksComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SafariBookmarksComponentIdentifierComJamfDdmSafariBookmarks SafariBookmarksComponentIdentifier = "com.jamf.ddm.safari-bookmarks"
+)
+
+// SafariBookmarksComponentIdentifierValues returns every value the Jamf API accepts for SafariBookmarksComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SafariBookmarksComponentIdentifierValues() []SafariBookmarksComponentIdentifier {
+	return []SafariBookmarksComponentIdentifier{
+		SafariBookmarksComponentIdentifierComJamfDdmSafariBookmarks,
+	}
+}
+
+// SafariExtensionsComponentIdentifier is the set of values accepted by SafariExtensionsComponent.Identifier.
+type SafariExtensionsComponentIdentifier = string
+
+// SafariExtensionsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SafariExtensionsComponentIdentifierComJamfDdmSafariExtensions SafariExtensionsComponentIdentifier = "com.jamf.ddm.safari-extensions"
+)
+
+// SafariExtensionsComponentIdentifierValues returns every value the Jamf API accepts for SafariExtensionsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SafariExtensionsComponentIdentifierValues() []SafariExtensionsComponentIdentifier {
+	return []SafariExtensionsComponentIdentifier{
+		SafariExtensionsComponentIdentifierComJamfDdmSafariExtensions,
+	}
+}
+
+// SafariSettingsComponentIdentifier is the set of values accepted by SafariSettingsComponent.Identifier.
+type SafariSettingsComponentIdentifier = string
+
+// SafariSettingsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SafariSettingsComponentIdentifierComJamfDdmSafariSettings SafariSettingsComponentIdentifier = "com.jamf.ddm.safari-settings"
+)
+
+// SafariSettingsComponentIdentifierValues returns every value the Jamf API accepts for SafariSettingsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SafariSettingsComponentIdentifierValues() []SafariSettingsComponentIdentifier {
+	return []SafariSettingsComponentIdentifier{
+		SafariSettingsComponentIdentifierComJamfDdmSafariSettings,
+	}
+}
+
+// SoftwareUpdateSettingsComponentIdentifier is the set of values accepted by SoftwareUpdateSettingsComponent.Identifier.
+type SoftwareUpdateSettingsComponentIdentifier = string
+
+// SoftwareUpdateSettingsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SoftwareUpdateSettingsComponentIdentifierComJamfDdmSoftwareUpdateSettings SoftwareUpdateSettingsComponentIdentifier = "com.jamf.ddm.software-update-settings"
+)
+
+// SoftwareUpdateSettingsComponentIdentifierValues returns every value the Jamf API accepts for SoftwareUpdateSettingsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SoftwareUpdateSettingsComponentIdentifierValues() []SoftwareUpdateSettingsComponentIdentifier {
+	return []SoftwareUpdateSettingsComponentIdentifier{
+		SoftwareUpdateSettingsComponentIdentifierComJamfDdmSoftwareUpdateSettings,
 	}
 }
 
@@ -394,6 +688,153 @@ func SwUpdateAutomaticConfigurationStrategyValues() []SwUpdateAutomaticConfigura
 	return []SwUpdateAutomaticConfigurationStrategy{
 		SwUpdateAutomaticConfigurationStrategyLatest,
 		SwUpdateAutomaticConfigurationStrategySemantic,
+	}
+}
+
+// SwUpdateComponentIdentifier is the set of values accepted by SwUpdateComponent.Identifier.
+type SwUpdateComponentIdentifier = string
+
+// SwUpdateComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SwUpdateComponentIdentifierComJamfDdmSwUpdates SwUpdateComponentIdentifier = "com.jamf.ddm.sw-updates"
+)
+
+// SwUpdateComponentIdentifierValues returns every value the Jamf API accepts for SwUpdateComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SwUpdateComponentIdentifierValues() []SwUpdateComponentIdentifier {
+	return []SwUpdateComponentIdentifier{
+		SwUpdateComponentIdentifierComJamfDdmSwUpdates,
+	}
+}
+
+// SwUpdateLatestConfigurationEnforcementType is the set of values accepted by SwUpdateLatestConfiguration.EnforcementType.
+type SwUpdateLatestConfigurationEnforcementType = string
+
+// SwUpdateLatestConfigurationEnforcementType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SwUpdateLatestConfigurationEnforcementTypeAutomatic SwUpdateLatestConfigurationEnforcementType = "AUTOMATIC"
+)
+
+// SwUpdateLatestConfigurationEnforcementTypeValues returns every value the Jamf API accepts for SwUpdateLatestConfigurationEnforcementType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SwUpdateLatestConfigurationEnforcementTypeValues() []SwUpdateLatestConfigurationEnforcementType {
+	return []SwUpdateLatestConfigurationEnforcementType{
+		SwUpdateLatestConfigurationEnforcementTypeAutomatic,
+	}
+}
+
+// SwUpdateLatestConfigurationStrategy is the set of values accepted by SwUpdateLatestConfiguration.Strategy.
+type SwUpdateLatestConfigurationStrategy = string
+
+// SwUpdateLatestConfigurationStrategy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SwUpdateLatestConfigurationStrategyLatest SwUpdateLatestConfigurationStrategy = "LATEST"
+)
+
+// SwUpdateLatestConfigurationStrategyValues returns every value the Jamf API accepts for SwUpdateLatestConfigurationStrategy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SwUpdateLatestConfigurationStrategyValues() []SwUpdateLatestConfigurationStrategy {
+	return []SwUpdateLatestConfigurationStrategy{
+		SwUpdateLatestConfigurationStrategyLatest,
+	}
+}
+
+// SwUpdateManualConfigurationEnforcementType is the set of values accepted by SwUpdateManualConfiguration.EnforcementType.
+type SwUpdateManualConfigurationEnforcementType = string
+
+// SwUpdateManualConfigurationEnforcementType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SwUpdateManualConfigurationEnforcementTypeManual SwUpdateManualConfigurationEnforcementType = "MANUAL"
+)
+
+// SwUpdateManualConfigurationEnforcementTypeValues returns every value the Jamf API accepts for SwUpdateManualConfigurationEnforcementType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SwUpdateManualConfigurationEnforcementTypeValues() []SwUpdateManualConfigurationEnforcementType {
+	return []SwUpdateManualConfigurationEnforcementType{
+		SwUpdateManualConfigurationEnforcementTypeManual,
+	}
+}
+
+// SwUpdateSemanticConfigurationEnforcementType is the set of values accepted by SwUpdateSemanticConfiguration.EnforcementType.
+type SwUpdateSemanticConfigurationEnforcementType = string
+
+// SwUpdateSemanticConfigurationEnforcementType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SwUpdateSemanticConfigurationEnforcementTypeAutomatic SwUpdateSemanticConfigurationEnforcementType = "AUTOMATIC"
+)
+
+// SwUpdateSemanticConfigurationEnforcementTypeValues returns every value the Jamf API accepts for SwUpdateSemanticConfigurationEnforcementType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SwUpdateSemanticConfigurationEnforcementTypeValues() []SwUpdateSemanticConfigurationEnforcementType {
+	return []SwUpdateSemanticConfigurationEnforcementType{
+		SwUpdateSemanticConfigurationEnforcementTypeAutomatic,
+	}
+}
+
+// SwUpdateSemanticConfigurationStrategy is the set of values accepted by SwUpdateSemanticConfiguration.Strategy.
+type SwUpdateSemanticConfigurationStrategy = string
+
+// SwUpdateSemanticConfigurationStrategy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SwUpdateSemanticConfigurationStrategySemantic SwUpdateSemanticConfigurationStrategy = "SEMANTIC"
+)
+
+// SwUpdateSemanticConfigurationStrategyValues returns every value the Jamf API accepts for SwUpdateSemanticConfigurationStrategy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SwUpdateSemanticConfigurationStrategyValues() []SwUpdateSemanticConfigurationStrategy {
+	return []SwUpdateSemanticConfigurationStrategy{
+		SwUpdateSemanticConfigurationStrategySemantic,
+	}
+}
+
+// URLBookmarkItemType is the set of values accepted by URLBookmarkItem.Type.
+type URLBookmarkItemType = string
+
+// URLBookmarkItemType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	URLBookmarkItemTypeBookmark URLBookmarkItemType = "BOOKMARK"
+)
+
+// URLBookmarkItemTypeValues returns every value the Jamf API accepts for URLBookmarkItemType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func URLBookmarkItemTypeValues() []URLBookmarkItemType {
+	return []URLBookmarkItemType{
+		URLBookmarkItemTypeBookmark,
 	}
 }
 

@@ -359,16 +359,17 @@ func (t {{ .Name }}) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 }
 {{- end }}
 {{- else }}
+{{- $base := or .EnumBaseType "string" }}
 // {{ .Comment }}
-type {{ .Name }} = string
+type {{ .Name }} = {{ $base }}
 {{- if .EnumValues }}
 {{- $enumType := .Name }}
 
-// {{ .Name }} values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
+// {{ .Name }} values accepted by the Jamf API. The alias above is {{ if eq $base "string" }}a string{{ else }}an {{ $base }}{{ end }}, so
+// these constants pass to any parameter or field declared as a plain {{ $base }}.
 const (
 {{- range .EnumValues }}
-	{{ .Name }} {{ $enumType }} = "{{ .Value }}"
+	{{ .Name }} {{ $enumType }} = {{ .Literal }}
 {{- end }}
 )
 
@@ -376,7 +377,7 @@ const (
 // in the order the spec declares them. Returns a fresh slice per call, so no
 // caller can corrupt the set for the rest of the process — which a package
 // level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// {{ if eq $base "string" }}stringvalidator.OneOf{{ else }}int64validator.OneOf{{ end }}, say) and anything that needs to enumerate the set
 // rather than name one member.
 func {{ .Name }}Values() []{{ $enumType }} {
 	return []{{ $enumType }}{

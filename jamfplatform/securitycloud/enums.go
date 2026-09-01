@@ -154,6 +154,27 @@ func CipherSuiteConfigIntegrityValues() []CipherSuiteConfigIntegrity {
 	}
 }
 
+// ConnectionConfigLeftResponseAuth is the set of values accepted by ConnectionConfigLeftResponse.Auth.
+type ConnectionConfigLeftResponseAuth = string
+
+// ConnectionConfigLeftResponseAuth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ConnectionConfigLeftResponseAuthPsk ConnectionConfigLeftResponseAuth = "psk"
+)
+
+// ConnectionConfigLeftResponseAuthValues returns every value the Jamf API accepts for ConnectionConfigLeftResponseAuth,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectionConfigLeftResponseAuthValues() []ConnectionConfigLeftResponseAuth {
+	return []ConnectionConfigLeftResponseAuth{
+		ConnectionConfigLeftResponseAuthPsk,
+	}
+}
+
 // ConnectionConfigPatchRightRequestVendor is the set of values accepted by ConnectionConfigPatchRightRequest.Vendor.
 type ConnectionConfigPatchRightRequestVendor = string
 
@@ -233,6 +254,27 @@ func ConnectionConfigRightRequestVendorValues() []ConnectionConfigRightRequestVe
 		ConnectionConfigRightRequestVendorStrongSwan,
 		ConnectionConfigRightRequestVendorWatchguard,
 		ConnectionConfigRightRequestVendorOther,
+	}
+}
+
+// ConnectionConfigRightResponseAuth is the set of values accepted by ConnectionConfigRightResponse.Auth.
+type ConnectionConfigRightResponseAuth = string
+
+// ConnectionConfigRightResponseAuth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ConnectionConfigRightResponseAuthPsk ConnectionConfigRightResponseAuth = "psk"
+)
+
+// ConnectionConfigRightResponseAuthValues returns every value the Jamf API accepts for ConnectionConfigRightResponseAuth,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectionConfigRightResponseAuthValues() []ConnectionConfigRightResponseAuth {
+	return []ConnectionConfigRightResponseAuth{
+		ConnectionConfigRightResponseAuthPsk,
 	}
 }
 
@@ -531,6 +573,64 @@ func GatewayStatusTunnelStateValues() []GatewayStatusTunnelState {
 	}
 }
 
+// GroupedGatewayCreateRequestRecoveryDelayInSec is the set of values accepted by GroupedGatewayCreateRequest.RecoveryDelayInSec.
+type GroupedGatewayCreateRequestRecoveryDelayInSec = int
+
+// GroupedGatewayCreateRequestRecoveryDelayInSec values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	GroupedGatewayCreateRequestRecoveryDelayInSec300   GroupedGatewayCreateRequestRecoveryDelayInSec = 300
+	GroupedGatewayCreateRequestRecoveryDelayInSec1800  GroupedGatewayCreateRequestRecoveryDelayInSec = 1800
+	GroupedGatewayCreateRequestRecoveryDelayInSec3600  GroupedGatewayCreateRequestRecoveryDelayInSec = 3600
+	GroupedGatewayCreateRequestRecoveryDelayInSec10800 GroupedGatewayCreateRequestRecoveryDelayInSec = 10800
+	GroupedGatewayCreateRequestRecoveryDelayInSec28800 GroupedGatewayCreateRequestRecoveryDelayInSec = 28800
+)
+
+// GroupedGatewayCreateRequestRecoveryDelayInSecValues returns every value the Jamf API accepts for GroupedGatewayCreateRequestRecoveryDelayInSec,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GroupedGatewayCreateRequestRecoveryDelayInSecValues() []GroupedGatewayCreateRequestRecoveryDelayInSec {
+	return []GroupedGatewayCreateRequestRecoveryDelayInSec{
+		GroupedGatewayCreateRequestRecoveryDelayInSec300,
+		GroupedGatewayCreateRequestRecoveryDelayInSec1800,
+		GroupedGatewayCreateRequestRecoveryDelayInSec3600,
+		GroupedGatewayCreateRequestRecoveryDelayInSec10800,
+		GroupedGatewayCreateRequestRecoveryDelayInSec28800,
+	}
+}
+
+// GroupedGatewayPatchRequestRecoveryDelayInSec is the set of values accepted by GroupedGatewayPatchRequest.RecoveryDelayInSec.
+type GroupedGatewayPatchRequestRecoveryDelayInSec = int
+
+// GroupedGatewayPatchRequestRecoveryDelayInSec values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	GroupedGatewayPatchRequestRecoveryDelayInSec300   GroupedGatewayPatchRequestRecoveryDelayInSec = 300
+	GroupedGatewayPatchRequestRecoveryDelayInSec1800  GroupedGatewayPatchRequestRecoveryDelayInSec = 1800
+	GroupedGatewayPatchRequestRecoveryDelayInSec3600  GroupedGatewayPatchRequestRecoveryDelayInSec = 3600
+	GroupedGatewayPatchRequestRecoveryDelayInSec10800 GroupedGatewayPatchRequestRecoveryDelayInSec = 10800
+	GroupedGatewayPatchRequestRecoveryDelayInSec28800 GroupedGatewayPatchRequestRecoveryDelayInSec = 28800
+)
+
+// GroupedGatewayPatchRequestRecoveryDelayInSecValues returns every value the Jamf API accepts for GroupedGatewayPatchRequestRecoveryDelayInSec,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GroupedGatewayPatchRequestRecoveryDelayInSecValues() []GroupedGatewayPatchRequestRecoveryDelayInSec {
+	return []GroupedGatewayPatchRequestRecoveryDelayInSec{
+		GroupedGatewayPatchRequestRecoveryDelayInSec300,
+		GroupedGatewayPatchRequestRecoveryDelayInSec1800,
+		GroupedGatewayPatchRequestRecoveryDelayInSec3600,
+		GroupedGatewayPatchRequestRecoveryDelayInSec10800,
+		GroupedGatewayPatchRequestRecoveryDelayInSec28800,
+	}
+}
+
 // RiskControlsLevelThreshold is the set of values accepted by RiskControls.LevelThreshold.
 type RiskControlsLevelThreshold = string
 
@@ -629,6 +729,27 @@ func ActivationProfileDeployRequestPlatformValues() []ActivationProfileDeployReq
 	}
 }
 
+// ActivationProfileDeployRequestUem is the set of values accepted by ActivationProfileDeployRequest.Uem.
+type ActivationProfileDeployRequestUem = string
+
+// ActivationProfileDeployRequestUem values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ActivationProfileDeployRequestUemJamf ActivationProfileDeployRequestUem = "JAMF"
+)
+
+// ActivationProfileDeployRequestUemValues returns every value the Jamf API accepts for ActivationProfileDeployRequestUem,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ActivationProfileDeployRequestUemValues() []ActivationProfileDeployRequestUem {
+	return []ActivationProfileDeployRequestUem{
+		ActivationProfileDeployRequestUemJamf,
+	}
+}
+
 // CitrixCloudOauthConfigRegion is the set of values accepted by CitrixCloudOauthConfig.Region.
 type CitrixCloudOauthConfigRegion = string
 
@@ -653,6 +774,68 @@ func CitrixCloudOauthConfigRegionValues() []CitrixCloudOauthConfigRegion {
 		CitrixCloudOauthConfigRegionEu,
 		CitrixCloudOauthConfigRegionUsa,
 		CitrixCloudOauthConfigRegionJapan,
+	}
+}
+
+// ConnectorConfigDeviceUnmanagedThreshold is the set of values accepted by ConnectorConfig.DeviceUnmanagedThreshold.
+type ConnectorConfigDeviceUnmanagedThreshold = int
+
+// ConnectorConfigDeviceUnmanagedThreshold values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	ConnectorConfigDeviceUnmanagedThreshold0  ConnectorConfigDeviceUnmanagedThreshold = 0
+	ConnectorConfigDeviceUnmanagedThreshold1  ConnectorConfigDeviceUnmanagedThreshold = 1
+	ConnectorConfigDeviceUnmanagedThreshold3  ConnectorConfigDeviceUnmanagedThreshold = 3
+	ConnectorConfigDeviceUnmanagedThreshold5  ConnectorConfigDeviceUnmanagedThreshold = 5
+	ConnectorConfigDeviceUnmanagedThreshold7  ConnectorConfigDeviceUnmanagedThreshold = 7
+	ConnectorConfigDeviceUnmanagedThreshold14 ConnectorConfigDeviceUnmanagedThreshold = 14
+)
+
+// ConnectorConfigDeviceUnmanagedThresholdValues returns every value the Jamf API accepts for ConnectorConfigDeviceUnmanagedThreshold,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectorConfigDeviceUnmanagedThresholdValues() []ConnectorConfigDeviceUnmanagedThreshold {
+	return []ConnectorConfigDeviceUnmanagedThreshold{
+		ConnectorConfigDeviceUnmanagedThreshold0,
+		ConnectorConfigDeviceUnmanagedThreshold1,
+		ConnectorConfigDeviceUnmanagedThreshold3,
+		ConnectorConfigDeviceUnmanagedThreshold5,
+		ConnectorConfigDeviceUnmanagedThreshold7,
+		ConnectorConfigDeviceUnmanagedThreshold14,
+	}
+}
+
+// ConnectorConfigRefreshRateMinutes is the set of values accepted by ConnectorConfig.RefreshRateMinutes.
+type ConnectorConfigRefreshRateMinutes = int64
+
+// ConnectorConfigRefreshRateMinutes values accepted by the Jamf API. The alias above is an int64, so
+// these constants pass to any parameter or field declared as a plain int64.
+const (
+	ConnectorConfigRefreshRateMinutes60   ConnectorConfigRefreshRateMinutes = 60
+	ConnectorConfigRefreshRateMinutes120  ConnectorConfigRefreshRateMinutes = 120
+	ConnectorConfigRefreshRateMinutes240  ConnectorConfigRefreshRateMinutes = 240
+	ConnectorConfigRefreshRateMinutes480  ConnectorConfigRefreshRateMinutes = 480
+	ConnectorConfigRefreshRateMinutes720  ConnectorConfigRefreshRateMinutes = 720
+	ConnectorConfigRefreshRateMinutes1440 ConnectorConfigRefreshRateMinutes = 1440
+)
+
+// ConnectorConfigRefreshRateMinutesValues returns every value the Jamf API accepts for ConnectorConfigRefreshRateMinutes,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ConnectorConfigRefreshRateMinutesValues() []ConnectorConfigRefreshRateMinutes {
+	return []ConnectorConfigRefreshRateMinutes{
+		ConnectorConfigRefreshRateMinutes60,
+		ConnectorConfigRefreshRateMinutes120,
+		ConnectorConfigRefreshRateMinutes240,
+		ConnectorConfigRefreshRateMinutes480,
+		ConnectorConfigRefreshRateMinutes720,
+		ConnectorConfigRefreshRateMinutes1440,
 	}
 }
 
@@ -781,6 +964,48 @@ func EmailMappingTypeValues() []EmailMappingType {
 	}
 }
 
+// GoogleConnectorCreateRequestVendor is the set of values accepted by GoogleConnectorCreateRequest.Vendor.
+type GoogleConnectorCreateRequestVendor = string
+
+// GoogleConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	GoogleConnectorCreateRequestVendorGoogle GoogleConnectorCreateRequestVendor = "GOOGLE"
+)
+
+// GoogleConnectorCreateRequestVendorValues returns every value the Jamf API accepts for GoogleConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func GoogleConnectorCreateRequestVendorValues() []GoogleConnectorCreateRequestVendor {
+	return []GoogleConnectorCreateRequestVendor{
+		GoogleConnectorCreateRequestVendorGoogle,
+	}
+}
+
+// IntuneConnectorCreateRequestVendor is the set of values accepted by IntuneConnectorCreateRequest.Vendor.
+type IntuneConnectorCreateRequestVendor = string
+
+// IntuneConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	IntuneConnectorCreateRequestVendorIntune IntuneConnectorCreateRequestVendor = "INTUNE"
+)
+
+// IntuneConnectorCreateRequestVendorValues returns every value the Jamf API accepts for IntuneConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func IntuneConnectorCreateRequestVendorValues() []IntuneConnectorCreateRequestVendor {
+	return []IntuneConnectorCreateRequestVendor{
+		IntuneConnectorCreateRequestVendorIntune,
+	}
+}
+
 // JamfProConnectorCreateRequestAuthStrategy is the set of values accepted by JamfProConnectorCreateRequest.AuthStrategy.
 type JamfProConnectorCreateRequestAuthStrategy = string
 
@@ -803,6 +1028,48 @@ func JamfProConnectorCreateRequestAuthStrategyValues() []JamfProConnectorCreateR
 		JamfProConnectorCreateRequestAuthStrategyJamfProOauth,
 		JamfProConnectorCreateRequestAuthStrategyBasic,
 		JamfProConnectorCreateRequestAuthStrategyM2m,
+	}
+}
+
+// JamfProConnectorCreateRequestVendor is the set of values accepted by JamfProConnectorCreateRequest.Vendor.
+type JamfProConnectorCreateRequestVendor = string
+
+// JamfProConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	JamfProConnectorCreateRequestVendorJamfPro JamfProConnectorCreateRequestVendor = "JAMF_PRO"
+)
+
+// JamfProConnectorCreateRequestVendorValues returns every value the Jamf API accepts for JamfProConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func JamfProConnectorCreateRequestVendorValues() []JamfProConnectorCreateRequestVendor {
+	return []JamfProConnectorCreateRequestVendor{
+		JamfProConnectorCreateRequestVendorJamfPro,
+	}
+}
+
+// JamfSchoolConnectorCreateRequestVendor is the set of values accepted by JamfSchoolConnectorCreateRequest.Vendor.
+type JamfSchoolConnectorCreateRequestVendor = string
+
+// JamfSchoolConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	JamfSchoolConnectorCreateRequestVendorJamfSchool JamfSchoolConnectorCreateRequestVendor = "JAMF_SCHOOL"
+)
+
+// JamfSchoolConnectorCreateRequestVendorValues returns every value the Jamf API accepts for JamfSchoolConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func JamfSchoolConnectorCreateRequestVendorValues() []JamfSchoolConnectorCreateRequestVendor {
+	return []JamfSchoolConnectorCreateRequestVendor{
+		JamfSchoolConnectorCreateRequestVendorJamfSchool,
 	}
 }
 
@@ -869,6 +1136,69 @@ func LatestSyncStatusValues() []LatestSyncStatus {
 		LatestSyncStatusConnectionTestFailed,
 		LatestSyncStatusCompletedWithErrors,
 		LatestSyncStatusStalled,
+	}
+}
+
+// Maas360ConnectorCreateRequestVendor is the set of values accepted by Maas360ConnectorCreateRequest.Vendor.
+type Maas360ConnectorCreateRequestVendor = string
+
+// Maas360ConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	Maas360ConnectorCreateRequestVendorMaas360 Maas360ConnectorCreateRequestVendor = "MAAS360"
+)
+
+// Maas360ConnectorCreateRequestVendorValues returns every value the Jamf API accepts for Maas360ConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func Maas360ConnectorCreateRequestVendorValues() []Maas360ConnectorCreateRequestVendor {
+	return []Maas360ConnectorCreateRequestVendor{
+		Maas360ConnectorCreateRequestVendorMaas360,
+	}
+}
+
+// MobileIronCloudConnectorCreateRequestVendor is the set of values accepted by MobileIronCloudConnectorCreateRequest.Vendor.
+type MobileIronCloudConnectorCreateRequestVendor = string
+
+// MobileIronCloudConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileIronCloudConnectorCreateRequestVendorMobileironcloud MobileIronCloudConnectorCreateRequestVendor = "MOBILEIRONCLOUD"
+)
+
+// MobileIronCloudConnectorCreateRequestVendorValues returns every value the Jamf API accepts for MobileIronCloudConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func MobileIronCloudConnectorCreateRequestVendorValues() []MobileIronCloudConnectorCreateRequestVendor {
+	return []MobileIronCloudConnectorCreateRequestVendor{
+		MobileIronCloudConnectorCreateRequestVendorMobileironcloud,
+	}
+}
+
+// MobileIronCoreConnectorCreateRequestVendor is the set of values accepted by MobileIronCoreConnectorCreateRequest.Vendor.
+type MobileIronCoreConnectorCreateRequestVendor = string
+
+// MobileIronCoreConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	MobileIronCoreConnectorCreateRequestVendorMobileironcore MobileIronCoreConnectorCreateRequestVendor = "MOBILEIRONCORE"
+)
+
+// MobileIronCoreConnectorCreateRequestVendorValues returns every value the Jamf API accepts for MobileIronCoreConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func MobileIronCoreConnectorCreateRequestVendorValues() []MobileIronCoreConnectorCreateRequestVendor {
+	return []MobileIronCoreConnectorCreateRequestVendor{
+		MobileIronCoreConnectorCreateRequestVendorMobileironcore,
 	}
 }
 
@@ -1011,6 +1341,68 @@ func SyncSettingsAutoDeviceDeletionValues() []SyncSettingsAutoDeviceDeletion {
 	}
 }
 
+// SyncSettingsDeviceUnmanagedThreshold is the set of values accepted by SyncSettings.DeviceUnmanagedThreshold.
+type SyncSettingsDeviceUnmanagedThreshold = int
+
+// SyncSettingsDeviceUnmanagedThreshold values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	SyncSettingsDeviceUnmanagedThreshold0  SyncSettingsDeviceUnmanagedThreshold = 0
+	SyncSettingsDeviceUnmanagedThreshold1  SyncSettingsDeviceUnmanagedThreshold = 1
+	SyncSettingsDeviceUnmanagedThreshold3  SyncSettingsDeviceUnmanagedThreshold = 3
+	SyncSettingsDeviceUnmanagedThreshold5  SyncSettingsDeviceUnmanagedThreshold = 5
+	SyncSettingsDeviceUnmanagedThreshold7  SyncSettingsDeviceUnmanagedThreshold = 7
+	SyncSettingsDeviceUnmanagedThreshold14 SyncSettingsDeviceUnmanagedThreshold = 14
+)
+
+// SyncSettingsDeviceUnmanagedThresholdValues returns every value the Jamf API accepts for SyncSettingsDeviceUnmanagedThreshold,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SyncSettingsDeviceUnmanagedThresholdValues() []SyncSettingsDeviceUnmanagedThreshold {
+	return []SyncSettingsDeviceUnmanagedThreshold{
+		SyncSettingsDeviceUnmanagedThreshold0,
+		SyncSettingsDeviceUnmanagedThreshold1,
+		SyncSettingsDeviceUnmanagedThreshold3,
+		SyncSettingsDeviceUnmanagedThreshold5,
+		SyncSettingsDeviceUnmanagedThreshold7,
+		SyncSettingsDeviceUnmanagedThreshold14,
+	}
+}
+
+// SyncSettingsRefreshRateMinutes is the set of values accepted by SyncSettings.RefreshRateMinutes.
+type SyncSettingsRefreshRateMinutes = int64
+
+// SyncSettingsRefreshRateMinutes values accepted by the Jamf API. The alias above is an int64, so
+// these constants pass to any parameter or field declared as a plain int64.
+const (
+	SyncSettingsRefreshRateMinutes60   SyncSettingsRefreshRateMinutes = 60
+	SyncSettingsRefreshRateMinutes120  SyncSettingsRefreshRateMinutes = 120
+	SyncSettingsRefreshRateMinutes240  SyncSettingsRefreshRateMinutes = 240
+	SyncSettingsRefreshRateMinutes480  SyncSettingsRefreshRateMinutes = 480
+	SyncSettingsRefreshRateMinutes720  SyncSettingsRefreshRateMinutes = 720
+	SyncSettingsRefreshRateMinutes1440 SyncSettingsRefreshRateMinutes = 1440
+)
+
+// SyncSettingsRefreshRateMinutesValues returns every value the Jamf API accepts for SyncSettingsRefreshRateMinutes,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SyncSettingsRefreshRateMinutesValues() []SyncSettingsRefreshRateMinutes {
+	return []SyncSettingsRefreshRateMinutes{
+		SyncSettingsRefreshRateMinutes60,
+		SyncSettingsRefreshRateMinutes120,
+		SyncSettingsRefreshRateMinutes240,
+		SyncSettingsRefreshRateMinutes480,
+		SyncSettingsRefreshRateMinutes720,
+		SyncSettingsRefreshRateMinutes1440,
+	}
+}
+
 // SyncSettingsVendor is the set of values accepted by SyncSettings.Vendor.
 type SyncSettingsVendor = string
 
@@ -1050,6 +1442,48 @@ func SyncSettingsVendorValues() []SyncSettingsVendor {
 	}
 }
 
+// WizyConnectorCreateRequestVendor is the set of values accepted by WizyConnectorCreateRequest.Vendor.
+type WizyConnectorCreateRequestVendor = string
+
+// WizyConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	WizyConnectorCreateRequestVendorWizy WizyConnectorCreateRequestVendor = "WIZY"
+)
+
+// WizyConnectorCreateRequestVendorValues returns every value the Jamf API accepts for WizyConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func WizyConnectorCreateRequestVendorValues() []WizyConnectorCreateRequestVendor {
+	return []WizyConnectorCreateRequestVendor{
+		WizyConnectorCreateRequestVendorWizy,
+	}
+}
+
+// WorkspaceOneConnectorCreateRequestVendor is the set of values accepted by WorkspaceOneConnectorCreateRequest.Vendor.
+type WorkspaceOneConnectorCreateRequestVendor = string
+
+// WorkspaceOneConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	WorkspaceOneConnectorCreateRequestVendorAirwatch WorkspaceOneConnectorCreateRequestVendor = "AIRWATCH"
+)
+
+// WorkspaceOneConnectorCreateRequestVendorValues returns every value the Jamf API accepts for WorkspaceOneConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func WorkspaceOneConnectorCreateRequestVendorValues() []WorkspaceOneConnectorCreateRequestVendor {
+	return []WorkspaceOneConnectorCreateRequestVendor{
+		WorkspaceOneConnectorCreateRequestVendorAirwatch,
+	}
+}
+
 // XenMobileConnectorCreateRequestAuthStrategy is the set of values accepted by XenMobileConnectorCreateRequest.AuthStrategy.
 type XenMobileConnectorCreateRequestAuthStrategy = string
 
@@ -1072,5 +1506,26 @@ func XenMobileConnectorCreateRequestAuthStrategyValues() []XenMobileConnectorCre
 		XenMobileConnectorCreateRequestAuthStrategyUsernamePassword,
 		XenMobileConnectorCreateRequestAuthStrategyCitrixCloudAdmin,
 		XenMobileConnectorCreateRequestAuthStrategyCitrixCloudAdminOauth,
+	}
+}
+
+// XenMobileConnectorCreateRequestVendor is the set of values accepted by XenMobileConnectorCreateRequest.Vendor.
+type XenMobileConnectorCreateRequestVendor = string
+
+// XenMobileConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	XenMobileConnectorCreateRequestVendorXenmobile XenMobileConnectorCreateRequestVendor = "XENMOBILE"
+)
+
+// XenMobileConnectorCreateRequestVendorValues returns every value the Jamf API accepts for XenMobileConnectorCreateRequestVendor,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func XenMobileConnectorCreateRequestVendorValues() []XenMobileConnectorCreateRequestVendor {
+	return []XenMobileConnectorCreateRequestVendor{
+		XenMobileConnectorCreateRequestVendorXenmobile,
 	}
 }

@@ -2145,7 +2145,7 @@ type CountryCodes struct {
 // CreatePathV2 represents a create path v2.
 type CreatePathV2 struct {
 	Path string `json:"path"`
-	// Allowed values: "APP".
+	// Allowed values: see the CreatePathV2Scope constants.
 	Scope string `json:"scope"`
 }
 
@@ -2389,9 +2389,11 @@ type DeviceCommunicationSettings struct {
 	AutoRenewComputerMDMProfileWhenDeviceIdentityCertExpiring     *bool `json:"autoRenewComputerMdmProfileWhenDeviceIdentityCertExpiring,omitempty"`
 	AutoRenewMobileDeviceMDMProfileWhenCaRenewed                  *bool `json:"autoRenewMobileDeviceMdmProfileWhenCaRenewed,omitempty"`
 	AutoRenewMobileDeviceMDMProfileWhenDeviceIdentityCertExpiring *bool `json:"autoRenewMobileDeviceMdmProfileWhenDeviceIdentityCertExpiring,omitempty"`
-	// Allowed values: 90, 120, 180.
+	// Allowed values: see the DeviceCommunicationSettingsMDMProfileComputerExpirationLimitInDays
+	// constants.
 	MDMProfileComputerExpirationLimitInDays *int `json:"mdmProfileComputerExpirationLimitInDays,omitempty"`
-	// Allowed values: 90, 120, 180.
+	// Allowed values: see the DeviceCommunicationSettingsMDMProfileMobileDeviceExpirationLimitInDays
+	// constants.
 	MDMProfileMobileDeviceExpirationLimitInDays *int `json:"mdmProfileMobileDeviceExpirationLimitInDays,omitempty"`
 }
 
@@ -3461,7 +3463,7 @@ type InstallPackage struct {
 // InternalRecipient represents a internal recipient.
 type InternalRecipient struct {
 	AccountID string `json:"accountId"`
-	// Allowed values: "DAILY".
+	// Allowed values: see the InternalRecipientFrequency constants.
 	Frequency *string `json:"frequency,omitempty"`
 }
 
@@ -6201,7 +6203,7 @@ type RemoteAdministrationResponse struct {
 	DisplayName string `json:"displayName"`
 	ID          string `json:"id"`
 	SiteID      string `json:"siteId"`
-	// Allowed values: "team-viewer".
+	// Allowed values: see the RemoteAdministrationResponseType constants.
 	Type string `json:"type"`
 }
 
@@ -6424,7 +6426,7 @@ type SessionCandidateRequest struct {
 	// Device identifier.
 	DeviceID string `json:"deviceId"`
 	// Device type.
-	// Allowed values: "COMPUTER".
+	// Allowed values: see the SessionCandidateRequestDeviceType constants.
 	DeviceType string `json:"deviceType"`
 }
 
@@ -6445,7 +6447,7 @@ type SessionDetails struct {
 	// Device name if found - null otherwise.
 	DeviceName string `json:"deviceName"`
 	// Device type.
-	// Allowed values: "COMPUTER".
+	// Allowed values: see the SessionDetailsDeviceType constants.
 	DeviceType string `json:"deviceType"`
 	// End user session URL.
 	EndUserLink string `json:"endUserLink"`
@@ -6815,7 +6817,7 @@ type StartupStatus struct {
 	StepCode  string  `json:"stepCode"`
 	StepParam *string `json:"stepParam,omitempty"`
 	Warning   *string `json:"warning,omitempty"`
-	// Allowed values: "SERVER_INIT_WARNING_DB_TABLE_ENCODING".
+	// Allowed values: see the StartupStatusWarningCode constants.
 	WarningCode  *string `json:"warningCode,omitempty"`
 	WarningParam *string `json:"warningParam,omitempty"`
 }

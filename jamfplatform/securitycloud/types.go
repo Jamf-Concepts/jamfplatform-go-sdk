@@ -314,7 +314,7 @@ type ConnectionConfigLeftRequest struct {
 // ConnectionConfigLeftResponse IPSec Jamf-side endpoint returned on GET. Secrets are never included.
 type ConnectionConfigLeftResponse struct {
 	// Authentication method.
-	// Allowed values: "psk".
+	// Allowed values: see the ConnectionConfigLeftResponseAuth constants.
 	Auth string `json:"auth"`
 	// Endpoint address.
 	Host string `json:"host"`
@@ -369,7 +369,7 @@ type ConnectionConfigRightRequest struct {
 // ConnectionConfigRightResponse IPSec remote-peer endpoint returned on GET. Secrets are never included.
 type ConnectionConfigRightResponse struct {
 	// Authentication method.
-	// Allowed values: "psk".
+	// Allowed values: see the ConnectionConfigRightResponseAuth constants.
 	Auth string `json:"auth"`
 	// Endpoint address.
 	Host string `json:"host"`
@@ -670,7 +670,7 @@ type GroupedGatewayCreateRequest struct {
 	// Required gateway stability before failover, in seconds, for the `ACTIVE_STANDBY` strategy. Must be
 	// one of the listed durations (mirrors the Jamf console). Required on create even for
 	// `RANDOM`/`NEAREST`, where it is ignored.
-	// Allowed values: 300, 1800, 3600, 10800, 28800.
+	// Allowed values: see the GroupedGatewayCreateRequestRecoveryDelayInSec constants.
 	RecoveryDelayInSec int `json:"recoveryDelayInSec"`
 	// `ACTIVE_STANDBY` — traffic goes to the primary gateway; failover to secondary on failure. `RANDOM`
 	// — traffic is distributed randomly across gateways. `NEAREST` — traffic routes to the
@@ -696,7 +696,7 @@ type GroupedGatewayPatchRequest struct {
 	// Recovery delay in seconds for the `ACTIVE_STANDBY` strategy. If provided, must be one of the listed
 	// durations. Omit to leave unchanged. Grouped gateways created before this constraint may hold a
 	// legacy value; `recoveryDelayInSec` is unaffected on PATCH operations that omit it.
-	// Allowed values: 300, 1800, 3600, 10800, 28800.
+	// Allowed values: see the GroupedGatewayPatchRequestRecoveryDelayInSec constants.
 	RecoveryDelayInSec *int `json:"recoveryDelayInSec,omitempty"`
 	// `ACTIVE_STANDBY` — traffic goes to the primary gateway; failover to secondary on failure. `RANDOM`
 	// — traffic is distributed randomly across gateways. `NEAREST` — traffic routes to the
@@ -854,7 +854,7 @@ type ActivationProfileDeployRequest struct {
 	// Allowed values: see the ActivationProfileDeployRequestPlatform constants.
 	Platform string `json:"platform"`
 	// The UEM platform to deploy profiles to.
-	// Allowed values: "JAMF".
+	// Allowed values: see the ActivationProfileDeployRequestUem constants.
 	Uem string `json:"uem"`
 	// Optional UEM group IDs to scope the deployment to.
 	// Group names are not accepted. These are the UEM's own group IDs — for Jamf Pro, obtain them from
@@ -936,7 +936,7 @@ type ConnectorConfig struct {
 	// Number of days since last check-in before a device is treated as unmanaged. `0` uses the platform
 	// default (3 days). Not applicable for JAMF_PRO — any value sent for that vendor is silently ignored
 	// (device status is taken exclusively from the UEM).
-	// Allowed values: 0, 1, 3, 5, 7, 14.
+	// Allowed values: see the ConnectorConfigDeviceUnmanagedThreshold constants.
 	DeviceUnmanagedThreshold int `json:"deviceUnmanagedThreshold"`
 	// Whether the UEM platform supports receiving device tags from JSC.
 	EmmTaggingSupported bool `json:"emmTaggingSupported"`
@@ -963,7 +963,7 @@ type ConnectorConfig struct {
 	// Timestamp when the previous sync started (ISO 8601).
 	PreviousSyncStart *time.Time `json:"previousSyncStart,omitempty"`
 	// Sync refresh interval in minutes.
-	// Allowed values: 60, 120, 240, 480, 720, 1440.
+	// Allowed values: see the ConnectorConfigRefreshRateMinutes constants.
 	RefreshRateMinutes int64 `json:"refreshRateMinutes"`
 	// Whether scheduled sync is active.
 	Scheduled bool `json:"scheduled"`
@@ -1193,7 +1193,7 @@ type GoogleConnectorCreateRequest struct {
 	// Google API URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "GOOGLE".
+	// Allowed values: see the GoogleConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1250,7 +1250,7 @@ type IntuneConnectorCreateRequest struct {
 	// Intune (Microsoft Graph) server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "INTUNE".
+	// Allowed values: see the IntuneConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1274,7 +1274,7 @@ type JamfProConnectorCreateRequest struct {
 	// Jamf Pro server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "JAMF_PRO".
+	// Allowed values: see the JamfProConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1307,7 +1307,7 @@ type JamfSchoolConnectorCreateRequest struct {
 	// Jamf School server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "JAMF_SCHOOL".
+	// Allowed values: see the JamfSchoolConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1361,7 +1361,7 @@ type Maas360ConnectorCreateRequest struct {
 	// MaaS360 server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "MAAS360".
+	// Allowed values: see the Maas360ConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1378,7 +1378,7 @@ type MobileIronCloudConnectorCreateRequest struct {
 	// MobileIron Cloud server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "MOBILEIRONCLOUD".
+	// Allowed values: see the MobileIronCloudConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1397,7 +1397,7 @@ type MobileIronCoreConnectorCreateRequest struct {
 	// MobileIron Core server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "MOBILEIRONCORE".
+	// Allowed values: see the MobileIronCoreConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1477,14 +1477,14 @@ type SyncSettings struct {
 	// Number of days since last check-in before a device is treated as unmanaged. `0` uses the platform
 	// default (3 days). Not applicable for JAMF_PRO — any value sent for that vendor is silently ignored
 	// (device status is taken exclusively from the UEM).
-	// Allowed values: 0, 1, 3, 5, 7, 14.
+	// Allowed values: see the SyncSettingsDeviceUnmanagedThreshold constants.
 	DeviceUnmanagedThreshold *int `json:"deviceUnmanagedThreshold,omitempty"`
 	// Whether to automatically disable sync after repeated authentication failures.
 	DisableSyncOnAuthError *bool `json:"disableSyncOnAuthError,omitempty"`
 	// Group mapping configuration. Maps UEM groups to JSC groups.
 	GroupSettings *GroupSettings `json:"groupSettings,omitempty"`
 	// Sync refresh interval in minutes.
-	// Allowed values: 60, 120, 240, 480, 720, 1440.
+	// Allowed values: see the SyncSettingsRefreshRateMinutes constants.
 	RefreshRateMinutes *int64 `json:"refreshRateMinutes,omitempty"`
 	// Whether scheduled sync is enabled.
 	Scheduled *bool `json:"scheduled,omitempty"`
@@ -1502,7 +1502,7 @@ type WizyConnectorCreateRequest struct {
 	// Wizy server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "WIZY".
+	// Allowed values: see the WizyConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1525,7 +1525,7 @@ type WorkspaceOneConnectorCreateRequest struct {
 	// Workspace ONE server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "AIRWATCH".
+	// Allowed values: see the WorkspaceOneConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
 
@@ -1550,6 +1550,6 @@ type XenMobileConnectorCreateRequest struct {
 	// XenMobile server URL.
 	URL string `json:"url"`
 	// UEM vendor discriminator.
-	// Allowed values: "XENMOBILE".
+	// Allowed values: see the XenMobileConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }

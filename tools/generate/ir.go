@@ -7,21 +7,25 @@ package main
 // Intermediate representation
 // ---------------------------------------------------------------------------
 
-// GoEnumConst is one value of a named string-enum schema, emitted as a
-// typed constant alongside the schema's `type X = string` alias.
+// GoEnumConst is one value of an enum, emitted as a typed constant alongside
+// the enum's `type X = <base>` alias. The base is usually string; numeric
+// enums (Jamf uses them for interval and threshold fields) alias int or int64
+// so the constants stay assignable to the struct field they constrain.
 // The declaration carries the wire value on the same line, so no per-value
 // godoc is emitted — a reader grepping for "MII_UNATHORIZED_RESPONSE_NOTIFICATION"
 // still finds it even though the identifier normalises the spec's misspelling.
 type GoEnumConst struct {
-	Name  string // Go identifier, e.g. NotificationTypeApnsCertRevoked
-	Value string // wire value, e.g. APNS_CERT_REVOKED
+	Name    string // Go identifier, e.g. NotificationTypeApnsCertRevoked
+	Value   string // wire value, e.g. APNS_CERT_REVOKED
+	Literal string // ready-to-emit Go literal: `"APNS_CERT_REVOKED"` for a string enum, `1440` for a numeric one
 }
 
 type GoType struct {
 	Name          string
 	Comment       string
 	Fields        []GoField
-	EnumValues    []GoEnumConst // populated for named string-enum schemas
+	EnumValues    []GoEnumConst // populated for enum schemas and for enums declared inline on a property
+	EnumBaseType  string        // underlying type of the enum alias: "string" (default when empty), "int" or "int64"
 	IsRawJSON     bool
 	Discriminator *GoDiscriminator
 	XMLName       string // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field

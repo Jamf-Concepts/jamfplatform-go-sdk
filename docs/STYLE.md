@@ -446,9 +446,41 @@ item always uses pointer fields.
 
 ---
 
+## A shared schema's optionality depends on where it is reachable from
+
+`needsPtr` in `schemaToGoType` (`tools/generate/schema.go`) includes
+`isRequest && !isRequired`: for a **request** type an unrequired scalar becomes
+`*T` with `,omitempty`, so a caller can distinguish "omit" from "send zero" —
+which PATCH depends on. For a response-only type the same field is a plain `T`.
+
+**A named schema emitted once and shared by both kinds therefore takes its shape
+from whichever parents happen to be reachable, and withdrawing an unrelated
+operation can silently flip it.** That is not hypothetical: `SmartGroupCriteria`
+went from `*bool` to `bool` on `OpeningParen` and `ClosingParen` between v1897 and
+v1942 while **its schema stayed byte-identical and its `required` list never
+changed**. The cause was v1942 withdrawing the V1 mobile smart-group operations,
+which stopped `SmartGroupAssignment` — a request body embedding
+`[]SmartGroupCriteria` — from being emitted at all. `SmartGroupCriteria` then
+survived only through `GroupWithCriteriaDtoV1`, a response, so the request branch
+of `needsPtr` stopped firing. It is the only one of five paren-bearing types to
+have moved, because the other four are reached through request bodies that
+survived.
+
+Two consequences worth knowing before touching this:
+
+- **It is a breaking change with no spec change behind it**, and it will not show
+  up in a spec diff. If a whitelist removal makes a shared schema response-only,
+  expect its optional scalars to lose their pointers.
+- **The stable fixes are both policy decisions, not bug fixes.** Forcing request
+  rules for every named schema restores three-state semantics everywhere and stops
+  the churn, at the cost of pointer-ising a large number of response-only optional
+  scalars. Forcing response rules does the reverse and breaks PATCH callers. Do
+  not pick one incidentally while fixing something else — the diff is wide either
+  way and consumers key on it.
+
 ## Enum constants
 
-Every string enum becomes a Go type plus one constant per value, in a per-package
+Every enum becomes a Go type plus one constant per value, in a per-package
 `enums.go` — never `types.go`, see `partitionEnumTypes`. Two sources feed it:
 
 - **Spec-named enum schemas** keep their own name (`NotificationType`), emitted by
@@ -520,11 +552,36 @@ field's own type already names the enum.
 
 ### Skips, and why every skip still reaches the caller
 
-Skipped, each deliberately: non-string enums (constants are typed to a `= string`
-alias), single-value sets, values yielding no Go identifier, the second of any two
-values colliding on one identifier, and any synthesised name the spec already uses
-— checked for both `<Owner><Property>` and `<Owner><Property>Values`, since the
-accessor shares the namespace. Every skip logs.
+Skipped, each deliberately: values yielding no Go identifier, the second of any
+two values colliding on one identifier, a `$ref`'d property or item schema (the
+field's own type already names the enum), a base type the SDK has no alias for
+(booleans), and any synthesised name the spec already uses — checked for both
+`<Owner><Property>` and `<Owner><Property>Values`, since the accessor shares the
+namespace. Every skip logs.
+
+**Non-string and single-value enums used to be skipped and are now emitted.** The
+old rationale was that a `= string` alias cannot type a number and that a
+one-value constant is noise. Both were wrong in the same way: a consumer
+validating input has to get the set from somewhere, and the only alternative is
+retyping the literals, which is exactly what `terraform-provider-jamfplatform`'s
+`enumguard` forbids. It lost that protection three times — `CreatePathV2.Scope`'s
+one-value `[APP]`, and uem-connect's `refreshRateMinutes` and
+`deviceUnmanagedThreshold` — before the rule changed.
+
+- **Numeric enums alias `int` or `int64`, not `string`.** The base tracks the
+  field's own Go type (`format: int64` → `int64`, otherwise `int`) so the
+  constants stay assignable to the field they constrain; `GoType.EnumBaseType`
+  carries it and `GoEnumConst.Literal` carries the rendered literal, unquoted.
+  The identifier is the decimal digits — `SyncSettingsRefreshRateMinutes1440` —
+  with a `Neg` prefix for negatives, since Go identifiers cannot carry a minus
+  sign and `-1` is a real Jamf sentinel. `Values()` returns `[]<alias>`, which is
+  `[]int64` by definition: **do not grep for `[]int64` to check the helper
+  exists**, it renders as the alias name.
+- **Single-value sets are emitted for the same reason as any other.** They are
+  the larger population: 50 new enum types appeared when the rule changed, most
+  of them the mandatory magic strings on DDM blueprint components.
+- A fractional numeric value would yield no identifier and is skipped with a log
+  line. None exists today, and inventing a spelling for one would be guesswork.
 
 **The collision check must happen at registration, not when draining the collected
 enums.** Draining late still writes the field's `see the X constants` line,
@@ -536,22 +593,22 @@ struct name — and its values remain reachable through the oddly-named
 
 **Every skip still gets its values into the godoc.** When `registerPropertyEnum`
 declines, `inlineFieldEnumValues` lists them on the field instead:
-`// Allowed values: 300, 1800, 3600, 10800, 28800.` Without it the constraint
-reached callers nowhere at all — the spec's prose routinely says "must be one of
-the listed durations" and leaves the list to the schema, which is unreadable from
-Go. It also picked up, for free, the far larger population of **single-value**
-enums, which are the mandatory magic strings on DDM blueprint components
-(`Allowed values: "com.jamf.ddm.passcode-settings".`) — previously a required
-field with an undocumented sole legal value.
+`// Allowed values: 300, 1800, 3600, 10800, 28800.` It is now a genuine fallback
+rather than the main path for numeric and single-value sets — those get
+constants, and the field's doc line points at them instead. What still reaches
+the godoc this way is a `$ref`'d property, a boolean enum, and a name the spec
+already claimed.
 
 It is scoped to **inline** property schemas: a `$ref`'d property (or `$ref`'d item
 schema) returns nil, because the field's Go type already names the enum and godoc
 groups the constants under it. Re-listing there would duplicate a list that then
 rots independently.
 
-`enumConsts` logs per-value drops but **silently skips a non-string or
-empty-string member of an otherwise-string enum**. Nothing in the tree hits that
-today, and it is the first path to check if a set ever comes out short.
+`enumConstsOfBase` logs per-value drops but **silently skips an empty-string
+member of a string enum, and a member whose type does not match the alias base**
+— a number in a string enum, or vice versa. Mixing types in one enum is a spec
+bug and coercing would emit a constant the field cannot accept; nothing in the
+tree hits it today, and it is the first path to check if a set comes out short.
 
 ### Auditing coverage
 

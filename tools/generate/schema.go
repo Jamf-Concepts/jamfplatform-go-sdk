@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"log"
 	"maps"
+	"math"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -1926,9 +1928,15 @@ var currentSpecTypeNames map[string]bool
 // Skipped cases, each for a reason:
 //   - $ref'd properties. The field's own type already names the enum, so a
 //     "see the X constants" line would just repeat the signature.
-//   - Non-string enums. The constants are typed to a `= string` alias.
-//   - Single-value enums. A constant for a one-value set is noise; the
-//     description already says what the value is.
+//   - Names the spec already uses for a schema (see below).
+//
+// Non-string and single-value enums used to be skipped too. Both are now
+// emitted, because a consumer validating against the set has to get it from
+// somewhere and the alternative is retyping the literals: the Terraform
+// provider's enumguard exists precisely to forbid that, and it lost its
+// protection three times over (CreatePathV2.Scope's one-value [APP] set, and
+// uem-connect's two numeric interval enums). Numeric enums alias int or int64
+// rather than string so the constants stay assignable to the field.
 //   - Names the spec already uses for a schema. Redeclaring one would break
 //     the build, and referencing it from the field would point the reader at a
 //     type carrying no constants.
@@ -1950,7 +1958,8 @@ func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) 
 			enumSrc = prop.Items.Value
 		}
 	}
-	if len(enumSrc.Enum) < 2 || !enumSrc.Type.Is("string") {
+	base := propertyEnumBase(enumSrc)
+	if len(enumSrc.Enum) == 0 || base == "" {
 		return ""
 	}
 
@@ -1965,7 +1974,7 @@ func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) 
 	if _, exists := currentPropertyEnums[typeName]; exists {
 		return typeName
 	}
-	consts := enumConsts(typeName, enumSrc.Enum)
+	consts := enumConstsOfBase(typeName, enumSrc.Enum, base)
 	if len(consts) == 0 {
 		return ""
 	}
@@ -1973,7 +1982,8 @@ func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) 
 		Name: typeName,
 		Comment: fmt.Sprintf("%s is the set of values accepted by %s.%s.",
 			typeName, ownerType, exportedGoName(pname)),
-		EnumValues: consts,
+		EnumValues:   consts,
+		EnumBaseType: base,
 	}
 	return typeName
 }
@@ -2020,14 +2030,45 @@ func namedEnumTypes(doc *openapi3.T, refs map[string]*schemaUsage) map[string]bo
 // collide on one, are skipped with a log line. Silently dropping one would
 // read as "the server does not accept this".
 func enumConsts(typeName string, enum []any) []GoEnumConst {
+	return enumConstsOfBase(typeName, enum, "string")
+}
+
+// enumConstsOfBase renders one constant per enum value against the given Go
+// base type. Values that do not match the base are skipped rather than
+// coerced: a spec mixing types in one enum is a spec bug, and silently
+// stringifying a number would emit a constant the field cannot accept.
+//
+// Numeric identifiers are the decimal digits, with a Neg prefix for negatives
+// (Go identifiers cannot carry a minus sign, and -1 is a real Jamf sentinel).
+// A fractional value yields no identifier and is skipped with a log line —
+// none exists today and inventing a spelling for one would be guesswork.
+func enumConstsOfBase(typeName string, enum []any, base string) []GoEnumConst {
 	out := make([]GoEnumConst, 0, len(enum))
 	seen := make(map[string]string, len(enum)) // const name → first wire value
 	for _, raw := range enum {
-		value, ok := raw.(string)
-		if !ok || value == "" {
-			continue
+		var value, ident, literal string
+		switch base {
+		case "int", "int64":
+			n, ok := enumNumericValue(raw)
+			if !ok {
+				log.Printf("enum %s: skipping value %v — not an integer, and the alias is %s", typeName, raw, base)
+				continue
+			}
+			value = strconv.FormatInt(n, 10)
+			literal = value
+			ident = value
+			if n < 0 {
+				ident = "Neg" + strconv.FormatInt(-n, 10)
+			}
+		default:
+			v, ok := raw.(string)
+			if !ok || v == "" {
+				continue
+			}
+			value = v
+			literal = strconv.Quote(v)
+			ident = enumConstIdent(v)
 		}
-		ident := enumConstIdent(value)
 		if ident == "" {
 			log.Printf("enum %s: skipping value %q — yields no Go identifier", typeName, value)
 			continue
@@ -2038,9 +2079,47 @@ func enumConsts(typeName string, enum []any) []GoEnumConst {
 			continue
 		}
 		seen[constName] = value
-		out = append(out, GoEnumConst{Name: constName, Value: value})
+		out = append(out, GoEnumConst{Name: constName, Value: value, Literal: literal})
 	}
 	return out
+}
+
+// enumNumericValue accepts the shapes a JSON or YAML decoder produces for an
+// integer literal. kin-openapi hands back float64 for JSON numbers, so a
+// whole-valued float is legitimate; a fractional one is not an integer enum.
+func enumNumericValue(raw any) (int64, bool) {
+	switch v := raw.(type) {
+	case int:
+		return int64(v), true
+	case int64:
+		return v, true
+	case float64:
+		if v != math.Trunc(v) {
+			return 0, false
+		}
+		return int64(v), true
+	case json.Number:
+		n, err := v.Int64()
+		return n, err == nil
+	}
+	return 0, false
+}
+
+// propertyEnumBase reports the Go base type for an enum declared on a
+// property, or "" when the property's type carries no enum the SDK emits
+// constants for. int64 tracks the field's own Go type so the constants stay
+// assignable: format int64 generates an int64 field, everything else int.
+func propertyEnumBase(s *openapi3.Schema) string {
+	switch {
+	case s.Type.Is("string"):
+		return "string"
+	case s.Type.Is("integer"):
+		if s.Format == "int64" {
+			return "int64"
+		}
+		return "int"
+	}
+	return ""
 }
 
 func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format string) GoType {

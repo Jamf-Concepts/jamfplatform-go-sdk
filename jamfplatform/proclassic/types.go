@@ -3110,7 +3110,7 @@ type ComputerCheckIn struct {
 	CheckForPoliciesAtLoginLogout *bool `xml:"check_for_policies_at_login_logout,omitempty"`
 	CheckForPoliciesAtStartup     *bool `xml:"check_for_policies_at_startup,omitempty"`
 	// Measured in minutes.
-	// Allowed values: 60, 30, 15, 5.
+	// Allowed values: see the ComputerCheckInCheckInFrequency constants.
 	CheckInFrequency       *int  `xml:"check_in_frequency,omitempty"`
 	CreateLoginLogoutHooks *bool `xml:"create_login_logout_hooks,omitempty"`
 	CreateStartupScript    *bool `xml:"create_startup_script,omitempty"`
@@ -8729,7 +8729,7 @@ type Logflush struct {
 	Computers *LogflushComputers `xml:"computers,omitempty"`
 	// Allowed values: see the LogflushInterval constants.
 	Interval *string `xml:"interval,omitempty"`
-	// Allowed values: "policy".
+	// Allowed values: see the LogflushLog constants.
 	Log   *string `xml:"log,omitempty"`
 	LogID *int    `xml:"log_id,omitempty"`
 }
