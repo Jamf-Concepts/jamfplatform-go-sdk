@@ -446,37 +446,42 @@ item always uses pointer fields.
 
 ---
 
-## A shared schema's optionality depends on where it is reachable from
+## A shared schema's optionality follows its request/response reachability
 
 `needsPtr` in `schemaToGoType` (`tools/generate/schema.go`) includes
 `isRequest && !isRequired`: for a **request** type an unrequired scalar becomes
 `*T` with `,omitempty`, so a caller can distinguish "omit" from "send zero" —
 which PATCH depends on. For a response-only type the same field is a plain `T`.
 
-**A named schema emitted once and shared by both kinds therefore takes its shape
-from whichever parents happen to be reachable, and withdrawing an unrelated
-operation can silently flip it.** That is not hypothetical: `SmartGroupCriteria`
-went from `*bool` to `bool` on `OpeningParen` and `ClosingParen` between v1897 and
-v1942 while **its schema stayed byte-identical and its `required` list never
-changed**. The cause was v1942 withdrawing the V1 mobile smart-group operations,
-which stopped `SmartGroupAssignment` — a request body embedding
-`[]SmartGroupCriteria` — from being emitted at all. `SmartGroupCriteria` then
-survived only through `GroupWithCriteriaDtoV1`, a response, so the request branch
-of `needsPtr` stopped firing. It is the only one of five paren-bearing types to
-have moved, because the other four are reached through request bodies that
-survived.
+**A named schema emitted once and shared by both kinds takes its shape from
+whichever parents are reachable, so a field can change shape with no diff in its
+own schema.** `SmartGroupCriteria.OpeningParen` and `.ClosingParen` went `*bool` →
+`bool` between v1897 and v1942 while that schema stayed **byte-identical** and its
+`required` list never mentioned either field. The trigger was v1942 withdrawing
+the V1 mobile smart-group operations, which took `SmartGroupAssignment` — a
+request body embedding `[]SmartGroupCriteria` — with them. It is the only one of
+five paren-bearing types to have moved, because the other four still have
+surviving request parents.
 
-Two consequences worth knowing before touching this:
+**Checked, and this is not a generator bug.** `schemaUsage` already unions
+`isRequest`/`isResponse` across every referencing parent and request wins, so
+there is no ordering dependence of the `detectPaginatedItemType` kind. And in the
+v1942 spec `SmartGroupCriteria` is not reachable from any request body **at all**,
+whitelist ignored — so response rules are the correct output for that input. The
+generator tracked a real spec change.
 
-- **It is a breaking change with no spec change behind it**, and it will not show
-  up in a spec diff. If a whitelist removal makes a shared schema response-only,
-  expect its optional scalars to lose their pointers.
-- **The stable fixes are both policy decisions, not bug fixes.** Forcing request
-  rules for every named schema restores three-state semantics everywhere and stops
-  the churn, at the cost of pointer-ising a large number of response-only optional
-  scalars. Forcing response rules does the reverse and breaks PATCH callers. Do
-  not pick one incidentally while fixing something else — the diff is wide either
-  way and consumers key on it.
+What *is* latent, and has not happened yet: the same flip could be caused by a
+**whitelist** removal rather than a spec removal, and then there would be no spec
+diff to explain it. Diagnose it by asking whether the schema is reachable from any
+`requestBody` in the spec document, not whether the generated parents exist.
+
+**Do not "fix" it by forcing one direction.** Measured: making every named schema
+use request rules pointer-ises **711 fields across 11 packages** (2127 changed
+lines, 1963 of them in `pro`) — a breaking change to the whole surface to restore
+two fields with no consumer. Forcing response rules instead would break every
+PATCH caller that relies on omit-vs-zero. Both are policy decisions about the
+whole SDK; if one is ever wanted, take it deliberately and on its own, not while
+fixing something else.
 
 ## Enum constants
 

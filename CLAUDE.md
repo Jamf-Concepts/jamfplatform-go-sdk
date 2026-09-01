@@ -783,6 +783,13 @@ formatting is inert to the generator, and bundle diffs become exact.
   reappears; a `schemaPatches` entry that *supplies* a missing property needs a
   `schemaPatchesRequireAbsent` line or it shadows the real one forever. Neither
   catches a re-typed root.
+- **A shared schema's optional scalars can change pointer-ness with no diff in
+  their own schema**, because `needsPtr` follows request/response reachability —
+  `SmartGroupCriteria`'s paren fields went `*bool` → `bool` at v1942 that way.
+  Verified not a generator bug (the schema is reachable from no request body in
+  that spec), and **not** to be fixed by forcing one direction: that pointer-ises
+  711 fields across 11 packages. Detail:
+  [docs/STYLE.md](docs/STYLE.md#a-shared-schemas-optionality-follows-its-requestresponse-reachability).
 - Full detail on every mechanism: [docs/STYLE.md](docs/STYLE.md#config-mechanisms).
 
 ---
