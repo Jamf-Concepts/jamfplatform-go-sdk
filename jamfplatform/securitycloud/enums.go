@@ -1529,3 +1529,47 @@ func XenMobileConnectorCreateRequestVendorValues() []XenMobileConnectorCreateReq
 		XenMobileConnectorCreateRequestVendorXenmobile,
 	}
 }
+
+// PublicApiCreateActivationProfileRequestOrigin is the set of values accepted by PublicApiCreateActivationProfileRequest.Origin.
+type PublicApiCreateActivationProfileRequestOrigin = string
+
+// PublicApiCreateActivationProfileRequestOrigin values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PublicApiCreateActivationProfileRequestOriginPublicApi PublicApiCreateActivationProfileRequestOrigin = "PUBLIC_API"
+)
+
+// PublicApiCreateActivationProfileRequestOriginValues returns every value the Jamf API accepts for PublicApiCreateActivationProfileRequestOrigin,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func PublicApiCreateActivationProfileRequestOriginValues() []PublicApiCreateActivationProfileRequestOrigin {
+	return []PublicApiCreateActivationProfileRequestOrigin{
+		PublicApiCreateActivationProfileRequestOriginPublicApi,
+	}
+}
+
+// PublicApiCreateActivationProfileRequestPlatforms is the set of values accepted by PublicApiCreateActivationProfileRequest.Platforms.
+type PublicApiCreateActivationProfileRequestPlatforms = string
+
+// PublicApiCreateActivationProfileRequestPlatforms values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PublicApiCreateActivationProfileRequestPlatformsIOS PublicApiCreateActivationProfileRequestPlatforms = "iOS"
+	PublicApiCreateActivationProfileRequestPlatformsMac PublicApiCreateActivationProfileRequestPlatforms = "MAC"
+)
+
+// PublicApiCreateActivationProfileRequestPlatformsValues returns every value the Jamf API accepts for PublicApiCreateActivationProfileRequestPlatforms,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func PublicApiCreateActivationProfileRequestPlatformsValues() []PublicApiCreateActivationProfileRequestPlatforms {
+	return []PublicApiCreateActivationProfileRequestPlatforms{
+		PublicApiCreateActivationProfileRequestPlatformsIOS,
+		PublicApiCreateActivationProfileRequestPlatformsMac,
+	}
+}

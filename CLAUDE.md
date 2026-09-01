@@ -294,6 +294,7 @@ a method that ignores the cursor fails.
 | `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v1981** |
 | `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v1981** |
 | `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v1981** |
+| `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v1993** (new) |
 | `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
 | `audit-api.yaml` | `external/audit` | v1897 |
@@ -310,14 +311,16 @@ the spec.
 `external/`, and all four are now sourced from there.** Prefer `external/` for any
 Security Cloud spec that appears in it: the stage variants declare
 `https://{region}.api.stage.platform.jamflabs.com/api/...` and an `(STAGE)` title,
-both of which leak into `api/*.json`. Only `securitycloud-enrollment` remains
-unpublished in every environment.
+both of which leak into `api/*.json`. **v1993 published the last one**, so
+every Security Cloud spec the SDK carries is now sourced from `external/` and
+none is unpublished.
 
 **When a spec starts carrying its own `/vN/` path prefix, the spec-level
 `"version"` key must be deleted in the same change** as the `"op"` paths gain the
 prefix. Leaving it produces `/v1/v1/…`; forgetting the paths makes generation fail
 outright with `path %s not found in spec` (a hard error, not a silent miss). All
-five Security Cloud specs now carry their own prefix and none sets the key.
+six Security Cloud specs now carry their own prefix and none sets the key —
+`securitycloud-enrollment` arrived at v1993 already carrying `/v1/`.
 
 **Never fall back to the source specs in
 `public-apis-oas/redocly-implementation/teams/`.** They carry no tenant segment, no
@@ -350,9 +353,57 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1988** (2026-09-01), except `capi` and `securitycloud-devices`,
+Ingested through **v1993** (2026-09-01), except `capi` and `securitycloud-devices`,
 both **held at v1897** — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
+
+**v1993 is one brand-new spec and nothing else.** `external/securitycloud-enrollment`
+appeared in all three environments at once, having existed in none of them at
+v1988; every other file outside `internal/dev` is byte-identical, `capi` included,
+so the only other diffs were the manifest, the two `_permissions` files and the
+two unified rollups (797 → 802 paths, 19 → 20 APIs).
+
+**The Security Cloud Enrollment API is now the `securitycloud` package's sixth
+spec** — 6 operations over activation profiles, tenant-scoped, `X-Tenant-Id`, its
+own `/v1/` prefix, prod `servers` at the gateway root with no `/api` segment. It
+is the missing half of `DeployActivationProfileToUemV1`: uem-connect deploys an
+activation profile code the SDK previously had no way to mint or list.
+
+Both privilege oracles agreed before the ingest and the wire agreed after.
+`_permissions` is purely additive — `routes.yaml` gains a `tenant`-typed
+`securitycloud` domain with the five paths, `scopes.yaml` gains
+`activation-profiles` with create/delete/read/update, filed under `environment`,
+which extends rather than resolves the routes/scopes scope-type disagreement
+already reported upstream. `authorization-policies` carries
+`securitycloud_api_enrollment.rego` on `main` allowing all six at
+`/api/securitycloud/v1/activation-profiles…`, identical in shape to the DNS
+policy, so prod's existing `/api/securitycloud/` Tyk listener already fronts them
+and no new api-product was needed. (Prod has no `jsc-activation-profiles`
+api-product; the stage and dev one listening on `/api/jsc-enrollment` is a
+different surface and is in no default-external plan.)
+
+**Six spec/wire disagreements came out of the probe, and one of them would have
+shipped broken.** `POST /v1/activation-profiles` answers `{"code": "…"}` — an
+`ActivationProfile` — and not the `ActivationProfileResponse` `{id, href}` the
+spec declares, with no `Location` header, verified both with and without
+`Accept-Encoding: gzip` so this is **not** the href-injection plugin nulling a
+compressed body the way it does on the DNS and ZTNA creates. Without the
+`responseType` override the generated create would have decoded a zero-valued
+struct and reported success. The other five, and the three declared constraints
+the server does not enforce, are in
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#security-cloud-enrollment-activation-profiles-2026-09-01)
+and carried as `docNotes` on the five affected types.
+
+**Deletion is a soft delete the read surface does not reflect, and that is the
+finding worth reporting upstream.** After `POST /delete-multiple` succeeds,
+`GET /v1/activation-profiles/{code}` still answers 200 and the collection still
+returns the code, indistinguishable from a live profile; only a write reveals the
+state, as `409 STATE_CONFLICT` ("… is already deleted."). Combined with a bulk
+delete that answers 204 with no body and no per-code result, a caller can neither
+confirm a deletion nor filter deleted profiles out of a list. It also means
+**every acceptance run leaves a permanent row in the tenant's list**, which is
+why the suite creates exactly one profile and folds every assertion that could
+have justified another into that one body.
 
 **v1988 changed one spec — `capi` — so nothing was ingested.** It is the held
 spec, and the change is twelve more deletions of the same kind v1942 made: the
@@ -401,7 +452,7 @@ verbs, reproducing exactly the incoherent surface that was the second reason
 and the SDK now sources them from there: `jsc-dns`, `jsc-ztna`, `jsc-categories`
 and `uem-connect`. The long-standing note that no Security Cloud spec had reached
 `external/` is obsolete for those four; `securitycloud-devices` was already there
-and `securitycloud-enrollment` still has no spec anywhere.
+and `securitycloud-enrollment` followed at v1993.
 
 **Switching those three read-only specs off stage was inert to Go and fixed the
 published artifacts.** `jsc-dns`, `jsc-ztna` and `jsc-categories` are identical to
@@ -794,7 +845,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
 | `capi` at v1897 | Now 32 operations behind. v1942 withdraws 20 including all of `/patchsoftwaretitles`: `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints, so taking it makes patch software titles unseedable and leaves the provider's `patch_software_title` resource with no create path; it also removes `GET`/`PUT /computers/id/{id}` while leaving `POST`/`DELETE`. v1988 withdraws 12 more — `GET`/`PUT`/`DELETE` on each of `/computers/{macaddress,name,serialnumber,udid}/{value}`, again leaving `POST` — none of which declares a successor, and all of which are live on the wire. Take it when Jamf publishes a routed software-title catalogue. |
 | `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-01 17:1x — and its declared successor `PUT /v2/groups/{groupId}` is still unrouted (403 `BAD_PERMISSIONS` on a real id and a bogus uuid alike; no OPA rule authored). Taking the removal would leave the package with no working update and break `ApplyDeviceGroupV2`. Take it once the v2 rule lands — but note `authorization-policies#264` (DRAFT) would **deny the v1 update without adding the v2 rule**, at which point the hold preserves a method the gateway refuses rather than a working capability. |
-| `securitycloud-enrollment`, `ai/governance/visibility` | No published spec in any environment. Not ingestable. |
+| `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 
 **A verbatim copy of the bundle YAML into `testing/` is safe and worth adopting.**
@@ -879,7 +930,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | `proclassic` | `proclassic` | tenant | 606 ops, XML end-to-end |
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
-| `securitycloud` | `securitycloud` | tenant (own identifier) | 48 ops across five specs |
+| `securitycloud` | `securitycloud` | tenant (own identifier) | 54 ops across six specs |
 | `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** |
 | `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
 | `audit` | `audit` | environment | compiles; every call 403s pending an `audit:read` grant |

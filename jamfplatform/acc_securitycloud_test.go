@@ -31,9 +31,12 @@ import (
 // writes that would provision or reconfigure real infrastructure on a shared
 // tenant.
 //
-// Activation profiles are absent from this suite because they are absent from
-// the SDK: their spec is not published in any environment of the GitOps build,
-// and the SDK only ingests published specs.
+// Activation profiles arrived in build v1993, which published the Security
+// Cloud Enrollment API to external/ for the first time. Their coverage carries
+// one deliberate asymmetry, explained at
+// TestAcceptance_SecurityCloudActivationProfileLifecycle: deletion is a soft
+// delete the read surface does not reflect, so every create this suite makes
+// stays in the tenant's list for good and the create count is kept to one.
 
 // jscName namespaces every artefact this suite creates, so a leftover from a
 // crashed run is identifiable and safe to remove by hand.
@@ -1001,6 +1004,404 @@ func TestAcceptance_SecurityCloudContentCategories(t *testing.T) {
 	}
 	t.Logf("%d content categories (totalCount=%d), first: id=%s name=%q displayName=%q",
 		len(cats.Results), cats.TotalCount, cats.Results[0].ID, cats.Results[0].Name, cats.Results[0].DisplayName)
+}
+
+// ---------------------------------------------------------------------------
+// Activation profiles (Security Cloud Enrollment API)
+// ---------------------------------------------------------------------------
+
+// jscActivationProfileCaps returns a capability set the server accepts.
+// networkSecurity and vulnerabilityManagement are coupled — both on or both off
+// or the create is refused — which the schema does not say. See the
+// PublicApiCapabilities godoc.
+func jscActivationProfileCaps(note string) securitycloud.PublicApiCapabilities {
+	on := true
+	return securitycloud.PublicApiCapabilities{
+		NetworkSecurity:         &on,
+		VulnerabilityManagement: &on,
+		Note:                    &note,
+	}
+}
+
+// TestAcceptance_SecurityCloudActivationProfileLifecycle covers all six
+// operations of the Enrollment API in one pass, and is the only test here that
+// creates anything.
+//
+// That is on purpose. DeleteActivationProfilesV1 is a soft delete and neither
+// GetActivationProfileV1 nor ListActivationProfilesV1 reflects it, so a profile
+// this suite creates stays in the tenant's list permanently no matter how
+// carefully the test cleans up. One create per run is the floor — the create
+// path cannot be covered without it — and everything else that could be
+// asserted with an extra create is folded into this one body instead.
+//
+// Two of the three constraints the spec declares but the server does not
+// enforce ride along on that single create:
+//
+//   - platforms carries three entries against a declared maxItems of 2, and
+//     succeeds, because the bound is applied after de-duplication.
+//   - the capability note is 256 characters against a declared maxLength of
+//     255, and succeeds.
+//
+// Both will fail the day upstream enforces its own schema, which is the signal
+// to move the assertion rather than delete it. The third — additionalProperties
+// false, also unenforced — is not expressible through a generated struct and
+// lives only in the PublicApiCreateActivationProfileRequest godoc.
+func TestAcceptance_SecurityCloudActivationProfileLifecycle(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	name := jscName("actprof")
+	created, err := sc.CreateActivationProfileV1(ctx, &securitycloud.PublicApiCreateActivationProfileRequest{
+		Origin: securitycloud.PublicApiCreateActivationProfileRequestOriginPublicApi,
+		Name:   name,
+		// Three entries, declared maximum two: de-duplicated to iOS+MAC before
+		// the size check runs.
+		Platforms: []string{
+			securitycloud.PublicApiCreateActivationProfileRequestPlatformsIOS,
+			securitycloud.PublicApiCreateActivationProfileRequestPlatformsMac,
+			securitycloud.PublicApiCreateActivationProfileRequestPlatformsIOS,
+		},
+		// 256 characters, declared maximum 255.
+		Capabilities: jscActivationProfileCaps(strings.Repeat("z", 256)),
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateActivationProfileV1 failed: %v", err)
+	}
+	if created.Code == "" {
+		t.Fatal("CreateActivationProfileV1 returned an empty code")
+	}
+	code := created.Code
+	t.Logf("created activation profile %s (name %q)", code, name)
+
+	// The 201 body is an ActivationProfile — {code} — and not the
+	// ActivationProfileResponse {id, href} the spec declares, which is why the
+	// operation carries a responseType override. A non-empty code proves the
+	// override is still right; if upstream ever starts sending {id, href} this
+	// decodes to an empty struct and the check above fails, which is the signal
+	// to drop the override rather than work around it. Note this is NOT the
+	// href-injection gzip bug assertCreateHrefEmpty pins elsewhere — verified
+	// 2026-09-01 with and without Accept-Encoding: gzip, the field is simply
+	// never sent.
+
+	// Registered even though the happy path deletes: a mid-test failure should
+	// still mark the profile deleted, since a live orphan is scoped to real
+	// enrollments.
+	jscCleanupDelete(t, "activation profile "+code, func() error {
+		return sc.DeleteActivationProfilesV1(context.Background(), &securitycloud.BulkDeleteActivationProfilesRequest{Codes: []string{code}})
+	})
+
+	got, err := sc.GetActivationProfileV1(ctx, code)
+	if err != nil {
+		t.Fatalf("GetActivationProfileV1(%s) failed: %v", code, err)
+	}
+	if got.Code != code {
+		t.Errorf("GetActivationProfileV1 returned code %q, want %q", got.Code, code)
+	}
+	// The read model is a code and nothing else — no name, capabilities,
+	// platforms or state — so nothing the create sent can be verified by
+	// reading it back. If a field ever appears here, the create assertions
+	// above should start checking it.
+
+	list, err := sc.ListActivationProfilesV1(ctx, securitycloud.PublicApiCreateActivationProfileRequestOriginPublicApi)
+	if err != nil {
+		t.Fatalf("ListActivationProfilesV1 failed: %v", err)
+	}
+	if !jscHasActivationProfile(list, code) {
+		t.Errorf("created profile %s missing from ListActivationProfilesV1 (%d profiles)", code, len(list.ActivationProfiles))
+	}
+
+	// Pause and resume answer 204 and are idempotent — a second pause on an
+	// already-paused profile is another 204, not a 409 — and neither has any
+	// observable effect, because the read model carries no state. So this
+	// covers the call, not the outcome.
+	for _, step := range []struct {
+		label string
+		fn    func(context.Context, string) error
+	}{
+		{"PauseActivationProfileV1", sc.PauseActivationProfileV1},
+		{"PauseActivationProfileV1 (repeat)", sc.PauseActivationProfileV1},
+		{"ResumeActivationProfileV1", sc.ResumeActivationProfileV1},
+		{"ResumeActivationProfileV1 (repeat)", sc.ResumeActivationProfileV1},
+	} {
+		if err := step.fn(ctx, code); err != nil {
+			t.Fatalf("%s(%s) failed: %v", step.label, code, err)
+		}
+	}
+
+	if err := sc.DeleteActivationProfilesV1(ctx, &securitycloud.BulkDeleteActivationProfilesRequest{Codes: []string{code}}); err != nil {
+		t.Fatalf("DeleteActivationProfilesV1(%s) failed: %v", code, err)
+	}
+
+	// The soft delete, pinned in all three of its observable parts. Every
+	// assertion below is a limitation, not a capability: each should be
+	// inverted the day the server starts reporting deletion on its read
+	// surface, and none should be deleted.
+	if _, err := sc.GetActivationProfileV1(ctx, code); err != nil {
+		t.Errorf("GetActivationProfileV1(%s) after delete = %v, want 200: deletion is a soft delete the item read does not reflect. A 404 here means that changed — invert this assertion and drop the caveat from the ActivationProfile godoc.", code, err)
+	}
+	after, err := sc.ListActivationProfilesV1(ctx, securitycloud.PublicApiCreateActivationProfileRequestOriginPublicApi)
+	if err != nil {
+		t.Fatalf("ListActivationProfilesV1 after delete failed: %v", err)
+	}
+	if !jscHasActivationProfile(after, code) {
+		t.Errorf("deleted profile %s absent from ListActivationProfilesV1: the list is expected to keep returning deleted profiles. Its disappearing means the server now filters them — invert this assertion and drop the caveat from the ActivationProfile godoc.", code)
+	}
+	// A write is the only surface that reveals the deleted state, and it does
+	// so in the service's own envelope rather than the ApiError shape the spec
+	// declares, so Details() is empty and the body is all there is to match on.
+	err = sc.PauseActivationProfileV1(ctx, code)
+	var apiErr *jamfplatform.APIResponseError
+	switch {
+	case err == nil:
+		t.Errorf("PauseActivationProfileV1(%s) after delete succeeded, want 409 STATE_CONFLICT", code)
+	case !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusConflict):
+		t.Errorf("PauseActivationProfileV1(%s) after delete = %v, want 409", code, err)
+	case !strings.Contains(apiErr.Body, "already deleted"):
+		t.Errorf("PauseActivationProfileV1(%s) after delete body = %q, want it to name the profile as already deleted", code, apiErr.Body)
+	}
+}
+
+// jscHasActivationProfile reports whether a listing carries the given code.
+func jscHasActivationProfile(list *securitycloud.ActivationProfilesResponse, code string) bool {
+	for _, p := range list.ActivationProfiles {
+		if p.Code == code {
+			return true
+		}
+	}
+	return false
+}
+
+// TestAcceptance_SecurityCloudActivationProfileRejections pins the Enrollment
+// API's validation surface, and provisions nothing: every request is doomed by
+// field validation, which runs before anything is created.
+//
+// Three of these disagree with the spec and are recorded here so the
+// disagreement fails loudly if either side moves:
+//
+//   - an out-of-enum origin is reported as "Origin not provided." even though
+//     it was provided, which misstates the cause;
+//   - the list operation's invalid-origin error is code INVALID_FIELD with no
+//     field attribution, where the spec documents INVALID_PARAMETER on
+//     field "origin";
+//   - an empty capabilities object is refused in the service's own error
+//     envelope rather than the ApiError shape the spec declares for 400, so
+//     the SDK parses no structured details out of it at all.
+func TestAcceptance_SecurityCloudActivationProfileRejections(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	valid := func() *securitycloud.PublicApiCreateActivationProfileRequest {
+		return &securitycloud.PublicApiCreateActivationProfileRequest{
+			Origin:       securitycloud.PublicApiCreateActivationProfileRequestOriginPublicApi,
+			Name:         jscName("actprof-reject"),
+			Platforms:    []string{securitycloud.PublicApiCreateActivationProfileRequestPlatformsIOS},
+			Capabilities: jscActivationProfileCaps("rejection probe"),
+		}
+	}
+
+	creates := []struct {
+		name  string
+		field string
+		want  string
+		mutID func(*securitycloud.PublicApiCreateActivationProfileRequest)
+	}{
+		{
+			// Origin is a required non-pointer string, so an empty one is
+			// marshaled as "origin": "" rather than omitted — the wire never
+			// sees the key absent through this SDK. The absent-key form is a
+			// different message ("Missing required attribute origin.",
+			// observed by hand with curl on 2026-09-01) and is unreachable
+			// here; if this assertion ever starts seeing it, the field gained
+			// omitempty and a caller can now send a body the spec forbids.
+			name:  "origin empty",
+			field: "origin",
+			want:  "Origin not provided.",
+			mutID: func(r *securitycloud.PublicApiCreateActivationProfileRequest) { r.Origin = "" },
+		},
+		{
+			// Present and out of enum, reported identically to empty. The
+			// description misreports the cause in this case — it was provided;
+			// asserting the exact string is what makes a fix visible.
+			name:  "origin out of enum",
+			field: "origin",
+			want:  "Origin not provided.",
+			mutID: func(r *securitycloud.PublicApiCreateActivationProfileRequest) { r.Origin = "UI" },
+		},
+		{
+			name:  "name blank",
+			field: "name",
+			want:  "must not be blank",
+			mutID: func(r *securitycloud.PublicApiCreateActivationProfileRequest) { r.Name = "" },
+		},
+		{
+			name:  "name over maxLength",
+			field: "name",
+			want:  "size must be between 0 and 100",
+			mutID: func(r *securitycloud.PublicApiCreateActivationProfileRequest) {
+				r.Name = strings.Repeat("n", 101)
+			},
+		},
+		{
+			name:  "platforms empty",
+			field: "platforms",
+			want:  "must not be empty",
+			mutID: func(r *securitycloud.PublicApiCreateActivationProfileRequest) { r.Platforms = []string{} },
+		},
+		{
+			// Attributed to "platforms[]", brackets included, not "platforms".
+			name:  "platforms member out of enum",
+			field: "platforms[]",
+			want:  "Only 'iOS' or 'MAC' platforms are accepted",
+			mutID: func(r *securitycloud.PublicApiCreateActivationProfileRequest) {
+				r.Platforms = []string{"ANDROID"}
+			},
+		},
+		{
+			// The coupling the schema does not declare.
+			name:  "networkSecurity without vulnerabilityManagement",
+			field: "capabilities",
+			want:  "networkSecurity and vulnerabilityManagement must both be enabled or both disabled",
+			mutID: func(r *securitycloud.PublicApiCreateActivationProfileRequest) {
+				on := true
+				r.Capabilities = securitycloud.PublicApiCapabilities{NetworkSecurity: &on}
+			},
+		},
+	}
+	for _, tc := range creates {
+		t.Run("create/"+tc.name, func(t *testing.T) {
+			req := valid()
+			tc.mutID(req)
+			_, err := sc.CreateActivationProfileV1(ctx, req)
+			jscAssertFieldError(t, err, tc.field, tc.want)
+		})
+	}
+
+	t.Run("create/capabilities empty", func(t *testing.T) {
+		req := valid()
+		req.Capabilities = securitycloud.PublicApiCapabilities{}
+		_, err := sc.CreateActivationProfileV1(ctx, req)
+		// minProperties: 1 is enforced, but as a business rule in the
+		// service's own envelope, so there is nothing structured to match.
+		jscAssertRawError(t, err, http.StatusBadRequest, "INVALID_INPUT")
+	})
+
+	t.Run("delete-multiple/codes empty", func(t *testing.T) {
+		err := sc.DeleteActivationProfilesV1(ctx, &securitycloud.BulkDeleteActivationProfilesRequest{Codes: []string{}})
+		jscAssertFieldError(t, err, "codes", "size must be between 1 and 100")
+	})
+
+	t.Run("delete-multiple/codes over maximum", func(t *testing.T) {
+		codes := make([]string, 101)
+		for i := range codes {
+			codes[i] = fmt.Sprintf("sdk-acc-nosuch-%03d", i)
+		}
+		err := sc.DeleteActivationProfilesV1(ctx, &securitycloud.BulkDeleteActivationProfilesRequest{Codes: codes})
+		jscAssertFieldError(t, err, "codes", "size must be between 1 and 100")
+	})
+
+	t.Run("delete-multiple/unknown code is silently skipped", func(t *testing.T) {
+		// 204 for a code that does not exist, with no body and so no per-code
+		// result. A caller cannot tell a delete that took from one the server
+		// skipped — the reason DeleteActivationProfilesV1 returning nil is not
+		// evidence of a deletion.
+		if err := sc.DeleteActivationProfilesV1(ctx, &securitycloud.BulkDeleteActivationProfilesRequest{
+			Codes: []string{"sdk-acc-nosuch-" + runSuffix()},
+		}); err != nil {
+			t.Errorf("DeleteActivationProfilesV1 on an unknown code = %v, want nil: unknown codes are silently skipped", err)
+		}
+	})
+
+	t.Run("list/origin out of enum", func(t *testing.T) {
+		// Spec documents INVALID_PARAMETER on field "origin"; the server sends
+		// INVALID_FIELD with no field at all.
+		_, err := sc.ListActivationProfilesV1(ctx, "BOGUS")
+		var apiErr *jamfplatform.APIResponseError
+		if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusBadRequest) {
+			t.Fatalf("ListActivationProfilesV1(BOGUS) = %v, want 400", err)
+		}
+		details := apiErr.Details()
+		if len(details) != 1 {
+			t.Fatalf("ListActivationProfilesV1(BOGUS) details = %+v, want exactly one", details)
+		}
+		if details[0].Code != "INVALID_FIELD" {
+			t.Errorf("code = %q, want INVALID_FIELD (the spec documents INVALID_PARAMETER; a change here means upstream aligned one side or the other)", details[0].Code)
+		}
+		if details[0].Field != "" {
+			t.Errorf("field = %q, want empty: the spec documents field \"origin\" and the server attributes nothing. A value here means the server now attributes it.", details[0].Field)
+		}
+	})
+
+	t.Run("list/origin omitted", func(t *testing.T) {
+		// origin is a required query parameter, and the generated method drops
+		// an empty one from the URL rather than sending origin= — so passing ""
+		// reaches the endpoint with the parameter absent. That is refused in
+		// the framework's envelope, not ApiError, which is why this asserts on
+		// the raw body.
+		_, err := sc.ListActivationProfilesV1(ctx, "")
+		jscAssertRawError(t, err, http.StatusBadRequest, "Required parameter 'origin' is not present.")
+	})
+
+	t.Run("get/unknown code", func(t *testing.T) {
+		if _, err := sc.GetActivationProfileV1(ctx, "sdk-acc-nosuch-"+runSuffix()); !isSecurityCloudNotFound(err) {
+			t.Errorf("GetActivationProfileV1 on an unknown code = %v, want 404", err)
+		}
+	})
+
+	t.Run("pause/unknown code", func(t *testing.T) {
+		if err := sc.PauseActivationProfileV1(ctx, "sdk-acc-nosuch-"+runSuffix()); !isSecurityCloudNotFound(err) {
+			t.Errorf("PauseActivationProfileV1 on an unknown code = %v, want 404", err)
+		}
+	})
+
+	t.Run("resume/unknown code", func(t *testing.T) {
+		if err := sc.ResumeActivationProfileV1(ctx, "sdk-acc-nosuch-"+runSuffix()); !isSecurityCloudNotFound(err) {
+			t.Errorf("ResumeActivationProfileV1 on an unknown code = %v, want 404", err)
+		}
+	})
+}
+
+// jscAssertFieldError requires a 400 carrying an ApiError detail attributed to
+// field with the given description. Asserting the description and not just the
+// field is deliberate: several of these strings misstate their own cause, and a
+// silent rewording upstream is exactly what this suite should surface.
+func jscAssertFieldError(t *testing.T, err error, field, wantDescription string) {
+	t.Helper()
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("error = %v, want *jamfplatform.APIResponseError with status 400", err)
+	}
+	if !apiErr.HasStatus(http.StatusBadRequest) {
+		t.Fatalf("status = %d, want 400 (body %q)", apiErr.StatusCode, apiErr.Body)
+	}
+	for _, d := range apiErr.Details() {
+		if d.Field == field && d.Description == wantDescription {
+			return
+		}
+	}
+	t.Errorf("no detail on field %q describing %q; got %+v", field, wantDescription, apiErr.Details())
+}
+
+// jscAssertRawError requires the given status and a substring of the raw body,
+// for the responses that arrive in the service's own error envelope rather than
+// the ApiError shape the spec declares. Nothing structured is parseable out of
+// those, so the body is the only assertion available — and the fact that it is
+// the only one available is itself worth pinning.
+func jscAssertRawError(t *testing.T, err error, wantStatus int, wantBodySubstring string) {
+	t.Helper()
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("error = %v, want *jamfplatform.APIResponseError", err)
+	}
+	if !apiErr.HasStatus(wantStatus) {
+		t.Errorf("status = %d, want %d (body %q)", apiErr.StatusCode, wantStatus, apiErr.Body)
+	}
+	if !strings.Contains(apiErr.Body, wantBodySubstring) {
+		t.Errorf("body = %q, want it to contain %q", apiErr.Body, wantBodySubstring)
+	}
+	if d := apiErr.Details(); len(d) != 0 {
+		t.Errorf("details = %+v, want none: this response arrives in the service's own envelope, which the SDK cannot parse. Details appearing means upstream moved it to the declared ApiError shape — assert them instead.", d)
+	}
 }
 
 // ---------------------------------------------------------------------------

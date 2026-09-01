@@ -1553,3 +1553,104 @@ type XenMobileConnectorCreateRequest struct {
 	// Allowed values: see the XenMobileConnectorCreateRequestVendor constants.
 	Vendor string `json:"vendor"`
 }
+
+// ActivationProfile A single activation profile resource.
+// The whole read model: a code, and nothing else. There is no name, no capability set, no platform
+// list and no state, so nothing a create sends can be read back and `PauseActivationProfileV1` /
+// `ResumeActivationProfileV1` have no observable effect on any GET.
+// **Deletion is a soft delete that the read surface does not reflect** (wire-verified 2026-09-01).
+// After `DeleteActivationProfilesV1` succeeds, `GetActivationProfileV1` still answers 200 for the
+// deleted code and `ListActivationProfilesV1` still returns it, indistinguishable from a live profile.
+// The only surface that reveals the state is a write: pause or resume on a deleted code answers `409
+// STATE_CONFLICT` (`Activation profile with code: is already deleted.`). So a caller cannot confirm a
+// delete, and cannot filter deleted profiles out of a list.
+type ActivationProfile struct {
+	// Unique identifier code for the activation profile.
+	Code string `json:"code"`
+}
+
+// ActivationProfileResponse Response body returned after successfully creating an activation profile.
+// Declared as the 201 body of `POST /v1/activation-profiles` and never sent. The server answers
+// `{"code": "..."}` — an ActivationProfile — with no `id`, no `href` and no `Location` header,
+// wire-verified 2026-09-01 both with and without `Accept-Encoding: gzip`, so this is not the
+// href-injection plugin nulling a compressed body the way it does on the DNS and ZTNA creates.
+// `CreateActivationProfileV1` therefore returns `*ActivationProfile` via a `responseType` override;
+// decoding into this type would have silently produced a zero-valued struct. Kept only because the
+// spec declares it.
+type ActivationProfileResponse struct {
+	// URL of the created activation profile.
+	Href string `json:"href"`
+	// Unique identifier code for the newly created activation profile.
+	ID string `json:"id"`
+}
+
+// ActivationProfilesResponse List of activation profiles for the customer.
+type ActivationProfilesResponse struct {
+	// List of activation profiles. Returns empty array if no profiles exist.
+	ActivationProfiles []ActivationProfile `json:"activationProfiles"`
+}
+
+// BulkDeleteActivationProfilesRequest Request body for bulk-deleting activation profiles by code.
+// `codes` is bounded at 1..100 and the bound is enforced as `400 INVALID_FIELD` on `codes` (`size must
+// be between 1 and 100`) — for an empty array, for an absent `codes` key, and at 101 entries.
+// `uniqueItems` is not enforced: a repeated code is accepted and answers 204.
+// The operation answers 204 in every non-validation case, including a code that does not exist and a
+// code already deleted, and returns no body — so there is no per-code result and no way to
+// distinguish a delete that took from one the server silently skipped. Combined with the soft-delete
+// behaviour noted on [ActivationProfile], a successful call is not evidence that anything was deleted.
+// Wire-verified 2026-09-01.
+type BulkDeleteActivationProfilesRequest struct {
+	// Codes of the activation profiles to delete.
+	Codes []string `json:"codes"`
+}
+
+// PublicApiCapabilities Capability configuration. At least one capability must be enabled.
+// `networkSecurity` and `vulnerabilityManagement` are coupled and the schema does not say so: they
+// must be both enabled or both disabled, or the create is refused with `400 INVALID_FIELD` on
+// `capabilities` (`networkSecurity and vulnerabilityManagement must both be enabled or both
+// disabled`). Wire-verified 2026-09-01.
+// The `minProperties: 1` requirement is real but is enforced as a business rule rather than field
+// validation: an empty object answers `400` in the service's own envelope (`{"error": "INVALID_INPUT",
+// "message": "Cannot create activation profile with given parameters for customer <uuid>", ...}`), not
+// the `ApiError` shape the spec declares for this status, so nothing here decodes it.
+type PublicApiCapabilities struct {
+	// Enable data policy capability.
+	DataPolicy *bool `json:"dataPolicy,omitempty"`
+	// Enable network security capability.
+	NetworkSecurity *bool `json:"networkSecurity,omitempty"`
+	// Optional note for this capability configuration.
+	Note *string `json:"note,omitempty"`
+	// Enable vulnerability management capability.
+	VulnerabilityManagement *bool `json:"vulnerabilityManagement,omitempty"`
+}
+
+// PublicApiCreateActivationProfileRequest Request body for creating a new activation profile via the public API.
+// Three of this schema's declared constraints are not what the server enforces (wire-verified
+// 2026-09-01 against the JSC sandbox tenant, every probe alongside a 200 control in the same
+// invocation).
+// `additionalProperties: false` is not enforced: a request carrying an undeclared key is accepted and
+// answers 201. `capabilities.note`'s `maxLength: 255` is not enforced either — 256 characters are
+// accepted. And `platforms`' `maxItems: 2` is applied after de-duplication, so `["iOS", "MAC", "iOS"]`
+// is three items and answers 201 while a genuinely three-valued list is refused with `size must be
+// between 1 and 2`.
+// What the server does enforce, all as `400 INVALID_FIELD` attributed to a field: `name` non-blank and
+// `maxLength: 100` (`size must be between 0 and 100`), `platforms` non-empty, each platform member in
+// `iOS`/`MAC` — attributed to `platforms[]`, with the brackets — and `origin` present. An `origin`
+// that is present but not `PUBLIC_API` is refused as `Origin not provided.`, which misreports the
+// cause; a genuinely absent `origin` says `Missing required attribute origin.`.
+// `groupId` is not checked for existence: a nonexistent group ID is accepted and answers 201, so a
+// typo produces a profile silently scoped to nothing.
+type PublicApiCreateActivationProfileRequest struct {
+	// Capability configuration. At least one capability must be enabled.
+	Capabilities PublicApiCapabilities `json:"capabilities"`
+	// Optional group ID to associate with the activation profile.
+	GroupID *string `json:"groupId,omitempty"`
+	// Name of the activation profile.
+	Name string `json:"name"`
+	// Creation origin.
+	// Allowed values: see the PublicApiCreateActivationProfileRequestOrigin constants.
+	Origin string `json:"origin"`
+	// Target platforms for this activation profile.
+	// Allowed values: see the PublicApiCreateActivationProfileRequestPlatforms constants.
+	Platforms []string `json:"platforms"`
+}

@@ -1379,17 +1379,147 @@ would have collapsed all of that; the spec is held at v1897 instead.**
 `GroupListItem` requires only `name`, and the reason `ResolveDeviceGroupV1ByName`
 yields an empty ID for it.
 
-### Enrollment (not covered — no published spec)
+### Security Cloud Enrollment (activation profiles), 2026-09-01
 
-`securitycloud-enrollment` (activation profiles) is `api_maturity: ga` with
-`prod: true`, answers in production, and appears in **no** environment of any
-bundle. Three things learned while it was briefly generated, worth having when the
-spec lands: `POST /v1/activation-profiles` returns `{"code"}` rather than the
-declared `{id, href}`; `capabilities.networkSecurity` and
-`capabilities.vulnerabilityManagement` must both be enabled or both disabled
-(400 `INVALID_FIELD`); and **`POST /v1/activation-profiles/delete-multiple`
-answers 204 and deletes nothing** — for a real code and a bogus one alike — so
-creating a profile leaks an undeletable enrollment code.
+Ingested at **v1993**, which published `external/securitycloud-enrollment` for the
+first time — in all three environments at once, having existed in none of them at
+v1988. Six operations, tenant-scoped. Everything below was probed on the EU
+gateway against a JSC-granted credential, with `GET /securitycloud/v1/categories`
+→ 200 as the routed control and `GET /securitycloud/v1/nonsense-probe-xyz` → 403
+`BAD_PERMISSIONS` as the unrouted control, both in the same invocation. A Jamf Pro
+credential is useless here: it answers 403 on every `/securitycloud/*` path
+including a deliberately nonsense one, so it cannot even classify routing.
+
+**This section supersedes the earlier "not covered — no published spec" note, and
+corrects it.** That note recorded `POST /v1/activation-profiles/delete-multiple`
+as answering "204 and deleting nothing", concluding a created profile leaks an
+undeletable enrollment code. The delete *does* take effect; what it does not do is
+show up on the read surface. See the soft-delete row below.
+
+| operation | status | what the wire does |
+|---|---|---|
+| `GET /v1/activation-profiles` | 200 | `{activationProfiles: [{code}]}`, no pagination params, no envelope counters. `origin` is a **required** query param |
+| `POST /v1/activation-profiles` | 201 | body is `{"code": "…"}`, **not** the declared `{id, href}`; no `Location` header |
+| `GET /v1/activation-profiles/{code}` | 200 | `{code}` and nothing else. 404 `NOT_FOUND` ("No such item exists.") for an unknown code |
+| `POST /v1/activation-profiles/{code}/pause` | 204 | idempotent — a second pause is another 204, not a conflict. 404 for an unknown code |
+| `POST /v1/activation-profiles/{code}/resume` | 204 | same |
+| `POST /v1/activation-profiles/delete-multiple` | 204 | no body, no per-code result; 204 for an unknown code, an already-deleted code and a duplicated code alike |
+
+#### The create response is not what the spec declares
+
+`{"code": "…"}` where the spec declares `ActivationProfileResponse` `{id, href}`
+plus a `Location` header. Verified **both with and without**
+`Accept-Encoding: gzip` — identical body, no `Location` either way — so this is
+*not* the href-injection plugin nulling a compressed body, which is what happens
+on the DNS and ZTNA creates ([`href` is nulled by response
+compression](#href-is-nulled-by-response-compression)). The field is simply never
+sent.
+
+`CreateActivationProfileV1` therefore carries a `responseType: "ActivationProfile"`
+override. Without it the generated method decodes `{code}` into an
+`ActivationProfileResponse`, yielding a zero-valued struct and **reporting
+success** — the same silent-data-loss shape the v1439 ZTNA create revert had, in
+the opposite direction.
+
+#### Deletion is a soft delete the read surface does not reflect
+
+The finding worth reporting upstream. After `delete-multiple` succeeds:
+
+- `GET /v1/activation-profiles/{code}` still answers **200** with the code.
+- The collection still returns the code, with no field distinguishing it from a
+  live profile.
+- Only a **write** reveals the state: pause or resume answers
+  `409 STATE_CONFLICT` — `Activation profile with code: <code> is already
+  deleted.` — in the service's own envelope, not `ApiError`.
+
+Verified on seven profiles created and deleted during the probe, all seven
+answering the 409 afterwards while all seven remained listed, and a pre-existing
+profile answering 204/204 to pause/resume in the same session as the live control.
+A 5-second settle and a repeated single-code delete changed nothing, so this is
+not eventual consistency.
+
+Two consequences. A caller cannot confirm a deletion: 204 covers "deleted",
+"never existed" and "silently skipped" indistinguishably, and the read surface
+will not settle it. And **every acceptance run leaves a permanent row in the
+tenant's list**, which is why the suite creates exactly one profile per run and
+folds every assertion that could have justified a second create into that one
+request body.
+
+#### Three declared constraints the server does not enforce
+
+| declared | actual |
+|---|---|
+| `additionalProperties: false` on the create request | an undeclared key is accepted, 201 |
+| `capabilities.note` `maxLength: 255` | 256 characters accepted, 201 |
+| `platforms` `maxItems: 2` | `["iOS","MAC","iOS"]` accepted, 201 — the bound is applied *after* de-duplication; a genuinely three-valued list is refused |
+
+The `note` and `platforms` cases are asserted in
+`TestAcceptance_SecurityCloudActivationProfileLifecycle`'s single create, so they
+fail the day upstream enforces its own schema. The `additionalProperties` case is
+not expressible through a generated struct and lives only in the
+`PublicApiCreateActivationProfileRequest` godoc.
+
+#### One constraint the schema does not declare at all
+
+`networkSecurity` and `vulnerabilityManagement` are **coupled**: both enabled or
+both disabled, or the create is refused with `400 INVALID_FIELD` on
+`capabilities` — `networkSecurity and vulnerabilityManagement must both be enabled
+or both disabled`. `dataPolicy` alone is fine. Nothing in `PublicApiCapabilities`
+says so.
+
+#### What is enforced, and how it is attributed
+
+All as `400 INVALID_FIELD` in the declared `ApiError` shape:
+
+| field | trigger | description |
+|---|---|---|
+| `origin` | absent key | `Missing required attribute origin.` |
+| `origin` | present but empty, **or** present and out of enum | `Origin not provided.` |
+| `name` | absent or empty | `must not be blank` |
+| `name` | 101 characters | `size must be between 0 and 100` |
+| `platforms` | `[]` | `must not be empty` **and** `size must be between 1 and 2` (two details for one cause) |
+| `platforms[]` | `["ANDROID"]` | `Only 'iOS' or 'MAC' platforms are accepted` — attributed to `platforms[]`, brackets included |
+| `codes` | `[]`, absent, or 101 entries | `size must be between 1 and 100` |
+
+Two notes on `origin`. The out-of-enum case reporting `Origin not provided.` when
+it *was* provided misstates the cause and is worth reporting. And the absent-key
+form is **unreachable through the SDK**: `Origin` is a required non-pointer
+string, so an empty one marshals as `"origin": ""` and gets the present-but-empty
+message; the absent-key message was only observable by hand.
+
+`groupId` is **not validated for existence** — a nonexistent group ID is accepted
+and answers 201, so a typo produces a profile silently scoped to nothing.
+
+#### Two 400s arrive in the wrong envelope
+
+Neither is the `ApiError` shape the spec declares for the status, so the SDK
+parses no structured details out of either and only the raw body is matchable:
+
+- **`capabilities: {}`** (the `minProperties: 1` violation) →
+  `{"error": "INVALID_INPUT", "message": "Cannot create activation profile with
+  given parameters for customer <tenant-uuid>", "logref": …, "statusCode": 400}`.
+  So the requirement is real but enforced as a business rule, after field
+  validation.
+- **`origin` omitted from the list query** →
+  `{"error": "BAD_REQUEST", "message": "Required parameter 'origin' is not
+  present.", …}`. Reachable through the SDK, because the generated method drops an
+  empty query param from the URL rather than sending `origin=`.
+
+#### The list operation's documented error is wrong on both counts
+
+The spec documents an invalid `origin` as `code: INVALID_PARAMETER`,
+`field: origin`, `Only 'PUBLIC_API' value is accepted as origin.` The server sends
+`code: INVALID_FIELD`, **no field at all**, `Unknown origin value.` Pinned in
+`TestAcceptance_SecurityCloudActivationProfileRejections/list/origin_out_of_enum`
+so whichever side moves, it shows.
+
+#### The read model carries nothing
+
+`ActivationProfile` is `{code}`. No name, capabilities, platforms or state — so
+nothing a create sends can be read back, `pause`/`resume` have no observable
+effect on any GET, and a name→ID resolver is impossible (there is no name in the
+list). `PauseActivationProfileV1` and `ResumeActivationProfileV1` are therefore
+covered as calls, not as outcomes.
 
 ---
 
