@@ -715,8 +715,18 @@ the same invocation:
 `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` asserts the 403 and **fails when
 routing lands** — invert it then, and do not weaken it to a skip.
 
-**Re-probed 2026-09-01 with the JSC sandbox tenant `928260f5…` on eu. Nothing has
-moved, and the v1 write still works.** Full sequence in one invocation:
+**Re-probed twice on 2026-09-01 with the JSC sandbox tenant `928260f5…` on eu —
+09:36 and 13:30, the second after v1981 published the Security Cloud specs to
+`external/`. Nothing has moved either time, and the v1 write still works.** The
+13:30 run added `DELETE /securitycloud/v2/groups/{real-id}` → **403**
+(`e742fd0cc80e1ccffd98f55c6191ffa6`), so all three verbs on
+`/v2/groups/{groupId}` are confirmed unrouted, with
+`GET /v2/groups/{id}` → 403 (`9135ce7e…`), `PUT` → 403 twice (`0829d86a…`,
+`9c0d378d…`), `PUT /v1/groups/{id}` → 200 and `DELETE /v1/groups/{id}` → 204 in
+the same invocation. Promotion of the specs to prod did not come with the OPA
+rule.
+
+The 09:36 sequence in full:
 
 | request | result |
 |---|---|
@@ -969,6 +979,29 @@ itself, verified with both `--compressed` and `identity`.
   documented field to be present in every response. The transport decodes
   leniently so nothing breaks, but `fieldName` is unreachable from Go. Worth
   reporting: a documentation policy is costing generated clients a real field.
+- **v1981 completed the per-vendor create split and moved the spec to
+  `external/` (2026-09-01).** The generic `ConnectorCreateRequest` is gone; all
+  ten vendors now have their own typed create schema and
+  `ConnectorCreateRequestBody`'s discriminator mapping is 1:1, which the
+  generator handles correctly — ten distinct variant fields, ten switch cases,
+  no dedup collapsing anything (the v1882 fix holding under a different shape).
+  `additionalProperties` flipped `false` → `true` on `JamfProConnectorCreateRequest`
+  and `JamfProCredentials`, and `url` gained `minLength: 1`.
+
+  **Only the `JAMF_PRO` variant is wire-verified.** The nine others are
+  documentation as of v1981 and nothing here has exercised them: the JSC sandbox
+  tenant has no connector and creating one provisions an API role on the UEM side
+  the SDK cannot remove. Their required-field sets are upstream's claim. The
+  new enums — `CitrixCloudOauthConfigRegion`
+  (`ASIA_PACIFIC`/`EU`/`USA`/`JAPAN`) and
+  `XenMobileConnectorCreateRequestAuthStrategy`
+  (`USERNAME_PASSWORD`/`CITRIX_CLOUD_ADMIN`/`CITRIX_CLOUD_ADMIN_OAUTH`) — are
+  unverified for the same reason.
+
+  Also note the spec is now sourced from `external/uem-connect` rather than
+  `internal/stage/uem-connect`. Content is identical; what changes is that
+  `api/securitycloud_uem_connect_api.json` stops advertising the stage host and
+  an `(STAGE)` title.
 - **v1958 constrained the two sync-interval fields, redefined one of them, and
   none of it could be probed (2026-09-01).** `refreshRateMinutes` went
   `minimum: 1` → `minimum: 60, maximum: 1440` with enum

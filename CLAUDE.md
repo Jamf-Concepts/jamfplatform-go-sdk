@@ -290,21 +290,28 @@ a method that ignores the cursor fails.
 
 | `testing/` file | bundle source | at |
 |---|---|---|
-| `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` | v1897 |
-| `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` | v1897 |
-| `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories` | v1897 |
-| `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` | **v1958** |
+| `securitycloud-dns-api.yaml` | `external/jsc-dns` | **v1981** |
+| `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v1981** |
+| `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v1981** |
+| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v1981** |
 | `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
 | `audit-api.yaml` | `external/audit` | v1897 |
 | `openapi-jpapi.json` | `external/jpapi` | **v1942** |
 | `Classic-openapi.json` | `external/capi` | v1897 (**held**) |
 
-The last Security Cloud row is named for its *tag* (`device-groups`) but the spec
-is the **Security Cloud Devices API**. `internal/stage/device-groups` is the
-unrelated **Platform** Device Groups API — diffing against it produces 800 lines
-of noise and, if copied, silently replaces the spec. No Security Cloud spec has
-moved into `external/`; the four stage rows are still stage-sourced.
+The `securitycloud-device-groups-api.yaml` row is named for its *tag*
+(`device-groups`) but the spec is the **Security Cloud Devices API**.
+`internal/stage/device-groups` is the unrelated **Platform** Device Groups API —
+diffing against it produces 800 lines of noise and, if copied, silently replaces
+the spec.
+
+**v1981 moved `jsc-dns`, `jsc-ztna`, `jsc-categories` and `uem-connect` into
+`external/`, and all four are now sourced from there.** Prefer `external/` for any
+Security Cloud spec that appears in it: the stage variants declare
+`https://{region}.api.stage.platform.jamflabs.com/api/...` and an `(STAGE)` title,
+both of which leak into `api/*.json`. Only `securitycloud-enrollment` remains
+unpublished in every environment.
 
 **When a spec starts carrying its own `/vN/` path prefix, the spec-level
 `"version"` key must be deleted in the same change** as the `"op"` paths gain the
@@ -343,9 +350,62 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1958** (2026-09-01), except `capi` and `securitycloud-devices`,
+Ingested through **v1981** (2026-09-01), except `capi` and `securitycloud-devices`,
 both **held at v1897** — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
+
+**v1981 published four Security Cloud specs to `external/` for the first time**,
+and the SDK now sources them from there: `jsc-dns`, `jsc-ztna`, `jsc-categories`
+and `uem-connect`. The long-standing note that no Security Cloud spec had reached
+`external/` is obsolete for those four; `securitycloud-devices` was already there
+and `securitycloud-enrollment` still has no spec anywhere.
+
+**Switching those three read-only specs off stage was inert to Go and fixed the
+published artifacts.** `jsc-dns`, `jsc-ztna` and `jsc-categories` are identical to
+their stage counterparts except `servers`, `info.title` and the OAuth `tokenUrl`,
+all of which the SDK ignores — so zero generated Go diff. What changed is
+`api/*.json`, 8 lines each: the host stops being
+`{region}.api.stage.platform.jamflabs.com/api/...`, the title stops carrying
+`(STAGE)`, and the region enum goes `us1` → `us`/`eu`/`apac`. **The published
+specs were advertising a stage host and a stage title to consumers**; that is now
+correct. Note the prod `servers` URL carries no `/api` segment, matching the GA
+gateway.
+
+**`uem-connect` completed the per-vendor create split, and it is breaking.** v1882
+gave Jamf Pro its own typed request against a generic `ConnectorCreateRequest` for
+the other nine vendors; v1981 deletes the generic type and gives all ten their own
+schema, so `ConnectorCreateRequestBody`'s discriminator mapping is now 1:1.
+Removed from Go: `ConnectorCreateRequest` and the whole
+`ConnectorCreateRequestVendor` enum. Added: `IntuneConnectorCreateRequest`,
+`XenMobileConnectorCreateRequest`, `Maas360ConnectorCreateRequest`,
+`WorkspaceOneConnectorCreateRequest` (the `AIRWATCH` variant),
+`JamfSchoolConnectorCreateRequest`, `MobileIronCloudConnectorCreateRequest`,
+`MobileIronCoreConnectorCreateRequest`, `GoogleConnectorCreateRequest`,
+`WizyConnectorCreateRequest`, plus `CitrixCloudConfig`, `CitrixCloudOauthConfig`,
+`GoogleApiSettings`, `IntuneApiCredentials` and two new enums
+(`CitrixCloudOauthConfigRegion`, `XenMobileConnectorCreateRequestAuthStrategy`).
+`additionalProperties` also flipped `false` → `true` on the Jamf Pro request and
+credentials schemas, and `url` gained `minLength: 1`.
+
+**Only the `JAMF_PRO` variant is wire-verified**; the nine others arrived as
+documentation and could not be exercised — the JSC sandbox has no connector and
+creating one provisions a UEM-side API role the SDK cannot remove. The
+`ConnectorCreateRequestBody` docNote says so.
+
+**No downstream code breaks.** `terraform-provider-jamfplatform`'s `uem_connect`
+resource names `ConnectorCreateRequestVendor` only in a comment; its code uses
+`ConnectorCreateRequestBodyVendorJamfPro` and
+`JamfProConnectorCreateRequestAuthStrategy*`, all of which survive. The comment is
+now stale and should be corrected there.
+
+One config repair self-expired as designed: the `ConnectorCreateRequest` docNote
+had no schema to attach to and generation **failed hard** with `docNotes names no
+emitted type`. Retargeted onto `ConnectorCreateRequestBody`.
+
+`external/_permissions/routes.yaml` changed again and is again a **pure
+reordering** — `sort`-identical, 1474 entries both sides, zero removed;
+`scopes.yaml` byte-identical. So the 146-operation filter is still in place, and
+`internal/dev` still carries all 788 jpapi and 606 capi operations at v1981.
 
 **v1958 changed one spec, `internal/stage/uem-connect`, and the change is
 constraints plus one redefinition.** `refreshRateMinutes` went from

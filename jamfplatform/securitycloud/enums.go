@@ -629,6 +629,33 @@ func ActivationProfileDeployRequestPlatformValues() []ActivationProfileDeployReq
 	}
 }
 
+// CitrixCloudOauthConfigRegion is the set of values accepted by CitrixCloudOauthConfig.Region.
+type CitrixCloudOauthConfigRegion = string
+
+// CitrixCloudOauthConfigRegion values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	CitrixCloudOauthConfigRegionAsiaPacific CitrixCloudOauthConfigRegion = "ASIA_PACIFIC"
+	CitrixCloudOauthConfigRegionEu          CitrixCloudOauthConfigRegion = "EU"
+	CitrixCloudOauthConfigRegionUsa         CitrixCloudOauthConfigRegion = "USA"
+	CitrixCloudOauthConfigRegionJapan       CitrixCloudOauthConfigRegion = "JAPAN"
+)
+
+// CitrixCloudOauthConfigRegionValues returns every value the Jamf API accepts for CitrixCloudOauthConfigRegion,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func CitrixCloudOauthConfigRegionValues() []CitrixCloudOauthConfigRegion {
+	return []CitrixCloudOauthConfigRegion{
+		CitrixCloudOauthConfigRegionAsiaPacific,
+		CitrixCloudOauthConfigRegionEu,
+		CitrixCloudOauthConfigRegionUsa,
+		CitrixCloudOauthConfigRegionJapan,
+	}
+}
+
 // ConnectorConfigVendor is the set of values accepted by ConnectorConfig.Vendor.
 type ConnectorConfigVendor = string
 
@@ -677,13 +704,13 @@ const (
 	ConnectorCreateRequestBodyVendorAirwatch        ConnectorCreateRequestBodyVendor = "AIRWATCH"
 	ConnectorCreateRequestBodyVendorGoogle          ConnectorCreateRequestBodyVendor = "GOOGLE"
 	ConnectorCreateRequestBodyVendorIntune          ConnectorCreateRequestBodyVendor = "INTUNE"
+	ConnectorCreateRequestBodyVendorJamfPro         ConnectorCreateRequestBodyVendor = "JAMF_PRO"
 	ConnectorCreateRequestBodyVendorJamfSchool      ConnectorCreateRequestBodyVendor = "JAMF_SCHOOL"
 	ConnectorCreateRequestBodyVendorMaas360         ConnectorCreateRequestBodyVendor = "MAAS360"
 	ConnectorCreateRequestBodyVendorMobileironcloud ConnectorCreateRequestBodyVendor = "MOBILEIRONCLOUD"
 	ConnectorCreateRequestBodyVendorMobileironcore  ConnectorCreateRequestBodyVendor = "MOBILEIRONCORE"
 	ConnectorCreateRequestBodyVendorWizy            ConnectorCreateRequestBodyVendor = "WIZY"
 	ConnectorCreateRequestBodyVendorXenmobile       ConnectorCreateRequestBodyVendor = "XENMOBILE"
-	ConnectorCreateRequestBodyVendorJamfPro         ConnectorCreateRequestBodyVendor = "JAMF_PRO"
 )
 
 // ConnectorCreateRequestBodyVendorValues returns every value the Jamf API accepts for ConnectorCreateRequestBodyVendor,
@@ -697,50 +724,13 @@ func ConnectorCreateRequestBodyVendorValues() []ConnectorCreateRequestBodyVendor
 		ConnectorCreateRequestBodyVendorAirwatch,
 		ConnectorCreateRequestBodyVendorGoogle,
 		ConnectorCreateRequestBodyVendorIntune,
+		ConnectorCreateRequestBodyVendorJamfPro,
 		ConnectorCreateRequestBodyVendorJamfSchool,
 		ConnectorCreateRequestBodyVendorMaas360,
 		ConnectorCreateRequestBodyVendorMobileironcloud,
 		ConnectorCreateRequestBodyVendorMobileironcore,
 		ConnectorCreateRequestBodyVendorWizy,
 		ConnectorCreateRequestBodyVendorXenmobile,
-		ConnectorCreateRequestBodyVendorJamfPro,
-	}
-}
-
-// ConnectorCreateRequestVendor is the set of values accepted by ConnectorCreateRequest.Vendor.
-type ConnectorCreateRequestVendor = string
-
-// ConnectorCreateRequestVendor values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	ConnectorCreateRequestVendorIntune          ConnectorCreateRequestVendor = "INTUNE"
-	ConnectorCreateRequestVendorXenmobile       ConnectorCreateRequestVendor = "XENMOBILE"
-	ConnectorCreateRequestVendorMaas360         ConnectorCreateRequestVendor = "MAAS360"
-	ConnectorCreateRequestVendorAirwatch        ConnectorCreateRequestVendor = "AIRWATCH"
-	ConnectorCreateRequestVendorJamfSchool      ConnectorCreateRequestVendor = "JAMF_SCHOOL"
-	ConnectorCreateRequestVendorMobileironcloud ConnectorCreateRequestVendor = "MOBILEIRONCLOUD"
-	ConnectorCreateRequestVendorMobileironcore  ConnectorCreateRequestVendor = "MOBILEIRONCORE"
-	ConnectorCreateRequestVendorGoogle          ConnectorCreateRequestVendor = "GOOGLE"
-	ConnectorCreateRequestVendorWizy            ConnectorCreateRequestVendor = "WIZY"
-)
-
-// ConnectorCreateRequestVendorValues returns every value the Jamf API accepts for ConnectorCreateRequestVendor,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func ConnectorCreateRequestVendorValues() []ConnectorCreateRequestVendor {
-	return []ConnectorCreateRequestVendor{
-		ConnectorCreateRequestVendorIntune,
-		ConnectorCreateRequestVendorXenmobile,
-		ConnectorCreateRequestVendorMaas360,
-		ConnectorCreateRequestVendorAirwatch,
-		ConnectorCreateRequestVendorJamfSchool,
-		ConnectorCreateRequestVendorMobileironcloud,
-		ConnectorCreateRequestVendorMobileironcore,
-		ConnectorCreateRequestVendorGoogle,
-		ConnectorCreateRequestVendorWizy,
 	}
 }
 
@@ -1057,5 +1047,30 @@ func SyncSettingsVendorValues() []SyncSettingsVendor {
 		SyncSettingsVendorMobileironcore,
 		SyncSettingsVendorGoogle,
 		SyncSettingsVendorWizy,
+	}
+}
+
+// XenMobileConnectorCreateRequestAuthStrategy is the set of values accepted by XenMobileConnectorCreateRequest.AuthStrategy.
+type XenMobileConnectorCreateRequestAuthStrategy = string
+
+// XenMobileConnectorCreateRequestAuthStrategy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	XenMobileConnectorCreateRequestAuthStrategyUsernamePassword      XenMobileConnectorCreateRequestAuthStrategy = "USERNAME_PASSWORD"
+	XenMobileConnectorCreateRequestAuthStrategyCitrixCloudAdmin      XenMobileConnectorCreateRequestAuthStrategy = "CITRIX_CLOUD_ADMIN"
+	XenMobileConnectorCreateRequestAuthStrategyCitrixCloudAdminOauth XenMobileConnectorCreateRequestAuthStrategy = "CITRIX_CLOUD_ADMIN_OAUTH"
+)
+
+// XenMobileConnectorCreateRequestAuthStrategyValues returns every value the Jamf API accepts for XenMobileConnectorCreateRequestAuthStrategy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func XenMobileConnectorCreateRequestAuthStrategyValues() []XenMobileConnectorCreateRequestAuthStrategy {
+	return []XenMobileConnectorCreateRequestAuthStrategy{
+		XenMobileConnectorCreateRequestAuthStrategyUsernamePassword,
+		XenMobileConnectorCreateRequestAuthStrategyCitrixCloudAdmin,
+		XenMobileConnectorCreateRequestAuthStrategyCitrixCloudAdminOauth,
 	}
 }

@@ -879,6 +879,35 @@ type ApiErrorEntry struct {
 	Field *string `json:"field,omitempty"`
 }
 
+// CitrixCloudConfig Citrix Cloud administrator credentials for the CITRIX_CLOUD_ADMIN strategy.
+type CitrixCloudConfig struct {
+	// Citrix Cloud API client (application) id.
+	ApplicationID string `json:"applicationId"`
+	// Citrix Cloud API client secret.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	ApplicationSecret string `json:"applicationSecret"`
+	// Citrix Cloud customer id.
+	CustomerID string `json:"customerId"`
+	// Citrix Cloud API URL.
+	URL string `json:"url"`
+}
+
+// CitrixCloudOauthConfig Citrix Cloud OAuth credentials for the CITRIX_CLOUD_ADMIN_OAUTH strategy.
+type CitrixCloudOauthConfig struct {
+	// Citrix Cloud API client (application) id.
+	ApplicationID string `json:"applicationId"`
+	// Citrix Cloud API client secret.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	ApplicationSecret string `json:"applicationSecret"`
+	// Citrix Cloud customer id.
+	CustomerID string `json:"customerId"`
+	// Citrix Cloud region — determines the API endpoint.
+	// Allowed values: see the CitrixCloudOauthConfigRegion constants.
+	Region string `json:"region"`
+}
+
 // ConnectorConfig Connector configuration. Contains both core fields and vendor-specific fields. Additional vendor-specific properties may appear alongside the documented ones. Secret fields (credentials) are write-only and are never returned.
 type ConnectorConfig struct {
 	// Whether this connector may sync concurrently with other connectors.
@@ -964,35 +993,31 @@ type ConnectorConfig struct {
 	Vendor string `json:"vendor"`
 }
 
-// ConnectorCreateRequest Request to create a connector. Contains the UEM server connection details. Vendor-specific fields may also be included; the `vendor` field determines which are applicable. Secret fields (credentials) are write-only and are never returned in responses. `JAMF_PRO` is not accepted here — it has a dedicated fully typed contract, see `JamfProConnectorCreateRequest`.
-// This is the generic contract, and `JAMF_PRO` is deliberately not among its vendors — v1882 gave
-// Jamf Pro its own fully typed `JamfProConnectorCreateRequest` and removed `JAMF_PRO` from the enum
-// here. Build a Jamf Pro connector through `ConnectorCreateRequestBody` and that variant.
-// The `authStrategy`, `deviceSyncAuth` and `tenantId` properties the SDK used to graft onto this
-// schema were removed in the same ingest. They were only ever wire-verified against `JAMF_PRO`, which
-// now declares them upstream where they belong; leaving them here would assert three unverified fields
-// across nine other vendors and offer a second way to build a Jamf Pro create that the spec calls
-// invalid. The server itself still resolves `vendor` to a per-vendor subtype whichever shape the JSON
-// arrived in — its 422 for an unknown vendor enumerates the lot — so the removal costs no
-// reachability, only the redundant path.
-// What the other nine vendors need beyond `vendor`/`url`/`isoCountry` is still undocumented, and
-// `additionalProperties` is open here for exactly that reason. None of them is wire-verified.
-type ConnectorCreateRequest struct {
-	// ISO country code for the UEM instance, when applicable.
-	IsoCountry *string `json:"isoCountry,omitempty"`
-	// UEM server URL.
-	URL string `json:"url"`
-	// UEM vendor name.
-	// Allowed values: see the ConnectorCreateRequestVendor constants.
-	Vendor string `json:"vendor"`
-}
-
-// ConnectorCreateRequestBody The connector to create. The `vendor` field selects the contract: `JAMF_PRO` uses the fully typed `JamfProConnectorCreateRequest`; every other vendor uses the generic `ConnectorCreateRequest`.
+// ConnectorCreateRequestBody The connector to create. The `vendor` field selects the contract: each vendor has its own fully typed request schema describing the fields it requires. Secret fields (credentials) are write-only — accepted on creation but never returned in any response.
+// v1981 completed the per-vendor split this union began at v1882. Every one of the ten vendors now has
+// its own fully typed create schema and the generic `ConnectorCreateRequest` is gone, so the mapping
+// is 1:1 and each `Vendor` value selects exactly one contract. Set `Vendor` from
+// `ConnectorCreateRequestBodyVendor` and populate only that vendor's fields.
+// Only the `JAMF_PRO` variant is wire-verified. The nine others arrived as documentation in v1981 and
+// nothing here has exercised them — the JSC sandbox tenant has no connector to replace and creating
+// one provisions an API role on the UEM side the SDK cannot remove. Treat their required fields as
+// upstream's claim.
+// `additionalProperties` is open on every variant, which is upstream's choice rather than the SDK's: a
+// field a vendor needs but the schema omits cannot be sent through the generated struct, so report the
+// gap rather than working around it.
 type ConnectorCreateRequestBody struct {
 	// Allowed values: see the ConnectorCreateRequestBodyVendor constants.
-	Vendor                 string                         `json:"vendor"`
-	ConnectorCreateRequest *ConnectorCreateRequest        `json:"-"`
-	JAMFPRO                *JamfProConnectorCreateRequest `json:"-"`
+	Vendor          string                                 `json:"vendor"`
+	AIRWATCH        *WorkspaceOneConnectorCreateRequest    `json:"-"`
+	GOOGLE          *GoogleConnectorCreateRequest          `json:"-"`
+	INTUNE          *IntuneConnectorCreateRequest          `json:"-"`
+	JAMFPRO         *JamfProConnectorCreateRequest         `json:"-"`
+	JAMFSCHOOL      *JamfSchoolConnectorCreateRequest      `json:"-"`
+	MAAS360         *Maas360ConnectorCreateRequest         `json:"-"`
+	MOBILEIRONCLOUD *MobileIronCloudConnectorCreateRequest `json:"-"`
+	MOBILEIRONCORE  *MobileIronCoreConnectorCreateRequest  `json:"-"`
+	WIZY            *WizyConnectorCreateRequest            `json:"-"`
+	XENMOBILE       *XenMobileConnectorCreateRequest       `json:"-"`
 }
 
 // UnmarshalJSON dispatches the payload to the variant matching the
@@ -1007,12 +1032,36 @@ func (m *ConnectorCreateRequestBody) UnmarshalJSON(data []byte) error {
 	}
 	m.Vendor = d.Vendor
 	switch d.Vendor {
-	case "AIRWATCH", "GOOGLE", "INTUNE", "JAMF_SCHOOL", "MAAS360", "MOBILEIRONCLOUD", "MOBILEIRONCORE", "WIZY", "XENMOBILE":
-		m.ConnectorCreateRequest = new(ConnectorCreateRequest)
-		return json.Unmarshal(data, m.ConnectorCreateRequest)
+	case "AIRWATCH":
+		m.AIRWATCH = new(WorkspaceOneConnectorCreateRequest)
+		return json.Unmarshal(data, m.AIRWATCH)
+	case "GOOGLE":
+		m.GOOGLE = new(GoogleConnectorCreateRequest)
+		return json.Unmarshal(data, m.GOOGLE)
+	case "INTUNE":
+		m.INTUNE = new(IntuneConnectorCreateRequest)
+		return json.Unmarshal(data, m.INTUNE)
 	case "JAMF_PRO":
 		m.JAMFPRO = new(JamfProConnectorCreateRequest)
 		return json.Unmarshal(data, m.JAMFPRO)
+	case "JAMF_SCHOOL":
+		m.JAMFSCHOOL = new(JamfSchoolConnectorCreateRequest)
+		return json.Unmarshal(data, m.JAMFSCHOOL)
+	case "MAAS360":
+		m.MAAS360 = new(Maas360ConnectorCreateRequest)
+		return json.Unmarshal(data, m.MAAS360)
+	case "MOBILEIRONCLOUD":
+		m.MOBILEIRONCLOUD = new(MobileIronCloudConnectorCreateRequest)
+		return json.Unmarshal(data, m.MOBILEIRONCLOUD)
+	case "MOBILEIRONCORE":
+		m.MOBILEIRONCORE = new(MobileIronCoreConnectorCreateRequest)
+		return json.Unmarshal(data, m.MOBILEIRONCORE)
+	case "WIZY":
+		m.WIZY = new(WizyConnectorCreateRequest)
+		return json.Unmarshal(data, m.WIZY)
+	case "XENMOBILE":
+		m.XENMOBILE = new(XenMobileConnectorCreateRequest)
+		return json.Unmarshal(data, m.XENMOBILE)
 	}
 	return nil
 }
@@ -1021,10 +1070,26 @@ func (m *ConnectorCreateRequestBody) UnmarshalJSON(data []byte) error {
 // pointer is nil, emits a minimal object carrying only the discriminator.
 func (m ConnectorCreateRequestBody) MarshalJSON() ([]byte, error) {
 	switch m.Vendor {
-	case "AIRWATCH", "GOOGLE", "INTUNE", "JAMF_SCHOOL", "MAAS360", "MOBILEIRONCLOUD", "MOBILEIRONCORE", "WIZY", "XENMOBILE":
-		return json.Marshal(m.ConnectorCreateRequest)
+	case "AIRWATCH":
+		return json.Marshal(m.AIRWATCH)
+	case "GOOGLE":
+		return json.Marshal(m.GOOGLE)
+	case "INTUNE":
+		return json.Marshal(m.INTUNE)
 	case "JAMF_PRO":
 		return json.Marshal(m.JAMFPRO)
+	case "JAMF_SCHOOL":
+		return json.Marshal(m.JAMFSCHOOL)
+	case "MAAS360":
+		return json.Marshal(m.MAAS360)
+	case "MOBILEIRONCLOUD":
+		return json.Marshal(m.MOBILEIRONCLOUD)
+	case "MOBILEIRONCORE":
+		return json.Marshal(m.MOBILEIRONCORE)
+	case "WIZY":
+		return json.Marshal(m.WIZY)
+	case "XENMOBILE":
+		return json.Marshal(m.XENMOBILE)
 	}
 	return json.Marshal(map[string]string{"vendor": m.Vendor})
 }
@@ -1107,6 +1172,31 @@ type EnablementRequest struct {
 	Enabled bool `json:"enabled"`
 }
 
+// GoogleApiSettings OAuth client credentials for the Google API.
+type GoogleApiSettings struct {
+	// OAuth client id.
+	ClientID string `json:"clientId"`
+	// OAuth client secret.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	ClientSecret *string `json:"clientSecret,omitempty"`
+}
+
+// GoogleConnectorCreateRequest Connector creation request for Google (Chrome / Android Enterprise). The OAuth client credentials (`apiSettings`) and the `authUrl` override are optional; JSC falls back to Google defaults when they are omitted.
+type GoogleConnectorCreateRequest struct {
+	// OAuth client credentials for the Google API.
+	ApiSettings *GoogleApiSettings `json:"apiSettings,omitempty"`
+	// Override for the Google authentication URL.
+	AuthURL *string `json:"authUrl,omitempty"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// Google API URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "GOOGLE".
+	Vendor string `json:"vendor"`
+}
+
 // GroupMapping A single UEM-group-to-JSC-group assignment. Both property names retain legacy internal product names (`emm` for UEM, `wandera` for JSC). They are the names the service serializes and accepts today, so they are documented as-is; renaming them would break existing callers.
 type GroupMapping struct {
 	// Group ID in the UEM platform. Group names are not accepted.
@@ -1127,6 +1217,41 @@ type GroupSettings struct {
 	// Explicit UEM-group-to-JSC-group assignments. Replaces the existing set on update; send an empty
 	// array to clear all mappings.
 	GroupMappings *[]GroupMapping `json:"groupMappings,omitempty"`
+}
+
+// IntuneApiCredentials OAuth client credentials for a single Intune API.
+type IntuneApiCredentials struct {
+	// OAuth client (application) id.
+	ClientID string `json:"clientId"`
+	// OAuth client secret.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	ClientSecret *string `json:"clientSecret,omitempty"`
+}
+
+// IntuneConnectorCreateRequest Connector creation request for Microsoft Intune. JSC talks to three Intune APIs — lifecycle management (`lcm`), Mobile Threat Defense (`mtd`), and device tagging (`tag`) — each authenticated with its own OAuth client credentials. The endpoint-URL overrides are optional and default to Microsoft's public endpoints when omitted.
+type IntuneConnectorCreateRequest struct {
+	// Override for the Microsoft Graph authentication URL.
+	GraphAuthURL *string `json:"graphAuthUrl,omitempty"`
+	// Override for the Microsoft Graph API URL.
+	GraphURL *string `json:"graphUrl,omitempty"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// OAuth client credentials for a single Intune API.
+	Lcm *IntuneApiCredentials `json:"lcm,omitempty"`
+	// OAuth client credentials for a single Intune API.
+	Mtd *IntuneApiCredentials `json:"mtd,omitempty"`
+	// Override for the Mobile Threat Defense API URL.
+	MtdURL *string `json:"mtdUrl,omitempty"`
+	// Override for the authentication URL of the non-Graph Intune APIs.
+	OtherApisAuthURL *string `json:"otherApisAuthUrl,omitempty"`
+	// OAuth client credentials for a single Intune API.
+	Tag *IntuneApiCredentials `json:"tag,omitempty"`
+	// Intune (Microsoft Graph) server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "INTUNE".
+	Vendor string `json:"vendor"`
 }
 
 // JamfProConnectorCreateRequest Connector creation request for Jamf Pro. The `authStrategy` field selects how JSC authenticates to Jamf Pro and determines which further fields are required: - `JAMF_PRO_OAUTH` — provide `deviceSyncAuth.clientId` and `deviceSyncAuth.clientSecret` (Jamf Pro API-role OAuth client credentials). - `BASIC` — provide `deviceSyncAuth.username` and `deviceSyncAuth.password`. - `M2M` — provide `tenantId`; `deviceSyncAuth` must be omitted (JSC authenticates through the shared machine-to-machine trust rather than per-connector credentials). The credential fields (`deviceSyncAuth.password`, `deviceSyncAuth.clientSecret`) are write-only. `tenantId` is likewise write-only: it is accepted on creation but not returned in responses. Write-only fields are never echoed back in any response.
@@ -1169,6 +1294,23 @@ type JamfProCredentials struct {
 	Username *string `json:"username,omitempty"`
 }
 
+// JamfSchoolConnectorCreateRequest Connector creation request for Jamf School.
+type JamfSchoolConnectorCreateRequest struct {
+	// Jamf School API key.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	ApiKey string `json:"apiKey"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// Jamf School network id.
+	NetworkID string `json:"networkId"`
+	// Jamf School server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "JAMF_SCHOOL".
+	Vendor string `json:"vendor"`
+}
+
 // LatestSync Summary of the connector's most recent sync run, embedded in `ConnectorConfig`. The containing `latestSync` property is `null` until the connector has run its first sync. This is **not** the same shape as the `SyncRun` entries returned by `GET /connectors/{configId}/sync/runs`: it carries `lastSeen` and `errorDetails`, and has no per-run device counters, because the connector record keeps only the current transaction's state and not its tallies. Use the sync-runs endpoint for run history and counts. `startedUtcMs` and `finishedUtcMs` are retained, deprecated epoch-millisecond duplicates of the ISO-8601 `started` and `finished`. They are still emitted for existing consumers; new consumers should read the ISO-8601 fields.
 type LatestSync struct {
 	// Why the most recent sync failed. Always present, with null members when the sync did not fail.
@@ -1194,6 +1336,69 @@ type LatestSync struct {
 	// identifier of the underlying sync transaction, and the whole object is null when there is no
 	// transaction.
 	TransactionID string `json:"transactionId"`
+}
+
+// Maas360ConnectorCreateRequest Connector creation request for IBM MaaS360.
+type Maas360ConnectorCreateRequest struct {
+	// MaaS360 application access key.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	AppAccessKey string `json:"appAccessKey"`
+	// MaaS360 registered application id.
+	AppID string `json:"appId"`
+	// MaaS360 registered application version.
+	AppVersion string `json:"appVersion"`
+	// MaaS360 billing (account) id.
+	BillingID string `json:"billingId"`
+	// MaaS360 API password.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	EmmPassword string `json:"emmPassword"`
+	// MaaS360 API username.
+	EmmUsername string `json:"emmUsername"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// MaaS360 server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "MAAS360".
+	Vendor string `json:"vendor"`
+}
+
+// MobileIronCloudConnectorCreateRequest Connector creation request for Ivanti Neurons for MDM (MobileIron Cloud). Note: the `vendor` discriminator value is `MOBILEIRONCLOUD`.
+type MobileIronCloudConnectorCreateRequest struct {
+	// MobileIron Cloud API password.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	EmmPassword string `json:"emmPassword"`
+	// MobileIron Cloud API username.
+	EmmUsername string `json:"emmUsername"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// MobileIron Cloud server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "MOBILEIRONCLOUD".
+	Vendor string `json:"vendor"`
+}
+
+// MobileIronCoreConnectorCreateRequest Connector creation request for Ivanti EPMM (MobileIron Core). Note: the `vendor` discriminator value is `MOBILEIRONCORE`.
+type MobileIronCoreConnectorCreateRequest struct {
+	// MobileIron Core API password.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	EmmPassword string `json:"emmPassword"`
+	// MobileIron Core API username.
+	EmmUsername string `json:"emmUsername"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// Optional PEM-encoded root certificate for TLS verification.
+	RootCertificate *string `json:"rootCertificate,omitempty"`
+	// MobileIron Core server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "MOBILEIRONCORE".
+	Vendor string `json:"vendor"`
 }
 
 // SyncConfig Sync configuration settings as returned in responses. Response-only: the corresponding update request carries these two settings as **top-level** `autoDeviceDeletion` and `disableSyncOnAuthError` fields on `SyncSettings`, not nested under `syncConfig`.
@@ -1285,5 +1490,66 @@ type SyncSettings struct {
 	Scheduled *bool `json:"scheduled,omitempty"`
 	// UEM vendor name — determines the shape of vendor-specific fields.
 	// Allowed values: see the SyncSettingsVendor constants.
+	Vendor string `json:"vendor"`
+}
+
+// WizyConnectorCreateRequest Connector creation request for Wizy.
+type WizyConnectorCreateRequest struct {
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// Wizy namespace.
+	Namespace string `json:"namespace"`
+	// Wizy server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "WIZY".
+	Vendor string `json:"vendor"`
+}
+
+// WorkspaceOneConnectorCreateRequest Connector creation request for VMware Workspace ONE. Note: the `vendor` discriminator value is `AIRWATCH`, the identifier the service uses for Workspace ONE (formerly AirWatch).
+type WorkspaceOneConnectorCreateRequest struct {
+	// Workspace ONE API password.
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	EmmPassword string `json:"emmPassword"`
+	// Workspace ONE API username.
+	EmmUsername string `json:"emmUsername"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// Optional PEM-encoded root certificate for TLS verification.
+	RootCertificate *string `json:"rootCertificate,omitempty"`
+	// Workspace ONE REST API tenant code (aw-tenant-code).
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	TenantCode string `json:"tenantCode"`
+	// Workspace ONE server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "AIRWATCH".
+	Vendor string `json:"vendor"`
+}
+
+// XenMobileConnectorCreateRequest Connector creation request for Citrix Endpoint Management (XenMobile). The `authStrategy` field selects the authentication method and determines which further fields are required: - `USERNAME_PASSWORD` — provide `emmUsername` and `emmPassword`. - `CITRIX_CLOUD_ADMIN` — provide `citrixCloudConfig`. - `CITRIX_CLOUD_ADMIN_OAUTH` — provide `citrixCloudOauthConfig`.
+type XenMobileConnectorCreateRequest struct {
+	// Authentication strategy used to connect to XenMobile. See the schema description for the fields each
+	// strategy requires.
+	// Allowed values: see the XenMobileConnectorCreateRequestAuthStrategy constants.
+	AuthStrategy string `json:"authStrategy"`
+	// Citrix Cloud administrator credentials for the CITRIX_CLOUD_ADMIN strategy.
+	CitrixCloudConfig *CitrixCloudConfig `json:"citrixCloudConfig,omitempty"`
+	// Citrix Cloud OAuth credentials for the CITRIX_CLOUD_ADMIN_OAUTH strategy.
+	CitrixCloudOauthConfig *CitrixCloudOauthConfig `json:"citrixCloudOauthConfig,omitempty"`
+	// XenMobile password (USERNAME_PASSWORD strategy).
+	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
+	// can supply a value on update.
+	EmmPassword *string `json:"emmPassword,omitempty"`
+	// XenMobile username (USERNAME_PASSWORD strategy).
+	EmmUsername *string `json:"emmUsername,omitempty"`
+	// ISO country code for the UEM instance, when applicable.
+	IsoCountry *string `json:"isoCountry,omitempty"`
+	// XenMobile server URL.
+	URL string `json:"url"`
+	// UEM vendor discriminator.
+	// Allowed values: "XENMOBILE".
 	Vendor string `json:"vendor"`
 }
