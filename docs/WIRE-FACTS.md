@@ -1916,6 +1916,70 @@ SDK change, no gateway change. Two separate credentials now lack it, making it a
 provisioning gap rather than a quirk of one integration — and since the token is
 opaque with an empty `scope`, no caller can confirm this from the API at all.
 
+### Re-probed 2026-09-01 on a third credential, with live controls — still ungranted
+
+The strongest version of this diagnosis so far, because the credential is
+demonstrably granted plenty else in the *same invocation*:
+
+| credential / environment | request | result |
+|---|---|---|
+| environment (eu), own env `aee3ec71` | `GET /devices/v1/devices` | **200** — real devices |
+| environment (eu), own env `aee3ec71` | `GET /blueprints/v1/blueprints` | **200** |
+| environment (eu), own env `aee3ec71` | `GET /ai/governance/policies/v1/policies` | **200** — 2 policies |
+| environment (eu), own env `aee3ec71` | `GET /audit/v1/bogus-xyz` | 403 `BAD_PERMISSIONS` |
+| environment (eu), own env `aee3ec71` | `GET /audit/v1/audit`, `/audit/v1/audit/sources`, `/audit/v1/audit/transactions/{bogus}`, `/audit/v1/audit/resources/{bogus}/lineage` | **403 `BAD_PERMISSIONS`** — all four |
+| organization (us) cred 2, own env `52251f1b` | `GET /audit/v1/audit`, `/audit/v1/audit/sources` | **403 `BAD_PERMISSIONS`** |
+
+**The audit namespace is mounted** — a bogus path under it answers 403, while a
+nonexistent namespace answers `404 page not found`, which is the routed/unrouted
+distinction. **All four generated operations are refused identically, and
+identically to a path that does not exist**, so status alone cannot tell a real
+audit path from a typo.
+
+So it is now three credentials across two organizations and two regions, each
+using an environment it owns, all 403. Since `audit_service_api.rego` *is*
+authored (gated on `read:env:audit` / `audit:read`), the missing piece remains the
+capability grant on the credential, not the rule.
+
+### The gateway's refusal layers, fully separated (2026-09-01)
+
+Established while chasing the above; each code names exactly one layer, which is
+what makes a refusal diagnosable without two credentials:
+
+| answer | layer |
+|---|---|
+| `401` plain text | no or invalid token |
+| `404 page not found` | namespace not mounted (or an `/api` prefix) |
+| `404 ENVIRONMENT_NOT_FOUND` | the environment does not exist — **fires even on a bogus path inside a mounted namespace**, so it precedes OPA |
+| `403 OWNERSHIP_FORBIDDEN` | the environment exists but the credential's organization does not own it |
+| `403 BAD_PERMISSIONS` | OPA deny. Also what a **bogus path inside a routed namespace** returns, which makes it the cheap control |
+| `400 REQUEST_CONTEXT_NOT_PROVIDED` | routed and granted, scope header absent |
+| `404 TENANT_NOT_FOUND` | environment exists and is owned, but has no tenant behind it |
+| `502 service_unavailable` | past auth *and* OPA; upstream unreachable — **evidence of a grant, not of a missing one** |
+
+Two consequences worth keeping:
+
+- **Ownership is checked before capability**, so a foreign `X-Environment-Id`
+  masks whether the credential holds the grant. A 403 cannot be classified until
+  the scope is known to belong to the credential — which is how `c1324e8c` and
+  `52251f1b` were first misread.
+- **Report upstream: the ordering is not uniform across namespaces, and two of
+  them leak environment existence.** With a credential owning *none* of the
+  environments below, `audit` refuses on ownership while `blueprints` and
+  `devices` answer past it and disclose the environment's tenant state:
+
+  | environment | `audit` | `blueprints` / `devices` |
+  |---|---|---|
+  | `52251f1b` (exists, unowned, no tenant) | `403 OWNERSHIP_FORBIDDEN` | `404 TENANT_NOT_FOUND` |
+  | `c1324e8c`, all-zero UUID (do not exist) | `404 ENVIRONMENT_NOT_FOUND` | `404 ENVIRONMENT_NOT_FOUND` |
+
+  So via blueprints or devices an unauthorized caller can distinguish "this
+  environment ID exists" from "it does not", and learn whether it has a tenant,
+  for an ID it has no rights to. `audit` demonstrates the correct behaviour.
+  Low severity — environment IDs are UUIDs, so this confirms a known or guessed
+  ID rather than enabling enumeration — but it is a real disclosure and the
+  inconsistency is itself a defect.
+
 **The path-scoping workaround this file once contemplated is confirmed
 unnecessary. Do not add it.**
 
