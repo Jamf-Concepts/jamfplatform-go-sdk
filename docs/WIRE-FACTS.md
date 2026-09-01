@@ -438,6 +438,14 @@ wound down.
 
 Two further checks, each independent of the specs:
 
+- **`internal/dev` in the same bundle carries every removed operation.**
+  `internal/dev/jpapi` has all 788 and `internal/dev/capi` all 606 — op-for-op
+  the v1897 `external/` sets — while `external/` and `internal/stage/` carry 666
+  and 586. Re-checked on v1958: unchanged. So the deletion happens between dev
+  and the prod/stage publish, which also explains `routes.yaml`: it is generated
+  on the dev side of the filter. Diffing `internal/dev` *file contents* is still
+  useless (its `x-generated` block churns every build) but comparing **operation
+  sets** across environments is exactly what it is good for.
 - **`authorization-policies`** `origin/main` is still `cdd734b` — v1897's
   `/v1/system/initialize` deny — with no successor commit. The hand-written OPA
   allow blocks for `v1`, `v2` and `v3` `computers-inventory` (including the
@@ -939,6 +947,35 @@ itself, verified with both `--compressed` and `identity`.
   documented field to be present in every response. The transport decodes
   leniently so nothing breaks, but `fieldName` is unreachable from Go. Worth
   reporting: a documentation policy is costing generated clients a real field.
+- **v1958 constrained the two sync-interval fields, redefined one of them, and
+  none of it could be probed (2026-09-01).** `refreshRateMinutes` went
+  `minimum: 1` → `minimum: 60, maximum: 1440` with enum
+  `60, 120, 240, 480, 720, 1440`; `deviceUnmanagedThreshold` gained enum
+  `0, 1, 3, 5, 7, 14`. Both sit on `SyncSettings` (PUT body) and
+  `ConnectorConfig` (response), and the generated diff is godoc only — numeric
+  enums become `Allowed values:` lines, constants are emitted for string enums
+  only.
+
+  The redefinition matters more than the constraint:
+  `deviceUnmanagedThreshold` was *consecutive syncs absent, `0` disables the
+  grace period*; it is now *days since last check-in, `0` uses the platform
+  default of 3 days*. The unit changed and `0` flipped from off to default-on, so
+  a caller who sent `0` to disable the behaviour now gets a 3-day threshold. The
+  spec also newly claims the field is **not applicable to `JAMF_PRO`** — silently
+  ignored for that vendor.
+
+  **Unverifiable right now, for two reasons worth remembering.** The JSC sandbox
+  has no connector (`GET /uem-connect/v1/connectors` → `totalCount: 0`; the
+  `M2M` one at `6a95614fa7d64061069424cf` recorded in v1882 is gone), and the
+  sync-settings PUT is the only surface carrying these fields. And the
+  doomed-request trick fails here: five PUTs to a bogus `configId` carrying
+  in-enum (`1440`, `3`), out-of-enum (`90`, `2`) and below-minimum (`1`) values
+  all returned the identical `404 NOT_FOUND` "Config with ID … doesn't exist"
+  (traces `01cfd20f…`, `e58717b4…`, `bc45a8e6…`, `a59d41eb…`, `e6425dab…`) with
+  `GET /connectors` → 200 as the control. **Resource resolution runs before field
+  validation on this PUT**, so a bogus id reaches no validator — the reverse of
+  the ordering that makes the technique work elsewhere. Re-probe when a
+  disposable connector exists.
 - **v1942's `uemGroups` documentation is upstream's claim, not wire truth
   (2026-09-01).** It is the only substantive v1942 change the SDK took, and it is
   doc-only, but it asserts four behaviours nothing here has probed: that

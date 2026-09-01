@@ -904,8 +904,10 @@ type ConnectorConfig struct {
 	// flag, and for an `M2M`-provisioned connector the `clientId` is the one Jamf Security Cloud minted
 	// for itself.
 	DeviceSyncAuth *DeviceSyncAuth `json:"deviceSyncAuth,omitempty"`
-	// Number of consecutive syncs a device may be absent from the UEM platform before it is treated as
-	// unmanaged. `0` disables the grace period.
+	// Number of days since last check-in before a device is treated as unmanaged. `0` uses the platform
+	// default (3 days). Not applicable for JAMF_PRO — any value sent for that vendor is silently ignored
+	// (device status is taken exclusively from the UEM).
+	// Allowed values: 0, 1, 3, 5, 7, 14.
 	DeviceUnmanagedThreshold int `json:"deviceUnmanagedThreshold"`
 	// Whether the UEM platform supports receiving device tags from JSC.
 	EmmTaggingSupported bool `json:"emmTaggingSupported"`
@@ -932,6 +934,7 @@ type ConnectorConfig struct {
 	// Timestamp when the previous sync started (ISO 8601).
 	PreviousSyncStart *time.Time `json:"previousSyncStart,omitempty"`
 	// Sync refresh interval in minutes.
+	// Allowed values: 60, 120, 240, 480, 720, 1440.
 	RefreshRateMinutes int64 `json:"refreshRateMinutes"`
 	// Whether scheduled sync is active.
 	Scheduled bool `json:"scheduled"`
@@ -1266,14 +1269,17 @@ type SyncSettings struct {
 	DeviceFieldMappings DeviceFieldMappings `json:"deviceFieldMappings"`
 	// Whether device risk levels are sent back to UEM.
 	DeviceRiskTagging *bool `json:"deviceRiskTagging,omitempty"`
-	// Number of consecutive syncs a device may be absent from the UEM platform before it is treated as
-	// unmanaged. `0` disables the grace period.
+	// Number of days since last check-in before a device is treated as unmanaged. `0` uses the platform
+	// default (3 days). Not applicable for JAMF_PRO — any value sent for that vendor is silently ignored
+	// (device status is taken exclusively from the UEM).
+	// Allowed values: 0, 1, 3, 5, 7, 14.
 	DeviceUnmanagedThreshold *int `json:"deviceUnmanagedThreshold,omitempty"`
 	// Whether to automatically disable sync after repeated authentication failures.
 	DisableSyncOnAuthError *bool `json:"disableSyncOnAuthError,omitempty"`
 	// Group mapping configuration. Maps UEM groups to JSC groups.
 	GroupSettings *GroupSettings `json:"groupSettings,omitempty"`
 	// Sync refresh interval in minutes.
+	// Allowed values: 60, 120, 240, 480, 720, 1440.
 	RefreshRateMinutes *int64 `json:"refreshRateMinutes,omitempty"`
 	// Whether scheduled sync is enabled.
 	Scheduled *bool `json:"scheduled,omitempty"`

@@ -359,7 +359,15 @@
             "$ref": "#/components/schemas/DeviceSyncAuth"
           },
           "deviceUnmanagedThreshold": {
-            "description": "Number of consecutive syncs a device may be absent from the UEM platform before it is\ntreated as unmanaged. `0` disables the grace period.\n",
+            "description": "Number of days since last check-in before a device is treated as unmanaged.\n`0` uses the platform default (3 days). Not applicable for JAMF_PRO — any value\nsent for that vendor is silently ignored (device status is taken exclusively from the UEM).\n",
+            "enum": [
+              0,
+              1,
+              3,
+              5,
+              7,
+              14
+            ],
             "example": 3,
             "minimum": 0,
             "type": "integer"
@@ -411,9 +419,18 @@
           },
           "refreshRateMinutes": {
             "description": "Sync refresh interval in minutes",
+            "enum": [
+              60,
+              120,
+              240,
+              480,
+              720,
+              1440
+            ],
             "example": 1440,
             "format": "int64",
-            "minimum": 1,
+            "maximum": 1440,
+            "minimum": 60,
             "type": "integer"
           },
           "scheduled": {
@@ -1085,7 +1102,15 @@
           },
           "deviceUnmanagedThreshold": {
             "default": 0,
-            "description": "Number of consecutive syncs a device may be absent from the UEM platform before it is\ntreated as unmanaged. `0` disables the grace period.\n",
+            "description": "Number of days since last check-in before a device is treated as unmanaged.\n`0` uses the platform default (3 days). Not applicable for JAMF_PRO — any value\nsent for that vendor is silently ignored (device status is taken exclusively from the UEM).\n",
+            "enum": [
+              0,
+              1,
+              3,
+              5,
+              7,
+              14
+            ],
             "example": 3,
             "minimum": 0,
             "type": "integer"
@@ -1101,10 +1126,19 @@
           },
           "refreshRateMinutes": {
             "default": 1440,
-            "description": "Sync refresh interval in minutes",
+            "description": "Sync refresh interval in minutes.",
+            "enum": [
+              60,
+              120,
+              240,
+              480,
+              720,
+              1440
+            ],
             "example": 1440,
             "format": "int64",
-            "minimum": 1,
+            "maximum": 1440,
+            "minimum": 60,
             "type": "integer"
           },
           "scheduled": {

@@ -293,7 +293,7 @@ a method that ignores the cursor fails.
 | `securitycloud-dns-api.yaml` | `internal/stage/jsc-dns` | v1897 |
 | `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` | v1897 |
 | `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories` | v1897 |
-| `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` | **v1942** |
+| `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` | **v1958** |
 | `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
 | `audit-api.yaml` | `external/audit` | v1897 |
@@ -343,8 +343,48 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1942** (2026-09-01), except `securitycloud-devices`, which is
+Ingested through **v1958** (2026-09-01), except `securitycloud-devices`, which is
 **held at v1897** — see the holds table.
+
+**v1958 changed one spec, `internal/stage/uem-connect`, and the change is
+constraints plus one redefinition.** `refreshRateMinutes` went from
+`minimum: 1` to `minimum: 60, maximum: 1440` with an enum of
+`60, 120, 240, 480, 720, 1440`; `deviceUnmanagedThreshold` gained an enum of
+`0, 1, 3, 5, 7, 14`. Both land on `SyncSettings` (the sync-settings PUT body) and
+`ConnectorConfig` (the response). The generated diff is godoc only — the
+generator records numeric enums as `Allowed values:` lines and emits constants
+only for string enums — so this is **not** a breaking change, and the field types
+stay `int64` / `int`.
+
+**`deviceUnmanagedThreshold` was redefined, and a caller sending `0` now gets
+something different.** It was "number of consecutive syncs a device may be absent
+from the UEM platform before it is treated as unmanaged. `0` disables the grace
+period." It is now "number of **days since last check-in** before a device is
+treated as unmanaged. `0` uses the **platform default (3 days)**." So the unit
+changed and `0` flipped from *off* to *default-on*. The spec also now says the
+field is **not applicable for `JAMF_PRO`** — any value sent for that vendor is
+silently ignored, device status coming exclusively from the UEM.
+
+**None of that is wire-verified, and here is why.** The JSC sandbox tenant has no
+UEM connector any more — the `M2M` one recorded at v1882
+(`6a95614fa7d64061069424cf`) is gone, `GET /uem-connect/v1/connectors` returns
+`totalCount: 0` — and the sync-settings PUT is the only surface carrying these
+fields. The validation-ordering trick does not reach them either: five PUTs
+against a bogus `configId` with in-enum, out-of-enum and below-minimum values all
+returned the same `404 NOT_FOUND` ("Config with ID … doesn't exist"), so resource
+resolution runs **before** field validation on this operation — the opposite of
+the ordering that makes doomed-request probing work. Re-probe once a disposable
+connector exists; creating one needs a Jamf Pro tenant and provisions an API role
+on the Pro side the SDK cannot remove.
+
+Everything else in v1958 was byte-identical to v1942 outside `internal/dev` — the
+only other diffs were the manifest and the two unified rollups.
+
+**v1958 also confirms the 146-operation filter is still in place and still
+prod-only.** `internal/dev/jpapi` carries all 788 operations and
+`internal/dev/capi` all 606 — the exact v1897 `external/` sets, op-for-op — while
+`external/` and `internal/stage/` stay at 666 and 586. See the v1942 section
+below.
 
 **v1942 deleted 146 deprecated operations from the published specs and the SDK
 took 144 of them**, holding the two Security Cloud ones. Every one was
@@ -363,9 +403,18 @@ next bundle does this again.
 | `external/declaration-reporting` | 5 → 3 | `GET /v1/declarations/{declarationIdentifier}`, `GET /v1/devices/{deviceId}` |
 | `external/securitycloud-devices` | *not taken* | would have removed `GET /v1/groups` and `PUT /v1/groups/{groupId}`; **held**, see below |
 
-**Four independent signals say the server has not withdrawn any of them**, so
+**Five independent signals say the server has not withdrawn any of them**, so
 the SDK is now materially stricter than the gateway:
 
+- **`internal/dev` in the same bundle carries every removed operation.**
+  `internal/dev/jpapi` has all 788 and `internal/dev/capi` all 606 — the exact
+  v1897 `external/` operation sets, op-for-op — while `external/` and
+  `internal/stage/` carry 666 and 586. Still true in v1958. This is the filter
+  caught in the act, and it is why `routes.yaml` still agrees with dev rather
+  than with prod. (The standing advice not to diff against `internal/dev` is
+  about its per-spec `x-generated` block making every file look changed;
+  comparing *operation sets* across environments is exactly what it is good
+  for.)
 - **The same bundle's own privilege oracle still declares all 146.**
   `external/_permissions/routes.yaml` is byte-different from v1897 but
   `sort`-identical — a pure reordering, 1474 route-method entries both sides,
