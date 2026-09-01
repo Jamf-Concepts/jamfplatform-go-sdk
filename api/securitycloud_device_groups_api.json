@@ -133,6 +133,15 @@
         ],
         "type": "object"
       },
+      "GroupListResponse": {
+        "description": "List of device groups for the authenticated customer. Always contains at least the implicit \"Default Group\" entry.",
+        "items": {
+          "$ref": "#/components/schemas/GroupListItem"
+        },
+        "maxItems": 10000,
+        "minItems": 1,
+        "type": "array"
+      },
       "GroupListResponseV2": {
         "description": "List of device groups for the authenticated customer.",
         "properties": {
@@ -199,6 +208,63 @@
   "openapi": "3.0.3",
   "paths": {
     "/v1/groups": {
+      "get": {
+        "deprecated": true,
+        "description": "Retrieves all device groups for the authenticated customer.\n\n**Required Permissions:** `device-groups:read`",
+        "operationId": "listGroups",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupListResponse"
+                }
+              }
+            },
+            "description": "Groups retrieved successfully",
+            "headers": {
+              "Deprecation": {
+                "description": "RFC 9745 deprecation timestamp",
+                "schema": {
+                  "example": "@1786492800",
+                  "type": "string"
+                },
+                "style": "simple"
+              },
+              "Link": {
+                "description": "Link to successor endpoint",
+                "schema": {
+                  "example": "\u003c/v2/groups\u003e; rel=\"successor-version\"",
+                  "type": "string"
+                },
+                "style": "simple"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "device-groups:read"
+            ]
+          }
+        ],
+        "summary": "List all device groups for a customer",
+        "tags": [
+          "device-groups"
+        ],
+        "x-deprecation-date": "2026-08-12",
+        "x-required-privileges": [
+          "device-groups:read"
+        ],
+        "x-successor-endpoint": "GET /v2/groups",
+        "x-sunset-date": "2027-08-12"
+      },
       "post": {
         "description": "Creates a new device group for the authenticated customer.\n\n**Required Permissions:** `device-groups:create`",
         "operationId": "createGroup",
@@ -415,6 +481,130 @@
         "x-required-privileges": [
           "device-groups:read"
         ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Updates the name of an existing device group.\n\n**Required Permissions:** `device-groups:update`",
+        "operationId": "updateGroup",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Unique identifier of the group to update",
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGroupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            },
+            "description": "Group updated successfully",
+            "headers": {
+              "Deprecation": {
+                "description": "RFC 9745 deprecation timestamp",
+                "schema": {
+                  "example": "@1787616000",
+                  "type": "string"
+                }
+              },
+              "Link": {
+                "description": "Link to successor endpoint",
+                "schema": {
+                  "example": "\u003c/v2/groups/{groupId}\u003e; rel=\"successor-version\"",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request, reserved group name, or cannot update default group"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Unauthorized - authentication required"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Forbidden - insufficient permissions"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Group not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Group with the same name already exists for this tenant"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "device-groups:update"
+            ]
+          }
+        ],
+        "summary": "Update a device group",
+        "tags": [
+          "device-groups"
+        ],
+        "x-deprecation-date": "2026-08-25",
+        "x-required-privileges": [
+          "device-groups:update"
+        ],
+        "x-successor-endpoint": "PUT /v2/groups/{groupId}",
+        "x-sunset-date": "2027-08-25"
       }
     },
     "/v2/groups": {

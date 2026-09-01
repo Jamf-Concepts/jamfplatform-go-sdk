@@ -294,7 +294,7 @@ a method that ignores the cursor fails.
 | `securitycloud-ztna-api.yaml` | `internal/stage/jsc-ztna` | v1897 |
 | `securitycloud-categories-api.yaml` | `internal/stage/jsc-categories` | v1897 |
 | `securitycloud-uem-connect-api.yaml` | `internal/stage/uem-connect` | **v1942** |
-| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | **v1942** |
+| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
 | `audit-api.yaml` | `external/audit` | v1897 |
 | `openapi-jpapi.json` | `external/jpapi` | **v1942** |
@@ -343,21 +343,25 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1942** (2026-09-01).
+Ingested through **v1942** (2026-09-01), except `securitycloud-devices`, which is
+**held at v1897** — see the holds table.
 
 **v1942 deleted 146 deprecated operations from the published specs and the SDK
-took the deletions.** Every one was `deprecated: true` in v1897 with a successor
-version that already existed. This is the second override of the
-additive-versions rule, and unlike v1897 it was **not** evidence-led — the
-evidence pointed the other way and the removal was taken as a deliberate
-decision to follow the specs. Record both halves.
+took 144 of them**, holding the two Security Cloud ones. Every one was
+`deprecated: true` in v1897 with a successor version that already existed. This
+is the second override of the additive-versions rule, and unlike v1897 it was
+**not** evidence-led — the evidence pointed the other way and following the
+specs was a deliberate decision. Record both halves. Where the wire evidence
+showed a removal would cost a capability outright, the spec was **held instead**;
+`securitycloud-devices` is that case, and it is the pattern to follow when the
+next bundle does this again.
 
 | spec | ops | what went |
 |---|---|---|
 | `external/jpapi` | 788 → 666 | computers-inventory `v1`/`v2`/`v3` (v4 survives), inventory-preload `v1` + unversioned (v2 survives), computer-groups `v2` (v3), mobile-device-groups `v1` (v2), mobile-device-prestages `v2` (v3), patch-software-title-configurations `v2` (v3), computer-inventory-collection-settings `v1` (v2), groups `v1` (v2), `GET /v1/mdm/commands` (v2) |
 | `external/capi` | 606 → 586 | `/computers` collection, `GET`+`PUT /computers/id/{id}`, `/computers/subset/basic`, and the whole `/patches`, `/patchsoftwaretitles`, `/patchpolicies` (collection) and `/patchreports` families |
 | `external/declaration-reporting` | 5 → 3 | `GET /v1/declarations/{declarationIdentifier}`, `GET /v1/devices/{deviceId}` |
-| `external/securitycloud-devices` | 7 → 5 | `GET /v1/groups`, `PUT /v1/groups/{groupId}` |
+| `external/securitycloud-devices` | *not taken* | would have removed `GET /v1/groups` and `PUT /v1/groups/{groupId}`; **held**, see below |
 
 **Four independent signals say the server has not withdrawn any of them**, so
 the SDK is now materially stricter than the gateway:
@@ -389,18 +393,20 @@ follows it.
 **What the removal cost, beyond the 146 methods.** Three real capability gaps,
 each pinned by a test that fails when it closes:
 
-- **Security Cloud has no working device-group update, and the removal is what
-  caused that.** `PUT /v1/groups/{groupId}` is gone from the spec but **still
-  answers 200 on the wire** — re-probed 2026-09-01 on the JSC sandbox tenant,
-  where it renamed a real group and the rename read back — while its declared
-  successor `PUT /v2/groups/{groupId}` is unrouted: 403 `BAD_PERMISSIONS` 3/3 on
-  a real id, again on a bogus uuid, and `GET /v2/groups/{groupId}` fails the same
-  way, so no verb on that path is routed. `ApplyDeviceGroupV2` previously used
-  the v1 write for its update branch and now uses the v2 one, so Apply's
-  update branch cannot succeed. `TestAcceptance_SecurityCloudApplyDeviceGroup`
-  asserts the create branch and pins the 403 on the update branch;
-  `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` keeps the standalone pin but
-  its control had to drop from a v1 *write* to a v1 read, which is weaker.
+- **`securitycloud-devices` is held at v1897 for exactly this reason.** Taking
+  v1942 there would have withdrawn `PUT /v1/groups/{groupId}` — the *only*
+  device-group update the gateway routes — leaving the unrouted
+  `PUT /v2/groups/{groupId}` as the package's sole update method and killing
+  `ApplyDeviceGroupV2`'s update branch. The v1 write **answers 200 on the wire**,
+  re-probed 2026-09-01 on the JSC sandbox tenant, where it renamed a real group
+  and the rename read back; the v2 successor is 403 `BAD_PERMISSIONS` on a real
+  id (4 attempts across two sessions), on a bogus uuid, and on `GET` too, so no
+  verb on that path is routed. Full evidence — including the third URL shape the
+  runtime `Link` header names, and the scope-header tells — in
+  [WIRE-FACTS.md](docs/WIRE-FACTS.md#device-groups-v2id-the-rule-has-not-been-authored).
+  So `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their resolver and both Applies
+  all stay, and `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` keeps its v1
+  *write* control.
 - **Patch software titles are unseedable.** Classic's
   `POST /patchsoftwaretitles/id/0` was the only way to mint an id the Pro v3
   configuration endpoints address; Pro exposes no routed catalogue
@@ -434,12 +440,13 @@ all gone, with no replacement — see the seeding gap above),
 `internal/resources/pro/patch_policy` (`ListPatchPolicies`),
 `internal/resources/pro/computer_inventory_collection_settings`
 (`ComputerInventoryCollectionPreferences` → `…V2`),
-`internal/resources/security_cloud/device_group` (`UpdateDeviceGroupV1`,
-`ListDeviceGroupsV1`), `internal/common/computertarget` and
+`internal/common/computertarget` and
 `internal/testhelpers/acceptance_assertions.go`
 (`ListComputersInventoryV3`, `ResolveComputerInventoryV3ID*`).
-`terraform-provider-jamfplatform-internal`, 3 files, all `UpdateDeviceGroupV1`.
-`jamf-cli-internal` is unaffected — it uses the SDK for transport only.
+`terraform-provider-jamfplatform-internal` and the provider's
+`internal/resources/security_cloud/device_group` are **unaffected** — holding
+`securitycloud-devices` keeps `UpdateDeviceGroupV1` and `ListDeviceGroupsV1`.
+`jamf-cli-internal` is unaffected too: transport only.
 
 **`internal/stage/uem-connect` also moved to v1942, and that change is
 documentation only.** `GroupMapping.EmmGroupID` now says the
@@ -587,6 +594,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | held | why |
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
+| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire 2026-09-01 — and its declared successor `PUT /v2/groups/{groupId}` is unrouted (403 `BAD_PERMISSIONS`; no OPA rule authored). Taking the removal would leave the package with no working update and break `ApplyDeviceGroupV2`. Take it once the v2 rule lands. |
 | `securitycloud-enrollment`, `ai/governance/visibility` | No published spec in any environment. Not ingestable. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 
@@ -665,7 +673,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | `proclassic` | `proclassic` | tenant | 586 ops, XML end-to-end |
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
-| `securitycloud` | `securitycloud` | tenant (own identifier) | 46 ops across five specs |
+| `securitycloud` | `securitycloud` | tenant (own identifier) | 48 ops across five specs |
 | `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** |
 | `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
 | `audit` | `audit` | environment | compiles; every call 403s pending an `audit:read` grant |

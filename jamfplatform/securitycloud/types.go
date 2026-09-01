@@ -832,6 +832,9 @@ type GroupListItem struct {
 	Name string `json:"name"`
 }
 
+// GroupListResponse is a list of GroupListItem.
+type GroupListResponse = []GroupListItem
+
 // GroupListResponseV2 List of device groups for the authenticated customer.
 type GroupListResponseV2 struct {
 	// Device groups belonging to the customer. Always contains at least the implicit "Default Group"

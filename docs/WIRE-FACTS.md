@@ -733,14 +733,14 @@ One more for the same team: `POST /securitycloud/v1/groups` returns
 `href: "/api/securitycloud/v1/groups/{id}"` — an `/api` prefix the GA gateway
 does not serve, so the href is not directly followable.
 
-**v1942 therefore removed the only working device-group update and kept the broken
-one.** It withdrew `PUT /v1/groups/{groupId}` from the spec — the call that answers
-200 above — leaving the unrouted v2 PUT as the package's sole update method.
-`ApplyDeviceGroupV2` was repointed onto it, so its update branch can no longer
-succeed (`TestAcceptance_SecurityCloudApplyDeviceGroup` pins that 403 too), and
-this probe's control had to weaken from a v1 *write* to a v1 read because the SDK
-no longer generates the write. Restore `UpdateDeviceGroupV1` if the gap needs
-closing before Jamf authors the v2 rule — the wire still serves it.
+**v1942 would have removed the only working device-group update and kept the broken
+one, so `securitycloud-devices` is held at v1897.** The build withdrew
+`PUT /v1/groups/{groupId}` — the call that answers 200 above — which would have left
+the unrouted v2 PUT as the package's sole update method and repointed
+`ApplyDeviceGroupV2` onto it, killing its update branch. The removal was taken and
+then reverted on that evidence: `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their
+resolver and both Applies all remain, and this probe's v1 *write* control remains
+available. Take the removal once the v2 rule is authored, not before.
 
 Two methodological warnings from this probe. The first attempt returned **500 on
 both v1 and v2**, which reads as "v2 is routed and merely faulting" — the opposite
@@ -987,15 +987,13 @@ exist**: `/v2/customers/{tenantId}/groups` is a third URL shape and answers 403,
 as does every `/v2/groups/{id}` form. The server is telling callers to migrate a
 write to a path that is neither published nor routed.
 
-`ListDeviceGroupsV1` returned a **bare JSON array** and `ListDeviceGroupsV2` wraps
-it in `{groups: []}`. Both resolvers and both Applies existed side by side, sharing
-the v1 create/update/delete ops. **v1942 withdrew `GET /v1/groups` and
-`PUT /v1/groups/{groupId}`**, so only the v2 resolver and Apply remain — and the
-`{groups: []}` unwrap is now the SDK's *only* `resultsField` user with no
-bare-array sibling to contrast against, which is exactly the shape most likely to
-rot silently. `POST /v1/groups`, `GET /v1/groups/{groupId}` and
-`DELETE /v1/groups/{groupId}` all survived, so Apply's create branch and the
-lifecycle test still work.
+`ListDeviceGroupsV1` returns a **bare JSON array** and `ListDeviceGroupsV2` wraps it
+in `{groups: []}`, so `ResolveDeviceGroupV1ByName` and `…V2ByName` differ in exactly
+the way most likely to rot silently — v2 is the SDK's only `resultsField` user, and
+the v1 bare-array sibling is what it is contrasted against. Both resolvers and both
+Applies exist side by side, sharing the v1 create/update/delete ops since v2 is
+list-only. **v1942 withdrew `GET /v1/groups` and `PUT /v1/groups/{groupId}`, which
+would have collapsed all of that; the spec is held at v1897 instead.**
 
 `Default Group` comes back with **no `id`** on both v1 and v2 — the reason
 `GroupListItem` requires only `name`, and the reason `ResolveDeviceGroupV1ByName`
