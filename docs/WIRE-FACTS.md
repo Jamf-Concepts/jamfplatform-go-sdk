@@ -707,6 +707,32 @@ capability gap. And **no `/v2/groups/{groupId}` verb is routed**: the `GET` fail
 the same way the `PUT` does, matching `securitycloud_api_devices.rego` having no
 rule for that path at all.
 
+**The v1 PUT's own `Link` header names a third URL shape, and it is unrouted
+too.** The 200 response carries `deprecation: @1787616000` (2026-08-25) and
+`link: </v2/customers/{tenantId}/groups/{groupId}>; rel="successor-version"` —
+neither the path the spec's `x-successor-endpoint` names
+(`PUT /v2/groups/{groupId}`) nor a published path at all. Probed with the tenant
+header: **403 `BAD_PERMISSIONS`**. So the runtime header and the spec disagree
+about the successor and both candidates are refused, while the deprecated call
+works.
+
+**Scope isolation: the `/customers/{tenantId}/` segment is inert, and the two
+failure modes are distinguishable.** Repeating the v2 probes with `X-Tenant-Id`
+*removed* returns **`400 REQUEST_CONTEXT_NOT_PROVIDED`** — for the path-scoped
+form as well as the bare one — so the gateway does not read the tenant from the
+path and the segment contributes nothing. That rules out "path scoping was
+retired" as an explanation for the successor path's 403. Keep the pair straight
+when diagnosing:
+
+| tell | meaning |
+|---|---|
+| `400 REQUEST_CONTEXT_NOT_PROVIDED` | no scope header on the request |
+| `403 BAD_PERMISSIONS`, constant across credentials and ids | path not routed |
+
+One more for the same team: `POST /securitycloud/v1/groups` returns
+`href: "/api/securitycloud/v1/groups/{id}"` — an `/api` prefix the GA gateway
+does not serve, so the href is not directly followable.
+
 **v1942 therefore removed the only working device-group update and kept the broken
 one.** It withdrew `PUT /v1/groups/{groupId}` from the spec — the call that answers
 200 above — leaving the unrouted v2 PUT as the package's sole update method.
