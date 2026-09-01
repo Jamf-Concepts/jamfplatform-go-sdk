@@ -726,6 +726,24 @@ routing lands** — invert it then, and do not weaken it to a skip.
 the same invocation. Promotion of the specs to prod did not come with the OPA
 rule.
 
+**A third run classified the 403 from the wire alone, using two credentials
+rather than two paths.** On the same real group, in one invocation with both
+tokens proven live (`GET /securitycloud/v2/groups` → 200 on the JSC credential,
+`GET /pro/v1/jamf-pro-version` → 200 on a `pro` one):
+
+| request | JSC credential | `pro` credential |
+|---|---|---|
+| `GET /securitycloud/v2/groups/{id}` | 403 `55fef538a4b2f0c81665dea059c9d7b0` | 403 `bbc5a3146958a8f3636b9ec865ee8d50` |
+| `PUT /securitycloud/v2/groups/{id}` | 403 `ab3e25bf65c2fed35faa25588a7afe81` | 403 `5526799f5087c641aa8ea97881aab254` |
+| `DELETE /securitycloud/v2/groups/{id}` | 403 `584fd8ec537b1311a47fc502fd0a13b4` | 403 `78520b00290262f616d23d8e3fb268de` |
+| `PUT /securitycloud/v1/groups/{id}` | **200**, rename applied | 403 `96faad136dcae9351590ce3961f369ad` |
+
+v1 **varies** by credential; v2 is **constant** across both. A 403 that varies is
+a capability grant, one constant across credentials is a missing authorization
+rule — so `/v2/groups/{groupId}` has no rule authored, established from the wire
+without reading `securitycloud_api_devices.rego`. The two sources now agree
+independently.
+
 The 09:36 sequence in full:
 
 | request | result |
