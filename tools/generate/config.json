@@ -5467,6 +5467,14 @@
       },
       "operations": [
         {
+          "op": "GET /computers/id/{id}",
+          "name": "GetComputerByID",
+          "responseType": "computer",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
           "op": "GET /computers/name/{name}",
           "name": "GetComputerByName",
           "responseType": "computer"
@@ -5482,6 +5490,15 @@
         {
           "op": "POST /computers/id/{id}",
           "name": "CreateComputerByID",
+          "requestType": "computer_post",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "PUT /computers/id/{id}",
+          "name": "UpdateComputerByID",
           "requestType": "computer_post",
           "pathNames": {
             "id": "id"
@@ -7103,6 +7120,40 @@
           }
         },
         {
+          "op": "GET /patches/id/{id}",
+          "name": "GetPatchByID",
+          "responseType": "software_title",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
+          "op": "POST /patches/id/{id}",
+          "name": "CreatePatchByID",
+          "requestType": "software_title",
+          "responseType": "software_title",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "PUT /patches/id/{id}",
+          "name": "UpdatePatchByID",
+          "requestType": "software_title",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "DELETE /patches/id/{id}",
+          "name": "DeletePatchByID",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
           "op": "GET /patchexternalsources/id/{id}",
           "name": "GetPatchExternalSourceByID",
           "responseType": "patch_external_source",
@@ -7174,6 +7225,48 @@
         {
           "op": "DELETE /patchpolicies/id/{id}",
           "name": "DeletePatchPolicyByID",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
+          "op": "GET /patchreports/patchsoftwaretitleid/{id}",
+          "name": "GetPatchReportByPatchSoftwareTitleID",
+          "responseType": "patch_report",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
+          "op": "GET /patchsoftwaretitles/id/{id}",
+          "name": "GetPatchSoftwareTitleByID",
+          "responseType": "patch_software_title",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
+          "op": "POST /patchsoftwaretitles/id/{id}",
+          "name": "CreatePatchSoftwareTitleByID",
+          "requestType": "patch_software_title",
+          "responseType": "patch_software_title",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "PUT /patchsoftwaretitles/id/{id}",
+          "name": "UpdatePatchSoftwareTitleByID",
+          "requestType": "patch_software_title",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "DELETE /patchsoftwaretitles/id/{id}",
+          "name": "DeletePatchSoftwareTitleByID",
           "pathNames": {
             "id": "id"
           }
@@ -8594,6 +8687,14 @@
           }
         },
         {
+          "op": "GET /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}",
+          "name": "ListPatchPoliciesBySoftwareTitleConfigID",
+          "responseType": "patch_policy",
+          "pathNames": {
+            "softwaretitleconfigid": "softwareTitleConfigID"
+          }
+        },
+        {
           "op": "GET /computercommands/name/{name}",
           "name": "GetComputerCommandByName",
           "responseType": "computer_command"
@@ -8637,6 +8738,11 @@
           "op": "GET /classes",
           "name": "ListClasses",
           "responseType": "classes"
+        },
+        {
+          "op": "GET /computers",
+          "name": "ListComputers",
+          "responseType": "computers"
         },
         {
           "op": "GET /mobiledevices",
@@ -8832,6 +8938,21 @@
           "op": "GET /patchinternalsources",
           "name": "ListPatchInternalSources",
           "responseType": "patch_internal_sources"
+        },
+        {
+          "op": "GET /patches",
+          "name": "ListPatches",
+          "responseType": "patch_management_software_titles"
+        },
+        {
+          "op": "GET /patchpolicies",
+          "name": "ListPatchPolicies",
+          "responseType": "patch_policies"
+        },
+        {
+          "op": "GET /patchsoftwaretitles",
+          "name": "ListPatchSoftwareTitles",
+          "responseType": "patch_software_titles"
         },
         {
           "op": "GET /printers",
@@ -9438,6 +9559,14 @@
           "name": "DeleteComputerInvitationByName"
         },
         {
+          "op": "GET /computers/id/{id}/subset/{subset}",
+          "name": "GetComputerByIDSubset",
+          "responseType": "computer",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
           "op": "GET /computers/macaddress/{macaddress}",
           "name": "GetComputerByMacAddress",
           "responseType": "computer"
@@ -9446,6 +9575,11 @@
           "op": "GET /computers/udid/{udid}",
           "name": "GetComputerByUDID",
           "responseType": "computer"
+        },
+        {
+          "op": "GET /computers/subset/basic",
+          "name": "GetComputersBasic",
+          "responseType": "computers_basic"
         },
         {
           "op": "GET /computers/match/{match}",
@@ -9726,8 +9860,21 @@
           "responseType": "software_title"
         },
         {
+          "op": "GET /patches/id/{id}/version/{version}",
+          "name": "GetPatchComputersByIDVersion",
+          "responseType": "computers"
+        },
+        {
           "op": "DELETE /patchexternalsources/name/{name}",
           "name": "DeletePatchExternalSourceByName"
+        },
+        {
+          "op": "GET /patchreports/patchsoftwaretitleid/{id}/version/{version}",
+          "name": "GetPatchReportByTitleIDVersion",
+          "responseType": "patch_report",
+          "pathNames": {
+            "id": "id"
+          }
         },
         {
           "op": "POST /policies/name/{name}",

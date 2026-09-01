@@ -4897,6 +4897,68 @@
         },
         "type": "array"
       },
+      "computers_basic": {
+        "properties": {
+          "computer": {
+            "properties": {
+              "building": {
+                "example": "East",
+                "type": "string"
+              },
+              "department": {
+                "example": "Accounting",
+                "type": "string"
+              },
+              "id": {
+                "example": 1,
+                "type": "integer"
+              },
+              "mac_address": {
+                "example": "E0:AC:CB:97:36:G4",
+                "type": "string"
+              },
+              "managed": {
+                "type": "boolean"
+              },
+              "model": {
+                "example": "13-inch MacBook Pro (Mid 2016)",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the computer",
+                "example": "Lauras MacBook Pro",
+                "type": "string"
+              },
+              "report_date_epoch": {
+                "example": 1499470624555,
+                "type": "string"
+              },
+              "report_date_utc": {
+                "example": "2017-07-07T18:37:04.555-0500",
+                "type": "string"
+              },
+              "serial_number": {
+                "example": "C02Q7KHTGFWF",
+                "type": "string"
+              },
+              "udid": {
+                "example": "55900BDC-347C-58B1-D249-F32244B11D30",
+                "type": "string"
+              },
+              "username": {
+                "example": "Laura",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "title": "computers",
+        "type": "object",
+        "xml": {
+          "name": "computers"
+        }
+      },
       "criterion": {
         "properties": {
           "and_or": {
@@ -12803,6 +12865,50 @@
         },
         "type": "array"
       },
+      "patch_management_software_titles": {
+        "items": {
+          "properties": {
+            "patch_management_software_title": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "Google Chrome",
+                  "type": "string"
+                },
+                "name_id": {
+                  "example": "GoogleChrome",
+                  "type": "string"
+                },
+                "source_id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "patch_policies": {
+        "items": {
+          "properties": {
+            "patch_policy": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "patch_policy": {
         "properties": {
           "general": {
@@ -13149,6 +13255,167 @@
           }
         },
         "type": "object"
+      },
+      "patch_report": {
+        "properties": {
+          "name": {
+            "example": "Google Chrome",
+            "type": "string"
+          },
+          "patch_software_title_id": {
+            "example": 1,
+            "type": "string"
+          },
+          "total_computers": {
+            "example": 1,
+            "type": "integer"
+          },
+          "total_versions": {
+            "example": 1,
+            "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "properties": {
+                "version": {
+                  "properties": {
+                    "computers": {
+                      "items": {
+                        "properties": {
+                          "computer": {
+                            "properties": {
+                              "id": {
+                                "example": 1,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "example": "Admins MacBook Pro",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "size": {
+                            "example": 1,
+                            "type": "integer"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "software_version": {
+                      "example": "65.0.3325.181",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "patch_software_title": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/category_object"
+          },
+          "id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "name": {
+            "example": "Google Chrome",
+            "type": "string"
+          },
+          "name_id": {
+            "example": "GoogleChrome",
+            "type": "string"
+          },
+          "notifications": {
+            "properties": {
+              "email_notification": {
+                "default": true,
+                "type": "boolean"
+              },
+              "web_notification": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "site": {
+            "$ref": "#/components/schemas/site_object"
+          },
+          "source_id": {
+            "example": 1,
+            "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "properties": {
+                "version": {
+                  "properties": {
+                    "package": {
+                      "properties": {
+                        "id": {
+                          "example": 1,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "example": "Google Chrome.dmg",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "software_version": {
+                      "example": "65.0.3325.181",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "patch_software_titles": {
+        "items": {
+          "properties": {
+            "patch_software_title": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "name_id": {
+                  "example": "GoogleChromne",
+                  "type": "string"
+                },
+                "source_id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "example": 1,
+              "type": "integer"
+            }
+          }
+        },
+        "type": "array"
       },
       "policies": {
         "items": {
@@ -17347,7 +17614,10 @@
               "patch-external-source:read": "",
               "patch-external-source:update": "",
               "patch-internal-source:read": "",
+              "patch-management-software-titles:create": "",
+              "patch-management-software-titles:delete": "",
               "patch-management-software-titles:read": "",
+              "patch-management-software-titles:update": "",
               "patch-policies:create": "",
               "patch-policies:delete": "",
               "patch-policies:read": "",
@@ -24549,6 +24819,50 @@
         ]
       }
     },
+    "/computers": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `devices:read`",
+        "operationId": "findComputers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computers"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computers"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "devices:read"
+            ]
+          }
+        ],
+        "summary": "Finds all computers",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00.000Z",
+        "x-required-privileges": [
+          "devices:read"
+        ]
+      }
+    },
     "/computers/id/{id}": {
       "delete": {
         "description": "**Required Permissions:** `destructive-device-actions:execute`",
@@ -24585,6 +24899,57 @@
         ],
         "x-required-privileges": [
           "destructive-device-actions:execute"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `devices:read`",
+        "operationId": "findComputersById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computer"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "devices:read"
+            ]
+          }
+        ],
+        "summary": "Finds computers by ID",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00.000Z",
+        "x-required-privileges": [
+          "devices:read"
         ]
       },
       "post": {
@@ -24627,6 +24992,112 @@
         "x-required-privileges": [
           "devices:create",
           "users:create"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Certificates and mdm_capable are ignored.\n\n**Required Permissions:** `devices:update`, `users:update`",
+        "operationId": "updateComputerById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "devices:update",
+              "users:update"
+            ]
+          }
+        ],
+        "summary": "Updates an existing computer by ID",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00.000Z",
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "devices:update",
+          "users:update"
+        ]
+      }
+    },
+    "/computers/id/{id}/subset/{subset}": {
+      "get": {
+        "deprecated": true,
+        "description": "Subset values can also be appended using an ampersand to return multiple subsets (e.g. /subsets/General\u0026Location)\n\n**Required Permissions:** `devices:read`",
+        "operationId": "findComputersByIdSubset",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Subset to filter by",
+            "in": "path",
+            "name": "subset",
+            "required": true,
+            "schema": {
+              "enum": [
+                "General",
+                "Location",
+                "Purchasing",
+                "Peripherals",
+                "Hardware",
+                "Certificates",
+                "Software",
+                "ExtensionAttributes",
+                "GroupsAccounts",
+                "iphones",
+                "ConfigurationProfiles"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "devices:read"
+            ]
+          }
+        ],
+        "summary": "Finds a subset of information for a computer",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00.000Z",
+        "x-required-privileges": [
+          "devices:read"
         ]
       }
     },
@@ -25240,6 +25711,50 @@
         "x-required-privileges": [
           "devices:update",
           "users:update"
+        ]
+      }
+    },
+    "/computers/subset/basic": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `devices:read`",
+        "operationId": "findComputersBasic",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/computers_basic"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/computers_basic"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "devices:read"
+            ]
+          }
+        ],
+        "summary": "Finds basic information for all computers",
+        "tags": [
+          "computers"
+        ],
+        "x-deprecation-date": "2025-02-11T00:00:00.000Z",
+        "x-required-privileges": [
+          "devices:read"
         ]
       }
     },
@@ -37426,6 +37941,267 @@
         ]
       }
     },
+    "/patches": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "findPatches",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_management_software_titles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_management_software_titles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patches (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
+    "/patches/id/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:delete`",
+        "operationId": "deleteSoftwareTitlesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:delete"
+            ]
+          }
+        ],
+        "summary": "Deletes a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:delete"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "findPatchesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_title"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_title"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds patches by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "The patch title must exist within a specific site or Full Jamf Pro. Use this endpoint to create additional instances of the patch software title for specific sites. The name_id element can be obtained from the /patches and/or /patches/id/{id} resources.\n\n**Required Permissions:** `patch-management-software-titles:create`",
+        "operationId": "createPatchSoftwareTitlesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:create"
+            ]
+          }
+        ],
+        "summary": "Creates a patch software title (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "patch-management-software-titles:create"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Using an empty \u003cpackage/\u003e tag will disassociate any previous packages associated with a specific software title version.\n\n**Required Permissions:** `patch-management-software-titles:update`",
+        "operationId": "updateSoftwareTitlesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:update"
+            ]
+          }
+        ],
+        "summary": "Updates a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "patch-management-software-titles:update"
+        ]
+      }
+    },
+    "/patches/id/{id}/version/{version}": {
+      "get": {
+        "deprecated": true,
+        "description": "Displays information specified with the {version} parameter for a patch specified with the {id} parameter. A version number of 'Latest' and 'Unknown' will also work.\n\n**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "findComputersByIDAndTitleVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Version number to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Display computers on a specific version (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}/definitions\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
     "/patches/name/{name}": {
       "get": {
         "deprecated": true,
@@ -37997,6 +38773,49 @@
         ]
       }
     },
+    "/patchpolicies": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-policies:read`",
+        "operationId": "findPatchPolicies",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policies"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policies"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-policies:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patch policies. (Deprecated). Please transition use to Jamf Pro API endpoint \"/v2/patch-policies\".",
+        "tags": [
+          "patchpolicies"
+        ],
+        "x-required-privileges": [
+          "patch-policies:read"
+        ]
+      }
+    },
     "/patchpolicies/id/{id}": {
       "delete": {
         "description": "**Required Permissions:** `patch-policies:delete`",
@@ -38190,6 +39009,56 @@
       }
     },
     "/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}": {
+      "get": {
+        "deprecated": true,
+        "description": "softwaretitleconfigid refers to the ID of the patch software title the policy is associated to\n\n**Required Permissions:** `patch-policies:read`",
+        "operationId": "findPatchPoliciesBySoftwareTitleConfigId",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Patch software title config ID value to filter by",
+            "in": "path",
+            "name": "softwaretitleconfigid",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-policies:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patch policies by patch software title configuration ID (Deprecated). Please transition use to Jamf Pro API endpoint \"/v2/patch-policies\".",
+        "tags": [
+          "patchpolicies"
+        ],
+        "x-required-privileges": [
+          "patch-policies:read"
+        ]
+      },
       "post": {
         "description": "softwaretitleconfig refers to the ID of the patch software title the policy is to be associated to\n\n**Required Permissions:** `patch-policies:create`",
         "operationId": "createPatchPolicyBySoftwareTitleConfigId",
@@ -38227,6 +39096,327 @@
         "x-jamf-expected-status": 201,
         "x-required-privileges": [
           "patch-policies:create"
+        ]
+      }
+    },
+    "/patchreports/patchsoftwaretitleid/{id}": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchreportsPatchsoftwaretitleidByIdGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Patch software title id to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds patch reports by patch software title ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}/patch-report\".",
+        "tags": [
+          "patchreports"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
+    "/patchreports/patchsoftwaretitleid/{id}/version/{version}": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchreportsPatchsoftwaretitleidVersionByIdAndVersionGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "Patch software title ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version number to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Display computers for a specific version of a patch report. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}/patch-report\".",
+        "tags": [
+          "patchreports"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
+    "/patchsoftwaretitles": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchsoftwaretitlesGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_titles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_titles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patch software titles. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
+    "/patchsoftwaretitles/id/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:delete`",
+        "operationId": "PatchsoftwaretitlesIdByIdDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:delete"
+            ]
+          }
+        ],
+        "summary": "Deletes a patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:delete"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchsoftwaretitlesIdByIdGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_title"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds a patch software titles by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:create`",
+        "operationId": "PatchsoftwaretitlesIdByIdPost",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:create"
+            ]
+          }
+        ],
+        "summary": "Creates new patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "patch-management-software-titles:create"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Including an empty package element \u003cpackage/\u003e within the version element will disassociate any previously associated packages with that version of the software title.\n\n**Required Permissions:** `patch-management-software-titles:update`",
+        "operationId": "PatchsoftwaretitlesIdByIdPut",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:update"
+            ]
+          }
+        ],
+        "summary": "Updates a patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "patch-management-software-titles:update"
         ]
       }
     },

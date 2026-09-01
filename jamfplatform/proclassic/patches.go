@@ -12,6 +12,88 @@ import (
 	"net/url"
 )
 
+// GetPatchByID finds patches by ID (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}".).
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: patch-management-software-titles:read.
+//
+// Parameters:
+//   - id: ID value to filter by.
+func (c *Client) GetPatchByID(ctx context.Context, id string) (*SoftwareTitle, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result SoftwareTitle
+	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchByID(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// CreatePatchByID creates a patch software title (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations".).
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: patch-management-software-titles:create.
+func (c *Client) CreatePatchByID(ctx context.Context, id string, request *SoftwareTitle) (*SoftwareTitle, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result SoftwareTitle
+	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreatePatchByID(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
+// UpdatePatchByID updates a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}".).
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: patch-management-software-titles:update.
+//
+// Parameters:
+//   - id: ID value to update by.
+func (c *Client) UpdatePatchByID(ctx context.Context, id string, request *SoftwareTitle) error {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdatePatchByID(%s): %w", id, err)
+	}
+	return nil
+}
+
+// DeletePatchByID deletes a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}".).
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: patch-management-software-titles:delete.
+//
+// Parameters:
+//   - id: ID value to filter by.
+func (c *Client) DeletePatchByID(ctx context.Context, id string) error {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/patches/id/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusOK, nil); err != nil {
+		return fmt.Errorf("DeletePatchByID(%s): %w", id, err)
+	}
+	return nil
+}
+
+// ListPatches finds all patches (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations".
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: patch-management-software-titles:read.
+func (c *Client) ListPatches(ctx context.Context) (*PatchManagementSoftwareTitles, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result PatchManagementSoftwareTitles
+	endpoint := prefix + "/patches"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListPatches: %w", err)
+	}
+	return &result, nil
+}
+
 // GetPatchByName finds the first patch with the name provided (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}".).
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
@@ -26,6 +108,25 @@ func (c *Client) GetPatchByName(ctx context.Context, name string) (*SoftwareTitl
 	endpoint := fmt.Sprintf("%s/patches/name/%s", prefix, url.PathEscape(name))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetPatchByName(%s): %w", name, err)
+	}
+	return &result, nil
+}
+
+// GetPatchComputersByIDVersion display computers on a specific version (Deprecated - Please transition use to Jamf Pro API endpoint "/v2/patch-software-title-configurations/{id}/definitions".).
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
+//
+// Required privileges: patch-management-software-titles:read.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - version: Version number to filter by.
+func (c *Client) GetPatchComputersByIDVersion(ctx context.Context, id string, version string) (*Computers, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result Computers
+	endpoint := fmt.Sprintf("%s/patches/id/%s/version/%s", prefix, url.PathEscape(id), url.PathEscape(version))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetPatchComputersByIDVersion(%s): %w", id, err)
 	}
 	return &result, nil
 }

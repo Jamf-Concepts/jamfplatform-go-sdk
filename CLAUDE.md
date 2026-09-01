@@ -298,7 +298,7 @@ a method that ignores the cursor fails.
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
 | `audit-api.yaml` | `external/audit` | v1897 |
 | `openapi-jpapi.json` | `external/jpapi` | **v1942** |
-| `Classic-openapi.json` | `external/capi` | **v1942** |
+| `Classic-openapi.json` | `external/capi` | v1897 (**held**) |
 
 The last Security Cloud row is named for its *tag* (`device-groups`) but the spec
 is the **Security Cloud Devices API**. `internal/stage/device-groups` is the
@@ -343,8 +343,9 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1958** (2026-09-01), except `securitycloud-devices`, which is
-**held at v1897** — see the holds table.
+Ingested through **v1958** (2026-09-01), except `capi` and `securitycloud-devices`,
+both **held at v1897** — see the holds table. Only `jpapi` and
+`declaration-reporting` took v1942's withdrawals.
 
 **v1958 changed one spec, `internal/stage/uem-connect`, and the change is
 constraints plus one redefinition.** `refreshRateMinutes` went from
@@ -387,7 +388,7 @@ prod-only.** `internal/dev/jpapi` carries all 788 operations and
 below.
 
 **v1942 deleted 146 deprecated operations from the published specs and the SDK
-took 144 of them**, holding the two Security Cloud ones. Every one was
+took 124 of them**, holding the 20 in `capi` and the 2 in `securitycloud-devices`. Every one was
 `deprecated: true` in v1897 with a successor version that already existed. This
 is the second override of the additive-versions rule, and unlike v1897 it was
 **not** evidence-led — the evidence pointed the other way and following the
@@ -399,7 +400,7 @@ next bundle does this again.
 | spec | ops | what went |
 |---|---|---|
 | `external/jpapi` | 788 → 666 | computers-inventory `v1`/`v2`/`v3` (v4 survives), inventory-preload `v1` + unversioned (v2 survives), computer-groups `v2` (v3), mobile-device-groups `v1` (v2), mobile-device-prestages `v2` (v3), patch-software-title-configurations `v2` (v3), computer-inventory-collection-settings `v1` (v2), groups `v1` (v2), `GET /v1/mdm/commands` (v2) |
-| `external/capi` | 606 → 586 | `/computers` collection, `GET`+`PUT /computers/id/{id}`, `/computers/subset/basic`, and the whole `/patches`, `/patchsoftwaretitles`, `/patchpolicies` (collection) and `/patchreports` families |
+| `external/capi` | *not taken* | would have removed the `/computers` collection, `GET`+`PUT /computers/id/{id}`, `/computers/subset/basic` and the whole `/patches`, `/patchsoftwaretitles`, `/patchpolicies` (collection) and `/patchreports` families; **held**, see below |
 | `external/declaration-reporting` | 5 → 3 | `GET /v1/declarations/{declarationIdentifier}`, `GET /v1/devices/{deviceId}` |
 | `external/securitycloud-devices` | *not taken* | would have removed `GET /v1/groups` and `PUT /v1/groups/{groupId}`; **held**, see below |
 
@@ -456,22 +457,36 @@ each pinned by a test that fails when it closes:
   So `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their resolver and both Applies
   all stay, and `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` keeps its v1
   *write* control.
-- **Patch software titles are unseedable.** Classic's
-  `POST /patchsoftwaretitles/id/0` was the only way to mint an id the Pro v3
-  configuration endpoints address; Pro exposes no routed catalogue
-  (`/pro/v{1,2}/patch-software-titles` are 403, probed 2026-09-01) and Classic's
-  `patchavailabletitles` `name_id` is not a `softwareTitleId`
-  (400 `SOFTWARE_TITLE_ID_NOT_FOUND`). `seedPatchSoftwareTitleFixture` now skips,
-  taking three tests with it — the V3 lifecycle, Apply and resolver-by-name.
-- **Classic computers lost by-id read and write.** `GET` and `PUT
-  /computers/id/{id}` are gone while `POST` and `DELETE` on the same path
-  survive. Enumeration moved to `MatchComputers(ctx, "*")`, which returns the
-  same `*Computers` type `ListComputers` did; reads moved to the by-name and
-  by-serial keys.
+- **`capi` is held at v1897 for two reasons, both evidenced.** First, Classic's
+  `POST /patchsoftwaretitles/id/0` is the **only** way to mint an id the Pro v3
+  patch-configuration endpoints address, so withdrawing it makes patch software
+  titles unseedable end to end: `/pro/v{1,2}/patch-software-titles` are
+  unrouted (403, probed 2026-09-01), Classic's `patchavailabletitles` `name_id`
+  is not a `softwareTitleId` (`400 SOFTWARE_TITLE_ID_NOT_FOUND` for `376` and
+  for `1`; `Firefox` → `400 INVALID_ID` *"must be string of positive numeric
+  value or -1"*), and no `*softwaretitles*` path exists in any spec in any
+  environment other than the Classic ones. That breaks
+  `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves
+  `terraform-provider-jamfplatform`'s `patch_software_title` resource with no
+  create path at all. Second, `GET` and `PUT /computers/id/{id}` go while `POST`
+  and `DELETE` on the same path stay, which is not a coherent surface. Holding
+  keeps all 606 operations and both problems away.
 
-`GET /patches/name/{name}` — one of the few patch operations to survive —
-**answers 500, not 404, for any name**, wire-verified 3/3 plus a plausible name
-on 2026-09-01 with a control. `TestAcceptance_Classic_GetPatchByName` pins it.
+  Pro v3 **is** otherwise a superset of the Classic
+  `patch_software_title` resource — `displayName`, `softwareTitleNameId`,
+  `uiNotifications`/`emailNotifications`, `categoryId`, `siteId`,
+  `extensionAttributes`, and `packages[] {packageId, version}` covering the
+  provider's `version_packages` — plus dashboard, definitions, dependencies,
+  export-report, history, patch-report and patch-summary sub-resources. Only
+  `source_id` has no equivalent (v3 offers `patchSourceName` /
+  `patchSourceEnabled`) and only `softwareTitleId` is unobtainable. So the
+  migration is blocked on one identifier, not on the model.
+
+`GET /patches/name/{name}` **answers 500, not 404, for a name the tenant does not
+have**, wire-verified 3/3 plus a plausible name (`Firefox`) on 2026-09-01 with a
+control in the same invocation. A server defect, found while the patch family was
+briefly withdrawn and worth reporting regardless of the hold; see
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#v1942-dropped-146-deprecated-operations-from-the-specs-every-one-is-live-2026-09-01).
 
 **Acceptance coverage is at parity**: no surviving generated method lost its
 only test. 146 operations went, 21 test functions were deleted as superseded by
@@ -481,21 +496,20 @@ their successor-version equivalents, two whole files went
 successor, and two replacement tests were written for the surviving patch
 endpoints that lost their enumeration fixture.
 
-**Downstream breakage** (report only — do not migrate from this repo).
-`terraform-provider-jamfplatform`, 21 files: the whole
-`internal/resources/pro/patch_software_title` package (Classic
-`PatchSoftwareTitle*` types and `{Get,Create,Update,Delete}PatchSoftwareTitleByID`
-all gone, with no replacement — see the seeding gap above),
-`internal/resources/pro/patch_policy` (`ListPatchPolicies`),
+**Downstream breakage** (report only — do not migrate from this repo). Holding
+`capi` and `securitycloud-devices` removed most of it. What remains in
+`terraform-provider-jamfplatform` is the pro inventory surface:
 `internal/resources/pro/computer_inventory_collection_settings`
 (`ComputerInventoryCollectionPreferences` → `…V2`),
 `internal/common/computertarget` and
 `internal/testhelpers/acceptance_assertions.go`
-(`ListComputersInventoryV3`, `ResolveComputerInventoryV3ID*`).
-`terraform-provider-jamfplatform-internal` and the provider's
-`internal/resources/security_cloud/device_group` are **unaffected** — holding
-`securitycloud-devices` keeps `UpdateDeviceGroupV1` and `ListDeviceGroupsV1`.
-`jamf-cli-internal` is unaffected too: transport only.
+(`ListComputersInventoryV3` → `…V4`, `ResolveComputerInventoryV3ID*` →
+`…V4ID*`). `internal/resources/pro/patch_software_title`,
+`internal/resources/pro/patch_policy` and
+`internal/resources/security_cloud/device_group` are **unaffected** — the holds
+keep the Classic patch family and the v1 device-group ops.
+`terraform-provider-jamfplatform-internal` is **unaffected**. `jamf-cli-internal`
+is unaffected too: transport only.
 
 **`internal/stage/uem-connect` also moved to v1942, and that change is
 documentation only.** `GroupMapping.EmmGroupID` now says the
@@ -643,6 +657,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | held | why |
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
+| `capi` at v1897 | v1942 withdraws 20 operations including all of `/patchsoftwaretitles`. `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints, so taking it makes patch software titles unseedable and leaves the provider's `patch_software_title` resource with no create path; it also removes `GET`/`PUT /computers/id/{id}` while leaving `POST`/`DELETE`. Take it when Jamf publishes a routed software-title catalogue. |
 | `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire 2026-09-01 — and its declared successor `PUT /v2/groups/{groupId}` is unrouted (403 `BAD_PERMISSIONS`; no OPA rule authored). Taking the removal would leave the package with no working update and break `ApplyDeviceGroupV2`. Take it once the v2 rule lands. |
 | `securitycloud-enrollment`, `ai/governance/visibility` | No published spec in any environment. Not ingestable. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
@@ -719,7 +734,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | package | namespace(s) | scope | notes |
 |---|---|---|---|
 | `pro` | `pro` | tenant or environment | 666 ops — the whole spec |
-| `proclassic` | `proclassic` | tenant | 586 ops, XML end-to-end |
+| `proclassic` | `proclassic` | tenant | 606 ops, XML end-to-end |
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
 | `securitycloud` | `securitycloud` | tenant (own identifier) | 48 ops across five specs |

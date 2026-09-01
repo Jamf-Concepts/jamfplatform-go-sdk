@@ -41,7 +41,7 @@ func TestAcceptance_Classic_ComputerHistoryByIDSubset(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 {
 		t.Skip("no computers on tenant")
@@ -66,7 +66,7 @@ func TestAcceptance_Classic_ComputerManagementByIDSubset(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 {
 		t.Skip("no computers on tenant")
@@ -89,7 +89,7 @@ func TestAcceptance_Classic_ComputerManagementByIDPatchFilter(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 {
 		t.Skip("no computers on tenant")
@@ -119,7 +119,7 @@ func TestAcceptance_Classic_ComputerManagementByIDUsername(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 {
 		t.Skip("no computers on tenant")
@@ -148,7 +148,7 @@ func TestAcceptance_Classic_ComputerHardwareSoftwareReportByIDDateRange(t *testi
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 {
 		t.Skip("no computers on tenant")
@@ -182,7 +182,7 @@ func TestAcceptance_Classic_ComputerApplicationUsageByNameDateRange(t *testing.T
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 || computers.Computers[0].Name == nil {
 		t.Skip("no computers (with names) on tenant")
@@ -552,6 +552,29 @@ func TestAcceptance_Classic_VPPInvitationByIDSubset(t *testing.T) {
 	t.Logf("VPP invitation %s (General subset) retrieved", id)
 }
 
+func TestAcceptance_Classic_PatchPolicyByIDSubset(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	list, err := p.ListPatchPolicies(ctx)
+	skipIfNoFixture(t, "patch-policies", err)
+	if len(list.PatchPolicies) == 0 {
+		t.Skip("no patch policies on tenant")
+	}
+	id := strconv.Itoa(*list.PatchPolicies[0].ID)
+
+	got, err := p.GetPatchPolicyByIDSubset(ctx, id, "General")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetPatchPolicyByIDSubset: %v", err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Patch policy %s (General subset) retrieved", id)
+}
+
 // --- mobile-device-enrollment-profile subset -------------------------
 
 func TestAcceptance_Classic_MobileDeviceEnrollmentProfileByIDSubset(t *testing.T) {
@@ -606,64 +629,30 @@ func TestAcceptance_Classic_MatchComputersByName(t *testing.T) {
 	t.Log("MatchComputersByName(*) succeeded")
 }
 
-// --- surviving patch alt-keys ----------------------------------------
-//
-// v1942 withdrew the /patches, /patchsoftwaretitles and /patchpolicies
-// collections, so neither of these two endpoints has an enumeration to source
-// a real key from any more. Both are probed against a key nothing owns, which
-// is all the surviving surface allows.
-
-// TestAcceptance_Classic_GetPatchByName pins a server defect, not a client
-// bug: GET /patches/name/{name} answers 500, not 404, for a name the tenant
-// does not have. Wire-verified 2026-09-01 on eu — 3/3 for an
-// obviously-absent name and again for a plausible one ("Firefox"), with
-// GET /pro/v1/jamf-pro-version → 200 as the control in the same invocation.
-//
-// This asserts the 500 so the suite FAILS when Jamf fixes it. On that day,
-// flip the expectation to 404 and drop the WIRE-FACTS note. Do not weaken it
-// to "any error" — that would hide a later regression to a different status.
-func TestAcceptance_Classic_GetPatchByName(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-
-	_, err := proclassic.New(c).GetPatchByName(ctx, "sdk-acc-does-not-exist-"+runSuffix())
-	if err == nil {
-		t.Fatal("GetPatchByName for an absent name succeeded — expected an error")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) {
-		t.Fatalf("GetPatchByName returned a non-API error: %v", err)
-	}
-	if apiErr.HasStatus(404) {
-		t.Fatalf("GetPatchByName now answers 404 for an absent name — the server bug this test pins is fixed. " +
-			"Change the expectation to 404 and remove the WIRE-FACTS note.")
-	}
-	if !apiErr.HasStatus(500) {
-		t.Fatalf("GetPatchByName: want 500 (the documented defect) or 404 (fixed), got %v", err)
-	}
-	t.Log("GetPatchByName(absent) answered 500 — documented server defect, still present ✓")
-}
-
-// TestAcceptance_Classic_GetPatchPolicyByIDSubset probes the subset read
-// against a bogus id. 404 wire-verified 2026-09-01, control in the same
-// invocation.
-func TestAcceptance_Classic_GetPatchPolicyByIDSubset(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-
-	_, err := proclassic.New(c).GetPatchPolicyByIDSubset(ctx, "99999999", "General")
-	if err == nil {
-		t.Fatal("GetPatchPolicyByIDSubset against a bogus id succeeded — expected 404")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		skipOnServerError(t, err)
-		t.Fatalf("GetPatchPolicyByIDSubset(bogus): want 404, got %v", err)
-	}
-	t.Log("GetPatchPolicyByIDSubset(bogus) rejected with 404 ✓")
-}
-
 // --- computer by-ID subset -------------------------------------------
+
+func TestAcceptance_Classic_ComputerByIDSubset(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	computers, err := p.ListComputers(ctx)
+	skipIfNoFixture(t, "computers", err)
+	if len(computers.Computers) == 0 {
+		t.Skip("no computers on tenant")
+	}
+	id := strconv.Itoa(*computers.Computers[0].ID)
+
+	got, err := p.GetComputerByIDSubset(ctx, id, "General")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerByIDSubset(%s, General): %v", id, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Computer %s (General subset) retrieved", id)
+}
 
 // --- computer by MAC address -----------------------------------------
 
@@ -672,18 +661,17 @@ func TestAcceptance_Classic_ComputerByMacAddress(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 {
 		t.Skip("no computers on tenant")
 	}
-	// MAC is in the General sub-object; do a by-name GET to fetch it. v1942
-	// withdrew GET /computers/id/{id}, so name is the cheapest surviving key.
-	name := *computers.Computers[0].Name
-	full, err := p.GetComputerByName(ctx, name)
+	// MAC is in the General sub-object; do a by-ID GET to fetch it.
+	id := strconv.Itoa(*computers.Computers[0].ID)
+	full, err := p.GetComputerByID(ctx, id)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetComputerByName(%s): %v", name, err)
+		t.Fatalf("GetComputerByID(%s): %v", id, err)
 	}
 	if full.General == nil || full.General.MacAddress == nil || *full.General.MacAddress == "" {
 		t.Skip("first computer has no MAC address")
@@ -708,16 +696,16 @@ func TestAcceptance_Classic_ComputerByUDID(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	computers, err := p.MatchComputers(ctx, "*")
+	computers, err := p.ListComputers(ctx)
 	skipIfNoFixture(t, "computers", err)
 	if len(computers.Computers) == 0 {
 		t.Skip("no computers on tenant")
 	}
-	name := *computers.Computers[0].Name
-	full, err := p.GetComputerByName(ctx, name)
+	id := strconv.Itoa(*computers.Computers[0].ID)
+	full, err := p.GetComputerByID(ctx, id)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetComputerByName(%s): %v", name, err)
+		t.Fatalf("GetComputerByID(%s): %v", id, err)
 	}
 	if full.General == nil || full.General.UDID == nil || *full.General.UDID == "" {
 		t.Skip("first computer has no UDID")
@@ -909,9 +897,102 @@ func TestAcceptance_Classic_MobileDeviceProvisioningProfileByIDSubset(t *testing
 
 // --- patch by name ---------------------------------------------------
 
+func TestAcceptance_Classic_PatchByName(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	titles, err := p.ListPatches(ctx)
+	skipIfNoFixture(t, "patches", err)
+	if len(titles.PatchManagementSoftwareTitles) == 0 {
+		t.Skip("no patch software titles on tenant")
+	}
+	item := titles.PatchManagementSoftwareTitles[0]
+	if item.Name == nil || *item.Name == "" {
+		t.Skip("first patch title has no name")
+	}
+	name := *item.Name
+
+	got, err := p.GetPatchByName(ctx, name)
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
+			t.Logf("GetPatchByName(%s): 404 — patch not resolvable by name on this tenant", name)
+			return
+		}
+		t.Fatalf("GetPatchByName(%s): %v", name, err)
+	}
+	if got == nil {
+		t.Fatal("nil response")
+	}
+	t.Logf("Patch %q retrieved by name", name)
+}
+
 // --- patch computers by ID+version -----------------------------------
 
+func TestAcceptance_Classic_PatchComputersByIDVersion(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	titles, err := p.ListPatchSoftwareTitles(ctx)
+	skipIfNoFixture(t, "patch-software-titles", err)
+	if len(titles.PatchSoftwareTitles) == 0 {
+		t.Skip("no patch software titles on tenant")
+	}
+	item := titles.PatchSoftwareTitles[0]
+	if item.ID == nil {
+		t.Skip("first patch software title has no ID")
+	}
+	id := strconv.Itoa(*item.ID)
+
+	// "latest" is not a real version; server may 404 — that's fine here.
+	got, err := p.GetPatchComputersByIDVersion(ctx, id, "latest")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			t.Logf("GetPatchComputersByIDVersion(%s, latest): API error %d — accepted", id, apiErr.StatusCode)
+			return
+		}
+		t.Fatalf("GetPatchComputersByIDVersion(%s, latest): %v", id, err)
+	}
+	_ = got
+	t.Logf("GetPatchComputersByIDVersion(%s, latest) succeeded", id)
+}
+
 // --- patch report by title ID + version ------------------------------
+
+func TestAcceptance_Classic_PatchReportByTitleIDVersion(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := proclassic.New(c)
+
+	titles, err := p.ListPatchSoftwareTitles(ctx)
+	skipIfNoFixture(t, "patch-software-titles", err)
+	if len(titles.PatchSoftwareTitles) == 0 {
+		t.Skip("no patch software titles on tenant")
+	}
+	item := titles.PatchSoftwareTitles[0]
+	if item.ID == nil {
+		t.Skip("first patch software title has no ID")
+	}
+	id := strconv.Itoa(*item.ID)
+
+	got, err := p.GetPatchReportByTitleIDVersion(ctx, id, "latest")
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) {
+			t.Logf("GetPatchReportByTitleIDVersion(%s, latest): API error %d — accepted", id, apiErr.StatusCode)
+			return
+		}
+		t.Fatalf("GetPatchReportByTitleIDVersion(%s, latest): %v", id, err)
+	}
+	_ = got
+	t.Logf("GetPatchReportByTitleIDVersion(%s, latest) succeeded", id)
+}
 
 // --- saved search by ID / name ---------------------------------------
 

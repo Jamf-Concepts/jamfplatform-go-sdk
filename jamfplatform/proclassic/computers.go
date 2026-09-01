@@ -12,6 +12,24 @@ import (
 	"net/url"
 )
 
+// GetComputerByID finds computers by ID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
+//
+// Required privileges: devices:read.
+//
+// Parameters:
+//   - id: ID value to filter by.
+func (c *Client) GetComputerByID(ctx context.Context, id string) (*Computer, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result Computer
+	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerByID(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetComputerByName finds the first computer with the given name.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
@@ -60,6 +78,24 @@ func (c *Client) CreateComputerByID(ctx context.Context, id string, request *Com
 	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, request, http.StatusCreated, nil); err != nil {
 		return fmt.Errorf("CreateComputerByID(%s): %w", id, err)
+	}
+	return nil
+}
+
+// UpdateComputerByID updates an existing computer by ID.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
+//
+// Required privileges: devices:update, users:update.
+// All of them are required, not alternatives.
+//
+// Parameters:
+//   - id: ID value to filter by.
+func (c *Client) UpdateComputerByID(ctx context.Context, id string, request *ComputerPost) error {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	endpoint := fmt.Sprintf("%s/computers/id/%s", prefix, url.PathEscape(id))
+	if err := c.transport.DoExpect(ctx, http.MethodPut, endpoint, request, http.StatusCreated, nil); err != nil {
+		return fmt.Errorf("UpdateComputerByID(%s): %w", id, err)
 	}
 	return nil
 }
@@ -131,6 +167,42 @@ func (c *Client) DeleteComputerBySerialNumber(ctx context.Context, serialNumber 
 	return nil
 }
 
+// ListComputers finds all computers.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
+//
+// Required privileges: devices:read.
+func (c *Client) ListComputers(ctx context.Context) (*Computers, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result Computers
+	endpoint := prefix + "/computers"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("ListComputers: %w", err)
+	}
+	return &result, nil
+}
+
+// GetComputerByIDSubset finds a subset of information for a computer.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
+//
+// Required privileges: devices:read.
+//
+// Parameters:
+//   - id: ID to filter by.
+//   - subset: Subset to filter by.
+//     Allowed values: "General", "Location", "Purchasing", "Peripherals", "Hardware", "Certificates",
+//     "Software", "ExtensionAttributes", "GroupsAccounts", "iphones", "ConfigurationProfiles".
+func (c *Client) GetComputerByIDSubset(ctx context.Context, id string, subset string) (*Computer, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result Computer
+	endpoint := fmt.Sprintf("%s/computers/id/%s/subset/%s", prefix, url.PathEscape(id), url.PathEscape(subset))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputerByIDSubset(%s): %w", id, err)
+	}
+	return &result, nil
+}
+
 // GetComputerByMacAddress finds computers by MAC address.
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
@@ -163,6 +235,21 @@ func (c *Client) GetComputerByUDID(ctx context.Context, udid string) (*Computer,
 	endpoint := fmt.Sprintf("%s/computers/udid/%s", prefix, url.PathEscape(udid))
 	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
 		return nil, fmt.Errorf("GetComputerByUDID(%s): %w", udid, err)
+	}
+	return &result, nil
+}
+
+// GetComputersBasic finds basic information for all computers.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-02-11) and may be removed in a future release.
+//
+// Required privileges: devices:read.
+func (c *Client) GetComputersBasic(ctx context.Context) (*ComputersBasic, error) {
+	prefix := c.transport.APIPrefix("proclassic", "")
+	var result ComputersBasic
+	endpoint := prefix + "/computers/subset/basic"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetComputersBasic: %w", err)
 	}
 	return &result, nil
 }

@@ -499,25 +499,47 @@ Pro v3 configuration endpoints address was Classic's
 | `GET /pro/v2/patch-software-titles` | `403 BAD_PERMISSIONS` (unrouted) |
 | `GET /pro/v3/patch-software-title-configurations` | 200 `[ ]` — nothing pre-existing to borrow, and borrowing would mean mutating a tenant's own configuration |
 
-So `seedPatchSoftwareTitleFixture` skips, and with it the V3 lifecycle, Apply
-and resolve-by-name tests. Restore real seeding when either the Classic
-operation returns to the spec or a routed Pro catalogue endpoint is whitelisted.
+`softwareTitleId` must be a **positive numeric string** naming a Jamf Pro
+software-title record — `Firefox` returns `400 INVALID_ID` *"id field must be
+string of positive numeric value or -1"*, so it is an id space, not a name. The
+catalogue is healthy on the probe tenant (internal source id 1, "Jamf",
+`enabled: true`, 1551 available titles), which rules out tenant state: what is
+missing is the step that *subscribes* a catalogue title and mints the id, and
+the only endpoint that does it is the withdrawn Classic POST. A grep of the whole
+v1942 bundle — `internal/dev` included — finds no `*softwaretitles*` path other
+than the two Classic ones.
 
-**`GET /patches/name/{name}` answers 500, not 404.** One of the few patch
-operations to survive, and it is broken: `500` for an obviously-absent name 3/3,
-and `500` again for a plausible one (`Firefox`), on a tenant whose
-`/patchsoftwaretitles` list is empty. Server defect, pinned by
-`TestAcceptance_Classic_GetPatchByName`, which fails when it starts answering
-404.
+**This is why `capi` is held at v1897.** Taking the withdrawal would leave patch
+software titles unseedable end to end and
+`terraform-provider-jamfplatform`'s `patch_software_title` resource with no
+create path. Pro v3 is otherwise a superset of the Classic resource —
+`displayName`, `softwareTitleNameId`, `uiNotifications`/`emailNotifications`,
+`categoryId`, `siteId`, `extensionAttributes`, and `packages[] {packageId,
+version, displayName}` covering the provider's `version_packages`, plus seven
+sub-resources Classic never had; only `source_id` lacks an equivalent (v3 has
+`patchSourceName` / `patchSourceEnabled`). So the migration is blocked on one
+identifier, not on the model. Take the withdrawal when Jamf publishes a routed
+software-title catalogue.
 
-**Classic computer enumeration and reads moved keys.** `GET` and
-`PUT /computers/id/{id}` went while `POST` and `DELETE` on the same path
-survived. `GET /proclassic/computers/match/*` answers 200 with `id`, `name`,
-`udid`, `serial_number` and `mac_address` per row, and `MatchComputers` returns
-the same `*Computers` type `ListComputers` did — so it is a drop-in enumeration
-replacement. Reads move to `GetComputerByName` / `…BySerialNumber`;
-`GET /computers/subset/basic` and `/computers/id/{id}/subset/{subset}` have no
-surviving equivalent at all.
+**`GET /patches/name/{name}` answers 500, not 404.** `500` for an
+obviously-absent name 3/3, and `500` again for a plausible one (`Firefox`), on a
+tenant whose `/patchsoftwaretitles` list is empty. A server defect found while
+the patch family was briefly withdrawn; worth reporting regardless of the hold.
+Not currently pinned by a test — with `capi` held at v1897 the original
+`TestAcceptance_Classic_PatchByName` is back, and it sources its name from
+`ListPatches`, so it skips on a tenant with no patch titles rather than reaching
+the defect.
+
+**Classic computers: the withdrawal is incoherent, which is the second reason
+`capi` is held.** v1942 removes `GET` and `PUT /computers/id/{id}` while keeping
+`POST` and `DELETE` on the same path, and removes both
+`GET /computers/subset/basic` and `/computers/id/{id}/subset/{subset}` with no
+equivalent anywhere. If it is ever taken, the migration is known and works:
+`GET /proclassic/computers/match/*` answers 200 with `id`, `name`, `udid`,
+`serial_number` and `mac_address` per row, and `MatchComputers` returns the same
+`*Computers` type `ListComputers` does, so it is a drop-in enumeration
+replacement; reads move to `GetComputerByName` / `…BySerialNumber`. The two
+subset reads have no replacement and would simply be lost.
 `GET /proclassic/patchpolicies/id/99999999/subset/General` → 404, as expected.
 
 ### The gateway-bypass technique
