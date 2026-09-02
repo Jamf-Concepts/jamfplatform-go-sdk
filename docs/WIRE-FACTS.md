@@ -1018,7 +1018,82 @@ both an unrouted path and a privilege failure.
 the `jsc-api-gateway` ping, `securitycloud-devices`' `GET /v1/…/devices`, and
 **every `/v2/groups/{id}` method** — see below.
 
-### Device groups `/v2/{id}`: the rule has not been authored
+### Device groups `/v2/{id}`: the rule landed on `main` 2026-09-02
+
+**Update 2026-09-02: the rule now exists.** `authorization-policies` PR **#265**
+merged at 10:13:41Z as `07791a1` ("JSC-72715: add PUT
+`/api/securitycloud/v2/groups/{groupId}` policy") and is the tip of `main`. It
+adds exactly one allow block to `securitycloud_api_devices.rego`, taking it from
+six rules to seven:
+
+```rego
+allow if {
+	some groupId
+	input.request.method == "PUT"
+	input.request.path = ["api", "securitycloud", "v2", "groups", groupId]
+	lib.is_external_m2m_token(input.subject)
+	lib.has_any_of_permissions(input.context.permissions.tenantPermissions, ["update:jsc:all", "device-groups:update"])
+}
+```
+
+Three things to hold onto. **It is `PUT` only** — `GET` and `DELETE` on the v2
+item path still have no rule of any method, which is consistent with the spec
+declaring neither, so their 403s continue to prove nothing. **The permission is
+read from `tenantPermissions`**, matching the v1 rules, and is satisfied by
+either `update:jsc:all` (legacy) or `device-groups:update` (capability-first) —
+so a credential holding neither will still 403 after rollout, and that 403 will
+be a capability gap rather than a missing rule. **`main` is not deployed, and
+tyk cannot tell you when it is.** Nothing in `tyk-gateway-management` needs to
+change — `prod/api-products/securitycloud/` already listens on
+`/api/securitycloud/` with `config_data.api-bundle: securitycloud` in all three
+regions, which routes the v2 item path into this package — and the
+`custom_middleware_bundle` hash there (`audit-with-external-68316e2.zip`) is a
+`jamf/tyk-custom-plugins` commit, **not** an OPA policy version. The OPA bundle
+is published by authorization-policies' own CI to ECR tagged with the short SHA
+and rolled out by `bump_policy.sh` in `jamf/authorization-service`, which is not
+cloned here. So the wire is the only oracle for whether it is live.
+
+**Probed, and it is not live yet: still 403, 3/3, 2026-09-02 ~11:00Z**, JSC
+sandbox tenant `928260f5…` on eu, `PUT /securitycloud/v1/groups/{id}` → **200**
+in the same invocation both times and the group unchanged afterwards
+(`{"name":"API Demo Group"}` in, same out). v2 traceIds
+`80005a5ea6c4ddeb68bad3892adf2d4c`, `0492550017943d37b9bb05664e16b5f6`,
+`85d146551ee0628b6156997724610308`.
+
+**This classifies the 403 from one credential, and the method is better than the
+two-credential test.** `PUT /v1/groups/{groupId}` and
+`PUT /v2/groups/{groupId}` declare the **identical** condition in the same rego
+file — `is_external_m2m_token` plus `tenantPermissions` holding
+`update:jsc:all` or `device-groups:update`. A credential that satisfies one
+satisfies the other by construction, and this one demonstrably satisfies the v1
+rule. So the v2 403 cannot be a capability gap: it is the deployed bundle
+predating `07791a1`. **Prefer a same-permission sibling rule over two
+credentials whenever the rego offers one** — it needs one token, one
+invocation, and it cannot be confounded by a grant difference.
+
+Two grants fall out of the same evidence, worth knowing before designing another
+probe. The JSC sandbox credential holds the **capability-first** permissions
+(`device-groups:read`, `device-groups:update`) and **not** the legacy
+`read:jsc:all` / `update:jsc:all` wildcards: `GET /securitycloud/v1/groups` and
+`GET /v2/groups` answer 200, and `GET /securitycloud/v1/activation-profiles`
+reaches the service (`400 BAD_REQUEST`, "Required parameter 'origin' is not
+present" — past OPA), while `GET /securitycloud/uem-connect/v1/connectors` is
+**403 `BAD_PERMISSIONS`**. `read:jsc:all` would have allowed that connector list
+outright, so its absence is proven, and `uem-connect:read` is absent too. The
+2026-09-01 uem-connect probes recorded above must therefore have used a
+different credential; **a `uem-connect:*` grant is a prerequisite for probing
+`422 VENDOR_MISMATCH`.** Also confirmed in passing: `/api/securitycloud/…`
+answers `404 page not found`, so the GA gateway takes no `/api` segment.
+
+This also clears the blocker `authorization-policies#264` names in its own body.
+That PR (still DRAFT, untouched since 2026-09-01 14:10Z) removes the allow
+blocks for `GET /v1/groups` and `PUT /v1/groups/{groupId}` among 155 rules across
+21 files, and explicitly said it needed the v2 `PUT` rule to land first. It has.
+So the sequence CLAUDE.md warned about — v1 denied with no v2 successor — is no
+longer the likely one, but **the order is still not guaranteed**: #264 could
+deploy before the OPA tag carrying `07791a1` does.
+
+Everything below predates that and is the record of the two-month absence.
 
 `securitycloud_api_devices.rego` carries exactly six rules — `POST`/`GET /v1/groups`,
 `GET /v2/groups`, and `GET`/`PUT`/`DELETE /v1/groups/{groupId}`. There is **no
@@ -1524,11 +1599,17 @@ itself, verified with both `--compressed` and `identity`.
   `updateSyncSettings` body must equal the connector's stored vendor, that it
   selects which vendor-specific fields apply rather than which connector is
   updated (that is the path `configId`), and that a connector's vendor cannot be
-  changed through this operation. It is probeable — a `JAMF_PRO`/`M2M` connector
-  is cheap to mint, as above — but not with a Platform credential: the eu Pro
-  credential answers `403 BAD_PERMISSIONS` on
-  `GET /securitycloud/uem-connect/v1/connectors`, identical to a bogus path in
-  the same namespace, and the token is opaque so its grants cannot be read back.
+  changed through this operation. It is probeable in principle — a
+  `JAMF_PRO`/`M2M` connector is cheap to mint, as above — but **neither
+  credential to hand carries a `uem-connect` grant.** The eu Pro credential
+  answers `403 BAD_PERMISSIONS` on
+  `GET /securitycloud/uem-connect/v1/connectors`, and so does the **JSC sandbox
+  credential**, which is capability-scoped to device-groups and
+  activation-profiles and holds neither `uem-connect:read` nor the legacy
+  `read:jsc:all` that would have covered it — proof and method in the
+  device-groups `/v2/{id}` section below. Both tokens are opaque, so grants
+  cannot be read back from the token itself; the rego's own permission sets are
+  the oracle.
   The doomed-request trick does not substitute, either: resource resolution runs
   before field validation on this PUT (five values, all `404`, recorded above), so
   a bogus `configId` never reaches the vendor check. Probe it against the JSC
@@ -2123,6 +2204,29 @@ So it is now three credentials across two organizations and two regions, each
 using an environment it owns, all 403. Since `audit_service_api.rego` *is*
 authored (gated on `read:env:audit` / `audit:read`), the missing piece remains the
 capability grant on the credential, not the rule.
+
+**Re-checked 2026-09-02 across both repos: nothing has moved, and one plausible
+hypothesis is foreclosed.** Only two commits have touched
+`prod/api-products/platform-audit-service/` since 2026-08-28 —
+tyk `3e99c347` (2026-08-28, "Audit Service is Environment scoped only", which
+added `header` to `request-context-allowed-sources` and **removed
+`organization`** from `request-context-types`) and `a9c1d4fa` (2026-09-01, the
+plugin-bundle bump that hit every prod product) — and neither changes
+grantability. On the OPA side `audit_service_api.rego` is unchanged since
+`ee84e61` (2026-08-28), which deleted the organization `allow` block two minutes
+before the matching tyk change; the surviving block accepts an `em2m` subject
+with a non-empty `environmentId` and `environmentPermissions` holding
+`read:env:audit` or `audit:read`. So both halves independently say
+environment-only, and both say the rule is not the blocker.
+
+**The foreclosed hypothesis: plan membership.**
+`platform-audit-service-external-*` is absent from
+`prod/plans/default-external.yaml` while the three securitycloud external APIs
+are present — which looks like the cause and is not. 99 of the 201
+`external-*`-tagged prod ApiDefinitions are absent from that plan, including
+`jamf-pro-external-api-use1` and `jamf-pro-external-capi-use1`, which demonstrably
+work for external M2M. Plan membership is not the gate for a
+`use_go_plugin_auth` API. Do not spend another pass on it.
 
 ### The gateway's refusal layers, fully separated (2026-09-01)
 

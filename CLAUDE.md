@@ -688,16 +688,22 @@ each pinned by a test that fails when it closes:
   re-probed 2026-09-01 on the JSC sandbox tenant, where it renamed a real group
   and the rename read back; `PUT /v2/groups/{groupId}` — the declared successor,
   and the *only* item-level v2 verb the spec has — is 403 `BAD_PERMISSIONS` on a
-  real id across three sessions and on a bogus uuid, and **constant across two
-  different credentials while the v1 write varies**, which classifies it as a
-  missing authorization rule rather than a capability gap. Note the resource is
+  real id across four sessions (the last 2026-09-02) and on a bogus uuid, and
+  **constant across two different credentials while the v1 write varies**, which
+  classified it as a missing authorization rule rather than a capability gap.
+  **The rule was then written** — `authorization-policies#265`, merged 2026-09-02
+  10:13Z as `07791a1` — and the 403 survived it, which narrows the diagnosis one
+  further step: the v1 and v2 PUT rules declare the identical `tenantPermissions`
+  condition, so a credential that passes v1 must pass v2 once the bundle carrying
+  the rule is deployed. The remaining gap is the rollout, in
+  `jamf/authorization-service`. Note the resource is
   split across versions by design: `POST /v1/groups`,
   `GET`/`DELETE /v1/groups/{groupId}`, `GET /v2/groups`,
   `PUT /v2/groups/{groupId}` — so `GET` and `DELETE` on the v2 item path are
   undeclared and their 403s are not evidence of anything. Full evidence —
   including the third URL shape the
   runtime `Link` header names, and the scope-header tells — in
-  [WIRE-FACTS.md](docs/WIRE-FACTS.md#device-groups-v2id-the-rule-has-not-been-authored).
+  [WIRE-FACTS.md](docs/WIRE-FACTS.md#device-groups-v2id-the-rule-landed-on-main-2026-09-02).
   So `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their resolver and both Applies
   all stay, and `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` keeps its v1
   *write* control.
@@ -927,7 +933,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
 | `capi` at v1897 — **`POST /patchsoftwaretitles/id/{id}` only** | The spec file stays at v1897, but the whitelist took 31 of the 32 withdrawn operations on 2026-09-02, so the hold is now one operation wide. `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints: taking it makes patch software titles unseedable, breaks `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves the provider's `patch_software_title` resource with no create path. Upstream has said the family is coming back after the SDK team's feedback — **when it reappears in a published spec, ingest `capi` and drop this row.** Note the surface the config now mirrors is incoherent by upstream's own doing: four alternate-identifier computer paths are `POST`-only, `/computers/id/{id}` is `POST`+`DELETE` with no read, none of the 31 declares a successor, and all 31 are live on the wire. |
-| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-01 17:1x — and its declared successor `PUT /v2/groups/{groupId}` is still unrouted (403 `BAD_PERMISSIONS` on a real id and a bogus uuid alike; no OPA rule authored). Taking the removal would leave the package with no working update and break `ApplyDeviceGroupV2`. Take it once the v2 rule lands — but note `authorization-policies#264` (DRAFT) would **deny the v1 update without adding the v2 rule**, at which point the hold preserves a method the gateway refuses rather than a working capability. |
+| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-02 — and its declared successor `PUT /v2/groups/{groupId}` still answers 403 `BAD_PERMISSIONS` (3/3 that day, v1 control 200 in the same invocation). **The OPA rule now exists**: `authorization-policies#265` merged 2026-09-02 10:13Z as `07791a1`, `PUT` only, requiring the same `tenantPermissions` the v1 PUT does — so the 403 is a bundle not yet rolled out, not a missing rule. Hold until the wire says 200; nothing in tyk has to change, and the rollout happens in `jamf/authorization-service`, which publishes no signal this repo can read. `authorization-policies#264` (DRAFT, unmoved since 2026-09-01) would deny the v1 update, and it named the missing v2 rule as its own blocker — that blocker is cleared on `main`, but the deploy order of the two is not guaranteed. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 
