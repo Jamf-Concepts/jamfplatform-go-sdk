@@ -1598,6 +1598,35 @@ spec is a standing liability: it is right only until the server agrees with its
 own spec, and nothing fails when that happens.** Prefer `unwrapResults`, which
 follows the spec's envelope and still hands the caller a slice.
 
+**That first fix was symmetric to the bug, and has since been replaced.**
+Swapping `responseType: "[]T"` for `unwrapResults: "[]T"` moved the hardcoded
+assumption from the array to the envelope; a flip back would have produced
+`json: cannot unmarshal array into Go value of type struct{…}` on every call, the
+identical outage in the other direction, with the identical absence of any test
+signal. `unwrapResults` now generates a call to `client.UnwrapResults[T]`, which
+decides the shape from the first non-space byte of the body and accepts both. The
+six affected methods keep their `([]T, error)` signatures, so nothing downstream
+changed — `terraform-provider-jamfplatform` calls `ListDeviceGroupMembers` from
+five places and needed no edit.
+
+No new silent path came with it: an envelope omitting the results key, `{}`, and
+`null` already decoded to an empty slice under the struct decode, and the only
+case that changed from error to empty is a bare `[]`, which means zero rows.
+
+**The detector moved to the acceptance suite, which is the only layer that sees
+the wire.** `assertListBodyShape` fetches a list endpoint outside the generated
+methods and asserts the shape, so a future flip fails a wire test instead of a
+consumer's `terraform plan`. Observed shapes:
+
+| endpoint | shape | when |
+|---|---|---|
+| `GET /licensing/v1/licenses` | envelope | 2026-09-01, two organizations (array before) |
+| `GET /partners/v1/deal-registrations` | envelope | 2026-09-01, two organizations (array before) |
+| `GET /sso/v1/domains` | envelope | 2026-09-01, two organizations (array before) |
+| `GET /sso/v1/connections` | envelope | 2026-09-01, two organizations (array before) |
+| `GET /device-groups/v1/devices/{id}/device-groups` | envelope | **2026-09-02**, wire, `ListDevices` as the control in the same run |
+| `GET /device-groups/v1/device-groups/{id}/members` | envelope | inferred, not probed — the struct decode it used until 2026-09-02 accepted nothing else, so every passing run of `TestAcceptance_DeviceGroup_ListMembers` is evidence. The assertion now dates it properly on the next run |
+
 **Widening `isSkywayScopeFault` exposed a false pass.**
 `TestAcceptance_AccountPurchaseOrderValidation` had been logging
 "correctly rejected the bogus order (400)" for both distributor POSTs when the

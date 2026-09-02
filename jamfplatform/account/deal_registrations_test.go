@@ -11,21 +11,37 @@ import (
 	"testing"
 )
 
+// The envelope shape the spec declares and the bare array the same endpoint
+// may answer with must both decode. Asserting only the declared one is what
+// let the account lists ship broken for five days: the stub served whatever
+// the method assumed, so the unit tests passed while every real call failed.
 func TestListDealRegistrations(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/partners/v1/deal-registrations", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{}}})
-	})
-
-	results, err := c.ListDealRegistrations(context.Background())
-	if err != nil {
-		t.Fatal(err)
+	bodies := []struct {
+		name string
+		body any
+	}{
+		{name: "envelope", body: map[string]any{"totalCount": 1, "results": []map[string]any{{}}}},
+		{name: "bare_array", body: []map[string]any{{}}},
 	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
+
+	for _, tc := range bodies {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+			mux.HandleFunc("/partners/v1/deal-registrations", func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != http.MethodGet {
+					t.Errorf("method = %s, want GET", r.Method)
+				}
+				writeJSON(t, w, http.StatusOK, tc.body)
+			})
+
+			results, err := c.ListDealRegistrations(context.Background())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(results) != 1 {
+				t.Fatalf("len = %d, want 1", len(results))
+			}
+		})
 	}
 }
 

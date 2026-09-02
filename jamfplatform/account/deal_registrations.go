@@ -9,6 +9,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListDealRegistrations list Deal Registrations.
@@ -18,12 +20,9 @@ func (c *Client) ListDealRegistrations(ctx context.Context) ([]DealRegistration,
 	prefix := c.transport.APIPrefix("partners", "v1")
 	endpoint := prefix + "/deal-registrations"
 
-	var result struct {
-		TotalCount int                `json:"totalCount"`
-		Results    []DealRegistration `json:"results"`
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	results, err := client.UnwrapResults[DealRegistration](ctx, c.transport, http.MethodGet, endpoint, "results")
+	if err != nil {
 		return nil, fmt.Errorf("ListDealRegistrations: %w", err)
 	}
-	return result.Results, nil
+	return results, nil
 }

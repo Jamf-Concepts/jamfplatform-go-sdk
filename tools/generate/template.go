@@ -84,6 +84,11 @@ var funcMap = template.FuncMap{
 		return ", " + strings.Join(args, ", ")
 	},
 	"isStringSlice": func(s string) bool { return s == "[]string" },
+	// sliceElem is the element type of an "[]T" config value, for the
+	// generic call in the unwrap template. UnwrapResults is parameterised on
+	// the element, while unwrapResults is declared as the slice the method
+	// returns.
+	"sliceElem": func(s string) string { return strings.TrimPrefix(s, "[]") },
 	// queryValue is the expression that converts one query parameter's Go
 	// argument into the string sent on the wire; queryGuard is the zero-value
 	// condition deciding whether an optional one is sent at all.
@@ -701,6 +706,11 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- end }}
 {{ end }}
 
+{{/* An unpaginated list endpoint may answer with the {totalCount, results}
+     envelope its spec declares or with a bare JSON array, and the same
+     operation has served both: the account lists flipped from array to
+     envelope on 2026-09-01 and broke every caller. So the shape is decided
+     from the body rather than assumed here — see client.UnwrapResults. */}}
 {{- define "unwrap" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .UnwrapResults }}, error) {
@@ -708,14 +718,11 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 
-	var result struct {
-		TotalCount int              ` + "`" + `json:"totalCount"` + "`" + `
-		Results    {{ .UnwrapResults }} ` + "`" + `json:"results"` + "`" + `
-	}
-	if err := c.transport.Do(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, &result); err != nil {
+	results, err := client.UnwrapResults[{{ sliceElem .UnwrapResults }}](ctx, c.transport, {{ httpConst .HTTPMethod }}, endpoint, "{{ .ResultsField }}")
+	if err != nil {
 		return nil, fmt.Errorf({{ errWrap . }})
 	}
-	return result.Results, nil
+	return results, nil
 }
 {{ end }}
 
@@ -1277,25 +1284,42 @@ func Test<% .Name %>(t *testing.T) {
 <% end %>
 
 <%- define "testUnwrap" %>
+// The envelope shape the spec declares and the bare array the same endpoint
+// may answer with must both decode. Asserting only the declared one is what
+// let the account lists ship broken for five days: the stub served whatever
+// the method assumed, so the unit tests passed while every real call failed.
 func Test<% .Name %>(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != <% httpConst .HTTPMethod %> {
-			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+	bodies := []struct {
+		name string
+		body any
+	}{
 <%- if isStringSlice .UnwrapResults %>
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []string{"item-1"}})
+		{name: "envelope", body: map[string]any{"totalCount": 1, "results": []string{"item-1"}}},
+		{name: "bare_array", body: []string{"item-1"}},
 <%- else %>
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{}}})
+		{name: "envelope", body: map[string]any{"totalCount": 1, "results": []map[string]any{{}}}},
+		{name: "bare_array", body: []map[string]any{{}}},
 <%- end %>
-	})
-
-	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
-	if err != nil {
-		t.Fatal(err)
 	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
+
+	for _, tc := range bodies {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+			mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != <% httpConst .HTTPMethod %> {
+					t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
+				}<% requiredQueryAsserts . %>
+				writeJSON(t, w, http.StatusOK, tc.body)
+			})
+
+			results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(results) != 1 {
+				t.Fatalf("len = %d, want 1", len(results))
+			}
+		})
 	}
 }
 

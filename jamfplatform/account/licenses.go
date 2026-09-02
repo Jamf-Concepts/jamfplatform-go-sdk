@@ -9,6 +9,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListLicenses list Licenses.
@@ -18,12 +20,9 @@ func (c *Client) ListLicenses(ctx context.Context) ([]License, error) {
 	prefix := c.transport.APIPrefix("licensing", "v1")
 	endpoint := prefix + "/licenses"
 
-	var result struct {
-		TotalCount int       `json:"totalCount"`
-		Results    []License `json:"results"`
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	results, err := client.UnwrapResults[License](ctx, c.transport, http.MethodGet, endpoint, "results")
+	if err != nil {
 		return nil, fmt.Errorf("ListLicenses: %w", err)
 	}
-	return result.Results, nil
+	return results, nil
 }

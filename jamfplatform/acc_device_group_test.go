@@ -250,6 +250,15 @@ func TestAcceptance_DeviceGroup_ListMembers(t *testing.T) {
 		t.Fatalf("ListDeviceGroupMembers failed: %v", err)
 	}
 	t.Logf("Fixture group has %d members", len(members))
+
+	// Membership is the busiest unwrap surface downstream —
+	// terraform-provider-jamfplatform calls it from device_group Read and
+	// Update, the data source, the list resource and the impact cache — so an
+	// unnoticed shape flip here would have failed every plan touching a static
+	// group. The method accepts either shape now; this is what dates a change.
+	// "envelope" is what every passing run of this test has decoded, since the
+	// struct decode it used until now accepted nothing else.
+	assertListBodyShape(t, c, "device-groups", "v1", "/device-groups/"+groupID+"/members", "envelope")
 }
 
 func TestAcceptance_DeviceGroup_UpdateMembers(t *testing.T) {
@@ -345,6 +354,10 @@ func TestAcceptance_DeviceGroup_ListGroupsForDevice(t *testing.T) {
 		t.Fatalf("ListDeviceGroupsForDevice failed: %v", err)
 	}
 	t.Logf("Device %s belongs to %d groups", d[0].ID, len(groups))
+
+	// The second unwrap surface in this package. Same reasoning as
+	// TestAcceptance_DeviceGroup_ListMembers.
+	assertListBodyShape(t, c, "device-groups", "v1", "/devices/"+d[0].ID+"/device-groups", "envelope")
 	for _, g := range groups {
 		t.Logf("  %s (%s)", g.GroupName, g.GroupID)
 	}

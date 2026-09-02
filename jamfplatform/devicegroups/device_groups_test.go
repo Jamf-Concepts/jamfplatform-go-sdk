@@ -115,21 +115,37 @@ func TestDeleteDeviceGroup(t *testing.T) {
 	}
 }
 
+// The envelope shape the spec declares and the bare array the same endpoint
+// may answer with must both decode. Asserting only the declared one is what
+// let the account lists ship broken for five days: the stub served whatever
+// the method assumed, so the unit tests passed while every real call failed.
 func TestListDeviceGroupMembers(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/device-groups/v1/device-groups/test-id/members", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []string{"item-1"}})
-	})
-
-	results, err := c.ListDeviceGroupMembers(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
+	bodies := []struct {
+		name string
+		body any
+	}{
+		{name: "envelope", body: map[string]any{"totalCount": 1, "results": []string{"item-1"}}},
+		{name: "bare_array", body: []string{"item-1"}},
 	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
+
+	for _, tc := range bodies {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+			mux.HandleFunc("/device-groups/v1/device-groups/test-id/members", func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != http.MethodGet {
+					t.Errorf("method = %s, want GET", r.Method)
+				}
+				writeJSON(t, w, http.StatusOK, tc.body)
+			})
+
+			results, err := c.ListDeviceGroupMembers(context.Background(), "test-id")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(results) != 1 {
+				t.Fatalf("len = %d, want 1", len(results))
+			}
+		})
 	}
 }
 

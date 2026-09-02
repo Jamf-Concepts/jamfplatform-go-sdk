@@ -257,6 +257,30 @@ misbehaving server hangs the caller with no error. Both are pinned in
 `internal/client/pagination_test.go`, and the generated stub serves *two* pages so
 a method that ignores the cursor fails.
 
+### Unpaginated lists decide their shape from the body
+
+`unwrapResults` (6 operations) generates a call to `client.UnwrapResults[T]`,
+which reads the first non-space byte and accepts **either** the
+`{totalCount, results}` envelope the spec declares **or** a bare JSON array.
+
+**That is a fix for a shipped outage, not defensive padding.** The four account
+list endpoints served a bare array until 2026-09-01 and the envelope after, and
+every account list method then failed on every call. **A generated method that
+hardcodes one shape cannot be tested for the other** — the httptest stub serves
+whatever the method assumed — so the first fix, swapping the
+`responseType: "[]T"` override for `unwrapResults`, was symmetric to the bug and
+would have broken identically if the server went back. Don't reintroduce a
+shape assumption in either direction.
+
+Nothing downstream changed: the signatures stay `([]T, error)`, and
+`terraform-provider-jamfplatform` calls `ListDeviceGroupMembers` from five
+places unedited. The detection that tolerance removed lives in the acceptance
+suite instead — `assertListBodyShape` pins each endpoint's current shape, so a
+flip fails a wire test rather than a consumer's `terraform plan`, and **every
+`unwrapResults` operation should have one**. Mechanism and the empty-vs-error
+table: [docs/STYLE.md](docs/STYLE.md#config-key-inventory); observed shapes:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#re-probed-2026-09-01-three-of-the-recorded-faults-have-flipped-and-two-of-them-broke-the-sdk).
+
 ---
 
 ## Working with specs

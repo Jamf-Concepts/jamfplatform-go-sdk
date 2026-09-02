@@ -447,3 +447,34 @@ func domainID(d account.Domain) string {
 	}
 	return d.ID.String()
 }
+
+// TestAcceptance_AccountListBodyShapes pins the wire shape of the four account
+// list endpoints, which is the reason ListLicenses, ListDomains,
+// ListConnections and ListDealRegistrations were broken in production for five
+// days: each served a bare JSON array until 2026-09-01 and the
+// {totalCount, results} envelope its spec had declared all along after, and
+// the SDK had the array hardcoded via a responseType override. Nothing failed
+// until a real call was made.
+//
+// The methods now accept either shape, so a repeat of that flip costs nothing.
+// This test is what still notices it. Read a failure here as "the server moved
+// again, go and date it", never as a broken SDK.
+func TestAcceptance_AccountListBodyShapes(t *testing.T) {
+	c := accOrgClient(t)
+
+	for _, tc := range []struct {
+		name      string
+		namespace string
+		path      string
+	}{
+		{name: "licenses", namespace: "licensing", path: "/licenses"},
+		{name: "deal-registrations", namespace: "partners", path: "/deal-registrations"},
+		{name: "domains", namespace: "sso", path: "/domains"},
+		{name: "connections", namespace: "sso", path: "/connections"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// Observed 2026-09-01 on two organizations. Was "array" before that.
+			assertListBodyShape(t, c, tc.namespace, "v1", tc.path, "envelope")
+		})
+	}
+}

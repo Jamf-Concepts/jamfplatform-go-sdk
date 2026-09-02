@@ -157,8 +157,8 @@ deliberately kept three of them for exactly that reason.
 | `maxPageSize` | 3 | page size requested per page (default 100). **Raise only once the endpoint's true server-side cap is wire-verified** |
 | `pageSizeParam` | 3 | page-size query key (default `page-size`). All three users are `ddmreport`, which calls it `size` |
 | `noRetry` | 2 | opt out of the transport's automatic 5xx retry despite the method qualifying |
-| `resultsField` | 2 | envelope key holding the element array (default `results`) |
-| `unwrapResults` | 2 | return the envelope's array directly as this Go type, for a non-paginated `{totalCount, results}` body |
+| `resultsField` | 5 | envelope key holding the element array (default `results`) |
+| `unwrapResults` | 6 | return the list body's array directly as this Go type, for a non-paginated list endpoint |
 | `version` | **0** | per-operation URL version override; highest precedence |
 | `cursorField` | **0** | envelope key carrying the next cursor (default `nextCursor`) |
 | `cursorParam` | **0** | query key the cursor goes back in (default `cursor`) |
@@ -170,10 +170,36 @@ byte-for-byte retry would replay stale, turning a successful-but-500ing write in
 a masked conflict on the retry. Both current users are prestage PUTs, which is the
 confirmed live case. Most PUTs have no such precondition and should keep the default.
 
-`unwrapResults` hardcodes `json:"results"` and does **not** honour `resultsField`.
-Nothing hits that today because both users are on the default key, but an endpoint
-wanting an unwrap over a differently-named envelope needs the template fixed
-first — the same hardcoded-envelope-key trap that bit the Apply templates.
+`unwrapResults` **decides the body shape from the body**, not from the spec. It
+generates a call to `client.UnwrapResults[T]`, which reads the first non-space
+byte and accepts either the `{totalCount, results}` envelope the spec declares or
+a bare JSON array. `resultsField` names the envelope key and is honoured (default
+`results`).
+
+That tolerance is not defensive padding — it is the fix for a shipped outage. The
+four account list endpoints served a bare array until 2026-09-01 and the envelope
+their specs had declared all along after; every one of `ListLicenses`,
+`ListDomains`, `ListConnections` and `ListDealRegistrations` then failed *every
+call* with `json: cannot unmarshal object into Go value of type
+[]account.License`. **No unit test can catch that**, because the generated
+httptest stub serves whichever shape the method assumed, and the first fix —
+swapping the `responseType: "[]T"` override for `unwrapResults` — was symmetric
+to the bug: it would break the same way if the server ever went back. So the
+generated method no longer holds an opinion about which shape arrives.
+
+The signal a shape did change moves to the acceptance suite, which is the only
+layer that sees the wire: `assertListBodyShape` in `acc_helpers_test.go` fetches
+a list endpoint outside the generated methods and pins what it answers with
+today. **Every `unwrapResults` operation should be covered by one**, and a
+failure there means "the server moved, date it in WIRE-FACTS", never "the SDK is
+broken". Current coverage: the four account lists
+(`TestAcceptance_AccountListBodyShapes`) and both devicegroups lists, asserted
+inside the tests that already hold an id.
+
+An emitted method's error path is unchanged in one respect worth knowing: an
+envelope that omits the results key, `{}`, and `null` all decode to an empty
+slice with no error, exactly as the struct decode this replaced did. The only
+behaviour that changed from error to empty is a bare `[]`, which means zero rows.
 
 ### Pagination styles
 

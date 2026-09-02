@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListConnections list Connections.
@@ -19,14 +21,11 @@ func (c *Client) ListConnections(ctx context.Context) ([]ConnectionSummary, erro
 	prefix := c.transport.APIPrefix("sso", "v1")
 	endpoint := prefix + "/connections"
 
-	var result struct {
-		TotalCount int                 `json:"totalCount"`
-		Results    []ConnectionSummary `json:"results"`
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	results, err := client.UnwrapResults[ConnectionSummary](ctx, c.transport, http.MethodGet, endpoint, "results")
+	if err != nil {
 		return nil, fmt.Errorf("ListConnections: %w", err)
 	}
-	return result.Results, nil
+	return results, nil
 }
 
 // CreateConnection add Connection.

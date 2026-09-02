@@ -124,14 +124,11 @@ func (c *Client) ListDeviceGroupMembers(ctx context.Context, id string) ([]strin
 	prefix := c.transport.APIPrefix("device-groups", "v1")
 	endpoint := fmt.Sprintf("%s/device-groups/%s/members", prefix, url.PathEscape(id))
 
-	var result struct {
-		TotalCount int      `json:"totalCount"`
-		Results    []string `json:"results"`
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	results, err := client.UnwrapResults[string](ctx, c.transport, http.MethodGet, endpoint, "results")
+	if err != nil {
 		return nil, fmt.Errorf("ListDeviceGroupMembers(%s): %w", id, err)
 	}
-	return result.Results, nil
+	return results, nil
 }
 
 // UpdateDeviceGroupMembers update device group members.

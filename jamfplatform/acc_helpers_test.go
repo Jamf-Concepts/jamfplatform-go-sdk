@@ -699,3 +699,65 @@ func benchmarkSyncState(c *jamfplatform.Client, ctx context.Context, benchmarkID
 	}
 	return "", false
 }
+
+// ---------------------------------------------------------------------------
+// List-response shape
+// ---------------------------------------------------------------------------
+
+// listBodyShape names which of the two list-response shapes a raw body is,
+// deciding on the first non-space byte rather than decoding: "envelope" for
+// the {totalCount, results} object the specs declare, "array" for a bare JSON
+// array. Anything else is reported verbatim so the failure message carries it.
+func listBodyShape(body []byte) string {
+	trimmed := bytes.TrimSpace(body)
+	switch {
+	case len(trimmed) == 0:
+		return "empty"
+	case trimmed[0] == '{':
+		return "envelope"
+	case trimmed[0] == '[':
+		return "array"
+	default:
+		return fmt.Sprintf("neither (starts %q)", string(trimmed[0]))
+	}
+}
+
+// assertListBodyShape fetches a list endpoint outside the generated methods and
+// asserts which shape it answers with.
+//
+// It exists because client.UnwrapResults deliberately accepts both. The four
+// account list endpoints served a bare array until 2026-09-01 and the envelope
+// their specs had declared all along after, which broke every caller with
+// `json: cannot unmarshal object into Go value of type []account.License` on
+// every call — and no unit test could see it, since the generated httptest
+// stub serves whatever the method assumed. Accepting both shapes removes that
+// outage but also removes the only signal that the server moved, so the signal
+// lives here instead: this pins what the wire sends today, on the one layer
+// that actually talks to the wire.
+//
+// A mismatch is an Errorf, not a Fatalf. The SDK still decodes correctly — the
+// finding is that the server changed and WIRE-FACTS is now stale, which is
+// worth a red test and is not worth stopping the run.
+func assertListBodyShape(t *testing.T, c *jamfplatform.Client, namespace, version, path, want string) {
+	t.Helper()
+
+	tr := c.Transport()
+	endpoint := tr.APIPrefix(namespace, version) + path
+
+	var raw json.RawMessage
+	if err := tr.Do(context.Background(), http.MethodGet, endpoint, nil, &raw); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GET %s: %v", endpoint, err)
+	}
+
+	got := listBodyShape(raw)
+	t.Logf("GET %s answers the %s shape", endpoint, got)
+	if got != want {
+		t.Errorf(`GET %s answers the %s shape, want %s.
+
+The SDK still decodes this correctly — client.UnwrapResults accepts both — so
+nothing is broken for consumers and no code change is needed. What is needed:
+record the new shape in docs/WIRE-FACTS.md and update the want here, since this
+assertion is the only thing that dates the change.`, endpoint, got, want)
+	}
+}

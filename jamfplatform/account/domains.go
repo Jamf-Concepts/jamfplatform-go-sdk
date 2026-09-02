@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // ListDomains list Domains.
@@ -19,14 +21,11 @@ func (c *Client) ListDomains(ctx context.Context) ([]Domain, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	endpoint := prefix + "/domains"
 
-	var result struct {
-		TotalCount int      `json:"totalCount"`
-		Results    []Domain `json:"results"`
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	results, err := client.UnwrapResults[Domain](ctx, c.transport, http.MethodGet, endpoint, "results")
+	if err != nil {
 		return nil, fmt.Errorf("ListDomains: %w", err)
 	}
-	return result.Results, nil
+	return results, nil
 }
 
 // CreateDomain add Domain.
