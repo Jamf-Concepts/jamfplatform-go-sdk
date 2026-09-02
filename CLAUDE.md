@@ -389,9 +389,21 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v2018** (2026-09-02), except `capi` and `securitycloud-devices`,
+Ingested through **v2024** (2026-09-02), except `capi` and `securitycloud-devices`,
 both **held at v1897** — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
+
+**v2024 is a pure pipeline re-run — zero spec content changed in any
+environment.** Not one file outside `internal/dev` differs from v2018:
+`_permissions/{routes,scopes}.yaml`, `capi`, the account specs, every
+Security Cloud spec, all byte-identical. The only diffs in the whole archive
+are the manifest's build number and commit, the `Generated` timestamps, and
+`info.version: auto-v3.2018` → `auto-v3.2024` in the two unified rollups.
+`internal/dev` reports all 22 specs as changed, which is the `x-generated`
+block and nothing else — stripping it makes all 22 semantically identical to
+v2018. Nothing to ingest and no generated diff. This is the second recorded
+no-op build (v1725 vs v1700 was the first), and it is the reason step 1 of the
+ingest is to hash before reading.
 
 **v2018 is `uem-connect` and nothing else, and it takes back half of v2005.**
 Every other file outside `internal/dev` is byte-identical to v2005 —
@@ -738,7 +750,7 @@ each pinned by a test that fails when it closes:
   re-probed 2026-09-01 on the JSC sandbox tenant, where it renamed a real group
   and the rename read back; `PUT /v2/groups/{groupId}` — the declared successor,
   and the *only* item-level v2 verb the spec has — is 403 `BAD_PERMISSIONS` on a
-  real id across four sessions (the last 2026-09-02) and on a bogus uuid, and
+  real id across five sessions (the last 2026-09-02 13:55Z) and on a bogus uuid, and
   **constant across two different credentials while the v1 write varies**, which
   classified it as a missing authorization rule rather than a capability gap.
   **The rule was then written** — `authorization-policies#265`, merged 2026-09-02
@@ -983,7 +995,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
 | `capi` at v1897 — **`POST /patchsoftwaretitles/id/{id}` only** | The spec file stays at v1897, but the whitelist took 31 of the 32 withdrawn operations on 2026-09-02, so the hold is now one operation wide. `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints: taking it makes patch software titles unseedable, breaks `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves the provider's `patch_software_title` resource with no create path. Upstream has said the family is coming back after the SDK team's feedback — **when it reappears in a published spec, ingest `capi` and drop this row.** Note the surface the config now mirrors is incoherent by upstream's own doing: four alternate-identifier computer paths are `POST`-only, `/computers/id/{id}` is `POST`+`DELETE` with no read, none of the 31 declares a successor, and all 31 are live on the wire. |
-| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-02 — and its declared successor `PUT /v2/groups/{groupId}` still answers 403 `BAD_PERMISSIONS` (3/3 that day, v1 control 200 in the same invocation). **The OPA rule now exists**: `authorization-policies#265` merged 2026-09-02 10:13Z as `07791a1`, `PUT` only, requiring the same `tenantPermissions` the v1 PUT does — so the 403 is a bundle not yet rolled out, not a missing rule. Hold until the wire says 200; nothing in tyk has to change, and the rollout happens in `jamf/authorization-service`, which publishes no signal this repo can read. `authorization-policies#264` (DRAFT, unmoved since 2026-09-01) would deny the v1 update, and it named the missing v2 rule as its own blocker — that blocker is cleared on `main`, but the deploy order of the two is not guaranteed. |
+| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-02 — and its declared successor `PUT /v2/groups/{groupId}` still answers 403 `BAD_PERMISSIONS` (3/3 that day, v1 control 200 in the same invocation). **The OPA rule now exists**: `authorization-policies#265` merged 2026-09-02 10:13Z as `07791a1`, `PUT` only, requiring the same `tenantPermissions` the v1 PUT does — so the 403 is a bundle not yet rolled out, not a missing rule. Hold until the wire says 200; nothing in tyk has to change, and the rollout happens in `jamf/authorization-service`, which publishes no signal this repo can read. Re-probed **2026-09-02 13:55Z**, 3h42m after the merge: still 403 (real id and bogus uuid alike, v1 control 200 in the same invocation), so that is a floor on the rollout lag, not a defect. `authorization-policies#264` (still DRAFT) would deny the v1 update, and it named the missing v2 rule as its own blocker — **it was rebased onto the current `main` at 2026-09-02 13:22Z (`fa4cb07`), so `07791a1` is now an ancestor of its head and its own rego keeps the v2 `PUT` allow.** The out-of-order deploy is therefore structurally excluded on the merge path, not merely unlikely; re-check that on any force-push. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 

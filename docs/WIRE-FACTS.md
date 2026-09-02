@@ -1085,13 +1085,39 @@ different credential; **a `uem-connect:*` grant is a prerequisite for probing
 `422 VENDOR_MISMATCH`.** Also confirmed in passing: `/api/securitycloud/…`
 answers `404 page not found`, so the GA gateway takes no `/api` segment.
 
-This also clears the blocker `authorization-policies#264` names in its own body.
-That PR (still DRAFT, untouched since 2026-09-01 14:10Z) removes the allow
+**Re-probed 2026-09-02 13:55Z and nothing has moved: still 403.** Same JSC
+sandbox tenant `928260f5…` on eu, same idempotent body read back from
+`GET /v1/groups/{id}` and written unchanged, all in one invocation with
+`GET /securitycloud/v2/groups?page-size=2` → **200** as the live-token control:
+
+| request | result |
+|---|---|
+| `GET /securitycloud/v2/groups?page-size=2` (control) | **200**, `{"groups":[…]}` |
+| `PUT /securitycloud/v2/groups/{real-id}` | **403** `BAD_PERMISSIONS`, `70136769181776170d0e85619bf1bd56` |
+| `PUT /securitycloud/v2/groups/{bogus-uuid}` | **403** `BAD_PERMISSIONS`, `8bf721480e8b3ff98d1e371abb813653` |
+| `PUT /securitycloud/v1/groups/{real-id}` (sibling-rule control) | **200**, `{"id":"d56a8e26…","name":"API Demo Group"}` |
+
+That is **3h42m after `07791a1` merged** and the deployed bundle still predates
+it, which sets a floor on the rollout lag rather than a defect: nothing in
+either repo publishes a signal this one can read, so the wire stays the only
+oracle. Note the bogus-uuid 403 is identical to the real-id 403 — OPA refuses
+before the service resolves the id, which is why a real group is not needed to
+detect the rollout and the acceptance test can keep asserting on either.
+
+**`authorization-policies#264` moved, and the move removes the ordering risk.**
+It is still DRAFT, but it was **rebased onto the current `main` at 2026-09-02
+13:22:43Z** (`fa4cb07`), so `07791a1` is now an ancestor of its head and its own
+copy of `securitycloud_api_devices.rego` **retains the v2 `PUT` allow** while
+deleting the v1 `GET`/`PUT` ones. So #264 can no longer deny the v1 update
+without carrying the v2 successor in the same bundle — the sequence CLAUDE.md
+warned about (v1 denied with no v2 successor) is now structurally excluded on
+the merge path, not merely unlikely. Verify it stays that way on any later
+force-push: `git merge-base --is-ancestor 07791a1 <pr head>` plus a grep for
+`"v2", "groups", groupId` in that file is the whole check.
+
+This also clears the blocker #264 named in its own body: it removes the allow
 blocks for `GET /v1/groups` and `PUT /v1/groups/{groupId}` among 155 rules across
 21 files, and explicitly said it needed the v2 `PUT` rule to land first. It has.
-So the sequence CLAUDE.md warned about — v1 denied with no v2 successor — is no
-longer the likely one, but **the order is still not guaranteed**: #264 could
-deploy before the OPA tag carrying `07791a1` does.
 
 Everything below predates that and is the record of the two-month absence.
 
