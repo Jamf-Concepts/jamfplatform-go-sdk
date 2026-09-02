@@ -2326,8 +2326,11 @@ func TestAcceptance_ResolveSmartComputerGroupV3_Lifecycle(t *testing.T) {
 	if err := c.DeleteSmartComputerGroupV3(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveSmartComputerGroupV3IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveSmartComputerGroupV3IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -2383,8 +2386,11 @@ func TestAcceptance_ResolveStaticComputerGroupV3_Lifecycle(t *testing.T) {
 	if err := c.DeleteStaticComputerGroupV3(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveStaticComputerGroupV3IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveStaticComputerGroupV3IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -2440,8 +2446,11 @@ func TestAcceptance_ResolveSmartMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	if err := c.DeleteSmartMobileDeviceGroupV2(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -2482,8 +2491,11 @@ func TestAcceptance_ResolveStaticMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	if err := c.DeleteStaticMobileDeviceGroupV2(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -2531,8 +2543,11 @@ func TestAcceptance_ResolveMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	if err := c.DeleteSmartMobileDeviceGroupV2(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
