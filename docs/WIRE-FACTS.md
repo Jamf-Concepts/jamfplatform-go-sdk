@@ -1580,7 +1580,7 @@ itself, verified with both `--compressed` and `identity`.
 - **v2005 is uem-connect only, and it is documentation plus declared error
   responses (2026-09-02).** Zero operations added or removed, zero schemas added
   or removed, and no semantic change to any operation outside its `responses`
-  map: every one of the twelve operations gained a `406`, and the five that carry
+  map: every one of the twelve operations gained a `406`, and the four that carry
   a request body also gained a `415`, with two new `components.responses` entries
   (`NotAcceptable`, `UnsupportedMediaType`) behind them. The generated Go diff is
   **four lines of godoc on `SyncSettings.Vendor`** — method comments are built
@@ -1635,7 +1635,10 @@ itself, verified with both `--compressed` and `identity`.
 
   **`406` is enforced, but the spec is wrong about what the operation produces.**
   `Accept: application/pdf`, `text/csv` and `image/png, application/pdf` each
-  answered **406** `code: NOT_ACCEPTABLE` on `GET /connectors`. But
+  answered **406** `code: NOT_ACCEPTABLE` on `GET /connectors`. (That probe used
+  only the collection `GET`, which is why it read as a first-class check; v2018
+  below establishes that `406` is decided at response-serialization time and is
+  the *last* thing in the pipeline.) But
   **`Accept: application/xml` answers 200 with an XML body** — `<ConnectorListResult>…`
   on the collection and `<JamfProConnectorConfig>…` on `GET sync-settings` —
   while the spec's new `NotAcceptable` text says the operation "only produces
@@ -1696,6 +1699,78 @@ itself, verified with both `--compressed` and `identity`.
   permission sets in
   `policies/tyk_external/securitycloud/uem_connect_api.rego` are the only way to
   read a grant back.
+
+- **v2018 is `uem-connect` only, and it takes `406` back off seven of the twelve
+  operations (2026-09-02).** Every other file outside `internal/dev` is
+  byte-identical to v2005 — `capi`, the three account specs and
+  `_permissions/{routes,scopes}.yaml` included — so the only other diffs were the
+  manifest and the two unified rollups, whose path counts did not move. Zero
+  operations, zero schemas, zero prose changes, `415` untouched at four. The
+  whole diff is 21 lines: `406` deleted from the seven operations that answer
+  204/202, kept on exactly the five that write a 2xx response body (`GET
+  /connectors`, `GET /connectors/{id}`, `GET …/sync-settings`, `GET …/sync/runs`
+  and `POST /connectors` → 201). `internal/stage` took a byte-identical delta and
+  `internal/dev` agrees op-for-op (5/12 both sides), so this is not an
+  environment rollout. Generated diff: 21 deletions in
+  `api/securitycloud_uem_connect_api.json`, **zero Go** —
+  `components.responses.NotAcceptable` survives, still referenced five times —
+  and the `api/`-fallback regen reproduced the identical single diff, so CI
+  agrees.
+
+  **The removal is correct, and the reason is that `406` sits at the *end* of the
+  pipeline rather than the start.** It is Spring's message-converter selection at
+  write time, so it can only fire once the handler has a body to serialize.
+  Probed with `Accept: application/pdf` and the connector-bearing `wisconsam`
+  tenant, control (`GET /connectors`, no `Accept`) 200 in the same invocation:
+
+  | request | result |
+  |---|---|
+  | `GET /connectors`, `Accept: application/pdf` | **406** `NOT_ACCEPTABLE`, `field: null`, "No acceptable representation available" |
+  | `GET …/{real}/sync-settings`, same `Accept` | **406** `NOT_ACCEPTABLE` |
+  | `GET /connectors/{bogus}`, same `Accept` | **404** `NOT_FOUND` — negotiation not reached |
+  | `GET …/{bogus}/sync-settings`, same `Accept` | **404** `NOT_FOUND` |
+  | `POST /connectors`, same `Accept`, out-of-enum `vendor` | **422** `VALIDATION_FAILED` — negotiation not reached |
+  | `DELETE /connectors/{bogus}` | **404** |
+  | `DELETE …/{bogus}/enablement` | **404** |
+  | `PUT …/{bogus}/enablement` (valid body) | **404** |
+  | `PUT …/{bogus}/sync-settings` (valid body) | **404** |
+  | `POST …/{bogus}/sync/runs` | **404** |
+  | `POST /activation-profiles/BOGUSCODE/deploy-to-uem` (valid body) | **404** `ACTIVATION_PROFILE_NOT_FOUND` |
+  | `DELETE …/{bogus}/sync/runs/current` | **204** — see below |
+
+  Every one of those eleven carried `Accept: application/pdf` and **not one
+  answered 406**, including the four `GET`s whose spec keeps the declaration. So
+  the full order is **`Content-Type` (415) → body validation (422) → resource
+  resolution (404) → business rules (422 `VENDOR_MISMATCH`) → response
+  serialization (406)**, and the flat "406 is enforced" recorded at v2005 is
+  superseded: it holds only for a request that gets all the way to writing a
+  body. Two consequences. A caller cannot use a restrictive `Accept` to probe
+  anything — it is the one check that never short-circuits. And the seven
+  operations v2018 stripped genuinely cannot return 406, so upstream's narrowing
+  is right rather than an under-declaration.
+
+  **`DELETE /connectors/{configId}/sync/runs/current` answers 204 on a connector
+  that does not exist**, both with and without an `Accept` header, and the spec
+  declares no `404` for it — consistent, but it means cancel-current-sync is an
+  unconditional success that resolves nothing, so a caller cannot distinguish
+  "cancelled a running sync" from "typo'd the configId". It is the only
+  uem-connect operation with no `404` in its response map. Worth reporting
+  upstream as a surface question rather than a defect.
+
+  **The XML disagreement stands.** v2018 left the `NotAcceptable` prose unchanged,
+  and `Accept: application/xml` on `GET /connectors` still answers **200** with
+  `<ConnectorListResult>…`, re-probed 2026-09-02. The spec still says these
+  operations produce only `application/json`. Still worth reporting upstream, and
+  still not an SDK exposure except through `WithHeaders`, which does not reserve
+  `Accept`.
+
+  `TestAcceptance_SecurityCloudUemConnectAcceptNegotiation` pins all three facts
+  and needs no fixture: 406 on the collection `GET` (which always resolves), 404
+  — asserted as **not** 406 — on `DisableUemConnectorV1` with a bogus id, and the
+  XML case as a limitation whose assertion fails the day upstream restricts the
+  converter. It builds its own client via `jscClientWithHeaders`, because
+  `WithHeaders` applies to every request and a restrictive `Accept` on the shared
+  singleton would break every other test.
 
 ### PUT response shapes
 

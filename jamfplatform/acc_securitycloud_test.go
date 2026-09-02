@@ -2490,3 +2490,132 @@ func isSecurityCloudNotFound(err error) bool {
 func boolValue(b *bool) bool {
 	return b != nil && *b
 }
+
+// jscClientWithHeaders builds a *fresh* Security Cloud client carrying extra
+// request headers, bypassing the shared singleton.
+//
+// It exists only for TestAcceptance_SecurityCloudUemConnectAcceptNegotiation.
+// `WithHeaders` applies to every request the client makes, so a restrictive
+// `Accept` cannot be attached to the suite-wide client without breaking every
+// other test on it. It skips and fails on exactly the same conditions
+// accSecurityCloudClient does, and deliberately does not memoise: each caller
+// wants its own header set.
+func jscClientWithHeaders(t *testing.T, h http.Header) *securitycloud.Client {
+	t.Helper()
+
+	baseURL := os.Getenv("JAMFPLATFORM_JSC_BASE_URL")
+	if baseURL == "" {
+		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+	}
+	clientID := os.Getenv("JAMFPLATFORM_JSC_CLIENT_ID")
+	clientSecret := os.Getenv("JAMFPLATFORM_JSC_CLIENT_SECRET")
+	tenantID := os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")
+	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
+		t.Skipf("Skipping Security Cloud acceptance test: %v", errAccJSCCredsUnset)
+	}
+
+	opts := append(accTraceOpts(),
+		jamfplatform.WithTenantID(tenantID),
+		jamfplatform.WithHeaders(h),
+	)
+	return securitycloud.New(jamfplatform.NewClient(baseURL, clientID, clientSecret, opts...))
+}
+
+// TestAcceptance_SecurityCloudUemConnectAcceptNegotiation pins where content
+// negotiation sits in uem-connect's request pipeline, which is what v2018's only
+// spec change turns on.
+//
+// v2005 declared a `406` on all twelve uem-connect operations. v2018 deleted it
+// from the seven that answer 204/202, keeping it on exactly the five that write a
+// 2xx response body. Wire-probed 2026-09-02, that is correct and the reason is
+// structural: **`406` is decided when the response body is serialized, so it is
+// the last check in the pipeline, not the first.** The full order is
+//
+//	Content-Type (415) → body validation (422) → resource resolution (404) →
+//	business rules (422 VENDOR_MISMATCH) → response serialization (406)
+//
+// which means an unsatisfiable `Accept` is invisible on an operation that never
+// writes a body, and is *also* invisible on the five that do whenever an earlier
+// check fires first. Both halves below are therefore fixture-free — the negative
+// half needs no connector because the 404 is the point, and the positive half
+// uses the collection GET, which always resolves.
+//
+// The SDK itself is unexposed: no generated method sets `Accept`, so it always
+// gets JSON. This test reaches the behaviour only by way of `WithHeaders`, which
+// does not reserve `Accept` — the same door a reverse proxy would come through.
+func TestAcceptance_SecurityCloudUemConnectAcceptNegotiation(t *testing.T) {
+	ctx := context.Background()
+
+	const bogusID = "bogus000000000000000000"
+
+	pdf := http.Header{}
+	pdf.Set("Accept", "application/pdf")
+	sc := jscClientWithHeaders(t, pdf)
+
+	// Positive half: the collection GET writes a body, so serialization is
+	// reached and negotiation fails. This is the one operation the 406 probe
+	// used at v2005, and the only reason it looked like a first-class check.
+	_, err := sc.ListUemConnectorsV1(ctx)
+	if err == nil {
+		t.Fatal("ListUemConnectorsV1 succeeded with Accept: application/pdf — the server has stopped " +
+			"negotiating content on an operation whose spec declares 406; re-probe and record it")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("Accept: application/pdf gave a non-API error: %v", err)
+	}
+	if apiErr.HasStatus(403) {
+		t.Fatalf("403 on uem-connect: this credential holds no uem-connect grant — see "+
+			"TestAcceptance_SecurityCloudUemConnectSyncSettingsValidation for which env var to repoint: %v", err)
+	}
+	if !apiErr.HasStatus(406) {
+		t.Fatalf("Accept: application/pdf on ListUemConnectorsV1 returned %v, want 406 NOT_ACCEPTABLE", err)
+	}
+	if !strings.Contains(apiErr.Error(), "NOT_ACCEPTABLE") {
+		t.Errorf("406 does not carry code NOT_ACCEPTABLE: %v", err)
+	}
+	t.Logf("Accept: application/pdf on the collection GET: 406 NOT_ACCEPTABLE (%v)", err)
+
+	// Negative half: a 204 operation never serializes a body, so the same
+	// unsatisfiable Accept is never consulted and resource resolution answers
+	// first. A 406 here would mean negotiation had moved ahead of resolution,
+	// making v2018's removal wrong — which is the change this test guards.
+	err = sc.DisableUemConnectorV1(ctx, bogusID)
+	if err == nil {
+		t.Fatalf("DisableUemConnectorV1(%q) succeeded against a nonexistent configId — impossible", bogusID)
+	}
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("bodiless op with Accept: application/pdf gave a non-API error: %v", err)
+	}
+	if apiErr.HasStatus(406) {
+		t.Fatalf("DisableUemConnectorV1 answered 406 with Accept: application/pdf — content negotiation now "+
+			"precedes resource resolution, so v2018's removal of the 406 from the seven bodiless operations "+
+			"is wrong and should be reported upstream: %v", err)
+	}
+	if !apiErr.HasStatus(404) {
+		t.Fatalf("DisableUemConnectorV1(%q) returned %v, want 404 NOT_FOUND", bogusID, err)
+	}
+	t.Logf("Accept: application/pdf on a 204 operation with a bogus configId: 404, negotiation not reached (%v)", err)
+
+	// uem-connect has Jackson's XML converter registered and its own spec does
+	// not know, so `application/xml` is satisfiable where the spec says only
+	// `application/json` is produced. Pinned as a *limitation*: the assertion is
+	// that this is not yet a 406, and it fails the day upstream restricts the
+	// converter — at which point flip it to expect 406 rather than deleting it.
+	xml := http.Header{}
+	xml.Set("Accept", "application/xml")
+	scXML := jscClientWithHeaders(t, xml)
+
+	_, err = scXML.ListUemConnectorsV1(ctx)
+	if err == nil {
+		t.Fatal("ListUemConnectorsV1 decoded an XML body as JSON — impossible; the transport uses " +
+			"json.Unmarshal, so a 200 here means the server answered JSON despite Accept: application/xml")
+	}
+	if errors.As(err, &apiErr) && apiErr.HasStatus(406) {
+		t.Fatalf("Accept: application/xml now answers 406. The spec has said all along that these "+
+			"operations produce only application/json, and the server has finally agreed — this test pinned "+
+			"the disagreement, so flip it to assert the 406 rather than deleting it: %v", err)
+	}
+	t.Logf("Accept: application/xml still yields an XML body the JSON decoder rejects, not a 406 — "+
+		"the spec's produces-only-JSON claim remains wrong (%v)", err)
+}

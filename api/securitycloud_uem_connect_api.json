@@ -1882,9 +1882,6 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "406": {
-            "$ref": "#/components/responses/NotAcceptable"
-          },
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
@@ -2033,9 +2030,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "406": {
-            "$ref": "#/components/responses/NotAcceptable"
           }
         },
         "security": [
@@ -2116,9 +2110,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "406": {
-            "$ref": "#/components/responses/NotAcceptable"
           }
         },
         "security": [
@@ -2164,9 +2155,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "406": {
-            "$ref": "#/components/responses/NotAcceptable"
           },
           "415": {
             "$ref": "#/components/responses/UnsupportedMediaType"
@@ -2267,9 +2255,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "406": {
-            "$ref": "#/components/responses/NotAcceptable"
           },
           "415": {
             "$ref": "#/components/responses/UnsupportedMediaType"
@@ -2377,9 +2362,6 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "406": {
-            "$ref": "#/components/responses/NotAcceptable"
-          },
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
@@ -2422,9 +2404,6 @@
         "responses": {
           "204": {
             "description": "Cancelation requested (or no sync was running)"
-          },
-          "406": {
-            "$ref": "#/components/responses/NotAcceptable"
           }
         },
         "security": [

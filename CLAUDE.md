@@ -329,7 +329,7 @@ table: [docs/STYLE.md](docs/STYLE.md#config-key-inventory); observed shapes:
 | `securitycloud-dns-api.yaml` | `external/jsc-dns` | **v1981** |
 | `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v1981** |
 | `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v1981** |
-| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2005** |
+| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2018** |
 | `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v1993** (new) |
 | `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
@@ -389,16 +389,48 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v2005** (2026-09-02), except `capi` and `securitycloud-devices`,
+Ingested through **v2018** (2026-09-02), except `capi` and `securitycloud-devices`,
 both **held at v1897** — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
+
+**v2018 is `uem-connect` and nothing else, and it takes back half of v2005.**
+Every other file outside `internal/dev` is byte-identical to v2005 —
+`_permissions/{routes,scopes}.yaml` included, `capi` included, the account specs
+included — so the only other diffs were the manifest and the two unified
+rollups, whose path counts did not move. Zero operations, zero schemas, zero
+prose, `415` untouched. The whole change is **`406` deleted from 7 of the 12
+operations**, leaving it on exactly the 5 that write a 2xx response body: the
+four `GET`s and `POST /connectors` (201). The seven it went from all answer
+204/202. `internal/stage` took a byte-identical delta and `internal/dev` agrees
+op-for-op, so this is not an environment rollout. Generated diff: **21 deletions
+in `api/securitycloud_uem_connect_api.json` and zero Go** —
+`components.responses.NotAcceptable` survives, still referenced five times.
+
+**The correction is right, and the reason is that `406` is the *last* check in
+the pipeline, not the first** (wire-verified 2026-09-02). It is decided when the
+response body is serialized, so an unsatisfiable `Accept` is invisible on an
+operation that never writes one — and invisible even on the five that do whenever
+an earlier check fires. `Accept: application/pdf` against a bogus `configId`
+answered `404` on all seven bodiless operations **and on the `GET`s that keep the
+406**; only a request that resolves and reaches serialization gets `406`. The
+full order is **`Content-Type` (415) → body validation (422) → resource
+resolution (404) → business rules (422 `VENDOR_MISMATCH`) → response
+serialization (406)**. That supersedes the flat "406 is enforced" recorded at
+v2005, which had only ever probed `GET /connectors` — the one operation where
+nothing earlier can fire.
+
+`TestAcceptance_SecurityCloudUemConnectAcceptNegotiation` pins all three halves
+and is fixture-free: 406 on the collection `GET`, 404 (**not** 406) on a
+bodiless op with a bogus id, and the XML disagreement below as a limitation that
+fails the day it lifts. It reaches `Accept` through `WithHeaders`, which is the
+only door — no generated method sets it.
 
 **v2005 is `uem-connect` and nothing else, and it is documentation plus declared
 error responses.** Every other file outside `internal/dev` is byte-identical to
 v1993 — `_permissions/{routes,scopes}.yaml` included, `capi` included — so the
 only other diffs were the manifest and the two unified rollups, whose path counts
 did not move (802 prod). Zero operations and zero schemas added or removed; the
-whole change is a `406` on all twelve operations, a `415` on the five that carry a
+whole change is a `406` on all twelve operations, a `415` on the four that carry a
 request body, two new `components.responses` entries behind them, and prose. The
 generated Go diff is **four lines of godoc on `SyncSettings.Vendor`**: method
 comments come from the operation `summary`, never its `description`, so the
@@ -412,12 +444,15 @@ sync-settings PUT carrying a vendor other than the connector's stored one is
 rejected whole, with both names in the description and `field: null`. `415` is
 enforced and runs **before** resource resolution, which makes it probeable with no
 connector at all. `406` is enforced for genuinely unsatisfiable types
-(`application/pdf`, `text/csv`) — **but `Accept: application/xml` answers 200 with
-an XML body**, so the spec's claim that these operations "only produce
-`application/json`" is false and worth reporting upstream. The SDK is unexposed
-(it never sets `Accept`, and `DoWithContentType` always sends
-`application/json`), but `WithHeaders` does not reserve `Accept`, so a proxy that
-sets it would feed XML to a JSON decoder.
+(`application/pdf`, `text/csv`) on an operation that reaches serialization — see
+v2018 above for where in the pipeline that is, since the claim as recorded here
+was too broad — **but `Accept: application/xml` answers 200 with an XML body**,
+so the spec's claim that these operations "only produce `application/json`" is
+false and worth reporting upstream; v2018 left that prose unchanged and the wire
+still disagrees (re-probed 2026-09-02). The SDK is unexposed (it never sets
+`Accept`, and `DoWithContentType` always sends `application/json`), but
+`WithHeaders` does not reserve `Accept`, so a proxy that sets it would feed XML
+to a JSON decoder.
 
 **The recorded validation ordering for this PUT was backwards, and correcting it
 reopens the doomed-request trick.** The real order is media type → body
