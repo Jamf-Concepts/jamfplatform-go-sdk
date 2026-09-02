@@ -300,6 +300,10 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	}
 	normalizeNullableUnions(doc)
 	applyPostSymmetry(doc, spec.PostSymmetryExcludes)
+	// Must precede hoistInlineObjects and follow applyPostSymmetry — see
+	// pruneUnreferencedSchemas' doc comment for why the order is what keeps
+	// testing/ and api/ generating identical type names.
+	pruneUnreferencedSchemas(doc, spec)
 	if spec.Format == "xml" {
 		flattenClassicSizeWrappers(doc)
 	}
@@ -460,6 +464,8 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 			}
 			normalizeNullableUnions(doc)
 			applyPostSymmetry(doc, ls.spec.PostSymmetryExcludes)
+			// See pruneUnreferencedSchemas: after post-symmetry, before hoist.
+			pruneUnreferencedSchemas(doc, ls.spec)
 			if ls.spec.Format == "xml" {
 				flattenClassicSizeWrappers(doc)
 			}

@@ -95,14 +95,10 @@ func TestAcceptance_Pro_Computer_SmartGroupCRUD(t *testing.T) {
 		t.Fatalf("DeleteSmartComputerGroupV3(%s): %v", created.ID, err)
 	}
 
-	_, err = p.GetSmartComputerGroupV3(ctx, created.ID)
-	if err == nil {
-		t.Fatalf("GetSmartComputerGroupV3(%s) after delete should 404", created.ID)
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("GetSmartComputerGroupV3(%s) after delete: want 404, got %v", created.ID, err)
-	}
+	settleUntilGone(t, "GetSmartComputerGroupV3("+created.ID+") after delete", func() error {
+		_, err := p.GetSmartComputerGroupV3(ctx, created.ID)
+		return err
+	})
 }
 
 // --- static computer groups v2 -----------------------------------------
@@ -172,14 +168,10 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 		t.Fatalf("DeleteStaticComputerGroupV3(%s): %v", created.ID, err)
 	}
 
-	_, err = p.GetStaticComputerGroupV3(ctx, created.ID)
-	if err == nil {
-		t.Fatalf("GetStaticComputerGroupV3(%s) after delete should 404", created.ID)
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("GetStaticComputerGroupV3(%s) after delete: want 404, got %v", created.ID, err)
-	}
+	settleUntilGone(t, "GetStaticComputerGroupV3("+created.ID+") after delete", func() error {
+		_, err := p.GetStaticComputerGroupV3(ctx, created.ID)
+		return err
+	})
 }
 
 // --- computer extension attributes -------------------------------------

@@ -299,3 +299,82 @@ func TestDetectPaginatedItemTypeStillHandlesRawArray(t *testing.T) {
 		t.Fatalf("detectPaginatedItemType = %q, want SiteObject", got)
 	}
 }
+
+// A whitelist that stops reaching a read schema must also stop that schema
+// naming the nested types it shares with its *_post sibling. applyPostSymmetry
+// makes the two share the very SchemaRef being lifted, and hoistInlineObjects
+// names a lift after whichever parent it reaches first in sorted order — so
+// while an unreachable `computer` sits in the document it keeps winning
+// `computer_general` over `computer_post`'s claim to it.
+//
+// That mattered because publishSpecs prunes before writing api/*.json while Go
+// generation read testing/*.json unpruned: dropping GET /computers/id/{id}
+// from the whitelist made the two inputs hoist different names, and CI —
+// which generates from api/ — failed `git diff --exit-code -- jamfplatform/`
+// on a rename nothing in config.json mentions. pruneUnreferencedSchemas
+// between the two passes is what makes the inputs identical by construction,
+// and this test fails if it is moved before applyPostSymmetry (the post type
+// loses the inherited section) or after hoistInlineObjects (the stale name
+// comes back).
+func TestPruneUnreferencedSchemasRunsBeforeHoistNaming(t *testing.T) {
+	// general.remote_management is declared inline on the read schema only;
+	// computer_post inherits it through post-symmetry, exactly as Classic's
+	// spec does.
+	newDoc := func() *openapi3.T {
+		remote := openapi3.NewObjectSchema()
+		remote.Properties = openapi3.Schemas{
+			"managed": {Value: openapi3.NewBoolSchema()},
+		}
+		general := openapi3.NewObjectSchema()
+		general.Properties = openapi3.Schemas{
+			"name":              {Value: openapi3.NewStringSchema()},
+			"remote_management": {Value: remote},
+		}
+		read := openapi3.NewObjectSchema()
+		read.Properties = openapi3.Schemas{"general": {Value: general}}
+
+		return &openapi3.T{
+			Paths: openapi3.NewPaths(),
+			Components: &openapi3.Components{
+				Schemas: openapi3.Schemas{
+					"computer":      {Value: read},
+					"computer_post": {Value: openapi3.NewObjectSchema()},
+				},
+			},
+		}
+	}
+
+	// Only the POST is whitelisted, and it names its body through config —
+	// which is how every Classic write operation is declared.
+	spec := SpecDef{
+		Format: "xml",
+		Operations: []OperationDef{
+			{Op: "POST /computers/id/{id}", Name: "CreateComputerByID", RequestType: "computer_post"},
+		},
+	}
+
+	doc := newDoc()
+	applyPostSymmetry(doc, nil)
+	pruneUnreferencedSchemas(doc, spec)
+	hoistInlineObjects(doc, spec.Format)
+
+	if _, ok := doc.Components.Schemas["computer"]; ok {
+		t.Error("computer is unreachable from the whitelist but survived the prune")
+	}
+	if _, ok := doc.Components.Schemas["computer_postGeneral"]; !ok {
+		t.Errorf("want computer_postGeneral hoisted; schemas = %v", sortedKeys(doc.Components.Schemas))
+	}
+	if _, ok := doc.Components.Schemas["computerGeneral"]; ok {
+		t.Error("computerGeneral was hoisted from a schema the whitelist no longer reaches")
+	}
+	if _, ok := doc.Components.Schemas["computer_postGeneralRemoteManagement"]; !ok {
+		t.Errorf("want computer_postGeneralRemoteManagement hoisted; schemas = %v", sortedKeys(doc.Components.Schemas))
+	}
+
+	// The section itself must still be there: pruning before post-symmetry
+	// would have stripped it off the post type along with its read sibling.
+	post := doc.Components.Schemas["computer_post"].Value
+	if _, ok := post.Properties["general"]; !ok {
+		t.Fatal("computer_post lost the inherited general section — prune ran before post-symmetry")
+	}
+}

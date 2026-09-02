@@ -65,6 +65,18 @@ local spec regenerates the tree *backwards*. When checking a generator change fo
 CI parity, force the fallback path (a scratch root of symlinks with no `testing/`,
 or a repo copy with it removed) so a local spec cannot contaminate the diff.
 
+**Do that for a whitelist change too, not just a generator change.** `api/` is
+pruned of unreachable schemas and `testing/` is not, so removing an operation can
+leave a schema present-but-unreachable in `testing/` and absent in `api/` — and
+`hoistInlineObjects` names its nested types after whichever parent it sees first.
+The v1993 `capi` alignment hit exactly that: 31 `ComputerGeneral*` →
+`ComputerPostGeneral*` renames that appeared only in the CI path, invisible to
+every local `make generate`. `pruneUnreferencedSchemas` now runs between
+`applyPostSymmetry` and `hoistInlineObjects` on both paths so the two inputs are
+identical by construction — see
+[docs/STYLE.md](docs/STYLE.md#schema-handling) for why neither side of that
+ordering is negotiable.
+
 **The generator prunes files it did not write.** Because generation is
 whitelist-driven, removing an operation stops a file being emitted but does not
 remove the one already on disk — and that file keeps compiling against types
@@ -381,6 +393,25 @@ Ingested through **v1993** (2026-09-01), except `capi` and `securitycloud-device
 both **held at v1897** — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
 
+**The `capi` hold is now config-only, and it has narrowed to a single
+operation.** On 2026-09-02 the whitelist was aligned to `external/capi` at v1993
+*without* ingesting the spec: `testing/Classic-openapi.json` stays at v1897 and
+31 of the 32 withdrawn operations were dropped from `config.json`, leaving 575.
+The one kept back is **`POST /patchsoftwaretitles/id/{id}`**, and it is kept for
+exactly one reason: it is the only way to mint a `softwareTitleId` for the Pro v3
+patch-configuration endpoints. Everything else in that family — the collection
+`GET`, and `GET`/`PUT`/`DELETE` on the item path — went with the rest.
+
+So the surface mirrors the published spec everywhere except that one `POST`.
+**When `/patchsoftwaretitles` reappears in a published spec, ingest `capi` and
+drop the hold entirely** — the identifier problem below is the only thing
+keeping it, and it evaporates the moment the family is back. Note the SDK now
+reproduces upstream's own incoherence on this path deliberately: create with no
+read, no update and no delete. Classic can no longer enumerate software titles
+at all, so the acceptance suite reaches Pro v3 for every fixture and every
+cleanup that used to go through Classic. Full record:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#the-v1993-config-alignment-2026-09-02).
+
 **v1993 is one brand-new spec and nothing else.** `external/securitycloud-enrollment`
 appeared in all three environments at once, having existed in none of them at
 v1988; every other file outside `internal/dev` is byte-identical, `capi` included,
@@ -429,7 +460,8 @@ confirm a deletion nor filter deleted profiles out of a list. It also means
 why the suite creates exactly one profile and folds every assertion that could
 have justified another into that one body.
 
-**v1988 changed one spec — `capi` — so nothing was ingested.** It is the held
+**v1988 changed one spec — `capi` — and the spec was not ingested, but the
+config took the removal on 2026-09-02.** It is the held
 spec, and the change is twelve more deletions of the same kind v1942 made: the
 alternate-identifier computer lookups, `GET`, `PUT` and `DELETE` on each of
 `/computers/{macaddress,name,serialnumber,udid}/{value}`. `external/capi` goes
@@ -578,7 +610,7 @@ next bundle does this again.
 | spec | ops | what went |
 |---|---|---|
 | `external/jpapi` | 788 → 666 | computers-inventory `v1`/`v2`/`v3` (v4 survives), inventory-preload `v1` + unversioned (v2 survives), computer-groups `v2` (v3), mobile-device-groups `v1` (v2), mobile-device-prestages `v2` (v3), patch-software-title-configurations `v2` (v3), computer-inventory-collection-settings `v1` (v2), groups `v1` (v2), `GET /v1/mdm/commands` (v2) |
-| `external/capi` | *not taken* | would have removed the `/computers` collection, `GET`+`PUT /computers/id/{id}`, `/computers/subset/basic` and the whole `/patches`, `/patchsoftwaretitles`, `/patchpolicies` (collection) and `/patchreports` families; **held**, see below |
+| `external/capi` | *spec held; 31 of 32 taken in config 2026-09-02* | the `/computers` collection, `GET`+`PUT /computers/id/{id}`, `/computers/subset/basic`, `/computers/id/{id}/subset/{subset}`, the twelve v1988 alternate-identifier verbs, the whole `/patches`, `/patchpolicies` (collection) and `/patchreports` families, and four of the five `/patchsoftwaretitles` ops all went. **Only `POST /patchsoftwaretitles/id/{id}` was kept** — see below |
 | `external/declaration-reporting` | 5 → 3 | `GET /v1/declarations/{declarationIdentifier}`, `GET /v1/devices/{deviceId}` |
 | `external/securitycloud-devices` | *not taken* | would have removed `GET /v1/groups` and `PUT /v1/groups/{groupId}`; **held**, see below |
 
@@ -867,7 +899,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | held | why |
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
-| `capi` at v1897 | Now 32 operations behind. v1942 withdraws 20 including all of `/patchsoftwaretitles`: `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints, so taking it makes patch software titles unseedable and leaves the provider's `patch_software_title` resource with no create path; it also removes `GET`/`PUT /computers/id/{id}` while leaving `POST`/`DELETE`. v1988 withdraws 12 more — `GET`/`PUT`/`DELETE` on each of `/computers/{macaddress,name,serialnumber,udid}/{value}`, again leaving `POST` — none of which declares a successor, and all of which are live on the wire. Take it when Jamf publishes a routed software-title catalogue. |
+| `capi` at v1897 — **`POST /patchsoftwaretitles/id/{id}` only** | The spec file stays at v1897, but the whitelist took 31 of the 32 withdrawn operations on 2026-09-02, so the hold is now one operation wide. `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints: taking it makes patch software titles unseedable, breaks `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves the provider's `patch_software_title` resource with no create path. Upstream has said the family is coming back after the SDK team's feedback — **when it reappears in a published spec, ingest `capi` and drop this row.** Note the surface the config now mirrors is incoherent by upstream's own doing: four alternate-identifier computer paths are `POST`-only, `/computers/id/{id}` is `POST`+`DELETE` with no read, none of the 31 declares a successor, and all 31 are live on the wire. |
 | `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-01 17:1x — and its declared successor `PUT /v2/groups/{groupId}` is still unrouted (403 `BAD_PERMISSIONS` on a real id and a bogus uuid alike; no OPA rule authored). Taking the removal would leave the package with no working update and break `ApplyDeviceGroupV2`. Take it once the v2 rule lands — but note `authorization-policies#264` (DRAFT) would **deny the v1 update without adding the v2 rule**, at which point the hold preserves a method the gateway refuses rather than a working capability. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
@@ -951,7 +983,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | package | namespace(s) | scope | notes |
 |---|---|---|---|
 | `pro` | `pro` | tenant or environment | 666 ops — the whole spec |
-| `proclassic` | `proclassic` | tenant | 606 ops, XML end-to-end |
+| `proclassic` | `proclassic` | tenant | 575 ops, XML end-to-end — the v1993 surface plus the one held `POST /patchsoftwaretitles/id/{id}` |
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
 | `securitycloud` | `securitycloud` | tenant (own identifier) | 54 ops across six specs |

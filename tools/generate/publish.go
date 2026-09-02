@@ -111,46 +111,7 @@ func publishSpecs(root string, cfg Config) error {
 			}
 		}
 
-		// Collect all $ref'd schemas from remaining operations.
-		usedSchemas := make(map[string]bool)
-		collectRefs(doc, usedSchemas)
-
-		// Preserve schemas named by config-level requestType/responseType
-		// overrides and walk them transitively. These are *not* reachable
-		// via $ref from the spec itself (Classic's operations carry no
-		// typed request bodies at all — the names come from config), so
-		// collectRefs misses them and they'd otherwise be pruned.
-		// Without this the published spec drops every *_post schema and
-		// downstream generation hits "Go type not emitted" errors.
-		if doc.Components != nil && doc.Components.Schemas != nil {
-			walk := newSchemaWalker(doc, func(name string) bool {
-				if usedSchemas[name] {
-					return false
-				}
-				usedSchemas[name] = true
-				return true
-			})
-			for _, op := range spec.Operations {
-				for _, typeName := range []string{op.RequestType, op.ResponseType} {
-					if typeName == "" {
-						continue
-					}
-					usedSchemas[typeName] = true
-					if ref, ok := doc.Components.Schemas[typeName]; ok {
-						walk(ref)
-					}
-				}
-			}
-		}
-
-		// Prune unreferenced schemas.
-		if doc.Components != nil && doc.Components.Schemas != nil {
-			for name := range doc.Components.Schemas {
-				if !usedSchemas[name] {
-					delete(doc.Components.Schemas, name)
-				}
-			}
-		}
+		pruneUnreferencedSchemas(doc, spec)
 
 		// Remove internal paths (e.g. /internal/v1/...).
 		for _, path := range doc.Paths.InMatchingOrder() {
@@ -339,6 +300,72 @@ func applyWireCorrectionExtensions(doc *openapi3.T, spec SpecDef) {
 		}
 		if op.ExpectedStatus != 0 {
 			specOp.Extensions[extExpectedStatus] = op.ExpectedStatus
+		}
+	}
+}
+
+// pruneUnreferencedSchemas deletes every component schema not reachable from
+// the whitelisted operations, either by $ref from the surviving path items or
+// from a config-level requestType/responseType override. It must run after
+// applyPostSymmetry — a *_post schema inherits the read sibling's properties
+// by shared pointer, so pruning the read schema first would strip the post
+// type — and before hoistInlineObjects, which is why both the publish path
+// and the Go-generation path call it at that point.
+//
+// Ordering it that way is load-bearing for CI parity, not tidiness.
+// hoistInlineObjects names a lifted nested object after whichever parent
+// schema it reaches first in sorted order, and post-symmetry makes a read
+// schema and its *_post sibling share the very SchemaRef pointers being
+// lifted. So while an unreachable read schema is still in the document it
+// wins the name: dropping GET /computers/id/{id} from the whitelist left
+// `computer` unreachable but still in `testing/`, where it kept naming
+// `ComputerGeneralManagementStatus` — while `api/`, already pruned by this
+// function before publication, hoisted the identical object from
+// `computer_post` as `ComputerPostGeneralManagementStatus`. CI generates from
+// `api/` and the repo tree came from `testing/`, so the two disagreed and
+// `git diff --exit-code -- jamfplatform/` failed on a name nothing in the
+// config mentions. Pruning here makes both inputs identical by construction.
+//
+// The typesOnly path deliberately does not call this: those specs emit every
+// schema they declare, reachability being irrelevant.
+func pruneUnreferencedSchemas(doc *openapi3.T, spec SpecDef) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+
+	// Collect all $ref'd schemas from the whitelisted operations.
+	usedSchemas := make(map[string]bool)
+	collectRefs(doc, usedSchemas, allowedOpsSet(spec))
+
+	// Preserve schemas named by config-level requestType/responseType
+	// overrides and walk them transitively. These are *not* reachable
+	// via $ref from the spec itself (Classic's operations carry no
+	// typed request bodies at all — the names come from config), so
+	// collectRefs misses them and they'd otherwise be pruned.
+	// Without this the published spec drops every *_post schema and
+	// downstream generation hits "Go type not emitted" errors.
+	walk := newSchemaWalker(doc, func(name string) bool {
+		if usedSchemas[name] {
+			return false
+		}
+		usedSchemas[name] = true
+		return true
+	})
+	for _, op := range spec.Operations {
+		for _, typeName := range []string{op.RequestType, op.ResponseType} {
+			if typeName == "" {
+				continue
+			}
+			usedSchemas[typeName] = true
+			if ref, ok := doc.Components.Schemas[typeName]; ok {
+				walk(ref)
+			}
+		}
+	}
+
+	for name := range doc.Components.Schemas {
+		if !usedSchemas[name] {
+			delete(doc.Components.Schemas, name)
 		}
 	}
 }

@@ -601,11 +601,13 @@ func TestAcceptance_Classic_ResolveComputerGroupByName(t *testing.T) {
 	id := *created.ID
 	cleanupDelete(t, "DeleteComputerGroupByID", func() error { return pc.DeleteComputerGroupByID(ctx, intToStr(id)) })
 
-	gotID, err := pc.ResolveComputerGroupIDByName(ctx, name)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ResolveComputerGroupIDByName: %v", err)
-	}
+	// Group reads lag their own writes — see settleUntilFound.
+	var gotID string
+	settleUntilFound(t, "ResolveComputerGroupIDByName", func() error {
+		var err error
+		gotID, err = pc.ResolveComputerGroupIDByName(ctx, name)
+		return err
+	})
 	assertResolvedID(t, "ResolveComputerGroupIDByName", gotID, id)
 
 	gotTyped, err := pc.ResolveComputerGroupByName(ctx, name)

@@ -248,29 +248,6 @@ func ComputerExtensionAttributeInventoryDisplayValues() []ComputerExtensionAttri
 	}
 }
 
-// ComputerHardwareSipStatus is the set of values accepted by ComputerHardware.SipStatus.
-type ComputerHardwareSipStatus = string
-
-// ComputerHardwareSipStatus values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	ComputerHardwareSipStatusEnabled  ComputerHardwareSipStatus = "Enabled"
-	ComputerHardwareSipStatusDisabled ComputerHardwareSipStatus = "Disabled"
-)
-
-// ComputerHardwareSipStatusValues returns every value the Jamf API accepts for ComputerHardwareSipStatus,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func ComputerHardwareSipStatusValues() []ComputerHardwareSipStatus {
-	return []ComputerHardwareSipStatus{
-		ComputerHardwareSipStatusEnabled,
-		ComputerHardwareSipStatusDisabled,
-	}
-}
-
 // ComputerHardwareSoftwareReportsFontReportType is the set of values accepted by ComputerHardwareSoftwareReportsFontReport.Type.
 type ComputerHardwareSoftwareReportsFontReportType = string
 

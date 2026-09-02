@@ -183,11 +183,11 @@ All list methods handle pagination automatically. Pro's versioned endpoints emit
 import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
 
 classic := proclassic.New(client)
-computer, err := classic.GetComputerByID(ctx, "42")
+policy, err := classic.GetPolicyByID(ctx, "42")
 if err != nil {
     log.Fatal(err)
 }
-fmt.Println(computer.General.Name, computer.Hardware.ModelIdentifier)
+fmt.Println(policy.General.Name, policy.Scope.AllComputers)
 ```
 
 Classic is fully typed — the generator hoists nested XML sections (`general`, `hardware`, `purchasing`, etc.) into named structs and emits every field as a pointer so three-state null/value semantics round-trip cleanly (required for the upcoming Terraform provider).

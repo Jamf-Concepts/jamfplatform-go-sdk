@@ -466,6 +466,34 @@ item always uses pointer fields.
   `restoreRefSiblings` re-attaches them from the source file before writing.
   **Do not "fix" that churn by reverting it**: a generate run without this pass
   rewrites unrelated packages backwards.
+- **Unreachable schemas are pruned between post-symmetry and hoisting, and that
+  ordering is load-bearing.** `pruneUnreferencedSchemas` deletes every component
+  schema the whitelist no longer reaches, and both the publish path and the Go
+  path call it at the same point: **after** `applyPostSymmetry`, **before**
+  `hoistInlineObjects`. Neither side of that sandwich is stylistic.
+  `applyPostSymmetry` gives a `*_post` schema its read sibling's properties by
+  **shared `SchemaRef` pointer**, so pruning first strips the post type of the
+  sections it inherits. And `hoistInlineObjects` names a lifted nested object
+  after whichever parent it reaches first in sorted order — so an *unreachable*
+  read schema still in the document keeps winning the name over the `_post`
+  sibling that is the only remaining owner.
+  That combination broke CI parity once and would again: dropping
+  `GET /computers/id/{id}` from the whitelist left `computer` unreachable but
+  present in `testing/`, where it went on naming `ComputerGeneralManagementStatus`,
+  while `api/` — pruned by this same function before publication — hoisted the
+  identical object off `computer_post` as `ComputerPostGeneralManagementStatus`.
+  CI generates from `api/`, the committed tree came from `testing/`, and
+  `git diff --exit-code -- jamfplatform/` failed on 31 renames no config key
+  mentions. Note the failure is **invisible to a normal local generate**, which
+  reads `testing/` — only the fallback-forcing run catches it, which is why that
+  check belongs in any change that alters which operations are whitelisted, not
+  just ones that touch the generator. Pinned by
+  `TestPruneUnreferencedSchemasRunsBeforeHoistNaming`. `collectRefs` takes the
+  whitelist for the same reason: an OAS3 document is loaded whole (`loadSpec`
+  only prunes Swagger 2.0 paths), so a withdrawn operation still sits in
+  `doc.Paths` and its `$ref`s would otherwise keep its schemas reachable
+  forever. The `typesOnly` path deliberately does not prune — those specs emit
+  every schema they declare.
 - **Swagger 2.0** is upconverted in-memory via `openapi2conv.ToV3`. Whitelisted
   paths are pruned from the Swagger document *before* conversion, because
   openapi2conv rejects some Classic operations (multiple body params) that are

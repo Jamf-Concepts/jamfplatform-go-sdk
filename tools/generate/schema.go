@@ -974,7 +974,7 @@ func newSchemaWalker(doc *openapi3.T, onRef func(name string) bool) func(ref *op
 
 // collectRefs walks the remaining spec paths and collects all referenced schema names,
 // following nested $refs transitively. Used for pruning published specs.
-func collectRefs(doc *openapi3.T, used map[string]bool) {
+func collectRefs(doc *openapi3.T, used map[string]bool, allowed map[string]bool) {
 	walk := newSchemaWalker(doc, func(name string) bool {
 		if used[name] {
 			return false
@@ -996,6 +996,15 @@ func collectRefs(doc *openapi3.T, used map[string]bool) {
 		for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
 			op := item.GetOperation(method)
 			if op == nil {
+				continue
+			}
+			// An OAS3 doc is loaded whole — loadSpec's allowlist only prunes
+			// Swagger 2.0 paths — so a withdrawn operation still sits in
+			// doc.Paths and its $refs would otherwise keep its schemas
+			// reachable. Skipping them here is what lets
+			// pruneUnreferencedSchemas drop a schema the whitelist no longer
+			// reaches.
+			if allowed != nil && !allowed[normalizeOpKey(method+" "+path)] {
 				continue
 			}
 			for _, p := range op.Parameters {

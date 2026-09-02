@@ -761,3 +761,83 @@ record the new shape in docs/WIRE-FACTS.md and update the want here, since this
 assertion is the only thing that dates the change.`, endpoint, got, want)
 	}
 }
+
+// Read-after-write staleness on group resources.
+//
+// Jamf Pro serves Classic and Pro *group* reads from behind something that
+// lags its own writes: a GET immediately after a POST can 404, and a GET
+// immediately after a DELETE can return 200 with the full record — while a
+// second DELETE on that same id returns 404, proving the object really is
+// gone. Measured on 11.31.1 (EU), the lag clears on the *next* attempt every
+// time: 2 attempts, 167-234ms.
+//
+// Spacing requests does not fix it and must not be used as the remedy. The
+// transport already paces requests 100ms apart by default
+// (defaultMinRequestInterval), and raising that to 250ms and 500ms still
+// produced stale reads — the staleness is intermittent, not a fixed latency,
+// so there is no interval that makes a bare assertion reliable. Retrying the
+// read is what converges.
+//
+// These helpers therefore poll rather than sleep, and they still assert the
+// real outcome: a timeout fails the test. They are deliberately narrow — use
+// them only for the first read that follows a write on a resource with this
+// behaviour, never to paper over an endpoint that is simply broken.
+const (
+	settleTimeout  = 15 * time.Second
+	settlePollWait = 100 * time.Millisecond
+)
+
+// settleUntilFound polls read until it succeeds, tolerating the post-write
+// staleness described above. Fails the test if the read never succeeds, and
+// returns immediately on a 5xx via skipOnServerError.
+func settleUntilFound(t *testing.T, label string, read func() error) {
+	t.Helper()
+	deadline := time.Now().Add(settleTimeout)
+	attempts := 0
+	for {
+		attempts++
+		err := read()
+		if err == nil {
+			if attempts > 1 {
+				t.Logf("%s: read settled after %d attempts", label, attempts)
+			}
+			return
+		}
+		skipOnServerError(t, err)
+		if apiErr := jamfplatform.AsAPIError(err); apiErr == nil || !apiErr.HasStatus(404) {
+			t.Fatalf("%s: %v", label, err)
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("%s: still 404 after %s and %d attempts", label, settleTimeout, attempts)
+		}
+		time.Sleep(settlePollWait)
+	}
+}
+
+// settleUntilGone polls read until it reports 404, the mirror of
+// settleUntilFound for the read that follows a delete. A non-404 error fails
+// immediately: only staleness is tolerated, not an unexpected status.
+func settleUntilGone(t *testing.T, label string, read func() error) {
+	t.Helper()
+	deadline := time.Now().Add(settleTimeout)
+	attempts := 0
+	for {
+		attempts++
+		err := read()
+		if err != nil {
+			skipOnServerError(t, err)
+			apiErr := jamfplatform.AsAPIError(err)
+			if apiErr == nil || !apiErr.HasStatus(404) {
+				t.Fatalf("%s: want 404, got %v", label, err)
+			}
+			if attempts > 1 {
+				t.Logf("%s: read settled after %d attempts", label, attempts)
+			}
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("%s: still readable %s after delete (%d attempts) — not staleness", label, settleTimeout, attempts)
+		}
+		time.Sleep(settlePollWait)
+	}
+}

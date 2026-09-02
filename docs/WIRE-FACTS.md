@@ -550,12 +550,13 @@ also that `GET /computers/match/{match}` and `GET /computers/match/name/{matchna
 carry the identical deprecation date and were **not** removed, so the filter is not
 even consistent within the family.
 
-All twelve are pinned by
-`TestAcceptance_Classic_AltIdentifierComputersStillRouted`, which asserts the 404
-on a nonexistent identifier for every verb and fails on a 403 — the day the
-withdrawal reaches the gateway, that test names the hold to lift.
-`TestAcceptance_Classic_GetComputerByName` covers the one withdrawn read that had
-no acceptance test of its own.
+**These twelve were taken into `config.json` on 2026-09-02** — see *The v1993
+config alignment* below — so they are no longer pinned. Both tests that pinned
+them, `TestAcceptance_Classic_AltIdentifierComputersStillRouted` and
+`TestAcceptance_Classic_GetComputerByName`, were deleted with the methods they
+called; a withdrawn operation cannot be pinned from inside the SDK. The evidence
+above stands as the record that the wire still served all twelve on the day the
+SDK stopped generating them.
 
 **Report upstream** alongside the v1942 finding: same defect, same bundle
 generation stage, and this time the deleted operations have no successor to
@@ -644,22 +645,138 @@ Also re-confirmed on 11.31.1: `GET /pro/v4/patch-software-title-configurations`
 obviously-absent name 3/3, and `500` again for a plausible one (`Firefox`), on a
 tenant whose `/patchsoftwaretitles` list is empty. A server defect found while
 the patch family was briefly withdrawn; worth reporting regardless of the hold.
-Not currently pinned by a test — with `capi` held at v1897 the original
-`TestAcceptance_Classic_PatchByName` is back, and it sources its name from
-`ListPatches`, so it skips on a tenant with no patch titles rather than reaching
-the defect.
+Not currently pinned by a test. `GET /patches/name/{name}` survives v1993 and
+`TestAcceptance_Classic_PatchByName` still covers it, but the enumeration it used
+to source a name from — `ListPatches` — is withdrawn, so the test now takes a
+name from `ListPatchSoftwareTitles` and skips on a tenant with no *configured*
+titles rather than reaching the defect.
 
-**Classic computers: the withdrawal is incoherent, which is the second reason
-`capi` is held.** v1942 removes `GET` and `PUT /computers/id/{id}` while keeping
-`POST` and `DELETE` on the same path, and removes both
-`GET /computers/subset/basic` and `/computers/id/{id}/subset/{subset}` with no
-equivalent anywhere. If it is ever taken, the migration is known and works:
+**Classic computers: the withdrawal is incoherent, and it was taken anyway.**
+v1942 removes `GET` and `PUT /computers/id/{id}` while keeping `POST` and
+`DELETE` on the same path, and removes both `GET /computers/subset/basic` and
+`/computers/id/{id}/subset/{subset}` with no equivalent anywhere. Taken on
+2026-09-02 regardless — see *The v1993 config alignment* below. The migration
+this section predicted is the one that was used and it works:
 `GET /proclassic/computers/match/*` answers 200 with `id`, `name`, `udid`,
 `serial_number` and `mac_address` per row, and `MatchComputers` returns the same
-`*Computers` type `ListComputers` does, so it is a drop-in enumeration
-replacement; reads move to `GetComputerByName` / `…BySerialNumber`. The two
-subset reads have no replacement and would simply be lost.
+`*Computers` type `ListComputers` did, so it was a drop-in enumeration
+replacement across six subset/filter fixtures and `ComputerCRUD`. What was lost
+is real and has no replacement: the two subset reads, every by-identifier read,
+and both by-identifier updates. `MatchComputers` is the only computer lookup
+left in the package.
 `GET /proclassic/patchpolicies/id/99999999/subset/General` → 404, as expected.
+
+### The v1993 config alignment (2026-09-02)
+
+The whitelist was aligned to `external/capi` at v1993 **without ingesting the
+spec** — `testing/Classic-openapi.json` stays at v1897. **31 of the 32 withdrawn
+operations were dropped** from `config.json`, leaving `proclassic` at 575. The
+single operation kept back is `POST /patchsoftwaretitles/id/{id}`, held for one
+reason only: nothing else can mint a `softwareTitleId` for the Pro v3
+patch-configuration endpoints. The other four in that family — the collection
+`GET`, and `GET`/`PUT`/`DELETE` on the item path — went with the rest. So the
+surface mirrors the published spec except for that one `POST`, and the hold is
+one operation wide.
+
+The v1993 diff itself is a pure withdrawal — verified 606 → 574 operations and
+273 → 262 paths, zero operations added, **zero semantic change to any of the 574
+survivors**, and `components/schemas` identical at 169 both sides. The only
+non-operation change is the OAuth scope list, 188 → 185: the three
+`patch-management-software-titles:{create,update,delete}` write scopes orphaned
+by the removals. `info.version` is `11.28.0` on both sides.
+
+| family | ops dropped | what is left |
+|---|---|---|
+| `computers` | 17 | `POST` + `DELETE /computers/id/{id}`, `POST` on each of the four alternate-identifier paths, `GET /computers/match/{match}`, `GET /computers/match/name/{matchname}` |
+| `patches` | 6 | `GET /patches/name/{name}` only |
+| `patchpolicies` | 2 | `GET`/`PUT`/`DELETE /patchpolicies/id/{id}`, its subset read, `POST /patchpolicies/softwaretitleconfig/id/{id}` |
+| `patchreports` | 2 | nothing |
+| `patchsoftwaretitles` | 4 | **`POST /patchsoftwaretitles/id/{id}` only — held** |
+
+**None of the 31 declares a successor.** `x-successor-endpoint` does not exist as
+a key anywhere in `capi`, in either version, in any environment — so the
+additive-versions rule's deprecated-with-successor override does not reach them,
+and following the spec here is the same deliberate override v1942 was.
+
+**The three signals that the server has withdrawn nothing still hold**, so the
+SDK is now materially stricter than the gateway on these 31: `internal/dev/capi`
+in the v1993 bundle carries all 606 operations, all 169 schemas and all 188
+scopes, byte-equal to the v1897 baseline modulo host and title;
+`external/_permissions/routes.yaml` still types `proclassic` at **273 routes** —
+the unfiltered count — and grants every one of the 31; and `internal/stage/capi`
+carries the identical removals, so this is a publication filter and not a
+prod-lagging rollout.
+
+What the Go tree lost: 31 methods, their 31 privilege-registry entries, 59 types
+(`Computer` and its whole nested tree, `ComputersBasic`,
+`PatchManagementSoftwareTitles`, `PatchPolicies`, `PatchReport` and their
+children), and the `ComputerHardwareSipStatus` enum. `ComputerPost` survives —
+the five surviving `POST`s take it. `Computers` survives via `MatchComputers`.
+`patchreports.go` and its test were removed by `pruneStale`, which is the guard
+working as designed. `PatchSoftwareTitles` and its two children went with the
+collection read; `PatchSoftwareTitle` itself stays as the surviving `POST`'s
+request and response type.
+
+**Classic can no longer enumerate patch software titles at all**, which is what
+makes the `POST`-only shape bite. Every Classic fixture and cleanup that went
+through that family now goes through Pro v3: `Classic_PatchByName` takes its
+name from `pro.ListPatchSoftwareTitleConfigurationsV3` (`SoftwareTitleName` is
+the same software-title name `GET /patches/name/{name}` keys on), and
+`Classic_ProbeCreate_CreatePatchSoftwareTitleByID` cleans up with
+`pro.DeletePatchSoftwareTitleConfigurationV3` — the same id, and deleting there
+removes the Classic record, as `seedPatchSoftwareTitleFixture` already relied
+on. `Classic_ListPatchSoftwareTitles` was deleted with its operation. The seed
+helper itself is unaffected: it only ever needed the `POST`.
+
+**31 nested types were also renamed, and the reason is a generator fix this
+change forced.** `ComputerGeneralManagementStatus` and 30 siblings became
+`ComputerPostGeneralManagementStatus` etc. Those inline sections are declared on
+the read schema and reach `computer_post` through `applyPostSymmetry`'s shared
+pointers, so `hoistInlineObjects` named them after whichever parent it reached
+first in sorted order — `computer`. With `computer` unreachable the name was
+being taken from a schema the SDK no longer emits, and worse, only in the
+`testing/` path: `publishSpecs` prunes before writing `api/*.json`, so CI —
+which generates from `api/` — produced the `ComputerPost*` names and
+`git diff --exit-code -- jamfplatform/` failed on 31 renames nothing in
+`config.json` mentions. `pruneUnreferencedSchemas` now runs on both paths
+between post-symmetry and hoisting, which makes the two inputs identical by
+construction; `collectRefs` takes the whitelist because an OAS3 document is
+loaded whole and a withdrawn operation's `$ref`s would otherwise keep its
+schemas alive. Blast radius was `proclassic/types.go` alone — no other package
+moved a byte — and no downstream repo names any of the 56 removed or 31 renamed
+types. Mechanism and the ordering invariant:
+[STYLE.md](STYLE.md#schema-handling). **The local generate cannot see this class
+of break**, since it reads `testing/`; force the `api/` fallback whenever a
+change alters which operations are whitelisted.
+
+**Acceptance coverage.** Seven test functions and one whole file went as
+superseded: `acc_proclassic_alt_identifier_test.go` in full (both its tests
+existed only to pin withdrawn operations), plus `Classic_GetComputerByID`,
+`Classic_ListComputers`, `Classic_ListPatches`, `Classic_ListPatchPolicies`,
+`Classic_GetComputersBasic`, `Classic_ListPatchSoftwareTitles`,
+`Classic_ComputerByIDSubset`,
+`Classic_ComputerByMacAddress`, `Classic_ComputerByUDID`,
+`Classic_PatchComputersByIDVersion`, `Classic_PatchReportByTitleIDVersion` and
+`Classic_ProbeCreate_CreatePatchByID`. Nine fixtures were repointed rather than
+deleted: six subset/filter tests and `Classic_GetComputerHistoryByID` moved from
+`ListComputers` to `MatchComputers(ctx, "*")` — same `*Computers` return type, so
+the change is one line each; `Classic_PatchByName` moved from `ListPatches` to
+`ListPatchSoftwareTitles`; and `Classic_PatchPolicyByIDSubset` now sources its id
+from `pro.ListPatchPoliciesV2`, because **both** Classic patch-policy
+enumerations were withdrawn and the Classic surface can no longer discover a
+patch policy id at all. `Classic_ComputerCRUD` was rewritten to the two verbs
+that survive on its path — create, then recover the id through `MatchComputers`,
+then delete, with absence from a later match as the post-delete assertion since
+no read remains.
+
+**One coverage gap is worth naming and it predates this change.**
+`CreateComputerByName`, `CreateComputerBySerialNumber`,
+`CreateComputerByMacAddress` and `CreateComputerByUDID` have no acceptance test
+and had none at v1897 either. That mattered less when those paths carried four
+verbs; they now carry `POST` alone, so the untested method *is* the whole
+surface. Same for `GetPatchPolicyByID` and `UpdatePatchPolicyByID`, untested before and
+after. `GetPatchSoftwareTitleByID` and `UpdatePatchSoftwareTitleByID` were in
+that list too and are now simply gone.
 
 ### Custom inventory paths: the scope vocabulary narrowed at v2, v1 still serves all three
 

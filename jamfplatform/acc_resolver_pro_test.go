@@ -611,10 +611,13 @@ func TestAcceptance_ResolveComputerGroupV1_Lifecycle(t *testing.T) {
 	id1 := resp.ID
 	t.Cleanup(func() { _ = c.DeleteSmartComputerGroupV3(ctx, id1) })
 
-	gotID, err := c.ResolveComputerGroupV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
+	// Group reads lag their own writes — see settleUntilFound.
+	var gotID string
+	settleUntilFound(t, "resolve ID", func() error {
+		var err error
+		gotID, err = c.ResolveComputerGroupV1IDByName(ctx, name)
+		return err
+	})
 	if gotID != id1 {
 		t.Errorf("resolve ID = %q, want %q", gotID, id1)
 	}
@@ -640,8 +643,10 @@ func TestAcceptance_ResolveComputerGroupV1_Lifecycle(t *testing.T) {
 	if err := c.DeleteSmartComputerGroupV3(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveComputerGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveComputerGroupV1IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 

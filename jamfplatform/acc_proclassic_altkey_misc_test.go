@@ -33,6 +33,7 @@ import (
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
 )
 
@@ -113,25 +114,6 @@ func TestAcceptance_Classic_ProbeCreate_CreateMobileDeviceProvisioningProfileByI
 	}
 }
 
-func TestAcceptance_Classic_ProbeCreate_CreatePatchByID(t *testing.T) {
-	c := accClient(t)
-	pc := proclassic.New(c)
-	ctx := context.Background()
-	created, err := pc.CreatePatchByID(ctx, "0", &proclassic.SoftwareTitle{})
-	if probeCreateHandleErr(t, "CreatePatchByID", err) {
-		return
-	}
-	if created != nil && created.ID != nil {
-		id := *created.ID
-		t.Cleanup(func() {
-			if err := pc.DeletePatchByID(ctx, intToStr(id)); err != nil {
-				t.Logf("cleanup: DeletePatchByID(%d): %v", id, err)
-			}
-		})
-		t.Logf("probe-create accepted empty body; id=%d queued for cleanup", id)
-	}
-}
-
 func TestAcceptance_Classic_ProbeCreate_CreatePatchPolicyBySoftwareTitleConfigID(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
@@ -161,9 +143,12 @@ func TestAcceptance_Classic_ProbeCreate_CreatePatchSoftwareTitleByID(t *testing.
 	}
 	if created != nil && created.ID != nil {
 		id := *created.ID
+		// POST is the only /patchsoftwaretitles verb the SDK still generates,
+		// so cleanup goes through Pro v3 — it addresses the same object by the
+		// same id and deleting there also removes the Classic record.
 		t.Cleanup(func() {
-			if err := pc.DeletePatchSoftwareTitleByID(ctx, intToStr(id)); err != nil {
-				t.Logf("cleanup: DeletePatchSoftwareTitleByID(%d): %v", id, err)
+			if err := pro.New(c).DeletePatchSoftwareTitleConfigurationV3(ctx, intToStr(id)); err != nil {
+				t.Logf("cleanup: DeletePatchSoftwareTitleConfigurationV3(%d): %v", id, err)
 			}
 		})
 		t.Logf("probe-create accepted empty body; id=%d queued for cleanup", id)
