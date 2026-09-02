@@ -1488,7 +1488,10 @@ type SyncSettings struct {
 	RefreshRateMinutes *int64 `json:"refreshRateMinutes,omitempty"`
 	// Whether scheduled sync is enabled.
 	Scheduled *bool `json:"scheduled,omitempty"`
-	// UEM vendor name — determines the shape of vendor-specific fields.
+	// UEM vendor name — determines the shape of vendor-specific fields. Must match the stored
+	// connector's vendor; a value that disagrees with it is rejected with `422 VENDOR_MISMATCH`. This
+	// field selects the applicable vendor-specific fields, it does not change which connector is updated
+	// (that is the path `configId`) nor the connector's vendor.
 	// Allowed values: see the SyncSettingsVendor constants.
 	Vendor string `json:"vendor"`
 }

@@ -1499,6 +1499,43 @@ itself, verified with both `--compressed` and `identity`.
   The same text sends callers to `GET /v1/mobile-device-groups`, which v1942
   deleted from `jpapi` in the same build.
 
+- **v2005 is uem-connect only, and it is documentation plus declared error
+  responses (2026-09-02).** Zero operations added or removed, zero schemas added
+  or removed, and no semantic change to any operation outside its `responses`
+  map: every one of the twelve operations gained a `406`, and the five that carry
+  a request body also gained a `415`, with two new `components.responses` entries
+  (`NotAcceptable`, `UnsupportedMediaType`) behind them. The generated Go diff is
+  **four lines of godoc on `SyncSettings.Vendor`** — method comments are built
+  from the operation `summary`, not its `description`, so the rewritten
+  `updateSyncSettings` prose reaches no method. `internal/stage/uem-connect` took
+  a byte-identical delta, and `internal/dev` agrees op-for-op (12/12) and carries
+  the same new responses, so this is not an environment rollout. `_permissions`
+  was byte-identical in the same bundle and the prod rollup's path count did not
+  move (802).
+
+  Two of the three claims cost the SDK nothing. `415` cannot be reached through
+  the generated methods at all: every body-bearing uem-connect operation goes
+  through `DoWithContentType(..., "application/json", ...)`, so the header is
+  always the one the server wants. `406` likewise — the transport never sends a
+  restrictive `Accept`.
+
+  **`422 VENDOR_MISMATCH` is the one substantive claim, and it is upstream's
+  assertion, not wire truth.** The spec now says the `vendor` in an
+  `updateSyncSettings` body must equal the connector's stored vendor, that it
+  selects which vendor-specific fields apply rather than which connector is
+  updated (that is the path `configId`), and that a connector's vendor cannot be
+  changed through this operation. It is probeable — a `JAMF_PRO`/`M2M` connector
+  is cheap to mint, as above — but not with a Platform credential: the eu Pro
+  credential answers `403 BAD_PERMISSIONS` on
+  `GET /securitycloud/uem-connect/v1/connectors`, identical to a bogus path in
+  the same namespace, and the token is opaque so its grants cannot be read back.
+  The doomed-request trick does not substitute, either: resource resolution runs
+  before field validation on this PUT (five values, all `404`, recorded above), so
+  a bogus `configId` never reaches the vendor check. Probe it against the JSC
+  sandbox with a real connector, and note it should be checked against the
+  **stored** vendor of a `JAMF_PRO` connector — the only variant that has ever
+  been created here.
+
 ### PUT response shapes
 
 `PUT /v1/…/groups/{id}` answers **200 with the updated `Group`**, not 204 — and it

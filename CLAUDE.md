@@ -329,7 +329,7 @@ table: [docs/STYLE.md](docs/STYLE.md#config-key-inventory); observed shapes:
 | `securitycloud-dns-api.yaml` | `external/jsc-dns` | **v1981** |
 | `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v1981** |
 | `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v1981** |
-| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v1981** |
+| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2005** |
 | `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v1993** (new) |
 | `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
 | `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
@@ -389,9 +389,36 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v1993** (2026-09-01), except `capi` and `securitycloud-devices`,
+Ingested through **v2005** (2026-09-02), except `capi` and `securitycloud-devices`,
 both **held at v1897** — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
+
+**v2005 is `uem-connect` and nothing else, and it is documentation plus declared
+error responses.** Every other file outside `internal/dev` is byte-identical to
+v1993 — `_permissions/{routes,scopes}.yaml` included, `capi` included — so the
+only other diffs were the manifest and the two unified rollups, whose path counts
+did not move (802 prod). Zero operations and zero schemas added or removed; the
+whole change is a `406` on all twelve operations, a `415` on the five that carry a
+request body, two new `components.responses` entries behind them, and prose. The
+generated Go diff is **four lines of godoc on `SyncSettings.Vendor`**: method
+comments come from the operation `summary`, never its `description`, so the
+rewritten `updateSyncSettings` text lands on no method. `internal/stage` took a
+byte-identical delta and `internal/dev` agrees op-for-op, so this is not an
+environment rollout.
+
+**The `406` and `415` declarations are unreachable through the SDK**, which is why
+they need no test: every body-bearing uem-connect method calls
+`DoWithContentType(..., "application/json", ...)`, and the transport never sends a
+restrictive `Accept`. **The one substantive claim is `422 VENDOR_MISMATCH`** — the
+body `vendor` must match the connector's stored vendor, it selects which
+vendor-specific fields apply rather than which connector is updated, and a
+connector's vendor cannot be changed through this operation. It is **not
+wire-verified**: it needs the JSC sandbox and a live connector, the Platform
+credential answers `403 BAD_PERMISSIONS` on every `securitycloud` path
+indistinguishably from a bogus one, and the doomed-request trick cannot reach it
+because resource resolution runs before field validation on this PUT. Carried as
+upstream's own godoc on `SyncSettings.Vendor`; see
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#uem-connect).
 
 **The `capi` hold is now config-only, and it has narrowed to a single
 operation.** On 2026-09-02 the whitelist was aligned to `external/capi` at v1993
