@@ -994,8 +994,17 @@ formatting is inert to the generator, and bundle diffs become exact.
   typed union when it is request-only (`isRefUnion` → `schemaToUnionType`) and
   keeps merging otherwise. **Do not widen the check to make a spec pass** —
   teach the generator the construct. `map[string]any` and `[]any` stay legal.
-  Mechanism and the one instance of the class knowingly left alone (blueprints'
-  `SwUpdateConfiguration`): [docs/STYLE.md](docs/STYLE.md#schema-handling).
+- **A `oneOf` whose `discriminator` the spec forgot is inferred, strictly.**
+  The `any` guard cannot see the sibling shape — `type: object` plus `oneOf`
+  plus the tag property emits a named type carrying only the tag, dropping the
+  union whole. blueprints' `SwUpdateConfiguration` shipped that way and could
+  not express a software-update configuration at all, which is why the Terraform
+  provider builds that component as a `map[string]any`. `inferDiscriminator`
+  reads the mapping off the variants' own single-value enums, refuses anything
+  ambiguous, and **never writes the inferred discriminator into `api/`**. It is
+  the opposite call from account-sso above, and the difference is that here the
+  tag lives *inside* each variant where the wire carries it. Mechanism and the
+  full refusal list: [docs/STYLE.md](docs/STYLE.md#schema-handling).
 - **A shared schema's optional scalars can change pointer-ness with no diff in
   their own schema**, because `needsPtr` follows request/response reachability —
   `SmartGroupCriteria`'s paren fields went `*bool` → `bool` at v1942 that way.

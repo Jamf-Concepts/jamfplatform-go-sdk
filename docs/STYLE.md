@@ -514,12 +514,57 @@ item always uses pointer fields.
   `[]any` are allowed and are what a genuinely freeform schema should produce.
   **Do not widen the check to make a spec pass** — teach the generator the
   construct, or correct the property through config.
-  - One live instance of the same *class* is knowingly left alone: blueprints'
-    `SwUpdateConfiguration` declares `type: object` **plus** `oneOf` plus its own
-    `enforcementType` property, so it goes down the object branch and emits with
-    that one field, dropping the union. That is a silent loss too, but it emits a
-    named type rather than an `any`, changing it is a breaking change for
-    blueprints consumers, and it needs its own decision. Recorded, not fixed.
+  - Note this guard would *not* have caught the sibling shape, which is why the
+    inference below exists: a schema declaring `type: object` **plus** `oneOf`
+    plus its own tag property emits a named type carrying only the tag, so there
+    is no `any` to fail on.
+- **A `oneOf` whose `discriminator` the spec forgot is inferred from the
+  variants' own enums.** blueprints' `SwUpdateConfiguration` declares
+  `type: object`, a `oneOf` over `SwUpdateManualConfiguration` and
+  `SwUpdateAutomaticConfiguration`, and one property of its own —
+  `enforcementType` — but no `discriminator` object. It fell through to plain
+  struct generation and emitted **that one field**, dropping the union whole: a
+  caller could read or write the enforcement type and nothing else, so the type
+  could not express a software-update configuration at all. That is why
+  `terraform-provider-jamfplatform` builds this component as a `map[string]any`
+  and never names the type — a consumer routing around a generated type is the
+  signal to look at.
+  - Nothing is guessed. Every variant constrains `enforcementType` to exactly
+    one value — `MANUAL` on the manual variant, `AUTOMATIC` on both of the
+    automatic one's own variants — so `inferDiscriminator` reads the mapping off
+    the spec. `unionSchema` is the single gate both call sites use: a declared
+    discriminator wins, a missing one is inferred, and a content-addressed
+    mapping (`com.jamf.ddm.*`) is refused either way.
+  - **The sibling proves it is an authoring slip, not a different model.**
+    `SwUpdateAutomaticConfiguration` declares the identical shape *with* a
+    discriminator and has always generated correctly. The inferred union comes
+    out shaped exactly like it, and the two nest: the outer dispatches on
+    `enforcementType`, the inner on `strategy`, and a full
+    `SwUpdateComponent` now round-trips to
+    `{"configuration":{"deploymentTime":"16:00","enforceAfterDays":14,"enforcementType":"AUTOMATIC","strategy":"LATEST"},…}`.
+  - **This is the opposite call from account-sso, and the difference is where the
+    tag lives.** Here the discriminator is inside each variant, where the wire
+    already carries it, so `MarshalJSON`/`UnmarshalJSON` work. There
+    `connectionType` is on the parent request, unreachable from the nested type,
+    so synthesising a discriminator would have emitted the tag twice and
+    marshalled an empty one — hence variant pointers and no tag at all.
+  - Deliberately strict, because a wrong tag is worse than no tag — it routes a
+    payload to the wrong variant in silence. The candidate must be declared on
+    the parent (which is what keeps `AuditEnvelope`, with no properties of its
+    own, on the structural merge); every variant must resolve it to exactly one
+    string value with the values pairwise distinct; resolution follows a
+    variant's own `oneOf` and requires its members to agree; and **two
+    candidates that both discriminate is refused rather than resolved by taking
+    the first**, since either works on the wire but they produce different Go
+    field names and a different emitted enum.
+  - The inferred discriminator is a shallow copy and **never reaches
+    `api/*.json`**. It is this generator's reading of the spec, not something
+    upstream declared. Report the omission upstream.
+  - `emitUnionRoundTripTest` covers both union kinds, so every generated union
+    now has a marshal test — five of them across `blueprints`, `pro` and
+    `securitycloud`. It matters most for an *inferred* discriminator, where the
+    value-to-variant pairing is the generator's inference rather than a
+    declaration.
 
 - **`$ref` siblings are restored on publish.** kin-openapi drops a `description`
   (or any sibling) that sits next to a `$ref`, so marshaling the parsed document

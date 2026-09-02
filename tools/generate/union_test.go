@@ -254,3 +254,217 @@ func TestValidateNoUntypedFields(t *testing.T) {
 		})
 	}
 }
+
+// variantRef builds a `$ref` whose target pins prop to one enum value, the
+// shape every SwUpdate variant uses.
+func variantRef(name, prop, value string) *openapi3.SchemaRef {
+	s := openapi3.NewObjectSchema()
+	s.Properties = openapi3.Schemas{
+		prop: {Value: &openapi3.Schema{Type: types("string"), Enum: []any{value}}},
+	}
+	s.Required = []string{prop}
+	return &openapi3.SchemaRef{Ref: "#/components/schemas/" + name, Value: s}
+}
+
+// tagProp is the parent's own declaration of the discriminator property — an
+// unconstrained string, which is what makes the schema eligible.
+func tagProp(prop string) openapi3.Schemas {
+	return openapi3.Schemas{prop: {Value: openapi3.NewStringSchema()}}
+}
+
+// blueprints' SwUpdateConfiguration declares `type: object`, a `oneOf` and the
+// tag property, but no `discriminator` — so it emitted that one field and
+// dropped the union whole, leaving a type through which no software-update
+// configuration could be expressed at all. Its sibling
+// SwUpdateAutomaticConfiguration declares the identical shape *with* a
+// discriminator, so the omission is an authoring slip and the mapping is
+// readable off the variants' own single-value enums.
+func TestInferDiscriminator(t *testing.T) {
+	schema := &openapi3.Schema{
+		Type:       types("object"),
+		Properties: tagProp("enforcementType"),
+		OneOf: openapi3.SchemaRefs{
+			variantRef("SwUpdateManualConfiguration", "enforcementType", "MANUAL"),
+			variantRef("SwUpdateAutomaticConfiguration", "enforcementType", "AUTOMATIC"),
+		},
+	}
+
+	d := inferDiscriminator("SwUpdateConfiguration", schema)
+	if d == nil {
+		t.Fatal("no discriminator inferred")
+	}
+	if d.PropertyName != "enforcementType" {
+		t.Fatalf("PropertyName = %q, want enforcementType", d.PropertyName)
+	}
+	want := map[string]string{
+		"MANUAL":    "#/components/schemas/SwUpdateManualConfiguration",
+		"AUTOMATIC": "#/components/schemas/SwUpdateAutomaticConfiguration",
+	}
+	if len(d.Mapping) != len(want) {
+		t.Fatalf("mapping = %v, want %v", d.Mapping, want)
+	}
+	for value, ref := range want {
+		if d.Mapping[value].Ref != ref {
+			t.Errorf("mapping[%q] = %q, want %q", value, d.Mapping[value].Ref, ref)
+		}
+	}
+}
+
+// The real SwUpdateConfiguration resolves AUTOMATIC one level down: the
+// automatic variant declares only `strategy` of its own, and both of *its*
+// variants pin enforcementType to AUTOMATIC. Requiring the nested members to
+// agree is what makes following the `oneOf` safe.
+func TestInferDiscriminatorResolvesThroughANestedOneOf(t *testing.T) {
+	automatic := &openapi3.Schema{
+		Type:       types("object"),
+		Properties: tagProp("strategy"),
+		OneOf: openapi3.SchemaRefs{
+			variantRef("SwUpdateLatestConfiguration", "enforcementType", "AUTOMATIC"),
+			variantRef("SwUpdateSemanticConfiguration", "enforcementType", "AUTOMATIC"),
+		},
+	}
+	schema := &openapi3.Schema{
+		Type:       types("object"),
+		Properties: tagProp("enforcementType"),
+		OneOf: openapi3.SchemaRefs{
+			variantRef("SwUpdateManualConfiguration", "enforcementType", "MANUAL"),
+			{Ref: "#/components/schemas/SwUpdateAutomaticConfiguration", Value: automatic},
+		},
+	}
+
+	d := inferDiscriminator("SwUpdateConfiguration", schema)
+	if d == nil {
+		t.Fatal("no discriminator inferred through the nested oneOf")
+	}
+	if d.Mapping["AUTOMATIC"].Ref != "#/components/schemas/SwUpdateAutomaticConfiguration" {
+		t.Fatalf("AUTOMATIC mapped to %q", d.Mapping["AUTOMATIC"].Ref)
+	}
+
+	// Members that disagree identify nothing, and picking either would route
+	// half the payloads to the wrong type.
+	automatic.OneOf[1] = variantRef("SwUpdateSemanticConfiguration", "enforcementType", "SOMETHING_ELSE")
+	if d := inferDiscriminator("SwUpdateConfiguration", schema); d != nil {
+		t.Fatalf("inferred %q from disagreeing nested members", d.PropertyName)
+	}
+}
+
+// A wrong tag is worse than no tag: it routes a payload to the wrong variant in
+// silence. Every rejection below is a shape where the property identifies
+// nothing, or where the choice is not the generator's to make.
+func TestInferDiscriminatorRefusals(t *testing.T) {
+	tests := []struct {
+		name   string
+		schema *openapi3.Schema
+	}{
+		{
+			// audit's AuditEnvelope: no properties of its own, so nothing is
+			// eligible and the structural merge still applies.
+			name: "no parent property to be the tag",
+			schema: &openapi3.Schema{OneOf: openapi3.SchemaRefs{
+				variantRef("GatewayEnvelope", "auditSource", "api-gateway"),
+				variantRef("ServiceEnvelope", "auditSource", "blueprints"),
+			}},
+		},
+		{
+			name: "a variant leaves the property open",
+			schema: &openapi3.Schema{
+				Type:       types("object"),
+				Properties: tagProp("enforcementType"),
+				OneOf: openapi3.SchemaRefs{
+					variantRef("A", "enforcementType", "MANUAL"),
+					{Ref: "#/components/schemas/B", Value: openapi3.NewObjectSchema()},
+				},
+			},
+		},
+		{
+			name: "two variants claim the same value",
+			schema: &openapi3.Schema{
+				Type:       types("object"),
+				Properties: tagProp("enforcementType"),
+				OneOf: openapi3.SchemaRefs{
+					variantRef("A", "enforcementType", "MANUAL"),
+					variantRef("B", "enforcementType", "MANUAL"),
+				},
+			},
+		},
+		{
+			name: "a variant is not a $ref, so it has no type to map to",
+			schema: &openapi3.Schema{
+				Type:       types("object"),
+				Properties: tagProp("enforcementType"),
+				OneOf: openapi3.SchemaRefs{
+					variantRef("A", "enforcementType", "MANUAL"),
+					{Value: variantRef("", "enforcementType", "AUTOMATIC").Value},
+				},
+			},
+		},
+		{
+			name: "the property has more than one enum value on a variant",
+			schema: &openapi3.Schema{
+				Type:       types("object"),
+				Properties: tagProp("enforcementType"),
+				OneOf: openapi3.SchemaRefs{
+					variantRef("A", "enforcementType", "MANUAL"),
+					{Ref: "#/components/schemas/B", Value: &openapi3.Schema{
+						Type: types("object"),
+						Properties: openapi3.Schemas{"enforcementType": {Value: &openapi3.Schema{
+							Type: types("string"), Enum: []any{"AUTOMATIC", "OTHER"},
+						}}},
+					}},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if d := inferDiscriminator("Probe", tc.schema); d != nil {
+				t.Fatalf("inferred %q from a shape that identifies nothing", d.PropertyName)
+			}
+		})
+	}
+}
+
+// Two properties that both discriminate is refused rather than resolved by
+// taking the first: either works on the wire, but they produce different Go
+// field names and a different emitted enum, so the choice is visible and
+// belongs to a human.
+func TestInferDiscriminatorRefusesAnAmbiguousChoice(t *testing.T) {
+	manual := variantRef("A", "enforcementType", "MANUAL")
+	manual.Value.Properties["kind"] = &openapi3.SchemaRef{
+		Value: &openapi3.Schema{Type: types("string"), Enum: []any{"K1"}},
+	}
+	automatic := variantRef("B", "enforcementType", "AUTOMATIC")
+	automatic.Value.Properties["kind"] = &openapi3.SchemaRef{
+		Value: &openapi3.Schema{Type: types("string"), Enum: []any{"K2"}},
+	}
+	schema := &openapi3.Schema{
+		Type: types("object"),
+		Properties: openapi3.Schemas{
+			"enforcementType": {Value: openapi3.NewStringSchema()},
+			"kind":            {Value: openapi3.NewStringSchema()},
+		},
+		OneOf: openapi3.SchemaRefs{manual, automatic},
+	}
+
+	if d := inferDiscriminator("Probe", schema); d != nil {
+		t.Fatalf("inferred %q when two properties both discriminate", d.PropertyName)
+	}
+}
+
+// unionSchema is the single gate both call sites go through: a declared
+// discriminator wins, a missing one is inferred, and a content-addressed
+// mapping is refused either way — "com.jamf.ddm.*" keys are routing
+// identifiers, not Go-safe type tags.
+func TestUnionSchemaRefusesContentAddressedMappings(t *testing.T) {
+	schema := &openapi3.Schema{
+		Type:       types("object"),
+		Properties: tagProp("identifier"),
+		OneOf: openapi3.SchemaRefs{
+			variantRef("A", "identifier", "com.jamf.ddm.sw-updates"),
+			variantRef("B", "identifier", "com.jamf.ddm.custom-declarations"),
+		},
+	}
+	if u := unionSchema("Probe", schema); u != nil {
+		t.Fatal("a content-addressed mapping was accepted as a discriminator")
+	}
+}

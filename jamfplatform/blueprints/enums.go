@@ -712,6 +712,29 @@ func SwUpdateComponentIdentifierValues() []SwUpdateComponentIdentifier {
 	}
 }
 
+// SwUpdateConfigurationEnforcementType is the set of values accepted by SwUpdateConfiguration.EnforcementType.
+type SwUpdateConfigurationEnforcementType = string
+
+// SwUpdateConfigurationEnforcementType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SwUpdateConfigurationEnforcementTypeAutomatic SwUpdateConfigurationEnforcementType = "AUTOMATIC"
+	SwUpdateConfigurationEnforcementTypeManual    SwUpdateConfigurationEnforcementType = "MANUAL"
+)
+
+// SwUpdateConfigurationEnforcementTypeValues returns every value the Jamf API accepts for SwUpdateConfigurationEnforcementType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SwUpdateConfigurationEnforcementTypeValues() []SwUpdateConfigurationEnforcementType {
+	return []SwUpdateConfigurationEnforcementType{
+		SwUpdateConfigurationEnforcementTypeAutomatic,
+		SwUpdateConfigurationEnforcementTypeManual,
+	}
+}
+
 // SwUpdateLatestConfigurationEnforcementType is the set of values accepted by SwUpdateLatestConfiguration.EnforcementType.
 type SwUpdateLatestConfigurationEnforcementType = string
 

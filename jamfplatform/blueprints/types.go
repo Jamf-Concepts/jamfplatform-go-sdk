@@ -1141,8 +1141,44 @@ type SwUpdateComponent struct {
 
 // SwUpdateConfiguration Software update enforcement configuration. Configures OS update enforcement using either manual (specific version by date) or automatic strategies.
 type SwUpdateConfiguration struct {
-	// Type of software update enforcement strategy.
-	EnforcementType *string `json:"enforcementType,omitempty"`
+	// Allowed values: see the SwUpdateConfigurationEnforcementType constants.
+	EnforcementType string                          `json:"enforcementType"`
+	AUTOMATIC       *SwUpdateAutomaticConfiguration `json:"-"`
+	MANUAL          *SwUpdateManualConfiguration    `json:"-"`
+}
+
+// UnmarshalJSON dispatches the payload to the variant matching the
+// enforcementType discriminator. Unknown values leave the variant
+// pointers nil but preserve the discriminator string.
+func (m *SwUpdateConfiguration) UnmarshalJSON(data []byte) error {
+	var d struct {
+		EnforcementType string `json:"enforcementType"`
+	}
+	if err := json.Unmarshal(data, &d); err != nil {
+		return err
+	}
+	m.EnforcementType = d.EnforcementType
+	switch d.EnforcementType {
+	case "AUTOMATIC":
+		m.AUTOMATIC = new(SwUpdateAutomaticConfiguration)
+		return json.Unmarshal(data, m.AUTOMATIC)
+	case "MANUAL":
+		m.MANUAL = new(SwUpdateManualConfiguration)
+		return json.Unmarshal(data, m.MANUAL)
+	}
+	return nil
+}
+
+// MarshalJSON emits the active variant's JSON. If the matching variant
+// pointer is nil, emits a minimal object carrying only the discriminator.
+func (m SwUpdateConfiguration) MarshalJSON() ([]byte, error) {
+	switch m.EnforcementType {
+	case "AUTOMATIC":
+		return json.Marshal(m.AUTOMATIC)
+	case "MANUAL":
+		return json.Marshal(m.MANUAL)
+	}
+	return json.Marshal(map[string]string{"enforcementType": m.EnforcementType})
 }
 
 // SwUpdateLatestConfiguration Automatic software update with LATEST strategy. Enforces the newest available OS version a specified number of days after release.

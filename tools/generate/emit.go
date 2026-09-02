@@ -2336,24 +2336,67 @@ func PrivilegesFor(method string) (jamfplatform.MethodPrivileges, bool) {
 }
 
 // emitUnionRoundTripTest writes unions_test.go for a package holding at least
-// one discriminator-less request union (see GoUnion). No-op otherwise.
+// one union — either a discriminator-less request union (GoUnion) or a
+// oneOf-with-discriminator one. No-op otherwise.
 //
-// The generated method tests cannot cover this. A method's httptest stub is
-// built from the request type, so it serialises whatever the generated code
+// The generated method tests cannot cover either kind. A method's httptest stub
+// is built from the request type, so it serialises whatever the generated code
 // assumed — the account SSO create test passed for as long as the field was
 // `any`, calling CreateConnection with a bare &ConnectionRequest{} and putting
 // nothing on the wire, which is exactly why nothing ever exercised any of the
 // four settings schemas the connection body can hold. These tests marshal each
 // variant in turn and assert the bytes, so a marshaler that emitted the wrong
-// variant, dropped fields, or silently picked one of two would fail here.
+// variant, dropped fields, or silently picked one of two fails here.
+//
+// It matters most for a union whose discriminator was *inferred*
+// (inferDiscriminator): the mapping is read off the variants' enums rather than
+// declared, so the value-to-variant pairing is the generator's reading of the
+// spec and a wrong one routes a payload to the wrong type in silence.
+//
+// A variant whose Go type is not a struct declared in this package is skipped —
+// `&T{}` is not a valid literal for an alias to a slice or json.RawMessage — and
+// a union with no usable variant is left out entirely.
 func emitUnionRoundTripTest(pkgDir, pkgName string, types []GoType) error {
-	var unions []GoType
+	// Every emitted type takes a `&T{}` literal except a json.RawMessage
+	// alias, a `type X = Y` alias and an enum. A nested union counts as a
+	// struct — SwUpdateConfiguration's AUTOMATIC variant is itself a
+	// discriminated union, and excluding it skipped the very union whose
+	// discriminator is inferred.
+	structNames := make(map[string]bool, len(types))
 	for _, t := range types {
-		if t.Union != nil && len(t.Union.Variants) > 0 {
-			unions = append(unions, t)
+		if !t.IsRawJSON && t.AliasTarget == "" && len(t.EnumValues) == 0 {
+			structNames[t.Name] = true
 		}
 	}
-	if len(unions) == 0 {
+	usable := func(variantTypes ...string) bool {
+		for _, tn := range variantTypes {
+			if !structNames[tn] {
+				return false
+			}
+		}
+		return true
+	}
+
+	var unions, tagged []GoType
+	for _, t := range types {
+		switch {
+		case t.Union != nil && len(t.Union.Variants) > 0:
+			unions = append(unions, t)
+		case t.Discriminator != nil && len(t.Discriminator.Variants) > 0:
+			ok := true
+			for _, v := range t.Discriminator.Variants {
+				if !usable(v.TypeName) {
+					ok = false
+				}
+			}
+			if ok {
+				tagged = append(tagged, t)
+			} else {
+				log.Printf("%s: skipping union round-trip test — a variant type is not a struct in this package", t.Name)
+			}
+		}
+	}
+	if len(unions) == 0 && len(tagged) == 0 {
 		return nil
 	}
 
@@ -2429,6 +2472,64 @@ func Test%[1]s_Marshal(t *testing.T) {
 				u.Union.Variants[1].FieldName, u.Union.Variants[1].TypeName)
 		}
 		b.WriteString("}\n")
+	}
+
+	for _, u := range tagged {
+		d := u.Discriminator
+		fmt.Fprintf(&b, `
+// Test%[1]s_Marshal asserts that each %[2]q value marshals to exactly the bytes
+// its variant alone produces, that a payload carrying the value decodes into
+// that variant, and that an unrecognised value leaves every variant nil while
+// preserving the discriminator rather than guessing.
+func Test%[1]s_Marshal(t *testing.T) {
+`, u.Name, d.PropertyName)
+		for _, v := range d.Variants {
+			for _, value := range v.Values {
+				fmt.Fprintf(&b, `	t.Run(%[4]q, func(t *testing.T) {
+		variant := &%[3]s{}
+		got, err := json.Marshal(%[1]s{%[2]s: %[4]q, %[5]s: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %%v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %%v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %%s, want the bare variant %%s", got, want)
+		}
+		var back %[1]s
+		if err := json.Unmarshal([]byte(%[6]s), &back); err != nil {
+			t.Fatalf("unmarshal union: %%v", err)
+		}
+		if back.%[2]s != %[4]q {
+			t.Fatalf("%[2]s = %%q after decode, want %%q", back.%[2]s, %[4]q)
+		}
+		if back.%[5]s == nil {
+			t.Fatal("%[4]s decoded with %[5]s nil — the value is mapped to no variant")
+		}
+	})
+`, u.Name, d.GoFieldName, v.TypeName, value, v.FieldName,
+					"`"+fmt.Sprintf(`{%q:%q}`, d.PropertyName, value)+"`")
+			}
+		}
+		fmt.Fprintf(&b, `	t.Run("unrecognised discriminator", func(t *testing.T) {
+		var back %[1]s
+		if err := json.Unmarshal([]byte(%[3]s), &back); err != nil {
+			t.Fatalf("unmarshal: %%v", err)
+		}
+		if back.%[2]s != "NOT_A_%[2]s_VALUE" {
+			t.Fatalf("%[2]s = %%q, want the unrecognised value preserved", back.%[2]s)
+		}
+`, u.Name, d.GoFieldName,
+			"`"+fmt.Sprintf(`{%q:%q}`, d.PropertyName, "NOT_A_"+d.GoFieldName+"_VALUE")+"`")
+		for _, v := range d.Variants {
+			fmt.Fprintf(&b, `		if back.%s != nil {
+			t.Error("%s was populated for an unrecognised discriminator")
+		}
+`, v.FieldName, v.FieldName)
+		}
+		b.WriteString("	})\n}\n")
 	}
 
 	outPath := filepath.Join(pkgDir, "unions_test.go")

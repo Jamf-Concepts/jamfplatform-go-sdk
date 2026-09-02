@@ -1335,9 +1335,10 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		}
 		if schema.Type == nil {
 			// oneOf + discriminator with no explicit type field (some specs
-			// omit "type: object" on union roots, e.g. BookmarkItem).
-			if schema.Discriminator != nil && len(schema.OneOf) > 0 && !hasContentAddressedDiscriminator(schema) {
-				types = append(types, schemaToDiscriminatorType(name, schema))
+			// omit "type: object" on union roots, e.g. BookmarkItem), the
+			// discriminator being inferred when the spec declares none.
+			if u := unionSchema(name, schema); u != nil {
+				types = append(types, schemaToDiscriminatorType(name, u))
 				continue
 			}
 			// Swagger 2.0 often omits type: object on definitions that are
@@ -1448,8 +1449,12 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		// identifiers (contain dots, e.g. "com.jamf.ddm.*"). Those are value
 		// discriminants for routing/documentation, not Go-safe type tags. The
 		// schema falls through to normal struct generation instead.
-		if schema.Discriminator != nil && len(schema.OneOf) > 0 && !hasContentAddressedDiscriminator(schema) {
-			types = append(types, schemaToDiscriminatorType(name, schema))
+		//
+		// A oneOf whose discriminator the spec forgot is inferred from the
+		// variants' own single-value enums, which is what stops the union being
+		// dropped whole — see inferDiscriminator.
+		if u := unionSchema(name, schema); u != nil {
+			types = append(types, schemaToDiscriminatorType(name, u))
 			continue
 		}
 
@@ -1819,6 +1824,164 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 	}
 	gt.Discriminator.EnumTypeName = registerDiscriminatorEnum(name, gt.Discriminator)
 	return gt
+}
+
+// unionSchema reports the schema to build a discriminated union from, or nil
+// when this schema is not one. The declared discriminator wins; a missing one is
+// inferred. Content-addressed mappings ("com.jamf.ddm.*") are refused either
+// way — those keys are routing identifiers, not Go-safe type tags — and fall
+// through to normal struct generation.
+func unionSchema(name string, schema *openapi3.Schema) *openapi3.Schema {
+	if schema == nil || len(schema.OneOf) == 0 {
+		return nil
+	}
+	if schema.Discriminator != nil {
+		if hasContentAddressedDiscriminator(schema) {
+			return nil
+		}
+		return schema
+	}
+	d := inferDiscriminator(name, schema)
+	if d == nil {
+		return nil
+	}
+	candidate := withDiscriminator(schema, d)
+	if hasContentAddressedDiscriminator(candidate) {
+		return nil
+	}
+	return candidate
+}
+
+// inferDiscriminator derives the discriminator a spec forgot to declare, for a
+// `oneOf` whose parent already carries the tag property and whose every variant
+// pins that property to a single enum value.
+//
+// blueprints' SwUpdateConfiguration is the case. It declares
+// `type: object`, a `oneOf` over SwUpdateManualConfiguration and
+// SwUpdateAutomaticConfiguration, and one property of its own —
+// `enforcementType` — but no `discriminator` object. So it fell through to plain
+// struct generation and emitted **that one field**, dropping the union whole: a
+// caller could read or write the enforcement type and nothing else, which is why
+// terraform-provider-jamfplatform builds this component as a `map[string]any`
+// and never names the type. Its sibling SwUpdateAutomaticConfiguration declares
+// the identical shape *with* a discriminator and generates correctly, so the
+// omission is an authoring slip rather than a different model.
+//
+// Nothing is guessed. Every variant constrains `enforcementType` to exactly one
+// value — MANUAL on the manual variant, AUTOMATIC on both of the automatic one's
+// own variants — so the mapping is read off the spec, and the discriminator ends
+// up *inside* each variant where the wire already carries it. That is what
+// separates this from account-sso's ConnectionRequest.connection, whose tag lives
+// on the parent request and cannot be reached from the nested type: there,
+// synthesising a discriminator would have emitted the tag twice and marshalled
+// an empty one. See GoUnion.
+//
+// Deliberately strict, because a wrong tag is worse than no tag — it silently
+// routes a payload to the wrong variant:
+//
+//   - The candidate must be declared on the parent. That is the "author wrote
+//     the tag but forgot the discriminator object" shape, and it is what keeps
+//     audit's AuditEnvelope out: it has no properties of its own, so nothing is
+//     eligible and the structural merge still applies.
+//   - Every variant must resolve the property to exactly one string value, and
+//     the values must be pairwise distinct. A variant that leaves it open, or
+//     two variants claiming the same value, means the property does not identify
+//     anything.
+//   - Resolution follows a variant's own `oneOf` and requires its members to
+//     agree, which is what lets the AUTOMATIC branch resolve through
+//     SwUpdateLatestConfiguration and SwUpdateSemanticConfiguration.
+//   - Two candidates that both discriminate is refused rather than resolved by
+//     picking the first: either would work on the wire, but they produce
+//     different Go field names and a different emitted enum, so the choice is
+//     visible and belongs to a human.
+func inferDiscriminator(name string, schema *openapi3.Schema) *openapi3.Discriminator {
+	if schema == nil || schema.Discriminator != nil || len(schema.OneOf) < 2 || len(schema.Properties) == 0 {
+		return nil
+	}
+	for _, m := range schema.OneOf {
+		if m == nil || m.Ref == "" || m.Value == nil {
+			return nil
+		}
+	}
+
+	var found []*openapi3.Discriminator
+	for _, prop := range sortedKeys(schema.Properties) {
+		decl := schema.Properties[prop]
+		if decl == nil || decl.Value == nil || !decl.Value.Type.Is("string") {
+			continue
+		}
+		mapping := make(map[string]openapi3.MappingRef, len(schema.OneOf))
+		ok := true
+		for _, m := range schema.OneOf {
+			value, resolved := singleEnumValue(m.Value, prop, map[*openapi3.Schema]bool{})
+			if !resolved || value == "" || mapping[value].Ref != "" {
+				ok = false
+				break
+			}
+			mapping[value] = openapi3.MappingRef{Ref: m.Ref}
+		}
+		if ok {
+			found = append(found, &openapi3.Discriminator{PropertyName: prop, Mapping: mapping})
+		}
+	}
+	switch len(found) {
+	case 0:
+		return nil
+	case 1:
+		log.Printf("%s: oneOf declares no discriminator; inferred %q from the variants' single-value enums", name, found[0].PropertyName)
+		return found[0]
+	default:
+		names := make([]string, 0, len(found))
+		for _, d := range found {
+			names = append(names, d.PropertyName)
+		}
+		log.Printf("%s: oneOf declares no discriminator and %v all discriminate — refusing to choose; declare one upstream or pick it in config", name, names)
+		return nil
+	}
+}
+
+// singleEnumValue reports the one value a schema pins a property to, following
+// the schema's own `oneOf` and requiring its members to agree. Returns false
+// when the property is absent, is not a single-valued string enum, or when a
+// nested union's members disagree.
+func singleEnumValue(schema *openapi3.Schema, prop string, seen map[*openapi3.Schema]bool) (string, bool) {
+	if schema == nil || seen[schema] {
+		return "", false
+	}
+	seen[schema] = true
+	props, _ := flattenAllOf(schema)
+	if p, ok := props[prop]; ok && p != nil && p.Value != nil &&
+		p.Value.Type.Is("string") && len(p.Value.Enum) == 1 {
+		if v, ok := p.Value.Enum[0].(string); ok && v != "" {
+			return v, true
+		}
+		return "", false
+	}
+	if len(schema.OneOf) == 0 {
+		return "", false
+	}
+	agreed := ""
+	for _, m := range schema.OneOf {
+		if m == nil || m.Value == nil {
+			return "", false
+		}
+		v, ok := singleEnumValue(m.Value, prop, seen)
+		if !ok || (agreed != "" && v != agreed) {
+			return "", false
+		}
+		agreed = v
+	}
+	return agreed, agreed != ""
+}
+
+// withDiscriminator returns a shallow copy of the schema carrying the given
+// discriminator. A copy rather than a mutation: the document is reloaded for
+// the publish pass, but an inferred discriminator is this generator's reading of
+// the spec and must not reach api/*.json as though upstream had declared it.
+func withDiscriminator(schema *openapi3.Schema, d *openapi3.Discriminator) *openapi3.Schema {
+	copied := *schema
+	copied.Discriminator = d
+	return &copied
 }
 
 // registerDiscriminatorEnum emits an enum type for the union's discriminator
