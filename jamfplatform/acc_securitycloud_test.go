@@ -1577,6 +1577,12 @@ func TestAcceptance_SecurityCloudUemConnectReads(t *testing.T) {
 	connectorPage, err := sc.ListUemConnectorsV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Fatalf("403 on uem-connect: uem-connect is a separate capability from device-groups and the JSC "+
+				"sandbox has credentials that hold one and not the other — point JAMFPLATFORM_JSC_CLIENT_ID at "+
+				"one granted uem-connect:read (or the legacy read:jsc:all). Underlying error: %v", err)
+		}
 		t.Fatalf("ListUemConnectorsV1 failed: %v", err)
 	}
 	connectors := connectorPage.Results
@@ -1608,6 +1614,193 @@ func TestAcceptance_SecurityCloudUemConnectReads(t *testing.T) {
 	for _, r := range runs {
 		t.Logf("  run %s: status=%s type=%s synced=%d errored=%d deleted=%d", r.TransactionID, r.Status, r.RefreshType, r.Synced, r.Errored, r.Deleted)
 	}
+}
+
+// TestAcceptance_SecurityCloudUemConnectSyncSettingsValidation pins the
+// validation ordering on PUT sync-settings, and it needs no fixture at all: it
+// works against a `configId` that does not exist.
+//
+// That is only possible because field validation runs BEFORE resource
+// resolution on this operation, which is the fact the test exists to hold in
+// place. An earlier record had it the other way round — five bogus-id PUTs were
+// observed answering 404 on 2026-09-01 — and if that ever becomes true again,
+// every field constraint on SyncSettings stops being probeable without a live
+// connector, which is expensive (see the skip below). So both halves are
+// asserted here: an out-of-enum value must 422, and the same body with an
+// in-enum value must 404. One without the other proves nothing.
+func TestAcceptance_SecurityCloudUemConnectSyncSettingsValidation(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	// A body that is otherwise complete: vendor, autoDeviceDeletion and
+	// deviceFieldMappings are the three required properties.
+	body := func(refresh int64) *securitycloud.SyncSettings {
+		return &securitycloud.SyncSettings{
+			Vendor:              securitycloud.SyncSettingsVendorJamfPro,
+			AutoDeviceDeletion:  securitycloud.SyncSettingsAutoDeviceDeletionDeletedOrRetired,
+			DeviceFieldMappings: securitycloud.DeviceFieldMappings{},
+			RefreshRateMinutes:  &refresh,
+		}
+	}
+
+	const bogusID = "bogus000000000000000000"
+
+	// 90 is not in {60, 120, 240, 480, 720, 1440}.
+	err := sc.UpdateUemConnectorSyncSettingsV1(ctx, bogusID, body(90))
+	if err == nil {
+		t.Fatal("UpdateUemConnectorSyncSettingsV1 succeeded against a nonexistent configId — impossible; re-probe before touching this test")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("out-of-enum refreshRateMinutes gave a non-API error: %v", err)
+	}
+	if apiErr.HasStatus(403) {
+		t.Fatalf("403 on uem-connect: this credential holds neither uem-connect:read/update nor the legacy "+
+			"update:jsc:all, so it cannot exercise UEM Connect at all. The JSC sandbox has more than one "+
+			"credential and they differ in capability — point JAMFPLATFORM_JSC_CLIENT_ID at one granted "+
+			"uem-connect. Underlying error: %v", err)
+	}
+	if !apiErr.HasStatus(422) {
+		t.Fatalf("out-of-enum refreshRateMinutes returned %v, want 422 VALIDATION_FAILED. A 404 here means "+
+			"resource resolution has moved ahead of field validation on this PUT, which invalidates the "+
+			"doomed-request technique for every SyncSettings constraint — re-probe and record it before "+
+			"weakening this assertion", err)
+	}
+	// The accepted set is leaked in the description and `field` is null, so
+	// FieldErrors() gets nothing — assert on the prose deliberately.
+	if !strings.Contains(apiErr.Error(), "1440") {
+		t.Errorf("422 description does not name the allowed values, want the accepted set leaked in the prose: %v", err)
+	}
+	t.Logf("out-of-enum refreshRateMinutes on a nonexistent configId: 422, validation precedes resolution (%v)", err)
+
+	// Same body, in-enum value: validation passes, so the lookup runs and fails.
+	err = sc.UpdateUemConnectorSyncSettingsV1(ctx, bogusID, body(1440))
+	if err == nil {
+		t.Fatal("UpdateUemConnectorSyncSettingsV1 succeeded against a nonexistent configId — impossible")
+	}
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("in-enum refreshRateMinutes on a nonexistent configId returned %v, want 404 NOT_FOUND. "+
+			"Together with the 422 above this is what proves the ordering; a 422 here would mean the body "+
+			"is being rejected for some other reason and the first assertion proves nothing", err)
+	}
+	t.Logf("in-enum refreshRateMinutes on a nonexistent configId: 404, resolution reached (%v)", err)
+}
+
+// TestAcceptance_SecurityCloudUemConnectVendorMismatch pins v2005's
+// `422 VENDOR_MISMATCH`: the body `vendor` must equal the connector's stored
+// vendor, it selects which vendor-specific fields apply rather than which
+// connector is updated, and a connector's vendor cannot be changed here.
+//
+// This is a write test that is safe against a live connector, which is why it is
+// not behind the skip below. The request is rejected whole — verified by reading
+// the settings back — so nothing is mutated. The body is nonetheless built from
+// the connector's *current* configuration rather than from convenient literals,
+// so that if the server ever stops enforcing the match, the write that gets
+// through is a no-op instead of a silent reconfiguration of somebody's live UEM
+// link.
+func TestAcceptance_SecurityCloudUemConnectVendorMismatch(t *testing.T) {
+	sc := accSecurityCloudClient(t)
+	ctx := context.Background()
+
+	page, err := sc.ListUemConnectorsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
+			t.Fatalf("403 on uem-connect: this credential holds no uem-connect grant — see "+
+				"TestAcceptance_SecurityCloudUemConnectSyncSettingsValidation for which env var to repoint: %v", err)
+		}
+		t.Fatalf("ListUemConnectorsV1 failed: %v", err)
+	}
+	if len(page.Results) == 0 {
+		t.Skip("tenant has no UEM connector, and VENDOR_MISMATCH is checked after resource resolution so a bogus configId cannot reach it — needs a tenant with a connector")
+	}
+	c := page.Results[0]
+
+	before, err := sc.GetUemConnectorSyncSettingsV1(ctx, c.ID)
+	if err != nil {
+		t.Fatalf("GetUemConnectorSyncSettingsV1(%s) failed: %v", c.ID, err)
+	}
+
+	// Faithful round-trip of the current state, with only `vendor` wrong. Note
+	// the read shape nests autoDeviceDeletion under syncConfig while the write
+	// shape has it top-level.
+	req := &securitycloud.SyncSettings{
+		Vendor:                   before.Vendor,
+		RefreshRateMinutes:       &before.RefreshRateMinutes,
+		Scheduled:                &before.Scheduled,
+		DeviceRiskTagging:        &before.DeviceRiskTagging,
+		DeviceUnmanagedThreshold: &before.DeviceUnmanagedThreshold,
+		ConcurrentSyncEnabled:    &before.ConcurrentSyncEnabled,
+		GroupSettings:            before.GroupSettings,
+	}
+	if before.SyncConfig != nil {
+		req.AutoDeviceDeletion = before.SyncConfig.AutoDeviceDeletion
+		req.DisableSyncOnAuthError = &before.SyncConfig.DisableSyncOnAuthError
+	}
+	if before.DeviceFieldMappings != nil {
+		req.DeviceFieldMappings = *before.DeviceFieldMappings
+	}
+
+	// Any vendor other than the stored one.
+	wrong := securitycloud.SyncSettingsVendorIntune
+	if before.Vendor == wrong {
+		wrong = securitycloud.SyncSettingsVendorJamfPro
+	}
+	req.Vendor = wrong
+
+	err = sc.UpdateUemConnectorSyncSettingsV1(ctx, c.ID, req)
+	if err == nil {
+		t.Fatalf("UpdateUemConnectorSyncSettingsV1(%s) accepted vendor %q against a connector stored as %q — "+
+			"the server has stopped enforcing VENDOR_MISMATCH, which v2005's spec introduced. The write was "+
+			"a no-op by construction, but flip this test to assert whatever the new behaviour is rather than "+
+			"deleting it", c.ID, wrong, before.Vendor)
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("vendor mismatch gave a non-API error: %v", err)
+	}
+	if !apiErr.HasStatus(422) {
+		t.Fatalf("vendor mismatch returned %v, want 422 VENDOR_MISMATCH", err)
+	}
+	if !strings.Contains(apiErr.Error(), "VENDOR_MISMATCH") {
+		t.Errorf("422 does not carry code VENDOR_MISMATCH: %v", err)
+	}
+	// `field` is null on this one, so the two vendor names live only in the
+	// description. FieldErrors() still returns an entry — keyed on the empty
+	// string — so the assertion has to be that no *named* field is attributed,
+	// not that the map is empty.
+	for field := range apiErr.FieldErrors() {
+		if field != "" {
+			t.Errorf("VENDOR_MISMATCH now attributes field %q — it was unattributed on 2026-09-02; record the change", field)
+		}
+	}
+	t.Logf("vendor %q against stored %q: 422 VENDOR_MISMATCH (%v)", wrong, before.Vendor, err)
+
+	after, err := sc.GetUemConnectorSyncSettingsV1(ctx, c.ID)
+	if err != nil {
+		t.Fatalf("GetUemConnectorSyncSettingsV1(%s) after the rejected write failed: %v", c.ID, err)
+	}
+	// The vendor is the only thing the rejected request tried to change, so it is
+	// the only equality that can be asserted: a UEM connector is shared
+	// infrastructure and an operator editing it in the console between these two
+	// reads is normal — observed 2026-09-02, when refreshRateMinutes and
+	// groupMappings both moved under the suite mid-session. Drift in anything
+	// else is logged, not failed, or this test becomes flaky for the wrong
+	// reason.
+	if after.Vendor != before.Vendor {
+		t.Fatalf("the rejected write changed the stored vendor %q→%q — the rejection is not atomic",
+			before.Vendor, after.Vendor)
+	}
+	if after.RefreshRateMinutes != before.RefreshRateMinutes ||
+		after.Scheduled != before.Scheduled || after.DeviceUnmanagedThreshold != before.DeviceUnmanagedThreshold {
+		t.Logf("connector drifted during the test (refresh %d→%d scheduled %v→%v threshold %d→%d) — "+
+			"the rejected write cannot have caused it, since it carried the current values; someone is "+
+			"editing this connector concurrently",
+			before.RefreshRateMinutes, after.RefreshRateMinutes,
+			before.Scheduled, after.Scheduled, before.DeviceUnmanagedThreshold, after.DeviceUnmanagedThreshold)
+	}
+	t.Log("rejected write left the stored vendor unchanged")
 }
 
 // jscProUemTenantID returns the platform tenant identifier of the Jamf Pro

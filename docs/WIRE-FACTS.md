@@ -1500,6 +1500,9 @@ itself, verified with both `--compressed` and `identity`.
   ignored for that vendor.
 
   **Both are now wire-verified — create a connector, do not try to shortcut it.**
+  (**Superseded on the ordering point, 2026-09-02** — field validation is now
+  observed to run *before* resource resolution on this PUT, so the trick does
+  work; see the v2005 entry below for the table. The rest of this bullet stands.)
   The doomed-request trick does not work here: five PUTs to a bogus `configId`
   carrying in-enum (`1440`, `3`), out-of-enum (`90`, `2`) and below-minimum (`1`)
   values all returned the identical `404 NOT_FOUND` "Config with ID … doesn't
@@ -1594,28 +1597,105 @@ itself, verified with both `--compressed` and `identity`.
   always the one the server wants. `406` likewise — the transport never sends a
   restrictive `Accept`.
 
-  **`422 VENDOR_MISMATCH` is the one substantive claim, and it is upstream's
-  assertion, not wire truth.** The spec now says the `vendor` in an
-  `updateSyncSettings` body must equal the connector's stored vendor, that it
-  selects which vendor-specific fields apply rather than which connector is
-  updated (that is the path `configId`), and that a connector's vendor cannot be
-  changed through this operation. It is probeable in principle — a
-  `JAMF_PRO`/`M2M` connector is cheap to mint, as above — but **neither
-  credential to hand carries a `uem-connect` grant.** The eu Pro credential
-  answers `403 BAD_PERMISSIONS` on
-  `GET /securitycloud/uem-connect/v1/connectors`, and so does the **JSC sandbox
-  credential**, which is capability-scoped to device-groups and
-  activation-profiles and holds neither `uem-connect:read` nor the legacy
-  `read:jsc:all` that would have covered it — proof and method in the
-  device-groups `/v2/{id}` section below. Both tokens are opaque, so grants
-  cannot be read back from the token itself; the rego's own permission sets are
-  the oracle.
-  The doomed-request trick does not substitute, either: resource resolution runs
-  before field validation on this PUT (five values, all `404`, recorded above), so
-  a bogus `configId` never reaches the vendor check. Probe it against the JSC
-  sandbox with a real connector, and note it should be checked against the
-  **stored** vendor of a `JAMF_PRO` connector — the only variant that has ever
-  been created here.
+  **All three claims were probed on 2026-09-02 and all three are real — with one
+  spec/wire disagreement on top.** The probe needed a *third* credential: see the
+  credential note at the end. The connector was a pre-existing live
+  `JAMF_PRO` one on the `wisconsam` tenant (`6a98020c4d55188d25835124`,
+  `connected: true`), so nothing was minted and nothing accumulated on the Jamf
+  Pro side.
+
+  **`422 VENDOR_MISMATCH` is enforced, atomic, and unattributed.** `PUT
+  sync-settings` on the real connector with `vendor: "INTUNE"` and every other
+  field set to the connector's current value → **422**,
+  `code: VENDOR_MISMATCH`, `field: null`, description
+  `"vendor 'INTUNE' in request body does not match stored vendor 'JAMF_PRO'"`.
+  The readback immediately after was byte-identical to the readback before, so
+  the request is rejected whole rather than partially applied, and the same body
+  with `vendor: "JAMF_PRO"` answered **204** as the control with the readback
+  again unchanged. Note `field` is null, so the vendor names live only in the
+  prose, the same pattern as the `refreshRateMinutes` enum message — and
+  `FieldErrors()` does **not** come back empty for a null field, it returns the
+  message keyed on `""`. An assertion that the map is empty fails; assert that no
+  *named* field is attributed.
+
+  **The sandbox connector is shared and someone else edits it.** Between one
+  readback and the next, minutes apart with only rejected writes in between,
+  `refreshRateMinutes` moved 1440 → 720 and `groupSettings.groupMappings` went
+  from `[]` to `[{emmGroupId: mobile_225, wanderaGroupId: d56a8e26…}]`. So a
+  UEM Connect test must not assert equality on fields its own request did not
+  touch, and a *successful* full-replacement PUT built from a stale read will
+  silently discard a concurrent operator's work — which is the strongest argument
+  for keeping the remaining write tests behind their skip.
+
+  **`415` is enforced and it precedes everything.** `PUT sync-settings` against a
+  **bogus** `configId` with `Content-Type: text/plain` → **415**,
+  `code: UNSUPPORTED_MEDIA_TYPE`, `field: null`. So the media-type check runs
+  before resource resolution, which makes it the one claim in this build that is
+  probeable with no fixture at all.
+
+  **`406` is enforced, but the spec is wrong about what the operation produces.**
+  `Accept: application/pdf`, `text/csv` and `image/png, application/pdf` each
+  answered **406** `code: NOT_ACCEPTABLE` on `GET /connectors`. But
+  **`Accept: application/xml` answers 200 with an XML body** — `<ConnectorListResult>…`
+  on the collection and `<JamfProConnectorConfig>…` on `GET sync-settings` —
+  while the spec's new `NotAcceptable` text says the operation "only produces
+  `application/json`". uem-connect has Jackson's XML converter registered and its
+  own spec does not know. **Report upstream.** The SDK is not exposed: it never
+  sets `Accept`, so it always gets JSON — but `WithHeaders` does not reserve
+  `Accept`, so a caller or a reverse proxy that sets `application/xml` would feed
+  XML to `json.Unmarshal` and fail at the decode rather than silently. Worth
+  knowing that the *sibling* APIs behave differently: `GET /securitycloud/v1/groups`
+  **does** 406 on `application/xml`, and does it with the legacy error envelope
+  (`{messageKey, message, error, logref, statusCode}`) rather than the
+  `{httpStatus, traceId, errors[]}` shape uem-connect uses — so the negotiation
+  layer is per-service, not gateway-wide.
+
+  **The recorded validation ordering on this PUT is wrong, and it is now the
+  useful direction.** The 2026-09-01 note above says resource resolution runs
+  *before* field validation, on the strength of five bogus-`configId` PUTs all
+  answering `404`. Re-probed 2026-09-02, that is not what happens:
+
+  | body | `configId` | result |
+  |---|---|---|
+  | `{"vendor":"JAMF_PRO"}` | bogus | **422** `VALIDATION_FAILED` ×2, `field: autoDeviceDeletion`, `field: deviceFieldMappings` |
+  | `{"vendor":"JAMF_PRO","refreshRateMinutes":90}` | bogus | **422** `VALIDATION_FAILED`, `field: null`, "Invalid refreshRateMinutes: 90. Allowed values: 60, 120, 240, 480, 720, 1440" |
+  | complete valid body, `vendor: JAMF_PRO` | bogus | **404** `NOT_FOUND`, "Config with ID … doesn't exist" |
+  | complete valid body, `vendor: INTUNE` | bogus | **404** `NOT_FOUND` |
+
+  So the real order is **media type → body validation → resource resolution →
+  vendor match**, and it is self-consistent: an invalid body never reaches the
+  lookup, a valid one does. **The doomed-request trick therefore works on this
+  PUT after all** — every field constraint on `SyncSettings` is reachable with a
+  bogus `configId` and no connector — while `VENDOR_MISMATCH` alone sits past the
+  lookup and needs a real one. Whether the service changed between the two dates
+  or the earlier probe sent complete bodies cannot be settled from here; treat
+  the earlier "resolution first" claim as superseded and the table above as
+  current.
+
+  Two smaller facts from the same pass. The PUT's required set is
+  `vendor`, `autoDeviceDeletion`, `deviceFieldMappings` — exactly as the spec
+  declares — and **validation short-circuits**: adding an out-of-enum
+  `refreshRateMinutes` to a body missing both required objects reported *only*
+  the enum failure, suppressing the two not-null failures, so a caller fixing
+  errors one 422 at a time will not see them all at once.
+
+  **The credential matters more than the tenant here.** Three credentials, all on
+  eu, two of them on the same `wisconsam` tenant `928260f5…`:
+
+  | credential | `securitycloud` device-groups | `uem-connect` |
+  |---|---|---|
+  | Platform/`pro` (eu) | 403 | 403 |
+  | JSC sandbox (`b6431862…`) | 200 (`device-groups:*`) | **403** |
+  | older JSC (`cbb961bc…`) | 200 | **200** |
+
+  So `uem-connect` is a separate capability from `device-groups`, neither
+  credential holds the legacy `read:jsc:all` wildcard that would cover both, and
+  **the connector that this section's earlier entries describe is visible only to
+  the third credential** — which is why the tenant looked like it had none. Any
+  future uem-connect probe needs that one. Both tokens are opaque, so the rego's
+  permission sets in
+  `policies/tyk_external/securitycloud/uem_connect_api.rego` are the only way to
+  read a grant back.
 
 ### PUT response shapes
 

@@ -406,18 +406,33 @@ rewritten `updateSyncSettings` text lands on no method. `internal/stage` took a
 byte-identical delta and `internal/dev` agrees op-for-op, so this is not an
 environment rollout.
 
-**The `406` and `415` declarations are unreachable through the SDK**, which is why
-they need no test: every body-bearing uem-connect method calls
-`DoWithContentType(..., "application/json", ...)`, and the transport never sends a
-restrictive `Accept`. **The one substantive claim is `422 VENDOR_MISMATCH`** — the
-body `vendor` must match the connector's stored vendor, it selects which
-vendor-specific fields apply rather than which connector is updated, and a
-connector's vendor cannot be changed through this operation. It is **not
-wire-verified**: it needs the JSC sandbox and a live connector, the Platform
-credential answers `403 BAD_PERMISSIONS` on every `securitycloud` path
-indistinguishably from a bogus one, and the doomed-request trick cannot reach it
-because resource resolution runs before field validation on this PUT. Carried as
-upstream's own godoc on `SyncSettings.Vendor`; see
+**All three claims are wire-verified (2026-09-02), and one of them is wrong in the
+spec.** `422 VENDOR_MISMATCH` is enforced, atomic and unattributed — a
+sync-settings PUT carrying a vendor other than the connector's stored one is
+rejected whole, with both names in the description and `field: null`. `415` is
+enforced and runs **before** resource resolution, which makes it probeable with no
+connector at all. `406` is enforced for genuinely unsatisfiable types
+(`application/pdf`, `text/csv`) — **but `Accept: application/xml` answers 200 with
+an XML body**, so the spec's claim that these operations "only produce
+`application/json`" is false and worth reporting upstream. The SDK is unexposed
+(it never sets `Accept`, and `DoWithContentType` always sends
+`application/json`), but `WithHeaders` does not reserve `Accept`, so a proxy that
+sets it would feed XML to a JSON decoder.
+
+**The recorded validation ordering for this PUT was backwards, and correcting it
+reopens the doomed-request trick.** The real order is media type → body
+validation → resource resolution → vendor match: an out-of-enum value against a
+nonexistent `configId` answers 422, the same body with a valid value answers 404.
+So every `SyncSettings` field constraint is now probeable without a connector, and
+only `VENDOR_MISMATCH` needs a real one. Two acceptance tests pin this —
+`…UemConnectSyncSettingsValidation` (no fixture, asserts both halves of the
+ordering) and `…UemConnectVendorMismatch` (a write that is safe because it is
+rejected, built from current state so an unexpected success is a no-op).
+
+**Two credentials on one JSC tenant differ in capability**, which is what made
+this look unprobeable at first: `uem-connect` is a separate capability from
+`device-groups`, and the connector is invisible to a credential without it. Full
+table, and the fact that the sandbox connector has a concurrent human operator:
 [WIRE-FACTS.md](docs/WIRE-FACTS.md#uem-connect).
 
 **The `capi` hold is now config-only, and it has narrowed to a single
