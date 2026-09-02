@@ -347,6 +347,9 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	if err := validateTypeReferences(fmt.Sprintf("spec %s", spec.File), declared, methods); err != nil {
 		return err
 	}
+	if err := validateUnwrapCodec(fmt.Sprintf("spec %s", spec.File), methods); err != nil {
+		return err
+	}
 
 	gf := GeneratedFile{
 		Package: cfg.Package,
@@ -509,6 +512,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	// the way the templates will actually see them.
 	for _, sm := range allSpecs {
 		if err := validateTypeReferences(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), allTypes, sm.methods); err != nil {
+			return err
+		}
+		if err := validateUnwrapCodec(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), sm.methods); err != nil {
 			return err
 		}
 	}

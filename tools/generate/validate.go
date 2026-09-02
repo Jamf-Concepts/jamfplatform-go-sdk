@@ -88,6 +88,43 @@ func validateTypeReferences(pkgContext string, declared []GoType, methods []GoMe
 	return fmt.Errorf("%s: %d unresolved type reference(s):\n%s\n\nfix: either add the schema under components/schemas so extractTypes emits it, or correct the config-level requestType/responseType override", pkgContext, len(missing), strings.Join(missing, "\n"))
 }
 
+// validateUnwrapCodec rejects `unwrapResults` on an operation whose response
+// will not be decoded as JSON.
+//
+// The unwrap template generates a call to client.UnwrapResults, which reads the
+// first non-space byte of the body and json.Unmarshals it. Two things select a
+// different codec at runtime and **neither looks at the Go type**: Transport.Do
+// routes any path containing "/proclassic/" through xml.Unmarshal, and a spec
+// declared `"format": "xml"` generates XML struct tags throughout. Either way
+// the bytes handed to UnwrapResults are XML, the shape sniff sees `<`, and the
+// caller gets a decode error on every call.
+//
+// This has no users to break — all six unwrap operations are JSON — and the
+// pre-existing struct decode was equally wrong here, so this is not a
+// regression being papered over. It is the failure mode being made
+// unreachable, because the config key gives no hint that it is JSON-only and
+// the cost of finding out is a method that compiles, generates a passing
+// httptest stub, and fails against the server.
+func validateUnwrapCodec(pkgContext string, methods []GoMethod) error {
+	var bad []string
+	for _, m := range methods {
+		if m.UnwrapResults == "" {
+			continue
+		}
+		switch {
+		case strings.EqualFold(m.Format, "xml"):
+			bad = append(bad, fmt.Sprintf("  - method %s: spec declares \"format\": \"xml\"", m.Name))
+		case m.Namespace == "proclassic":
+			bad = append(bad, fmt.Sprintf("  - method %s: namespace %q is decoded as XML by the transport", m.Name, m.Namespace))
+		}
+	}
+
+	if len(bad) == 0 {
+		return nil
+	}
+	return fmt.Errorf("%s: %d operation(s) declare unwrapResults on a non-JSON response:\n%s\n\nfix: unwrapResults is JSON-only. Use responseType with an XML-tagged schema, or rawBody, for a Classic or format=xml operation", pkgContext, len(bad), strings.Join(bad, "\n"))
+}
+
 // normalizeTypeRef strips slice / pointer prefixes and returns the bare
 // Go type name the validator should look up. Composite expressions like
 // `map[string]Foo` yield "Foo" — we care about the user-defined type at
