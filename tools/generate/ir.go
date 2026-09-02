@@ -28,9 +28,10 @@ type GoType struct {
 	EnumBaseType  string        // underlying type of the enum alias: "string" (default when empty), "int" or "int64"
 	IsRawJSON     bool
 	Discriminator *GoDiscriminator
-	XMLName       string // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field
-	AliasTarget   string // non-empty → emit as `type Name = AliasTarget` (used for top-level array schemas)
-	IsListWrapper bool   // true when this is a Classic list wrapper (flattens {size, resource} array items into sibling fields). Excludes the type from heuristics that inject top-level id or carry id as a resource signal.
+	Union         *GoUnion // populated for a discriminator-less oneOf reached only as a request body
+	XMLName       string   // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field
+	AliasTarget   string   // non-empty → emit as `type Name = AliasTarget` (used for top-level array schemas)
+	IsListWrapper bool     // true when this is a Classic list wrapper (flattens {size, resource} array items into sibling fields). Excludes the type from heuristics that inject top-level id or carry id as a resource signal.
 }
 
 // GoDiscriminator describes a oneOf-with-discriminator polymorphic schema.
@@ -64,6 +65,62 @@ type GoDiscriminatorVariant struct {
 	Values    []string
 	TypeName  string // Go type name (e.g. "MobileDeviceIosInventory")
 	FieldName string // exported Go field name in the union struct (e.g. "IOS")
+}
+
+// Privilege provenance values for GoMethod.PrivilegeSource and the generated
+// MethodPrivileges.Source. An empty string means no privileges are recorded at
+// all, which is not the same as none being required — see MethodPrivileges.
+const (
+	// privilegeSourceSpec: read from the operation's own
+	// x-required-privileges extension.
+	privilegeSourceSpec = "spec"
+	// privilegeSourceGatewayPolicy: supplied by config.requiredPrivileges from
+	// the gateway's authorization policy, because the published spec declares
+	// none. See SpecDef.RequiredPrivileges.
+	privilegeSourceGatewayPolicy = "gateway-policy"
+)
+
+// GoUnion describes a discriminator-less `oneOf` whose members are all
+// `$ref`s and which is reachable only as a request body. The Go
+// representation is one pointer per variant plus a Raw json.RawMessage, with
+// a MarshalJSON that emits whichever single variant is set.
+//
+// It exists because the alternative for this shape was silence. A
+// discriminator-less union reached through a *property* had no branch at all:
+// schemaRefToGoType fell through to its default and produced a bare `any`,
+// which type-checks nothing, marshals whatever it is handed, and — since the
+// transport sets no DisallowUnknownFields — decodes anything. account-sso's
+// ConnectionRequest.connection carried the entire provider-settings body of
+// every SSO connection create and update that way, with all four of the
+// settings schemas it can hold emitted as Go types that no signature in the
+// module referenced. validateNoUntypedFields now fails generation on a bare
+// `any` field so the class cannot recur silently.
+//
+// Merging the variants into one flat struct — what a *named* discriminator-less
+// union gets, see mergeOneOfVariants — is the right answer for a response,
+// where decoding has to work without a tag and the union is structural. It is
+// the wrong answer for a request: the four account settings schemas share a
+// base and then disagree on which of `domain`, `groups`, `clientId` and
+// `scopes` are required, so the merge intersects nearly every one of them to
+// optional and a caller can populate fields from two providers at once with
+// nothing to say so. Pointers keep the pairing visible to the compiler.
+//
+// Nothing here can validate the variant against its sibling discriminator —
+// account-sso's `connectionType` lives on the *parent* schema, which the
+// nested type cannot see, and the spec declares no discriminator to key it on
+// anyway. Marshaling more than one variant is what does get rejected.
+type GoUnion struct {
+	Variants []GoUnionVariant
+}
+
+type GoUnionVariant struct {
+	// FieldName is the exported Go field, and is simply the variant's own
+	// type name. Deriving something shorter (Oidc from OidcConnectionSettings)
+	// means stripping a suffix the variants happen to share, which is not
+	// stable across specs and can collide after stripping; the stutter is
+	// worth the determinism.
+	FieldName string
+	TypeName  string
 }
 
 type GoField struct {
@@ -126,6 +183,10 @@ type GoMethod struct {
 	// paired by position: their lengths differ on 29 pro operations and their
 	// orders disagree on 9 more. The legacy form is published only for the Pro
 	// family. See privilegeSetsAreNotPairs.
+	// PrivilegeSource records where ScopedPrivileges came from, so a consumer
+	// can tell a spec-declared set from one this repo supplied out of band.
+	// Empty when the set is empty.
+	PrivilegeSource  string
 	PrivilegesKnown  bool
 	ScopedPrivileges []string // GA capability permissions, {capability}:{action}, e.g. "buildings:create"
 	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"

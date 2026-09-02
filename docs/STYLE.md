@@ -122,6 +122,8 @@ deliberately kept three of them for exactly that reason.
 | `fieldTypeOverrides` | 5 | `"schema.property"` → Go type, to correct a spec bug. `*.property` matches the property on every schema. Applied per spec so an upstream fix isn't silently overwritten |
 | `docNotes` | 3 | Go type name → prose appended to its godoc. For corrections belonging to the type as a whole, which `schemaPatches` cannot reach (it patches properties). **A key matching no emitted type is a build failure** — a silently dropped correction leaves the wrong doc in place |
 | `schemaPatches` | 3 | schema → dotted property path → raw OpenAPI 3 Schema. Adds or replaces at that path |
+| `requiredPrivileges` | 3 | `"METHOD /path"` → GA capability permissions, for an operation the **published spec declares none for** but an authoritative out-of-band source does. Carried straight to the generated registry with `Source: "gateway-policy"`, never into the spec document, so `api/` stays faithful to upstream. **Fails generation if the operation now declares `x-required-privileges`** — that means upstream published them and the entry must go. All three users are the `account` specs; see [Required privileges](#required-privileges) |
+| `enumAdditions` | 1 | schema name → wire values to append to its `enum`, for a value the server produces or accepts that the spec omits. Applied with the other schema patches, so the value reaches `api/` too. **Panics when the value is already declared**, when the schema declares no enum, or when the schema is missing — a duplicated enum member would emit two identical constants and compile, so nothing else would ever notice. One user: `Region` gaining `RAMP` |
 | `emitNullForOptional` | 2 | schema names whose optional pointer fields must marshal as explicit `null` when nil rather than being omitted. For servers that distinguish "omitted" (keep) from "present and null" (clear). Accepts snake_case or PascalCase; JSON marshalling only |
 | `propertyRenames` | 2 | schema → dotted path → new key. Repairs a spec key that doesn't match the wire, which otherwise decodes silently to nothing |
 | `schemaAdditions` | 2 | schema → property → openapi type (`string`, `integer`, `boolean`, `string:password` for a writeOnly string). Injects a property the server accepts but the spec omits |
@@ -458,6 +460,66 @@ struct with `Selected=true` and injects it into the request before the patch. Se
 item always uses pointer fields.
 
 ### Schema handling
+
+- **A discriminator-less `oneOf` reached through a property used to become
+  `any`, silently.** `schemaRefToGoType` ends in `default: return "any"`, and an
+  inline union has no properties, so `hoistInlineObjects` never lifted it, no
+  component schema was ever named for it, and the containing field type-checked
+  nothing. The transport sets no `DisallowUnknownFields`, so such a field also
+  decodes anything without complaint — nothing fails at generate time or at run
+  time. account-sso's `ConnectionRequest.connection` shipped that way: the entire
+  provider-settings body of every SSO connection create and update, with all four
+  settings schemas it can hold emitted as Go types **no signature in the module
+  referenced**. Three parts to the fix, each load-bearing:
+  - `isRefUnion` recognises the shape — a discriminator-less `oneOf` over two or
+    more bare `$ref`s, with no type, properties or other composition of its own —
+    and `hoistInlineObjects` now lifts it into a named schema
+    (`ConnectionRequestConnection`), which is what gives it a Go type at all.
+    Every member must be a `$ref` so each variant has a type to point at; a
+    one-member `oneOf` and `oneOf: [{$ref}, {type: null}]` are other idioms and
+    are excluded.
+  - **A request-only union gets variant pointers; everything else keeps merging.**
+    `mergeOneOfVariants` is right for a *response*, where decoding has to work
+    with no tag in the body — audit's `AuditEnvelope` is that case and is
+    untouched. It is wrong for a request: the four account settings schemas share
+    a base and then disagree on which of `domain`, `groups`, `clientId` and
+    `scopes` are required, so the merge intersects nearly all of them to optional
+    and a caller can populate two providers' fields at once with nothing to say
+    so. So `usage.isRequest && !usage.isResponse` selects `schemaToUnionType`:
+    one pointer per variant, a `Raw json.RawMessage`, and a `MarshalJSON` that
+    emits the single non-nil variant, **errors on two**, and emits `null` on none
+    so a zero-valued enclosing request stays marshalable. Decoding cannot pick a
+    variant, so `UnmarshalJSON` preserves the bytes in `Raw` and says so.
+  - **Nothing here validates the variant against its sibling discriminator.**
+    account-sso's `connectionType` lives on the *parent* schema, which the nested
+    type cannot see, and the spec declares no `discriminator` to key on. Adding
+    one through config was considered and rejected: the union machinery puts the
+    discriminator field *inside* the nested struct, so `ConnectionRequest` would
+    carry `connectionType` twice and a caller setting only the outer one
+    marshals `{"connectionType":""}` into `connection`.
+  - Field names are the variant's own type name (`OidcConnectionSettings
+    *OidcConnectionSettings`). Stripping the suffix the variants happen to share
+    reads better and is not stable across specs — it can collide after
+    stripping — so the stutter is the deliberate trade.
+  - `emitUnionRoundTripTest` writes `unions_test.go`, marshaling each variant and
+    asserting the bytes equal the bare variant. The generated *method* test cannot
+    cover this: its stub is built from the request type, so it serialises whatever
+    the generated code assumed. The account SSO create test passed for as long as
+    the field was `any`, calling `CreateConnection` with a bare
+    `&ConnectionRequest{}` and putting nothing on the wire.
+- **A bare `any` field now fails generation.** `validateNoUntypedFields` rejects
+  any emitted field typed `any` or `*any`, because that is the tell of a schema
+  construct the generator has no branch for and the failure mode is silence. It
+  passes with zero exemptions across all twelve packages. `map[string]any` and
+  `[]any` are allowed and are what a genuinely freeform schema should produce.
+  **Do not widen the check to make a spec pass** — teach the generator the
+  construct, or correct the property through config.
+  - One live instance of the same *class* is knowingly left alone: blueprints'
+    `SwUpdateConfiguration` declares `type: object` **plus** `oneOf` plus its own
+    `enforcementType` property, so it goes down the object branch and emits with
+    that one field, dropping the union. That is a silent loss too, but it emits a
+    named type rather than an `any`, changing it is a breaking change for
+    blueprints consumers, and it needs its own decision. Recorded, not fixed.
 
 - **`$ref` siblings are restored on publish.** kin-openapi drops a `description`
   (or any sibling) that sits next to a `$ref`, so marshaling the parsed document
@@ -857,12 +919,14 @@ What the article does settle, and what now depends on it:
   — `flush-policy-logs:execute` *or* `policies:delete`) reaches the registry as a
   single identifier because the spec declares only the first. Evidence:
   [WIRE-FACTS.md](WIRE-FACTS.md#the-whole-registry-cross-checked-against-the-allowlist-2026-08-31).
-- **An empty `Scoped` slice means the spec declares none, not that none is
-  required.** The 18 `account` methods are empty only because the licensing,
-  partners and sso specs ship no `x-required-privileges`, while the gateway
-  policy gates every one of them. Both the struct godoc and `privilegeComment`
-  say "the spec declares none" rather than the old "callable by any authenticated
-  API client".
+- **An empty `Scoped` slice means nothing declares a privilege, not that none is
+  required.** Both the struct godoc and `privilegeComment` say so rather than the
+  old "callable by any authenticated API client". A consumer still has to be told,
+  because it cannot see a godoc: a Terraform provider rendered the empty account
+  sets as *"None — any authenticated Jamf Platform API integration may call the
+  underlying endpoints"* and was about to publish that to the Terraform Registry.
+  `MethodPrivileges.Source` is what makes the distinction machine-readable —
+  `"spec"`, `"gateway-policy"`, or `""` when the set is empty.
 - **The capability reference is a closed vocabulary, so it is a tripwire.**
   `gaCapabilityActions` in `tools/generate/privileges_test.go` transcribes it and
   `TestScopedPrivilegesUseGAVocabulary` asserts all 314 distinct generated
@@ -873,11 +937,46 @@ What the article does settle, and what now depends on it:
 
 `x-required-privileges` feeds a per-package `Privileges` registry plus a
 `// Required privileges:` godoc line, and downstream a Terraform provider
-permissions table. The SDK **reports what the spec says** and does not correct it
-locally; upstream disagreements get reported, not patched. `undocumented: true` on
-a spec skips the privilege name-match check and stamps an "Unofficial:" godoc
-line — it marks a spec whose operations are in no spec Jamf publishes. It
-currently has zero users, and the bar for a new one is a published spec.
+permissions table. The SDK **reports what the spec says** and does not correct
+it locally; upstream disagreements get reported, not patched.
+
+**The `account` family is the one exception, and the grounds are structural
+rather than "upstream is slow".** The earlier position — recorded in the
+`MethodPrivileges` godoc itself — was that its 18 empty sets stay empty and get
+reported upstream. That waits forever. Each of the three specs *is* authored
+with a `requiredPrivileges` block in
+`public-apis-oas/redocly-implementation/teams/account-*/config.yaml`, and that
+file's own closing comment says why the published artifact carries none: these
+routes resolve the organization from the access token, so Tyk's
+`request-context-allowed-sources` is `[token]`, so the beta transform that
+attaches `x-required-privileges` does not apply to them. The omission is a
+consequence of the routing model, not a backlog item, and it will not change
+while the routing model does not.
+
+So `requiredPrivileges` in `config.json` supplies them, and three things keep
+that honest:
+
+- **The values are attributed, not asserted.** They reach the registry as
+  `Source: "gateway-policy"` and the method godoc says *"The published spec
+  declares none for this operation; these are the capabilities the gateway's own
+  authorization policy enforces."*
+- **They never enter the spec document.** `api/*.json` still declares none, which
+  is what upstream publishes. Unlike `schemaPatches`, this key is not part of the
+  spec-patch pipeline.
+- **Three independent sources agree on all 18.** The `config.yaml` blocks above;
+  the hand-written OPA rules in
+  `authorization-policies/policies/tyk_external/account/account_api.rego`; and
+  `TestScopedPrivilegesUseGAVocabulary`, which validated every one of the 18
+  against the published capability reference without a single addition to
+  `gaCapabilityActions`. Note the rego accepts *either* the GA capability or a
+  retired `read:org:*`/`update:org:*` permission
+  (`lib.has_any_of_permissions`), and only the GA form is carried: `Scoped` is a
+  conjunction, so listing the alternative would read as "both required".
+
+`undocumented: true` on a spec skips the privilege name-match check and stamps an
+"Unofficial:" godoc line — it marks a spec whose operations are in no spec Jamf
+publishes. It currently has zero users, and the bar for a new one is a published
+spec.
 
 ---
 

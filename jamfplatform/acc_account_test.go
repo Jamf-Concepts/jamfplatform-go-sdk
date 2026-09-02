@@ -9,7 +9,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"math/rand/v2"
+	"slices"
 	"strings"
 	"testing"
 
@@ -413,6 +415,116 @@ func TestAcceptance_AccountPurchaseOrderValidation(t *testing.T) {
 // body is exercised below, which reaches validation without creating anything.
 func TestAcceptance_AccountSsoConnectionWrites(t *testing.T) {
 	t.Skip("SSO connection writes reconfigure how a real organization's users log in, and CreateConnection answers 500 UPSTREAM_ERROR for every well-formed body (2026-09-01). Needs an organization reserved for the suite, and a working create.")
+}
+
+// TestAcceptance_AccountSsoRegionEnumCoversTheWire pins the generated Region
+// enum against the values a live organization actually holds.
+//
+// RegionValues() exists to be a validator source — a Terraform provider feeds
+// it straight to stringvalidator.OneOf — so a value the server produces and
+// the enum omits is not a documentation gap, it is a consumer that rejects the
+// server's own output. The spec declared US, EU, AU and JP; this organization
+// returns RAMP on 1 of its 22 connections (2026-09-02), which made an existing
+// RAMP connection unreadable, unimportable and unrefreshable through any
+// consumer built on the helper. RAMP is now carried through enumAdditions in
+// tools/generate/config.json.
+//
+// Read a failure here as "a region the enum does not know has appeared, go and
+// date it and add it", never as a broken SDK. The values are Auth0 regions
+// Jamf provisions connections in, so a new one arrives with no spec change and
+// nothing else in the tree would notice.
+func TestAcceptance_AccountSsoRegionEnumCoversTheWire(t *testing.T) {
+	ac := account.New(accOrgClient(t))
+
+	conns, err := ac.ListConnections(context.Background())
+	if err != nil {
+		t.Fatalf("ListConnections: %v", err)
+	}
+	if len(conns) == 0 {
+		t.Skip("organization holds no SSO connections, so there is no region to check")
+	}
+
+	known := make(map[string]bool)
+	for _, r := range account.RegionValues() {
+		known[r] = true
+	}
+	seen := make(map[string]int)
+	for _, c := range conns {
+		if c.Region != nil {
+			seen[*c.Region]++
+		}
+	}
+	if len(seen) == 0 {
+		t.Fatalf("none of the %d connections carried a region — the field has moved or gone", len(conns))
+	}
+	for _, r := range slices.Sorted(maps.Keys(seen)) {
+		t.Logf("region %-6s on %d connection(s)", r, seen[r])
+		if !known[r] {
+			t.Errorf("the server returned region %q, which RegionValues() does not list: any consumer validating against the helper rejects it. Add it to enumAdditions in tools/generate/config.json and report it upstream", r)
+		}
+	}
+}
+
+// TestAcceptance_AccountSsoConnectionBodyReachesTheServer proves the union type
+// carrying the provider settings marshals into the request as the settings
+// object itself, and does it without creating anything.
+//
+// ConnectionRequest.Connection was `any` until 2026-09-02: a discriminator-less
+// oneOf reached through a property, which the generator had no branch for. The
+// four settings schemas it can hold were emitted as Go types that no signature
+// in the module referenced, so nothing type-checked the body and no test ever
+// serialised one — the generated stub calls CreateConnection with a bare
+// &ConnectionRequest{} and puts nothing on the wire.
+//
+// The server distinguishes the two failure modes cleanly, which is what makes
+// this assertable (wire-verified 2026-09-02, both shapes in one invocation):
+// `connection: null` and `connection: {}` both answer
+// `400 BAD_REQUEST "A connection requires a region"`, while a settings object
+// carrying a region answers `400 BAD_REQUEST "Unsupported region: <value>"`.
+// So an out-of-enum region reaching the region check is proof the variant's own
+// fields travelled, and a "requires a region" here means the union marshalled
+// to nothing.
+//
+// Safe by construction rather than by cleanup: region validation runs ahead of
+// the upstream call — the same ordering that makes every well-formed body answer
+// 500 UPSTREAM_ERROR on this organization — so this request cannot create a
+// connection. Contrast TestAcceptance_AccountSsoConnectionWrites, skipped
+// because a body the server accepts changes how a real organization's users log
+// in.
+func TestAcceptance_AccountSsoConnectionBodyReachesTheServer(t *testing.T) {
+	ac := account.New(accOrgClient(t))
+
+	req := &account.ConnectionRequest{
+		ConnectionType:  account.ConnectionTypeOidc,
+		Domains:         []string{"sdk-acc-nonexistent.invalid"},
+		EnabledProducts: []account.EnabledProduct{},
+		Connection: account.ConnectionRequestConnection{
+			OidcConnectionSettings: &account.OidcConnectionSettings{
+				Name:   "sdk-acceptance-probe-do-not-create",
+				Region: "MARS",
+			},
+		},
+	}
+
+	_, err := ac.CreateConnection(context.Background(), req)
+	if err == nil {
+		t.Fatal("CreateConnection accepted region MARS — an SSO connection may have been created; investigate immediately")
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("CreateConnection: non-API error, the request did not reach the endpoint: %v", err)
+	}
+	summary := apiErr.Summary()
+	if !apiErr.HasStatus(400) {
+		t.Fatalf("CreateConnection returned %d, want 400 from the region check: %s", apiErr.StatusCode, summary)
+	}
+	if strings.Contains(summary, "requires a region") {
+		t.Fatalf("the server saw no region, so the union marshalled to null or an empty object rather than the variant: %s", summary)
+	}
+	if !strings.Contains(summary, "MARS") {
+		t.Fatalf("want the region check to quote the value the variant carried, got: %s", summary)
+	}
+	t.Logf("the OIDC variant's own fields reached the server: %s", summary)
 }
 
 func TestAcceptance_AccountCreateConnectionRejected(t *testing.T) {

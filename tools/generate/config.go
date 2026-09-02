@@ -92,6 +92,57 @@ type SpecDef struct {
 	// and both are listed here.
 	SchemaPatchesRequireAbsent []string `json:"schemaPatchesRequireAbsent,omitempty"`
 
+	// EnumAdditions appends values to a named component schema's `enum` list.
+	// Key: schema name (e.g. "Region"). Value: the wire values to append, in
+	// the order they should follow the spec's own.
+	//
+	// For a value the server produces (or accepts) that the spec omits.
+	// Generated enum helpers exist to be used as validators — Terraform's
+	// stringvalidator.OneOf reads RegionValues() — so an omission is not a
+	// documentation gap, it is a validator that rejects the server's own
+	// output. account-sso's Region declares US/EU/AU/JP and the wire returns
+	// RAMP on a live organization (1 of 22 connections, 2026-09-02), which
+	// made an existing RAMP connection unreadable through any consumer built
+	// on the helper.
+	//
+	// Self-expiring: generation fails when the value is already declared, which
+	// is the signal that upstream has published it and the entry should be
+	// deleted. Applied with the other schema patches, so the value also reaches
+	// the published spec under api/.
+	EnumAdditions map[string][]string `json:"enumAdditions,omitempty"`
+
+	// RequiredPrivileges supplies the privileges an operation requires when
+	// the published spec declares none but an authoritative out-of-band source
+	// does. Key: "METHOD /path" exactly as in Operations. Value: GA capability
+	// permissions in {capability}:{action} form.
+	//
+	// These never enter the spec document: they are carried straight to the
+	// generated Privileges registry, marked Source "gateway-policy" so a
+	// consumer can tell them from spec-declared ones, and are absent from the
+	// published spec under api/, which stays faithful to upstream.
+	//
+	// The account family is the case this exists for. All three specs are
+	// authored with a `requiredPrivileges` block in
+	// public-apis-oas/redocly-implementation/teams/account-*/config.yaml, and
+	// the build strips x-required-privileges from the published artifact
+	// because these routes resolve the organization from the token and so take
+	// no beta scope-prefix transform — upstream's own config.yaml says so in a
+	// comment. So the omission is structural and waiting for it to arrive is
+	// waiting forever, which is why this is patched locally where the earlier
+	// decision was not to. Two independent sources agree on all 18 values: that
+	// config.yaml, and the hand-written OPA rules in
+	// authorization-policies/policies/tyk_external/account/account_api.rego.
+	//
+	// Note the rego accepts *either* the GA capability or a retired
+	// read:org:*/update:org:* permission (lib.has_any_of_permissions), so only
+	// the GA form is recorded here: MethodPrivileges.Scoped is a conjunction,
+	// and adding the alternative would read as "both required".
+	//
+	// Self-expiring: generation fails when the operation already declares
+	// x-required-privileges, which means upstream has published them and the
+	// entry should be deleted.
+	RequiredPrivileges map[string][]string `json:"requiredPrivileges,omitempty"`
+
 	// DocNotes appends a note to the godoc of an emitted Go type. Key: the Go
 	// type name as generated (a struct, or the alias a string enum emits).
 	// Value: prose, wrapped and appended to whatever comment the spec's own

@@ -695,6 +695,15 @@ func privilegeComment(m GoMethod) string {
 	if len(m.ScopedPrivileges) == 0 {
 		return "\n//\n// Required privileges: the spec declares none."
 	}
+	if m.PrivilegeSource == privilegeSourceGatewayPolicy {
+		line := "\n//\n// Required privileges: " + strings.Join(m.ScopedPrivileges, ", ") + "."
+		if len(m.ScopedPrivileges) > 1 {
+			line += "\n// All of them are required, not alternatives."
+		}
+		return line + "\n// The published spec declares none for this operation; these are the" +
+			"\n// capabilities the gateway's own authorization policy enforces. See" +
+			"\n// Privileges in this package for the provenance."
+	}
 	line := "\n//\n// Required privileges: " + strings.Join(m.ScopedPrivileges, ", ") + "."
 	if len(m.LegacyPrivileges) > 0 {
 		line += " Legacy Jamf Pro privilege name(s): " + strings.Join(m.LegacyPrivileges, ", ") + "."
@@ -1097,6 +1106,20 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		// consumer gets that the two are not parallel.
 		m.ScopedPrivileges = stringSliceExtension(op, "x-required-privileges")
 		m.LegacyPrivileges = stringSliceExtension(op, "x-required-privileges-legacy")
+		if len(m.ScopedPrivileges) > 0 {
+			m.PrivilegeSource = privilegeSourceSpec
+		}
+		// config.requiredPrivileges supplies what the published spec omits.
+		// Only ever additive to an operation declaring none: if upstream has
+		// started declaring them, the config entry has expired and generation
+		// says so rather than choosing a winner.
+		if extra, ok := spec.RequiredPrivileges[normalizeOpKey(opDef.Op)]; ok {
+			if hasPrivExt {
+				return GoMethod{}, fmt.Errorf("requiredPrivileges[%q]: the spec now declares x-required-privileges — delete the config entry so the spec is the only source", opDef.Op)
+			}
+			m.ScopedPrivileges = append([]string(nil), extra...)
+			m.PrivilegeSource = privilegeSourceGatewayPolicy
+		}
 		if c := privilegeComment(m); c != "" {
 			if m.Comment == "" {
 				m.Comment = opDef.Name + " calls a Jamf Platform API endpoint."

@@ -526,10 +526,11 @@ type Region = string
 // Region values accepted by the Jamf API. The alias above is a string, so
 // these constants pass to any parameter or field declared as a plain string.
 const (
-	RegionUs Region = "US"
-	RegionEu Region = "EU"
-	RegionAu Region = "AU"
-	RegionJp Region = "JP"
+	RegionUs   Region = "US"
+	RegionEu   Region = "EU"
+	RegionAu   Region = "AU"
+	RegionJp   Region = "JP"
+	RegionRamp Region = "RAMP"
 )
 
 // RegionValues returns every value the Jamf API accepts for Region,
@@ -544,6 +545,7 @@ func RegionValues() []Region {
 		RegionEu,
 		RegionAu,
 		RegionJp,
+		RegionRamp,
 	}
 }
 

@@ -14,7 +14,10 @@ import (
 
 // CreateDistributorPurchaseOrder submit Distributor Purchase Order.
 //
-// Required privileges: the spec declares none.
+// Required privileges: distributor-actions:create.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) CreateDistributorPurchaseOrder(ctx context.Context, request *DistributorPurchaseOrder) error {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	endpoint := prefix + "/distributor/purchase-orders"
@@ -26,7 +29,10 @@ func (c *Client) CreateDistributorPurchaseOrder(ctx context.Context, request *Di
 
 // GetDistributorPurchaseOrder get Distributor Purchase Order.
 //
-// Required privileges: the spec declares none.
+// Required privileges: distributor-actions:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - jamfPoNumber: Jamf-assigned purchase order number, as returned in the `jamfPoNumber` field of a purchase order.
@@ -43,7 +49,10 @@ func (c *Client) GetDistributorPurchaseOrder(ctx context.Context, jamfPoNumber s
 
 // ValidateDistributorPurchaseOrder validate Distributor Purchase Order.
 //
-// Required privileges: the spec declares none.
+// Required privileges: distributor-actions:update.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) ValidateDistributorPurchaseOrder(ctx context.Context, request *DistributorPurchaseOrder) (*PurchaseOrderValidationResult, error) {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	var result PurchaseOrderValidationResult

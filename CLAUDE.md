@@ -979,8 +979,23 @@ formatting is inert to the generator, and bundle diffs become exact.
   with nothing to migrate to turns every consumer's build red for no reason.
 - **Local spec repairs are self-expiring.** `schemaCreations` panics if the name
   reappears; a `schemaPatches` entry that *supplies* a missing property needs a
-  `schemaPatchesRequireAbsent` line or it shadows the real one forever. Neither
-  catches a re-typed root.
+  `schemaPatchesRequireAbsent` line or it shadows the real one forever;
+  `enumAdditions` panics on a value the spec now declares; `requiredPrivileges`
+  fails generation once the operation declares `x-required-privileges`. Neither
+  of the first two catches a re-typed root.
+- **A generated field may never be a bare `any`.** `validateNoUntypedFields`
+  fails generation on `any` or `*any`, because that is `schemaRefToGoType`'s
+  `default:` branch and it means the generator met a construct it has no branch
+  for — a field that type-checks nothing and, with no
+  `DisallowUnknownFields`, decodes anything. `ConnectionRequest.connection`
+  shipped that way for the whole of account-sso's life: the entire SSO
+  connection write payload, with its four settings schemas emitted as types no
+  signature referenced. A discriminator-less `oneOf` over `$ref`s now becomes a
+  typed union when it is request-only (`isRefUnion` → `schemaToUnionType`) and
+  keeps merging otherwise. **Do not widen the check to make a spec pass** —
+  teach the generator the construct. `map[string]any` and `[]any` stay legal.
+  Mechanism and the one instance of the class knowingly left alone (blueprints'
+  `SwUpdateConfiguration`): [docs/STYLE.md](docs/STYLE.md#schema-handling).
 - **A shared schema's optional scalars can change pointer-ness with no diff in
   their own schema**, because `needsPtr` follows request/response reachability —
   `SmartGroupCriteria`'s paren fields went `*bool` → `bool` at v1942 that way.
@@ -1035,13 +1050,27 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | `devices`, `devicegroups`, `deviceactions` | as named | tenant | Platform APIs |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | tenant | |
 | `securitycloud` | `securitycloud` | tenant (own identifier) | 54 ops across six specs |
-| `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** |
+| `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** The only package whose privileges come from `requiredPrivileges` rather than the spec |
 | `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
 | `audit` | `audit` | environment | compiles; every call 403s pending an `audit:read` grant |
 
 `account` is the documented exception to package-follows-namespace. It is also the
 SDK's first organization-scoped API, and **organization scope is the absence of a
 scope, not a header** — `Client.Scope()` reports the zero kind with an empty ID.
+
+**It is also the one exception to "report privileges upstream, never patch them
+locally", and the grounds are structural.** All three specs are authored *with* a
+`requiredPrivileges` block, and the publishing pipeline strips
+`x-required-privileges` from the artifact because these routes resolve the
+organization from the token and so take no beta scope-prefix transform —
+upstream's own `config.yaml` says so. Waiting for it is waiting forever, so
+`config.json`'s `requiredPrivileges` supplies all 18, attributed as
+`Source: "gateway-policy"` in the registry and in each method's godoc, and never
+written into `api/`. Three sources agree on the values; the earlier decision
+(recorded in `MethodPrivileges`' own godoc until 2026-09-02) was to leave them
+empty, and an empty set was being rendered downstream as "no permission needed",
+which is false. Evidence and the alternatives-vs-conjunction trap:
+[docs/STYLE.md](docs/STYLE.md#required-privileges).
 
 `audit` is correct as generated and unusable, which is the honest state. The
 blocker is a missing capability grant, confirmed independently by the gateway

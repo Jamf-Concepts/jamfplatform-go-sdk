@@ -10231,6 +10231,11 @@
       "package": "account",
       "splitByTag": true,
       "specFile": "account_licensing_api.json",
+      "requiredPrivileges": {
+        "GET /v1/licenses": [
+          "licensing:read"
+        ]
+      },
       "operations": [
         {
           "op": "GET /v1/licenses",
@@ -10245,6 +10250,29 @@
       "package": "account",
       "splitByTag": true,
       "specFile": "account_partners_api.json",
+      "requiredPrivileges": {
+        "GET /v1/deal-registrations": [
+          "deal-registration:read"
+        ],
+        "GET /v1/distributor/configuration": [
+          "distributor-actions:read"
+        ],
+        "PATCH /v1/distributor/configuration": [
+          "distributor-actions:update"
+        ],
+        "POST /v1/distributor/purchase-orders": [
+          "distributor-actions:create"
+        ],
+        "GET /v1/distributor/purchase-orders/{jamfPoNumber}": [
+          "distributor-actions:read"
+        ],
+        "GET /v1/distributor/quotes/{quoteNumber}": [
+          "distributor-actions:read"
+        ],
+        "POST /v1/distributor/validate-purchase-order": [
+          "distributor-actions:update"
+        ]
+      },
       "operations": [
         {
           "op": "GET /v1/deal-registrations",
@@ -10286,6 +10314,43 @@
       "fieldTypeOverrides": {
         "domain.id": "json.Number",
         "domain.verifiedTldId": "json.Number"
+      },
+      "requiredPrivileges": {
+        "GET /v1/connections": [
+          "sso-connections:read"
+        ],
+        "POST /v1/connections": [
+          "sso-connections:create"
+        ],
+        "GET /v1/connections/{connectionId}": [
+          "sso-connections:read"
+        ],
+        "PUT /v1/connections/{connectionId}": [
+          "sso-connections:update"
+        ],
+        "DELETE /v1/connections/{connectionId}": [
+          "sso-connections:delete"
+        ],
+        "GET /v1/domains": [
+          "sso-domains:read"
+        ],
+        "POST /v1/domains": [
+          "sso-domains:create"
+        ],
+        "GET /v1/domains/allocation/{domain}": [
+          "sso-domains:read"
+        ],
+        "DELETE /v1/domains/{domainId}": [
+          "sso-domains:delete"
+        ],
+        "POST /v1/domains/{domainId}/actions/verify": [
+          "sso-domains:update"
+        ]
+      },
+      "enumAdditions": {
+        "Region": [
+          "RAMP"
+        ]
       },
       "operations": [
         {

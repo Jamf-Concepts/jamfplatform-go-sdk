@@ -11,20 +11,28 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // requires, sourced from the x-required-privileges vendor extensions in the
 // Jamf OpenAPI specs. Identifiers are GA capability permissions in
 // {capability}:{action} form and a multi-entry Scoped slice means all of them
-// are required. An empty Scoped slice means the spec declares none — see
-// jamfplatform.MethodPrivileges for why that is not the same as none being
-// required. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CreateBenchmark":                  {Method: "CreateBenchmark", HTTPMethod: "POST", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:create"}, Legacy: nil},
-	"DeleteBenchmark":                  {Method: "DeleteBenchmark", HTTPMethod: "DELETE", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:delete"}, Legacy: nil},
-	"GetBaselineRules":                 {Method: "GetBaselineRules", HTTPMethod: "GET", Path: "/v1/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
-	"GetBenchmark":                     {Method: "GetBenchmark", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
-	"GetBenchmarkCompliancePercentage": {Method: "GetBenchmarkCompliancePercentage", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/compliance-percentage", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
-	"ListBaselines":                    {Method: "ListBaselines", HTTPMethod: "GET", Path: "/v1/baselines", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
-	"ListBenchmarkRuleDevices":         {Method: "ListBenchmarkRuleDevices", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/devices", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
-	"ListBenchmarkRulesStats":          {Method: "ListBenchmarkRulesStats", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
-	"ListBenchmarks":                   {Method: "ListBenchmarks", HTTPMethod: "GET", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil},
+	"CreateBenchmark":                  {Method: "CreateBenchmark", HTTPMethod: "POST", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:create"}, Legacy: nil, Source: "spec"},
+	"DeleteBenchmark":                  {Method: "DeleteBenchmark", HTTPMethod: "DELETE", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:delete"}, Legacy: nil, Source: "spec"},
+	"GetBaselineRules":                 {Method: "GetBaselineRules", HTTPMethod: "GET", Path: "/v1/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"GetBenchmark":                     {Method: "GetBenchmark", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"GetBenchmarkCompliancePercentage": {Method: "GetBenchmarkCompliancePercentage", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/compliance-percentage", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBaselines":                    {Method: "ListBaselines", HTTPMethod: "GET", Path: "/v1/baselines", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBenchmarkRuleDevices":         {Method: "ListBenchmarkRuleDevices", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/devices", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBenchmarkRulesStats":          {Method: "ListBenchmarkRulesStats", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBenchmarks":                   {Method: "ListBenchmarks", HTTPMethod: "GET", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

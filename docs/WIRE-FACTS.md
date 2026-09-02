@@ -1887,6 +1887,89 @@ covered as calls, not as outcomes.
 
 ## Jamf Account (`account`) — organization scope
 
+### Probed 2026-09-02: `RAMP` is accepted on write, and the connection body has a testable tell
+
+One organization (`5d58972b-57f6-4686-8654-c7ae7a2f7e00`), controls in the same
+invocation throughout. Three findings and one correction to this document.
+
+**`RAMP` is in the server's *write* vocabulary too, not merely its read one.**
+`POST /sso/v1/connections` answers `400 BAD_REQUEST "Unsupported region: ZZZZ"`
+for a value outside the set, and `region: "RAMP"` does **not** get that answer —
+it passes the region check and reaches the upstream call, byte-identically to
+`US` and `EU` in the same run (all three `500 [UPSTREAM_ERROR]`, the bogus
+`.invalid` domain being what stops them). So the omission is not a read-only
+vocabulary the spec deliberately excludes from writes; it is simply missing.
+Verified no connection was created: the collection stayed at 22 rows across all
+five probes.
+
+**The earlier "not patchable locally" verdict was wrong, and is worth recording
+because it was reached for a good reason.** `schemaPatches` does address
+properties by dotted path and `Region` is a bare top-level enum, so that key
+genuinely cannot reach it — but the conclusion drawn from that ("fix belongs
+upstream") treated the existing config keys as the limit of what was possible.
+The generator gained `enumAdditions` instead: schema name → values to append,
+panicking when the value is already declared so the entry expires the day
+upstream publishes it. `RegionValues()` now returns five values and
+`TestAcceptance_AccountSsoRegionEnumCoversTheWire` pins the enum against a live
+organization's connections, so a sixth region fails a wire test rather than a
+consumer's `terraform plan`. Still report it upstream.
+
+**`connection: null` and `connection: {}` are distinguishable from a populated
+settings object**, which is what makes the request body assertable without
+creating anything:
+
+| body | answer |
+|---|---|
+| `"connection": null` | `400 BAD_REQUEST "A connection requires a region"` |
+| `"connection": {}` | `400 BAD_REQUEST "A connection requires a region"` |
+| `"connection": {…, "region": "MARS"}` | `400 BAD_REQUEST "Unsupported region: MARS"` |
+| `"connectionType": "NOPE"` | `400 MALFORMED_REQUEST_BODY` (Jackson subtype registry, ahead of everything) |
+
+`TestAcceptance_AccountSsoConnectionBodyReachesTheServer` uses exactly that: an
+OIDC variant carrying `region: "MARS"`, asserting the region check quotes the
+value. A *"requires a region"* there means the union marshalled to null or an
+empty object, so the test fails for the one reason it exists to catch. It is safe
+by construction rather than by cleanup — region validation runs ahead of the
+upstream call, so the request cannot create a connection.
+
+That matters because until 2026-09-02 `ConnectionRequest.Connection` was `any`:
+a discriminator-less `oneOf` reached through a property, which the generator had
+no branch for. Nothing type-checked the create or update body, the four settings
+schemas were emitted as Go types no signature referenced, and **no test in the
+module had ever serialised one** — the generated stub calls `CreateConnection`
+with a bare `&ConnectionRequest{}` and puts nothing on the wire. See
+[STYLE.md](STYLE.md#schema-handling) for the fix and for the `any`-field guard
+that now fails generation on the class.
+
+**All 18 account privileges are corroborated three ways**, which is what
+justified supplying them locally after the earlier decision not to:
+`public-apis-oas/redocly-implementation/teams/account-*/config.yaml`
+`requiredPrivileges`; the hand-written OPA rules in
+`authorization-policies/policies/tyk_external/account/account_api.rego`; and
+`TestScopedPrivilegesUseGAVocabulary`, which validated every identifier against
+the published capability reference with no addition to `gaCapabilityActions`.
+The `config.yaml` for each spec states the cause in its own closing comment:
+these routes resolve the organization from the token, Tyk's
+`request-context-allowed-sources` is `[token]`, so the beta scope-prefix
+transform does not apply and **the build strips `x-required-privileges` from the
+published artifact by construction**. Note the rego accepts *either* the GA
+capability or a retired `read:org:*`/`update:org:*` permission
+(`lib.has_any_of_permissions`); only the GA form is carried, because `Scoped` is
+a conjunction.
+
+**Unrelated read-back gap, re-confirmed on the wire.**
+`GET /sso/v1/connections/{id}` returns no `enabledProducts` and no
+`enabledEnvironments` (checked on the RAMP connection, which the collection
+reports as enabled for `PRO`), and `ConnectionSummary.enabledApplications`
+carries product *names* only, never tenant ids. So the part of a connection a
+client writes cannot be read back, and drift detection for it is impossible.
+Compounding it, no endpoint in this SDK lists an organization's tenants or
+environments — `ListLicenses` is a commercial record with nothing joinable, and
+`GetCsaTenantIdV1`/`GetM2MTenantIDV1` return the *caller's own* tenant and need
+tenant or environment scope, which an organization-scoped integration does not
+have. An organization-scoped tenant/environment listing is the missing
+primitive. Report upstream.
+
 ### Re-probed 2026-09-01: three of the recorded faults have flipped, and two of them broke the SDK
 
 Two organization credentials, two different organizations
@@ -1950,13 +2033,12 @@ payload. It now fails, correctly.
 
 **`RAMP` is a fifth `Region` the spec's enum omits**, and it is no longer a
 single sighting: it appears on `ConnectionSummary.region` in **both**
-organizations (1 of 5 and 1 of 24) and on `DomainAllocationConnection.authZeroRegion`
+organizations (1 of 5 and 1 of 22) and on `DomainAllocationConnection.authZeroRegion`
 for `ramp.mockingbirduat.com`. `type Region = string`, so nothing mis-decodes,
 but `RegionValues()` exists to feed `stringvalidator.OneOf` and would refuse a
-region the server itself returns. **Not patchable locally:** `schemaPatches`
-addresses properties under a schema by dotted path, and `Region` is a bare
-top-level enum with no properties — patching every *usage* would inline the enum
-and lose the shared type. Fix belongs upstream.
+region the server itself returns. **Now carried locally** through
+`enumAdditions` — see the 2026-09-02 section below, which also records the
+earlier "not patchable locally" verdict and why it was wrong.
 
 **`POST /sso/v1/connections` cannot succeed.** Every well-formed body answers
 `500 [UPSTREAM_ERROR] "The request could not be completed"` — probed across a
@@ -2102,8 +2184,10 @@ row is `type: JAMF_SECURITY_CLOUD` with `addOnType: JAMF_TRUST`,
 and the wire returned **`RAMP`**. Nothing breaks today because `Region` is a
 `string` alias, but `RegionValues()` exists to feed `stringvalidator.OneOf` and
 would refuse a region the server itself returns. Re-confirmed 2026-09-01 in a
-*second* organization — see the re-probe at the top of this section for why it
-cannot be patched locally.
+*second* organization, and 2026-09-02 shown to be accepted on **write** as well —
+carried locally through `enumAdditions` since then. The "cannot be patched
+locally" verdict this note used to end on is superseded; see the 2026-09-02
+probe at the top of this section.
 
 ---
 

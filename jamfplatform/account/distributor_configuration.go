@@ -13,7 +13,10 @@ import (
 
 // GetDistributorConfiguration get Distributor Configuration.
 //
-// Required privileges: the spec declares none.
+// Required privileges: distributor-actions:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) GetDistributorConfiguration(ctx context.Context) (*DistributorConfiguration, error) {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	var result DistributorConfiguration
@@ -26,7 +29,10 @@ func (c *Client) GetDistributorConfiguration(ctx context.Context) (*DistributorC
 
 // UpdateDistributorConfiguration update Distributor Configuration.
 //
-// Required privileges: the spec declares none.
+// Required privileges: distributor-actions:update.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) UpdateDistributorConfiguration(ctx context.Context, request *DistributorConfiguration) error {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	endpoint := prefix + "/distributor/configuration"

@@ -15,7 +15,10 @@ import (
 
 // ListLicenses list Licenses.
 //
-// Required privileges: the spec declares none.
+// Required privileges: licensing:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) ListLicenses(ctx context.Context) ([]License, error) {
 	prefix := c.transport.APIPrefix("licensing", "v1")
 	endpoint := prefix + "/licenses"

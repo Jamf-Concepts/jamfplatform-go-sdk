@@ -11,14 +11,22 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // requires, sourced from the x-required-privileges vendor extensions in the
 // Jamf OpenAPI specs. Identifiers are GA capability permissions in
 // {capability}:{action} form and a multi-entry Scoped slice means all of them
-// are required. An empty Scoped slice means the spec declares none — see
-// jamfplatform.MethodPrivileges for why that is not the same as none being
-// required. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"GetDeviceChannels":                    {Method: "GetDeviceChannels", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/channels", Scoped: []string{"declarations:read"}, Legacy: nil},
-	"GetDeviceDeclarationReportFiltered":   {Method: "GetDeviceDeclarationReportFiltered", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/declarations", Scoped: []string{"declarations:read"}, Legacy: nil},
-	"ListDeclarationReportClientsFiltered": {Method: "ListDeclarationReportClientsFiltered", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}/devices", Scoped: []string{"declarations:read"}, Legacy: nil},
+	"GetDeviceChannels":                    {Method: "GetDeviceChannels", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/channels", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
+	"GetDeviceDeclarationReportFiltered":   {Method: "GetDeviceDeclarationReportFiltered", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/declarations", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
+	"ListDeclarationReportClientsFiltered": {Method: "ListDeclarationReportClientsFiltered", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}/devices", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

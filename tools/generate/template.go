@@ -390,6 +390,54 @@ func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(map[string]string{"{{ .Discriminator.PropertyName }}": m.{{ .Discriminator.GoFieldName }}})
 }
+{{- else if .Union }}
+// {{ .Comment }}
+type {{ .Name }} struct {
+{{- range .Union.Variants }}
+	{{ .FieldName }} *{{ .TypeName }} ` + "`" + `json:"-"` + "`" + `
+{{- end }}
+	// Raw holds the payload exactly as it arrived. Decoding cannot choose a
+	// variant — the spec declares no discriminator, so nothing inside the
+	// payload names one — so UnmarshalJSON stores the bytes here and leaves
+	// every variant pointer nil. Decode it into the variant whichever sibling
+	// field selects.
+	Raw json.RawMessage ` + "`" + `json:"-"` + "`" + `
+}
+
+// MarshalJSON emits the one variant that is set.
+//
+// More than one is an error rather than an arbitrary pick between them: the
+// wire has room for exactly one, and silently dropping the rest is how a
+// caller ships a body it did not write. With none set it emits Raw, or JSON
+// null when Raw is empty too — the zero value has to stay marshalable, since
+// it is what the enclosing request carries until the caller fills it in, and
+// null is what the server rejects with a message naming the field.
+func (u {{ .Name }}) MarshalJSON() ([]byte, error) {
+	var set []string
+	var payload any
+{{- range .Union.Variants }}
+	if u.{{ .FieldName }} != nil {
+		set = append(set, "{{ .FieldName }}")
+		payload = u.{{ .FieldName }}
+	}
+{{- end }}
+	switch {
+	case len(set) > 1:
+		return nil, fmt.Errorf("{{ .Name }}: %d variants set (%s); the payload carries exactly one", len(set), strings.Join(set, ", "))
+	case len(set) == 1:
+		return json.Marshal(payload)
+	case len(u.Raw) > 0:
+		return u.Raw, nil
+	}
+	return []byte("null"), nil
+}
+
+// UnmarshalJSON preserves the payload in Raw. See that field's comment for
+// why it does not populate a variant.
+func (u *{{ .Name }}) UnmarshalJSON(data []byte) error {
+	u.Raw = append(u.Raw[:0], data...)
+	return nil
+}
 {{- else if or .Fields (and (eq $.Format "xml") .XMLName) }}
 // {{ .Comment }}
 type {{ .Name }} struct {

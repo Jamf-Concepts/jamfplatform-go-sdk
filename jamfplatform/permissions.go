@@ -44,16 +44,34 @@ type MethodPrivileges struct {
 	// consumer can therefore render a multi-entry Scoped slice as "grant all
 	// of these".
 	//
-	// An empty slice means the spec declares no privilege for the endpoint,
+	// An empty slice means nothing declares a privilege for the endpoint,
 	// which is not the same as none being required. Most such endpoints are
-	// genuinely unauthenticated (/v1/jamf-pro-version, /v2/jamf-pro-information,
-	// the /v1/notifications list), but the account package's 18 methods are
-	// empty only because the licensing, partners and sso specs ship no
-	// x-required-privileges at all: the gateway's authorization policy gates
-	// them on licensing:read, deal-registration:read, distributor-actions:{c,r,u}
-	// and sso-connections / sso-domains:{c,r,u,d}. Reported upstream; the SDK
-	// reports what the spec says and does not patch it locally.
+	// genuinely unauthenticated — /v1/jamf-pro-version,
+	// /v2/jamf-pro-information, the /v1/notifications list. A consumer
+	// rendering a permissions table must not print an empty slice as "no
+	// permission needed"; read Source to tell the two apart.
 	Scoped []string
+	// Source names where Scoped came from:
+	//
+	//   - "spec": the operation's own x-required-privileges extension.
+	//   - "gateway-policy": the published spec declares none and the SDK
+	//     supplies what the gateway's own authorization policy enforces. The
+	//     account package's 18 methods are this case, and permanently so:
+	//     these routes resolve the organization from the access token, which
+	//     exempts them from the transform the publishing pipeline attaches
+	//     x-required-privileges during, so the artifact ships without them by
+	//     construction. The values come from
+	//     public-apis-oas/redocly-implementation/teams/account-*/config.yaml
+	//     and the hand-written OPA rules in
+	//     authorization-policies/policies/tyk_external/account/account_api.rego,
+	//     which agree on all 18.
+	//   - "": Scoped is empty.
+	//
+	// Note for "gateway-policy": several account rules accept *either* the GA
+	// capability recorded here or a retired read:org:*/update:org:* permission.
+	// Only the GA form is carried, because Scoped is a conjunction and listing
+	// the alternative would read as "both required".
+	Source string
 	// Legacy lists the human-readable Jamf Pro privilege names, e.g.
 	// "Create Buildings". It is populated for the Pro API family only —
 	// other families do not publish legacy names.

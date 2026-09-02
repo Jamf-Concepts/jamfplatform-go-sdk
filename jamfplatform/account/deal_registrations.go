@@ -15,7 +15,10 @@ import (
 
 // ListDealRegistrations list Deal Registrations.
 //
-// Required privileges: the spec declares none.
+// Required privileges: deal-registration:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) ListDealRegistrations(ctx context.Context) ([]DealRegistration, error) {
 	prefix := c.transport.APIPrefix("partners", "v1")
 	endpoint := prefix + "/deal-registrations"

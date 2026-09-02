@@ -293,6 +293,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 		applySchemaCreations(doc, spec.SchemaCreations)
 		applySchemaRenames(doc, spec.SchemaRenames)
 		applySchemaAdditions(doc, spec.SchemaAdditions)
+		applyEnumAdditions(doc, spec.EnumAdditions)
 		assertSchemaPatchTargetsAbsent(doc, spec.SchemaPatchesRequireAbsent)
 		applySchemaPatches(doc, spec.SchemaPatches)
 		applyPropertyRenames(doc, spec.PropertyRenames)
@@ -347,6 +348,9 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	declared := make([]GoType, 0, len(emittedTypes))
 	for name := range emittedTypes {
 		declared = append(declared, GoType{Name: name})
+	}
+	if err := validateNoUntypedFields(fmt.Sprintf("spec %s", spec.File), declared); err != nil {
+		return err
 	}
 	if err := validateTypeReferences(fmt.Sprintf("spec %s", spec.File), declared, methods); err != nil {
 		return err
@@ -457,6 +461,7 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 				applySchemaCreations(doc, ls.spec.SchemaCreations)
 				applySchemaRenames(doc, ls.spec.SchemaRenames)
 				applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+				applyEnumAdditions(doc, ls.spec.EnumAdditions)
 				assertSchemaPatchTargetsAbsent(doc, ls.spec.SchemaPatchesRequireAbsent)
 				applySchemaPatches(doc, ls.spec.SchemaPatches)
 				applyPropertyRenames(doc, ls.spec.PropertyRenames)
@@ -517,6 +522,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	// union of types emitted across all specs in this package, matching
 	// the way the templates will actually see them.
 	for _, sm := range allSpecs {
+		if err := validateNoUntypedFields(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), allTypes); err != nil {
+			return err
+		}
 		if err := validateTypeReferences(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), allTypes, sm.methods); err != nil {
 			return err
 		}
@@ -543,6 +551,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		return err
 	}
 	if err := emitPkgEnums(pkgDir, cfg, goPkgName, pkgFormat, enumTypeDecls); err != nil {
+		return err
+	}
+	if err := emitUnionRoundTripTest(pkgDir, goPkgName, structTypes); err != nil {
 		return err
 	}
 
@@ -618,6 +629,13 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		applySchemaCreations(doc, ls.spec.SchemaCreations)
 		applySchemaRenames(doc, ls.spec.SchemaRenames)
 		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+		// Skipped on the api/ fallback: the published spec already carries the
+		// added values, and applyEnumAdditions panics on a value already
+		// declared. Unlike the patches around it this pass is not idempotent,
+		// by design — see its doc comment.
+		if !ls.usedFallback {
+			applyEnumAdditions(doc, ls.spec.EnumAdditions)
+		}
 		assertSchemaPatchTargetsAbsent(doc, ls.spec.SchemaPatchesRequireAbsent)
 		applySchemaPatches(doc, ls.spec.SchemaPatches)
 		applyPropertyRenames(doc, ls.spec.PropertyRenames)
@@ -2266,22 +2284,31 @@ import "%s/jamfplatform"
 // requires, sourced from the x-required-privileges vendor extensions in the
 // Jamf OpenAPI specs. Identifiers are GA capability permissions in
 // {capability}:{action} form and a multi-entry Scoped slice means all of them
-// are required. An empty Scoped slice means the spec declares none — see
-// jamfplatform.MethodPrivileges for why that is not the same as none being
-// required. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
 `, pkgName, cfg.Module, pkgName)
 
 	for _, e := range entries {
 		m := e.method
-		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scoped: %s, Legacy: %s},\n",
+		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scoped: %s, Legacy: %s, Source: %s},\n",
 			strconv.Quote(m.Name),
 			strconv.Quote(m.Name),
 			strconv.Quote(m.HTTPMethod),
 			strconv.Quote(e.path),
 			goStringSliceLiteral(m.ScopedPrivileges),
 			goStringSliceLiteral(m.LegacyPrivileges),
+			strconv.Quote(m.PrivilegeSource),
 		)
 	}
 
@@ -2297,6 +2324,114 @@ func PrivilegesFor(method string) (jamfplatform.MethodPrivileges, bool) {
 `)
 
 	outPath := filepath.Join(pkgDir, "permissions.go")
+	formatted, err := imports.Process(outPath, []byte(b.String()), &imports.Options{Comments: true})
+	if err != nil {
+		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, b.String())
+	}
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
+		return fmt.Errorf("writing %s: %w", outPath, err)
+	}
+	log.Printf("wrote %s", outPath)
+	return nil
+}
+
+// emitUnionRoundTripTest writes unions_test.go for a package holding at least
+// one discriminator-less request union (see GoUnion). No-op otherwise.
+//
+// The generated method tests cannot cover this. A method's httptest stub is
+// built from the request type, so it serialises whatever the generated code
+// assumed — the account SSO create test passed for as long as the field was
+// `any`, calling CreateConnection with a bare &ConnectionRequest{} and putting
+// nothing on the wire, which is exactly why nothing ever exercised any of the
+// four settings schemas the connection body can hold. These tests marshal each
+// variant in turn and assert the bytes, so a marshaler that emitted the wrong
+// variant, dropped fields, or silently picked one of two would fail here.
+func emitUnionRoundTripTest(pkgDir, pkgName string, types []GoType) error {
+	var unions []GoType
+	for _, t := range types {
+		if t.Union != nil && len(t.Union.Variants) > 0 {
+			unions = append(unions, t)
+		}
+	}
+	if len(unions) == 0 {
+		return nil
+	}
+
+	var b strings.Builder
+	fmt.Fprintf(&b, `// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package %s
+
+import (
+	"bytes"
+	"encoding/json"
+	"testing"
+)
+`, pkgName)
+
+	for _, u := range unions {
+		fmt.Fprintf(&b, `
+// Test%[1]s_Marshal asserts that each variant marshals to exactly the bytes
+// the variant alone produces — the union adds no wrapper and drops no field —
+// that the payload survives a decode into Raw, that setting no variant emits
+// null rather than an empty object, and that setting two is refused instead of
+// silently shipping one of them.
+func Test%[1]s_Marshal(t *testing.T) {
+`, u.Name)
+		for _, v := range u.Union.Variants {
+			fmt.Fprintf(&b, `	t.Run(%[3]q, func(t *testing.T) {
+		variant := &%[2]s{}
+		got, err := json.Marshal(%[1]s{%[3]s: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %%v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %%v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %%s, want the bare variant %%s", got, want)
+		}
+		var back %[1]s
+		if err := json.Unmarshal(got, &back); err != nil {
+			t.Fatalf("unmarshal union: %%v", err)
+		}
+		if !bytes.Equal(back.Raw, got) {
+			t.Fatalf("Raw is %%s, want the payload %%s", back.Raw, got)
+		}
+		if err := json.Unmarshal(back.Raw, &%[2]s{}); err != nil {
+			t.Fatalf("decoding Raw back into %[2]s: %%v", err)
+		}
+	})
+`, u.Name, v.TypeName, v.FieldName)
+		}
+		fmt.Fprintf(&b, `	t.Run("no variant set", func(t *testing.T) {
+		got, err := json.Marshal(%[1]s{})
+		if err != nil {
+			t.Fatalf("marshal: %%v", err)
+		}
+		if string(got) != "null" {
+			t.Fatalf("zero union marshalled to %%s, want null", got)
+		}
+	})
+`, u.Name)
+		if len(u.Union.Variants) > 1 {
+			fmt.Fprintf(&b, `	t.Run("two variants set", func(t *testing.T) {
+		if _, err := json.Marshal(%[1]s{%[2]s: &%[3]s{}, %[4]s: &%[5]s{}}); err == nil {
+			t.Fatal("marshalling two variants succeeded; want an error naming both")
+		}
+	})
+`, u.Name,
+				u.Union.Variants[0].FieldName, u.Union.Variants[0].TypeName,
+				u.Union.Variants[1].FieldName, u.Union.Variants[1].TypeName)
+		}
+		b.WriteString("}\n")
+	}
+
+	outPath := filepath.Join(pkgDir, "unions_test.go")
 	formatted, err := imports.Process(outPath, []byte(b.String()), &imports.Options{Comments: true})
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, b.String())
@@ -2634,16 +2769,34 @@ type MethodPrivileges struct {
 	// consumer can therefore render a multi-entry Scoped slice as "grant all
 	// of these".
 	//
-	// An empty slice means the spec declares no privilege for the endpoint,
+	// An empty slice means nothing declares a privilege for the endpoint,
 	// which is not the same as none being required. Most such endpoints are
-	// genuinely unauthenticated (/v1/jamf-pro-version, /v2/jamf-pro-information,
-	// the /v1/notifications list), but the account package's 18 methods are
-	// empty only because the licensing, partners and sso specs ship no
-	// x-required-privileges at all: the gateway's authorization policy gates
-	// them on licensing:read, deal-registration:read, distributor-actions:{c,r,u}
-	// and sso-connections / sso-domains:{c,r,u,d}. Reported upstream; the SDK
-	// reports what the spec says and does not patch it locally.
+	// genuinely unauthenticated — /v1/jamf-pro-version,
+	// /v2/jamf-pro-information, the /v1/notifications list. A consumer
+	// rendering a permissions table must not print an empty slice as "no
+	// permission needed"; read Source to tell the two apart.
 	Scoped []string
+	// Source names where Scoped came from:
+	//
+	//   - "spec": the operation's own x-required-privileges extension.
+	//   - "gateway-policy": the published spec declares none and the SDK
+	//     supplies what the gateway's own authorization policy enforces. The
+	//     account package's 18 methods are this case, and permanently so:
+	//     these routes resolve the organization from the access token, which
+	//     exempts them from the transform the publishing pipeline attaches
+	//     x-required-privileges during, so the artifact ships without them by
+	//     construction. The values come from
+	//     public-apis-oas/redocly-implementation/teams/account-*/config.yaml
+	//     and the hand-written OPA rules in
+	//     authorization-policies/policies/tyk_external/account/account_api.rego,
+	//     which agree on all 18.
+	//   - "": Scoped is empty.
+	//
+	// Note for "gateway-policy": several account rules accept *either* the GA
+	// capability recorded here or a retired read:org:*/update:org:* permission.
+	// Only the GA form is carried, because Scoped is a conjunction and listing
+	// the alternative would read as "both required".
+	Source string
 	// Legacy lists the human-readable Jamf Pro privilege names, e.g.
 	// "Create Buildings". It is populated for the Pro API family only —
 	// other families do not publish legacy names.

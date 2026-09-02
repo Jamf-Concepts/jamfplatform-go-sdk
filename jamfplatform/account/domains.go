@@ -16,7 +16,10 @@ import (
 
 // ListDomains list Domains.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-domains:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) ListDomains(ctx context.Context) ([]Domain, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	endpoint := prefix + "/domains"
@@ -30,7 +33,10 @@ func (c *Client) ListDomains(ctx context.Context) ([]Domain, error) {
 
 // CreateDomain add Domain.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-domains:create.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) CreateDomain(ctx context.Context, request *DomainRequest) (*Domain, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	var result Domain
@@ -43,7 +49,10 @@ func (c *Client) CreateDomain(ctx context.Context, request *DomainRequest) (*Dom
 
 // GetDomainAllocation get Domain Allocation.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-domains:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - domain: The domain name itself, as returned in the `domain` field of a domain. Domains have no separate
@@ -60,7 +69,10 @@ func (c *Client) GetDomainAllocation(ctx context.Context, domain string) (*Domai
 
 // DeleteDomain delete Domain.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-domains:delete.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - domainID: Jamf-assigned identifier of the domain, as returned in the `id` field of a domain. Treat it as an
@@ -76,7 +88,10 @@ func (c *Client) DeleteDomain(ctx context.Context, domainID string) error {
 
 // VerifyDomain verify Domain.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-domains:update.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - domainID: Jamf-assigned identifier of the domain, as returned in the `id` field of a domain. Treat it as an

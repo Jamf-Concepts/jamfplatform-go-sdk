@@ -14,7 +14,10 @@ import (
 
 // GetDistributorQuote get Distributor Quote.
 //
-// Required privileges: the spec declares none.
+// Required privileges: distributor-actions:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - quoteNumber: Jamf-assigned quote number, as returned in the `quoteNumber` field of a quote.

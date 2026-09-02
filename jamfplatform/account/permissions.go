@@ -11,29 +11,37 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // requires, sourced from the x-required-privileges vendor extensions in the
 // Jamf OpenAPI specs. Identifiers are GA capability permissions in
 // {capability}:{action} form and a multi-entry Scoped slice means all of them
-// are required. An empty Scoped slice means the spec declares none — see
-// jamfplatform.MethodPrivileges for why that is not the same as none being
-// required. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CreateConnection":                 {Method: "CreateConnection", HTTPMethod: "POST", Path: "/v1/connections", Scoped: nil, Legacy: nil},
-	"CreateDistributorPurchaseOrder":   {Method: "CreateDistributorPurchaseOrder", HTTPMethod: "POST", Path: "/v1/distributor/purchase-orders", Scoped: nil, Legacy: nil},
-	"CreateDomain":                     {Method: "CreateDomain", HTTPMethod: "POST", Path: "/v1/domains", Scoped: nil, Legacy: nil},
-	"DeleteConnection":                 {Method: "DeleteConnection", HTTPMethod: "DELETE", Path: "/v1/connections/{connectionId}", Scoped: nil, Legacy: nil},
-	"DeleteDomain":                     {Method: "DeleteDomain", HTTPMethod: "DELETE", Path: "/v1/domains/{domainId}", Scoped: nil, Legacy: nil},
-	"GetConnection":                    {Method: "GetConnection", HTTPMethod: "GET", Path: "/v1/connections/{connectionId}", Scoped: nil, Legacy: nil},
-	"GetDistributorConfiguration":      {Method: "GetDistributorConfiguration", HTTPMethod: "GET", Path: "/v1/distributor/configuration", Scoped: nil, Legacy: nil},
-	"GetDistributorPurchaseOrder":      {Method: "GetDistributorPurchaseOrder", HTTPMethod: "GET", Path: "/v1/distributor/purchase-orders/{jamfPoNumber}", Scoped: nil, Legacy: nil},
-	"GetDistributorQuote":              {Method: "GetDistributorQuote", HTTPMethod: "GET", Path: "/v1/distributor/quotes/{quoteNumber}", Scoped: nil, Legacy: nil},
-	"GetDomainAllocation":              {Method: "GetDomainAllocation", HTTPMethod: "GET", Path: "/v1/domains/allocation/{domain}", Scoped: nil, Legacy: nil},
-	"ListConnections":                  {Method: "ListConnections", HTTPMethod: "GET", Path: "/v1/connections", Scoped: nil, Legacy: nil},
-	"ListDealRegistrations":            {Method: "ListDealRegistrations", HTTPMethod: "GET", Path: "/v1/deal-registrations", Scoped: nil, Legacy: nil},
-	"ListDomains":                      {Method: "ListDomains", HTTPMethod: "GET", Path: "/v1/domains", Scoped: nil, Legacy: nil},
-	"ListLicenses":                     {Method: "ListLicenses", HTTPMethod: "GET", Path: "/v1/licenses", Scoped: nil, Legacy: nil},
-	"UpdateConnection":                 {Method: "UpdateConnection", HTTPMethod: "PUT", Path: "/v1/connections/{connectionId}", Scoped: nil, Legacy: nil},
-	"UpdateDistributorConfiguration":   {Method: "UpdateDistributorConfiguration", HTTPMethod: "PATCH", Path: "/v1/distributor/configuration", Scoped: nil, Legacy: nil},
-	"ValidateDistributorPurchaseOrder": {Method: "ValidateDistributorPurchaseOrder", HTTPMethod: "POST", Path: "/v1/distributor/validate-purchase-order", Scoped: nil, Legacy: nil},
-	"VerifyDomain":                     {Method: "VerifyDomain", HTTPMethod: "POST", Path: "/v1/domains/{domainId}/actions/verify", Scoped: nil, Legacy: nil},
+	"CreateConnection":                 {Method: "CreateConnection", HTTPMethod: "POST", Path: "/v1/connections", Scoped: []string{"sso-connections:create"}, Legacy: nil, Source: "gateway-policy"},
+	"CreateDistributorPurchaseOrder":   {Method: "CreateDistributorPurchaseOrder", HTTPMethod: "POST", Path: "/v1/distributor/purchase-orders", Scoped: []string{"distributor-actions:create"}, Legacy: nil, Source: "gateway-policy"},
+	"CreateDomain":                     {Method: "CreateDomain", HTTPMethod: "POST", Path: "/v1/domains", Scoped: []string{"sso-domains:create"}, Legacy: nil, Source: "gateway-policy"},
+	"DeleteConnection":                 {Method: "DeleteConnection", HTTPMethod: "DELETE", Path: "/v1/connections/{connectionId}", Scoped: []string{"sso-connections:delete"}, Legacy: nil, Source: "gateway-policy"},
+	"DeleteDomain":                     {Method: "DeleteDomain", HTTPMethod: "DELETE", Path: "/v1/domains/{domainId}", Scoped: []string{"sso-domains:delete"}, Legacy: nil, Source: "gateway-policy"},
+	"GetConnection":                    {Method: "GetConnection", HTTPMethod: "GET", Path: "/v1/connections/{connectionId}", Scoped: []string{"sso-connections:read"}, Legacy: nil, Source: "gateway-policy"},
+	"GetDistributorConfiguration":      {Method: "GetDistributorConfiguration", HTTPMethod: "GET", Path: "/v1/distributor/configuration", Scoped: []string{"distributor-actions:read"}, Legacy: nil, Source: "gateway-policy"},
+	"GetDistributorPurchaseOrder":      {Method: "GetDistributorPurchaseOrder", HTTPMethod: "GET", Path: "/v1/distributor/purchase-orders/{jamfPoNumber}", Scoped: []string{"distributor-actions:read"}, Legacy: nil, Source: "gateway-policy"},
+	"GetDistributorQuote":              {Method: "GetDistributorQuote", HTTPMethod: "GET", Path: "/v1/distributor/quotes/{quoteNumber}", Scoped: []string{"distributor-actions:read"}, Legacy: nil, Source: "gateway-policy"},
+	"GetDomainAllocation":              {Method: "GetDomainAllocation", HTTPMethod: "GET", Path: "/v1/domains/allocation/{domain}", Scoped: []string{"sso-domains:read"}, Legacy: nil, Source: "gateway-policy"},
+	"ListConnections":                  {Method: "ListConnections", HTTPMethod: "GET", Path: "/v1/connections", Scoped: []string{"sso-connections:read"}, Legacy: nil, Source: "gateway-policy"},
+	"ListDealRegistrations":            {Method: "ListDealRegistrations", HTTPMethod: "GET", Path: "/v1/deal-registrations", Scoped: []string{"deal-registration:read"}, Legacy: nil, Source: "gateway-policy"},
+	"ListDomains":                      {Method: "ListDomains", HTTPMethod: "GET", Path: "/v1/domains", Scoped: []string{"sso-domains:read"}, Legacy: nil, Source: "gateway-policy"},
+	"ListLicenses":                     {Method: "ListLicenses", HTTPMethod: "GET", Path: "/v1/licenses", Scoped: []string{"licensing:read"}, Legacy: nil, Source: "gateway-policy"},
+	"UpdateConnection":                 {Method: "UpdateConnection", HTTPMethod: "PUT", Path: "/v1/connections/{connectionId}", Scoped: []string{"sso-connections:update"}, Legacy: nil, Source: "gateway-policy"},
+	"UpdateDistributorConfiguration":   {Method: "UpdateDistributorConfiguration", HTTPMethod: "PATCH", Path: "/v1/distributor/configuration", Scoped: []string{"distributor-actions:update"}, Legacy: nil, Source: "gateway-policy"},
+	"ValidateDistributorPurchaseOrder": {Method: "ValidateDistributorPurchaseOrder", HTTPMethod: "POST", Path: "/v1/distributor/validate-purchase-order", Scoped: []string{"distributor-actions:update"}, Legacy: nil, Source: "gateway-policy"},
+	"VerifyDomain":                     {Method: "VerifyDomain", HTTPMethod: "POST", Path: "/v1/domains/{domainId}/actions/verify", Scoped: []string{"sso-domains:update"}, Legacy: nil, Source: "gateway-policy"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

@@ -156,6 +156,49 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 	}
 }
 
+// applyEnumAdditions appends values to a named component schema's enum list.
+// For a value the server produces or accepts that the spec does not declare —
+// see SpecDef.EnumAdditions for why an omission here is a correctness bug and
+// not a documentation one.
+//
+// Panics when the value is already declared, which is how the entry expires:
+// upstream publishing the value must delete the config entry rather than
+// silently duplicate it, because a duplicated enum member emits two Go
+// constants with the same value and the second shadows nothing — it just
+// compiles, so nothing would ever notice. Panics too when the schema is
+// missing or declares no enum at all, since either means the entry no longer
+// names what it was written against.
+//
+// Runs with the other schema patches, so the value reaches the published spec
+// under api/ as well as the generated Go.
+func applyEnumAdditions(doc *openapi3.T, additions map[string][]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(additions) == 0 {
+		return
+	}
+	for _, schemaName := range sortedMapKeys(additions) {
+		values := additions[schemaName]
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			panic(fmt.Sprintf("enumAdditions[%q]: no such component schema — delete or retarget the entry", schemaName))
+		}
+		schema := ref.Value
+		if len(schema.Enum) == 0 {
+			panic(fmt.Sprintf("enumAdditions[%q]: schema declares no enum to add to — delete or retarget the entry", schemaName))
+		}
+		declared := make(map[string]bool, len(schema.Enum))
+		for _, e := range schema.Enum {
+			declared[fmt.Sprint(e)] = true
+		}
+		for _, v := range values {
+			if declared[v] {
+				panic(fmt.Sprintf("enumAdditions[%q]: the spec now declares %q — delete it from the entry so the upstream declaration is the only source", schemaName, v))
+			}
+			schema.Enum = append(schema.Enum, v)
+			declared[v] = true
+		}
+	}
+}
+
 // assertSchemaPatchTargetsAbsent enforces SchemaPatchesRequireAbsent: every
 // listed "<SchemaName>.<dotted.path>" must NOT already resolve in the spec.
 // Panics when one does, because that means upstream has started declaring a
@@ -787,7 +830,7 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 			}
 			return false
 		}
-		inlineObject := hasObjShape(v)
+		inlineObject := hasObjShape(v) || isRefUnion(v)
 		inlineArrayOfObject := v.Type.Is("array") && v.Items != nil && v.Items.Ref == "" &&
 			hasObjShape(v.Items.Value)
 		if !inlineObject && !inlineArrayOfObject {
@@ -1304,6 +1347,14 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 				t := schemaToGoType(name, schema, usage.isRequest, format)
 				t.XMLName = xmlName
 				types = append(types, t)
+			} else if isRefUnion(schema) && usage.isRequest && !usage.isResponse {
+				// A request-only union of named payloads. Merging would make
+				// every variant-specific field optional and let a caller
+				// populate two variants at once; a pointer per variant keeps
+				// the choice visible to the compiler and makes marshaling two
+				// an error. See GoUnion.
+				types = append(types, schemaToUnionType(name, schema))
+				continue
 			} else if len(schema.OneOf) > 0 {
 				// oneOf with no discriminator and no properties of its own:
 				// a *structurally* discriminated union, where the variant is
@@ -1851,6 +1902,72 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 	}
 	sort.Strings(required)
 	return props, required
+}
+
+// isRefUnion reports whether an inline schema is nothing but a
+// discriminator-less `oneOf` over two or more `$ref`s — the shape a spec uses
+// for "one of these named payloads, and the tag naming which is somewhere
+// else".
+//
+// Hoisting it is what gives it a Go type at all. hasObjShape only recognises
+// properties, so a union reached through a property was never lifted, never
+// named, and resolved to a bare `any` in the containing struct. Every member
+// must be a `$ref` so the hoisted schema's variants are types the generator
+// already emits; a member declaring its own shape inline has nothing to point
+// at and falls through to the merge, as before.
+//
+// Two members are the minimum. A one-member `oneOf` is 3.0's way of attaching
+// siblings to a `$ref` and collapses elsewhere, and `oneOf: [{$ref}, {type:
+// null}]` is a nullable reference that normalizeNullableUnions has already
+// rewritten by the time hoisting runs.
+func isRefUnion(s *openapi3.Schema) bool {
+	if s == nil || len(s.OneOf) < 2 {
+		return false
+	}
+	if (s.Type != nil && len(*s.Type) > 0) || len(s.Properties) > 0 ||
+		len(s.AllOf) > 0 || len(s.AnyOf) > 0 || len(s.Enum) > 0 ||
+		s.Discriminator != nil || s.AdditionalProperties.Schema != nil {
+		return false
+	}
+	for _, m := range s.OneOf {
+		if m == nil || m.Ref == "" {
+			return false
+		}
+	}
+	return true
+}
+
+// schemaToUnionType builds the GoType for an isRefUnion schema: one pointer
+// field per variant, named after the variant's own type. See GoUnion for why
+// this shape rather than a merge, and why the field names stutter.
+func schemaToUnionType(name string, schema *openapi3.Schema) GoType {
+	gt := GoType{Name: name, Comment: name + " carries the payload for exactly one of the variants below."}
+	if schema.Description != "" {
+		gt.Comment = name + " " + cleanComment(schema.Description)
+	}
+	// The contract is appended rather than substituted: the property
+	// description says what the payload *is*, and this says how to supply it.
+	// A reader who only ever sees the spec's sentence has no way to know that
+	// setting two pointers is an error. Wrapped and joined the way applyDocNotes
+	// does it, so the template's single "// {{ .Comment }}" line renders a
+	// paragraph rather than one enormous line.
+	contract := "Set exactly one variant pointer. The spec declares no discriminator, so nothing " +
+		"here can check the choice against the sibling field that selects it; marshaling more " +
+		"than one is an error, and marshaling none emits null."
+	if lines := docParagraphs(contract, typeDocWidth); len(lines) > 0 {
+		gt.Comment += "\n// \n// " + strings.Join(lines, "\n// ")
+	}
+	gt.Union = &GoUnion{}
+	seen := map[string]bool{}
+	for _, m := range schema.OneOf {
+		tn := refName(m)
+		if tn == "" || seen[tn] {
+			continue
+		}
+		seen[tn] = true
+		gt.Union.Variants = append(gt.Union.Variants, GoUnionVariant{FieldName: tn, TypeName: tn})
+	}
+	return gt
 }
 
 // mergeOneOfVariants collapses a discriminator-less oneOf union into a single

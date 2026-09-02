@@ -7,6 +7,8 @@ package account
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -427,7 +429,7 @@ type Connection struct {
 // ConnectionRequest A connection to create or replace, together with the domains and products it serves.
 type ConnectionRequest struct {
 	// Provider settings, in the shape matching `connectionType`.
-	Connection any `json:"connection"`
+	Connection ConnectionRequestConnection `json:"connection"`
 	// Provider type, which selects the settings expected in `connection`.
 	ConnectionType ConnectionType `json:"connectionType"`
 	// Verified domains the connection signs users in for. Every domain must already be verified for the
@@ -438,6 +440,69 @@ type ConnectionRequest struct {
 	// Products, and the tenants of those products, the connection is enabled for. Send an empty array to
 	// enable the connection for no tenant-scoped product.
 	EnabledProducts []EnabledProduct `json:"enabledProducts"`
+}
+
+// ConnectionRequestConnection Provider settings, in the shape matching `connectionType`.
+//
+// Set exactly one variant pointer. The spec declares no discriminator, so nothing here can check the
+// choice against the sibling field that selects it; marshaling more than one is an error, and
+// marshaling none emits null.
+type ConnectionRequestConnection struct {
+	OidcConnectionSettings   *OidcConnectionSettings   `json:"-"`
+	EntraConnectionSettings  *EntraConnectionSettings  `json:"-"`
+	OktaConnectionSettings   *OktaConnectionSettings   `json:"-"`
+	GoogleConnectionSettings *GoogleConnectionSettings `json:"-"`
+	// Raw holds the payload exactly as it arrived. Decoding cannot choose a
+	// variant — the spec declares no discriminator, so nothing inside the
+	// payload names one — so UnmarshalJSON stores the bytes here and leaves
+	// every variant pointer nil. Decode it into the variant whichever sibling
+	// field selects.
+	Raw json.RawMessage `json:"-"`
+}
+
+// MarshalJSON emits the one variant that is set.
+//
+// More than one is an error rather than an arbitrary pick between them: the
+// wire has room for exactly one, and silently dropping the rest is how a
+// caller ships a body it did not write. With none set it emits Raw, or JSON
+// null when Raw is empty too — the zero value has to stay marshalable, since
+// it is what the enclosing request carries until the caller fills it in, and
+// null is what the server rejects with a message naming the field.
+func (u ConnectionRequestConnection) MarshalJSON() ([]byte, error) {
+	var set []string
+	var payload any
+	if u.OidcConnectionSettings != nil {
+		set = append(set, "OidcConnectionSettings")
+		payload = u.OidcConnectionSettings
+	}
+	if u.EntraConnectionSettings != nil {
+		set = append(set, "EntraConnectionSettings")
+		payload = u.EntraConnectionSettings
+	}
+	if u.OktaConnectionSettings != nil {
+		set = append(set, "OktaConnectionSettings")
+		payload = u.OktaConnectionSettings
+	}
+	if u.GoogleConnectionSettings != nil {
+		set = append(set, "GoogleConnectionSettings")
+		payload = u.GoogleConnectionSettings
+	}
+	switch {
+	case len(set) > 1:
+		return nil, fmt.Errorf("ConnectionRequestConnection: %d variants set (%s); the payload carries exactly one", len(set), strings.Join(set, ", "))
+	case len(set) == 1:
+		return json.Marshal(payload)
+	case len(u.Raw) > 0:
+		return u.Raw, nil
+	}
+	return []byte("null"), nil
+}
+
+// UnmarshalJSON preserves the payload in Raw. See that field's comment for
+// why it does not populate a variant.
+func (u *ConnectionRequestConnection) UnmarshalJSON(data []byte) error {
+	u.Raw = append(u.Raw[:0], data...)
+	return nil
 }
 
 // ConnectionSummary A connection as it appears in a list, without the provider settings. Read a single connection for those.

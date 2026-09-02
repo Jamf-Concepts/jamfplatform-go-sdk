@@ -16,7 +16,10 @@ import (
 
 // ListConnections list Connections.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-connections:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) ListConnections(ctx context.Context) ([]ConnectionSummary, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	endpoint := prefix + "/connections"
@@ -30,7 +33,10 @@ func (c *Client) ListConnections(ctx context.Context) ([]ConnectionSummary, erro
 
 // CreateConnection add Connection.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-connections:create.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 func (c *Client) CreateConnection(ctx context.Context, request *ConnectionRequest) (*Connection, error) {
 	prefix := c.transport.APIPrefix("sso", "v1")
 	var result Connection
@@ -43,7 +49,10 @@ func (c *Client) CreateConnection(ctx context.Context, request *ConnectionReques
 
 // GetConnection get Connection.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-connections:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - connectionID: Identifier of the connection, as returned in the `id` field of a connection.
@@ -59,7 +68,10 @@ func (c *Client) GetConnection(ctx context.Context, connectionID string) (*Conne
 
 // UpdateConnection update Connection.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-connections:update.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - connectionID: Identifier of the connection, as returned in the `id` field of a connection.
@@ -75,7 +87,10 @@ func (c *Client) UpdateConnection(ctx context.Context, connectionID string, requ
 
 // DeleteConnection delete Connection.
 //
-// Required privileges: the spec declares none.
+// Required privileges: sso-connections:delete.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
 //
 // Parameters:
 //   - connectionID: Identifier of the connection, as returned in the `id` field of a connection.
