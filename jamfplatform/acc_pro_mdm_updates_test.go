@@ -96,6 +96,21 @@ func TestAcceptance_Pro_MdmUpdates_GetEnableAllApnsClientsStatusV1(t *testing.T)
 	status, err := pro.New(c).GetEnableAllApnsClientsStatusV1(context.Background())
 	if err != nil {
 		skipOnServerError(t, err)
+		// 404 here is "no enable-all request has ever been made on this
+		// instance", not a missing endpoint. Wire-verified 2026-09-03 on two
+		// instances running the identical build 11.31.1-t1787060595569: one had
+		// a real record (status COMPLETED, requestedTime 2026-08-30) and
+		// answered 200; the other had never had a request and answered 404 with
+		// an empty errors array. The endpoint reports the status OF a request,
+		// so with no request there is nothing to report.
+		//
+		// Not tolerated blindly: the body must be the empty-errors 404 that
+		// shape produces. Anything else still fails, and only EnableAllApnsClientsV1
+		// — which is state-changing on real MDM clients and so never called here —
+		// could make this return 200 on a fresh instance.
+		if apiErr := jamfplatform.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) && len(apiErr.FieldErrors()) == 0 {
+			t.Skip("no enable-all APNs request has been made on this instance, so there is no status to read (404)")
+		}
 		t.Fatalf("GetEnableAllApnsClientsStatusV1: %v", err)
 	}
 	t.Logf("Enable-all APNs clients status: %+v", status)

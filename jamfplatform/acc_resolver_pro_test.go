@@ -499,10 +499,30 @@ func TestAcceptance_ResolveComputerInventoryV4IDByName_Existing(t *testing.T) {
 	if len(computers) == 0 {
 		t.Skip("no computers — skipping")
 	}
-	first := computers[0]
-	if first.General == nil || first.General.Name == "" {
-		t.Skip("first computer has no name — skipping")
+	// Pick a name that occurs exactly once. The resolver refuses an ambiguous
+	// name by design, so a test that grabs computers[0] is asserting uniqueness
+	// it never checked — and it fails on any tenant that has two machines with
+	// the same name, which is normal: one instance probed on 2026-09-03 had
+	// three computers all called "admin's Virtual Machine". That refusal is the
+	// resolver working, so the test must supply a resolvable name rather than
+	// treat the tenant's data as a bug.
+	counts := map[string]int{}
+	for _, comp := range computers {
+		if comp.General != nil && comp.General.Name != "" {
+			counts[comp.General.Name]++
+		}
 	}
+	var unique *pro.ComputerInventoryV4
+	for i, comp := range computers {
+		if comp.General != nil && counts[comp.General.Name] == 1 {
+			unique = &computers[i]
+			break
+		}
+	}
+	if unique == nil {
+		t.Skipf("no uniquely-named computer among %d — every name is duplicated, so ResolveComputerInventoryV4IDByName cannot succeed by design", len(computers))
+	}
+	first := *unique
 	gotID, err := c.ResolveComputerInventoryV4IDByName(ctx, first.General.Name)
 	if err != nil {
 		t.Fatalf("resolve: %v", err)

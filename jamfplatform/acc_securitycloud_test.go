@@ -124,7 +124,7 @@ func jscEnsureGateways(t *testing.T, sc *securitycloud.Client, n int) []security
 			Name:       jscName("fixture-gateway"),
 			Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 			Enabled:    &enabled,
-			TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
+			TenantIds:  jscTenantIDs(t),
 			Contact: securitycloud.GatewayContact{
 				Email: "sdk-acc@example.invalid",
 				Name:  "SDK acceptance fixture",
@@ -504,7 +504,7 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 	created, err := sc.CreateZtnaGroupedGatewayV1(ctx, &securitycloud.GroupedGatewayCreateRequest{
 		Name:            name,
 		GatewayIds:      []string{gateways[0].ID, gateways[1].ID},
-		TenantIds:       []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
+		TenantIds:       jscTenantIDs(t),
 		RoutingStrategy: "NEAREST",
 		// Required on create even for NEAREST, where the server ignores it
 		// (spec v1401, wire-confirmed). Leaving the Go zero value in place
@@ -543,6 +543,56 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 	}
 }
 
+// jscTenantIDs returns the Security Cloud tenant ID list for a create body,
+// skipping the test when there is none to give.
+//
+// Security Cloud creates take tenantIds, and the ID cannot be derived from the
+// client: initJSCAcceptanceClient falls back to the environment credential when
+// no dedicated Security Cloud set is configured, and Client.Scope() then reports
+// an ENVIRONMENT id — a different identifier space, which the server rejects with
+// 400 "No mapping found for one of the supplied ids". Nor is it discoverable:
+// probed 2026-09-03, no Security Cloud read exposes a tenant id on this surface
+// (shared gateways return only id and name, and every other collection was
+// empty).
+//
+// So the honest answer is to skip. Sending []string{""} — which is what reading
+// the unset variable directly did — produces that same 400 at request validation,
+// before any of the field constraints a test is actually asserting, so the
+// failure reads as a spec/wire disagreement rather than as a missing fixture.
+// That is exactly how TestAcceptance_SecurityCloudZtnaGroupedGatewayRecoveryDelay
+// failed on 2026-09-03.
+//
+// # Two dead ends, so nobody retries them
+//
+// GetCsaTenantIdV1 looks like the answer — it returns a real tenant UUID for the
+// caller's Jamf Pro environment, and tenantIds is documented as "validated
+// against the caller's organization". It is not. Probed 2026-09-03 on the
+// environment credential's Security Cloud tenant, a grouped-gateway create
+// answered 400 "No mapping found for one of the supplied ids" for ALL FOUR
+// combinations: CSA id + real shared gateways, bogus id + real gateways, CSA id +
+// bogus gateways, and bogus + bogus. Bogus-and-bogus answering the same as
+// real-and-real proves the 400 is not about which ids were supplied.
+//
+// The cause is the tenant, not the id: that Security Cloud tenant is not
+// provisioned for ZTNA — its apps, zones and grouped-gateway collections are all
+// empty. The control in the same invocation settles it, the JSC sandbox tenant
+// with its own credential answering 422 SHARED_GATEWAY_MEMBER, "Grouped Gateway
+// members must be dedicated gateways", which is exactly what these tests assert.
+//
+// So the environment credential covers Security Cloud for 26 of 27 tests — device
+// groups, DNS, categories, activation profiles and uem-connect all pass on it —
+// and only the ZTNA gateway creates need the dedicated Security Cloud credential
+// set. Configure it if that coverage is wanted; do not try to synthesise the
+// tenant id.
+func jscTenantIDs(t *testing.T) []string {
+	t.Helper()
+	id := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")
+	if id == "" {
+		t.Skip("needs JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID: Security Cloud creates take tenantIds, and the ID is neither derivable from an environment-scoped client nor discoverable from any read on this surface")
+	}
+	return []string{id}
+}
+
 // TestAcceptance_SecurityCloudZtnaGroupedGatewayRecoveryDelay pins the
 // recoveryDelayInSec constraint the ztna spec gained in GitOps build v1401 and
 // that was wire-confirmed on 2026-08-21: the field is required on create for
@@ -568,11 +618,17 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayRecoveryDelay(t *testing.T) {
 	}
 	members := []string{shared.Results[0].ID, shared.Results[1].ID}
 
+	// Resolved once, here, rather than inside req(): req is called from subtest
+	// goroutines but closes over the PARENT t, and t.Skip must run on the
+	// goroutine of the test it is skipping — otherwise the runtime.Goexit lands
+	// in the wrong place and the subtest is recorded as a failure instead.
+	tenantIDs := jscTenantIDs(t)
+
 	req := func(delay int) *securitycloud.GroupedGatewayCreateRequest {
 		return &securitycloud.GroupedGatewayCreateRequest{
 			Name:               jscName("grouped-delay"),
 			GatewayIds:         members,
-			TenantIds:          []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
+			TenantIds:          tenantIDs,
 			RoutingStrategy:    "ACTIVE_STANDBY",
 			RecoveryDelayInSec: delay,
 		}
@@ -678,7 +734,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		Name:       name,
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
-		TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
+		TenantIds:  jscTenantIDs(t),
 		Contact: securitycloud.GatewayContact{
 			Email: "sdk-acc@example.invalid",
 			Name:  "SDK acceptance",
@@ -757,7 +813,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		Name:       jscName("gateway-leftpair"),
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
-		TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
+		TenantIds:  jscTenantIDs(t),
 		Contact:    securitycloud.GatewayContact{Email: "sdk-acc@example.invalid", Name: "SDK acceptance"},
 		Ipsec: &securitycloud.GatewayIpSecRequest{
 			KeyExchange: "ikev2",
@@ -2359,7 +2415,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGroupedGateway(t *testing.T) {
 	req := &securitycloud.GroupedGatewayCreateRequest{
 		Name:               name,
 		GatewayIds:         []string{gateways[0].ID, gateways[1].ID},
-		TenantIds:          []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
+		TenantIds:          jscTenantIDs(t),
 		RoutingStrategy:    "NEAREST",
 		RecoveryDelayInSec: 3600,
 	}
@@ -2409,7 +2465,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 		Name:       jscName("apply-gateway"),
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
-		TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
+		TenantIds:  jscTenantIDs(t),
 		Contact: securitycloud.GatewayContact{
 			Email: "sdk-acc@example.invalid",
 			Name:  "SDK acceptance",
