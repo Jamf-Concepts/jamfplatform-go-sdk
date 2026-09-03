@@ -13,7 +13,7 @@ import (
 
 // ListActiveUserSessionsV1 get active user sessions.
 //
-// Required privileges: read:pro:user-sessions. Legacy Jamf Pro privilege name(s): Read User.
+// Required privileges: user-sessions:read. Legacy Jamf Pro privilege name(s): Read User.
 func (c *Client) ListActiveUserSessionsV1(ctx context.Context) ([]ActiveUserSession, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []ActiveUserSession
@@ -26,7 +26,7 @@ func (c *Client) ListActiveUserSessionsV1(ctx context.Context) ([]ActiveUserSess
 
 // GetActiveUsersCountV1 get count of active user sessions.
 //
-// Required privileges: read:pro:user-sessions. Legacy Jamf Pro privilege name(s): Read User.
+// Required privileges: user-sessions:read. Legacy Jamf Pro privilege name(s): Read User.
 func (c *Client) GetActiveUsersCountV1(ctx context.Context) (*ActiveUsersCount, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ActiveUsersCount

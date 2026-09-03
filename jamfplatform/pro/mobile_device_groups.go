@@ -19,7 +19,8 @@ import (
 
 // ListMobileDeviceGroupsV2 return the list of all Mobile Device Groups.
 //
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
+// Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGroup, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []MobileDeviceGroup
@@ -30,24 +31,9 @@ func (c *Client) ListMobileDeviceGroupsV2(ctx context.Context) ([]MobileDeviceGr
 	return result, nil
 }
 
-// ListMobileDeviceGroupsV1 return the list of all Mobile Device Groups.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Static Mobile Device Groups.
-func (c *Client) ListMobileDeviceGroupsV1(ctx context.Context) ([]MobileDeviceGroup, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result []MobileDeviceGroup
-	endpoint := prefix + "/mobile-device-groups"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListMobileDeviceGroupsV1: %w", err)
-	}
-	return result, nil
-}
-
 // ListSmartMobileDeviceGroupsV2 get Smart Groups.
 //
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
+// Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupId:asc. Available criteria
@@ -86,52 +72,9 @@ func (c *Client) ListSmartMobileDeviceGroupsV2(ctx context.Context, sort []strin
 	})
 }
 
-// ListSmartMobileDeviceGroupsV1 get Smart Groups.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
-//
-// Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Available criteria to
-//     sort on: groupId, groupName, siteId.
-//   - filter: Query in the RSQL format, allowing to filter smart group collection. Default filter is empty query -
-//     returning all results for the requested page. Fields allowed in the query: groupId, groupName,
-//     siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have
-//     siteId filtered automatically. This param can be combined with paging and sorting. Example:
-//     groupName=="smartGroup1".
-func (c *Client) ListSmartMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]SmartGroup, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]SmartGroup, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/mobile-device-groups/smart-groups"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int          `json:"totalCount"`
-			Results    []SmartGroup `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // CreateSmartMobileDeviceGroupV2 create a smart group.
 //
-// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Smart Mobile Device Groups.
+// Required privileges: device-groups:create. Legacy Jamf Pro privilege name(s): Create Smart Mobile Device Groups.
 //
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
@@ -152,34 +95,9 @@ func (c *Client) CreateSmartMobileDeviceGroupV2(ctx context.Context, request *Sm
 	return &result, nil
 }
 
-// CreateSmartMobileDeviceGroupV1 create a smart group.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Smart Mobile Device Groups.
-//
-// Parameters:
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
-func (c *Client) CreateSmartMobileDeviceGroupV1(ctx context.Context, request *SmartGroupAssignment, platform bool) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result HrefResponse
-	endpoint := prefix + "/mobile-device-groups/smart-groups"
-	params := url.Values{}
-	if platform {
-		params.Set("platform", "true")
-	}
-	if encoded := params.Encode(); encoded != "" {
-		endpoint += "?" + encoded
-	}
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateSmartMobileDeviceGroupV1: %w", err)
-	}
-	return &result, nil
-}
-
 // GetSmartMobileDeviceGroupV2 get Smart Group by Id.
 //
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
+// Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
 //
 // Parameters:
 //   - id: instance id of smart-group.
@@ -193,27 +111,9 @@ func (c *Client) GetSmartMobileDeviceGroupV2(ctx context.Context, id string) (*S
 	return &result, nil
 }
 
-// GetSmartMobileDeviceGroupV1 get Smart Group by Id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups.
-//
-// Parameters:
-//   - id: instance id of smart-group.
-func (c *Client) GetSmartMobileDeviceGroupV1(ctx context.Context, id string) (*SmartGroupDetail, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result SmartGroupDetail
-	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetSmartMobileDeviceGroupV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // UpdateSmartMobileDeviceGroupV2 update a smart group.
 //
-// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
+// Required privileges: device-groups:update. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
 //
 // Parameters:
 //   - id: instance id of a smart group.
@@ -227,27 +127,9 @@ func (c *Client) UpdateSmartMobileDeviceGroupV2(ctx context.Context, id string, 
 	return &result, nil
 }
 
-// UpdateSmartMobileDeviceGroupV1 update a smart group.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
-//
-// Parameters:
-//   - id: instance id of a smart group.
-func (c *Client) UpdateSmartMobileDeviceGroupV1(ctx context.Context, id string, request *SmartGroupAssignment) (*SmartGroupAssignment, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result SmartGroupAssignment
-	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateSmartMobileDeviceGroupV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // DeleteSmartMobileDeviceGroupV2 remove Smart Group by Id.
 //
-// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Smart Mobile Device Groups.
+// Required privileges: device-groups:delete. Legacy Jamf Pro privilege name(s): Delete Smart Mobile Device Groups.
 //
 // Parameters:
 //   - id: instance id of smart-group.
@@ -260,27 +142,11 @@ func (c *Client) DeleteSmartMobileDeviceGroupV2(ctx context.Context, id string) 
 	return nil
 }
 
-// DeleteSmartMobileDeviceGroupV1 remove Smart Group by Id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Smart Mobile Device Groups.
-//
-// Parameters:
-//   - id: instance id of smart-group.
-func (c *Client) DeleteSmartMobileDeviceGroupV1(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteSmartMobileDeviceGroupV1(%s): %w", id, err)
-	}
-	return nil
-}
-
 // ListSmartMobileDeviceGroupMembershipV2 get Smart Group Membership by Id.
 //
-// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
+// All of them are required, not alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: instance id of smart-group.
@@ -368,102 +234,9 @@ func (c *Client) ListSmartMobileDeviceGroupMembershipV2(ctx context.Context, id 
 	})
 }
 
-// ListSmartMobileDeviceGroupMembershipV1 get Smart Group Membership by Id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Smart Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - id: instance id of smart-group.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is mobileDeviceId:asc. Multiple sort
-//     criteria are supported and must be separated with a comma.
-//     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
-//     `availableSpaceMb`, `batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`,
-//     `bluetoothMacAddress`, `capacityMb`, `lostModeEnabledDate`, `declarativeDeviceManagementEnabled`,
-//     `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,
-//     `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,
-//     `osRapidSecurityResponse`, `osSupplementalBuildVersion`, `osVersion`, `ipAddress`,
-//     `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`,
-//     `lastEnrolledDate`, `lastCloudBackupDate`, `lastInventoryUpdateDate`, `locales`,
-//     `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`,
-//     `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,
-//     `preferredVoiceNumber`, `quotaSize`, `residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,
-//     `tethered`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`, `deviceOwnershipType`,
-//     `building`, `department`, `emailAddress`, `fullName`, `userPhoneNumber`, `position`, `room`,
-//     `username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`, `poDate`, `poNumber`,
-//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`,
-//     `warrantyExpirationDate`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,
-//     `fileEncryptionCapable`, `hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`,
-//     `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
-//     `carrierSettingsVersion`, `cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`,
-//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`,
-//     `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`,
-//     `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`,
-//     `lastLoggedInUsernameMdmTimestamp`.
-//     Extension attributes can be sorted by using the format `EA+ID` where ID is the ID of the extension
-//     attribute, for example `EA+1!=null`.
-//     Example: `sort=displayName:desc,username:asc`.
-//   - filter: Query in the RSQL format, allowing to filter mobile device collection. Default filter is empty query
-//   - returning all results for the requested page.
-//     Fields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
-//     `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`,
-//     `capacityMb`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,
-//     `devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`,
-//     `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`,
-//     `managementId`, `languages`, `lastInventoryUpdateDate`, `locales`,
-//     `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`,
-//     `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,
-//     `residentUsers`, `serialNumber`, `sharedIpad`, `supervised`, `tethered`, `timeZone`, `udid`,
-//     `usedSpacePercentage`, `wifiMacAddress`, `building`, `department`, `emailAddress`, `fullName`,
-//     `userPhoneNumber`, `position`, `room`, `username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,
-//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`,
-//     `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,
-//     `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,
-//     `passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`, `currentMobileCountryCode`,
-//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`, `roaming`,
-//     `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`,
-//     `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`.
-//     Extension attributes can be filtered by using the format `EA+ID` where ID is the ID of the extension
-//     attribute, for example `EA+1!=null`.
-//     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
-func (c *Client) ListSmartMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := fmt.Sprintf("%s/mobile-device-groups/smart-group-membership/%s", prefix, url.PathEscape(id))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                         `json:"totalCount"`
-			Results    []InventoryListMobileDevice `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // ListStaticMobileDeviceGroupsV2 get Static Groups.
 //
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
+// Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupId:asc. Available criteria
@@ -502,52 +275,9 @@ func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []stri
 	})
 }
 
-// ListStaticMobileDeviceGroupsV1 get Static Groups.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
-//
-// Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Available criteria to
-//     sort on: groupId, groupName, siteId.
-//   - filter: Query in the RSQL format, allowing to filter department collection. Default filter is empty query -
-//     returning all results for the requested page. Fields allowed in the query: groupId, groupName,
-//     siteId. The siteId field can only be filtered by admins with full access. Any sited admin will have
-//     siteId filtered automatically. This param can be combined with paging and sorting. Example:
-//     groupName=="staticGroup1".
-func (c *Client) ListStaticMobileDeviceGroupsV1(ctx context.Context, sort []string, filter string) ([]StaticGroup, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]StaticGroup, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/mobile-device-groups/static-groups"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int           `json:"totalCount"`
-			Results    []StaticGroup `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // CreateStaticMobileDeviceGroupV2 create a static group.
 //
-// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Static Mobile Device Groups.
+// Required privileges: device-groups:create. Legacy Jamf Pro privilege name(s): Create Static Mobile Device Groups.
 //
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
@@ -568,34 +298,9 @@ func (c *Client) CreateStaticMobileDeviceGroupV2(ctx context.Context, request *S
 	return &result, nil
 }
 
-// CreateStaticMobileDeviceGroupV1 create membership of a static group.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: create:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Create Static Mobile Device Groups.
-//
-// Parameters:
-//   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
-func (c *Client) CreateStaticMobileDeviceGroupV1(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result HrefResponse
-	endpoint := prefix + "/mobile-device-groups/static-groups"
-	params := url.Values{}
-	if platform {
-		params.Set("platform", "true")
-	}
-	if encoded := params.Encode(); encoded != "" {
-		endpoint += "?" + encoded
-	}
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateStaticMobileDeviceGroupV1: %w", err)
-	}
-	return &result, nil
-}
-
 // GetStaticMobileDeviceGroupV2 get Static Group by Id.
 //
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
+// Required privileges: device-groups:read. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
 //
 // Parameters:
 //   - id: instance id of static-group.
@@ -609,27 +314,9 @@ func (c *Client) GetStaticMobileDeviceGroupV2(ctx context.Context, id string) (*
 	return &result, nil
 }
 
-// GetStaticMobileDeviceGroupV1 get Static Group by Id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups.
-//
-// Parameters:
-//   - id: instance id of static-group.
-func (c *Client) GetStaticMobileDeviceGroupV1(ctx context.Context, id string) (*StaticGroup, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result StaticGroup
-	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetStaticMobileDeviceGroupV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // DeleteStaticMobileDeviceGroupV2 remove Static Group by Id.
 //
-// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Static Mobile Device Groups.
+// Required privileges: device-groups:delete. Legacy Jamf Pro privilege name(s): Delete Static Mobile Device Groups.
 //
 // Parameters:
 //   - id: instance id of static-group.
@@ -642,26 +329,9 @@ func (c *Client) DeleteStaticMobileDeviceGroupV2(ctx context.Context, id string)
 	return nil
 }
 
-// DeleteStaticMobileDeviceGroupV1 remove Static Group by Id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: delete:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Delete Static Mobile Device Groups.
-//
-// Parameters:
-//   - id: instance id of static-group.
-func (c *Client) DeleteStaticMobileDeviceGroupV1(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteStaticMobileDeviceGroupV1(%s): %w", id, err)
-	}
-	return nil
-}
-
 // PatchStaticMobileDeviceGroupV2 update a static group.
 //
-// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Static Mobile Device Groups.
+// Required privileges: device-groups:update. Legacy Jamf Pro privilege name(s): Update Static Mobile Device Groups.
 //
 // Parameters:
 //   - id: instance id of static-group.
@@ -675,28 +345,11 @@ func (c *Client) PatchStaticMobileDeviceGroupV2(ctx context.Context, id string, 
 	return &result, nil
 }
 
-// PatchStaticMobileDeviceGroupV1 update membership of a static group.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Static Mobile Device Groups.
-//
-// Parameters:
-//   - id: instance id of a static group.
-func (c *Client) PatchStaticMobileDeviceGroupV1(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result StaticGroupAssignment
-	endpoint := fmt.Sprintf("%s/mobile-device-groups/static-groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("PatchStaticMobileDeviceGroupV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // ListStaticMobileDeviceGroupMembershipV2 get Static Group Membership by Id.
 //
-// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read, devices:read. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
+// All of them are required, not alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: instance id of static-group.
@@ -784,103 +437,9 @@ func (c *Client) ListStaticMobileDeviceGroupMembershipV2(ctx context.Context, id
 	})
 }
 
-// ListStaticMobileDeviceGroupMembershipV1 get Static Group Membership by Id.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:mobile-device-groups, read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Static Mobile Device Groups, Read Mobile Devices.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - id: instance id of static-group.
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is mobileDeviceId:asc. Multiple sort
-//     criteria are supported and must be separated with a comma.
-//     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
-//     `availableSpaceMb`, `batteryLevel`, `batteryHealth`, `bluetoothLowEnergyCapable`,
-//     `bluetoothMacAddress`, `capacityMb`, `lostModeEnabledDate`, `declarativeDeviceManagementEnabled`,
-//     `deviceId`, `deviceLocatorServiceEnabled`, `devicePhoneNumber`,
-//     `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `enrollmentSessionTokenValid`, `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`,
-//     `osRapidSecurityResponse`, `osSupplementalBuildVersion`, `osVersion`, `ipAddress`,
-//     `itunesStoreAccountActive`, `mobileDeviceId`, `managementId`, `languages`, `lastBackupDate`,
-//     `lastEnrolledDate`, `lastCloudBackupDate`, `lastInventoryUpdateDate`, `locales`,
-//     `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`,
-//     `mdmProfileExpirationDate`, `model`, `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`,
-//     `preferredVoiceNumber`, `quotaSize`, `residentUsers`, `serialNumber`, `sharedIpad`, `supervised`,
-//     `tethered`, `timeZone`, `udid`, `usedSpacePercentage`, `wifiMacAddress`, `deviceOwnershipType`,
-//     `building`, `department`, `emailAddress`, `fullName`, `userPhoneNumber`, `position`, `room`,
-//     `username`, `appleCareId`, `leaseExpirationDate`,`lifeExpectancyYears`, `poDate`, `poNumber`,
-//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`,
-//     `warrantyExpirationDate`, `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`,
-//     `fileEncryptionCapable`, `hardwareEncryptionSupported`, `jailbreakStatus`, `passcodeCompliant`,
-//     `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`, `passcodePresent`,
-//     `carrierSettingsVersion`, `cellularTechnology`, `currentCarrierNetwork`, `currentMobileCountryCode`,
-//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`,
-//     `voiceRoamingEnabled`, `roaming`, `lastLoggedInUsernameSelfService`,
-//     `lastLoggedInUsernameSelfServiceTimestamp`, `lastLoggedInUsernameMdm`,
-//     `lastLoggedInUsernameMdmTimestamp`.
-//     Extension attributes can be sorted by using the format `EA+ID` where ID is the ID of the extension
-//     attribute, for example `EA+1!=null`.
-//     Example: `sort=displayName:desc,username:asc`.
-//   - filter: Query in the RSQL format, allowing to filter mobile device collection. Default filter is empty query
-//   - returning all results for the requested page.
-//     Fields allowed in the query: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
-//     `availableSpaceMb`, `batteryLevel`, `bluetoothLowEnergyCapable`, `bluetoothMacAddress`,
-//     `capacityMb`, `declarativeDeviceManagementEnabled`, `deviceId`, `deviceLocatorServiceEnabled`,
-//     `devicePhoneNumber`, `diagnosticAndUsageReportingEnabled`, `displayName`, `doNotDisturbEnabled`,
-//     `exchangeDeviceId`, `cloudBackupEnabled`, `osBuild`, `osSupplementalBuildVersion`, `osVersion`,
-//     `osRapidSecurityResponse`, `ipAddress`, `itunesStoreAccountActive`, `mobileDeviceId`,
-//     `managementId`, `languages`, `lastInventoryUpdateDate`, `locales`,
-//     `locationServicesForSelfServiceMobileEnabled`, `lostModeEnabled`, `managed`, `model`,
-//     `modelIdentifier`, `modelNumber`, `modemFirmwareVersion`, `preferredVoiceNumber`, `quotaSize`,
-//     `residentUsers`, `serialNumber`, `sharedIpad`, `supervised`, `tethered`, `timeZone`, `udid`,
-//     `usedSpacePercentage`, `wifiMacAddress`, `building`, `department`, `emailAddress`, `fullName`,
-//     `userPhoneNumber`, `position`, `room`, `username`, `appleCareId`, `lifeExpectancyYears`, `poNumber`,
-//     `purchasePrice`, `purchasedOrLeased`, `purchasingAccount`, `purchasingContact`, `vendor`,
-//     `activationLockEnabled`, `blockEncryptionCapable`, `dataProtection`, `fileEncryptionCapable`,
-//     `passcodeCompliant`, `passcodeCompliantWithProfile`, `passcodeLockGracePeriodEnforcedSeconds`,
-//     `passcodePresent`, `carrierSettingsVersion`, `currentCarrierNetwork`, `currentMobileCountryCode`,
-//     `currentMobileNetworkCode`, `dataRoamingEnabled`, `eid`, `network`, `homeMobileCountryCode`,
-//     `homeMobileNetworkCode`, `iccid`, `imei`, `imei2`, `meid`, `personalHotspotEnabled`, `roaming`,
-//     `lastLoggedInUsernameSelfService`, `lastLoggedInUsernameSelfServiceTimestamp`,
-//     `lastLoggedInUsernameMdm`, `lastLoggedInUsernameMdmTimestamp`.
-//     Extension attributes can be filtered by using the format `EA+ID` where ID is the ID of the extension
-//     attribute, for example `EA+1!=null`.
-//     This param can be combined with paging and sorting. Example: `filter=displayName=="iPad"`.
-func (c *Client) ListStaticMobileDeviceGroupMembershipV1(ctx context.Context, id string, sort []string, filter string) ([]InventoryListMobileDevice, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]InventoryListMobileDevice, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := fmt.Sprintf("%s/mobile-device-groups/static-group-membership/%s", prefix, url.PathEscape(id))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                         `json:"totalCount"`
-			Results    []InventoryListMobileDevice `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // EraseMobileDeviceGroupV2 erase all devices in the group.
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
 //
 // Parameters:
 //   - id: instance id of mobile-device-group.
@@ -889,24 +448,6 @@ func (c *Client) EraseMobileDeviceGroupV2(ctx context.Context, id string, reques
 	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusAccepted, nil); err != nil {
 		return fmt.Errorf("EraseMobileDeviceGroupV2(%s): %w", id, err)
-	}
-	return nil
-}
-
-// EraseMobileDeviceGroupV1 erase all devices in the group.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send MDM command information in Jamf Pro API.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - id: instance id of mobile-device-group.
-func (c *Client) EraseMobileDeviceGroupV1(ctx context.Context, id string, request *GroupResetRequest) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/mobile-device-groups/%s/erase", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("EraseMobileDeviceGroupV1(%s): %w", id, err)
 	}
 	return nil
 }
@@ -937,32 +478,6 @@ func (c *Client) ResolveMobileDeviceGroupV2ByName(ctx context.Context, name stri
 	return &out, nil
 }
 
-// ResolveMobileDeviceGroupV1IDByName looks up a MobileDeviceGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/mobile-device-groups"
-	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveMobileDeviceGroupV1IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveMobileDeviceGroupV1ByName looks up a MobileDeviceGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveMobileDeviceGroupV1ByName(ctx context.Context, name string) (*MobileDeviceGroup, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/mobile-device-groups"
-	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveMobileDeviceGroupV1ByName(%s): %w", name, err)
-	}
-	var out MobileDeviceGroup
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
 // ResolveSmartMobileDeviceGroupV2IDByName looks up a SmartMobileDeviceGroupV2 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveSmartMobileDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
@@ -985,32 +500,6 @@ func (c *Client) ResolveSmartMobileDeviceGroupV2ByName(ctx context.Context, name
 	var out SmartGroup
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV2ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveSmartMobileDeviceGroupV1IDByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveSmartMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/mobile-device-groups/smart-groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveSmartMobileDeviceGroupV1IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveSmartMobileDeviceGroupV1ByName looks up a SmartMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveSmartMobileDeviceGroupV1ByName(ctx context.Context, name string) (*SmartGroup, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/mobile-device-groups/smart-groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV1ByName(%s): %w", name, err)
-	}
-	var out SmartGroup
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveSmartMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
 }
@@ -1041,32 +530,6 @@ func (c *Client) ResolveStaticMobileDeviceGroupV2ByName(ctx context.Context, nam
 	return &out, nil
 }
 
-// ResolveStaticMobileDeviceGroupV1IDByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveStaticMobileDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/mobile-device-groups/static-groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveStaticMobileDeviceGroupV1IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveStaticMobileDeviceGroupV1ByName looks up a StaticMobileDeviceGroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveStaticMobileDeviceGroupV1ByName(ctx context.Context, name string) (*StaticGroup, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/mobile-device-groups/static-groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupId", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV1ByName(%s): %w", name, err)
-	}
-	var out StaticGroup
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveStaticMobileDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
 // ApplySmartMobileDeviceGroupV2 creates or updates a SmartMobileDeviceGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
 func (c *Client) ApplySmartMobileDeviceGroupV2(ctx context.Context, request *SmartGroupAssignmentV2, platform bool) (string, bool, error) {
 	name := request.GroupName
@@ -1087,30 +550,6 @@ func (c *Client) ApplySmartMobileDeviceGroupV2(ctx context.Context, request *Sma
 	_, err = c.UpdateSmartMobileDeviceGroupV2(ctx, id, request)
 	if err != nil {
 		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV2: update(%s): %w", id, err)
-	}
-	return id, false, nil
-}
-
-// ApplySmartMobileDeviceGroupV1 creates or updates a SmartMobileDeviceGroupV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
-func (c *Client) ApplySmartMobileDeviceGroupV1(ctx context.Context, request *SmartGroupAssignment, platform bool) (string, bool, error) {
-	name := request.GroupName
-	if name == "" {
-		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: GroupName must not be empty")
-	}
-	id, err := c.ResolveSmartMobileDeviceGroupV1IDByName(ctx, name)
-	if err != nil {
-		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
-			resp, createErr := c.CreateSmartMobileDeviceGroupV1(ctx, request, platform)
-			if createErr != nil {
-				return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: create: %w", createErr)
-			}
-			return resp.ID, true, nil
-		}
-		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: resolve: %w", err)
-	}
-	_, err = c.UpdateSmartMobileDeviceGroupV1(ctx, id, request)
-	if err != nil {
-		return "", false, fmt.Errorf("ApplySmartMobileDeviceGroupV1: update(%s): %w", id, err)
 	}
 	return id, false, nil
 }
@@ -1150,45 +589,6 @@ func (c *Client) ApplyStaticMobileDeviceGroupV2(ctx context.Context, request *St
 	_, err = c.PatchStaticMobileDeviceGroupV2(ctx, id, request)
 	if err != nil {
 		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV2: update(%s): %w", id, err)
-	}
-	return id, false, nil
-}
-
-// ApplyStaticMobileDeviceGroupV1 creates or updates a StaticMobileDeviceGroupV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
-func (c *Client) ApplyStaticMobileDeviceGroupV1(ctx context.Context, request *StaticGroupAssignment, platform bool) (string, bool, error) {
-	name := request.GroupName
-	if name == "" {
-		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: GroupName must not be empty")
-	}
-	id, err := c.ResolveStaticMobileDeviceGroupV1IDByName(ctx, name)
-	if err != nil {
-		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
-			resp, createErr := c.CreateStaticMobileDeviceGroupV1(ctx, request, platform)
-			if createErr != nil {
-				return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: create: %w", createErr)
-			}
-			return resp.ID, true, nil
-		}
-		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: resolve: %w", err)
-	}
-	// Fetch current membership to preserve existing devices in the patch.
-	membership, memberErr := c.ListStaticMobileDeviceGroupMembershipV1(ctx, id, nil, "")
-	if memberErr != nil {
-		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: fetch membership(%s): %w", id, memberErr)
-	}
-	assignments := make([]Assignment, 0, len(membership))
-	for _, m := range membership {
-		mid := m.MobileDeviceID
-		sel := true
-		assignments = append(assignments, Assignment{
-			MobileDeviceID: &mid,
-			Selected:       &sel,
-		})
-	}
-	request.Assignments = &assignments
-	_, err = c.PatchStaticMobileDeviceGroupV1(ctx, id, request)
-	if err != nil {
-		return "", false, fmt.Errorf("ApplyStaticMobileDeviceGroupV1: update(%s): %w", id, err)
 	}
 	return id, false, nil
 }

@@ -16,57 +16,12 @@ type ApiErrorDto struct {
 	TraceID string `json:"traceId"`
 }
 
-// DeclarationReportClientDto represents a declaration report client dto.
-type DeclarationReportClientDto struct {
-	// The active state of the declaration.
-	Active bool `json:"active"`
-	// The platform channel.
-	Channel string `json:"channel"`
-	// The timestamp when this declaration status was last updated for the device.
-	DateUpdated *time.Time `json:"dateUpdated,omitempty"`
-	// The platform deviceId.
-	DeviceID string `json:"deviceId"`
-	// Reasons associated with the declaration, if any.
-	Reasons []StatusReportDeclarationReasonDto `json:"reasons"`
-	// The server token for the declaration.
-	ServerToken string `json:"serverToken"`
-	// The validity state of the declaration.
-	// Allowed values: see the DeclarationReportClientDtoValidityState constants.
-	ValidityState string `json:"validityState"`
-}
-
-// DeclarationReportDto represents a declaration report dto.
-type DeclarationReportDto struct {
-	// The identifier of the declaration.
-	DeclarationIdentifier string `json:"declarationIdentifier"`
-	// The clients reporting the declaration.
-	Results []DeclarationReportClientDto `json:"results"`
-	// The total number of clients reporting the declaration.
-	TotalCount int64 `json:"totalCount"`
-}
-
 // DeviceChannelsDto represents a device channels dto.
 type DeviceChannelsDto struct {
 	// The channels associated with the device.
 	Channels []string `json:"channels"`
 	// The platform deviceId.
 	DeviceID string `json:"deviceId"`
-}
-
-// DeviceReportChannelDto represents a device report channel dto.
-type DeviceReportChannelDto struct {
-	// The channel of the client from which the report is sent.
-	Channel string `json:"channel"`
-	// The declarations associated with the channel.
-	Declarations []StatusReportDeclarationDto `json:"declarations"`
-	// The last report received from the channel.
-	LastReportTime time.Time `json:"lastReportTime"`
-}
-
-// DeviceReportDto represents a device report dto.
-type DeviceReportDto struct {
-	// The channels associated with the device.
-	Channels []DeviceReportChannelDto `json:"channels"`
 }
 
 // ErrorDto represents a error dto.
@@ -128,29 +83,6 @@ type FilteredResultDto struct {
 	Type string `json:"type"`
 	// The validity state of the declaration.
 	// Allowed values: see the FilteredResultDtoValidityState constants.
-	ValidityState string `json:"validityState"`
-}
-
-// StatusReportDeclarationDto represents a status report declaration dto.
-type StatusReportDeclarationDto struct {
-	// The active state of the declaration.
-	Active bool `json:"active"`
-	// The timestamp when this declaration status was last updated for the device.
-	DateUpdated *time.Time `json:"dateUpdated,omitempty"`
-	// The identifier of the declaration.
-	DeclarationIdentifier string `json:"declarationIdentifier"`
-	// Reasons associated with the declaration, if any.
-	Reasons []StatusReportDeclarationReasonDto `json:"reasons"`
-	// The server token for the declaration.
-	ServerToken string `json:"serverToken"`
-	// The installation status of the declaration.
-	// Allowed values: see the StatusReportDeclarationDtoStatus constants.
-	Status string `json:"status"`
-	// The type of the declaration.
-	// Allowed values: see the StatusReportDeclarationDtoType constants.
-	Type string `json:"type"`
-	// The validity state of the declaration.
-	// Allowed values: see the StatusReportDeclarationDtoValidityState constants.
 	ValidityState string `json:"validityState"`
 }
 

@@ -13,7 +13,7 @@ import (
 
 // GetSMTPServer finds the Jamf Pro SMTP server information.
 //
-// Required privileges: read:pro:smtp-server.
+// Required privileges: smtp-server:read.
 func (c *Client) GetSMTPServer(ctx context.Context) (*SmtpServer, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SmtpServer
@@ -26,7 +26,7 @@ func (c *Client) GetSMTPServer(ctx context.Context) (*SmtpServer, error) {
 
 // UpdateSMTPServer updates the Jamf Pro SMTP server information.
 //
-// Required privileges: update:pro:smtp-server.
+// Required privileges: smtp-server:update.
 func (c *Client) UpdateSMTPServer(ctx context.Context, request *SmtpServer) error {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/smtpserver"

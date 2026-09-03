@@ -17,7 +17,7 @@ import (
 
 // GetScriptByID finds scripts by ID.
 //
-// Required privileges: read:pro:scripts.
+// Required privileges: scripts:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetScriptByID(ctx context.Context, id string) (*Script, error) 
 
 // CreateScriptByID creates a new script by ID.
 //
-// Required privileges: create:pro:scripts.
+// Required privileges: scripts:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateScriptByID(ctx context.Context, id string, request *Scrip
 
 // UpdateScriptByID updates an existing script by ID.
 //
-// Required privileges: update:pro:scripts.
+// Required privileges: scripts:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateScriptByID(ctx context.Context, id string, request *Scrip
 
 // DeleteScriptByID deletes a script by ID.
 //
-// Required privileges: delete:pro:scripts.
+// Required privileges: scripts:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteScriptByID(ctx context.Context, id string) error {
 
 // GetScriptByName finds scripts by name.
 //
-// Required privileges: read:pro:scripts.
+// Required privileges: scripts:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetScriptByName(ctx context.Context, name string) (*Script, err
 
 // UpdateScriptByName updates an existing script by name.
 //
-// Required privileges: update:pro:scripts.
+// Required privileges: scripts:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateScriptByName(ctx context.Context, name string, request *S
 
 // DeleteScriptByName deletes a script by name.
 //
-// Required privileges: delete:pro:scripts.
+// Required privileges: scripts:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteScriptByName(ctx context.Context, name string) error {
 
 // ListScripts finds all scripts.
 //
-// Required privileges: read:pro:scripts.
+// Required privileges: scripts:read.
 func (c *Client) ListScripts(ctx context.Context) (*Scripts, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Scripts
@@ -138,7 +138,7 @@ func (c *Client) ListScripts(ctx context.Context) (*Scripts, error) {
 
 // CreateScriptByName creates a new script by ID.
 //
-// Required privileges: create:pro:scripts.
+// Required privileges: scripts:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -198,107 +197,6 @@ func TestAcceptance_ApplyScriptV1(t *testing.T) {
 	}
 }
 
-// ---------- ApiRoleV1 ----------
-
-func TestAcceptance_ApplyApiRoleV1(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	name := "sdk-acc-apply-role-" + runSuffix()
-
-	id, created, err := p.ApplyApiRoleV1(ctx, &pro.ApiRoleRequest{
-		DisplayName: name,
-		Privileges:  []string{"Read Buildings"},
-	})
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "ApiRole "+id, func() error { return p.DeleteApiRoleV1(ctx, id) })
-	if !created {
-		t.Error("expected created = true")
-	}
-
-	id2, created2, err := p.ApplyApiRoleV1(ctx, &pro.ApiRoleRequest{
-		DisplayName: name,
-		Privileges:  []string{"Read Buildings", "Read Categories"},
-	})
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false")
-	}
-	if id2 != id {
-		t.Errorf("id changed: %s → %s", id, id2)
-	}
-
-	if err := p.DeleteApiRoleV1(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolveApiRoleV1IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
-
-// ---------- ApiIntegrationV1 ----------
-
-func TestAcceptance_ApplyApiIntegrationV1(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	// AuthorizationScopes requires existing API role display names.
-	roles, err := p.ListApiRolesV1(ctx, nil, "")
-	if err != nil {
-		t.Fatalf("list roles: %v", err)
-	}
-	if len(roles) == 0 {
-		t.Skip("no API roles available — cannot test integration apply")
-	}
-	roleName := roles[0].DisplayName
-
-	name := "sdk-acc-apply-integ-" + runSuffix()
-	enabled := true
-
-	id, created, err := p.ApplyApiIntegrationV1(ctx, &pro.ApiIntegrationRequest{
-		DisplayName:         name,
-		Enabled:             &enabled,
-		AuthorizationScopes: []string{roleName},
-	})
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "ApiIntegration "+id, func() error { return p.DeleteApiIntegrationV1(ctx, id) })
-	if !created {
-		t.Error("expected created = true")
-	}
-
-	id2, created2, err := p.ApplyApiIntegrationV1(ctx, &pro.ApiIntegrationRequest{
-		DisplayName:         name,
-		Enabled:             &enabled,
-		AuthorizationScopes: []string{roleName},
-	})
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false")
-	}
-	if id2 != id {
-		t.Errorf("id changed: %s → %s", id, id2)
-	}
-
-	if err := p.DeleteApiIntegrationV1(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolveApiIntegrationV1IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
-
 // ---------- ComputerExtensionAttributeV1 ----------
 
 func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
@@ -318,7 +216,7 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
 		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   strPtr("SDK acceptance test"),
+		Description:                   new("SDK acceptance test"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
 		PopupMenuChoices:              &emptySlice,
@@ -337,7 +235,7 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
 		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   strPtr("SDK acceptance test updated"),
+		Description:                   new("SDK acceptance test updated"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
 		PopupMenuChoices:              &emptySlice,
@@ -375,9 +273,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
 		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   ptr("SDK acceptance test"),
-		LdapAttributeMapping:          ptr(""),
-		LdapExtensionAttributeAllowed: ptr(false),
+		Description:                   new("SDK acceptance test"),
+		LdapAttributeMapping:          new(""),
+		LdapExtensionAttributeAllowed: new(false),
 		PopupMenuChoices:              &[]string{},
 	})
 	if err != nil {
@@ -393,9 +291,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
 		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   ptr("SDK acceptance test updated"),
-		LdapAttributeMapping:          ptr(""),
-		LdapExtensionAttributeAllowed: ptr(false),
+		Description:                   new("SDK acceptance test updated"),
+		LdapAttributeMapping:          new(""),
+		LdapExtensionAttributeAllowed: new(false),
 		PopupMenuChoices:              &[]string{},
 	})
 	if err != nil {
@@ -419,129 +317,15 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 // ---------- SmartComputerGroupV2 ----------
 
-func TestAcceptance_ApplySmartComputerGroupV2(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	name := "sdk-acc-apply-scg-" + runSuffix()
-
-	id, created, err := p.ApplySmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{Name: name}, false)
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "SmartComputerGroup "+id, func() error { return p.DeleteSmartComputerGroupV2(ctx, id) })
-	if !created {
-		t.Error("expected created = true")
-	}
-
-	id2, created2, err := p.ApplySmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{Name: name}, false)
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false")
-	}
-	if id2 != id {
-		t.Errorf("id changed: %s → %s", id, id2)
-	}
-
-	if err := p.DeleteSmartComputerGroupV2(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolveSmartComputerGroupV2IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
-
 // ---------- StaticComputerGroupV2 ----------
 
-func TestAcceptance_ApplyStaticComputerGroupV2(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	name := "sdk-acc-apply-stcg-" + runSuffix()
-	assignments := []string{}
-
-	id, created, err := p.ApplyStaticComputerGroupV2(ctx, &pro.StaticComputerGroupAssignment{
-		Name:        name,
-		Assignments: &assignments,
-	}, false)
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "StaticComputerGroup "+id, func() error { return p.DeleteStaticComputerGroupV2(ctx, id) })
-	if !created {
-		t.Error("expected created = true")
-	}
-
-	id2, created2, err := p.ApplyStaticComputerGroupV2(ctx, &pro.StaticComputerGroupAssignment{
-		Name:        name,
-		Assignments: &assignments,
-	}, false)
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false")
-	}
-	if id2 != id {
-		t.Errorf("id changed: %s → %s", id, id2)
-	}
-
-	if err := p.DeleteStaticComputerGroupV2(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolveStaticComputerGroupV2IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
-
 // ---------- SmartMobileDeviceGroupV1 ----------
-
-func TestAcceptance_ApplySmartMobileDeviceGroupV1(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	name := "sdk-acc-apply-smdg-" + runSuffix()
-
-	id, created, err := p.ApplySmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{GroupName: name, SiteID: strPtr("-1")}, false)
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "SmartMobileDeviceGroup "+id, func() error { return p.DeleteSmartMobileDeviceGroupV1(ctx, id) })
-	if !created {
-		t.Error("expected created = true")
-	}
-
-	id2, created2, err := p.ApplySmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{GroupName: name, SiteID: strPtr("-1")}, false)
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false")
-	}
-	if id2 != id {
-		t.Errorf("id changed: %s → %s", id, id2)
-	}
-
-	if err := p.DeleteSmartMobileDeviceGroupV1(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolveSmartMobileDeviceGroupV1IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
 
 // ---------- PackageV1 ----------
 
 func TestAcceptance_ApplyPackageV1(t *testing.T) {
 	c := accClient(t)
+	requirePackageStore(t, c)
 	ctx := context.Background()
 	p := pro.New(c)
 
@@ -614,11 +398,11 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 		Name:                      name,
 		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server.example.com",
-		ShareName:                 strPtr("share"),
-		ReadOnlyUsername:          strPtr("rouser"),
-		ReadOnlyPassword:          strPtr("ropass"),
-		ReadWriteUsername:         strPtr("rwuser"),
-		ReadWritePassword:         strPtr("rwpass"),
+		ShareName:                 new("share"),
+		ReadOnlyUsername:          new("rouser"),
+		ReadOnlyPassword:          new("ropass"),
+		ReadWriteUsername:         new("rwuser"),
+		ReadWritePassword:         new("rwpass"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -632,11 +416,11 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 		Name:                      name,
 		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server-updated.example.com",
-		ShareName:                 strPtr("share"),
-		ReadOnlyUsername:          strPtr("rouser"),
-		ReadOnlyPassword:          strPtr("ropass"),
-		ReadWriteUsername:         strPtr("rwuser"),
-		ReadWritePassword:         strPtr("rwpass"),
+		ShareName:                 new("share"),
+		ReadOnlyUsername:          new("rouser"),
+		ReadOnlyPassword:          new("ropass"),
+		ReadWriteUsername:         new("rwuser"),
+		ReadWritePassword:         new("rwpass"),
 		Principal:                 &principal,
 	})
 	if err != nil {
@@ -986,61 +770,6 @@ func TestAcceptance_ApplyMacOSBrandingConfigurationV1(t *testing.T) {
 	}
 }
 
-// ---------- AppInstallerDeploymentV1 ----------
-
-func TestAcceptance_ApplyAppInstallerDeploymentV1(t *testing.T) {
-	// App Installer deployments require a valid app installer title reference.
-	// List existing titles and use the first one.
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	titles, err := p.ListAppInstallerTitlesV1(ctx)
-	if err != nil {
-		t.Fatalf("list app installer titles: %v", err)
-	}
-	if len(titles) == 0 {
-		t.Skip("no app installer titles available — cannot test deployment apply")
-	}
-	titleID := titles[0].ID
-
-	name := "sdk-acc-apply-aid-" + runSuffix()
-	req := &pro.AppInstallerDeploymentCreate{
-		Name:           name,
-		AppTitleID:     titleID,
-		DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeInstallAutomatically,
-		UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
-	}
-
-	id, created, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "AppInstallerDeployment "+id, func() error { return p.DeleteAppInstallerDeploymentV1(ctx, id) })
-	if !created {
-		t.Error("expected created = true")
-	}
-
-	id2, created2, err := p.ApplyAppInstallerDeploymentV1(ctx, req)
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false")
-	}
-	if id2 != id {
-		t.Errorf("id changed: %s → %s", id, id2)
-	}
-
-	if err := p.DeleteAppInstallerDeploymentV1(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolveAppInstallerDeploymentV1IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
-
 // ---------- ReturnToServiceConfigurationV1 ----------
 
 // wifiMobileProfilePayload returns a minimal mobile-device Wi-Fi mobileconfig plist.
@@ -1167,70 +896,6 @@ func TestAcceptance_ApplyUserV1(t *testing.T) {
 // ---------- helpers ----------
 
 // ---------- PatchSoftwareTitleConfigurationV2 ----------
-
-func TestAcceptance_ApplyPatchSoftwareTitleConfigurationV2(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	// Patch software title configurations require a valid softwareTitleId,
-	// which depends on an external patch source (e.g. Jamf's built-in patch
-	// management definitions). List existing configs to find one, or skip.
-	existing, err := p.ListPatchSoftwareTitleConfigurationsV2(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
-	}
-	if len(existing) == 0 {
-		t.Skip("tenant has no patch software title configurations — cannot determine softwareTitleId for Apply test")
-	}
-
-	// Use the first config's softwareTitleId for the new config.
-	ref := existing[0]
-	softwareTitleID := ref.SoftwareTitleID
-	t.Logf("using softwareTitleId=%s from existing config %s (%s)", softwareTitleID, ref.ID, ref.DisplayName)
-
-	name := "sdk-acc-apply-patchtitle-" + runSuffix()
-
-	// 1. Apply creates
-	id, created, err := p.ApplyPatchSoftwareTitleConfigurationV2(ctx, &pro.PatchSoftwareTitleConfigurationBase{
-		DisplayName:     name,
-		SoftwareTitleID: softwareTitleID,
-	})
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("apply create: %v", err)
-	}
-	cleanupDelete(t, "PatchSoftwareTitleConfig "+id, func() error { return p.DeletePatchSoftwareTitleConfigurationV2(ctx, id) })
-	if !created {
-		t.Error("expected created = true on first apply")
-	}
-	t.Logf("created patch software title config id=%s", id)
-
-	// 2. Apply updates (JSON round-trip: PatchSoftwareTitleConfigurationBase → PatchSoftwareTitleConfigurationPatch)
-	id2, created2, err := p.ApplyPatchSoftwareTitleConfigurationV2(ctx, &pro.PatchSoftwareTitleConfigurationBase{
-		DisplayName:     name,
-		SoftwareTitleID: softwareTitleID,
-	})
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false on second apply")
-	}
-	if id2 != id {
-		t.Errorf("id mismatch: first=%s second=%s", id, id2)
-	}
-
-	// 3. Delete + verify 404
-	if err := p.DeletePatchSoftwareTitleConfigurationV2(ctx, id); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = p.ResolvePatchSoftwareTitleConfigurationV2IDByName(ctx, name)
-	if err == nil {
-		t.Fatal("expected 404 after delete")
-	}
-}
 
 // ---------- PatchSoftwareTitleConfigurationV3 ----------
 
@@ -1359,7 +1024,7 @@ func TestAcceptance_ApplyVolumePurchasingLocationV1(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	token := vppToken(t) // skips if JAMFPLATFORM_VPP_TOKEN not set
+	token := vppToken(t) // skips if JAMFPLATFORM_ACC_PRO_VPP_TOKEN not set
 	name := "sdk-acc-apply-vpl-" + runSuffix()
 
 	// 1. Apply creates (VolumePurchasingLocationPost has ServiceToken; update type VolumePurchasingLocationPatch doesn't require it)
@@ -1693,9 +1358,9 @@ func TestAcceptance_ApplyDeviceEnrollmentV1(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	token := strings.Join(strings.Fields(os.Getenv("JAMFPLATFORM_DEP_TOKEN")), "")
+	token := strings.Join(strings.Fields(accEnv("JAMFPLATFORM_ACC_PRO_DEP_TOKEN")), "")
 	if token == "" {
-		t.Skip("JAMFPLATFORM_DEP_TOKEN not set — DEP-token-dependent test skipped")
+		t.Skip("JAMFPLATFORM_ACC_PRO_DEP_TOKEN not set — DEP-token-dependent test skipped")
 	}
 
 	name := "sdk-acc-apply-dep-" + runSuffix()
@@ -1824,125 +1489,6 @@ func TestAcceptance_ApplyAppRequestFormInputFieldV1(t *testing.T) {
 
 // ---------- StaticMobileDeviceGroupV1 ----------
 
-// TestAcceptance_ApplyStaticMobileDeviceGroupV1 verifies the Apply method's
-// membership pre-fetch behaviour: on update, the method fetches current group
-// membership and re-sends all members as selected=true so the PATCH does not
-// wipe devices that were added outside of the Apply call.
-func TestAcceptance_ApplyStaticMobileDeviceGroupV1(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-	pc := proclassic.New(c)
-
-	suffix := runSuffix()
-	groupName := "sdk-acc-apply-static-mdm-group-" + suffix
-
-	// Create 3 dummy mobile device records via Classic API.
-	createDevice := func(n int) string {
-		sn := fmt.Sprintf("SDKACC%s%d", strings.ToUpper(suffix), n)
-		name := fmt.Sprintf("sdk-acc-device-%s-%d", suffix, n)
-		managed := true
-		dev, err := pc.CreateMobileDeviceByID(ctx, "0", &proclassic.MobileDevicePost{
-			General: &proclassic.MobileDevicePostGeneral{
-				Name:         &name,
-				SerialNumber: &sn,
-				UDID:         &sn,
-				Managed:      &managed,
-			},
-		})
-		if err != nil {
-			t.Fatalf("create device %d: %v", n, err)
-		}
-		if dev.ID == nil {
-			t.Fatalf("create device %d: missing ID in response", n)
-		}
-		return strconv.Itoa(*dev.ID)
-	}
-
-	dev1ID := createDevice(1)
-	dev2ID := createDevice(2)
-	dev3ID := createDevice(3)
-	t.Logf("dummy devices: %s, %s, %s", dev1ID, dev2ID, dev3ID)
-
-	t.Cleanup(func() {
-		for _, id := range []string{dev1ID, dev2ID, dev3ID} {
-			if err := pc.DeleteMobileDeviceByID(ctx, id); err != nil {
-				t.Logf("cleanup device %s: %v", id, err)
-			}
-		}
-	})
-
-	trueVal := true
-
-	// 1. Apply creates group with device 1.
-	siteID := "-1"
-	groupID, created, err := p.ApplyStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{
-		GroupName: groupName,
-		SiteID:    &siteID,
-		Assignments: &[]pro.Assignment{
-			{MobileDeviceID: &dev1ID, Selected: &trueVal},
-		},
-	}, false)
-	if err != nil {
-		t.Fatalf("apply create: %v", err)
-	}
-	if !created {
-		t.Error("expected created = true")
-	}
-	t.Logf("created group id=%s", groupID)
-
-	t.Cleanup(func() {
-		if err := p.DeleteStaticMobileDeviceGroupV1(ctx, groupID); err != nil {
-			t.Logf("cleanup group %s: %v", groupID, err)
-		}
-	})
-
-	// 2. Add devices 2 and 3 via direct PATCH (outside of Apply).
-	_, err = p.PatchStaticMobileDeviceGroupV1(ctx, groupID, &pro.StaticGroupAssignment{
-		GroupName: groupName,
-		SiteID:    &siteID,
-		Assignments: &[]pro.Assignment{
-			{MobileDeviceID: &dev2ID, Selected: &trueVal},
-			{MobileDeviceID: &dev3ID, Selected: &trueVal},
-		},
-	})
-	if err != nil {
-		t.Fatalf("patch to add devices 2+3: %v", err)
-	}
-
-	// 3. Apply update: the method must fetch current membership (all 3 devices)
-	// and include them in the PATCH so none are removed.
-	groupID2, created2, err := p.ApplyStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{
-		GroupName: groupName,
-		SiteID:    &siteID,
-	}, false)
-	if err != nil {
-		t.Fatalf("apply update: %v", err)
-	}
-	if created2 {
-		t.Error("expected created = false on update")
-	}
-	if groupID2 != groupID {
-		t.Errorf("apply update: id=%s, want %s", groupID2, groupID)
-	}
-
-	// 4. Verify all 3 devices are still members after the Apply update.
-	members, err := p.ListStaticMobileDeviceGroupMembershipV1(ctx, groupID, nil, "")
-	if err != nil {
-		t.Fatalf("list membership: %v", err)
-	}
-	memberIDs := make(map[string]bool, len(members))
-	for _, m := range members {
-		memberIDs[m.MobileDeviceID] = true
-	}
-	for _, wantID := range []string{dev1ID, dev2ID, dev3ID} {
-		if !memberIDs[wantID] {
-			t.Errorf("device %s missing from membership after apply update", wantID)
-		}
-	}
-	t.Logf("membership after apply update: %v", memberIDs)
-}
-
 // ---------- SmartComputerGroupV3 ----------
 // New in Jamf Pro 11.28.0. Mirrors the V2 lifecycle.
 
@@ -2036,7 +1582,7 @@ func TestAcceptance_ApplySmartMobileDeviceGroupV2(t *testing.T) {
 
 	name := "sdk-acc-apply-smdg-v2-" + runSuffix()
 
-	id, created, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	id, created, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -2045,7 +1591,7 @@ func TestAcceptance_ApplySmartMobileDeviceGroupV2(t *testing.T) {
 		t.Error("expected created = true")
 	}
 
-	id2, created2, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	id2, created2, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}

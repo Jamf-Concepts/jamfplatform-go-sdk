@@ -17,7 +17,7 @@ import (
 
 // GetDiskEncryptionConfigurationByID finds disk encryption configurations by ID.
 //
-// Required privileges: read:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetDiskEncryptionConfigurationByID(ctx context.Context, id stri
 
 // CreateDiskEncryptionConfigurationByID creates a new disk encryption configuration by ID.
 //
-// Required privileges: create:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateDiskEncryptionConfigurationByID(ctx context.Context, id s
 
 // UpdateDiskEncryptionConfigurationByID updates an existing disk encryption configuration by ID.
 //
-// Required privileges: update:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateDiskEncryptionConfigurationByID(ctx context.Context, id s
 
 // DeleteDiskEncryptionConfigurationByID deletes a disk encryption configuration by ID.
 //
-// Required privileges: delete:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteDiskEncryptionConfigurationByID(ctx context.Context, id s
 
 // GetDiskEncryptionConfigurationByName finds disk encryption configurations by name.
 //
-// Required privileges: read:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetDiskEncryptionConfigurationByName(ctx context.Context, name 
 
 // UpdateDiskEncryptionConfigurationByName updates an existing disk encryption configuration by name.
 //
-// Required privileges: update:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateDiskEncryptionConfigurationByName(ctx context.Context, na
 
 // DeleteDiskEncryptionConfigurationByName deletes a disk encryption configuration by name.
 //
-// Required privileges: delete:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteDiskEncryptionConfigurationByName(ctx context.Context, na
 
 // ListDiskEncryptionConfigurations finds all disk encryption configurations.
 //
-// Required privileges: read:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:read.
 func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEncryptionConfigurations, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DiskEncryptionConfigurations
@@ -138,7 +138,7 @@ func (c *Client) ListDiskEncryptionConfigurations(ctx context.Context) (*DiskEnc
 
 // CreateDiskEncryptionConfigurationByName creates a new disk encryption configuration by ID.
 //
-// Required privileges: create:pro:disk-encryption-configurations.
+// Required privileges: disk-encryption-configurations:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

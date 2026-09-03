@@ -14,7 +14,7 @@ import (
 
 // GetClassicLdapMappingsV1 get mappings for OnPrem Ldap configuration with given id.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: OnPrem Ldap identifier.

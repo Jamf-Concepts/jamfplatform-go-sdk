@@ -17,7 +17,7 @@ import (
 
 // GetAdvancedComputerSearchByID finds computer searches by ID.
 //
-// Required privileges: read:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetAdvancedComputerSearchByID(ctx context.Context, id string) (
 
 // CreateAdvancedComputerSearchByID creates a new advanced computer search.
 //
-// Required privileges: create:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:create.
 //
 // Parameters:
 //   - id: ID to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateAdvancedComputerSearchByID(ctx context.Context, id string
 
 // UpdateAdvancedComputerSearchByID updates an existing advanced computer search by ID.
 //
-// Required privileges: update:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateAdvancedComputerSearchByID(ctx context.Context, id string
 
 // DeleteAdvancedComputerSearchByID deletes a computer search by ID.
 //
-// Required privileges: delete:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteAdvancedComputerSearchByID(ctx context.Context, id string
 
 // GetAdvancedComputerSearchByName finds advanced computer searches by name.
 //
-// Required privileges: read:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetAdvancedComputerSearchByName(ctx context.Context, name strin
 
 // DeleteAdvancedComputerSearchByName deletes a computer search by name.
 //
-// Required privileges: delete:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:delete.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -110,7 +110,7 @@ func (c *Client) DeleteAdvancedComputerSearchByName(ctx context.Context, name st
 
 // ListAdvancedComputerSearches finds all advanced computer searches.
 //
-// Required privileges: read:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:read.
 func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedComputerSearches, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedComputerSearches
@@ -123,7 +123,7 @@ func (c *Client) ListAdvancedComputerSearches(ctx context.Context) (*AdvancedCom
 
 // UpdateAdvancedComputerSearchByName updates an existing advanced computer search by name.
 //
-// Required privileges: update:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:update.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -138,7 +138,7 @@ func (c *Client) UpdateAdvancedComputerSearchByName(ctx context.Context, name st
 
 // CreateAdvancedComputerSearchByName creates a new advanced computer search.
 //
-// Required privileges: create:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:create.
 //
 // Parameters:
 //   - name: ID to filter by.

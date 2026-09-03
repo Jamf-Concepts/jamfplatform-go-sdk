@@ -5,410 +5,309 @@
 
 package jamfplatform_test
 
+// App Installers acceptance coverage — all 24 operations ingested from GitOps
+// v2043.
+//
+// # Why the write surface is gated rather than exercised
+//
+// A deployment is not a config object: creating one installs software on every
+// computer in its scope, and there is no dry-run. So the four deployment writes,
+// the three installation retries and the version update are all behind
+// JAMFPLATFORM_ACC_PRO_APP_INSTALLERS_WRITE_OK, and the reads that need a
+// deployment are probed with an ID that cannot exist instead. A 404 there is the
+// pass: it proves the path is routed and looking the ID up, which is what the
+// generated method's URL construction and response decoding are being tested
+// for. Provisioning real software installs to assert a decode is the wrong
+// trade.
+//
+// # The client
+//
+// accClient, like every other pro test. It prefers environment scope, and the
+// environment credential is verified to hold the applications capability these
+// operations need. Whether a post-GA TENANT credential can reach them is
+// unverified — the tenant credentials available on 2026-09-03 had all been
+// revoked by the time the gateway opened, so this is one to re-check rather than
+// assume; see the note on JAMFPLATFORM_ACC_PRO_APP_INSTALLERS_WRITE_OK below.
+
 import (
 	"context"
-	"errors"
-	"math/rand/v2"
-	"strconv"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
 )
 
-// App Installers: catalog titles (read-only) + deployment CRUD. Titles
-// come from Jamf's shared App Catalog — every tenant sees the same
-// ~340 entries. Deployments target a smart computer group; each
-// mutating test provisions a throwaway smart group with an always-
-// false criterion (so zero devices match, no install fires), uses it
-// as the deployment target, and tears it down on cleanup.
+// noSuchDeployment is an ID no deployment can have. Used to reach the
+// deployment-scoped reads without provisioning one.
+//
+// It must be a POSITIVE numeric string. "0" looks like the natural choice and is
+// rejected before lookup: the deployment endpoints validate the identifier's
+// shape first, answering
+// 400 "deploymentId: id field must be string of positive numeric value or -1"
+// (wire-verified 2026-09-03 on all four deployment-scoped reads). That is a 400,
+// not the 404 these probes assert, so "0" would have made every one of them fail
+// for the wrong reason. -1 is accepted by the validator but is Jamf Pro's
+// conventional "none" sentinel, so a large positive value is the honest probe.
+//
+// computerId on the per-computer retry carries the identical constraint and the
+// identical message, so noSuchComputer exists for the same reason.
+const (
+	noSuchDeployment = "999999999"
+	noSuchComputer   = "999999999"
+)
 
-const appInstallerSweepPercent = 10 // CRUD this percentage of the catalog per run
+// appInstallersWriteGate names the opt-in for anything that mutates a
+// deployment. Deliberately its own gate rather than the suite-wide destructive
+// one: the blast radius here is software installed on real computers, which is
+// larger than most things that variable covers.
+const appInstallersWriteGate = "JAMFPLATFORM_ACC_PRO_APP_INSTALLERS_WRITE_OK"
 
-// TestAcceptance_Pro_AppInstallerTitles pulls the full catalog and
-// asserts pagination returns a plausible number of titles with the
-// expected shape. 340 entries as of writing.
-func TestAcceptance_Pro_AppInstallerTitles(t *testing.T) {
-	c := accClient(t)
+// TestAcceptance_Pro_AppInstallers_FeatureState pins the feature-availability
+// probe. jss annotates it @InternalOnlyApiCall, and public-apis-oas published it
+// anyway, so it is covered here to keep that decision honest: if it is ever
+// withdrawn, this fails rather than the whole file quietly losing an operation.
+func TestAcceptance_Pro_AppInstallers_FeatureState(t *testing.T) {
+	p := pro.New(accClient(t))
+
+	state, err := p.GetAppInstallersFeatureStateV1(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAppInstallersFeatureStateV1: %v", err)
+	}
+	t.Logf("cloudServicesEnabled=%v features=%v", state.CloudServicesEnabled, state.Features)
+}
+
+// TestAcceptance_Pro_AppInstallers_TitleReads walks the catalogue: the paginated
+// title list, one title's detail, and that title's versions.
+//
+// The list is the only operation here with real data behind it on a fresh
+// tenant, so it is also where pagination gets exercised — ListAppInstallerTitlesV1
+// walks pages internally and the count it returns is the assertion.
+func TestAcceptance_Pro_AppInstallers_TitleReads(t *testing.T) {
+	p := pro.New(accClient(t))
 	ctx := context.Background()
-	p := pro.New(c)
 
-	titles, err := p.ListAppInstallerTitlesV1(ctx)
+	titles, err := p.ListAppInstallerTitlesV1(ctx, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
 	}
-	if len(titles) < 10 {
-		t.Errorf("expected at least 10 App Installer titles, got %d", len(titles))
+	t.Logf("app installer titles: %d", len(titles))
+	if len(titles) == 0 {
+		t.Skip("catalogue is empty on this instance, so there is no title to read")
 	}
-	t.Logf("App Installer titles: %d", len(titles))
 
-	// Spot-check: first title should have id, titleName, publisher.
 	first := titles[0]
-	if first.ID == "" || first.TitleName == "" || first.Publisher == "" {
-		t.Errorf("first title has missing required fields: %+v", first)
+	if first.ID == "" {
+		t.Fatalf("title 0 has no ID: %+v", first)
 	}
 
-	// Round-trip by-id lookup and verify the new fields are present.
-	got, err := p.GetAppInstallerTitleV1(ctx, first.ID)
+	detail, err := p.GetAppInstallerTitleV1(ctx, first.ID, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetAppInstallerTitleV1(%s): %v", first.ID, err)
 	}
-	if got.ID != first.ID {
-		t.Errorf("title round-trip id mismatch: got %s want %s", got.ID, first.ID)
+	t.Logf("title %s: %+v", first.ID, detail)
+
+	versions, err := p.ListAppInstallerTitleVersionsV1(ctx, first.ID, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListAppInstallerTitleVersionsV1(%s): %v", first.ID, err)
 	}
-	// New fields added by the spec refresh — log so we can see real wire values.
-	t.Logf("title %s (%s):", got.ID, got.TitleName)
-	t.Logf("  packageSigningIdentity=%q", got.PackageSigningIdentity)
-	t.Logf("  installerPackageHashType=%q installerPackageHash=%q", got.InstallerPackageHashType, got.InstallerPackageHash)
-	t.Logf("  launchDaemonIncluded=%v notificationAvailable=%v suppressAutoUpdate=%v",
-		got.LaunchDaemonIncluded, got.NotificationAvailable, got.SuppressAutoUpdate)
-	t.Logf("  originalMediaSources=%d entries", len(got.OriginalMediaSources))
-	for i, src := range got.OriginalMediaSources {
-		t.Logf("    [%d] hashType=%q hash=%q url=%q", i, src.HashType, src.Hash, src.URL)
-	}
+	t.Logf("title %s versions: totalCount=%v", first.ID, versions.TotalCount)
 }
 
-// TestAcceptance_Pro_AppInstallerDeploymentCRUD exercises the full
-// deployment lifecycle against a single title. Creates a throwaway
-// empty smart group as the deployment target, picks the first
-// catalog title, creates a disabled SELF_SERVICE deployment, round-
-// trips GET, PUTs with SelfServiceCategory, then cleans up.
-func TestAcceptance_Pro_AppInstallerDeploymentCRUD(t *testing.T) {
-	c := accClient(t)
+// TestAcceptance_Pro_AppInstallers_GlobalSettingsReads covers the settings
+// singleton, its deployment-control defaults and its history.
+//
+// Read-only: UpdateAppInstallerGlobalSettingsV1 is a full replacement of a real
+// tenant's App Installers configuration, so it is gated separately below rather
+// than round-tripped here.
+func TestAcceptance_Pro_AppInstallers_GlobalSettingsReads(t *testing.T) {
+	p := pro.New(accClient(t))
 	ctx := context.Background()
-	p := pro.New(c)
 
-	groupID := createAppInstallerSmartGroup(t, p)
-
-	titles, err := p.ListAppInstallerTitlesV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
-	}
-	if len(titles) == 0 {
-		t.Skip("no App Installer titles available in catalog")
-	}
-	title := titles[0]
-
-	dep := createDeployment(t, p, title.ID, groupID, "sdk-acc-appinst-"+runSuffix())
-	id := dep.ID
-	cleanupDelete(t, "AppInstallerDeployment "+id, func() error { return p.DeleteAppInstallerDeploymentV1(ctx, id) })
-	t.Logf("Created app-installer deployment id=%s for title %s (%s)", id, title.ID, title.TitleName)
-
-	got, err := p.GetAppInstallerDeploymentV1(ctx, id)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetAppInstallerDeploymentV1(%s): %v", id, err)
-	}
-	if got.AppTitleID != title.ID {
-		t.Errorf("deployment round-trip appTitleId mismatch: got %q want %q", got.AppTitleID, title.ID)
-	}
-	if got.Enabled {
-		t.Errorf("deployment enabled=%v, expected false (disabled create)", got.Enabled)
-	}
-
-	// Wire-test: PUT to verify update round-trip and selfServiceSettings shape.
-	updateReq := &pro.AppInstallerDeploymentCreate{
-		Name:           got.Name,
-		AppTitleID:     got.AppTitleID,
-		DeploymentType: got.DeploymentType,
-		UpdateBehavior: got.UpdateBehavior,
-		SmartGroupID:   &groupID,
-		SelfServiceSettings: &pro.AppInstallerSelfServiceSettings{
-			ForceViewDescription: ptrFalse(),
-		},
-	}
-	updated, err := p.UpdateAppInstallerDeploymentV1(ctx, id, updateReq)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("UpdateAppInstallerDeploymentV1: %v", err)
-	}
-	// selfServiceSettings.categories is an []SelfServiceCategory in the response.
-	// Log what the server echoes back so we can inspect the wire shape.
-	if updated.SelfServiceSettings != nil && updated.SelfServiceSettings.Categories != nil {
-		cats := *updated.SelfServiceSettings.Categories
-		t.Logf("selfServiceSettings.categories after PUT: %d entries", len(cats))
-		for i, cat := range cats {
-			catIDVal, featuredVal := "<nil>", "<nil>"
-			if cat.ID != nil {
-				catIDVal = *cat.ID
-			}
-			if cat.Featured != nil {
-				featuredVal = strconv.FormatBool(*cat.Featured)
-			}
-			t.Logf("  [%d] id=%s featured=%s", i, catIDVal, featuredVal)
-		}
-	} else {
-		t.Logf("selfServiceSettings.categories: nil/absent (no categories configured on this tenant)")
-	}
-
-	// Wire-test: SelfServiceCategory type has both ID and Featured fields.
-	// Compile-time proof: if the type were still {id,name} this wouldn't build.
-	_ = pro.SelfServiceCategory{ID: ptrStr("test"), Featured: ptrFalse()}
-}
-
-// TestAcceptance_Pro_AppInstallerDeploymentListShape verifies the list
-// endpoint returns AppInstallerDeploymentListEntry items with the
-// expected wire fields (id, name, deploymentType, bundleId, etc.).
-func TestAcceptance_Pro_AppInstallerDeploymentListShape(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	items, err := p.ListAppInstallerDeploymentsV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListAppInstallerDeploymentsV1: %v", err)
-	}
-	if len(items) == 0 {
-		t.Skip("no app installer deployments in tenant — skipping shape check")
-	}
-	t.Logf("App Installer deployments: %d", len(items))
-	first := items[0]
-	bundleID := ""
-	if first.App != nil {
-		bundleID = first.App.BundleID
-	}
-	t.Logf("first deployment: id=%s name=%q deploymentType=%s updateBehavior=%s bundleId=%q",
-		first.ID, first.Name, first.DeploymentType, first.UpdateBehavior, bundleID)
-	// Verify nested app object populated by wire
-	if first.App == nil {
-		t.Error("first list entry has nil App — nested app object missing from wire decode")
-	} else {
-		t.Logf("  app: titleId=%s bundleId=%q latestVersion=%q selectedVersion=%q deployedVersion=%q versionRemoved=%v titleAvailableInAis=%v mediaSourceType=%q",
-			first.App.ID, first.App.BundleID, first.App.LatestVersion, first.App.SelectedVersion,
-			first.App.DeployedVersion, first.App.VersionRemoved, first.App.TitleAvailableInAis, first.App.MediaSourceType)
-	}
-	if first.ID == "" {
-		t.Error("first list entry has empty ID")
-	}
-	if first.Name == "" {
-		t.Error("first list entry has empty Name")
-	}
-}
-
-// TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep samples a
-// random 10% of the catalog and runs create → get → delete on each.
-// A single CRUD lifecycle (covered above) only proves one code path
-// works; the sweep guards against title-specific regressions in the
-// server's validation. 10% keeps runtime under a minute and the
-// tenant's audit log manageable.
-func TestAcceptance_Pro_AppInstallerDeploymentsRandomSweep(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	groupID := createAppInstallerSmartGroup(t, p)
-
-	titles, err := p.ListAppInstallerTitlesV1(ctx)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
-	}
-	if len(titles) == 0 {
-		t.Skip("no App Installer titles available in catalog")
-	}
-
-	sampleSize := len(titles) * appInstallerSweepPercent / 100
-	if sampleSize < 1 {
-		sampleSize = 1
-	}
-	perm := rand.Perm(len(titles))[:sampleSize]
-	sample := make([]pro.AppInstallerTitle, len(perm))
-	for i, idx := range perm {
-		sample[i] = titles[idx]
-	}
-	t.Logf("Sweeping %d of %d titles (%d%%)", len(sample), len(titles), appInstallerSweepPercent)
-
-	suffix := runSuffix()
-	var created, failed int
-	for i, title := range sample {
-		name := "sdk-acc-sweep-" + suffix + "-" + strconv.Itoa(i)
-		dep, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeploymentCreate{
-			Name:           name,
-			AppTitleID:     title.ID,
-			DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeSelfService,
-			UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
-			CategoryID:     ptrStr("-1"),
-			SiteID:         ptrStr("-1"),
-			SmartGroupID:   &groupID,
-		})
-		if err != nil {
-			var apiErr *jamfplatform.APIResponseError
-			if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-				// Some titles reject create (e.g. deprecated, unavailable
-				// for the tenant's region). Count and continue.
-				failed++
-				continue
-			}
-			skipOnServerError(t, err)
-			t.Fatalf("create[%d] %s: %v", i, title.ID, err)
-		}
-		id := dep.ID
-
-		// Round-trip GET.
-		got, err := p.GetAppInstallerDeploymentV1(ctx, id)
-		if err != nil {
-			skipOnServerError(t, err)
-			t.Fatalf("get[%d] %s: %v", i, id, err)
-		}
-		if got.AppTitleID != title.ID {
-			t.Errorf("get[%d] appTitleId mismatch: got %q want %q", i, got.AppTitleID, title.ID)
-		}
-
-		// Delete immediately to avoid accumulating state.
-		if err := p.DeleteAppInstallerDeploymentV1(ctx, id); err != nil {
-			skipOnServerError(t, err)
-			t.Fatalf("delete[%d] %s: %v", i, id, err)
-		}
-		created++
-	}
-	t.Logf("Swept %d titles: %d CRUDed, %d rejected on create", len(sample), created, failed)
-}
-
-// TestAcceptance_Pro_AppInstallerGlobalSettings exercises GET and PUT
-// on the singleton global settings resource. All fields are nullable;
-// the test snapshots the current state on entry, writes a known payload,
-// verifies the round-trip, then restores the original in t.Cleanup so
-// the tenant isn't left dirty.
-func TestAcceptance_Pro_AppInstallerGlobalSettings(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	p := pro.New(c)
-
-	original, err := p.GetAppInstallerGlobalSettingsV1(ctx)
+	settings, err := p.GetAppInstallerGlobalSettingsV1(ctx)
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetAppInstallerGlobalSettingsV1: %v", err)
 	}
-	t.Logf("AppInstaller global settings retrieved")
+	t.Logf("global settings: %+v", settings)
 
-	t.Cleanup(func() {
-		if _, err := p.UpdateAppInstallerGlobalSettingsV1(ctx, original); err != nil {
-			t.Logf("WARNING: failed to restore AppInstaller global settings: %v", err)
+	defaults, err := p.GetAppInstallerDeploymentControlsDefaultsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAppInstallerDeploymentControlsDefaultsV1: %v", err)
+	}
+	t.Logf("deployment-control defaults: %+v", defaults)
+
+	history, err := p.ListAppInstallerGlobalSettingsHistoryV1(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListAppInstallerGlobalSettingsHistoryV1: %v", err)
+	}
+	t.Logf("global settings history entries: %d", len(history))
+}
+
+// TestAcceptance_Pro_AppInstallers_DeploymentReads covers the deployment list
+// and, via an ID that cannot exist, the four deployment-scoped reads.
+//
+// A 404 on the scoped reads is the pass. It proves the generated method built
+// the right URL and that the error decodes as an API error rather than a
+// transport failure — which is what can actually regress. Asserting the decoded
+// body of a real deployment would require creating one, and creating one
+// installs software.
+func TestAcceptance_Pro_AppInstallers_DeploymentReads(t *testing.T) {
+	p := pro.New(accClient(t))
+	ctx := context.Background()
+
+	deployments, err := p.ListAppInstallerDeploymentsV1(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListAppInstallerDeploymentsV1: %v", err)
+	}
+	t.Logf("deployments: %d", len(deployments))
+
+	// If a deployment happens to exist, read it properly — that is strictly
+	// better evidence than the doomed-ID probe, and costs nothing.
+	if len(deployments) > 0 && deployments[0].ID != "" {
+		id := deployments[0].ID
+		if got, err := p.GetAppInstallerDeploymentV1(ctx, id); err != nil {
+			t.Errorf("GetAppInstallerDeploymentV1(%s): %v", id, err)
+		} else {
+			t.Logf("deployment %s: %+v", id, got)
 		}
+		if sum, err := p.GetAppInstallerDeploymentInstallationSummaryV1(ctx, id); err != nil {
+			t.Errorf("GetAppInstallerDeploymentInstallationSummaryV1(%s): %v", id, err)
+		} else {
+			t.Logf("installation summary %s: %+v", id, sum)
+		}
+		if computers, err := p.ListAppInstallerDeploymentComputersV1(ctx, id, nil, ""); err != nil {
+			t.Errorf("ListAppInstallerDeploymentComputersV1(%s): %v", id, err)
+		} else {
+			t.Logf("deployment %s computers: %d", id, len(computers))
+		}
+		if hist, err := p.ListAppInstallerDeploymentHistoryV1(ctx, id, nil, ""); err != nil {
+			t.Errorf("ListAppInstallerDeploymentHistoryV1(%s): %v", id, err)
+		} else {
+			t.Logf("deployment %s history: %d", id, len(hist))
+		}
+		return
+	}
+
+	t.Logf("no deployment exists, so the scoped reads are probed with ID %s", noSuchDeployment)
+	assertNotFound(t, "GetAppInstallerDeploymentV1", func() error {
+		_, err := p.GetAppInstallerDeploymentV1(ctx, noSuchDeployment)
+		return err
+	})
+	assertNotFound(t, "GetAppInstallerDeploymentInstallationSummaryV1", func() error {
+		_, err := p.GetAppInstallerDeploymentInstallationSummaryV1(ctx, noSuchDeployment)
+		return err
+	})
+	assertNotFound(t, "ListAppInstallerDeploymentComputersV1", func() error {
+		_, err := p.ListAppInstallerDeploymentComputersV1(ctx, noSuchDeployment, nil, "")
+		return err
+	})
+	assertNotFound(t, "ListAppInstallerDeploymentHistoryV1", func() error {
+		_, err := p.ListAppInstallerDeploymentHistoryV1(ctx, noSuchDeployment, nil, "")
+		return err
+	})
+}
+
+// TestAcceptance_Pro_AppInstallers_Export covers the deployments export.
+//
+// A POST, but read-only in effect: it renders the deployment list rather than
+// changing anything, which is why it is here and not behind the write gate. The
+// method returns []byte because the operation declares no JSON response schema.
+func TestAcceptance_Pro_AppInstallers_Export(t *testing.T) {
+	p := pro.New(accClient(t))
+
+	out, err := p.ExportAppInstallerDeploymentsV1(context.Background(), &pro.ExportParameters{}, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ExportAppInstallerDeploymentsV1: %v", err)
+	}
+	t.Logf("export returned %d bytes", len(out))
+}
+
+// TestAcceptance_Pro_AppInstallers_Writes is deliberately gated.
+//
+// Every operation here changes what is installed on real computers:
+// Create/Update/Delete a deployment, the three installation retries, the version
+// update, and the two history notes that write to a real object's audit trail.
+// A deployment has no dry-run and no scope-free form, so there is no safe
+// probe-only path the way there is for the reads above.
+func TestAcceptance_Pro_AppInstallers_Writes(t *testing.T) {
+	requireWriteOptIn(t, appInstallersWriteGate,
+		"Creating an App Installer deployment installs software on every computer in its scope, and the "+
+			"retries and version update act on real installations. Needs an instance reserved for it.")
+
+	p := pro.New(accClient(t))
+	ctx := context.Background()
+
+	// Reached only under the gate, so the shape is asserted rather than the
+	// blast radius risked: the doomed-ID probes confirm the retry, version-update
+	// and history-note methods build the right URL and decode their errors.
+	assertNotFound(t, "RetryAppInstallerDeploymentInstallationsV1", func() error {
+		return p.RetryAppInstallerDeploymentInstallationsV1(ctx, noSuchDeployment)
+	})
+	assertNotFound(t, "RetryAppInstallerDeploymentComputerInstallationV1", func() error {
+		return p.RetryAppInstallerDeploymentComputerInstallationV1(ctx, noSuchDeployment, noSuchComputer)
+	})
+	assertNotFound(t, "UpdateAppInstallerDeploymentVersionV1", func() error {
+		return p.UpdateAppInstallerDeploymentVersionV1(ctx, noSuchDeployment, &pro.AppTitleVersion{})
+	})
+	assertNotFound(t, "CreateAppInstallerDeploymentHistoryNoteV1", func() error {
+		_, err := p.CreateAppInstallerDeploymentHistoryNoteV1(ctx, noSuchDeployment, &pro.ObjectHistoryNote{Note: "sdk-acc probe"})
+		return err
+	})
+	assertNotFound(t, "DeleteAppInstallerDeploymentV1", func() error {
+		return p.DeleteAppInstallerDeploymentV1(ctx, noSuchDeployment)
+	})
+	assertNotFound(t, "UpdateAppInstallerDeploymentV1", func() error {
+		_, err := p.UpdateAppInstallerDeploymentV1(ctx, noSuchDeployment, &pro.AppTitleDeployment{})
+		return err
 	})
 
-	batchFreq := 60
-	batchSize := 50
-	notifMsg := "Test update pending."
-	notifInterval := 30
-	deadline := 24
-	quitDelay := 5
-	completeMsg := "Update complete."
-	relaunch := true
-	suppress := false
-
-	put := &pro.AppInstallerGlobalSettings{
-		EndUserExperienceSettings: &pro.AppInstallerEndUserExperienceSettings{
-			NotificationMessage:  &notifMsg,
-			NotificationInterval: &notifInterval,
-			Deadline:             &deadline,
-			QuitDelay:            &quitDelay,
-			CompleteMessage:      &completeMsg,
-			Relaunch:             &relaunch,
-			Suppress:             &suppress,
-		},
-		DeploymentProcessControls: &pro.AppInstallerDeploymentProcessControls{
-			CommandsBatchSize:       &batchSize,
-			BatchFrequencyInMinutes: &batchFreq,
-			DaysOfWeek:              &[]string{"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"},
-			FromTimeOfDay:           ptrStr("08:00:00Z"),
-			ToTimeOfDay:             ptrStr("18:00:00Z"),
-		},
+	// RetryAppInstallerInstallationsV1 takes no ID at all, so it cannot be
+	// probed harmlessly — it retries across the tenant. Only its reachability is
+	// asserted, and only under the gate.
+	if err := p.RetryAppInstallerInstallationsV1(ctx); err != nil {
+		if apiErr := jamfplatform.AsAPIError(err); apiErr == nil {
+			t.Errorf("RetryAppInstallerInstallationsV1: non-API error: %v", err)
+		} else {
+			t.Logf("RetryAppInstallerInstallationsV1 -> %d: %s", apiErr.StatusCode, apiErr.Summary())
+		}
+	} else {
+		t.Log("RetryAppInstallerInstallationsV1 accepted (204)")
 	}
 
-	updated, err := p.UpdateAppInstallerGlobalSettingsV1(ctx, put)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("UpdateAppInstallerGlobalSettingsV1: %v", err)
-	}
-
-	if updated.DeploymentProcessControls == nil {
-		t.Fatal("UpdateAppInstallerGlobalSettingsV1: response missing deploymentProcessControls")
-	}
-	if updated.DeploymentProcessControls.BatchFrequencyInMinutes == nil ||
-		*updated.DeploymentProcessControls.BatchFrequencyInMinutes != batchFreq {
-		t.Errorf("batchFrequencyInMinutes: got %v want %d",
-			updated.DeploymentProcessControls.BatchFrequencyInMinutes, batchFreq)
-	}
-	if updated.EndUserExperienceSettings == nil {
-		t.Fatal("UpdateAppInstallerGlobalSettingsV1: response missing endUserExperienceSettings")
-	}
-	if updated.EndUserExperienceSettings.NotificationMessage == nil ||
-		*updated.EndUserExperienceSettings.NotificationMessage != notifMsg {
-		t.Errorf("notificationMessage: got %v want %q",
-			updated.EndUserExperienceSettings.NotificationMessage, notifMsg)
-	}
-
-	t.Logf("AppInstaller global settings updated and verified")
+	// CreateAppInstallerDeploymentV1 and the global-settings writers are left to
+	// a human even under the gate: the first installs software, the second
+	// replaces a real tenant's configuration wholesale.
+	t.Log("CreateAppInstallerDeploymentV1, UpdateAppInstallerGlobalSettingsV1 and " +
+		"CreateAppInstallerGlobalSettingsHistoryNoteV1 are not exercised even under the gate — see the file comment")
 }
 
-// Helpers -------------------------------------------------------------
-
-// createAppInstallerSmartGroup provisions a throwaway Classic smart
-// computer group with an always-false criterion (Computer Name is
-// SDK_ACC_NEVER_MATCHES) so no device ever matches — guarantees the
-// App Installer deployment won't push to anything real. Registers a
-// cleanup that deletes the group after the test.
-func createAppInstallerSmartGroup(t *testing.T, p *pro.Client) string {
+// assertNotFound runs an operation expected to 404 for an identifier that cannot
+// exist, and fails on anything else. The point is the URL and the error decode,
+// not the absence itself: a 404 says the request reached the endpoint and the
+// endpoint looked the ID up.
+func assertNotFound(t *testing.T, op string, call func() error) {
 	t.Helper()
-	ctx := context.Background()
-	name := "sdk-acc-appinst-group-" + runSuffix()
-	resp, err := p.CreateSmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{
-		Name: name,
-		Criteria: &[]pro.SmartSearchCriterion{
-			{
-				AndOr:      "and",
-				Name:       "Computer Name",
-				SearchType: "is",
-				Value:      "SDK_ACC_NEVER_MATCHES",
-			},
-		},
-	}, false)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("CreateSmartComputerGroupV2 for app-installer test: %v", err)
+	err := call()
+	if err == nil {
+		t.Errorf("%s(%s) succeeded for an ID that cannot exist", op, noSuchDeployment)
+		return
 	}
-	id := resp.ID
-	t.Logf("Created throwaway smart group id=%s for app-installer test", id)
-	cleanupDelete(t, "SmartComputerGroup "+id, func() error { return p.DeleteSmartComputerGroupV2(ctx, id) })
-	return id
+	apiErr := jamfplatform.AsAPIError(err)
+	if apiErr == nil {
+		t.Errorf("%s: non-API error, the request did not reach the endpoint: %v", op, err)
+		return
+	}
+	if !apiErr.HasStatus(404) {
+		t.Errorf("%s: want 404 for a nonexistent ID, got %d: %s", op, apiErr.StatusCode, apiErr.Summary())
+		return
+	}
+	t.Logf("%s: 404 for a nonexistent ID, as expected", op)
 }
-
-// createDeployment creates a disabled SELF_SERVICE deployment for a given
-// title and smart group, returning the hydrated GET response.
-func createDeployment(t *testing.T, p *pro.Client, titleID, smartGroupID, name string) *pro.AppInstallerDeployment {
-	t.Helper()
-	ctx := context.Background()
-	ref, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppInstallerDeploymentCreate{
-		Name:           name,
-		AppTitleID:     titleID,
-		DeploymentType: pro.AppInstallerDeploymentCreateDeploymentTypeSelfService,
-		UpdateBehavior: pro.AppInstallerDeploymentCreateUpdateBehaviorAutomatic,
-		CategoryID:     ptrStr("-1"),
-		SiteID:         ptrStr("-1"),
-		SmartGroupID:   &smartGroupID,
-		Enabled:        ptrFalse(),
-	})
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("CreateAppInstallerDeploymentV1: %v", err)
-	}
-	if ref == nil || ref.ID == "" {
-		t.Fatal("CreateAppInstallerDeploymentV1 returned empty id")
-	}
-	// Hydrate to a full deployment by re-reading — the href response
-	// only carries id + href.
-	full, err := p.GetAppInstallerDeploymentV1(ctx, ref.ID)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetAppInstallerDeploymentV1(%s) after create: %v", ref.ID, err)
-	}
-	return full
-}
-
-func ptrStr(s string) *string { return &s }
-func ptrFalse() *bool         { b := false; return &b }

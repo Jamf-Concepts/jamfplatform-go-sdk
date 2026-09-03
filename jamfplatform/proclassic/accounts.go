@@ -17,7 +17,7 @@ import (
 
 // GetAccountByUserID finds accounts by ID.
 //
-// Required privileges: read:pro:accounts.
+// Required privileges: accounts:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetAccountByUserID(ctx context.Context, id string) (*Account, e
 
 // CreateAccountByUserID creates a new account by ID.
 //
-// Required privileges: create:pro:accounts.
+// Required privileges: accounts:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateAccountByUserID(ctx context.Context, id string, request *
 
 // UpdateAccountByUserID updates an existing account by ID.
 //
-// Required privileges: update:pro:accounts.
+// Required privileges: accounts:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateAccountByUserID(ctx context.Context, id string, request *
 
 // DeleteAccountByUserID deletes an account by ID.
 //
-// Required privileges: delete:pro:accounts.
+// Required privileges: accounts:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteAccountByUserID(ctx context.Context, id string) error {
 
 // GetAccountGroupByID finds groups by ID.
 //
-// Required privileges: read:pro:accounts.
+// Required privileges: accounts:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetAccountGroupByID(ctx context.Context, id string) (*Group, er
 
 // CreateAccountGroupByID creates a new group by ID.
 //
-// Required privileges: create:pro:accounts.
+// Required privileges: accounts:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -111,7 +111,7 @@ func (c *Client) CreateAccountGroupByID(ctx context.Context, id string, request 
 
 // UpdateAccountGroupByID updates an existing group by ID.
 //
-// Required privileges: update:pro:accounts.
+// Required privileges: accounts:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -126,7 +126,7 @@ func (c *Client) UpdateAccountGroupByID(ctx context.Context, id string, request 
 
 // DeleteAccountGroupByID deletes a group by ID.
 //
-// Required privileges: delete:pro:accounts.
+// Required privileges: accounts:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -141,7 +141,7 @@ func (c *Client) DeleteAccountGroupByID(ctx context.Context, id string) error {
 
 // GetAccountGroupByName finds groups by name.
 //
-// Required privileges: read:pro:accounts.
+// Required privileges: accounts:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -157,7 +157,7 @@ func (c *Client) GetAccountGroupByName(ctx context.Context, name string) (*Group
 
 // UpdateAccountGroupByName updates an existing group by name.
 //
-// Required privileges: update:pro:accounts.
+// Required privileges: accounts:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -172,7 +172,7 @@ func (c *Client) UpdateAccountGroupByName(ctx context.Context, name string, requ
 
 // DeleteAccountGroupByName deletes a group by name.
 //
-// Required privileges: delete:pro:accounts.
+// Required privileges: accounts:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -187,7 +187,7 @@ func (c *Client) DeleteAccountGroupByName(ctx context.Context, name string) erro
 
 // GetAccountByUsername finds accounts by name.
 //
-// Required privileges: read:pro:accounts.
+// Required privileges: accounts:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -203,7 +203,7 @@ func (c *Client) GetAccountByUsername(ctx context.Context, name string) (*Accoun
 
 // UpdateAccountByUsername updates an existing account by name.
 //
-// Required privileges: update:pro:accounts.
+// Required privileges: accounts:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -218,7 +218,7 @@ func (c *Client) UpdateAccountByUsername(ctx context.Context, name string, reque
 
 // DeleteAccountByUsername deletes an account by name.
 //
-// Required privileges: delete:pro:accounts.
+// Required privileges: accounts:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -233,7 +233,7 @@ func (c *Client) DeleteAccountByUsername(ctx context.Context, name string) error
 
 // ListAccounts finds all accounts.
 //
-// Required privileges: read:pro:accounts.
+// Required privileges: accounts:read.
 func (c *Client) ListAccounts(ctx context.Context) (*Accounts, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Accounts
@@ -246,7 +246,7 @@ func (c *Client) ListAccounts(ctx context.Context) (*Accounts, error) {
 
 // CreateAccountGroupByName creates a new group by ID.
 //
-// Required privileges: create:pro:accounts.
+// Required privileges: accounts:create.
 //
 // Parameters:
 //   - name: ID value to filter by.
@@ -261,7 +261,7 @@ func (c *Client) CreateAccountGroupByName(ctx context.Context, name string, requ
 
 // CreateAccountByUsername creates a new account by ID.
 //
-// Required privileges: create:pro:accounts.
+// Required privileges: accounts:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

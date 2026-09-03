@@ -250,7 +250,7 @@ func TestAcceptance_Classic_OSXProfile_QuoteRoundtrip(t *testing.T) {
 
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(createPayload),
 		},
 	})
@@ -281,7 +281,7 @@ func TestAcceptance_Classic_OSXProfile_QuoteRoundtrip(t *testing.T) {
 	updatePayload := osxProfilePlist(name, "update-marker-quote-\"-only", false)
 	updateReq := &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(updatePayload),
 		},
 	}
@@ -325,7 +325,7 @@ func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
 
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(createPayload),
 		},
 	})
@@ -356,7 +356,7 @@ func TestAcceptance_Classic_OSXProfile_AmpersandRoundtrip(t *testing.T) {
 	updatePayload := osxProfilePlist(name, "update-marker-amp-\"-and-&amp;", true)
 	updateReq := &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(updatePayload),
 		},
 	}
@@ -412,7 +412,7 @@ func TestAcceptance_Classic_MobileDeviceProfile_QuoteRoundtrip(t *testing.T) {
 
 	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(createPayload),
 		},
 	})
@@ -443,7 +443,7 @@ func TestAcceptance_Classic_MobileDeviceProfile_QuoteRoundtrip(t *testing.T) {
 	updatePayload := mobileProfilePlist(name, "update-marker-quote-\"-only", false)
 	updateReq := &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(updatePayload),
 		},
 	}
@@ -531,7 +531,7 @@ func TestAcceptance_Classic_OSXProfile_NotificationsFixtureRoundtrip(t *testing.
 
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(createPayload),
 		},
 	})
@@ -568,7 +568,7 @@ func TestAcceptance_Classic_OSXProfile_NotificationsFixtureRoundtrip(t *testing.
 	updatePayload := minimalNotificationsPlist(name, "update-marker")
 	updateReq := &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(updatePayload),
 		},
 	}
@@ -759,7 +759,7 @@ func TestAcceptance_Classic_OSXProfile_ReservedCharacterMatrix(t *testing.T) {
 
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(matrixProfilePlist(name)),
 		},
 	})
@@ -789,7 +789,7 @@ func TestAcceptance_Classic_OSXProfile_ReservedCharacterMatrix(t *testing.T) {
 	// server's identifier-preserving replace.
 	if err := pc.UpdateOSXConfigurationProfileByID(ctx, intToStr(id), &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(matrixProfilePlist(name)),
 		},
 	}); err != nil {
@@ -823,7 +823,7 @@ func TestAcceptance_Classic_MobileDeviceProfile_ReservedCharacterMatrix(t *testi
 
 	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(matrixProfilePlist(name)),
 		},
 	})
@@ -958,7 +958,7 @@ func TestAcceptance_Classic_OSXProfile_LineBreakRoundtrip(t *testing.T) {
 
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(lineBreakProbePlist(name)),
 		},
 	})
@@ -986,7 +986,7 @@ func TestAcceptance_Classic_OSXProfile_LineBreakRoundtrip(t *testing.T) {
 
 	updateReq := &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(lineBreakProbePlist(name)),
 		},
 	}
@@ -1018,7 +1018,7 @@ func TestAcceptance_Classic_MobileDeviceProfile_LineBreakRoundtrip(t *testing.T)
 
 	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name:     classicStrPtr(name),
+			Name:     new(name),
 			Payloads: payloadsXMLPtr(lineBreakProbePlist(name)),
 		},
 	})

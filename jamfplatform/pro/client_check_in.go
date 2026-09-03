@@ -18,7 +18,7 @@ import (
 
 // GetCheckInSettingsV3 get Client Check-In settings.
 //
-// Required privileges: read:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Read Computer Check-In.
+// Required privileges: computer-check-in:read. Legacy Jamf Pro privilege name(s): Read Computer Check-In.
 func (c *Client) GetCheckInSettingsV3(ctx context.Context) (*ClientCheckInV3, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ClientCheckInV3
@@ -31,7 +31,7 @@ func (c *Client) GetCheckInSettingsV3(ctx context.Context) (*ClientCheckInV3, er
 
 // UpdateCheckInSettingsV3 update Client Check-In object.
 //
-// Required privileges: update:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
+// Required privileges: computer-check-in:update. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
 func (c *Client) UpdateCheckInSettingsV3(ctx context.Context, request *ClientCheckInV3) (*ClientCheckInV3, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result ClientCheckInV3
@@ -44,7 +44,7 @@ func (c *Client) UpdateCheckInSettingsV3(ctx context.Context, request *ClientChe
 
 // ListCheckInHistoryV3 get Client Check-In history object.
 //
-// Required privileges: read:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Read Computer Check-In.
+// Required privileges: computer-check-in:read. Legacy Jamf Pro privilege name(s): Read Computer Check-In.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
@@ -84,7 +84,7 @@ func (c *Client) ListCheckInHistoryV3(ctx context.Context, sort []string, filter
 
 // CreateCheckInHistoryNoteV3 add a Note to Client Check-In History.
 //
-// Required privileges: update:pro:computer-check-in. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
+// Required privileges: computer-check-in:update. Legacy Jamf Pro privilege name(s): Update Computer Check-In.
 func (c *Client) CreateCheckInHistoryNoteV3(ctx context.Context, request *ObjectHistoryNote) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse

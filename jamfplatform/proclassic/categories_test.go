@@ -13,7 +13,7 @@ import (
 
 func TestGetCategoryByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetCategoryByID(t *testing.T) {
 
 func TestGetCategoryByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/categories/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetCategoryByID_NotFound(t *testing.T) {
 
 func TestCreateCategoryByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateCategoryByID(t *testing.T) {
 
 func TestUpdateCategoryByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateCategoryByID(t *testing.T) {
 
 func TestDeleteCategoryByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteCategoryByID(t *testing.T) {
 
 func TestGetCategoryByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetCategoryByName(t *testing.T) {
 
 func TestGetCategoryByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetCategoryByName_NotFound(t *testing.T) {
 
 func TestUpdateCategoryByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateCategoryByName(t *testing.T) {
 
 func TestDeleteCategoryByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteCategoryByName(t *testing.T) {
 
 func TestListCategories(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListCategories(t *testing.T) {
 
 func TestListCategories_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/categories", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListCategories_NotFound(t *testing.T) {
 
 func TestCreateCategoryByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -196,7 +196,7 @@ func TestCreateCategoryByName(t *testing.T) {
 
 func TestResolveCategoryIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -214,7 +214,7 @@ func TestResolveCategoryIDByName(t *testing.T) {
 
 func TestResolveCategoryByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -233,13 +233,13 @@ func TestResolveCategoryByName(t *testing.T) {
 func TestApplyCategory_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/categories/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/categories/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -261,13 +261,13 @@ func TestApplyCategory_Create(t *testing.T) {
 func TestApplyCategory_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/categories/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<category><id>42</id></category>")
 	})
-	mux.HandleFunc("/api/proclassic/categories/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/categories/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

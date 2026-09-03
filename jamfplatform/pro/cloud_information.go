@@ -13,7 +13,7 @@ import (
 
 // GetCloudInformationV1 retrieve information related to cloud setup.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetCloudInformationV1(ctx context.Context) (*CloudResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudResponse

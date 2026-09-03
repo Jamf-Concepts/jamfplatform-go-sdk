@@ -17,7 +17,7 @@ import (
 
 // GetBuildingByID finds buildings by ID.
 //
-// Required privileges: read:pro:buildings.
+// Required privileges: buildings:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetBuildingByID(ctx context.Context, id string) (*Building, err
 
 // CreateBuildingByID creates a new building.
 //
-// Required privileges: create:pro:buildings.
+// Required privileges: buildings:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateBuildingByID(ctx context.Context, id string, request *Bui
 
 // UpdateBuildingByID updates an existing building by ID.
 //
-// Required privileges: update:pro:buildings.
+// Required privileges: buildings:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateBuildingByID(ctx context.Context, id string, request *Bui
 
 // DeleteBuildingByID deletes a building by ID.
 //
-// Required privileges: delete:pro:buildings.
+// Required privileges: buildings:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteBuildingByID(ctx context.Context, id string) error {
 
 // GetBuildingByName finds buildings by name.
 //
-// Required privileges: read:pro:buildings.
+// Required privileges: buildings:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetBuildingByName(ctx context.Context, name string) (*Building,
 
 // UpdateBuildingByName updates an existing building by name.
 //
-// Required privileges: update:pro:buildings.
+// Required privileges: buildings:update.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateBuildingByName(ctx context.Context, name string, request 
 
 // DeleteBuildingByName deletes a building by name.
 //
-// Required privileges: delete:pro:buildings.
+// Required privileges: buildings:delete.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteBuildingByName(ctx context.Context, name string) error {
 
 // ListBuildings finds all buildings.
 //
-// Required privileges: read:pro:buildings.
+// Required privileges: buildings:read.
 func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Buildings
@@ -138,7 +138,7 @@ func (c *Client) ListBuildings(ctx context.Context) (*Buildings, error) {
 
 // CreateBuildingByName creates a new building.
 //
-// Required privileges: create:pro:buildings.
+// Required privileges: buildings:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

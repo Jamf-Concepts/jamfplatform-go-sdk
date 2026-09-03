@@ -138,6 +138,33 @@ func CommandflushStatusValues() []CommandflushStatus {
 	}
 }
 
+// ComputerCheckInCheckInFrequency is the set of values accepted by ComputerCheckIn.CheckInFrequency.
+type ComputerCheckInCheckInFrequency = int
+
+// ComputerCheckInCheckInFrequency values accepted by the Jamf API. The alias above is an int, so
+// these constants pass to any parameter or field declared as a plain int.
+const (
+	ComputerCheckInCheckInFrequency60 ComputerCheckInCheckInFrequency = 60
+	ComputerCheckInCheckInFrequency30 ComputerCheckInCheckInFrequency = 30
+	ComputerCheckInCheckInFrequency15 ComputerCheckInCheckInFrequency = 15
+	ComputerCheckInCheckInFrequency5  ComputerCheckInCheckInFrequency = 5
+)
+
+// ComputerCheckInCheckInFrequencyValues returns every value the Jamf API accepts for ComputerCheckInCheckInFrequency,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// int64validator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerCheckInCheckInFrequencyValues() []ComputerCheckInCheckInFrequency {
+	return []ComputerCheckInCheckInFrequency{
+		ComputerCheckInCheckInFrequency60,
+		ComputerCheckInCheckInFrequency30,
+		ComputerCheckInCheckInFrequency15,
+		ComputerCheckInCheckInFrequency5,
+	}
+}
+
 // ComputerExtensionAttributeDataType is the set of values accepted by ComputerExtensionAttribute.DataType.
 type ComputerExtensionAttributeDataType = string
 
@@ -218,29 +245,6 @@ func ComputerExtensionAttributeInventoryDisplayValues() []ComputerExtensionAttri
 		ComputerExtensionAttributeInventoryDisplayUserAndLocation,
 		ComputerExtensionAttributeInventoryDisplayPurchasing,
 		ComputerExtensionAttributeInventoryDisplayExtensionAttributes,
-	}
-}
-
-// ComputerHardwareSipStatus is the set of values accepted by ComputerHardware.SipStatus.
-type ComputerHardwareSipStatus = string
-
-// ComputerHardwareSipStatus values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	ComputerHardwareSipStatusEnabled  ComputerHardwareSipStatus = "Enabled"
-	ComputerHardwareSipStatusDisabled ComputerHardwareSipStatus = "Disabled"
-)
-
-// ComputerHardwareSipStatusValues returns every value the Jamf API accepts for ComputerHardwareSipStatus,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func ComputerHardwareSipStatusValues() []ComputerHardwareSipStatus {
-	return []ComputerHardwareSipStatus{
-		ComputerHardwareSipStatusEnabled,
-		ComputerHardwareSipStatusDisabled,
 	}
 }
 
@@ -1238,6 +1242,27 @@ func LogflushIntervalValues() []LogflushInterval {
 	}
 }
 
+// LogflushLog is the set of values accepted by Logflush.Log.
+type LogflushLog = string
+
+// LogflushLog values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	LogflushLogPolicy LogflushLog = "policy"
+)
+
+// LogflushLogValues returns every value the Jamf API accepts for LogflushLog,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func LogflushLogValues() []LogflushLog {
+	return []LogflushLog{
+		LogflushLogPolicy,
+	}
+}
+
 // MobileDeviceApplicationGeneralDeploymentType is the set of values accepted by MobileDeviceApplicationGeneral.DeploymentType.
 type MobileDeviceApplicationGeneralDeploymentType = string
 
@@ -1523,29 +1548,6 @@ func PatchPolicyUserInteractionNotificationsNotificationTypeValues() []PatchPoli
 	return []PatchPolicyUserInteractionNotificationsNotificationType{
 		PatchPolicyUserInteractionNotificationsNotificationTypeSelfService,
 		PatchPolicyUserInteractionNotificationsNotificationTypeSelfServiceAndNotificationCenter,
-	}
-}
-
-// PeripheralTypeFieldsFieldItemType is the set of values accepted by PeripheralTypeFieldsFieldItem.Type.
-type PeripheralTypeFieldsFieldItemType = string
-
-// PeripheralTypeFieldsFieldItemType values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	PeripheralTypeFieldsFieldItemTypeMenu PeripheralTypeFieldsFieldItemType = "menu"
-	PeripheralTypeFieldsFieldItemTypeText PeripheralTypeFieldsFieldItemType = "text"
-)
-
-// PeripheralTypeFieldsFieldItemTypeValues returns every value the Jamf API accepts for PeripheralTypeFieldsFieldItemType,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func PeripheralTypeFieldsFieldItemTypeValues() []PeripheralTypeFieldsFieldItemType {
-	return []PeripheralTypeFieldsFieldItemType{
-		PeripheralTypeFieldsFieldItemTypeMenu,
-		PeripheralTypeFieldsFieldItemTypeText,
 	}
 }
 

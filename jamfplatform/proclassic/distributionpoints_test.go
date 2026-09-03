@@ -13,7 +13,7 @@ import (
 
 func TestGetDistributionPointByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetDistributionPointByID(t *testing.T) {
 
 func TestGetDistributionPointByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetDistributionPointByID_NotFound(t *testing.T) {
 
 func TestCreateDistributionPointByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateDistributionPointByID(t *testing.T) {
 
 func TestUpdateDistributionPointByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateDistributionPointByID(t *testing.T) {
 
 func TestDeleteDistributionPointByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteDistributionPointByID(t *testing.T) {
 
 func TestGetDistributionPointByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetDistributionPointByName(t *testing.T) {
 
 func TestGetDistributionPointByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetDistributionPointByName_NotFound(t *testing.T) {
 
 func TestUpdateDistributionPointByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateDistributionPointByName(t *testing.T) {
 
 func TestDeleteDistributionPointByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteDistributionPointByName(t *testing.T) {
 
 func TestListDistributionPoints(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListDistributionPoints(t *testing.T) {
 
 func TestListDistributionPoints_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListDistributionPoints_NotFound(t *testing.T) {
 
 func TestCreateDistributionPointByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -196,7 +196,7 @@ func TestCreateDistributionPointByName(t *testing.T) {
 
 func TestResolveDistributionPointIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -214,7 +214,7 @@ func TestResolveDistributionPointIDByName(t *testing.T) {
 
 func TestResolveDistributionPointByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -233,13 +233,13 @@ func TestResolveDistributionPointByName(t *testing.T) {
 func TestApplyDistributionPoint_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/distributionpoints/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -261,13 +261,13 @@ func TestApplyDistributionPoint_Create(t *testing.T) {
 func TestApplyDistributionPoint_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/distributionpoints/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<distribution_point><id>42</id></distribution_point>")
 	})
-	mux.HandleFunc("/api/proclassic/distributionpoints/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/distributionpoints/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

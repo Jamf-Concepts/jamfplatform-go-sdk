@@ -14,7 +14,7 @@ import (
 
 // CreateDockItemV1 create a DockItem.
 //
-// Required privileges: create:pro:dock-items. Legacy Jamf Pro privilege name(s): Create Dock Items.
+// Required privileges: dock-items:create. Legacy Jamf Pro privilege name(s): Create Dock Items.
 func (c *Client) CreateDockItemV1(ctx context.Context, request *DockItem) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -27,7 +27,7 @@ func (c *Client) CreateDockItemV1(ctx context.Context, request *DockItem) (*Href
 
 // GetDockItemV1 retrieve a full dockItem object.
 //
-// Required privileges: read:pro:dock-items. Legacy Jamf Pro privilege name(s): Read Dock Items.
+// Required privileges: dock-items:read. Legacy Jamf Pro privilege name(s): Read Dock Items.
 //
 // Parameters:
 //   - id: DockItem object identifier.
@@ -43,7 +43,7 @@ func (c *Client) GetDockItemV1(ctx context.Context, id string) (*DockItem, error
 
 // UpdateDockItemV1 replace the dockItem at the id with the supplied information.
 //
-// Required privileges: update:pro:dock-items. Legacy Jamf Pro privilege name(s): Update Dock Items.
+// Required privileges: dock-items:update. Legacy Jamf Pro privilege name(s): Update Dock Items.
 //
 // Parameters:
 //   - id: DockItem object identifier.
@@ -59,7 +59,7 @@ func (c *Client) UpdateDockItemV1(ctx context.Context, id string, request *DockI
 
 // DeleteDockItemV1 delete a DockItem at the specified id.
 //
-// Required privileges: delete:pro:dock-items. Legacy Jamf Pro privilege name(s): Delete Dock Items.
+// Required privileges: dock-items:delete. Legacy Jamf Pro privilege name(s): Delete Dock Items.
 //
 // Parameters:
 //   - id: DockItem object identifier.

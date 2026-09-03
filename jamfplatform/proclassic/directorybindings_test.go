@@ -13,7 +13,7 @@ import (
 
 func TestGetDirectoryBindingByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetDirectoryBindingByID(t *testing.T) {
 
 func TestGetDirectoryBindingByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetDirectoryBindingByID_NotFound(t *testing.T) {
 
 func TestCreateDirectoryBindingByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateDirectoryBindingByID(t *testing.T) {
 
 func TestUpdateDirectoryBindingByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateDirectoryBindingByID(t *testing.T) {
 
 func TestDeleteDirectoryBindingByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteDirectoryBindingByID(t *testing.T) {
 
 func TestGetDirectoryBindingByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetDirectoryBindingByName(t *testing.T) {
 
 func TestGetDirectoryBindingByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetDirectoryBindingByName_NotFound(t *testing.T) {
 
 func TestUpdateDirectoryBindingByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateDirectoryBindingByName(t *testing.T) {
 
 func TestDeleteDirectoryBindingByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteDirectoryBindingByName(t *testing.T) {
 
 func TestListDirectoryBindings(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListDirectoryBindings(t *testing.T) {
 
 func TestListDirectoryBindings_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListDirectoryBindings_NotFound(t *testing.T) {
 
 func TestCreateDirectoryBindingByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -196,7 +196,7 @@ func TestCreateDirectoryBindingByName(t *testing.T) {
 
 func TestResolveDirectoryBindingIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -214,7 +214,7 @@ func TestResolveDirectoryBindingIDByName(t *testing.T) {
 
 func TestResolveDirectoryBindingByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -233,13 +233,13 @@ func TestResolveDirectoryBindingByName(t *testing.T) {
 func TestApplyDirectoryBinding_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/directorybindings/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/directorybindings/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -261,13 +261,13 @@ func TestApplyDirectoryBinding_Create(t *testing.T) {
 func TestApplyDirectoryBinding_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/directorybindings/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<directory_binding><id>42</id></directory_binding>")
 	})
-	mux.HandleFunc("/api/proclassic/directorybindings/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/directorybindings/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

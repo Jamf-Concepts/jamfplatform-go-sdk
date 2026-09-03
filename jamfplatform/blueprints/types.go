@@ -88,7 +88,8 @@ type AudioAccessorySettingsComponent struct {
 	// Audio accessory settings configuration.
 	// Configures audio accessory temporary pairing behavior.
 	Configuration AudioAccessorySettingsConfiguration `json:"configuration"`
-	Identifier    string                              `json:"identifier"`
+	// Allowed values: see the AudioAccessorySettingsComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // AudioAccessorySettingsConfiguration Audio accessory settings configuration. Configures audio accessory temporary pairing behavior.
@@ -221,6 +222,7 @@ type BookmarkGroup struct {
 
 // BookmarkItem is a polymorphic response keyed by Type. Exactly one variant pointer is populated after unmarshaling.
 type BookmarkItem struct {
+	// Allowed values: see the BookmarkItemType constants.
 	Type     string              `json:"Type"`
 	BOOKMARK *URLBookmarkItem    `json:"-"`
 	FOLDER   *FolderBookmarkItem `json:"-"`
@@ -320,13 +322,13 @@ type ConfigurationProfile struct {
 	// ### Example — `com.apple.wifi.managed`.
 	// The same pattern works for any payload. For
 	// [com.apple.wifi.managed](https://github.com/apple/device-management/blob/release/mdm/profiles/com.apple.wifi.managed.yaml),
-	// look up its `payloadkeys` and send:.
+	// look up its `payloadkeys` and send:
 	// ```json { "payloadDisplayName": "Corporate Wi-Fi", "payloadContent": [ { "payloadType":
 	// "com.apple.wifi.managed", "SSID_STR": "Corporate-WiFi", "EncryptionType": "WPA2", "AutoJoin": true,
 	// "IsHotspot": false } ] } ```.
 	// ### Combining multiple Apple payloads in one component.
 	// A single `com.jamf.ddm-configuration-profile` component can contain multiple Apple payloads in the
-	// `payloadContent` array:.
+	// `payloadContent` array:
 	// ```json { "payloadDisplayName": "Network & Domains", "payloadContent": [ { "payloadType":
 	// "com.apple.domains", "WebDomains": ["*.corp.example.com"], "EmailDomains": ["corp.example.com"] }, {
 	// "payloadType": "com.apple.wifi.managed", "SSID_STR": "CorpNet", "EncryptionType": "WPA3" } ] } ```.
@@ -345,27 +347,35 @@ type ConfigurationProfile struct {
 	// > **Unsupported payload types:** Blueprints with > `com.apple.font` or `com.apple.webClip.managed`
 	// payloads > cannot be created.
 	// ### Step 2 — Build the `configuration` object.
-	// The `configuration` has two mandatory fields:.
-	// | Field | Type | Description | |---|---|---| | `payloadDisplayName` | string | A human-readable name
-	// shown on the device (e.g., `"Managed Domains"`) | | `payloadContent` | array | An array of payload
-	// objects — each one represents a single Apple payload |.
-	// Each entry in `payloadContent` **must** contain:.
-	// | Field | Type | Description | |---|---|---| | `payloadType` | string | The Apple payload type
-	// identifier (e.g., `com.apple.domains`) |.
+	// The `configuration` has two mandatory fields:
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `payloadDisplayName` | string | A human-readable name shown on the device (e.g., `"Managed Domains"`) |
+	// | `payloadContent` | array | An array of payload objects — each one represents a single Apple payload |
+	// Each entry in `payloadContent` **must** contain:
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `payloadType` | string | The Apple payload type identifier (e.g., `com.apple.domains`) |
 	// In addition to `payloadType`, include the payload-specific keys from the `payloadkeys` section of
 	// the Apple payload YAML.
 	// ### Apple type → JSON type mapping.
-	// | Apple type | JSON value type | Example | |---|---|---| | `<string>` | string | `"example.com"` | |
-	// `<integer>` | number | `42` | | `<real>` | number | `3.14` | | `<boolean>` | boolean | `true` | |
-	// `<data>` | string (Base64-encoded) | `"SGVsbG8="` | | `<date>` | string (ISO 8601) |
-	// `"2026-01-15T00:00:00Z"` | | `<array>` | array | `["a", "b"]` | | `<dictionary>` | object | `{
-	// "key": "value" }` |.
+	// | Apple type | JSON value type | Example |
+	// |---|---|---|
+	// | `<string>` | string | `"example.com"` |
+	// | `<integer>` | number | `42` |
+	// | `<real>` | number | `3.14` |
+	// | `<boolean>` | boolean | `true` |
+	// | `<data>` | string (Base64-encoded) | `"SGVsbG8="` |
+	// | `<date>` | string (ISO 8601) | `"2026-01-15T00:00:00Z"` |
+	// | `<array>` | array | `["a", "b"]` |
+	// | `<dictionary>` | object | `{ "key": "value" }` |
 	// Only include the keys you want to configure. Keys marked `presence: optional` in the Apple YAML can
 	// be omitted; keys marked `presence: required` must be present.
 	// ### Reference.
 	// - Apple payload definitions: https://github.com/apple/device-management/tree/release/mdm/profiles -
 	// Apple Configuration Profile reference:
 	// https://developer.apple.com/documentation/devicemanagement/profile-specific-payload-keys.
+	// Allowed values: see the ConfigurationProfileIdentifier constants.
 	Identifier string `json:"identifier"`
 }
 
@@ -447,7 +457,7 @@ type CustomDeclarationsComponent struct {
 	// A configuration declaration can reference an asset declaration defined in the same `declarations`
 	// array using the `$PAYLOAD_<payloadKey>` placeholder. The `payloadKey` values are local to the
 	// declarations list in this request — they do not need to be globally unique or consistent across
-	// requests:.
+	// requests:
 	// ```json { "declarations": [ { "type": "com.apple.asset.credential.userpassword", "channelType":
 	// "SYSTEM", "kind": "ASSET", "payload": { "Reference": { "DataURL":
 	// "https://example.com/asset-data/credential.json", "ContentType": "application/json" } },
@@ -467,12 +477,16 @@ type CustomDeclarationsComponent struct {
 	// `com.apple.configuration.passcode.settings`, `com.apple.asset.useridentity`) identifies each
 	// declaration.
 	// ### Step 2 — Set the `kind` field.
-	// The `kind` maps to the declaration group, derived from the Apple declaration type prefix:.
-	// | `kind` | Apple declaration type prefix | |---|---| | `CONFIGURATION` | `com.apple.configuration.`
-	// | | `ASSET` | `com.apple.asset.` |.
+	// The `kind` maps to the declaration group, derived from the Apple declaration type prefix:
+	// | `kind` | Apple declaration type prefix |
+	// |---|---|
+	// | `CONFIGURATION` | `com.apple.configuration.` |
+	// | `ASSET` | `com.apple.asset.` |
 	// ### Step 3 — Set the `channelType` field.
-	// | `channelType` | Description | |---|---| | `SYSTEM` | Applies the declaration to the system
-	// (device) channel | | `USER` | Applies the declaration to the user channel |.
+	// | `channelType` | Description |
+	// |---|---|
+	// | `SYSTEM` | Applies the declaration to the system (device) channel |
+	// | `USER` | Applies the declaration to the user channel |
 	// ### Step 4 — Build the `payload` object.
 	// The `payload` is a JSON object containing the declaration-specific keys from the `payloadkeys`
 	// section of the corresponding Apple declaration YAML.
@@ -486,6 +500,7 @@ type CustomDeclarationsComponent struct {
 	// The `payloadKey` value is local to the declarations in this request — it does not need to be
 	// globally unique or consistent across requests. This is useful when a configuration declaration must
 	// reference an asset declaration defined in the same component.
+	// Allowed values: see the CustomDeclarationsComponentIdentifier constants.
 	Identifier string `json:"identifier"`
 }
 
@@ -520,6 +535,7 @@ type Deployment struct {
 	// Date when deployment job started.
 	Started time.Time `json:"started"`
 	// Deployment job state.
+	// Allowed values: "PENDING", "DEPLOYING", "SUCCEEDED", "FAILED".
 	State string `json:"state"`
 }
 
@@ -545,7 +561,8 @@ type DiskManagementComponent struct {
 	// Disk management settings configuration.
 	// Configures restrictions for external and network storage access.
 	Configuration DiskManagementSettingsConfiguration `json:"configuration"`
-	Identifier    string                              `json:"identifier"`
+	// Allowed values: see the DiskManagementComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // DiskManagementSettingsConfiguration Disk management settings configuration. Configures restrictions for external and network storage access.
@@ -553,6 +570,7 @@ type DiskManagementSettingsConfiguration struct {
 	// Storage restrictions configuration.
 	Restrictions *Restrictions `json:"Restrictions,omitempty"`
 	// Configuration version.
+	// Allowed values: see the DiskManagementSettingsConfigurationVersion constants.
 	Version int `json:"version"`
 }
 
@@ -584,7 +602,8 @@ type FolderBookmarkItem struct {
 	Folder *[]URLBookmarkItem `json:"Folder,omitempty"`
 	// The title of the folder shown in Safari.
 	Title string `json:"Title"`
-	Type  string `json:"Type"`
+	// Allowed values: see the FolderBookmarkItemType constants.
+	Type string `json:"Type"`
 }
 
 // InputModes represents a input modes.
@@ -647,28 +666,31 @@ type ManagedAppComponent struct {
 	// available blueprint components](../listComponents) endpoint (`GET /v1/blueprint-components`) to
 	// discover apps available to your organization and retrieve their identifiers.
 	// ### Required fields per app.
-	// | Field | Type | Description | |---|---|---| | `AssetId` | string | volume purchasing asset
-	// identifier for the app | | `AppAndBookTokenId` | string | Identifier of the volume purchasing token
-	// that licenses the app | | `AppId` | string | App bundle identifier (e.g., `com.microsoft.Excel`) |.
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `AssetId` | string | volume purchasing asset identifier for the app |
+	// | `AppAndBookTokenId` | string | Identifier of the volume purchasing token that licenses the app |
+	// | `AppId` | string | App bundle identifier (e.g., `com.microsoft.Excel`) |
 	// ### Optional management fields.
-	// | Field | Type | Values | Description | |---|---|---|---| | `Install` | string | `Required`,
-	// `Optional` | Whether the app must be installed. Defaults to `Required`. | |
-	// `AllowDownloadsOverCellular` | string | `AlwaysOn`, `AlwaysOff`, `StoreSettings` | Controls cellular
-	// downloads. Defaults to `StoreSettings`. | | `AutomaticAppUpdates` | string | `AlwaysOn`,
-	// `AlwaysOff`, `StoreSettings` | Controls automatic updates. Defaults to `StoreSettings`. | |
-	// `IncludeInBackup` | boolean | `true`, `false` | Whether app data is included in device backups. | |
-	// `Attributes` | object | — | Fine-grained app behavior settings. See `Attributes` fields below. |.
+	// | Field | Type | Values | Description |
+	// |---|---|---|---|
+	// | `Install` | string | `Required`, `Optional` | Whether the app must be installed. Defaults to `Required`. |
+	// | `AllowDownloadsOverCellular` | string | `AlwaysOn`, `AlwaysOff`, `StoreSettings` | Controls cellular downloads. Defaults to `StoreSettings`. |
+	// | `AutomaticAppUpdates` | string | `AlwaysOn`, `AlwaysOff`, `StoreSettings` | Controls automatic updates. Defaults to `StoreSettings`. |
+	// | `IncludeInBackup` | boolean | `true`, `false` | Whether app data is included in device backups. |
+	// | `Attributes` | object | — | Fine-grained app behavior settings. See `Attributes` fields below. |
 	// ### `Attributes` fields (all optional).
-	// | Field | Type | Description | |---|---|---| | `Hideable` | boolean | Allow the user to hide the app
-	// (requires iOS 18.1 or later). When `Lockable` is `false`, `Hideable` must also be `false`. | |
-	// `Lockable` | boolean | Allow the user to lock the app behind Face ID / Touch ID (requires iOS 18.1
-	// or later). | | `TapToPayScreenLock` | boolean | Require screen lock when Tap to Pay is used. | |
-	// `AssociatedDomains` | array of strings | Associated domains for the app (e.g., `["example.com"]`). |
-	// | `AssociatedDomainsEnableDirectDownloads` | boolean | Enable direct downloads for the associated
-	// domains. | | `CellularSliceUUID` | string (UUID) | Network slicing UUID for the app's cellular
-	// connection. | | `DNSProxyUUID` | string (UUID) | UUID of the DNS proxy configuration to apply to the
-	// app. |.
+	// | Field | Type | Description |
+	// |---|---|---|
+	// | `Hideable` | boolean | Allow the user to hide the app (requires iOS 18.1 or later). When `Lockable` is `false`, `Hideable` must also be `false`. |
+	// | `Lockable` | boolean | Allow the user to lock the app behind Face ID / Touch ID (requires iOS 18.1 or later). |
+	// | `TapToPayScreenLock` | boolean | Require screen lock when Tap to Pay is used. |
+	// | `AssociatedDomains` | array of strings | Associated domains for the app (e.g., `["example.com"]`). |
+	// | `AssociatedDomainsEnableDirectDownloads` | boolean | Enable direct downloads for the associated domains. |
+	// | `CellularSliceUUID` | string (UUID) | Network slicing UUID for the app's cellular connection. |
+	// | `DNSProxyUUID` | string (UUID) | UUID of the DNS proxy configuration to apply to the app. |
 	// > **Validation rule:** When `Lockable` is `false`, `Hideable` is required and must also be `false`.
+	// Allowed values: see the ManagedAppComponentIdentifier constants.
 	Identifier string `json:"identifier"`
 }
 
@@ -739,7 +761,8 @@ type MathSettingsComponent struct {
 	// Configures Calculator app modes and system-wide math behavior including keyboard suggestions and
 	// Math Notes.
 	Configuration MathSettingsConfiguration `json:"configuration"`
-	Identifier    string                    `json:"identifier"`
+	// Allowed values: see the MathSettingsComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // MathSettingsConfiguration Math settings configuration. Configures Calculator app modes and system-wide math behavior including keyboard suggestions and Math Notes.
@@ -872,7 +895,8 @@ type PasscodeSettingsComponent struct {
 	// Passcode settings configuration.
 	// Configures device passcode requirements including complexity, length, and expiration.
 	Configuration PasscodeSettingsConfiguration `json:"configuration"`
-	Identifier    string                        `json:"identifier"`
+	// Allowed values: see the PasscodeSettingsComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // PasscodeSettingsConfiguration Passcode settings configuration. Configures device passcode requirements including complexity, length, and expiration.
@@ -891,6 +915,7 @@ type PasscodeSettingsConfiguration struct {
 	RequireComplexPasscode       *RequireComplexPasscode       `json:"RequireComplexPasscode,omitempty"`
 	RequirePasscode              *RequirePasscode              `json:"RequirePasscode,omitempty"`
 	// Configuration version.
+	// Allowed values: see the PasscodeSettingsConfigurationVersion constants.
 	Version int `json:"version"`
 }
 
@@ -960,7 +985,8 @@ type SafariBookmarksComponent struct {
 	// Safari bookmarks configuration.
 	// Defines managed bookmark groups and folders that appear in Safari across managed devices.
 	Configuration SafariBookmarksConfiguration `json:"configuration"`
-	Identifier    string                       `json:"identifier"`
+	// Allowed values: see the SafariBookmarksComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // SafariBookmarksConfiguration Safari bookmarks configuration. Defines managed bookmark groups and folders that appear in Safari across managed devices.
@@ -974,7 +1000,8 @@ type SafariExtensionsComponent struct {
 	// Safari extensions configuration.
 	// Manages Safari browser extensions including allowed/denied domains and private browsing settings.
 	Configuration SafariExtensionsConfiguration `json:"configuration"`
-	Identifier    string                        `json:"identifier"`
+	// Allowed values: see the SafariExtensionsComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // SafariExtensionsConfiguration Safari extensions configuration. Manages Safari browser extensions including allowed/denied domains and private browsing settings.
@@ -988,7 +1015,8 @@ type SafariSettingsComponent struct {
 	// Configures Safari browser behavior including cookies, JavaScript, popups, private browsing, and
 	// start page settings.
 	Configuration SafariSettingsConfiguration `json:"configuration"`
-	Identifier    string                      `json:"identifier"`
+	// Allowed values: see the SafariSettingsComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // SafariSettingsConfiguration Safari settings configuration. Configures Safari browser behavior including cookies, JavaScript, popups, private browsing, and start page settings.
@@ -1027,7 +1055,8 @@ type SoftwareUpdateSettingsComponent struct {
 	// Configures OS update behavior including notifications, automatic actions, deferrals, and rapid
 	// security responses.
 	Configuration SoftwareUpdateSettingsConfiguration `json:"configuration"`
-	Identifier    string                              `json:"identifier"`
+	// Allowed values: see the SoftwareUpdateSettingsComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // SoftwareUpdateSettingsConfiguration Software update settings configuration. Configures OS update behavior including notifications, automatic actions, deferrals, and rapid security responses.
@@ -1060,6 +1089,7 @@ type SupportedOs struct {
 
 // SwUpdateAutomaticConfiguration Automatic software update enforcement configuration. Automatically enforces updates based on strategy (LATEST or SEMANTIC).
 type SwUpdateAutomaticConfiguration struct {
+	// Allowed values: see the SwUpdateAutomaticConfigurationStrategy constants.
 	Strategy string                         `json:"strategy"`
 	LATEST   *SwUpdateLatestConfiguration   `json:"-"`
 	SEMANTIC *SwUpdateSemanticConfiguration `json:"-"`
@@ -1105,13 +1135,50 @@ type SwUpdateComponent struct {
 	// Configures OS update enforcement using either manual (specific version by date) or automatic
 	// strategies.
 	Configuration SwUpdateConfiguration `json:"configuration"`
-	Identifier    string                `json:"identifier"`
+	// Allowed values: see the SwUpdateComponentIdentifier constants.
+	Identifier string `json:"identifier"`
 }
 
 // SwUpdateConfiguration Software update enforcement configuration. Configures OS update enforcement using either manual (specific version by date) or automatic strategies.
 type SwUpdateConfiguration struct {
-	// Type of software update enforcement strategy.
-	EnforcementType *string `json:"enforcementType,omitempty"`
+	// Allowed values: see the SwUpdateConfigurationEnforcementType constants.
+	EnforcementType string                          `json:"enforcementType"`
+	AUTOMATIC       *SwUpdateAutomaticConfiguration `json:"-"`
+	MANUAL          *SwUpdateManualConfiguration    `json:"-"`
+}
+
+// UnmarshalJSON dispatches the payload to the variant matching the
+// enforcementType discriminator. Unknown values leave the variant
+// pointers nil but preserve the discriminator string.
+func (m *SwUpdateConfiguration) UnmarshalJSON(data []byte) error {
+	var d struct {
+		EnforcementType string `json:"enforcementType"`
+	}
+	if err := json.Unmarshal(data, &d); err != nil {
+		return err
+	}
+	m.EnforcementType = d.EnforcementType
+	switch d.EnforcementType {
+	case "AUTOMATIC":
+		m.AUTOMATIC = new(SwUpdateAutomaticConfiguration)
+		return json.Unmarshal(data, m.AUTOMATIC)
+	case "MANUAL":
+		m.MANUAL = new(SwUpdateManualConfiguration)
+		return json.Unmarshal(data, m.MANUAL)
+	}
+	return nil
+}
+
+// MarshalJSON emits the active variant's JSON. If the matching variant
+// pointer is nil, emits a minimal object carrying only the discriminator.
+func (m SwUpdateConfiguration) MarshalJSON() ([]byte, error) {
+	switch m.EnforcementType {
+	case "AUTOMATIC":
+		return json.Marshal(m.AUTOMATIC)
+	case "MANUAL":
+		return json.Marshal(m.MANUAL)
+	}
+	return json.Marshal(map[string]string{"enforcementType": m.EnforcementType})
 }
 
 // SwUpdateLatestConfiguration Automatic software update with LATEST strategy. Enforces the newest available OS version a specified number of days after release.
@@ -1121,16 +1188,19 @@ type SwUpdateLatestConfiguration struct {
 	// Optional URL with details about the enforced update.
 	DetailsURL *DetailsURL `json:"detailsURL,omitempty"`
 	// The number of days after the OS update release.
-	EnforceAfterDays int    `json:"enforceAfterDays"`
-	EnforcementType  string `json:"enforcementType"`
-	Strategy         string `json:"strategy"`
+	EnforceAfterDays int `json:"enforceAfterDays"`
+	// Allowed values: see the SwUpdateLatestConfigurationEnforcementType constants.
+	EnforcementType string `json:"enforcementType"`
+	// Allowed values: see the SwUpdateLatestConfigurationStrategy constants.
+	Strategy string `json:"strategy"`
 }
 
 // SwUpdateManualConfiguration Manual software update enforcement configuration. Enforces a specific OS version by a specific date/time.
 type SwUpdateManualConfiguration struct {
 	// Optional URL with details about the enforced update.
-	DetailsURL      *DetailsURL `json:"detailsURL,omitempty"`
-	EnforcementType string      `json:"enforcementType"`
+	DetailsURL *DetailsURL `json:"detailsURL,omitempty"`
+	// Allowed values: see the SwUpdateManualConfigurationEnforcementType constants.
+	EnforcementType string `json:"enforcementType"`
 	// Local time of the device until which update must be performed.
 	TargetLocalDateTime time.Time `json:"targetLocalDateTime"`
 	// Target OS version in semantic versioning format.
@@ -1140,11 +1210,13 @@ type SwUpdateManualConfiguration struct {
 // SwUpdateSemanticConfiguration Automatic software update with SEMANTIC strategy. Applies semantic versioning rules to determine update enforcement timing.
 type SwUpdateSemanticConfiguration struct {
 	// Optional URL with details about the enforced update.
-	DetailsURL      *DetailsURL `json:"detailsURL,omitempty"`
-	EnforcementType string      `json:"enforcementType"`
+	DetailsURL *DetailsURL `json:"detailsURL,omitempty"`
+	// Allowed values: see the SwUpdateSemanticConfigurationEnforcementType constants.
+	EnforcementType string `json:"enforcementType"`
 	// Rules for semantic update strategy.
-	Rules    UpdateRules `json:"rules"`
-	Strategy string      `json:"strategy"`
+	Rules UpdateRules `json:"rules"`
+	// Allowed values: see the SwUpdateSemanticConfigurationStrategy constants.
+	Strategy string `json:"strategy"`
 }
 
 // SystemBehavior represents a system behavior.
@@ -1216,7 +1288,8 @@ type UpdateRules struct {
 type URLBookmarkItem struct {
 	// The title of the bookmark shown in Safari.
 	Title string `json:"Title"`
-	Type  string `json:"Type"`
+	// Allowed values: see the URLBookmarkItemType constants.
+	Type string `json:"Type"`
 	// The URL for the bookmark item.
 	URL string `json:"URL"`
 }

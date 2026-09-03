@@ -18,7 +18,7 @@ import (
 
 // ListPatchPolicyLogsV2 retrieve Patch Policy Logs.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.
@@ -59,7 +59,7 @@ func (c *Client) ListPatchPolicyLogsV2(ctx context.Context, id string, sort []st
 
 // GetPatchPolicyEligibleRetryCountV2 return the count of the Patch Policy Logs for the patch policy id that are eligible for a retry attempt.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.
@@ -75,7 +75,7 @@ func (c *Client) GetPatchPolicyEligibleRetryCountV2(ctx context.Context, id stri
 
 // RetryPatchPolicyLogsV2 send retry attempts for specific devices.
 //
-// Required privileges: update:pro:patch-policies. Legacy Jamf Pro privilege name(s): Update Patch Policies.
+// Required privileges: patch-policies:update. Legacy Jamf Pro privilege name(s): Update Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.
@@ -90,7 +90,7 @@ func (c *Client) RetryPatchPolicyLogsV2(ctx context.Context, id string, request 
 
 // RetryAllPatchPolicyLogsV2 send retry attempts for all devices.
 //
-// Required privileges: update:pro:patch-policies. Legacy Jamf Pro privilege name(s): Update Patch Policies.
+// Required privileges: patch-policies:update. Legacy Jamf Pro privilege name(s): Update Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.
@@ -105,7 +105,7 @@ func (c *Client) RetryAllPatchPolicyLogsV2(ctx context.Context, id string) error
 
 // GetPatchPolicyLogForDeviceV2 retrieves a single Patch Policy Log.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.
@@ -122,7 +122,7 @@ func (c *Client) GetPatchPolicyLogForDeviceV2(ctx context.Context, id string, de
 
 // ListPatchPolicyLogDetailsForDeviceV2 return attempt details for a specific log.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.

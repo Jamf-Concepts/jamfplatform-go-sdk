@@ -62,7 +62,7 @@ func fakeProxy(t *testing.T) (baseURL string, seen func() map[string]capturedReq
 			t.Errorf("writing token response: %v", err)
 		}
 	})
-	mux.HandleFunc("/proxypath/api/pro/v1/buildings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proxypath/pro/v1/buildings", func(w http.ResponseWriter, r *http.Request) {
 		record("api", r)
 		w.Header().Set("Content-Type", "application/json")
 		if _, err := w.Write([]byte(`{"totalCount":0,"results":[]}`)); err != nil {
@@ -84,7 +84,7 @@ func fakeProxy(t *testing.T) (baseURL string, seen func() map[string]capturedReq
 func callBoth(t *testing.T, c *Transport) {
 	t.Helper()
 	var out map[string]any
-	if err := c.Do(context.Background(), http.MethodGet, "/api/pro/v1/buildings", nil, &out); err != nil {
+	if err := c.Do(context.Background(), http.MethodGet, "/pro/v1/buildings", nil, &out); err != nil {
 		t.Fatalf("Do: %v", err)
 	}
 }

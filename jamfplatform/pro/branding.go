@@ -14,7 +14,7 @@ import (
 
 // DownloadBrandingImageV1 download a self service branding image.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - id: id of the self service branding image.

@@ -88,6 +88,80 @@ func validateTypeReferences(pkgContext string, declared []GoType, methods []GoMe
 	return fmt.Errorf("%s: %d unresolved type reference(s):\n%s\n\nfix: either add the schema under components/schemas so extractTypes emits it, or correct the config-level requestType/responseType override", pkgContext, len(missing), strings.Join(missing, "\n"))
 }
 
+// validateUnwrapCodec rejects `unwrapResults` on an operation whose response
+// will not be decoded as JSON.
+//
+// The unwrap template generates a call to client.UnwrapResults, which reads the
+// first non-space byte of the body and json.Unmarshals it. Two things select a
+// different codec at runtime and **neither looks at the Go type**: Transport.Do
+// routes any path containing "/proclassic/" through xml.Unmarshal, and a spec
+// declared `"format": "xml"` generates XML struct tags throughout. Either way
+// the bytes handed to UnwrapResults are XML, the shape sniff sees `<`, and the
+// caller gets a decode error on every call.
+//
+// This has no users to break — all six unwrap operations are JSON — and the
+// pre-existing struct decode was equally wrong here, so this is not a
+// regression being papered over. It is the failure mode being made
+// unreachable, because the config key gives no hint that it is JSON-only and
+// the cost of finding out is a method that compiles, generates a passing
+// httptest stub, and fails against the server.
+func validateUnwrapCodec(pkgContext string, methods []GoMethod) error {
+	var bad []string
+	for _, m := range methods {
+		if m.UnwrapResults == "" {
+			continue
+		}
+		switch {
+		case strings.EqualFold(m.Format, "xml"):
+			bad = append(bad, fmt.Sprintf("  - method %s: spec declares \"format\": \"xml\"", m.Name))
+		case m.Namespace == "proclassic":
+			bad = append(bad, fmt.Sprintf("  - method %s: namespace %q is decoded as XML by the transport", m.Name, m.Namespace))
+		}
+	}
+
+	if len(bad) == 0 {
+		return nil
+	}
+	return fmt.Errorf("%s: %d operation(s) declare unwrapResults on a non-JSON response:\n%s\n\nfix: unwrapResults is JSON-only. Use responseType with an XML-tagged schema, or rawBody, for a Classic or format=xml operation", pkgContext, len(bad), strings.Join(bad, "\n"))
+}
+
+// validateNoUntypedFields rejects an emitted struct field whose Go type is a
+// bare `any` or `*any`.
+//
+// That is the tell of a schema construct the generator has no branch for.
+// schemaRefToGoType ends in `default: return "any"`, so a property whose
+// schema it does not recognise produces a field that type-checks nothing,
+// marshals whatever it is handed, and — the transport setting no
+// DisallowUnknownFields — decodes anything without complaint. Nothing fails,
+// at generate time or at run time, and the consumer discovers it by having to
+// reimplement the shape by hand.
+//
+// The live case was account-sso's ConnectionRequest.connection: a
+// discriminator-less `oneOf` over four `$ref`s, reached through a property, so
+// never hoisted and never named. It carried the whole provider-settings body
+// of every SSO connection create and update as `any`, while all four settings
+// schemas sat in types.go referenced by no signature in the module. isRefUnion
+// gives that shape a type now; this check is what stops the next unrecognised
+// construct reaching a consumer the same way.
+//
+// Container `any`s are deliberately allowed. `map[string]any` and `[]any` are
+// what a genuinely freeform or unconstrained-item schema *should* produce, and
+// they say so at the call site.
+func validateNoUntypedFields(pkgContext string, declared []GoType) error {
+	var bad []string
+	for _, t := range declared {
+		for _, f := range t.Fields {
+			if f.Type == "any" || f.Type == "*any" {
+				bad = append(bad, fmt.Sprintf("  - %s.%s (json:%q) is %s", t.Name, f.Name, f.JSONTag, f.Type))
+			}
+		}
+	}
+	if len(bad) == 0 {
+		return nil
+	}
+	return fmt.Errorf("%s: %d field(s) emitted as untyped any:\n%s\n\nfix: teach the generator the schema construct behind the property (see isRefUnion for the discriminator-less oneOf case), or correct the property's schema through config. Do not silence this by widening the check — an `any` field here is a shape no caller can rely on", pkgContext, len(bad), strings.Join(bad, "\n"))
+}
+
 // normalizeTypeRef strips slice / pointer prefixes and returns the bare
 // Go type name the validator should look up. Composite expressions like
 // `map[string]Foo` yield "Foo" — we care about the user-defined type at

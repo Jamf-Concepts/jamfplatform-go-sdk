@@ -150,7 +150,7 @@ func TestAcceptance_Pro_Distribution_CloudDistributionPointLifecycleV1(t *testin
 			t.Logf("cleanup: CDP 404 — restoring snapshot")
 		}
 		restore := *snapshot
-		restore.InventoryID = ptr("")
+		restore.InventoryID = new("")
 		if _, err := p.CreateCloudDistributionPointV1(context.Background(), &restore); err != nil {
 			t.Logf("cleanup restore CDP: %v", err)
 			return
@@ -175,7 +175,7 @@ func TestAcceptance_Pro_Distribution_CloudDistributionPointLifecycleV1(t *testin
 
 	// 2. Re-create CDP from the snapshot (JCDS mode preserved).
 	recreate := *snapshot
-	recreate.InventoryID = ptr("")
+	recreate.InventoryID = new("")
 	recreated, err := p.CreateCloudDistributionPointV1(ctx, &recreate)
 	if err != nil {
 		skipOnServerError(t, err)

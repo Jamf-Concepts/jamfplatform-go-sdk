@@ -273,9 +273,24 @@ func annotateTokenError(err error) error {
 
 	const guidance = "this is typically a security policy (WAF or IP allowlist) blocking the request from this host's IP address rather than a credential problem"
 
+	// A 404 is the one non-JSON token response with a likelier cause than a
+	// WAF: a base URL that is not the gateway root. The token endpoint is
+	// always {baseURL}/auth/token, so a base URL carrying a path prefix
+	// (https://host/api) sends the exchange to /api/auth/token, which Jamf's
+	// gateways do not serve — wire-verified 2026-08-28 on both
+	// eu.api.jamfcloud.com and eu.apigw.jamf.com. Naming the WAF here instead
+	// sends the caller to their network team over a config typo, which the GA
+	// base-URL change (apigw.jamf.com to {region}.api.jamfcloud.com) makes the
+	// most likely failure of all.
+	const baseURLGuidance = "the token endpoint is always {baseURL}/auth/token, so a 404 here usually means baseURL is wrong or carries a path prefix — it must be the gateway root, e.g. https://eu.api.jamfcloud.com (no /api segment)"
+
 	if re, ok := errors.AsType[*oauth2.RetrieveError](err); ok {
 		if looksLikeJSON(re.Body) {
 			return err
+		}
+		if re.Response != nil && re.Response.StatusCode == http.StatusNotFound {
+			return fmt.Errorf("%w: %w\n%s",
+				ErrUnexpectedResponse, err, baseURLGuidance)
 		}
 		// No need to echo the body: RetrieveError.Error() already appends it in
 		// full, and repeating it buries the guidance under a second copy of the

@@ -13,7 +13,7 @@ import (
 
 func TestGetMobileDeviceConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetMobileDeviceConfigurationProfileByID(t *testing.T) {
 
 func TestGetMobileDeviceConfigurationProfileByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetMobileDeviceConfigurationProfileByID_NotFound(t *testing.T) {
 
 func TestCreateMobileDeviceConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateMobileDeviceConfigurationProfileByID(t *testing.T) {
 
 func TestUpdateMobileDeviceConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateMobileDeviceConfigurationProfileByID(t *testing.T) {
 
 func TestDeleteMobileDeviceConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteMobileDeviceConfigurationProfileByID(t *testing.T) {
 
 func TestGetMobileDeviceConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetMobileDeviceConfigurationProfileByName(t *testing.T) {
 
 func TestGetMobileDeviceConfigurationProfileByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetMobileDeviceConfigurationProfileByName_NotFound(t *testing.T) {
 
 func TestUpdateMobileDeviceConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateMobileDeviceConfigurationProfileByName(t *testing.T) {
 
 func TestDeleteMobileDeviceConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteMobileDeviceConfigurationProfileByName(t *testing.T) {
 
 func TestListMobileDeviceConfigurationProfiles(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListMobileDeviceConfigurationProfiles(t *testing.T) {
 
 func TestListMobileDeviceConfigurationProfiles_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListMobileDeviceConfigurationProfiles_NotFound(t *testing.T) {
 
 func TestGetMobileDeviceConfigurationProfileByIDSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -199,7 +199,7 @@ func TestGetMobileDeviceConfigurationProfileByIDSubset(t *testing.T) {
 
 func TestGetMobileDeviceConfigurationProfileByIDSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -211,7 +211,7 @@ func TestGetMobileDeviceConfigurationProfileByIDSubset_NotFound(t *testing.T) {
 
 func TestGetMobileDeviceConfigurationProfileByNameSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -229,7 +229,7 @@ func TestGetMobileDeviceConfigurationProfileByNameSubset(t *testing.T) {
 
 func TestGetMobileDeviceConfigurationProfileByNameSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -241,7 +241,7 @@ func TestGetMobileDeviceConfigurationProfileByNameSubset_NotFound(t *testing.T) 
 
 func TestCreateMobileDeviceConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -256,7 +256,7 @@ func TestCreateMobileDeviceConfigurationProfileByName(t *testing.T) {
 
 func TestResolveMobileDeviceConfigurationProfileIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -274,7 +274,7 @@ func TestResolveMobileDeviceConfigurationProfileIDByName(t *testing.T) {
 
 func TestResolveMobileDeviceConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -293,13 +293,13 @@ func TestResolveMobileDeviceConfigurationProfileByName(t *testing.T) {
 func TestApplyMobileDeviceConfigurationProfile_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -321,13 +321,13 @@ func TestApplyMobileDeviceConfigurationProfile_Create(t *testing.T) {
 func TestApplyMobileDeviceConfigurationProfile_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<configuration_profile><general><id>42</id></general></configuration_profile>")
 	})
-	mux.HandleFunc("/api/proclassic/mobiledeviceconfigurationprofiles/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/mobiledeviceconfigurationprofiles/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

@@ -17,7 +17,7 @@ import (
 
 // GetDepartmentByID finds departments by ID.
 //
-// Required privileges: read:pro:departments.
+// Required privileges: departments:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetDepartmentByID(ctx context.Context, id string) (*Department,
 
 // CreateDepartmentByID creates a new department by ID.
 //
-// Required privileges: create:pro:departments.
+// Required privileges: departments:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateDepartmentByID(ctx context.Context, id string, request *D
 
 // UpdateDepartmentByID updates an existing department by ID.
 //
-// Required privileges: update:pro:departments.
+// Required privileges: departments:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateDepartmentByID(ctx context.Context, id string, request *D
 
 // DeleteDepartmentByID deletes a department by ID.
 //
-// Required privileges: delete:pro:departments.
+// Required privileges: departments:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteDepartmentByID(ctx context.Context, id string) error {
 
 // GetDepartmentByName finds departments by name.
 //
-// Required privileges: read:pro:departments.
+// Required privileges: departments:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetDepartmentByName(ctx context.Context, name string) (*Departm
 
 // UpdateDepartmentByName updates an existing department by name.
 //
-// Required privileges: update:pro:departments.
+// Required privileges: departments:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateDepartmentByName(ctx context.Context, name string, reques
 
 // DeleteDepartmentByName deletes a department by name.
 //
-// Required privileges: delete:pro:departments.
+// Required privileges: departments:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteDepartmentByName(ctx context.Context, name string) error 
 
 // ListDepartments finds all departments.
 //
-// Required privileges: read:pro:departments.
+// Required privileges: departments:read.
 func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Departments
@@ -138,7 +138,7 @@ func (c *Client) ListDepartments(ctx context.Context) (*Departments, error) {
 
 // CreateDepartmentByName creates a new department by ID.
 //
-// Required privileges: create:pro:departments.
+// Required privileges: departments:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

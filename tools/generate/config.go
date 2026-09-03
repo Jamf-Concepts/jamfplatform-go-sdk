@@ -25,7 +25,7 @@ type SpecDef struct {
 	File               string                       `json:"file"`
 	Namespace          string                       `json:"namespace"`
 	SpecFile           string                       `json:"specFile,omitempty"`     // override published spec filename
-	Package            string                       `json:"package,omitempty"`      // target Go sub-package under jamfplatform/; empty emits to root (legacy)
+	Package            string                       `json:"package,omitempty"`      // target Go sub-package under jamfplatform/; validateConfig requires it — an empty value takes the legacy root path (processSpec), which nothing has used since sub-packages landed
 	SplitByTag         bool                         `json:"splitByTag,omitempty"`   // emit one methods file per OpenAPI tag instead of one per spec
 	Format             string                       `json:"format,omitempty"`       // "json" (default) or "xml" — drives struct tag style and transport codec
 	RawBody            bool                         `json:"rawBody,omitempty"`      // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
@@ -40,9 +40,9 @@ type SpecDef struct {
 	// all $ref strings that reference the old name. Applied before all other
 	// patches so downstream fixups see the corrected names. Use when a spec
 	// uses generic schema names that would collide with schemas emitted by
-	// other specs in the same Go package (e.g. "SelfServiceSettings" is a
-	// top-level Pro API type; an app-installer spec reusing that name would
-	// silently shadow it). Outer key: old schema name. Value: new schema name.
+	// other specs in the same Go package (e.g. a generic "SelfServiceSettings"
+	// in a second spec would silently shadow the top-level Pro API type of the
+	// same name). Outer key: old schema name. Value: new schema name.
 	SchemaRenames map[string]string `json:"schemaRenames,omitempty"`
 
 	// SchemaCreations adds whole named component schemas the spec no longer
@@ -71,6 +71,99 @@ type SpecDef struct {
 	// added. Applied after SchemaAdditions and before PostSymmetry, so a patch
 	// to the read schema also flows into the *_post sibling.
 	SchemaPatches map[string]map[string]json.RawMessage `json:"schemaPatches,omitempty"`
+
+	// SchemaPatchesRequireAbsent marks the SchemaPatches entries that stand in
+	// for a property the spec does not declare at all, as opposed to the usual
+	// case of correcting one it declares wrongly. Each element is
+	// "<SchemaName>.<dotted.path>", and generation panics if that path already
+	// resolves in the spec.
+	//
+	// This is the SchemaPatches counterpart of the panic SchemaCreations gets
+	// for free. A patch silently overwrites, which is right when the point is to
+	// replace a wrong declaration — but wrong when the point is to supply a
+	// missing one, because the day upstream adds the real property our
+	// hand-written stand-in shadows it forever, discarding whatever enum,
+	// format or required-ness upstream declared. Listing the path here converts
+	// that silent shadowing into a build failure that names the entry to delete.
+	//
+	// Live case: securitycloud's ConnectorCreateRequest omits `authStrategy`
+	// and `deviceSyncAuth`, without which CreateUemConnectorV1 can only ever
+	// return 500 (wire-verified 2026-08-21). Both are patched in from the wire
+	// and both are listed here.
+	SchemaPatchesRequireAbsent []string `json:"schemaPatchesRequireAbsent,omitempty"`
+
+	// EnumAdditions appends values to a named component schema's `enum` list.
+	// Key: schema name (e.g. "Region"). Value: the wire values to append, in
+	// the order they should follow the spec's own.
+	//
+	// For a value the server produces (or accepts) that the spec omits.
+	// Generated enum helpers exist to be used as validators — Terraform's
+	// stringvalidator.OneOf reads RegionValues() — so an omission is not a
+	// documentation gap, it is a validator that rejects the server's own
+	// output. account-sso's Region declares US/EU/AU/JP and the wire returns
+	// RAMP on a live organization (1 of 22 connections, 2026-09-02), which
+	// made an existing RAMP connection unreadable through any consumer built
+	// on the helper.
+	//
+	// Self-expiring: generation fails when the value is already declared, which
+	// is the signal that upstream has published it and the entry should be
+	// deleted. Applied with the other schema patches, so the value also reaches
+	// the published spec under api/.
+	EnumAdditions map[string][]string `json:"enumAdditions,omitempty"`
+
+	// RequiredPrivileges supplies the privileges an operation requires when
+	// the published spec declares none but an authoritative out-of-band source
+	// does. Key: "METHOD /path" exactly as in Operations. Value: GA capability
+	// permissions in {capability}:{action} form.
+	//
+	// These never enter the spec document: they are carried straight to the
+	// generated Privileges registry, marked Source "gateway-policy" so a
+	// consumer can tell them from spec-declared ones, and are absent from the
+	// published spec under api/, which stays faithful to upstream.
+	//
+	// The account family is the case this exists for. All three specs are
+	// authored with a `requiredPrivileges` block in
+	// public-apis-oas/redocly-implementation/teams/account-*/config.yaml, and
+	// the build strips x-required-privileges from the published artifact
+	// because these routes resolve the organization from the token and so take
+	// no beta scope-prefix transform — upstream's own config.yaml says so in a
+	// comment. So the omission is structural and waiting for it to arrive is
+	// waiting forever, which is why this is patched locally where the earlier
+	// decision was not to. Two independent sources agree on all 18 values: that
+	// config.yaml, and the hand-written OPA rules in
+	// authorization-policies/policies/tyk_external/account/account_api.rego.
+	//
+	// Note the rego accepts *either* the GA capability or a retired
+	// read:org:*/update:org:* permission (lib.has_any_of_permissions), so only
+	// the GA form is recorded here: MethodPrivileges.Scoped is a conjunction,
+	// and adding the alternative would read as "both required".
+	//
+	// Self-expiring: generation fails when the operation already declares
+	// x-required-privileges, which means upstream has published them and the
+	// entry should be deleted.
+	RequiredPrivileges map[string][]string `json:"requiredPrivileges,omitempty"`
+
+	// DocNotes appends a note to the godoc of an emitted Go type. Key: the Go
+	// type name as generated (a struct, or the alias a string enum emits).
+	// Value: prose, wrapped and appended to whatever comment the spec's own
+	// description produced.
+	//
+	// For the corrections that belong to the type as a whole rather than to one
+	// of its properties, which SchemaPatches cannot reach: it patches
+	// properties, so a schema-level description and a generated enum helper are
+	// both out of its range.
+	//
+	// Two live cases, both in securitycloud's uem-connect spec. SyncSettings
+	// calls itself a full replacement without noting that groupSettings is
+	// exempt from it. EmailMappingType enumerates every vendor's members at
+	// once, so EmailMappingTypeValues() is a superset of what any single vendor
+	// accepts and is not a safe validator source.
+	//
+	// A key that matches no type emitted for this spec is a build failure: the
+	// note is there to correct something, and a silently dropped correction
+	// leaves the wrong doc in place. Rename or delete the entry when upstream
+	// moves the type.
+	DocNotes map[string]string `json:"docNotes,omitempty"`
 
 	// PropertyRenames renames property keys at dotted paths under a named
 	// component schema. Outer key: schema name. Inner key: dotted path to the
@@ -131,6 +224,35 @@ type SpecDef struct {
 	// entries. Used when the server is order-sensitive within an XML element
 	// (e.g. Classic /vppinvitations <general> requires a fixed field order).
 	FieldOrder map[string][]string `json:"fieldOrder,omitempty"`
+
+	// Version supplies the URL version segment for every operation in this
+	// spec whose own path carries none. Precedence is operation override >
+	// version prefix on the spec path > this default, so a spec mixing
+	// versioned and unversioned paths still resolves each one correctly.
+	//
+	// Needed because the published Security Cloud specs (dns, ztna,
+	// categories) carry tenant-scoped paths with the version segment
+	// dropped — `/tenant/{tenantId}/dns/zones`, not
+	// `/v1/tenant/{tenantId}/dns/zones`. The gateway does not route the
+	// versionless form (wire-probed: 403 BAD_PERMISSIONS), so the version has
+	// to come from somewhere, and per-operation entries would mean 29 copies
+	// of the same "v1" across three specs.
+	Version string `json:"version,omitempty"`
+
+	// TagRenames remaps an OpenAPI tag before it picks the output filename,
+	// and nothing else — method names, godoc and the published spec are
+	// untouched. Needed when two specs in one package share a tag, since
+	// splitByTag writes one <tag>.go per spec and emitMethodsByTag errors on
+	// the collision rather than letting the second spec overwrite the first's
+	// file.
+	//
+	// Live use: Security Cloud's uem-connect spec tags one operation
+	// "activation-profiles", which is also the tag of every operation in the
+	// enrollment spec. That spec is not ingested today (it is absent from the
+	// GitOps build), so the rename is what keeps uem-connect's operation in
+	// uem_connect_activation_profiles.go and leaves activation_profiles.go
+	// free for the enrollment spec if it gets published.
+	TagRenames map[string]string `json:"tagRenames,omitempty"`
 }
 
 // baseName derives a Go file base name from the spec file path.
@@ -146,11 +268,21 @@ func (s SpecDef) outputFile() string     { return "jamfplatform/" + s.baseName()
 func (s SpecDef) testOutputFile() string { return "jamfplatform/" + s.baseName() + "_test.go" }
 
 type OperationDef struct {
-	Op             string            `json:"op"`   // "GET /v1/devices/{id}"
-	Name           string            `json:"name"` // Go method name
-	ContentType    string            `json:"contentType,omitempty"`
-	Pagination     string            `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount, rawArray
-	PageSizeParam  string            `json:"pageSizeParam,omitempty"`
+	Op            string `json:"op"`   // "GET /v1/devices/{id}"
+	Name          string `json:"name"` // Go method name
+	ContentType   string `json:"contentType,omitempty"`
+	Pagination    string `json:"pagination,omitempty"` // hasNext, sizeCheck, totalCount, rawArray, cursor
+	PageSizeParam string `json:"pageSizeParam,omitempty"`
+	// ResultsField is the envelope key holding the element array. Empty
+	// defaults to "results"; cursor-paginated endpoints in particular tend to
+	// name it something else (audit uses "items" and "transactions").
+	ResultsField string `json:"resultsField,omitempty"`
+	// CursorField is the envelope key carrying the next page's cursor, for
+	// Pagination == "cursor". Empty defaults to "nextCursor".
+	CursorField string `json:"cursorField,omitempty"`
+	// CursorParam is the query parameter the cursor is sent back in, for
+	// Pagination == "cursor". Empty defaults to "cursor".
+	CursorParam    string            `json:"cursorParam,omitempty"`
 	MaxPageSize    int               `json:"maxPageSize,omitempty"` // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
 	Version        string            `json:"version,omitempty"`     // override version for tenantPrefix
 	PathNames      map[string]string `json:"pathNames,omitempty"`   // spec param -> Go param name
@@ -274,14 +406,42 @@ type ExtraParam struct {
 	Go           string
 	Type         string
 	Undocumented bool // set via a trailing ":undocumented" in config.json; skips the spec name-match check
+
+	// AlwaysSend suppresses the zero-value guard the optional params get, so
+	// the parameter travels whatever the caller passed. It is derived from
+	// the spec, never declared in config.json — see resolveQueryParams for
+	// the derivation and for why a ":required" suffix would have been the
+	// wrong shape.
+	AlwaysSend bool
 }
 
 // validateConfig rejects misconfigured specs before generation runs.
-// Currently enforces that no operation in Operations appears in ExcludePaths —
-// the deny list is meant to catch accidental re-adds, so a conflict means
-// either the entry should be removed from one side or the other.
+//
+// Enforces that no operation in Operations appears in ExcludePaths — the deny
+// list is meant to catch accidental re-adds, so a conflict means either the
+// entry should be removed from one side or the other — and that every spec
+// names a target Package.
+//
+// The Package requirement is a guard on a path nothing exercises. An empty
+// Package routes the spec through processSpec, the pre-sub-package emitter,
+// which has no consumer: all of config.json's specs name a package and the
+// root holds only the handwritten client.go. Every generator change since is
+// therefore only ever exercised on the processPackage path, and the root one
+// silently rots — validateNoUntypedFields shipped wired against name-only
+// GoTypes there, unable to fire at all, precisely because no config could
+// reach it. Refusing the empty value makes that impossible to trip over by
+// accident: re-enabling root emission now means deleting this check, which is
+// the point at which the path's wiring gets re-read.
+//
+// Rejecting a nil Fields slice inside validateNoUntypedFields would have been
+// the wrong guard for the same problem: an enum alias, an IsRawJSON type and
+// an XML-name-only struct all legitimately carry no fields, so it would fail
+// generation on every spec that declares an enum.
 func validateConfig(cfg Config) error {
 	for _, spec := range cfg.Specs {
+		if spec.Package == "" {
+			return fmt.Errorf("spec %q: \"package\" is required — an empty package emits to the legacy root path, which no spec has used since sub-packages landed and which is not maintained; set a sub-package name", spec.File)
+		}
 		if spec.TypesOnly && len(spec.Operations) > 0 {
 			return fmt.Errorf("spec %q: typesOnly specs must not declare operations", spec.File)
 		}

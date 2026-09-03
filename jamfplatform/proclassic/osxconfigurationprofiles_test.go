@@ -13,7 +13,7 @@ import (
 
 func TestGetOSXConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetOSXConfigurationProfileByID(t *testing.T) {
 
 func TestGetOSXConfigurationProfileByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetOSXConfigurationProfileByID_NotFound(t *testing.T) {
 
 func TestCreateOSXConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateOSXConfigurationProfileByID(t *testing.T) {
 
 func TestUpdateOSXConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdateOSXConfigurationProfileByID(t *testing.T) {
 
 func TestDeleteOSXConfigurationProfileByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -91,7 +91,7 @@ func TestDeleteOSXConfigurationProfileByID(t *testing.T) {
 
 func TestGetOSXConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestGetOSXConfigurationProfileByName(t *testing.T) {
 
 func TestGetOSXConfigurationProfileByName_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -121,7 +121,7 @@ func TestGetOSXConfigurationProfileByName_NotFound(t *testing.T) {
 
 func TestUpdateOSXConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -136,7 +136,7 @@ func TestUpdateOSXConfigurationProfileByName(t *testing.T) {
 
 func TestDeleteOSXConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestDeleteOSXConfigurationProfileByName(t *testing.T) {
 
 func TestListOSXConfigurationProfiles(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +169,7 @@ func TestListOSXConfigurationProfiles(t *testing.T) {
 
 func TestListOSXConfigurationProfiles_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -181,7 +181,7 @@ func TestListOSXConfigurationProfiles_NotFound(t *testing.T) {
 
 func TestGetOsxConfigurationProfileByIDSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -199,7 +199,7 @@ func TestGetOsxConfigurationProfileByIDSubset(t *testing.T) {
 
 func TestGetOsxConfigurationProfileByIDSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -211,7 +211,7 @@ func TestGetOsxConfigurationProfileByIDSubset_NotFound(t *testing.T) {
 
 func TestGetOsxConfigurationProfileByNameSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -229,7 +229,7 @@ func TestGetOsxConfigurationProfileByNameSubset(t *testing.T) {
 
 func TestGetOsxConfigurationProfileByNameSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -241,7 +241,7 @@ func TestGetOsxConfigurationProfileByNameSubset_NotFound(t *testing.T) {
 
 func TestCreateOSXConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -256,7 +256,7 @@ func TestCreateOSXConfigurationProfileByName(t *testing.T) {
 
 func TestResolveOSXConfigurationProfileIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -274,7 +274,7 @@ func TestResolveOSXConfigurationProfileIDByName(t *testing.T) {
 
 func TestResolveOSXConfigurationProfileByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -293,13 +293,13 @@ func TestResolveOSXConfigurationProfileByName(t *testing.T) {
 func TestApplyOSXConfigurationProfile_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns 404 → apply creates.
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		w.WriteHeader(http.StatusNotFound)
 	})
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -321,13 +321,13 @@ func TestApplyOSXConfigurationProfile_Create(t *testing.T) {
 func TestApplyOSXConfigurationProfile_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// Classic direct resolver: GetByName returns the resource with id=42 → apply updates.
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/name/{name}", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeXML(t, w, http.StatusOK, "<os_x_configuration_profile><general><id>42</id></general></os_x_configuration_profile>")
 	})
-	mux.HandleFunc("/api/proclassic/osxconfigurationprofiles/id/42", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/osxconfigurationprofiles/id/42", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(201)
 	})
 

@@ -13,7 +13,7 @@ import (
 
 func TestGetConditionalAccessFeatureToggleV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/conditional-access/device-compliance/feature-toggle", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/conditional-access/device-compliance/feature-toggle", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetConditionalAccessFeatureToggleV1(t *testing.T) {
 
 func TestGetConditionalAccessFeatureToggleV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/conditional-access/device-compliance/feature-toggle", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/conditional-access/device-compliance/feature-toggle", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetConditionalAccessFeatureToggleV1_NotFound(t *testing.T) {
 
 func TestGetConditionalAccessComputerComplianceV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/conditional-access/device-compliance-information/computer/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/conditional-access/device-compliance-information/computer/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestGetConditionalAccessComputerComplianceV1(t *testing.T) {
 
 func TestGetConditionalAccessComputerComplianceV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/conditional-access/device-compliance-information/computer/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/conditional-access/device-compliance-information/computer/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -81,7 +81,7 @@ func TestGetConditionalAccessComputerComplianceV1_NotFound(t *testing.T) {
 
 func TestGetConditionalAccessMobileComplianceV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/conditional-access/device-compliance-information/mobile/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/conditional-access/device-compliance-information/mobile/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestGetConditionalAccessMobileComplianceV1(t *testing.T) {
 
 func TestGetConditionalAccessMobileComplianceV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/conditional-access/device-compliance-information/mobile/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/conditional-access/device-compliance-information/mobile/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

@@ -17,7 +17,7 @@ import (
 
 // GetMobileDeviceEnrollmentProfileByID finds mobile device enrollment profiles by ID.
 //
-// Required privileges: read:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByID(ctx context.Context, id st
 
 // CreateMobileDeviceEnrollmentProfileByID creates a new mobile device enrollment profile by ID.
 //
-// Required privileges: create:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 
 // UpdateMobileDeviceEnrollmentProfileByID updates an existing mobile device enrollment profile by ID.
 //
-// Required privileges: update:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 
 // DeleteMobileDeviceEnrollmentProfileByID deletes a mobile device enrollment profile by ID.
 //
-// Required privileges: delete:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByID(ctx context.Context, id
 
 // GetMobileDeviceEnrollmentProfileByName finds mobile device enrollment profiles by name.
 //
-// Required privileges: read:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByName(ctx context.Context, nam
 
 // DeleteMobileDeviceEnrollmentProfileByName deletes a mobile device enrollment profile by name.
 //
-// Required privileges: delete:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByName(ctx context.Context, 
 
 // GetMobileDeviceEnrollmentProfileByInvitation finds mobile device enrollment profiles by invitation.
 //
-// Required privileges: read:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:read.
 //
 // Parameters:
 //   - invitation: Invitation value to filter by.
@@ -126,7 +126,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByInvitation(ctx context.Contex
 
 // ListMobileDeviceEnrollmentProfiles finds all mobile device enrollment profiles.
 //
-// Required privileges: read:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:read.
 func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*MobileDeviceEnrollmentProfiles, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceEnrollmentProfiles
@@ -139,7 +139,7 @@ func (c *Client) ListMobileDeviceEnrollmentProfiles(ctx context.Context) (*Mobil
 
 // GetMobileDeviceEnrollmentProfileByIDSubset finds a subset of data for an enrollment profile.
 //
-// Required privileges: read:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:read.
 //
 // Parameters:
 //   - id: ID to filter by.
@@ -157,7 +157,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByIDSubset(ctx context.Context,
 
 // DeleteMobileDeviceEnrollmentProfileByInvitation deletes a mobile device enrollment profile by invitation.
 //
-// Required privileges: delete:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:delete.
 //
 // Parameters:
 //   - invitation: Invitation value to filter by.
@@ -172,7 +172,7 @@ func (c *Client) DeleteMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 
 // UpdateMobileDeviceEnrollmentProfileByInvitation updates an existing mobile device enrollment profile by invitation.
 //
-// Required privileges: update:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:update.
 //
 // Parameters:
 //   - invitation: Invitation value to filter by.
@@ -187,7 +187,7 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 
 // UpdateMobileDeviceEnrollmentProfileByName updates an existing mobile device enrollment profile by name.
 //
-// Required privileges: update:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -202,7 +202,7 @@ func (c *Client) UpdateMobileDeviceEnrollmentProfileByName(ctx context.Context, 
 
 // GetMobileDeviceEnrollmentProfileByNameSubset finds a subset of data for mobile device enrollment profiles by name.
 //
-// Required privileges: read:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -220,7 +220,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByNameSubset(ctx context.Contex
 
 // GetMobileDeviceEnrollmentProfileByInvitationSubset finds a subset of data for an enrollment profile.
 //
-// Required privileges: read:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:read.
 //
 // Parameters:
 //   - invitation: ID to filter by.
@@ -238,7 +238,7 @@ func (c *Client) GetMobileDeviceEnrollmentProfileByInvitationSubset(ctx context.
 
 // CreateMobileDeviceEnrollmentProfileByInvitation creates a new mobile device enrollment profile by ID.
 //
-// Required privileges: create:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:create.
 //
 // Parameters:
 //   - invitation: ID value to filter by.
@@ -253,7 +253,7 @@ func (c *Client) CreateMobileDeviceEnrollmentProfileByInvitation(ctx context.Con
 
 // CreateMobileDeviceEnrollmentProfileByName creates a new mobile device enrollment profile by ID.
 //
-// Required privileges: create:pro:enrollment-profiles.
+// Required privileges: enrollment-profiles:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

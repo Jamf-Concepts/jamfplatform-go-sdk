@@ -13,7 +13,7 @@ import (
 
 // GetSelfServicePlusFeatureToggleEnabledV1 determines if Self Service Plus feature toggle is enabled.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetSelfServicePlusFeatureToggleEnabledV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/self-service-plus/feature-toggle/enabled"
@@ -25,7 +25,7 @@ func (c *Client) GetSelfServicePlusFeatureToggleEnabledV1(ctx context.Context) e
 
 // GetSelfServicePlusSettingsV1 get Self Service Plus settings.
 //
-// Required privileges: read:pro:self-service. Legacy Jamf Pro privilege name(s): Read Self Service.
+// Required privileges: self-service:read. Legacy Jamf Pro privilege name(s): Read Self Service.
 func (c *Client) GetSelfServicePlusSettingsV1(ctx context.Context) (*SelfServicePlusSettings, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SelfServicePlusSettings
@@ -38,7 +38,7 @@ func (c *Client) GetSelfServicePlusSettingsV1(ctx context.Context) (*SelfService
 
 // UpdateSelfServicePlusSettingsV1 save Self Service Plus settings.
 //
-// Required privileges: update:pro:self-service. Legacy Jamf Pro privilege name(s): Update Self Service.
+// Required privileges: self-service:update. Legacy Jamf Pro privilege name(s): Update Self Service.
 func (c *Client) UpdateSelfServicePlusSettingsV1(ctx context.Context, request *SelfServicePlusSettings) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/self-service-plus/settings"

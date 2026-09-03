@@ -67,7 +67,7 @@ func createLightweightBenchmark(t *testing.T, c *jamfplatform.Client, title stri
 }
 
 func TestAcceptance_ResolveBenchmarkIDByName(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -86,7 +86,7 @@ func TestAcceptance_ResolveBenchmarkIDByName(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBenchmarkByName(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -111,7 +111,7 @@ func TestAcceptance_ResolveBenchmarkByName(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBenchmarkIDByName_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -131,7 +131,7 @@ func TestAcceptance_ResolveBenchmarkIDByName_NotFound(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBenchmark_Ambiguous(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -200,7 +200,7 @@ func TestAcceptance_ResolveBenchmark_Ambiguous(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBaselineIDByName(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -229,7 +229,7 @@ func TestAcceptance_ResolveBaselineIDByName(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBaselineByName(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -261,7 +261,7 @@ func TestAcceptance_ResolveBaselineByName(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBaselineIDByName_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 

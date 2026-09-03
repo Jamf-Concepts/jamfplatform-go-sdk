@@ -14,7 +14,7 @@ import (
 
 // VerifyLdapKeystoreV1 validate keystore for Cloud Identity Provider secure connection.
 //
-// Required privileges: create:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
+// Required privileges: ldap-servers:create. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
 func (c *Client) VerifyLdapKeystoreV1(ctx context.Context, request *CloudLdapKeystoreFile) (*CloudLdapKeystore, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result CloudLdapKeystore
@@ -27,7 +27,7 @@ func (c *Client) VerifyLdapKeystoreV1(ctx context.Context, request *CloudLdapKey
 
 // CreateCloudLdapV2 create Cloud Identity Provider configuration.
 //
-// Required privileges: create:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
+// Required privileges: ldap-servers:create. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
 func (c *Client) CreateCloudLdapV2(ctx context.Context, request *LdapConfigurationRequest) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
@@ -40,7 +40,7 @@ func (c *Client) CreateCloudLdapV2(ctx context.Context, request *LdapConfigurati
 
 // GetCloudLdapDefaultMappingsV2 get default mappings.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - provider: Cloud Identity Provider name.
@@ -56,7 +56,7 @@ func (c *Client) GetCloudLdapDefaultMappingsV2(ctx context.Context, provider str
 
 // GetCloudLdapDefaultServerConfigurationV2 get default server configuration.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - provider: Cloud Identity Provider name.
@@ -72,7 +72,7 @@ func (c *Client) GetCloudLdapDefaultServerConfigurationV2(ctx context.Context, p
 
 // GetCloudLdapV2 get Cloud Identity Provider configuration with given id.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -88,7 +88,7 @@ func (c *Client) GetCloudLdapV2(ctx context.Context, id string) (*LdapConfigurat
 
 // UpdateCloudLdapV2 update Cloud Identity Provider configuration.
 //
-// Required privileges: update:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
+// Required privileges: ldap-servers:update. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -104,7 +104,7 @@ func (c *Client) UpdateCloudLdapV2(ctx context.Context, id string, request *Ldap
 
 // DeleteCloudLdapV2 delete Cloud Identity Provider configuration.
 //
-// Required privileges: delete:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Delete LDAP Servers.
+// Required privileges: ldap-servers:delete. Legacy Jamf Pro privilege name(s): Delete LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -119,7 +119,7 @@ func (c *Client) DeleteCloudLdapV2(ctx context.Context, id string) error {
 
 // GetCloudLdapBindStatisticsV2 get bind connection pool statistics.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -135,7 +135,7 @@ func (c *Client) GetCloudLdapBindStatisticsV2(ctx context.Context, id string) (*
 
 // GetCloudLdapSearchStatisticsV2 get search connection pool statistics.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -151,7 +151,7 @@ func (c *Client) GetCloudLdapSearchStatisticsV2(ctx context.Context, id string) 
 
 // GetCloudLdapConnectionStatusV2 tests the communication with the specified cloud connection.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -167,7 +167,7 @@ func (c *Client) GetCloudLdapConnectionStatusV2(ctx context.Context, id string) 
 
 // GetCloudLdapMappingsV2 get mappings configurations for Cloud Identity Providers server configuration.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -183,7 +183,7 @@ func (c *Client) GetCloudLdapMappingsV2(ctx context.Context, id string) (*CloudL
 
 // UpdateCloudLdapMappingsV2 update Cloud Identity Provider mappings configuration.
 //
-// Required privileges: update:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
+// Required privileges: ldap-servers:update. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.

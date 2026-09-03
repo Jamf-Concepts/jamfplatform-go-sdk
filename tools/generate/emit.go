@@ -273,7 +273,7 @@ func resolveSpecPath(root string, cfg Config, spec SpecDef) (path string, usedFa
 	return fallback, true, nil
 }
 
-func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFallback bool, emittedTypes map[string]bool) error {
+func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFallback bool, emittedTypes map[string]bool, rootTypes *[]GoType) error {
 	doc, err := loadSpec(specPath, allowedOpsSet(spec))
 	if err != nil {
 		return fmt.Errorf("loading spec: %w", err)
@@ -293,12 +293,18 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 		applySchemaCreations(doc, spec.SchemaCreations)
 		applySchemaRenames(doc, spec.SchemaRenames)
 		applySchemaAdditions(doc, spec.SchemaAdditions)
+		applyEnumAdditions(doc, spec.EnumAdditions)
+		assertSchemaPatchTargetsAbsent(doc, spec.SchemaPatchesRequireAbsent)
 		applySchemaPatches(doc, spec.SchemaPatches)
 		applyPropertyRenames(doc, spec.PropertyRenames)
 		applyPropertyRemovals(doc, spec.PropertyRemovals)
 	}
 	normalizeNullableUnions(doc)
 	applyPostSymmetry(doc, spec.PostSymmetryExcludes)
+	// Must precede hoistInlineObjects and follow applyPostSymmetry — see
+	// pruneUnreferencedSchemas' doc comment for why the order is what keeps
+	// testing/ and api/ generating identical type names.
+	pruneUnreferencedSchemas(doc, spec)
 	if spec.Format == "xml" {
 		flattenClassicSizeWrappers(doc)
 	}
@@ -328,19 +334,35 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 	currentFieldOverrides = nil
 	currentEmitNullForOptional = nil
 	currentFieldOrder = nil
+	if err := applyDocNotes(types, spec.DocNotes); err != nil {
+		return fmt.Errorf("%s: %w", spec.File, err)
+	}
 
 	for _, t := range types {
 		emittedTypes[t.Name] = true
 	}
 
-	// All root-package specs share a single Go package (legacy path), so the
-	// validator has visibility into every type already emitted across prior
-	// specs — any method reference must resolve against that accumulated set.
-	declared := make([]GoType, 0, len(emittedTypes))
-	for name := range emittedTypes {
-		declared = append(declared, GoType{Name: name})
+	// All root-package specs share a single Go package (legacy path), so both
+	// validators have visibility into every type already emitted across prior
+	// specs — a method reference must resolve against that accumulated set, and
+	// a field emitted by an earlier spec is still a field in this package.
+	//
+	// rootTypes accumulates the whole GoType, fields included, the way
+	// processPackage's allTypes does. Handing the validators a slice rebuilt
+	// from emittedTypes — a set of type *names* — is what silently disabled
+	// validateNoUntypedFields here: every element had a nil Fields slice, so
+	// its loop body never ran and it returned success whatever was emitted.
+	// validateTypeReferences only reads .Name and was unaffected, which is why
+	// nothing failed. Pinned by TestProcessSpecRejectsUntypedFieldOnRootPath.
+	*rootTypes = append(*rootTypes, types...)
+
+	if err := validateNoUntypedFields(fmt.Sprintf("spec %s", spec.File), *rootTypes); err != nil {
+		return err
 	}
-	if err := validateTypeReferences(fmt.Sprintf("spec %s", spec.File), declared, methods); err != nil {
+	if err := validateTypeReferences(fmt.Sprintf("spec %s", spec.File), *rootTypes, methods); err != nil {
+		return err
+	}
+	if err := validateUnwrapCodec(fmt.Sprintf("spec %s", spec.File), methods); err != nil {
 		return err
 	}
 
@@ -367,7 +389,7 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 		if err != nil {
 			return fmt.Errorf("goimports %s: %w\n---raw---\n%s", pair.out, err, buf.String())
 		}
-		if err := os.WriteFile(filepath.Join(root, pair.out), formatted, 0o644); err != nil {
+		if err := writeGenerated(filepath.Join(root, pair.out), formatted, 0o644); err != nil {
 			return fmt.Errorf("writing %s: %w", pair.out, err)
 		}
 		log.Printf("wrote %s", pair.out)
@@ -446,12 +468,16 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 				applySchemaCreations(doc, ls.spec.SchemaCreations)
 				applySchemaRenames(doc, ls.spec.SchemaRenames)
 				applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+				applyEnumAdditions(doc, ls.spec.EnumAdditions)
+				assertSchemaPatchTargetsAbsent(doc, ls.spec.SchemaPatchesRequireAbsent)
 				applySchemaPatches(doc, ls.spec.SchemaPatches)
 				applyPropertyRenames(doc, ls.spec.PropertyRenames)
 				applyPropertyRemovals(doc, ls.spec.PropertyRemovals)
 			}
 			normalizeNullableUnions(doc)
 			applyPostSymmetry(doc, ls.spec.PostSymmetryExcludes)
+			// See pruneUnreferencedSchemas: after post-symmetry, before hoist.
+			pruneUnreferencedSchemas(doc, ls.spec)
 			if ls.spec.Format == "xml" {
 				flattenClassicSizeWrappers(doc)
 			}
@@ -483,6 +509,9 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 		currentFieldOverrides = nil
 		currentEmitNullForOptional = nil
 		currentFieldOrder = nil
+		if err := applyDocNotes(types, spec.DocNotes); err != nil {
+			return fmt.Errorf("%s: %w", spec.File, err)
+		}
 		for _, t := range types {
 			pkgEmitted[t.Name] = true
 		}
@@ -500,7 +529,13 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	// union of types emitted across all specs in this package, matching
 	// the way the templates will actually see them.
 	for _, sm := range allSpecs {
+		if err := validateNoUntypedFields(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), allTypes); err != nil {
+			return err
+		}
 		if err := validateTypeReferences(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), allTypes, sm.methods); err != nil {
+			return err
+		}
+		if err := validateUnwrapCodec(fmt.Sprintf("spec %s (package %s)", sm.spec.File, pkgName), sm.methods); err != nil {
 			return err
 		}
 	}
@@ -525,10 +560,19 @@ func processPackage(root string, cfg Config, pkgName string, specs []loadedSpec)
 	if err := emitPkgEnums(pkgDir, cfg, goPkgName, pkgFormat, enumTypeDecls); err != nil {
 		return err
 	}
+	if err := emitUnionRoundTripTest(pkgDir, goPkgName, structTypes); err != nil {
+		return err
+	}
+
+	// Which spec claimed each tag-derived filename, so a second spec tagging
+	// its operations the same way fails loudly instead of overwriting the
+	// first spec's file — the methods in it would vanish with no error from
+	// the generator, the compiler or the test suite.
+	tagFileOwner := make(map[string]string)
 
 	for _, sm := range allSpecs {
 		if sm.spec.SplitByTag {
-			if err := emitMethodsByTag(pkgDir, cfg, goPkgName, sm.spec, sm.methods); err != nil {
+			if err := emitMethodsByTag(pkgDir, cfg, goPkgName, sm.spec, sm.methods, tagFileOwner); err != nil {
 				return err
 			}
 			continue
@@ -592,6 +636,14 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		applySchemaCreations(doc, ls.spec.SchemaCreations)
 		applySchemaRenames(doc, ls.spec.SchemaRenames)
 		applySchemaAdditions(doc, ls.spec.SchemaAdditions)
+		// Skipped on the api/ fallback: the published spec already carries the
+		// added values, and applyEnumAdditions panics on a value already
+		// declared. Unlike the patches around it this pass is not idempotent,
+		// by design — see its doc comment.
+		if !ls.usedFallback {
+			applyEnumAdditions(doc, ls.spec.EnumAdditions)
+		}
+		assertSchemaPatchTargetsAbsent(doc, ls.spec.SchemaPatchesRequireAbsent)
 		applySchemaPatches(doc, ls.spec.SchemaPatches)
 		applyPropertyRenames(doc, ls.spec.PropertyRenames)
 		applyPropertyRemovals(doc, ls.spec.PropertyRemovals)
@@ -617,6 +669,9 @@ func processPackageTypesOnly(root string, cfg Config, pkgDir, goPkgName string, 
 		currentFieldOverrides = nil
 		currentEmitNullForOptional = nil
 		currentFieldOrder = nil
+		if err := applyDocNotes(types, ls.spec.DocNotes); err != nil {
+			return fmt.Errorf("%s: %w", ls.spec.File, err)
+		}
 		for _, t := range types {
 			pkgEmitted[t.Name] = true
 		}
@@ -701,9 +756,14 @@ import (
 			continue
 		}
 		if t.Discriminator != nil {
-			// Per-variant round-trip test for discriminator (union) types.
+			// Per-variant round-trip test for discriminator (union) types —
+			// one per discriminator *value*, not per variant, so a variant
+			// serving several values has every case covered. A per-variant
+			// test passes while the other values marshal to nothing but the
+			// discriminator, which is exactly how that bug stayed hidden.
 			for _, v := range t.Discriminator.Variants {
-				fmt.Fprintf(&buf, `
+				for _, dv := range v.Values {
+					fmt.Fprintf(&buf, `
 func TestRoundTrip_%s_%s(t *testing.T) {
 	original := %s{%s: "%s", %s: &%s{}}
 	data, err := json.Marshal(original)
@@ -721,11 +781,12 @@ func TestRoundTrip_%s_%s(t *testing.T) {
 		t.Fatal("expected variant %s to be non-nil")
 	}
 }
-`, t.Name, v.FieldName,
-					t.Name, t.Discriminator.GoFieldName, v.Value, v.FieldName, v.TypeName,
-					t.Name,
-					t.Discriminator.GoFieldName, v.Value, t.Discriminator.GoFieldName, v.Value,
-					v.FieldName, v.FieldName)
+`, t.Name, exportedGoName(dv),
+						t.Name, t.Discriminator.GoFieldName, dv, v.FieldName, v.TypeName,
+						t.Name,
+						t.Discriminator.GoFieldName, dv, t.Discriminator.GoFieldName, dv,
+						v.FieldName, v.FieldName)
+				}
 			}
 			continue
 		}
@@ -753,7 +814,7 @@ func TestRoundTrip_%s(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting types_test.go: %w\n---raw---\n%s", err, buf.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1202,7 +1263,7 @@ func (p *PayloadsXMLText) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers.go: %w", err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1450,7 +1511,7 @@ func TestPayloadsXMLText_NilOmitsField(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting xml_helpers_test.go: %w\n---raw---\n%s", err, src)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -1893,7 +1954,7 @@ func TestAccount_WireFixture_DirectoryUser(t *testing.T) {
 	if err != nil {
 		return fmt.Errorf("formatting accounts_privileges_test.go: %w\n---raw---\n%s", err, src)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2022,7 +2083,7 @@ func injectVersionLock(dst, src reflect.Value) {
 	if err != nil {
 		return fmt.Errorf("formatting version_lock_helpers.go: %w", err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2037,7 +2098,7 @@ func injectVersionLock(dst, src reflect.Value) {
 // normalize to the same base — e.g. `foo` + `foo-preview` after the
 // -preview strip — merge into one file instead of the second overwriting
 // the first.
-func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, methods []GoMethod) error {
+func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, methods []GoMethod, tagFileOwner map[string]string) error {
 	buckets := make(map[string][]GoMethod)
 	for _, m := range methods {
 		if m.Tag == "" {
@@ -2054,6 +2115,11 @@ func emitMethodsByTag(pkgDir string, cfg Config, pkgName string, spec SpecDef, m
 	sort.Strings(bases)
 
 	for _, base := range bases {
+		if owner, taken := tagFileOwner[base]; taken && owner != spec.File {
+			return fmt.Errorf("spec %s: tag %q writes %s.go, already written by spec %s — two specs in package %s share an OpenAPI tag; add a tagRenames entry for %q in this spec to give it a distinct filename", spec.File, buckets[base][0].Tag, base, owner, pkgName, buckets[base][0].Tag)
+		}
+		tagFileOwner[base] = spec.File
+
 		mf := GeneratedFile{Package: pkgName, Module: cfg.Module, Format: spec.Format, Methods: buckets[base]}
 		if err := emitTemplated(sourceTmpl, mf, filepath.Join(pkgDir, base+".go")); err != nil {
 			return err
@@ -2128,7 +2194,7 @@ func emitTemplated(tmpl *template.Template, data any, outPath string) error {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, buf.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2167,7 +2233,7 @@ func New(base *jamfplatform.Client) *Client {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w", outPath, err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2223,21 +2289,33 @@ import "%s/jamfplatform"
 
 // Privileges maps each %s SDK method name to the Jamf API privileges it
 // requires, sourced from the x-required-privileges vendor extensions in the
-// Jamf OpenAPI specs. Methods that require no special privilege have an empty
-// Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// Jamf OpenAPI specs. Identifiers are GA capability permissions in
+// {capability}:{action} form and a multi-entry Scoped slice means all of them
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
 `, pkgName, cfg.Module, pkgName)
 
 	for _, e := range entries {
 		m := e.method
-		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scoped: %s, Legacy: %s},\n",
+		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scoped: %s, Legacy: %s, Source: %s},\n",
 			strconv.Quote(m.Name),
 			strconv.Quote(m.Name),
 			strconv.Quote(m.HTTPMethod),
 			strconv.Quote(e.path),
 			goStringSliceLiteral(m.ScopedPrivileges),
 			goStringSliceLiteral(m.LegacyPrivileges),
+			strconv.Quote(m.PrivilegeSource),
 		)
 	}
 
@@ -2257,7 +2335,216 @@ func PrivilegesFor(method string) (jamfplatform.MethodPrivileges, bool) {
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, b.String())
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
+		return fmt.Errorf("writing %s: %w", outPath, err)
+	}
+	log.Printf("wrote %s", outPath)
+	return nil
+}
+
+// emitUnionRoundTripTest writes unions_test.go for a package holding at least
+// one union — either a discriminator-less request union (GoUnion) or a
+// oneOf-with-discriminator one. No-op otherwise.
+//
+// The generated method tests cannot cover either kind. A method's httptest stub
+// is built from the request type, so it serialises whatever the generated code
+// assumed — the account SSO create test passed for as long as the field was
+// `any`, calling CreateConnection with a bare &ConnectionRequest{} and putting
+// nothing on the wire, which is exactly why nothing ever exercised any of the
+// four settings schemas the connection body can hold. These tests marshal each
+// variant in turn and assert the bytes, so a marshaler that emitted the wrong
+// variant, dropped fields, or silently picked one of two fails here.
+//
+// It matters most for a union whose discriminator was *inferred*
+// (inferDiscriminator): the mapping is read off the variants' enums rather than
+// declared, so the value-to-variant pairing is the generator's reading of the
+// spec and a wrong one routes a payload to the wrong type in silence.
+//
+// A variant whose Go type is not a struct declared in this package is skipped —
+// `&T{}` is not a valid literal for an alias to a slice or json.RawMessage — and
+// a union with no usable variant is left out entirely.
+func emitUnionRoundTripTest(pkgDir, pkgName string, types []GoType) error {
+	// Every emitted type takes a `&T{}` literal except a json.RawMessage
+	// alias, a `type X = Y` alias and an enum. A nested union counts as a
+	// struct — SwUpdateConfiguration's AUTOMATIC variant is itself a
+	// discriminated union, and excluding it skipped the very union whose
+	// discriminator is inferred.
+	structNames := make(map[string]bool, len(types))
+	for _, t := range types {
+		if !t.IsRawJSON && t.AliasTarget == "" && len(t.EnumValues) == 0 {
+			structNames[t.Name] = true
+		}
+	}
+	usable := func(variantTypes ...string) bool {
+		for _, tn := range variantTypes {
+			if !structNames[tn] {
+				return false
+			}
+		}
+		return true
+	}
+
+	var unions, tagged []GoType
+	for _, t := range types {
+		switch {
+		case t.Union != nil && len(t.Union.Variants) > 0:
+			unions = append(unions, t)
+		case t.Discriminator != nil && len(t.Discriminator.Variants) > 0:
+			ok := true
+			for _, v := range t.Discriminator.Variants {
+				if !usable(v.TypeName) {
+					ok = false
+				}
+			}
+			if ok {
+				tagged = append(tagged, t)
+			} else {
+				log.Printf("%s: skipping union round-trip test — a variant type is not a struct in this package", t.Name)
+			}
+		}
+	}
+	if len(unions) == 0 && len(tagged) == 0 {
+		return nil
+	}
+
+	var b strings.Builder
+	fmt.Fprintf(&b, `// Code generated by tools/generate; DO NOT EDIT.
+
+// Copyright Jamf Software LLC 2026
+// SPDX-License-Identifier: MIT
+
+package %s
+
+import (
+	"bytes"
+	"encoding/json"
+	"testing"
+)
+`, pkgName)
+
+	for _, u := range unions {
+		fmt.Fprintf(&b, `
+// Test%[1]s_Marshal asserts that each variant marshals to exactly the bytes
+// the variant alone produces — the union adds no wrapper and drops no field —
+// that the payload survives a decode into Raw, that setting no variant emits
+// null rather than an empty object, and that setting two is refused instead of
+// silently shipping one of them.
+func Test%[1]s_Marshal(t *testing.T) {
+`, u.Name)
+		for _, v := range u.Union.Variants {
+			fmt.Fprintf(&b, `	t.Run(%[3]q, func(t *testing.T) {
+		variant := &%[2]s{}
+		got, err := json.Marshal(%[1]s{%[3]s: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %%v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %%v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %%s, want the bare variant %%s", got, want)
+		}
+		var back %[1]s
+		if err := json.Unmarshal(got, &back); err != nil {
+			t.Fatalf("unmarshal union: %%v", err)
+		}
+		if !bytes.Equal(back.Raw, got) {
+			t.Fatalf("Raw is %%s, want the payload %%s", back.Raw, got)
+		}
+		if err := json.Unmarshal(back.Raw, &%[2]s{}); err != nil {
+			t.Fatalf("decoding Raw back into %[2]s: %%v", err)
+		}
+	})
+`, u.Name, v.TypeName, v.FieldName)
+		}
+		fmt.Fprintf(&b, `	t.Run("no variant set", func(t *testing.T) {
+		got, err := json.Marshal(%[1]s{})
+		if err != nil {
+			t.Fatalf("marshal: %%v", err)
+		}
+		if string(got) != "null" {
+			t.Fatalf("zero union marshalled to %%s, want null", got)
+		}
+	})
+`, u.Name)
+		if len(u.Union.Variants) > 1 {
+			fmt.Fprintf(&b, `	t.Run("two variants set", func(t *testing.T) {
+		if _, err := json.Marshal(%[1]s{%[2]s: &%[3]s{}, %[4]s: &%[5]s{}}); err == nil {
+			t.Fatal("marshalling two variants succeeded; want an error naming both")
+		}
+	})
+`, u.Name,
+				u.Union.Variants[0].FieldName, u.Union.Variants[0].TypeName,
+				u.Union.Variants[1].FieldName, u.Union.Variants[1].TypeName)
+		}
+		b.WriteString("}\n")
+	}
+
+	for _, u := range tagged {
+		d := u.Discriminator
+		fmt.Fprintf(&b, `
+// Test%[1]s_Marshal asserts that each %[2]q value marshals to exactly the bytes
+// its variant alone produces, that a payload carrying the value decodes into
+// that variant, and that an unrecognised value leaves every variant nil while
+// preserving the discriminator rather than guessing.
+func Test%[1]s_Marshal(t *testing.T) {
+`, u.Name, d.PropertyName)
+		for _, v := range d.Variants {
+			for _, value := range v.Values {
+				fmt.Fprintf(&b, `	t.Run(%[4]q, func(t *testing.T) {
+		variant := &%[3]s{}
+		got, err := json.Marshal(%[1]s{%[2]s: %[4]q, %[5]s: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %%v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %%v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %%s, want the bare variant %%s", got, want)
+		}
+		var back %[1]s
+		if err := json.Unmarshal([]byte(%[6]s), &back); err != nil {
+			t.Fatalf("unmarshal union: %%v", err)
+		}
+		if back.%[2]s != %[4]q {
+			t.Fatalf("%[2]s = %%q after decode, want %%q", back.%[2]s, %[4]q)
+		}
+		if back.%[5]s == nil {
+			t.Fatal("%[4]s decoded with %[5]s nil — the value is mapped to no variant")
+		}
+	})
+`, u.Name, d.GoFieldName, v.TypeName, value, v.FieldName,
+					"`"+fmt.Sprintf(`{%q:%q}`, d.PropertyName, value)+"`")
+			}
+		}
+		fmt.Fprintf(&b, `	t.Run("unrecognised discriminator", func(t *testing.T) {
+		var back %[1]s
+		if err := json.Unmarshal([]byte(%[3]s), &back); err != nil {
+			t.Fatalf("unmarshal: %%v", err)
+		}
+		if back.%[2]s != "NOT_A_%[2]s_VALUE" {
+			t.Fatalf("%[2]s = %%q, want the unrecognised value preserved", back.%[2]s)
+		}
+`, u.Name, d.GoFieldName,
+			"`"+fmt.Sprintf(`{%q:%q}`, d.PropertyName, "NOT_A_"+d.GoFieldName+"_VALUE")+"`")
+		for _, v := range d.Variants {
+			fmt.Fprintf(&b, `		if back.%s != nil {
+			t.Error("%s was populated for an unrecognised discriminator")
+		}
+`, v.FieldName, v.FieldName)
+		}
+		b.WriteString("	})\n}\n")
+	}
+
+	outPath := filepath.Join(pkgDir, "unions_test.go")
+	formatted, err := imports.Process(outPath, []byte(b.String()), &imports.Options{Comments: true})
+	if err != nil {
+		return fmt.Errorf("goimports %s: %w\n---raw---\n%s", outPath, err, b.String())
+	}
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2357,7 +2644,7 @@ func ptrStr(s string) *string { return &s }%s
 	if err != nil {
 		return fmt.Errorf("goimports %s: %w", outPath, err)
 	}
-	if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+	if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 		return fmt.Errorf("writing %s: %w", outPath, err)
 	}
 	log.Printf("wrote %s", outPath)
@@ -2452,7 +2739,7 @@ const JamfProAPIVersion = %q
 // to call typed methods.
 //
 //	c := %s.NewClient(
-//		"https://your-tenant.apigw.jamf.com",
+//		"https://eu.api.jamfcloud.com",
 //		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 //		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
 //		%s.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),
@@ -2574,19 +2861,79 @@ type MethodPrivileges struct {
 	// Path is the endpoint's resource path relative to the tenant prefix,
 	// e.g. "/buildings/{id}".
 	Path string
-	// Scoped lists the modern scoped privilege identifiers in
-	// action:scope:resource form, e.g. "create:pro:buildings". An empty
-	// slice means the endpoint requires no special privilege: any
-	// authenticated API client may call it. Where more than one identifier
-	// is present, the Jamf spec does not encode whether they are required
-	// together (AND) or as alternatives (OR); consumers should present the
-	// full set and avoid asserting a relationship.
+	// Scoped lists the GA capability permissions the endpoint requires, in
+	// {capability}:{action} form, e.g. "buildings:create". The capability is
+	// kebab-case and carries no product name — one capability is reached by
+	// endpoints across several products — and the action is one of exactly
+	// six, lowercase and case-sensitive: create, read, update, delete,
+	// deploy, execute. The three-part beta slug ("create:pro:buildings") is
+	// the retired form and never appears here.
+	//
+	// Where more than one identifier is present, ALL of them are required.
+	// The platform has exactly one route that accepts either of two
+	// capabilities rather than both — DELETE /proclassic/logflush takes
+	// flush-policy-logs:execute or policies:delete — and its specs declare
+	// only the first, so no entry in this registry is an alternatives set. A
+	// consumer can therefore render a multi-entry Scoped slice as "grant all
+	// of these".
+	//
+	// An empty slice means nothing declares a privilege for the endpoint,
+	// which is not the same as none being required. Most such endpoints are
+	// genuinely unauthenticated — /v1/jamf-pro-version,
+	// /v2/jamf-pro-information, the /v1/notifications list. A consumer
+	// rendering a permissions table must not print an empty slice as "no
+	// permission needed"; read Source to tell the two apart.
 	Scoped []string
+	// Source names where Scoped came from:
+	//
+	//   - "spec": the operation's own x-required-privileges extension.
+	//   - "gateway-policy": the published spec declares none and the SDK
+	//     supplies what the gateway's own authorization policy enforces. The
+	//     account package's 18 methods are this case, and permanently so:
+	//     these routes resolve the organization from the access token, which
+	//     exempts them from the transform the publishing pipeline attaches
+	//     x-required-privileges during, so the artifact ships without them by
+	//     construction. The values come from
+	//     public-apis-oas/redocly-implementation/teams/account-*/config.yaml
+	//     and the hand-written OPA rules in
+	//     authorization-policies/policies/tyk_external/account/account_api.rego,
+	//     which agree on all 18.
+	//   - "": Scoped is empty.
+	//
+	// Note for "gateway-policy": several account rules accept *either* the GA
+	// capability recorded here or a retired read:org:*/update:org:* permission.
+	// Only the GA form is carried, because Scoped is a conjunction and listing
+	// the alternative would read as "both required".
+	Source string
 	// Legacy lists the human-readable Jamf Pro privilege names, e.g.
 	// "Create Buildings". It is populated for the Pro API family only —
-	// other families do not publish legacy names. Legacy is NOT
-	// index-aligned with Scoped: a single legacy name may correspond to
-	// multiple scoped identifiers.
+	// other families do not publish legacy names.
+	//
+	// Scoped and Legacy are INDEPENDENT SETS, not parallel arrays. Do not
+	// match them by position, and do not assume equal length. Both are copied
+	// in spec order.
+	//
+	// Two things make a positional pairing wrong, and each on its own is
+	// sufficient (counts are pro at spec 11.31.0, 746 privileged operations):
+	//
+	//   - The lengths differ on 29 operations, because the GA capability
+	//     consolidation mapped several legacy privileges onto one capability.
+	//     GET /v1/computer-groups is Scoped ["device-groups:read"] against
+	//     Legacy ["Read Smart Computer Groups", "Read Static Computer
+	//     Groups"]. There is no bijection to zip.
+	//   - Where the lengths do match, the orders still disagree, in the spec
+	//     itself. POST /v1/jamf-management-framework/redeploy/{id} is Scoped
+	//     ["computer-check-in:read", "device-actions:execute"] against Legacy
+	//     ["Send Computer Remote Command to Install Package", "Read Computer
+	//     Check-In"] — reversed. 9 of the 24 equal-length multi-privilege
+	//     operations are like this.
+	//
+	// A consumer rendering a table of required privileges therefore has to
+	// present the two lists separately, or label from Scoped alone. Jamf does
+	// not publish the scoped-to-legacy mapping in the specs; its "Jamf Pro
+	// permissions map" documentation article is the only artefact that carries
+	// it, and until that is machine-readable a correct label per scoped
+	// identifier cannot be derived here.
 	Legacy []string
 }
 `, pkg),
@@ -2721,7 +3068,7 @@ func ptrStr(s string) *string { return &s }
 		if err != nil {
 			return fmt.Errorf("formatting %s: %w", relPath, err)
 		}
-		if err := os.WriteFile(outPath, formatted, 0o644); err != nil {
+		if err := writeGenerated(outPath, formatted, 0o644); err != nil {
 			return fmt.Errorf("writing %s: %w", relPath, err)
 		}
 		log.Printf("wrote %s", relPath)

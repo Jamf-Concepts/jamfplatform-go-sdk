@@ -9,15 +9,26 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 
 // Privileges maps each deviceactions SDK method name to the Jamf API privileges it
 // requires, sourced from the x-required-privileges vendor extensions in the
-// Jamf OpenAPI specs. Methods that require no special privilege have an empty
-// Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// Jamf OpenAPI specs. Identifiers are GA capability permissions in
+// {capability}:{action} form and a multi-entry Scoped slice means all of them
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CheckInDevice":  {Method: "CheckInDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/check-in", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"EraseDevice":    {Method: "EraseDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/erase", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"RestartDevice":  {Method: "RestartDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/restart", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"ShutdownDevice": {Method: "ShutdownDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/shutdown", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
-	"UnmanageDevice": {Method: "UnmanageDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/unmanage", Scoped: []string{"execute:pro:device-actions"}, Legacy: nil},
+	"CheckInDevice":  {Method: "CheckInDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/check-in", Scoped: []string{"device-actions:execute"}, Legacy: nil, Source: "spec"},
+	"EraseDevice":    {Method: "EraseDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/erase", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil, Source: "spec"},
+	"RestartDevice":  {Method: "RestartDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/restart", Scoped: []string{"device-actions:execute"}, Legacy: nil, Source: "spec"},
+	"ShutdownDevice": {Method: "ShutdownDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/shutdown", Scoped: []string{"device-actions:execute"}, Legacy: nil, Source: "spec"},
+	"UnmanageDevice": {Method: "UnmanageDevice", HTTPMethod: "POST", Path: "/v1/devices/{id}/unmanage", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

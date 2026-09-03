@@ -17,7 +17,7 @@ import (
 
 // GetClassByID finds classes by ID.
 //
-// Required privileges: read:pro:classes.
+// Required privileges: classes:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetClassByID(ctx context.Context, id string) (*Class, error) {
 
 // CreateClassByID creates a new class by ID.
 //
-// Required privileges: create:pro:classes.
+// Required privileges: classes:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateClassByID(ctx context.Context, id string, request *ClassP
 
 // UpdateClassByID updates an existing class by ID.
 //
-// Required privileges: update:pro:classes.
+// Required privileges: classes:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateClassByID(ctx context.Context, id string, request *ClassP
 
 // DeleteClassByID deletes a class by ID.
 //
-// Required privileges: delete:pro:classes.
+// Required privileges: classes:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteClassByID(ctx context.Context, id string) error {
 
 // GetClassByName finds classes by name.
 //
-// Required privileges: read:pro:classes.
+// Required privileges: classes:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetClassByName(ctx context.Context, name string) (*Class, error
 
 // UpdateClassByName updates an existing class by name.
 //
-// Required privileges: update:pro:classes.
+// Required privileges: classes:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateClassByName(ctx context.Context, name string, request *Cl
 
 // DeleteClassByName deletes a class by name.
 //
-// Required privileges: delete:pro:classes.
+// Required privileges: classes:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteClassByName(ctx context.Context, name string) error {
 
 // ListClasses finds all classes.
 //
-// Required privileges: read:pro:classes.
+// Required privileges: classes:read.
 func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Classes
@@ -138,7 +138,7 @@ func (c *Client) ListClasses(ctx context.Context) (*Classes, error) {
 
 // CreateClassByName creates a new class by ID.
 //
-// Required privileges: create:pro:classes.
+// Required privileges: classes:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

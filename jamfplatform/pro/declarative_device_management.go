@@ -14,8 +14,8 @@ import (
 
 // ListDdmStatusItemsV1 retrieve the Status Items from the latest Status Report for a device.
 //
-// Required privileges: read:pro:mobile-devices, read:pro:computers. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - clientManagementID: client management id of the target device.
@@ -31,8 +31,8 @@ func (c *Client) ListDdmStatusItemsV1(ctx context.Context, clientManagementID st
 
 // GetDdmStatusItemV1 retrieve a Status Item from the latest Status Report for a device.
 //
-// Required privileges: read:pro:mobile-devices, read:pro:computers. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - clientManagementID: client management id of the target device.
@@ -49,8 +49,7 @@ func (c *Client) GetDdmStatusItemV1(ctx context.Context, clientManagementID stri
 
 // SyncDdmV1 force a device DDM sync.
 //
-// Required privileges: execute:pro:computer-commands, execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Declarative Management Command.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-actions:execute. Legacy Jamf Pro privilege name(s): Send Declarative Management Command.
 //
 // Parameters:
 //   - clientManagementID: The client management id of the target device.
@@ -61,4 +60,21 @@ func (c *Client) SyncDdmV1(ctx context.Context, clientManagementID string) error
 		return fmt.Errorf("SyncDdmV1(%s): %w", clientManagementID, err)
 	}
 	return nil
+}
+
+// GetDssDeclarationsV1 retrieve an existing declaration.
+//
+// Required privileges: declarations:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices, Read Computers.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
+//
+// Parameters:
+//   - declarationID: Declaration UUID.
+func (c *Client) GetDssDeclarationsV1(ctx context.Context, declarationID string) (*DssDeclarations, error) {
+	prefix := c.transport.APIPrefix("pro", "v1")
+	var result DssDeclarations
+	endpoint := fmt.Sprintf("%s/dss-declarations/%s", prefix, url.PathEscape(declarationID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDssDeclarationsV1(%s): %w", declarationID, err)
+	}
+	return &result, nil
 }

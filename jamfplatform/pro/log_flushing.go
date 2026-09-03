@@ -14,7 +14,7 @@ import (
 
 // GetLogFlushingV1 get log flushing settings.
 //
-// Required privileges: read:pro:retention-policy. Legacy Jamf Pro privilege name(s): Read Retention Policy.
+// Required privileges: retention-policy:read. Legacy Jamf Pro privilege name(s): Read Retention Policy.
 func (c *Client) GetLogFlushingV1(ctx context.Context) (*LogFlushingV1, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result LogFlushingV1
@@ -27,7 +27,7 @@ func (c *Client) GetLogFlushingV1(ctx context.Context) (*LogFlushingV1, error) {
 
 // ListLogFlushingTasksV1 get log flushing tasks.
 //
-// Required privileges: read:pro:retention-policy. Legacy Jamf Pro privilege name(s): Read Retention Policy.
+// Required privileges: retention-policy:read. Legacy Jamf Pro privilege name(s): Read Retention Policy.
 func (c *Client) ListLogFlushingTasksV1(ctx context.Context) ([]LogFlushingTaskV1, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []LogFlushingTaskV1
@@ -40,7 +40,7 @@ func (c *Client) ListLogFlushingTasksV1(ctx context.Context) ([]LogFlushingTaskV
 
 // CreateLogFlushingTaskV1 queue a log flushing task.
 //
-// Required privileges: update:pro:retention-policy. Legacy Jamf Pro privilege name(s): Update Retention Policy.
+// Required privileges: retention-policy:update. Legacy Jamf Pro privilege name(s): Update Retention Policy.
 func (c *Client) CreateLogFlushingTaskV1(ctx context.Context, request *LogFlushingTaskV1) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -53,7 +53,7 @@ func (c *Client) CreateLogFlushingTaskV1(ctx context.Context, request *LogFlushi
 
 // GetLogFlushingTaskV1 get log flushing task.
 //
-// Required privileges: read:pro:retention-policy. Legacy Jamf Pro privilege name(s): Read Retention Policy.
+// Required privileges: retention-policy:read. Legacy Jamf Pro privilege name(s): Read Retention Policy.
 //
 // Parameters:
 //   - id: The identifier of the log flushing task.
@@ -69,7 +69,7 @@ func (c *Client) GetLogFlushingTaskV1(ctx context.Context, id string) (*LogFlush
 
 // DeleteLogFlushingTaskV1 cancels a log flushing task.
 //
-// Required privileges: update:pro:retention-policy. Legacy Jamf Pro privilege name(s): Update Retention Policy.
+// Required privileges: retention-policy:update. Legacy Jamf Pro privilege name(s): Update Retention Policy.
 //
 // Parameters:
 //   - id: The identifier of the log flushing task.

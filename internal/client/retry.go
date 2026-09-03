@@ -12,13 +12,17 @@ import (
 )
 
 // retryWaitMin/retryWaitMax/retryMax bound the transport's automatic retry
-// of transient failures (429/503, 500/502/504 on GET/DELETE/HEAD, and
+// of transient failures (429/503, 500/502/504 on GET/DELETE/PUT/HEAD, and
 // recoverable network errors — see isRetryableWriteStatus). Total attempts
-// per request is retryMax+1. retryWaitMax also acts as a hard ceiling on a
-// server-supplied Retry-After: retryablehttp honors that header verbatim
-// and uncapped (see jamfBackoff), which would otherwise let a misconfigured
-// or hostile value stall a request far longer than any caller-supplied
-// context deadline is likely to allow for.
+// per request is retryMax+1.
+//
+// retryWaitMin seeds the exponential curve (see jamfBackoff), so these
+// values bound a full retry sequence at 1+2+4+8 = 15s of waiting.
+// retryWaitMax is not reached by that curve at retryMax=4; it exists as a
+// ceiling for two other cases — a caller who raises maxRetries via
+// WithRetryPolicy, and a server-supplied Retry-After, which would otherwise
+// be honored verbatim and could stall a request far longer than any
+// caller-supplied context deadline is likely to allow for.
 const (
 	retryWaitMin = 1 * time.Second
 	retryWaitMax = 60 * time.Second
@@ -104,17 +108,127 @@ func jamfCheckRetry(ctx context.Context, resp *http.Response, err error) (bool, 
 	return isRetryableWriteStatus(resp.Request.Method, resp.StatusCode), nil
 }
 
-// jamfBackoff wraps retryablehttp.RateLimitLinearJitterBackoff — which
-// honors a server-supplied Retry-After for 429/503 verbatim and uncapped —
-// so the wait is always clamped to max. An oversized or malformed
-// Retry-After should slow a retry down, not let it stall past what
-// retryWaitMax already promises callers.
+// jamfBackoff is retryablehttp.DefaultBackoff with one addition: the wait is
+// always clamped to maxWait.
+//
+// DefaultBackoff supplies everything else — exponential backoff of
+// minWait*2^attemptNum capped at maxWait, overflow-guarded, plus Retry-After
+// parsing (seconds and date form) for 429 and 503. The clamp is needed
+// because that Retry-After path returns the server's value verbatim and
+// uncapped, which would let a misconfigured or hostile header stall a
+// request far past what maxWait promises callers. For the exponential path
+// the clamp is a no-op, since DefaultBackoff already caps there.
+//
+// This deliberately does NOT use retryablehttp.RateLimitLinearJitterBackoff,
+// which the SDK previously selected — presumably for its Retry-After
+// handling, which DefaultBackoff also has. That function samples uniformly
+// over the *entire* [minWait, maxWait] window and multiplies by attempt
+// number, so under this SDK's 1s/60s window the very first retry waited ~30s
+// on average and a four-retry sequence averaged over three minutes — all of
+// it inside a single httpClient.Do emitting no log output (see
+// logRetryAttempt), which is indistinguishable from a hang. DefaultBackoff
+// bounds the same sequence at 1+2+4+8 = 15s.
+//
+// One property is given up in the swap: DefaultBackoff is deterministic, so
+// concurrent requests that fail together wake together and collide again.
+// That is tolerable while no Jamf path rate-limits (as of 2026-08-31 every
+// prod Tyk plan carries rate: -1 and the gateway reports
+// x-ratelimit-limit: 0 with no Retry-After on any response). If rate
+// limiting arrives without a Retry-After header, revisit this and add
+// jittering around the exponential band — not by returning to the linear
+// variant. See docs/WIRE-FACTS.md#rate-limiting.
 func jamfBackoff(minWait, maxWait time.Duration, attemptNum int, resp *http.Response) time.Duration {
-	wait := retryablehttp.RateLimitLinearJitterBackoff(minWait, maxWait, attemptNum, resp)
-	if wait > maxWait {
-		return maxWait
+	return min(retryablehttp.DefaultBackoff(minWait, maxWait, attemptNum, resp), maxWait)
+}
+
+// logRetryAttempt is the RequestLogHook: retryablehttp calls it immediately
+// before every attempt, with attemptNum 0 for the first.
+//
+// It exists because the retry loop is otherwise invisible from outside the
+// transport. execute() logs one request, hands the whole loop to a single
+// httpClient.Do, and handleResponse logs only the response that survives it
+// — so a caller watching the log sees exactly one request and one response
+// no matter how many attempts ran or how long the backoff waited. A
+// four-retry sequence and a single slow call produce identical output, which
+// is what made a multi-minute retry sequence read as a hang.
+//
+// Attempt 0 is skipped because execute() has already logged it; without that
+// guard every request would log twice. The body is deliberately nil rather
+// than a replay of the original: the bytes are identical across attempts, so
+// re-dumping them multiplies a large request body through the log for no
+// diagnostic gain.
+//
+// The retryablehttp.Logger argument is always nil here — newRetryClient sets
+// rc.Logger = nil, and retryablehttp's hook dispatch passes nil through its
+// default branch rather than skipping the hook. The SDK's own Logger is read
+// from the Transport at call time, so a logger installed after construction
+// (SetLogger, WithLogger) is picked up.
+func (c *Transport) logRetryAttempt(_ retryablehttp.Logger, req *http.Request, attemptNum int) {
+	if c.logger == nil || attemptNum == 0 {
+		return
 	}
-	return wait
+	c.logger.LogRequest(req.Context(), req.Method, req.URL.String(), nil)
+}
+
+// logRetriedResponse is the ResponseLogHook: retryablehttp calls it after
+// every attempt that produced a response, before it decides whether to wait
+// and try again.
+//
+// It is the other half of logRetryAttempt. Logging the retried *requests*
+// alone leaves the log reading "request, request, 404" — the status that
+// actually caused each retry never appears, because handleResponse only ever
+// sees the response that survives the loop. That cost is documented in this
+// SDK: requirePackageStore's doc in jamfplatform/acc_helpers_test.go records
+// four package tests failing on a 404 whose real cause was a 500 two hops
+// earlier, which took a wire probe to establish. With this hook the 500 is in
+// the log next to the 404 that replaced it.
+//
+// Gating is the whole design problem: the hook fires for every attempt's
+// response, including the last one, and handleResponse already logs that one.
+// Logging unconditionally would double-log every single request in the SDK.
+// So the same predicate that drives the retry decides whether to log —
+// jamfCheckRetry (and through it isRetryableWriteStatus), consulted with a nil
+// error exactly as retryablehttp consults it — which means the statuses logged
+// here can never drift from the statuses actually retried. err is nil rather
+// than resp's own error because retryablehttp does not call this hook at all
+// when the attempt failed at the transport layer (resp would be nil), so a
+// response reaching here always came back from the server.
+//
+// One duplicate survives that gate deliberately: when retries are exhausted,
+// the final attempt is retryable by policy but not retried, because
+// retryablehttp checks the remaining budget after this hook and passes no
+// attempt number here to reconstruct it. That response is logged twice — once
+// as retryable, once by handleResponse as the surviving response. One extra
+// line at the end of an exhausted sequence is a better trade than either
+// tracking per-request attempt state in a Transport shared by concurrent
+// callers, or dropping the last (and most interesting) failure from the log.
+//
+// Headers and body are both nil, which is the same discipline as
+// logRetryAttempt's nil body. The body especially must not be read here:
+// retryablehttp drains it to reuse the connection when it retries, and on the
+// not-retried path it is the body handleResponse decodes for the caller —
+// consuming it would break decoding. A nil http.Header is safe for a consumer
+// logger, since Get and range are both nil-safe. The status is the only thing
+// a retry sequence adds: the method and URL are already on the LogRequest line
+// this response answers, and the Logger interface's LogResponse carries no
+// place for them anyway.
+//
+// As in logRetryAttempt, the retryablehttp.Logger argument is always nil
+// (newRetryClient sets rc.Logger = nil, and retryablehttp's hook dispatch
+// passes nil through its default branch), and the SDK's own Logger is read
+// from the Transport at call time so a logger installed later via SetLogger or
+// WithLogger is picked up. Installed next to logRetryAttempt in NewTransport
+// rather than in newRetryClient, for the same reason: it is a method on the
+// Transport, which does not exist when newRetryClient runs.
+func (c *Transport) logRetriedResponse(_ retryablehttp.Logger, resp *http.Response) {
+	if c.logger == nil || resp == nil {
+		return
+	}
+	ctx := resp.Request.Context()
+	if shouldRetry, err := jamfCheckRetry(ctx, resp, nil); err != nil || !shouldRetry {
+		return
+	}
+	c.logger.LogResponse(ctx, resp.StatusCode, nil, nil)
 }
 
 // newRetryClient builds a retryablehttp.Client around authed — the

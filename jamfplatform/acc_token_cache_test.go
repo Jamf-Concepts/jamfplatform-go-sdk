@@ -15,10 +15,10 @@ import (
 )
 
 func TestAcceptance_FileTokenCache(t *testing.T) {
-	baseURL := os.Getenv("JAMFPLATFORM_BASE_URL")
-	clientID := os.Getenv("JAMFPLATFORM_CLIENT_ID")
-	clientSecret := os.Getenv("JAMFPLATFORM_CLIENT_SECRET")
-	tenantID := os.Getenv("JAMFPLATFORM_TENANT_ID")
+	baseURL := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+	clientID := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID")
+	clientSecret := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET")
+	tenantID := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_ID")
 
 	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
 		t.Skip("missing required environment variables")

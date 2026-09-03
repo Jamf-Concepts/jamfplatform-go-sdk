@@ -17,7 +17,7 @@ import (
 
 // ListReturnToServiceConfigurationsV1 get all Return to Service Configurations.
 //
-// Required privileges: read:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): View Return To Service Configurations.
+// Required privileges: return-to-service:read. Legacy Jamf Pro privilege name(s): View Return To Service Configurations.
 func (c *Client) ListReturnToServiceConfigurationsV1(ctx context.Context) (*ReturnToServiceConfigurationSearchResults, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ReturnToServiceConfigurationSearchResults
@@ -30,7 +30,7 @@ func (c *Client) ListReturnToServiceConfigurationsV1(ctx context.Context) (*Retu
 
 // CreateReturnToServiceConfigurationV1 create a Return to Service Configuration.
 //
-// Required privileges: update:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): Edit Return To Service Configurations.
+// Required privileges: return-to-service:update. Legacy Jamf Pro privilege name(s): Edit Return To Service Configurations.
 func (c *Client) CreateReturnToServiceConfigurationV1(ctx context.Context, request *ReturnToServiceConfigurationRequest) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -43,7 +43,7 @@ func (c *Client) CreateReturnToServiceConfigurationV1(ctx context.Context, reque
 
 // GetReturnToServiceConfigurationV1 retrieve a Return to Service Configuration with the supplied id.
 //
-// Required privileges: read:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): View Return To Service Configurations.
+// Required privileges: return-to-service:read. Legacy Jamf Pro privilege name(s): View Return To Service Configurations.
 //
 // Parameters:
 //   - id: Return to Service Configuration identifier.
@@ -59,7 +59,7 @@ func (c *Client) GetReturnToServiceConfigurationV1(ctx context.Context, id strin
 
 // UpdateReturnToServiceConfigurationV1 update a Return to Service Configuration.
 //
-// Required privileges: update:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): Edit Return To Service Configurations.
+// Required privileges: return-to-service:update. Legacy Jamf Pro privilege name(s): Edit Return To Service Configurations.
 //
 // Parameters:
 //   - id: Return to Service Configuration identifier.
@@ -75,7 +75,7 @@ func (c *Client) UpdateReturnToServiceConfigurationV1(ctx context.Context, id st
 
 // DeleteReturnToServiceConfigurationV1 delete a Return To Service Configuration with the supplied id.
 //
-// Required privileges: delete:pro:return-to-service-configurations. Legacy Jamf Pro privilege name(s): Delete Return To Service Configurations.
+// Required privileges: return-to-service:delete. Legacy Jamf Pro privilege name(s): Delete Return To Service Configurations.
 //
 // Parameters:
 //   - id: Return To Service Configurations identifier.

@@ -14,7 +14,7 @@ import (
 
 // CreateDigicertTrustLifecycleManagerV1 create DigiCert Trust Lifecycle Manager configuration with client authentication via client certificate.
 //
-// Required privileges: create:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Create DigiCert Settings.
+// Required privileges: digicert-settings:create. Legacy Jamf Pro privilege name(s): Create DigiCert Settings.
 func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, request *DigiCertSetting) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -27,7 +27,7 @@ func (c *Client) CreateDigicertTrustLifecycleManagerV1(ctx context.Context, requ
 
 // GetDigicertTrustLifecycleManagerV1 retrieve DigiCert Trust Lifecycle Manager configuration.
 //
-// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+// Required privileges: digicert-settings:read. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
 //
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
@@ -43,7 +43,7 @@ func (c *Client) GetDigicertTrustLifecycleManagerV1(ctx context.Context, id stri
 
 // UpdateDigicertTrustLifecycleManagerV1 update DigiCert Trust Lifecycle Manager configuration.
 //
-// Required privileges: update:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Update DigiCert Settings.
+// Required privileges: digicert-settings:update. Legacy Jamf Pro privilege name(s): Update DigiCert Settings.
 //
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
@@ -58,7 +58,7 @@ func (c *Client) UpdateDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 
 // DeleteDigicertTrustLifecycleManagerV1 delete DigiCert Trust Lifecycle Manager configuration.
 //
-// Required privileges: delete:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Delete DigiCert Settings.
+// Required privileges: digicert-settings:delete. Legacy Jamf Pro privilege name(s): Delete DigiCert Settings.
 //
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
@@ -73,7 +73,7 @@ func (c *Client) DeleteDigicertTrustLifecycleManagerV1(ctx context.Context, id s
 
 // GetDigicertTrustLifecycleManagerConnectionStatusV1 get connection status of DigiCert Trust Lifecycle Manager for a given ID.
 //
-// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+// Required privileges: digicert-settings:read. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
 //
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager settings.
@@ -89,7 +89,7 @@ func (c *Client) GetDigicertTrustLifecycleManagerConnectionStatusV1(ctx context.
 
 // GetDigicertTrustLifecycleManagerDependenciesV1 retrieve list of DigiCert Trust Lifecycle Manager Settings dependencies.
 //
-// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+// Required privileges: digicert-settings:read. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
 //
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager configuration.
@@ -105,7 +105,7 @@ func (c *Client) GetDigicertTrustLifecycleManagerDependenciesV1(ctx context.Cont
 
 // CheckDigicertTrustLifecycleManagerPrivilegesV1 check DigiCert account permissions for certificate deployment.
 //
-// Required privileges: read:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
+// Required privileges: digicert-settings:read. Legacy Jamf Pro privilege name(s): Read DigiCert Settings.
 //
 // Parameters:
 //   - id: ID of the DigiCert Trust Lifecycle Manager settings.
@@ -120,8 +120,9 @@ func (c *Client) CheckDigicertTrustLifecycleManagerPrivilegesV1(ctx context.Cont
 
 // ValidateDigicertClientCertificateV1 validate DigiCert Trust Lifecycle Manager client certificate.
 //
-// Required privileges: create:pro:digicert-settings, update:pro:digicert-settings. Legacy Jamf Pro privilege name(s): Create DigiCert Settings, Update DigiCert Settings.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: digicert-settings:create, digicert-settings:update. Legacy Jamf Pro privilege name(s): Create DigiCert Settings, Update DigiCert Settings.
+// All of them are required, not alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 func (c *Client) ValidateDigicertClientCertificateV1(ctx context.Context, request *Certificate) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/pki/digicert/trust-lifecycle-manager/validate-client-certificate"

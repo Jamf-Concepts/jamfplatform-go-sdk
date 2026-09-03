@@ -13,7 +13,7 @@ import (
 
 func TestGetJamfProServerURLV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-pro-server-url", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-pro-server-url", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetJamfProServerURLV1(t *testing.T) {
 
 func TestGetJamfProServerURLV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-pro-server-url", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-pro-server-url", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetJamfProServerURLV1_NotFound(t *testing.T) {
 
 func TestUpdateJamfProServerURLV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-pro-server-url", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-pro-server-url", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -55,6 +55,46 @@ func TestUpdateJamfProServerURLV1(t *testing.T) {
 	})
 
 	result, err := c.UpdateJamfProServerURLV1(context.Background(), &JamfProServerURL{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListJamfProServerURLHistoryV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v1/jamf-pro-server-url/history", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListJamfProServerURLHistoryV1(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
+func TestCreateJamfProServerURLHistoryNoteV1(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v1/jamf-pro-server-url/history", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+
+	result, err := c.CreateJamfProServerURLHistoryNoteV1(context.Background(), &ObjectHistoryNote{})
 	if err != nil {
 		t.Fatal(err)
 	}

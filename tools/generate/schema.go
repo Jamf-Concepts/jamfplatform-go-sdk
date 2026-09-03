@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"log"
 	"maps"
+	"math"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -150,6 +152,81 @@ func applySchemaAdditions(doc *openapi3.T, additions map[string]map[string]strin
 				propSchema.AdditionalProperties = openapi3.AdditionalProperties{}
 			}
 			schema.Properties[propName] = &openapi3.SchemaRef{Value: propSchema}
+		}
+	}
+}
+
+// applyEnumAdditions appends values to a named component schema's enum list.
+// For a value the server produces or accepts that the spec does not declare —
+// see SpecDef.EnumAdditions for why an omission here is a correctness bug and
+// not a documentation one.
+//
+// Panics when the value is already declared, which is how the entry expires:
+// upstream publishing the value must delete the config entry rather than
+// silently duplicate it, because a duplicated enum member emits two Go
+// constants with the same value and the second shadows nothing — it just
+// compiles, so nothing would ever notice. Panics too when the schema is
+// missing or declares no enum at all, since either means the entry no longer
+// names what it was written against.
+//
+// Runs with the other schema patches, so the value reaches the published spec
+// under api/ as well as the generated Go.
+func applyEnumAdditions(doc *openapi3.T, additions map[string][]string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil || len(additions) == 0 {
+		return
+	}
+	for _, schemaName := range sortedMapKeys(additions) {
+		values := additions[schemaName]
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			panic(fmt.Sprintf("enumAdditions[%q]: no such component schema — delete or retarget the entry", schemaName))
+		}
+		schema := ref.Value
+		if len(schema.Enum) == 0 {
+			panic(fmt.Sprintf("enumAdditions[%q]: schema declares no enum to add to — delete or retarget the entry", schemaName))
+		}
+		declared := make(map[string]bool, len(schema.Enum))
+		for _, e := range schema.Enum {
+			declared[fmt.Sprint(e)] = true
+		}
+		for _, v := range values {
+			if declared[v] {
+				panic(fmt.Sprintf("enumAdditions[%q]: the spec now declares %q — delete it from the entry so the upstream declaration is the only source", schemaName, v))
+			}
+			schema.Enum = append(schema.Enum, v)
+			declared[v] = true
+		}
+	}
+}
+
+// assertSchemaPatchTargetsAbsent enforces SchemaPatchesRequireAbsent: every
+// listed "<SchemaName>.<dotted.path>" must NOT already resolve in the spec.
+// Panics when one does, because that means upstream has started declaring a
+// property we were substituting for and the config entry now shadows the real
+// declaration.
+//
+// Runs before applySchemaPatches, so the check sees the spec as published
+// rather than the patched result. A missing schema is not an error here — the
+// patch itself is a no-op in that case, and applySchemaPatches skips it too.
+func assertSchemaPatchTargetsAbsent(doc *openapi3.T, paths []string) {
+	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
+		return
+	}
+	for _, full := range paths {
+		schemaName, path, found := strings.Cut(full, ".")
+		if !found || schemaName == "" || path == "" {
+			panic(fmt.Sprintf("schemaPatchesRequireAbsent[%q]: want \"<SchemaName>.<dotted.path>\"", full))
+		}
+		ref, ok := doc.Components.Schemas[schemaName]
+		if !ok || ref == nil || ref.Value == nil {
+			continue
+		}
+		parent, leaf, ok := walkPropertyPath(ref.Value, path)
+		if !ok || parent == nil {
+			continue
+		}
+		if _, exists := parent.Properties[leaf]; exists {
+			panic(fmt.Sprintf("schemaPatchesRequireAbsent[%q]: the spec now declares this property — delete the schemaPatches entry (and its schemaPatchesRequireAbsent line, and any schemaCreations it depended on) so the upstream declaration is used instead", full))
 		}
 	}
 }
@@ -753,7 +830,7 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 			}
 			return false
 		}
-		inlineObject := hasObjShape(v)
+		inlineObject := hasObjShape(v) || isRefUnion(v)
 		inlineArrayOfObject := v.Type.Is("array") && v.Items != nil && v.Items.Ref == "" &&
 			hasObjShape(v.Items.Value)
 		if !inlineObject && !inlineArrayOfObject {
@@ -940,7 +1017,7 @@ func newSchemaWalker(doc *openapi3.T, onRef func(name string) bool) func(ref *op
 
 // collectRefs walks the remaining spec paths and collects all referenced schema names,
 // following nested $refs transitively. Used for pruning published specs.
-func collectRefs(doc *openapi3.T, used map[string]bool) {
+func collectRefs(doc *openapi3.T, used map[string]bool, allowed map[string]bool) {
 	walk := newSchemaWalker(doc, func(name string) bool {
 		if used[name] {
 			return false
@@ -962,6 +1039,15 @@ func collectRefs(doc *openapi3.T, used map[string]bool) {
 		for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
 			op := item.GetOperation(method)
 			if op == nil {
+				continue
+			}
+			// An OAS3 doc is loaded whole — loadSpec's allowlist only prunes
+			// Swagger 2.0 paths — so a withdrawn operation still sits in
+			// doc.Paths and its $refs would otherwise keep its schemas
+			// reachable. Skipping them here is what lets
+			// pruneUnreferencedSchemas drop a schema the whitelist no longer
+			// reaches.
+			if allowed != nil && !allowed[normalizeOpKey(method+" "+path)] {
 				continue
 			}
 			for _, p := range op.Parameters {
@@ -1073,6 +1159,67 @@ func collectReferencedSchemas(doc *openapi3.T, spec SpecDef) map[string]*schemaU
 				}
 			}
 		}
+		// Named string-enum schemas reached only through a parameter. These are
+		// registered so they are emitted as a Go type with constants, which is
+		// what lets a caller pass pro.ComputerSectionV4General instead of the
+		// bare literal "GENERAL". Before this, an enum schema reachable *only*
+		// from a parameter was never emitted and the values survived solely as
+		// an inline `Allowed values:` list in the method godoc — readable, but
+		// not referenceable, so every call site hard-coded strings.
+		//
+		// Deliberately NOT a full parameter walk. Descending into parameter
+		// schemas the way the request/response walkers do would register
+		// arbitrary object schemas that nothing currently emits, changing the
+		// type set across every spec. This registers a name only when it
+		// resolves to a component that is itself a string enum, so the blast
+		// radius is exactly the enum types and nothing else. Today that is 5
+		// schemas, all in pro: ComputerSection, ComputerSectionV2/V3/V4 and
+		// MobileDeviceSection.
+		//
+		// Both shapes the specs use are handled: a parameter whose schema is a
+		// direct $ref, and the far more common `type: array` whose items are a
+		// $ref (the repeatable `section` query param).
+		registerParamEnum := func(ref *openapi3.SchemaRef) {
+			if ref == nil || doc.Components == nil || doc.Components.Schemas == nil {
+				return
+			}
+			candidates := []string{}
+			if ref.Ref != "" {
+				candidates = append(candidates, ref.Ref)
+			}
+			if ref.Value != nil && ref.Value.Items != nil && ref.Value.Items.Ref != "" {
+				candidates = append(candidates, ref.Value.Items.Ref)
+			}
+			for _, refStr := range candidates {
+				name := refStr[strings.LastIndex(refStr, "/")+1:]
+				target, ok := doc.Components.Schemas[name]
+				if !ok || target.Value == nil {
+					continue
+				}
+				if !target.Value.Type.Is("string") || len(target.Value.Enum) == 0 {
+					continue
+				}
+				if used[name] == nil {
+					used[name] = &schemaUsage{}
+				}
+				// Read-side: a bare `= string` alias carries no fields, so the
+				// request/response distinction drives nothing here. isResponse
+				// is the conservative choice — it keeps the request-type
+				// pointer heuristics in schemaToGoType out of play entirely.
+				used[name].isResponse = true
+			}
+		}
+		for _, paramRef := range op.Parameters {
+			if paramRef != nil && paramRef.Value != nil {
+				registerParamEnum(paramRef.Value.Schema)
+			}
+		}
+		for _, paramRef := range pathItem.Parameters {
+			if paramRef != nil && paramRef.Value != nil {
+				registerParamEnum(paramRef.Value.Schema)
+			}
+		}
+
 		// Config-level type overrides: when the spec is untyped (e.g. Classic)
 		// the curator names request/response schemas explicitly. Record those
 		// as referenced and descend into their properties.
@@ -1188,9 +1335,10 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		}
 		if schema.Type == nil {
 			// oneOf + discriminator with no explicit type field (some specs
-			// omit "type: object" on union roots, e.g. BookmarkItem).
-			if schema.Discriminator != nil && len(schema.OneOf) > 0 && !hasContentAddressedDiscriminator(schema) {
-				types = append(types, schemaToDiscriminatorType(name, schema))
+			// omit "type: object" on union roots, e.g. BookmarkItem), the
+			// discriminator being inferred when the spec declares none.
+			if u := unionSchema(name, schema); u != nil {
+				types = append(types, schemaToDiscriminatorType(name, u))
 				continue
 			}
 			// Swagger 2.0 often omits type: object on definitions that are
@@ -1200,7 +1348,35 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 				t := schemaToGoType(name, schema, usage.isRequest, format)
 				t.XMLName = xmlName
 				types = append(types, t)
-			} else if len(schema.AllOf) == 0 && len(schema.OneOf) == 0 && len(schema.AnyOf) == 0 {
+			} else if isRefUnion(schema) && usage.isRequest && !usage.isResponse {
+				// A request-only union of named payloads. Merging would make
+				// every variant-specific field optional and let a caller
+				// populate two variants at once; a pointer per variant keeps
+				// the choice visible to the compiler and makes marshaling two
+				// an error. See GoUnion.
+				types = append(types, schemaToUnionType(name, schema))
+				continue
+			} else if len(schema.OneOf) > 0 {
+				// oneOf with no discriminator and no properties of its own:
+				// a *structurally* discriminated union, where the variant is
+				// identified by which optional fields are present rather than
+				// by a tag value. Merge the variants into one struct.
+				//
+				// Emitting nothing was the previous behaviour and it failed
+				// closed only by luck: a union used as a *named* response type
+				// aborts generation with "Go type not emitted", but one
+				// reached solely through a property would have silently become
+				// `any`. audit's AuditEnvelope is the first case — a gateway
+				// event carries actor+requestContext, a service event carries
+				// data, and the two never mix.
+				//
+				// A discriminator cannot be synthesised here: the nearest
+				// candidate field (auditSource) is an open string, so a
+				// mapping would rot the moment a new source appears.
+				t := schemaToGoType(name, mergeOneOfVariants(schema), usage.isRequest, format)
+				t.XMLName = xmlName
+				types = append(types, t)
+			} else if len(schema.AllOf) == 0 && len(schema.AnyOf) == 0 {
 				// Completely empty schema (e.g. JsonNode: {}) — no type, no
 				// properties, no composition. Treat as freeform → json.RawMessage.
 				comment := name + " represents a freeform JSON value."
@@ -1273,8 +1449,12 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		// identifiers (contain dots, e.g. "com.jamf.ddm.*"). Those are value
 		// discriminants for routing/documentation, not Go-safe type tags. The
 		// schema falls through to normal struct generation instead.
-		if schema.Discriminator != nil && len(schema.OneOf) > 0 && !hasContentAddressedDiscriminator(schema) {
-			types = append(types, schemaToDiscriminatorType(name, schema))
+		//
+		// A oneOf whose discriminator the spec forgot is inferred from the
+		// variants' own single-value enums, which is what stops the union being
+		// dropped whole — see inferDiscriminator.
+		if u := unionSchema(name, schema); u != nil {
+			types = append(types, schemaToDiscriminatorType(name, u))
 			continue
 		}
 
@@ -1308,6 +1488,51 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 		addTopLevelIDsForClassic(types)
 	}
 	return append(types, drainPropertyEnums()...)
+}
+
+// typeDocWidth is the wrap width for type-level documentation. Matches
+// fieldDocWidth; the rendered prefix here is "// " with no leading tab, so the
+// two land within a couple of columns of each other.
+const typeDocWidth = 100
+
+// applyDocNotes appends each configured note to the godoc of the type it names.
+// Returns an error naming every key that matched nothing, so a note that has
+// drifted off its type fails the build instead of vanishing — the wrong doc it
+// was written to correct would otherwise stay in place unremarked.
+//
+// The note is wrapped and joined the way struct field docs are, which renders
+// through the template's single "// {{ .Comment }}" line as one comment block
+// per type. No IR or template change is needed for that.
+func applyDocNotes(types []GoType, notes map[string]string) error {
+	if len(notes) == 0 {
+		return nil
+	}
+	applied := make(map[string]bool, len(notes))
+	for i := range types {
+		note, ok := notes[types[i].Name]
+		if !ok {
+			continue
+		}
+		applied[types[i].Name] = true
+		lines := docParagraphs(note, typeDocWidth)
+		if len(lines) == 0 {
+			continue
+		}
+		if types[i].Comment != "" {
+			types[i].Comment += "\n// "
+		}
+		types[i].Comment += strings.Join(lines, "\n// ")
+	}
+	var missing []string
+	for _, name := range sortedKeys(notes) {
+		if !applied[name] {
+			missing = append(missing, name)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("docNotes names no emitted type: %s", strings.Join(missing, ", "))
+	}
+	return nil
 }
 
 // drainPropertyEnums returns the collected inline-property enum types, name
@@ -1554,14 +1779,30 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 		PropertyName: schema.Discriminator.PropertyName,
 		GoFieldName:  exportedGoName(schema.Discriminator.PropertyName),
 	}
-	seen := make(map[string]bool)
+	// Group by Go type rather than dropping repeats: several discriminator
+	// values may legitimately share one variant schema, and each still needs
+	// its own case in the generated switches. Deduping the *field* is right —
+	// nine identical pointers would be nonsense — but deduping the *value*
+	// silently strips the cases, and a caller setting one of the dropped
+	// discriminators marshals to a lone discriminator with every other field
+	// gone. Variant order follows first appearance, so it stays deterministic.
+	byType := make(map[string]int)
 	addVariant := func(value, typeName string) {
-		if value == "" || typeName == "" || seen[typeName] {
+		if value == "" || typeName == "" {
 			return
 		}
-		seen[typeName] = true
+		if i, ok := byType[typeName]; ok {
+			v := &gt.Discriminator.Variants[i]
+			v.Values = append(v.Values, value)
+			// The field can no longer be named after a single value without
+			// implying this variant is only reachable through it. Name it
+			// after the schema instead, which covers every value equally.
+			v.FieldName = typeName
+			return
+		}
+		byType[typeName] = len(gt.Discriminator.Variants)
 		gt.Discriminator.Variants = append(gt.Discriminator.Variants, GoDiscriminatorVariant{
-			Value:     value,
+			Values:    []string{value},
 			TypeName:  typeName,
 			FieldName: exportedGoName(value),
 		})
@@ -1581,7 +1822,207 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 			addVariant(tn, exportedGoName(tn))
 		}
 	}
+	gt.Discriminator.EnumTypeName = registerDiscriminatorEnum(name, gt.Discriminator)
 	return gt
+}
+
+// unionSchema reports the schema to build a discriminated union from, or nil
+// when this schema is not one. The declared discriminator wins; a missing one is
+// inferred. Content-addressed mappings ("com.jamf.ddm.*") are refused either
+// way — those keys are routing identifiers, not Go-safe type tags — and fall
+// through to normal struct generation.
+func unionSchema(name string, schema *openapi3.Schema) *openapi3.Schema {
+	if schema == nil || len(schema.OneOf) == 0 {
+		return nil
+	}
+	if schema.Discriminator != nil {
+		if hasContentAddressedDiscriminator(schema) {
+			return nil
+		}
+		return schema
+	}
+	d := inferDiscriminator(name, schema)
+	if d == nil {
+		return nil
+	}
+	candidate := withDiscriminator(schema, d)
+	if hasContentAddressedDiscriminator(candidate) {
+		return nil
+	}
+	return candidate
+}
+
+// inferDiscriminator derives the discriminator a spec forgot to declare, for a
+// `oneOf` whose parent already carries the tag property and whose every variant
+// pins that property to a single enum value.
+//
+// blueprints' SwUpdateConfiguration is the case. It declares
+// `type: object`, a `oneOf` over SwUpdateManualConfiguration and
+// SwUpdateAutomaticConfiguration, and one property of its own —
+// `enforcementType` — but no `discriminator` object. So it fell through to plain
+// struct generation and emitted **that one field**, dropping the union whole: a
+// caller could read or write the enforcement type and nothing else, which is why
+// terraform-provider-jamfplatform builds this component as a `map[string]any`
+// and never names the type. Its sibling SwUpdateAutomaticConfiguration declares
+// the identical shape *with* a discriminator and generates correctly, so the
+// omission is an authoring slip rather than a different model.
+//
+// Nothing is guessed. Every variant constrains `enforcementType` to exactly one
+// value — MANUAL on the manual variant, AUTOMATIC on both of the automatic one's
+// own variants — so the mapping is read off the spec, and the discriminator ends
+// up *inside* each variant where the wire already carries it. That is what
+// separates this from account-sso's ConnectionRequest.connection, whose tag lives
+// on the parent request and cannot be reached from the nested type: there,
+// synthesising a discriminator would have emitted the tag twice and marshalled
+// an empty one. See GoUnion.
+//
+// Deliberately strict, because a wrong tag is worse than no tag — it silently
+// routes a payload to the wrong variant:
+//
+//   - The candidate must be declared on the parent. That is the "author wrote
+//     the tag but forgot the discriminator object" shape, and it is what keeps
+//     audit's AuditEnvelope out: it has no properties of its own, so nothing is
+//     eligible and the structural merge still applies.
+//   - Every variant must resolve the property to exactly one string value, and
+//     the values must be pairwise distinct. A variant that leaves it open, or
+//     two variants claiming the same value, means the property does not identify
+//     anything.
+//   - Resolution follows a variant's own `oneOf` and requires its members to
+//     agree, which is what lets the AUTOMATIC branch resolve through
+//     SwUpdateLatestConfiguration and SwUpdateSemanticConfiguration.
+//   - Two candidates that both discriminate is refused rather than resolved by
+//     picking the first: either would work on the wire, but they produce
+//     different Go field names and a different emitted enum, so the choice is
+//     visible and belongs to a human.
+func inferDiscriminator(name string, schema *openapi3.Schema) *openapi3.Discriminator {
+	if schema == nil || schema.Discriminator != nil || len(schema.OneOf) < 2 || len(schema.Properties) == 0 {
+		return nil
+	}
+	for _, m := range schema.OneOf {
+		if m == nil || m.Ref == "" || m.Value == nil {
+			return nil
+		}
+	}
+
+	var found []*openapi3.Discriminator
+	for _, prop := range sortedKeys(schema.Properties) {
+		decl := schema.Properties[prop]
+		if decl == nil || decl.Value == nil || !decl.Value.Type.Is("string") {
+			continue
+		}
+		mapping := make(map[string]openapi3.MappingRef, len(schema.OneOf))
+		ok := true
+		for _, m := range schema.OneOf {
+			value, resolved := singleEnumValue(m.Value, prop, map[*openapi3.Schema]bool{})
+			if !resolved || value == "" || mapping[value].Ref != "" {
+				ok = false
+				break
+			}
+			mapping[value] = openapi3.MappingRef{Ref: m.Ref}
+		}
+		if ok {
+			found = append(found, &openapi3.Discriminator{PropertyName: prop, Mapping: mapping})
+		}
+	}
+	switch len(found) {
+	case 0:
+		return nil
+	case 1:
+		log.Printf("%s: oneOf declares no discriminator; inferred %q from the variants' single-value enums", name, found[0].PropertyName)
+		return found[0]
+	default:
+		names := make([]string, 0, len(found))
+		for _, d := range found {
+			names = append(names, d.PropertyName)
+		}
+		log.Printf("%s: oneOf declares no discriminator and %v all discriminate — refusing to choose; declare one upstream or pick it in config", name, names)
+		return nil
+	}
+}
+
+// singleEnumValue reports the one value a schema pins a property to, following
+// the schema's own `oneOf` and requiring its members to agree. Returns false
+// when the property is absent, is not a single-valued string enum, or when a
+// nested union's members disagree.
+func singleEnumValue(schema *openapi3.Schema, prop string, seen map[*openapi3.Schema]bool) (string, bool) {
+	if schema == nil || seen[schema] {
+		return "", false
+	}
+	seen[schema] = true
+	props, _ := flattenAllOf(schema)
+	if p, ok := props[prop]; ok && p != nil && p.Value != nil &&
+		p.Value.Type.Is("string") && len(p.Value.Enum) == 1 {
+		if v, ok := p.Value.Enum[0].(string); ok && v != "" {
+			return v, true
+		}
+		return "", false
+	}
+	if len(schema.OneOf) == 0 {
+		return "", false
+	}
+	agreed := ""
+	for _, m := range schema.OneOf {
+		if m == nil || m.Value == nil {
+			return "", false
+		}
+		v, ok := singleEnumValue(m.Value, prop, seen)
+		if !ok || (agreed != "" && v != agreed) {
+			return "", false
+		}
+		agreed = v
+	}
+	return agreed, agreed != ""
+}
+
+// withDiscriminator returns a shallow copy of the schema carrying the given
+// discriminator. A copy rather than a mutation: the document is reloaded for
+// the publish pass, but an inferred discriminator is this generator's reading of
+// the spec and must not reach api/*.json as though upstream had declared it.
+func withDiscriminator(schema *openapi3.Schema, d *openapi3.Discriminator) *openapi3.Schema {
+	copied := *schema
+	copied.Discriminator = d
+	return &copied
+}
+
+// registerDiscriminatorEnum emits an enum type for the union's discriminator
+// values, so the accepted set is nameable rather than only readable off the
+// generated switch. The mapping is the authoritative list: a variant's own
+// `enum` covers just the values routing to that variant, and a spec that
+// splits one schema into several moves values out of those enums altogether.
+//
+// Registered through currentPropertyEnums so it lands in enums.go beside every
+// other property enum, and skipped — rather than shadowing — when a spec schema
+// already claims either spelling, matching propertyEnumTypeName's rule.
+func registerDiscriminatorEnum(unionName string, d *GoDiscriminator) string {
+	var values []any
+	for _, v := range d.Variants {
+		for _, dv := range v.Values {
+			values = append(values, dv)
+		}
+	}
+	if len(values) < 2 {
+		return ""
+	}
+	typeName := unionName + d.GoFieldName
+	if currentSpecTypeNames[typeName] || currentSpecTypeNames[typeName+"Values"] {
+		log.Printf("discriminator enum %s.%s: skipping — %s is already declared by a spec schema",
+			unionName, d.GoFieldName, typeName)
+		return ""
+	}
+	if _, exists := currentPropertyEnums[typeName]; exists {
+		return typeName
+	}
+	consts := enumConsts(typeName, values)
+	if len(consts) == 0 {
+		return ""
+	}
+	currentPropertyEnums[typeName] = GoType{
+		Name: typeName,
+		Comment: fmt.Sprintf("%s is the set of values accepted by %s.%s.",
+			typeName, unionName, d.GoFieldName),
+		EnumValues: consts,
+	}
+	return typeName
 }
 
 // sortedMapKeys returns deterministically-ordered keys for a string-keyed map.
@@ -1626,6 +2067,125 @@ func flattenAllOf(schema *openapi3.Schema) (map[string]*openapi3.SchemaRef, []st
 	return props, required
 }
 
+// isRefUnion reports whether an inline schema is nothing but a
+// discriminator-less `oneOf` over two or more `$ref`s — the shape a spec uses
+// for "one of these named payloads, and the tag naming which is somewhere
+// else".
+//
+// Hoisting it is what gives it a Go type at all. hasObjShape only recognises
+// properties, so a union reached through a property was never lifted, never
+// named, and resolved to a bare `any` in the containing struct. Every member
+// must be a `$ref` so the hoisted schema's variants are types the generator
+// already emits; a member declaring its own shape inline has nothing to point
+// at and falls through to the merge, as before.
+//
+// Two members are the minimum. A one-member `oneOf` is 3.0's way of attaching
+// siblings to a `$ref` and collapses elsewhere, and `oneOf: [{$ref}, {type:
+// null}]` is a nullable reference that normalizeNullableUnions has already
+// rewritten by the time hoisting runs.
+func isRefUnion(s *openapi3.Schema) bool {
+	if s == nil || len(s.OneOf) < 2 {
+		return false
+	}
+	if (s.Type != nil && len(*s.Type) > 0) || len(s.Properties) > 0 ||
+		len(s.AllOf) > 0 || len(s.AnyOf) > 0 || len(s.Enum) > 0 ||
+		s.Discriminator != nil || s.AdditionalProperties.Schema != nil {
+		return false
+	}
+	for _, m := range s.OneOf {
+		if m == nil || m.Ref == "" {
+			return false
+		}
+	}
+	return true
+}
+
+// schemaToUnionType builds the GoType for an isRefUnion schema: one pointer
+// field per variant, named after the variant's own type. See GoUnion for why
+// this shape rather than a merge, and why the field names stutter.
+func schemaToUnionType(name string, schema *openapi3.Schema) GoType {
+	gt := GoType{Name: name, Comment: name + " carries the payload for exactly one of the variants below."}
+	if schema.Description != "" {
+		gt.Comment = name + " " + cleanComment(schema.Description)
+	}
+	// The contract is appended rather than substituted: the property
+	// description says what the payload *is*, and this says how to supply it.
+	// A reader who only ever sees the spec's sentence has no way to know that
+	// setting two pointers is an error. Wrapped and joined the way applyDocNotes
+	// does it, so the template's single "// {{ .Comment }}" line renders a
+	// paragraph rather than one enormous line.
+	contract := "Set exactly one variant pointer. The spec declares no discriminator, so nothing " +
+		"here can check the choice against the sibling field that selects it; marshaling more " +
+		"than one is an error, and marshaling none emits null."
+	if lines := docParagraphs(contract, typeDocWidth); len(lines) > 0 {
+		gt.Comment += "\n// \n// " + strings.Join(lines, "\n// ")
+	}
+	gt.Union = &GoUnion{}
+	seen := map[string]bool{}
+	for _, m := range schema.OneOf {
+		tn := refName(m)
+		if tn == "" || seen[tn] {
+			continue
+		}
+		seen[tn] = true
+		gt.Union.Variants = append(gt.Union.Variants, GoUnionVariant{FieldName: tn, TypeName: tn})
+	}
+	return gt
+}
+
+// mergeOneOfVariants collapses a discriminator-less oneOf union into a single
+// schema carrying the union of every variant's properties. A property required
+// by *every* variant stays required; one required by only some becomes
+// optional, which is what makes the merged struct able to represent any variant
+// without lying about presence. Variant-specific fields therefore land as
+// pointers and nil is the caller's signal for "not this variant".
+//
+// The union root's own properties and required list are kept and take part in
+// the intersection, so a schema mixing `oneOf` with its own `properties`
+// behaves the same as one without.
+func mergeOneOfVariants(schema *openapi3.Schema) *openapi3.Schema {
+	merged := openapi3.NewObjectSchema()
+	merged.Description = schema.Description
+	merged.Properties = make(map[string]*openapi3.SchemaRef)
+
+	if rootProps, rootRequired := flattenAllOf(schema); len(rootProps) > 0 {
+		maps.Copy(merged.Properties, rootProps)
+		merged.Required = rootRequired
+	}
+
+	// Intersect required across variants: counted, then kept only where the
+	// count reaches the number of variants that actually resolved.
+	requiredCount := make(map[string]int)
+	resolved := 0
+	for _, variant := range schema.OneOf {
+		if variant == nil || variant.Value == nil {
+			continue
+		}
+		resolved++
+		props, required := flattenAllOf(variant.Value)
+		maps.Copy(merged.Properties, props)
+		for _, r := range required {
+			requiredCount[r]++
+		}
+	}
+
+	rootRequired := toSet(merged.Required)
+	required := make([]string, 0, len(requiredCount))
+	for name, n := range requiredCount {
+		if n == resolved || rootRequired[name] {
+			required = append(required, name)
+		}
+	}
+	for name := range rootRequired {
+		if requiredCount[name] == 0 {
+			required = append(required, name)
+		}
+	}
+	sort.Strings(required)
+	merged.Required = required
+	return merged
+}
+
 // fieldDocWidth is the wrap width for struct field documentation. Matches
 // parameterDocWidth; the rendered prefix is one tab plus "// ".
 const fieldDocWidth = 100
@@ -1657,9 +2217,15 @@ var currentSpecTypeNames map[string]bool
 // Skipped cases, each for a reason:
 //   - $ref'd properties. The field's own type already names the enum, so a
 //     "see the X constants" line would just repeat the signature.
-//   - Non-string enums. The constants are typed to a `= string` alias.
-//   - Single-value enums. A constant for a one-value set is noise; the
-//     description already says what the value is.
+//   - Names the spec already uses for a schema (see below).
+//
+// Non-string and single-value enums used to be skipped too. Both are now
+// emitted, because a consumer validating against the set has to get it from
+// somewhere and the alternative is retyping the literals: the Terraform
+// provider's enumguard exists precisely to forbid that, and it lost its
+// protection three times over (CreatePathV2.Scope's one-value [APP] set, and
+// uem-connect's two numeric interval enums). Numeric enums alias int or int64
+// rather than string so the constants stay assignable to the field.
 //   - Names the spec already uses for a schema. Redeclaring one would break
 //     the build, and referencing it from the field would point the reader at a
 //     type carrying no constants.
@@ -1681,7 +2247,8 @@ func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) 
 			enumSrc = prop.Items.Value
 		}
 	}
-	if len(enumSrc.Enum) < 2 || !enumSrc.Type.Is("string") {
+	base := propertyEnumBase(enumSrc)
+	if len(enumSrc.Enum) == 0 || base == "" {
 		return ""
 	}
 
@@ -1696,7 +2263,7 @@ func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) 
 	if _, exists := currentPropertyEnums[typeName]; exists {
 		return typeName
 	}
-	consts := enumConsts(typeName, enumSrc.Enum)
+	consts := enumConstsOfBase(typeName, enumSrc.Enum, base)
 	if len(consts) == 0 {
 		return ""
 	}
@@ -1704,7 +2271,8 @@ func registerPropertyEnum(ownerType, pname string, propRef *openapi3.SchemaRef) 
 		Name: typeName,
 		Comment: fmt.Sprintf("%s is the set of values accepted by %s.%s.",
 			typeName, ownerType, exportedGoName(pname)),
-		EnumValues: consts,
+		EnumValues:   consts,
+		EnumBaseType: base,
 	}
 	return typeName
 }
@@ -1751,14 +2319,45 @@ func namedEnumTypes(doc *openapi3.T, refs map[string]*schemaUsage) map[string]bo
 // collide on one, are skipped with a log line. Silently dropping one would
 // read as "the server does not accept this".
 func enumConsts(typeName string, enum []any) []GoEnumConst {
+	return enumConstsOfBase(typeName, enum, "string")
+}
+
+// enumConstsOfBase renders one constant per enum value against the given Go
+// base type. Values that do not match the base are skipped rather than
+// coerced: a spec mixing types in one enum is a spec bug, and silently
+// stringifying a number would emit a constant the field cannot accept.
+//
+// Numeric identifiers are the decimal digits, with a Neg prefix for negatives
+// (Go identifiers cannot carry a minus sign, and -1 is a real Jamf sentinel).
+// A fractional value yields no identifier and is skipped with a log line —
+// none exists today and inventing a spelling for one would be guesswork.
+func enumConstsOfBase(typeName string, enum []any, base string) []GoEnumConst {
 	out := make([]GoEnumConst, 0, len(enum))
 	seen := make(map[string]string, len(enum)) // const name → first wire value
 	for _, raw := range enum {
-		value, ok := raw.(string)
-		if !ok || value == "" {
-			continue
+		var value, ident, literal string
+		switch base {
+		case "int", "int64":
+			n, ok := enumNumericValue(raw)
+			if !ok {
+				log.Printf("enum %s: skipping value %v — not an integer, and the alias is %s", typeName, raw, base)
+				continue
+			}
+			value = strconv.FormatInt(n, 10)
+			literal = value
+			ident = value
+			if n < 0 {
+				ident = "Neg" + strconv.FormatInt(-n, 10)
+			}
+		default:
+			v, ok := raw.(string)
+			if !ok || v == "" {
+				continue
+			}
+			value = v
+			literal = strconv.Quote(v)
+			ident = enumConstIdent(v)
 		}
-		ident := enumConstIdent(value)
 		if ident == "" {
 			log.Printf("enum %s: skipping value %q — yields no Go identifier", typeName, value)
 			continue
@@ -1769,9 +2368,47 @@ func enumConsts(typeName string, enum []any) []GoEnumConst {
 			continue
 		}
 		seen[constName] = value
-		out = append(out, GoEnumConst{Name: constName, Value: value})
+		out = append(out, GoEnumConst{Name: constName, Value: value, Literal: literal})
 	}
 	return out
+}
+
+// enumNumericValue accepts the shapes a JSON or YAML decoder produces for an
+// integer literal. kin-openapi hands back float64 for JSON numbers, so a
+// whole-valued float is legitimate; a fractional one is not an integer enum.
+func enumNumericValue(raw any) (int64, bool) {
+	switch v := raw.(type) {
+	case int:
+		return int64(v), true
+	case int64:
+		return v, true
+	case float64:
+		if v != math.Trunc(v) {
+			return 0, false
+		}
+		return int64(v), true
+	case json.Number:
+		n, err := v.Int64()
+		return n, err == nil
+	}
+	return 0, false
+}
+
+// propertyEnumBase reports the Go base type for an enum declared on a
+// property, or "" when the property's type carries no enum the SDK emits
+// constants for. int64 tracks the field's own Go type so the constants stay
+// assignable: format int64 generates an int64 field, everything else int.
+func propertyEnumBase(s *openapi3.Schema) string {
+	switch {
+	case s.Type.Is("string"):
+		return "string"
+	case s.Type.Is("integer"):
+		if s.Format == "int64" {
+			return "int64"
+		}
+		return "int"
+	}
+	return ""
 }
 
 func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format string) GoType {
@@ -1873,6 +2510,14 @@ func schemaToGoType(name string, schema *openapi3.Schema, isRequest bool, format
 		if enumType := registerPropertyEnum(gt.Name, pname, propRef); enumType != "" {
 			fieldDoc = append(fieldDoc, wrapCommentText(
 				"Allowed values: see the "+enumType+" constants.", fieldDocWidth)...)
+		} else if vals := inlineFieldEnumValues(propRef); len(vals) > 0 {
+			// The enum exists but no Go type carries it: non-string values,
+			// a single-value set, or a name collision. Without this the
+			// field's only record of the constraint is the spec's own prose,
+			// which routinely says "must be one of the listed durations"
+			// and leaves the list to the schema — unreadable from Go.
+			fieldDoc = append(fieldDoc, wrapCommentText(
+				"Allowed values: "+strings.Join(vals, ", ")+".", fieldDocWidth)...)
 		}
 		if !suppressWriteOnly && prop != nil && (prop.WriteOnly || prop.Format == "password") {
 			fieldDoc = append(fieldDoc, wrapCommentText(
@@ -1913,6 +2558,36 @@ func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 	schema := ref.Value
 	if schema == nil {
 		return "any"
+	}
+	// OpenAPI 3.0's `$ref`-with-siblings idiom. A property needing its own
+	// description, `nullable` or `example` alongside a reference has to wrap
+	// the reference in a single-member `allOf`, because 3.0 ignores every
+	// sibling of a bare `$ref`. The wrapper declares no type and no properties
+	// of its own, so without this it falls through to the default branch and
+	// becomes `any` — silently, since the transport sets no
+	// DisallowUnknownFields and an `any` field decodes anything. The
+	// referenced struct's fields are then unreachable without a map
+	// type-assert.
+	//
+	// aigovernance's BlueprintDeployment.lastDeployment is the live case:
+	// `nullable: true` + `allOf: [{$ref: DeploymentRun}]`, which produced
+	// `LastDeployment any` and hid DeploymentRun's started/state entirely.
+	//
+	// Only an exactly-one-member wrapper collapses. A multi-member `allOf` is
+	// a real composition with no single Go type, and a schema carrying `allOf`
+	// *plus* properties of its own (PolicyDetail extending PolicySummary) is a
+	// named component that extractTypes flattens into its own struct — this
+	// branch is only ever reached by an inline schema, since a `$ref` returns
+	// above.
+	//
+	// Nullability is unaffected and deliberately so: the wrapper is inline, so
+	// the field emitter still reads `nullable` off the wrapper rather than off
+	// the shared component the reference points at. Collapsing by mutating the
+	// target's Nullable — the way collapseNullableOneOf does for its $ref
+	// branch — would mark that component nullable for every field in the spec
+	// that references it.
+	if isSingleRefAllOfWrapper(schema) {
+		return schemaRefToGoType(schema.AllOf[0])
 	}
 	switch {
 	case schema.Type.Is("string"):
@@ -1955,6 +2630,24 @@ func schemaRefToGoType(ref *openapi3.SchemaRef) string {
 	default:
 		return "any"
 	}
+}
+
+// isSingleRefAllOfWrapper reports whether a schema is nothing but a
+// single-member `allOf` — OpenAPI 3.0's only way to attach a description,
+// `nullable` or an `example` to a `$ref`. Every other member of the schema
+// must be empty: a type, properties, an enum, `additionalProperties` or a
+// second composition keyword all mean the schema says something of its own
+// that collapsing to the reference would discard.
+func isSingleRefAllOfWrapper(schema *openapi3.Schema) bool {
+	if schema == nil || len(schema.AllOf) != 1 || schema.AllOf[0] == nil {
+		return false
+	}
+	if schema.Type != nil && len(*schema.Type) > 0 {
+		return false
+	}
+	return len(schema.Properties) == 0 && len(schema.OneOf) == 0 &&
+		len(schema.AnyOf) == 0 && len(schema.Enum) == 0 &&
+		schema.AdditionalProperties.Schema == nil
 }
 
 // refName extracts the schema name from a $ref string, or falls back to
@@ -2011,4 +2704,22 @@ func xmlWireName(specName string, schema *openapi3.Schema) string {
 		return before
 	}
 	return specName
+}
+
+// inlineFieldEnumValues returns the formatted enum values of an inline
+// property schema, for the field-godoc fallback used when the enum has no
+// generated Go type to point at. A $ref'd property (or a $ref'd item schema)
+// returns nil: the field's own Go type already names the enum, so listing the
+// values again on every field that carries it is duplication that rots
+// independently. Values are formatted exactly as parameterEnumValues does, so
+// a field and a parameter constrained by the same enum read identically.
+func inlineFieldEnumValues(propRef *openapi3.SchemaRef) []string {
+	if propRef == nil || propRef.Ref != "" || propRef.Value == nil {
+		return nil
+	}
+	prop := propRef.Value
+	if len(prop.Enum) == 0 && prop.Items != nil && prop.Items.Ref != "" {
+		return nil
+	}
+	return parameterEnumValues(propRef)
 }

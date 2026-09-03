@@ -13,7 +13,7 @@ import (
 
 func TestGetPatchPolicyByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetPatchPolicyByID(t *testing.T) {
 
 func TestGetPatchPolicyByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetPatchPolicyByID_NotFound(t *testing.T) {
 
 func TestCreatePatchPolicyBySoftwareTitleConfigID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/softwaretitleconfig/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/patchpolicies/softwaretitleconfig/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreatePatchPolicyBySoftwareTitleConfigID(t *testing.T) {
 
 func TestUpdatePatchPolicyByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestUpdatePatchPolicyByID(t *testing.T) {
 
 func TestDeletePatchPolicyByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/patchpolicies/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -89,69 +89,9 @@ func TestDeletePatchPolicyByID(t *testing.T) {
 	}
 }
 
-func TestListPatchPoliciesBySoftwareTitleConfigID(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/softwaretitleconfig/id/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeXML(t, w, http.StatusOK, "<patch_policy></patch_policy>")
-	})
-
-	result, err := c.ListPatchPoliciesBySoftwareTitleConfigID(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestListPatchPoliciesBySoftwareTitleConfigID_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/softwaretitleconfig/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.ListPatchPoliciesBySoftwareTitleConfigID(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
-func TestListPatchPolicies(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeXML(t, w, http.StatusOK, "<patch_policies></patch_policies>")
-	})
-
-	result, err := c.ListPatchPolicies(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestListPatchPolicies_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies", func(w http.ResponseWriter, _ *http.Request) {
-		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
-	})
-
-	_, err := c.ListPatchPolicies(context.Background())
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestGetPatchPolicyByIDSubset(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/patchpolicies/id/test-id/subset/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -169,7 +109,7 @@ func TestGetPatchPolicyByIDSubset(t *testing.T) {
 
 func TestGetPatchPolicyByIDSubset_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/patchpolicies/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/patchpolicies/id/test-id/subset/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 

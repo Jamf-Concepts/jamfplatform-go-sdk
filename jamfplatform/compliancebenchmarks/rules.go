@@ -12,9 +12,9 @@ import (
 	"net/url"
 )
 
-// GetBaselineRules get list of rules for given baseline.
+// GetBaselineRules returns list of rules for specific baseline.
 //
-// Required privileges: read:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:read.
 //
 // Parameters:
 //   - baselineID: Given baseline ID.
@@ -23,9 +23,7 @@ func (c *Client) GetBaselineRules(ctx context.Context, baselineID string) (*Sour
 	var result SourcedRules
 	endpoint := prefix + "/rules"
 	params := url.Values{}
-	if baselineID != "" {
-		params.Set("baseline-id", baselineID)
-	}
+	params.Set("baseline-id", baselineID)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}

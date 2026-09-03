@@ -17,7 +17,7 @@ import (
 
 // GetNetworkSegmentByID finds network segments by ID.
 //
-// Required privileges: read:pro:network-segments.
+// Required privileges: network-segments:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetNetworkSegmentByID(ctx context.Context, id string) (*Network
 
 // CreateNetworkSegmentByID creates a new network segment by ID.
 //
-// Required privileges: create:pro:network-segments.
+// Required privileges: network-segments:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateNetworkSegmentByID(ctx context.Context, id string, reques
 
 // UpdateNetworkSegmentByID updates an existing network segment by ID.
 //
-// Required privileges: update:pro:network-segments.
+// Required privileges: network-segments:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateNetworkSegmentByID(ctx context.Context, id string, reques
 
 // DeleteNetworkSegmentByID deletes a network segment by ID.
 //
-// Required privileges: delete:pro:network-segments.
+// Required privileges: network-segments:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteNetworkSegmentByID(ctx context.Context, id string) error 
 
 // GetNetworkSegmentByName finds network segments by name.
 //
-// Required privileges: read:pro:network-segments.
+// Required privileges: network-segments:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetNetworkSegmentByName(ctx context.Context, name string) (*Net
 
 // UpdateNetworkSegmentByName updates an existing network segment by name.
 //
-// Required privileges: update:pro:network-segments.
+// Required privileges: network-segments:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateNetworkSegmentByName(ctx context.Context, name string, re
 
 // DeleteNetworkSegmentByName deletes a network segment by name.
 //
-// Required privileges: delete:pro:network-segments.
+// Required privileges: network-segments:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteNetworkSegmentByName(ctx context.Context, name string) er
 
 // ListNetworkSegments finds all network segments.
 //
-// Required privileges: read:pro:network-segments.
+// Required privileges: network-segments:read.
 func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result NetworkSegments
@@ -138,7 +138,7 @@ func (c *Client) ListNetworkSegments(ctx context.Context) (*NetworkSegments, err
 
 // CreateNetworkSegmentByName creates a new network segment by ID.
 //
-// Required privileges: create:pro:network-segments.
+// Required privileges: network-segments:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

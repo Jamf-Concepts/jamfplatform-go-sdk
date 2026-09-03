@@ -14,7 +14,7 @@ import (
 
 // GetInfrastructureManagerByID finds infrastructure manager by ID.
 //
-// Required privileges: read:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetInfrastructureManagerByID(ctx context.Context, id string) (*
 
 // UpdateInfrastructureManagerByID updates an existing infrastructure manager by ID.
 //
-// Required privileges: update:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -45,7 +45,7 @@ func (c *Client) UpdateInfrastructureManagerByID(ctx context.Context, id string,
 
 // ListInfrastructureManagers find all Infrastructure Managers.
 //
-// Required privileges: read:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:read.
 func (c *Client) ListInfrastructureManagers(ctx context.Context) (*InfrastructureManagers, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result InfrastructureManagers
@@ -58,7 +58,7 @@ func (c *Client) ListInfrastructureManagers(ctx context.Context) (*Infrastructur
 
 // DeleteInfrastructureManagerByID updates an existing infrastructure manager by ID.
 //
-// Required privileges: delete:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.

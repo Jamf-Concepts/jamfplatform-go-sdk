@@ -148,8 +148,8 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 				gr.IDNilCheck = strings.Join(checks, " || ")
 				gr.IDDeref = "*" + expr.String()
 				xmlBody := "42"
-				for i := len(parts) - 1; i >= 0; i-- {
-					tag := strings.ToLower(parts[i])
+				for _, part := range slices.Backward(parts) {
+					tag := strings.ToLower(part)
 					xmlBody = "<" + tag + ">" + xmlBody + "</" + tag + ">"
 				}
 				gr.IDTestInnerXML = xmlBody
@@ -240,7 +240,7 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				createReturnID = `fmt.Sprintf("%d", *resp.ID)`
 			} else {
 				switch createM.ResponseType {
-				case "HrefResponse", "AppInstallerDeploymentHrefResponse":
+				case "HrefResponse":
 					createReturnID = "resp.ID"
 				default:
 					// Non-HrefResponse: check if the response has a string or int ID.
@@ -382,19 +382,20 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				NameIsPointer:     nameIsPointer,
 				NameNested:        nameNested,
 				// Test generation paths.
-				ListNamespace: src.Namespace,
-				ListVersion:   src.Version,
-				ListPath:      src.ResourcePath,
-				ListNameField: r.NameField,
-				ListIDField:   r.IDField,
-				CreateNS:      createM.Namespace,
-				CreateVer:     createM.Version,
-				CreatePath:    createM.ResourcePath,
-				CreateStatus:  createM.ExpectedStatus,
-				UpdateNS:      updateM.Namespace,
-				UpdateVer:     updateM.Version,
-				UpdatePath:    updateM.ResourcePath,
-				UpdateStatus:  updateM.ExpectedStatus,
+				ListNamespace:    src.Namespace,
+				ListVersion:      src.Version,
+				ListPath:         src.ResourcePath,
+				ListNameField:    r.NameField,
+				ListIDField:      r.IDField,
+				ListResultsField: r.ResultsField,
+				CreateNS:         createM.Namespace,
+				CreateVer:        createM.Version,
+				CreatePath:       createM.ResourcePath,
+				CreateStatus:     createM.ExpectedStatus,
+				UpdateNS:         updateM.Namespace,
+				UpdateVer:        updateM.Version,
+				UpdatePath:       updateM.ResourcePath,
+				UpdateStatus:     updateM.ExpectedStatus,
 			}
 			// Check if list and create share the same URL (both path and
 			// namespace/version match). When true, the test template must
@@ -516,8 +517,8 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 				}
 				idParts := strings.Split(idPath, ".")
 				idXML := "42"
-				for i := len(idParts) - 1; i >= 0; i-- {
-					tag := strings.ToLower(idParts[i])
+				for _, idPart := range slices.Backward(idParts) {
+					tag := strings.ToLower(idPart)
 					idXML = "<" + tag + ">" + idXML + "</" + tag + ">"
 				}
 				ga.ClassicResolverIDInnerXML = idXML
@@ -692,14 +693,29 @@ func privilegeComment(m GoMethod) string {
 		return ""
 	}
 	if len(m.ScopedPrivileges) == 0 {
-		return "\n//\n// Required privileges: none (callable by any authenticated API client)."
+		return "\n//\n// Required privileges: the spec declares none."
+	}
+	if m.PrivilegeSource == privilegeSourceGatewayPolicy {
+		line := "\n//\n// Required privileges: " + strings.Join(m.ScopedPrivileges, ", ") + "."
+		if len(m.ScopedPrivileges) > 1 {
+			line += "\n// All of them are required, not alternatives."
+		}
+		return line + "\n// The published spec declares none for this operation; these are the" +
+			"\n// capabilities the gateway's own authorization policy enforces. See" +
+			"\n// Privileges in this package for the provenance."
 	}
 	line := "\n//\n// Required privileges: " + strings.Join(m.ScopedPrivileges, ", ") + "."
 	if len(m.LegacyPrivileges) > 0 {
 		line += " Legacy Jamf Pro privilege name(s): " + strings.Join(m.LegacyPrivileges, ", ") + "."
 	}
 	if len(m.ScopedPrivileges) > 1 {
-		line += "\n// The Jamf API spec does not encode whether these are required together or as alternatives."
+		line += "\n// All of them are required, not alternatives."
+	}
+	// Say so wherever a reader could mistake the two lists for parallel arrays.
+	// They are independent sets: the spec's own ordering differs between them
+	// and the lengths need not match. See privilegeSetsAreNotPairs.
+	if len(m.LegacyPrivileges) > 0 && (len(m.ScopedPrivileges) > 1 || len(m.LegacyPrivileges) > 1) {
+		line += "\n// The scoped and legacy lists are independent sets, not pairs: do not match them by position."
 	}
 	return line
 }
@@ -724,27 +740,12 @@ func defaultMethodComment(name string, spec SpecDef) string {
 	return name + " calls a Jamf Platform API endpoint."
 }
 
-// parameterComment renders a godoc block documenting the parameters a method
-// takes, sourced from the spec's parameter objects. Ordering follows the Go
-// signature — path params first, then the config-declared query params — so
-// the block reads against the call the consumer is writing. Without it the
-// only place a caller can learn which fields a `filter` or `sort` argument
-// accepts is the raw spec: those RSQL field lists live in the parameter
-// description and nowhere else in the SDK.
-//
-// Documentation only: parameter types stay exactly as config declares them.
-// That is what makes it safe to quote enum values verbatim — Jamf's Classic
-// path enums include values that are unusable as Go identifiers
-// ("Pending+Failed", "EnableRemoteDesktop (macOS 10.14.4 and later)") and one
-// outright typo ("Hardwre"), all of which are still what the server accepts.
-//
-// Params the spec doesn't describe are skipped. A config-declared query
-// param absent from the spec is an error unless marked ":undocumented" in
-// config.json (see parseParams) — that marker is reserved for a param
-// wire-verified to work despite the spec's silence; anything else absent is
-// almost always a typo or a spec rename the config wasn't updated for.
-// Returns "" when nothing is documentable.
-func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Operation, enumTypes map[string]bool) (string, error) {
+// collectSpecParams keys an operation's spec parameter objects by wire name.
+// It is the single point at which a config-declared param is matched to what
+// the spec says about it: both resolveQueryParams (behaviour) and
+// parameterComment (documentation) read the map this returns, so the two
+// cannot disagree about which spec parameter a config entry refers to.
+func collectSpecParams(pathItem *openapi3.PathItem, op *openapi3.Operation) map[string]*openapi3.Parameter {
 	specParams := make(map[string]*openapi3.Parameter)
 	collect := func(params openapi3.Parameters) {
 		for _, ref := range params {
@@ -773,23 +774,49 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 	if op != nil {
 		collect(op.Parameters)
 	}
+	return specParams
+}
 
-	// config.json's "params" entries hand-type the wire query-parameter name
-	// as a literal string with nothing else cross-checking it against the
-	// spec. If Jamf renames or drops the parameter, or the entry was simply
-	// mistyped, the generated method keeps compiling and keeps sending a
-	// query key the server silently ignores — the GetBaselineRules
-	// baselineId/baseline-id incident. Catch it at generate time instead,
-	// unless the entry opts out via ":undocumented" (a param that is
-	// wire-verified to work but that the spec doesn't declare at all).
+// resolveQueryParams cross-checks every config-declared query param against
+// the spec and records on the ExtraParam what the spec says about it. Two
+// things come out of this one resolution, and they are here together
+// deliberately — the first check shipped alone and the second was the gap it
+// left:
+//
+//   - The name-match check. config.json's "params" entries hand-type the wire
+//     query-parameter name as a literal string with nothing else
+//     cross-checking it against the spec. If Jamf renames or drops the
+//     parameter, or the entry was simply mistyped, the generated method keeps
+//     compiling and keeps sending a query key the server silently ignores —
+//     the GetBaselineRules baselineId/baseline-id incident. Caught at generate
+//     time, unless the entry opts out via ":undocumented" (a param that is
+//     wire-verified to work but that the spec doesn't declare at all).
+//
+//   - AlwaysSend. Every query param used to be emitted behind a zero-value
+//     guard, spec-required ones included, so a caller passing "" for a
+//     required param sent a request with it silently omitted and got back a
+//     400 whose wording reads like a server or auth fault rather than a
+//     caller error. Required params are emitted unguarded instead. Deriving
+//     the flag here rather than accepting a ":required" suffix in config.json
+//     is what keeps it correct across ingests: required-ness lives in the
+//     spec, so a second declaration of it would rot the first time a bundle
+//     flips a param from optional to required.
+//
+// An ":undocumented" param has no spec parameter to read, so it keeps its
+// guard — that is the only safe emission for something the spec is silent
+// about.
+func resolveQueryParams(m *GoMethod, specParams map[string]*openapi3.Parameter) error {
 	var unmatched []string
-	for _, q := range m.QueryParams {
-		if q.Undocumented {
+	for i := range m.QueryParams {
+		q := &m.QueryParams[i]
+		sp, ok := specParams[q.Spec]
+		if !ok {
+			if !q.Undocumented {
+				unmatched = append(unmatched, q.Spec)
+			}
 			continue
 		}
-		if _, ok := specParams[q.Spec]; !ok {
-			unmatched = append(unmatched, q.Spec)
-		}
+		q.AlwaysSend = sp.Required && !hasSpecDefault(sp.Schema)
 	}
 	if len(unmatched) > 0 {
 		known := make([]string, 0, len(specParams))
@@ -797,12 +824,72 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 			known = append(known, name)
 		}
 		sort.Strings(known)
-		return "", fmt.Errorf("%s %s: config declares query param(s) %v not found in spec (spec declares: %v) — the spec may have renamed or removed it, fix config.json; if this is a wire-verified param the spec genuinely omits, mark the entry \":undocumented\"",
+		return fmt.Errorf("%s %s: config declares query param(s) %v not found in spec (spec declares: %v) — the spec may have renamed or removed it, fix config.json; if this is a wire-verified param the spec genuinely omits, mark the entry \":undocumented\"",
 			m.HTTPMethod, m.SpecPath, unmatched, known)
 	}
+	return nil
+}
 
+// hasSpecDefault reports whether a parameter schema declares a default that
+// gives its own absence a defined meaning. Such a parameter keeps the
+// zero-value guard even when the spec marks it required, and the reasoning is
+// the mirror image of the guard's removal rather than an exception to it:
+// dropping a required param is wrong because the server can do nothing
+// sensible without it, but where the spec publishes a default the server can
+// and does — so sending an empty value replaces a documented default with
+// nothing, which is the same harm pointed the other way.
+//
+// OpenAPI forbids the combination ("default SHALL NOT be used with required"),
+// so any parameter reaching the true branch here is a malformed declaration
+// and the choice of which half to follow is evidence-led, not textual. Pro's
+// `columns-to-export` on GET /v3/patch-software-title-configurations/{id}/export-report
+// is the only live case — required: true with a nine-column default — and the
+// wire settles it. Probed 2026-09-01 against a config whose patch report has
+// zero rows, so the baseline answer is 400 either way: omitting the parameter
+// and passing a valid two-column list both return that same 400, while
+// `columns-to-export=` returns **500**. Sending the empty value is strictly
+// worse than omitting it, which is the opposite of every other required param
+// here. See WIRE-FACTS.md.
+//
+// If a bundle ever drops that default, this stops applying to the param and it
+// starts travelling unguarded on the next generate — the correct response to
+// the spec no longer defining its absence.
+//
+// An empty default (`""`, `[]`) states nothing and does not count.
+func hasSpecDefault(ref *openapi3.SchemaRef) bool {
+	if ref == nil || ref.Value == nil || ref.Value.Default == nil {
+		return false
+	}
+	switch d := ref.Value.Default.(type) {
+	case string:
+		return d != ""
+	case []any:
+		return len(d) > 0
+	case map[string]any:
+		return len(d) > 0
+	}
+	return true
+}
+
+// parameterComment renders a godoc block documenting the parameters a method
+// takes, sourced from the spec's parameter objects (see collectSpecParams).
+// Ordering follows the Go signature — path params first, then the
+// config-declared query params — so the block reads against the call the
+// consumer is writing. Without it the only place a caller can learn which
+// fields a `filter` or `sort` argument accepts is the raw spec: those RSQL
+// field lists live in the parameter description and nowhere else in the SDK.
+//
+// Documentation only: parameter types stay exactly as config declares them.
+// That is what makes it safe to quote enum values verbatim — Jamf's Classic
+// path enums include values that are unusable as Go identifiers
+// ("Pending+Failed", "EnableRemoteDesktop (macOS 10.14.4 and later)") and one
+// outright typo ("Hardwre"), all of which are still what the server accepts.
+//
+// Params the spec doesn't describe are skipped. Returns "" when nothing is
+// documentable.
+func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enumTypes map[string]bool) string {
 	if len(specParams) == 0 {
-		return "", nil
+		return ""
 	}
 
 	type docParam struct{ goName, specName string }
@@ -830,9 +917,9 @@ func parameterComment(m GoMethod, pathItem *openapi3.PathItem, op *openapi3.Oper
 		}
 	}
 	if len(lines) == 0 {
-		return "", nil
+		return ""
 	}
-	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n"), nil
+	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n")
 }
 
 // isPlaceholderParamDoc reports whether a parameter's description says nothing
@@ -934,8 +1021,8 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		return GoMethod{}, fmt.Errorf("%s not found", opDef.Op)
 	}
 
-	// Version: operation override > extract from path > "v1"
-	version := coalesce(opDef.Version, extractVersion(specPath))
+	// Version: operation override > extract from path > spec-level default
+	version := coalesce(opDef.Version, coalesce(extractVersion(specPath), spec.Version))
 
 	m := GoMethod{
 		Name:            opDef.Name,
@@ -949,7 +1036,9 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		PaginationStyle: opDef.Pagination,
 		PageSizeParam:   coalesce(opDef.PageSizeParam, "page-size"),
 		MaxPageSize:     coalesceInt(opDef.MaxPageSize, defaultMaxPageSize(spec.Package, opDef.Pagination)),
-		ResultsField:    "results",
+		ResultsField:    coalesce(opDef.ResultsField, "results"),
+		CursorField:     coalesce(opDef.CursorField, "nextCursor"),
+		CursorParam:     coalesce(opDef.CursorParam, "cursor"),
 		SpecPath:        specPath,
 		UnwrapResults:   opDef.UnwrapResults,
 		NoRetry:         opDef.NoRetry,
@@ -961,6 +1050,9 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	if len(op.Tags) > 0 {
 		m.Tag = op.Tags[0]
+		if renamed, ok := spec.TagRenames[m.Tag]; ok {
+			m.Tag = renamed
+		}
 	}
 
 	if isRateLimited(op) {
@@ -1003,8 +1095,31 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 	_, hasPrivExt := op.Extensions["x-required-privileges"]
 	if !spec.Undocumented || hasPrivExt {
 		m.PrivilegesKnown = true
+		// Both arrays are copied in spec order and NEITHER is sorted. That is
+		// deliberate for the legacy one, and the reasoning is not guessable —
+		// see privilegeSetsAreNotPairs and TestLegacyPrivilegesAreNotSorted.
+		// Sorting it would make an (incorrect) positional pairing come out
+		// right on 23 of the 24 equal-length multi-privilege pro operations
+		// instead of 16, hiding a consumer's bug almost everywhere rather than
+		// exposing it. Upstream already ships every scoped array alphabetical,
+		// so the visible disorder in the legacy array is the only signal a
+		// consumer gets that the two are not parallel.
 		m.ScopedPrivileges = stringSliceExtension(op, "x-required-privileges")
 		m.LegacyPrivileges = stringSliceExtension(op, "x-required-privileges-legacy")
+		if len(m.ScopedPrivileges) > 0 {
+			m.PrivilegeSource = privilegeSourceSpec
+		}
+		// config.requiredPrivileges supplies what the published spec omits.
+		// Only ever additive to an operation declaring none: if upstream has
+		// started declaring them, the config entry has expired and generation
+		// says so rather than choosing a winner.
+		if extra, ok := spec.RequiredPrivileges[normalizeOpKey(opDef.Op)]; ok {
+			if hasPrivExt {
+				return GoMethod{}, fmt.Errorf("requiredPrivileges[%q]: the spec now declares x-required-privileges — delete the config entry so the spec is the only source", opDef.Op)
+			}
+			m.ScopedPrivileges = append([]string(nil), extra...)
+			m.PrivilegeSource = privilegeSourceGatewayPolicy
+		}
 		if c := privilegeComment(m); c != "" {
 			if m.Comment == "" {
 				m.Comment = opDef.Name + " calls a Jamf Platform API endpoint."
@@ -1015,14 +1130,17 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	m.PathParams = extractPathParams(m.ResourcePath, opDef.PathNames)
 
+	// One resolution of the spec's parameter objects feeds both the
+	// required-ness the templates emit against and the godoc below.
+	specParams := collectSpecParams(pathItem, op)
+	if err := resolveQueryParams(&m, specParams); err != nil {
+		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
+	}
+
 	// Parameter docs come last so the block sits below the summary and the
 	// privilege/deprecation lines, matching how godoc reads: prose, then
 	// metadata, then the per-argument list.
-	pc, err := parameterComment(m, pathItem, op, enumTypes)
-	if err != nil {
-		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
-	}
-	if pc != "" {
+	if pc := parameterComment(m, specParams, enumTypes); pc != "" {
 		if m.Comment == "" {
 			m.Comment = defaultMethodComment(opDef.Name, spec)
 		}
@@ -1080,11 +1198,31 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		m.RequestType = goTypeName(opDef.RequestType)
 	}
 	if opDef.ResponseType != "" {
-		m.ResponseType = goTypeName(opDef.ResponseType)
+		// A "[]T" literal names a bare JSON array response whose element type
+		// is a component schema, for the case where the spec declares an
+		// envelope the server does not send. Passed through verbatim rather
+		// than run through goTypeName, which would mangle the brackets.
+		//
+		// This is deliberately an operation-level override and not a spec
+		// patch: the disagreement is about what the server does, so it is
+		// recorded where the wire evidence is cited (CLAUDE.md) and deleted in
+		// one line when the server or the spec changes. A patched schema would
+		// instead shadow the corrected declaration silently.
+		if elem, isSlice := strings.CutPrefix(opDef.ResponseType, "[]"); isSlice {
+			// ReturnsSlice / ResponseIsJSONArray / Category are all derived
+			// from ResponseType further down, so setting it here is enough —
+			// no need to short-circuit the rest of the build.
+			m.ResponseType = "[]" + goTypeName(elem)
+			m.ResponseWireName = elem
+		} else {
+			m.ResponseType = goTypeName(opDef.ResponseType)
+		}
 		// XML wire name is the raw spec name unless the schema overrides
 		// via xml.name — test stubs emit <wireName> bodies so the generated
 		// type's XMLName check passes.
-		m.ResponseWireName = opDef.ResponseType
+		if m.ResponseWireName == "" {
+			m.ResponseWireName = opDef.ResponseType
+		}
 		if doc.Components != nil && doc.Components.Schemas != nil {
 			if ref, ok := doc.Components.Schemas[opDef.ResponseType]; ok && ref.Value != nil && ref.Value.XML != nil && ref.Value.XML.Name != "" {
 				m.ResponseWireName = ref.Value.XML.Name
@@ -1097,11 +1235,12 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	// Paginated item type
 	if m.PaginationStyle != "" {
-		m.ItemType = detectPaginatedItemType(op)
+		m.ItemType = detectPaginatedItemType(op, m.ResultsField)
 		m.ResponseType = ""
 	}
 
 	m.ReturnsSlice = strings.HasPrefix(m.ResponseType, "[]")
+	m.ResponseIsJSONArray = m.ReturnsSlice || namedResponseIsArray(doc, m.ResponseType)
 
 	// Determine category
 	m.Category = categorize(m)
@@ -1115,6 +1254,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		m.UnwrapResults = ""
 		m.ItemType = ""
 		m.ReturnsSlice = false
+		m.ResponseIsJSONArray = false
 		if httpMethod == http.MethodGet || httpMethod == http.MethodDelete {
 			m.RequestType = ""
 		} else {
@@ -1136,6 +1276,9 @@ func categorize(m GoMethod) string {
 	}
 	if m.UnwrapResults != "" {
 		return "unwrap"
+	}
+	if m.PaginationStyle == "cursor" {
+		return "paginatedCursor"
 	}
 	if m.PaginationStyle != "" {
 		return "paginated"
@@ -1212,6 +1355,22 @@ func extractVersion(path string) string {
 	return match[1:] // strip leading "/"
 }
 
+// namedResponseIsArray reports whether goType names a component schema whose
+// own type is `array` — a Go type alias for a slice, so the wire body is a
+// JSON array even though the method signature shows a single named type.
+func namedResponseIsArray(doc *openapi3.T, goType string) bool {
+	if goType == "" || doc.Components == nil || doc.Components.Schemas == nil {
+		return false
+	}
+	for specName, ref := range doc.Components.Schemas {
+		if goTypeName(specName) != goType || ref.Value == nil {
+			continue
+		}
+		return ref.Value.Type.Is("array")
+	}
+	return false
+}
+
 func detectResponse(op *openapi3.Operation) (int, string) {
 	for _, code := range []int{200, 201, 202, 204} {
 		resp := op.Responses.Status(code)
@@ -1271,35 +1430,64 @@ func isJSONContentType(ct string) bool {
 	return base == "" || base == "application/json" || strings.HasSuffix(base, "+json")
 }
 
-func detectPaginatedItemType(op *openapi3.Operation) string {
+// detectPaginatedItemType finds the Go element type of a paginated response's
+// element array. resultsField names the envelope key holding it, because the
+// key is not always "results" — cursor-paginated endpoints in particular name it
+// for the resource (audit uses "items" and "transactions"). Defaulting to
+// "results" when the caller passes an empty string keeps every existing
+// operation on the old behaviour.
+//
+// Falling back to "any" on a miss is deliberate but easy to misread: it is not a
+// harmless default, it silently widens the method's element type, which is what
+// a wrong resultsField looks like from the outside.
+func detectPaginatedItemType(op *openapi3.Operation, resultsField string) string {
+	if resultsField == "" {
+		resultsField = "results"
+	}
 	resp := op.Responses.Status(200)
 	if resp == nil || resp.Value == nil {
 		return "any"
 	}
-	for _, content := range resp.Value.Content {
-		if content.Schema == nil {
+	// Two passes over deterministically ordered content types, because an
+	// operation can declare several and they need not agree. Iterating the
+	// Content map directly made the item type depend on Go's randomised map
+	// order: pro's GET /inventory-preload declares the envelope under
+	// text/csv but an *array of* that envelope under application/json (a spec
+	// bug — the wire sends the bare envelope, confirmed 2026-08-31), so the
+	// same config generated either InventoryPreloadRecord or
+	// InventoryPreloadRecordSearchResults from run to run.
+	//
+	// The envelope form wins over the raw-array form for the same reason: a
+	// resultsField match is positive evidence of the pagination wrapper this
+	// function exists to see through, whereas the array branch is a fallback
+	// for the "rawArray" style that cannot tell a genuine top-level array
+	// from a mis-declared wrapper.
+	for _, content := range sortedContentEntries(resp.Value.Content) {
+		if content.Schema == nil || content.Schema.Value == nil {
 			continue
 		}
 		schema := content.Schema.Value
-		if schema == nil {
-			continue
-		}
 		// allOf composition (pagination wrapper)
 		for _, part := range schema.AllOf {
 			if part.Value == nil {
 				continue
 			}
-			if r := part.Value.Properties["results"]; r != nil && r.Value != nil && r.Value.Items != nil {
+			if r := part.Value.Properties[resultsField]; r != nil && r.Value != nil && r.Value.Items != nil {
 				return refName(r.Value.Items)
 			}
 		}
 		// Direct results field
-		if r := schema.Properties["results"]; r != nil && r.Value != nil && r.Value.Items != nil {
+		if r := schema.Properties[resultsField]; r != nil && r.Value != nil && r.Value.Items != nil {
 			return refName(r.Value.Items)
 		}
-		// Raw array response — no wrapper, items live at the top level.
-		// Paired with pagination style "rawArray" in config.
-		if schema.Type.Is("array") && schema.Items != nil {
+	}
+	// Raw array response — no wrapper, items live at the top level.
+	// Paired with pagination style "rawArray" in config.
+	for _, content := range sortedContentEntries(resp.Value.Content) {
+		if content.Schema == nil || content.Schema.Value == nil {
+			continue
+		}
+		if schema := content.Schema.Value; schema.Type.Is("array") && schema.Items != nil {
 			return refName(schema.Items)
 		}
 	}

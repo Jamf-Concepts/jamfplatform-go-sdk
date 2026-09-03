@@ -14,7 +14,7 @@ import (
 
 // GetMobileDeviceByID finds mobile devices by ID.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetMobileDeviceByID(ctx context.Context, id string) (*MobileDev
 
 // GetMobileDeviceByName finds mobile devices by name.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -46,7 +46,7 @@ func (c *Client) GetMobileDeviceByName(ctx context.Context, name string) (*Mobil
 
 // GetMobileDeviceBySerialNumber finds mobile devices by serial number.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - serialNumber: Serial number to filter by.
@@ -62,7 +62,7 @@ func (c *Client) GetMobileDeviceBySerialNumber(ctx context.Context, serialNumber
 
 // GetMobileDeviceByUDID finds mobile devices by UDID.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - udid: UDID to filter by.
@@ -78,7 +78,7 @@ func (c *Client) GetMobileDeviceByUDID(ctx context.Context, udid string) (*Mobil
 
 // GetMobileDeviceByMacAddress finds mobile devices by Mac address.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - macAddress: Mac address to filter by.
@@ -94,8 +94,8 @@ func (c *Client) GetMobileDeviceByMacAddress(ctx context.Context, macAddress str
 
 // CreateMobileDeviceByID creates a new mobile device by ID.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:create, users:create.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -111,8 +111,8 @@ func (c *Client) CreateMobileDeviceByID(ctx context.Context, id string, request 
 
 // UpdateMobileDeviceByID updates an existing mobile device by ID.
 //
-// Required privileges: update:pro:mobile-devices, update:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:update, users:update.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -127,8 +127,8 @@ func (c *Client) UpdateMobileDeviceByID(ctx context.Context, id string, request 
 
 // UpdateMobileDeviceByName updates an existing mobile device by name.
 //
-// Required privileges: update:pro:mobile-devices, update:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:update, users:update.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -143,8 +143,8 @@ func (c *Client) UpdateMobileDeviceByName(ctx context.Context, name string, requ
 
 // UpdateMobileDeviceBySerialNumber updates an existing mobile device by serial number.
 //
-// Required privileges: update:pro:mobile-devices, update:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:update, users:update.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
@@ -159,8 +159,8 @@ func (c *Client) UpdateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 
 // UpdateMobileDeviceByUDID updates an existing mobile device by UDID.
 //
-// Required privileges: update:pro:mobile-devices, update:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:update, users:update.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - udid: UDID value to filter by.
@@ -175,8 +175,8 @@ func (c *Client) UpdateMobileDeviceByUDID(ctx context.Context, udid string, requ
 
 // UpdateMobileDeviceByMacAddress updates an existing mobile device by Mac address.
 //
-// Required privileges: update:pro:mobile-devices, update:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:update, users:update.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - macAddress: Mac address value to filter by.
@@ -191,7 +191,7 @@ func (c *Client) UpdateMobileDeviceByMacAddress(ctx context.Context, macAddress 
 
 // DeleteMobileDeviceByID deletes a mobile device by ID.
 //
-// Required privileges: delete:pro:mobile-devices.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -206,7 +206,7 @@ func (c *Client) DeleteMobileDeviceByID(ctx context.Context, id string) error {
 
 // DeleteMobileDeviceByName deletes a mobile device by name.
 //
-// Required privileges: delete:pro:mobile-devices.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -221,7 +221,7 @@ func (c *Client) DeleteMobileDeviceByName(ctx context.Context, name string) erro
 
 // DeleteMobileDeviceBySerialNumber deletes a mobile device by serial number.
 //
-// Required privileges: delete:pro:mobile-devices.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - serialNumber: Serial number value to filter by.
@@ -236,7 +236,7 @@ func (c *Client) DeleteMobileDeviceBySerialNumber(ctx context.Context, serialNum
 
 // DeleteMobileDeviceByUDID deletes a mobile device by UDID.
 //
-// Required privileges: delete:pro:mobile-devices.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - udid: UDID value to filter by.
@@ -251,7 +251,7 @@ func (c *Client) DeleteMobileDeviceByUDID(ctx context.Context, udid string) erro
 
 // DeleteMobileDeviceByMacAddress deletes a mobile device by Mac address.
 //
-// Required privileges: delete:pro:mobile-devices.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - macAddress: Mac address value to filter by.
@@ -266,7 +266,7 @@ func (c *Client) DeleteMobileDeviceByMacAddress(ctx context.Context, macAddress 
 
 // ListMobileDevices finds all mobile devices.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDevices
@@ -279,7 +279,7 @@ func (c *Client) ListMobileDevices(ctx context.Context) (*MobileDevices, error) 
 
 // GetMobileDeviceByIDSubset finds a subset of data for a mobile device.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - id: ID to filter by.
@@ -299,7 +299,7 @@ func (c *Client) GetMobileDeviceByIDSubset(ctx context.Context, id string, subse
 
 // GetMobileDeviceByMatch searches for mobile devices that match the provided parameter.
 //
-// Required privileges: read:pro:mobile-devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - match: Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.
@@ -315,8 +315,8 @@ func (c *Client) GetMobileDeviceByMatch(ctx context.Context, match string) (*Mob
 
 // CreateMobileDeviceByName creates a new mobile device by ID.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:create, users:create.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - name: ID value to filter by.
@@ -331,8 +331,8 @@ func (c *Client) CreateMobileDeviceByName(ctx context.Context, name string, requ
 
 // CreateMobileDeviceBySerialNumber creates a new mobile device by ID.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:create, users:create.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - serialNumber: ID value to filter by.
@@ -347,8 +347,8 @@ func (c *Client) CreateMobileDeviceBySerialNumber(ctx context.Context, serialNum
 
 // CreateMobileDeviceByMacAddress creates a new mobile device by ID.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:create, users:create.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - macaddress: ID value to filter by.
@@ -363,8 +363,8 @@ func (c *Client) CreateMobileDeviceByMacAddress(ctx context.Context, macaddress 
 
 // CreateMobileDeviceByUDID creates a new mobile device by ID.
 //
-// Required privileges: create:pro:mobile-devices, create:pro:users.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: devices:create, users:create.
+// All of them are required, not alternatives.
 //
 // Parameters:
 //   - udid: ID value to filter by.

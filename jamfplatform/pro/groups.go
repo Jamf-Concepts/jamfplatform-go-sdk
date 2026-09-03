@@ -19,8 +19,7 @@ import (
 
 // ListGroupsV2 returns group information for all Mobile Device and Computer groups.
 //
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupName:asc. Multiple sort
@@ -63,60 +62,9 @@ func (c *Client) ListGroupsV2(ctx context.Context, sort []string, filter string)
 	})
 }
 
-// ListGroupsV1 returns group information for all Mobile Device and Computer groups.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - sort: Sorting criteria in the format: property:asc/desc. Default sort is groupName:asc. Multiple sort
-//     criteria are supported and must be separated with a comma. Fields allowed in sorting: groupName,
-//     groupDescription, groupType, isSmart. Example: sort=groupName:asc,groupType:desc.
-//   - filter: Query in the RSQL format, allowing to filter group collection. Default filter is empty query -
-//     returning all results for the requested page. Fields allowed in the query: groupPlatformId,
-//     groupName, groupDescription, groupType, isSmart. This param can be combined with paging and sorting.
-//     When using groupPlatformId in the filter, the supported operators are: =in= (match any in list),
-//     =out= (exclude all in list). When using groupType in the filter, the value must be either "MOBILE"
-//     or "COMPUTER" but not both. When using groupType in the filter, the value is case sensitive. When
-//     using groupType in the filter, it will exclude groups of the other type regardless of or/and
-//     conditionals. Example: filter=groupPlatformId=in=('uuid1','uuid2','uuid3') Example:
-//     filter=groupName=="*Managed*" and isSmart=="true" Example: filter=groupType=="COMPUTER" and
-//     groupDescription=="*Admin*".
-func (c *Client) ListGroupsV1(ctx context.Context, sort []string, filter string) ([]GroupDtoV1, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]GroupDtoV1, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/groups"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int          `json:"totalCount"`
-			Results    []GroupDtoV1 `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // GetGroupV2 returns group information for the given platform UUID.
 //
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:read.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -130,29 +78,9 @@ func (c *Client) GetGroupV2(ctx context.Context, id string) (*GroupWithCriteriaD
 	return &result, nil
 }
 
-// GetGroupV1 returns group information for the given platform UUID.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: read:pro:computer-groups, read:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - id: The platform UUID of a group.
-func (c *Client) GetGroupV1(ctx context.Context, id string) (*GroupWithCriteriaDtoV1, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result GroupWithCriteriaDtoV1
-	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetGroupV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // DeleteGroupV2 delete a group by platform UUID.
 //
-// Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:delete.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -165,28 +93,9 @@ func (c *Client) DeleteGroupV2(ctx context.Context, id string) error {
 	return nil
 }
 
-// DeleteGroupV1 delete a group by platform UUID.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: delete:pro:computer-groups, delete:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - id: The platform UUID of a group.
-func (c *Client) DeleteGroupV1(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteGroupV1(%s): %w", id, err)
-	}
-	return nil
-}
-
 // PatchGroupV2 update a group by platform UUID.
 //
-// Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: device-groups:update.
 //
 // Parameters:
 //   - id: The platform UUID of a group.
@@ -195,24 +104,6 @@ func (c *Client) PatchGroupV2(ctx context.Context, id string, request *GroupUpda
 	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
 	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
 		return fmt.Errorf("PatchGroupV2(%s): %w", id, err)
-	}
-	return nil
-}
-
-// PatchGroupV1 update a group by platform UUID.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-28) and may be removed in a future release.
-//
-// Required privileges: update:pro:computer-groups, update:pro:mobile-device-groups.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - id: The platform UUID of a group.
-func (c *Client) PatchGroupV1(ctx context.Context, id string, request *GroupUpdateDtoV1) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("PatchGroupV1(%s): %w", id, err)
 	}
 	return nil
 }
@@ -239,32 +130,6 @@ func (c *Client) ResolveGroupV2ByName(ctx context.Context, name string) (*GroupD
 	var out GroupDtoV1
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveGroupV2ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveGroupV1IDByName looks up a GroupV1 by its groupName field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/groups"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveGroupV1IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveGroupV1ByName looks up a GroupV1 by its groupName field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveGroupV1ByName(ctx context.Context, name string) (*GroupDtoV1, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/groups"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "groupName", "groupName", "groupPlatformId", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveGroupV1ByName(%s): %w", name, err)
-	}
-	var out GroupDtoV1
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveGroupV1ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
 }

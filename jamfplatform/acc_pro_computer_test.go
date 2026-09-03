@@ -30,13 +30,13 @@ func TestAcceptance_Pro_Computer_ListComputerGroupsV1(t *testing.T) {
 
 // --- smart computer groups v2 ------------------------------------------
 
-func TestAcceptance_Pro_Computer_ListSmartComputerGroupsV2(t *testing.T) {
+func TestAcceptance_Pro_Computer_ListSmartComputerGroupsV3(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := pro.New(c).ListSmartComputerGroupsV2(context.Background(), nil, "")
+	groups, err := pro.New(c).ListSmartComputerGroupsV3(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListSmartComputerGroupsV2: %v", err)
+		t.Fatalf("ListSmartComputerGroupsV3: %v", err)
 	}
 	t.Logf("Found %d smart computer groups", len(groups))
 }
@@ -49,24 +49,24 @@ func TestAcceptance_Pro_Computer_SmartGroupCRUD(t *testing.T) {
 	name := "sdk-acc-smart-cg-" + runSuffix()
 	desc := "SDK acceptance test fixture"
 
-	created, err := p.CreateSmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{
+	created, err := p.CreateSmartComputerGroupV3(ctx, &pro.SmartComputerGroupV3{
 		Name:        name,
 		Description: &desc,
 	}, false)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("CreateSmartComputerGroupV2: %v", err)
+		t.Fatalf("CreateSmartComputerGroupV3: %v", err)
 	}
 	if created.ID == "" {
-		t.Fatalf("CreateSmartComputerGroupV2 returned no ID (href=%q)", created.Href)
+		t.Fatalf("CreateSmartComputerGroupV3 returned no ID (href=%q)", created.Href)
 	}
-	cleanupDelete(t, "DeleteSmartComputerGroupV2", func() error { return p.DeleteSmartComputerGroupV2(ctx, created.ID) })
+	cleanupDelete(t, "DeleteSmartComputerGroupV3", func() error { return p.DeleteSmartComputerGroupV3(ctx, created.ID) })
 	t.Logf("Created smart group %s", created.ID)
 
-	got, err := p.GetSmartComputerGroupV2(ctx, created.ID)
+	got, err := p.GetSmartComputerGroupV3(ctx, created.ID)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetSmartComputerGroupV2(%s): %v", created.ID, err)
+		t.Fatalf("GetSmartComputerGroupV3(%s): %v", created.ID, err)
 	}
 	if got.Name != name {
 		t.Errorf("Name = %q, want %q", got.Name, name)
@@ -74,46 +74,42 @@ func TestAcceptance_Pro_Computer_SmartGroupCRUD(t *testing.T) {
 
 	newDesc := desc + " (updated)"
 	got.Description = &newDesc
-	updated, err := p.UpdateSmartComputerGroupV2(ctx, created.ID, got)
+	updated, err := p.UpdateSmartComputerGroupV3(ctx, created.ID, got)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("UpdateSmartComputerGroupV2(%s): %v", created.ID, err)
+		t.Fatalf("UpdateSmartComputerGroupV3(%s): %v", created.ID, err)
 	}
 	if updated.Description == nil || *updated.Description != newDesc {
 		t.Errorf("Description = %v, want %q", updated.Description, newDesc)
 	}
 
-	mem, err := p.GetSmartComputerGroupMembershipV2(ctx, created.ID)
+	mem, err := p.GetSmartComputerGroupMembershipV3(ctx, created.ID)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetSmartComputerGroupMembershipV2(%s): %v", created.ID, err)
+		t.Fatalf("GetSmartComputerGroupMembershipV3(%s): %v", created.ID, err)
 	}
 	t.Logf("Smart group %s membership: %d members", created.ID, len(mem.Members))
 
-	if err := p.DeleteSmartComputerGroupV2(ctx, created.ID); err != nil {
+	if err := p.DeleteSmartComputerGroupV3(ctx, created.ID); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("DeleteSmartComputerGroupV2(%s): %v", created.ID, err)
+		t.Fatalf("DeleteSmartComputerGroupV3(%s): %v", created.ID, err)
 	}
 
-	_, err = p.GetSmartComputerGroupV2(ctx, created.ID)
-	if err == nil {
-		t.Fatalf("GetSmartComputerGroupV2(%s) after delete should 404", created.ID)
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("GetSmartComputerGroupV2(%s) after delete: want 404, got %v", created.ID, err)
-	}
+	settleUntilGone(t, "GetSmartComputerGroupV3("+created.ID+") after delete", func() error {
+		_, err := p.GetSmartComputerGroupV3(ctx, created.ID)
+		return err
+	})
 }
 
 // --- static computer groups v2 -----------------------------------------
 
-func TestAcceptance_Pro_Computer_ListStaticComputerGroupsV2(t *testing.T) {
+func TestAcceptance_Pro_Computer_ListStaticComputerGroupsV3(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := pro.New(c).ListStaticComputerGroupsV2(context.Background(), nil, "")
+	groups, err := pro.New(c).ListStaticComputerGroupsV3(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListStaticComputerGroupsV2: %v", err)
+		t.Fatalf("ListStaticComputerGroupsV3: %v", err)
 	}
 	t.Logf("Found %d static computer groups", len(groups))
 }
@@ -130,25 +126,25 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 	// pattern as popupMenuChoices on CEA create). Sending [] instead of
 	// omitting lets the server iterate safely.
 	assignments := []string{}
-	created, err := p.CreateStaticComputerGroupV2(ctx, &pro.StaticComputerGroupAssignment{
+	created, err := p.CreateStaticComputerGroupV3(ctx, &pro.StaticComputerGroupAssignment{
 		Name:        name,
 		Description: &desc,
 		Assignments: &assignments,
 	}, false)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("CreateStaticComputerGroupV2: %v", err)
+		t.Fatalf("CreateStaticComputerGroupV3: %v", err)
 	}
 	if created.ID == "" {
-		t.Fatalf("CreateStaticComputerGroupV2 returned no ID")
+		t.Fatalf("CreateStaticComputerGroupV3 returned no ID")
 	}
-	cleanupDelete(t, "DeleteStaticComputerGroupV2", func() error { return p.DeleteStaticComputerGroupV2(ctx, created.ID) })
+	cleanupDelete(t, "DeleteStaticComputerGroupV3", func() error { return p.DeleteStaticComputerGroupV3(ctx, created.ID) })
 	t.Logf("Created static group %s", created.ID)
 
-	got, err := p.GetStaticComputerGroupV2(ctx, created.ID)
+	got, err := p.GetStaticComputerGroupV3(ctx, created.ID)
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("GetStaticComputerGroupV2(%s): %v", created.ID, err)
+		t.Fatalf("GetStaticComputerGroupV3(%s): %v", created.ID, err)
 	}
 	if got.Name != name {
 		t.Errorf("Name = %q, want %q", got.Name, name)
@@ -162,24 +158,20 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 		Description: &newDesc,
 		Assignments: &assignments,
 	}
-	if _, err := p.UpdateStaticComputerGroupV2(ctx, created.ID, update); err != nil {
+	if _, err := p.UpdateStaticComputerGroupV3(ctx, created.ID, update); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("UpdateStaticComputerGroupV2(%s): %v", created.ID, err)
+		t.Fatalf("UpdateStaticComputerGroupV3(%s): %v", created.ID, err)
 	}
 
-	if err := p.DeleteStaticComputerGroupV2(ctx, created.ID); err != nil {
+	if err := p.DeleteStaticComputerGroupV3(ctx, created.ID); err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("DeleteStaticComputerGroupV2(%s): %v", created.ID, err)
+		t.Fatalf("DeleteStaticComputerGroupV3(%s): %v", created.ID, err)
 	}
 
-	_, err = p.GetStaticComputerGroupV2(ctx, created.ID)
-	if err == nil {
-		t.Fatalf("GetStaticComputerGroupV2(%s) after delete should 404", created.ID)
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("GetStaticComputerGroupV2(%s) after delete: want 404, got %v", created.ID, err)
-	}
+	settleUntilGone(t, "GetStaticComputerGroupV3("+created.ID+") after delete", func() error {
+		_, err := p.GetStaticComputerGroupV3(ctx, created.ID)
+		return err
+	})
 }
 
 // --- computer extension attributes -------------------------------------
@@ -226,12 +218,12 @@ func TestAcceptance_Pro_Computer_CEACRUD(t *testing.T) {
 
 	created, err := p.CreateComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                 name,
-		Description:          ptr("SDK acceptance test fixture"),
-		Enabled:              ptr(true),
+		Description:          new("SDK acceptance test fixture"),
+		Enabled:              new(true),
 		InputType:            pro.ComputerExtensionAttributesInputTypeScript,
 		InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 		DataType:             pro.ComputerExtensionAttributesDataTypeString,
-		ScriptContents:       ptr(script),
+		ScriptContents:       new(script),
 		PopupMenuChoices:     &[]string{},
 	})
 	if err != nil {
@@ -253,7 +245,7 @@ func TestAcceptance_Pro_Computer_CEACRUD(t *testing.T) {
 		t.Errorf("Name = %q, want %q", got.Name, name)
 	}
 
-	got.Description = ptr("updated")
+	got.Description = new("updated")
 	if _, err := p.UpdateComputerExtensionAttributeV1(ctx, created.ID, got); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateComputerExtensionAttributeV1(%s): %v", created.ID, err)
@@ -325,12 +317,12 @@ func TestAcceptance_Pro_Computer_DeleteMultipleCEAV1(t *testing.T) {
 	for _, tag := range []string{"a", "b"} {
 		resp, err := p.CreateComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 			Name:                 "sdk-acc-cea-bulk-" + suffix + "-" + tag,
-			Description:          ptr("SDK acceptance bulk-delete fixture"),
-			Enabled:              ptr(true),
+			Description:          new("SDK acceptance bulk-delete fixture"),
+			Enabled:              new(true),
 			InputType:            pro.ComputerExtensionAttributesInputTypeScript,
 			InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 			DataType:             pro.ComputerExtensionAttributesDataTypeString,
-			ScriptContents:       ptr("#!/bin/sh\necho bulk\n"),
+			ScriptContents:       new("#!/bin/sh\necho bulk\n"),
 			PopupMenuChoices:     &[]string{},
 		})
 		if err != nil {

@@ -13,7 +13,7 @@ import (
 
 func TestListReturnToServiceConfigurationsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListReturnToServiceConfigurationsV1(t *testing.T) {
 
 func TestListReturnToServiceConfigurationsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListReturnToServiceConfigurationsV1_NotFound(t *testing.T) {
 
 func TestCreateReturnToServiceConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestCreateReturnToServiceConfigurationV1(t *testing.T) {
 
 func TestGetReturnToServiceConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestGetReturnToServiceConfigurationV1(t *testing.T) {
 
 func TestGetReturnToServiceConfigurationV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -99,7 +99,7 @@ func TestGetReturnToServiceConfigurationV1_NotFound(t *testing.T) {
 
 func TestUpdateReturnToServiceConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestUpdateReturnToServiceConfigurationV1(t *testing.T) {
 
 func TestDeleteReturnToServiceConfigurationV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -132,7 +132,7 @@ func TestDeleteReturnToServiceConfigurationV1(t *testing.T) {
 
 func TestResolveReturnToServiceConfigurationV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -155,7 +155,7 @@ func TestResolveReturnToServiceConfigurationV1IDByName(t *testing.T) {
 
 func TestResolveReturnToServiceConfigurationV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -179,7 +179,7 @@ func TestResolveReturnToServiceConfigurationV1ByName(t *testing.T) {
 func TestApplyReturnToServiceConfigurationV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -211,7 +211,7 @@ func TestApplyReturnToServiceConfigurationV1_Create(t *testing.T) {
 func TestApplyReturnToServiceConfigurationV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -222,7 +222,7 @@ func TestApplyReturnToServiceConfigurationV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/return-to-service/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/return-to-service/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

@@ -17,7 +17,7 @@ import (
 
 // GetDistributionPointByID finds distribution points by ID.
 //
-// Required privileges: read:pro:distribution-points.
+// Required privileges: distribution-points:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetDistributionPointByID(ctx context.Context, id string) (*Dist
 
 // CreateDistributionPointByID creates a new distribution point by ID.
 //
-// Required privileges: create:pro:distribution-points.
+// Required privileges: distribution-points:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateDistributionPointByID(ctx context.Context, id string, req
 
 // UpdateDistributionPointByID updates an existing distribution point by ID.
 //
-// Required privileges: update:pro:distribution-points.
+// Required privileges: distribution-points:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateDistributionPointByID(ctx context.Context, id string, req
 
 // DeleteDistributionPointByID deletes a distribution point by ID.
 //
-// Required privileges: delete:pro:distribution-points.
+// Required privileges: distribution-points:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteDistributionPointByID(ctx context.Context, id string) err
 
 // GetDistributionPointByName finds distribution points by name.
 //
-// Required privileges: read:pro:distribution-points.
+// Required privileges: distribution-points:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetDistributionPointByName(ctx context.Context, name string) (*
 
 // UpdateDistributionPointByName updates an existing distribution point by name.
 //
-// Required privileges: update:pro:distribution-points.
+// Required privileges: distribution-points:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateDistributionPointByName(ctx context.Context, name string,
 
 // DeleteDistributionPointByName deletes a distribution point by name.
 //
-// Required privileges: delete:pro:distribution-points.
+// Required privileges: distribution-points:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteDistributionPointByName(ctx context.Context, name string)
 
 // ListDistributionPoints finds all distribution points.
 //
-// Required privileges: read:pro:distribution-points.
+// Required privileges: distribution-points:read.
 func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoints, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result DistributionPoints
@@ -138,7 +138,7 @@ func (c *Client) ListDistributionPoints(ctx context.Context) (*DistributionPoint
 
 // CreateDistributionPointByName creates a new distribution point by ID.
 //
-// Required privileges: create:pro:distribution-points.
+// Required privileges: distribution-points:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

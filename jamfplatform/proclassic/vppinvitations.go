@@ -14,7 +14,7 @@ import (
 
 // GetVPPInvitationByID finds a VPP Invitation by ID.
 //
-// Required privileges: read:pro:vpp-invitations.
+// Required privileges: volume-purchasing-locations:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetVPPInvitationByID(ctx context.Context, id string) (*VppInvit
 
 // CreateVPPInvitationByID creates a new VPP invitation by ID.
 //
-// Required privileges: create:pro:vpp-invitations.
+// Required privileges: volume-purchasing-locations:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -46,7 +46,7 @@ func (c *Client) CreateVPPInvitationByID(ctx context.Context, id string, request
 
 // UpdateVPPInvitationByID updates a VPP invitation by ID.
 //
-// Required privileges: update:pro:vpp-invitations.
+// Required privileges: volume-purchasing-locations:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -61,7 +61,7 @@ func (c *Client) UpdateVPPInvitationByID(ctx context.Context, id string, request
 
 // DeleteVPPInvitationByID deletes a VPP invitation by ID.
 //
-// Required privileges: delete:pro:vpp-invitations.
+// Required privileges: volume-purchasing-locations:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -76,7 +76,7 @@ func (c *Client) DeleteVPPInvitationByID(ctx context.Context, id string) error {
 
 // ListVPPInvitations finds all VPP Invitations.
 //
-// Required privileges: read:pro:vpp-invitations.
+// Required privileges: volume-purchasing-locations:read.
 func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppInvitations
@@ -89,7 +89,7 @@ func (c *Client) ListVPPInvitations(ctx context.Context) (*VppInvitations, error
 
 // GetVPPInvitationByIDSubset finds a subset of data for a VPP invitation.
 //
-// Required privileges: read:pro:vpp-invitations.
+// Required privileges: volume-purchasing-locations:read.
 //
 // Parameters:
 //   - id: ID to filter by.

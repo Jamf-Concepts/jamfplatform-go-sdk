@@ -76,12 +76,17 @@ func TestAcceptance_Pro_Settings_SmtpServerV2Read(t *testing.T) {
 // current SMTP settings, so it can legitimately be narrower than the
 // SmtpServerV2AuthenticationType constants.
 //
-// Not yet routed by the API gateway (probed 2026-08-16, two credential sets, an
-// 11.31.0 tenant): 403 BAD_PERMISSIONS in the gateway's own compact error
-// shape, byte-identical to what a typo'd path returns — see the gateway-vs-Pro
-// note in CLAUDE.md's error-handling section. Not a privilege problem, so no
-// scope grant will clear it. Skip rather than fail; tighten to t.Fatalf once
-// the gateway allowlists the path.
+// Reachable as of 2026-08-29, contrary to what this comment said for a fortnight.
+// The path is routed and gated on `smtp-server:read` (jamf/authorization-policies
+// jamf_pro_smtp_server.rego); an environment-scoped credential returned 200 with
+// all four values, while two tenant-scoped credentials — one EU, one US — were
+// refused 403 against the same regional bundles. So the 403 is a capability the
+// tenant credentials do not hold, not the unrouted path the earlier note claimed,
+// and no amount of reading one credential's 403 was going to reveal that.
+//
+// Hence the asymmetry below: an environment-scoped client is proven to reach this,
+// so a 403 there is a real failure and is fatal. A tenant-scoped client skips,
+// naming the capability to grant. Nothing tolerates a 403 unconditionally.
 func TestAcceptance_Pro_Settings_SmtpServerAllowedAuthTypesV2(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -91,7 +96,10 @@ func TestAcceptance_Pro_Settings_SmtpServerAllowedAuthTypesV2(t *testing.T) {
 		skipOnServerError(t, err)
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
-			t.Skipf("allowed-auth-types not routed by the API gateway (403 while GetSmtpServerV2 200s on the same scope): %v", err)
+			if kind, _ := c.Scope(); kind == jamfplatform.ScopeEnvironment {
+				t.Fatalf("allowed-auth-types: 403 on an environment-scoped client, which was wire-verified to reach this path on 2026-08-29 — the credential has lost smtp-server:read, or the policy changed: %v", err)
+			}
+			t.Skipf("allowed-auth-types: 403 on a tenant-scoped client while GetSmtpServerV2 200s on the same scope — this credential lacks smtp-server:read. An environment-scoped credential returns 200: %v", err)
 		}
 		t.Fatalf("ListSmtpServerAllowedAuthTypesV2: %v", err)
 	}
@@ -167,6 +175,21 @@ func TestAcceptance_Pro_Settings_JamfProServerURLV1Read(t *testing.T) {
 		t.Fatalf("GetJamfProServerURLV1: %v", err)
 	}
 	t.Logf("Jamf Pro server URL: %s", url.URL)
+}
+
+// The history sub-resource is read-only from the SDK's point of view: GET is
+// routed and answers 200, but POST is not routed at the gateway even though the
+// credential holds jss-url:update — pinned by
+// TestAcceptance_Pro_JamfProServerURLHistoryNoteUnroutedAtGateway.
+func TestAcceptance_Pro_Settings_JamfProServerURLHistoryV1(t *testing.T) {
+	c := accClient(t)
+
+	entries, err := pro.New(c).ListJamfProServerURLHistoryV1(context.Background(), nil)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListJamfProServerURLHistoryV1: %v", err)
+	}
+	t.Logf("Jamf Pro server URL history: %d entries", len(entries))
 }
 
 // --- device-communication settings ------------------------------------

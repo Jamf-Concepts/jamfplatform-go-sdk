@@ -18,7 +18,7 @@ import (
 
 // GetParentAppSettingsV1 get the current Jamf Parent app settings.
 //
-// Required privileges: read:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Read Parent App Settings.
+// Required privileges: parent-app:read. Legacy Jamf Pro privilege name(s): Read Parent App Settings.
 func (c *Client) GetParentAppSettingsV1(ctx context.Context) (*ParentApp, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ParentApp
@@ -31,7 +31,7 @@ func (c *Client) GetParentAppSettingsV1(ctx context.Context) (*ParentApp, error)
 
 // UpdateParentAppSettingsV1 update Jamf Parent app settings.
 //
-// Required privileges: update:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Update Parent App Settings.
+// Required privileges: parent-app:update. Legacy Jamf Pro privilege name(s): Update Parent App Settings.
 func (c *Client) UpdateParentAppSettingsV1(ctx context.Context, request *ParentApp) (*ParentApp, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ParentApp
@@ -44,7 +44,7 @@ func (c *Client) UpdateParentAppSettingsV1(ctx context.Context, request *ParentA
 
 // ListParentAppHistoryV1 get Jamf Parent app settings history.
 //
-// Required privileges: read:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Read Parent App Settings.
+// Required privileges: parent-app:read. Legacy Jamf Pro privilege name(s): Read Parent App Settings.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria
@@ -84,7 +84,7 @@ func (c *Client) ListParentAppHistoryV1(ctx context.Context, sort []string, filt
 
 // CreateParentAppHistoryNoteV1 add Jamf Parent app settings history notes.
 //
-// Required privileges: update:pro:parent-app-settings. Legacy Jamf Pro privilege name(s): Update Parent App Settings.
+// Required privileges: parent-app:update. Legacy Jamf Pro privilege name(s): Update Parent App Settings.
 func (c *Client) CreateParentAppHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory

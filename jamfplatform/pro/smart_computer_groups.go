@@ -14,7 +14,7 @@ import (
 
 // RecalculateSmartComputerGroupV1 recalculate the smart group for the given id.
 //
-// Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
+// Required privileges: device-groups:update. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
 //
 // Parameters:
 //   - id: instance id of smart group.
@@ -30,7 +30,7 @@ func (c *Client) RecalculateSmartComputerGroupV1(ctx context.Context, id string)
 
 // RecalculateComputerSmartGroupsV1 recalculate a smart group for the given id.
 //
-// Required privileges: update:pro:computer-groups. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
+// Required privileges: device-groups:update. Legacy Jamf Pro privilege name(s): Update Smart Computer Groups.
 //
 // Parameters:
 //   - id: id of computer.

@@ -17,7 +17,7 @@ import (
 
 // GetComputerExtensionAttributeByID finds computer extension attributes by ID.
 //
-// Required privileges: read:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetComputerExtensionAttributeByID(ctx context.Context, id strin
 
 // CreateComputerExtensionAttributeByID creates a new computer extension attribute by ID.
 //
-// Required privileges: create:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateComputerExtensionAttributeByID(ctx context.Context, id st
 
 // UpdateComputerExtensionAttributeByID updates an existing computer extension attribute by ID.
 //
-// Required privileges: update:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateComputerExtensionAttributeByID(ctx context.Context, id st
 
 // DeleteComputerExtensionAttributeByID deletes a computer extension attribute by ID.
 //
-// Required privileges: delete:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteComputerExtensionAttributeByID(ctx context.Context, id st
 
 // GetComputerExtensionAttributeByName finds computer extension attributes by name.
 //
-// Required privileges: read:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetComputerExtensionAttributeByName(ctx context.Context, name s
 
 // UpdateComputerExtensionAttributeByName updates an existing computer extension attribute by name.
 //
-// Required privileges: update:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateComputerExtensionAttributeByName(ctx context.Context, nam
 
 // DeleteComputerExtensionAttributeByName deletes a computer extension attribute by name.
 //
-// Required privileges: delete:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteComputerExtensionAttributeByName(ctx context.Context, nam
 
 // ListComputerExtensionAttributes finds all computer extension attributes.
 //
-// Required privileges: read:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:read.
 func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*ComputerExtensionAttributes, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerExtensionAttributes
@@ -138,7 +138,7 @@ func (c *Client) ListComputerExtensionAttributes(ctx context.Context) (*Computer
 
 // CreateComputerExtensionAttributeByName creates a new computer extension attribute by ID.
 //
-// Required privileges: create:pro:computer-extension-attributes.
+// Required privileges: extension-attributes:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

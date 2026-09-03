@@ -19,7 +19,7 @@ import (
 
 // GetAllComputerPrestageScopeV2 get all device Scope for all Computer Prestages.
 //
-// Required privileges: read:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
 func (c *Client) GetAllComputerPrestageScopeV2(ctx context.Context) (*PrestageScopeV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result PrestageScopeV2
@@ -32,7 +32,7 @@ func (c *Client) GetAllComputerPrestageScopeV2(ctx context.Context) (*PrestageSc
 
 // GetComputerPrestageScopeV2 get device Scope for a specific Computer Prestage.
 //
-// Required privileges: read:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
 //
 // Parameters:
 //   - id: Computer Prestage identifier.
@@ -48,7 +48,7 @@ func (c *Client) GetComputerPrestageScopeV2(ctx context.Context, id string) (*Pr
 
 // ReplaceComputerPrestageScopeV2 replace device Scope for a specific Computer Prestage.
 //
-// Required privileges: update:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
 //
 // Parameters:
 //   - id: Computer Prestage identifier.
@@ -64,7 +64,7 @@ func (c *Client) ReplaceComputerPrestageScopeV2(ctx context.Context, id string, 
 
 // AddToComputerPrestageScopeV2 add device Scope for a specific Computer Prestage.
 //
-// Required privileges: update:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
 //
 // Parameters:
 //   - id: Computer Prestage identifier.
@@ -80,7 +80,7 @@ func (c *Client) AddToComputerPrestageScopeV2(ctx context.Context, id string, re
 
 // RemoveFromComputerPrestageScopeV2 remove device Scope for a specific Computer Prestage.
 //
-// Required privileges: update:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
 //
 // Parameters:
 //   - id: Computer Prestage identifier.
@@ -96,7 +96,7 @@ func (c *Client) RemoveFromComputerPrestageScopeV2(ctx context.Context, id strin
 
 // ListComputerPrestagesV3 get sorted and paged Computer Prestages.
 //
-// Required privileges: read:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Multiple sort criteria are supported and must be
@@ -129,7 +129,7 @@ func (c *Client) ListComputerPrestagesV3(ctx context.Context, sort []string) ([]
 
 // CreateComputerPrestageV3 create a Computer Prestage.
 //
-// Required privileges: create:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Create Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:create. Legacy Jamf Pro privilege name(s): Create Computer PreStage Enrollments.
 func (c *Client) CreateComputerPrestageV3(ctx context.Context, request *PostComputerPrestageV3) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
@@ -142,7 +142,7 @@ func (c *Client) CreateComputerPrestageV3(ctx context.Context, request *PostComp
 
 // GetComputerPrestageV3 retrieve a Computer Prestage with the supplied id.
 //
-// Required privileges: read:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:read. Legacy Jamf Pro privilege name(s): Read Computer PreStage Enrollments.
 //
 // Parameters:
 //   - id: Computer Prestage identifier.
@@ -160,7 +160,7 @@ func (c *Client) GetComputerPrestageV3(ctx context.Context, id string) (*GetComp
 //
 // This endpoint requires an optimistic-lock precondition in its request body, sourced from a prior GET. The transport does NOT auto-retry a 5xx here — unlike other PUT/DELETE/GET/HEAD calls — because a blind retry would replay the now-stale precondition and could turn a successful-but-500ing write into a masked conflict on the retried attempt. See client.DoWithContentTypeNoRetry.
 //
-// Required privileges: update:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:update. Legacy Jamf Pro privilege name(s): Update Computer PreStage Enrollments.
 //
 // Parameters:
 //   - id: Computer Prestage identifier.
@@ -176,7 +176,7 @@ func (c *Client) UpdateComputerPrestageV3(ctx context.Context, id string, reques
 
 // DeleteComputerPrestageV3 delete a Computer Prestage with the supplied id.
 //
-// Required privileges: delete:pro:computer-prestage-enrollments. Legacy Jamf Pro privilege name(s): Delete Computer PreStage Enrollments.
+// Required privileges: prestage-enrollments:delete. Legacy Jamf Pro privilege name(s): Delete Computer PreStage Enrollments.
 //
 // Parameters:
 //   - id: Computer Prestage identifier.

@@ -7,26 +7,31 @@ package main
 // Intermediate representation
 // ---------------------------------------------------------------------------
 
-// GoEnumConst is one value of a named string-enum schema, emitted as a
-// typed constant alongside the schema's `type X = string` alias.
+// GoEnumConst is one value of an enum, emitted as a typed constant alongside
+// the enum's `type X = <base>` alias. The base is usually string; numeric
+// enums (Jamf uses them for interval and threshold fields) alias int or int64
+// so the constants stay assignable to the struct field they constrain.
 // The declaration carries the wire value on the same line, so no per-value
 // godoc is emitted — a reader grepping for "MII_UNATHORIZED_RESPONSE_NOTIFICATION"
 // still finds it even though the identifier normalises the spec's misspelling.
 type GoEnumConst struct {
-	Name  string // Go identifier, e.g. NotificationTypeApnsCertRevoked
-	Value string // wire value, e.g. APNS_CERT_REVOKED
+	Name    string // Go identifier, e.g. NotificationTypeApnsCertRevoked
+	Value   string // wire value, e.g. APNS_CERT_REVOKED
+	Literal string // ready-to-emit Go literal: `"APNS_CERT_REVOKED"` for a string enum, `1440` for a numeric one
 }
 
 type GoType struct {
 	Name          string
 	Comment       string
 	Fields        []GoField
-	EnumValues    []GoEnumConst // populated for named string-enum schemas
+	EnumValues    []GoEnumConst // populated for enum schemas and for enums declared inline on a property
+	EnumBaseType  string        // underlying type of the enum alias: "string" (default when empty), "int" or "int64"
 	IsRawJSON     bool
 	Discriminator *GoDiscriminator
-	XMLName       string // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field
-	AliasTarget   string // non-empty → emit as `type Name = AliasTarget` (used for top-level array schemas)
-	IsListWrapper bool   // true when this is a Classic list wrapper (flattens {size, resource} array items into sibling fields). Excludes the type from heuristics that inject top-level id or carry id as a resource signal.
+	Union         *GoUnion // populated for a discriminator-less oneOf reached only as a request body
+	XMLName       string   // wire element name when format=xml and it differs from Go type name; emitted as XMLName xml.Name `xml:"..."` field
+	AliasTarget   string   // non-empty → emit as `type Name = AliasTarget` (used for top-level array schemas)
+	IsListWrapper bool     // true when this is a Classic list wrapper (flattens {size, resource} array items into sibling fields). Excludes the type from heuristics that inject top-level id or carry id as a resource signal.
 }
 
 // GoDiscriminator describes a oneOf-with-discriminator polymorphic schema.
@@ -37,12 +42,85 @@ type GoDiscriminator struct {
 	PropertyName string // JSON property name of the discriminator field (e.g. "deviceType")
 	GoFieldName  string // Go exported name for the discriminator field (e.g. "DeviceType")
 	Variants     []GoDiscriminatorVariant
+	// EnumTypeName names the generated enum carrying every discriminator value,
+	// when one was emitted. The mapping keys are the authoritative set of values
+	// the union accepts, and without constants for them the set is reachable
+	// only by reading the generated switch. It matters most when a spec moves a
+	// value out of a variant's own enum and into the mapping — uem-connect
+	// dropped JAMF_PRO from ConnectorCreateRequest.vendor when it gained a
+	// dedicated variant, which would otherwise have left the SDK with no
+	// constant for the commonest vendor.
+	EnumTypeName string
 }
 
 type GoDiscriminatorVariant struct {
-	Value     string // discriminator value as seen on the wire (e.g. "iOS")
+	// Values holds every discriminator value routing to this variant, in the
+	// order the mapping declares them. Usually one, but a spec may point
+	// several values at a single schema — uem-connect maps nine UEM vendors at
+	// the generic ConnectorCreateRequest and only JAMF_PRO at its own type.
+	// Every value must become a case in the generated marshal and unmarshal
+	// switches: collapsing them to one loses the others silently, and a
+	// caller setting an unlisted discriminator would marshal to nothing but
+	// the discriminator itself.
+	Values    []string
 	TypeName  string // Go type name (e.g. "MobileDeviceIosInventory")
 	FieldName string // exported Go field name in the union struct (e.g. "IOS")
+}
+
+// Privilege provenance values for GoMethod.PrivilegeSource and the generated
+// MethodPrivileges.Source. An empty string means no privileges are recorded at
+// all, which is not the same as none being required — see MethodPrivileges.
+const (
+	// privilegeSourceSpec: read from the operation's own
+	// x-required-privileges extension.
+	privilegeSourceSpec = "spec"
+	// privilegeSourceGatewayPolicy: supplied by config.requiredPrivileges from
+	// the gateway's authorization policy, because the published spec declares
+	// none. See SpecDef.RequiredPrivileges.
+	privilegeSourceGatewayPolicy = "gateway-policy"
+)
+
+// GoUnion describes a discriminator-less `oneOf` whose members are all
+// `$ref`s and which is reachable only as a request body. The Go
+// representation is one pointer per variant plus a Raw json.RawMessage, with
+// a MarshalJSON that emits whichever single variant is set.
+//
+// It exists because the alternative for this shape was silence. A
+// discriminator-less union reached through a *property* had no branch at all:
+// schemaRefToGoType fell through to its default and produced a bare `any`,
+// which type-checks nothing, marshals whatever it is handed, and — since the
+// transport sets no DisallowUnknownFields — decodes anything. account-sso's
+// ConnectionRequest.connection carried the entire provider-settings body of
+// every SSO connection create and update that way, with all four of the
+// settings schemas it can hold emitted as Go types that no signature in the
+// module referenced. validateNoUntypedFields now fails generation on a bare
+// `any` field so the class cannot recur silently.
+//
+// Merging the variants into one flat struct — what a *named* discriminator-less
+// union gets, see mergeOneOfVariants — is the right answer for a response,
+// where decoding has to work without a tag and the union is structural. It is
+// the wrong answer for a request: the four account settings schemas share a
+// base and then disagree on which of `domain`, `groups`, `clientId` and
+// `scopes` are required, so the merge intersects nearly every one of them to
+// optional and a caller can populate fields from two providers at once with
+// nothing to say so. Pointers keep the pairing visible to the compiler.
+//
+// Nothing here can validate the variant against its sibling discriminator —
+// account-sso's `connectionType` lives on the *parent* schema, which the
+// nested type cannot see, and the spec declares no discriminator to key it on
+// anyway. Marshaling more than one variant is what does get rejected.
+type GoUnion struct {
+	Variants []GoUnionVariant
+}
+
+type GoUnionVariant struct {
+	// FieldName is the exported Go field, and is simply the variant's own
+	// type name. Deriving something shorter (Oidc from OidcConnectionSettings)
+	// means stripping a suffix the variants happen to share, which is not
+	// stable across specs and can collide after stripping; the stutter is
+	// worth the determinism.
+	FieldName string
+	TypeName  string
 }
 
 type GoField struct {
@@ -75,12 +153,21 @@ type GoMethod struct {
 	MaxPageSize      int
 	ItemType         string
 	ResultsField     string
+	CursorField      string
+	CursorParam      string
 	ReturnsSlice     bool
-	SpecPath         string
-	UnwrapResults    string
-	Format           string      // carried from SpecDef so per-method templates can branch without $-scope
-	Resolver         *GoResolver // populated on synthetic resolver methods (Category resolverID/resolverTyped)
-	Apply            *GoApply    // populated on synthetic apply (upsert) methods
+	// ResponseIsJSONArray reports that the success body is a JSON array,
+	// which ReturnsSlice does not: a named schema declared `type: array`
+	// (Security Cloud's GroupListResponse = []Group) travels as an array but
+	// appears in the Go signature as its alias, not as a []T. Test stubs
+	// pick the body shape from this; the method templates keep using
+	// ReturnsSlice, which is about the Go type.
+	ResponseIsJSONArray bool
+	SpecPath            string
+	UnwrapResults       string
+	Format              string      // carried from SpecDef so per-method templates can branch without $-scope
+	Resolver            *GoResolver // populated on synthetic resolver methods (Category resolverID/resolverTyped)
+	Apply               *GoApply    // populated on synthetic apply (upsert) methods
 
 	// Required-privilege metadata, sourced from the operation's
 	// x-required-privileges / x-required-privileges-legacy vendor extensions.
@@ -88,13 +175,20 @@ type GoMethod struct {
 	// buildMethod); it stays false on synthetic resolver/apply methods, which
 	// compose underlying endpoints rather than mapping to one operation. A
 	// spec-derived method with no declared privileges has PrivilegesKnown=true
-	// and empty slices — that means the endpoint needs no special privilege
-	// (any authenticated API client may call it), which is distinct from
-	// "unknown". ScopedPrivileges and LegacyPrivileges are NOT index-aligned:
-	// a single legacy name can cover multiple scoped IDs, and the legacy form
-	// is published only for the Pro family.
+	// and empty slices — that means the *spec* declares none, which is
+	// distinct from both "unknown" and "none required": the 18 account
+	// methods are empty because the licensing/partners/sso specs carry no
+	// x-required-privileges, while the gateway policy still gates them.
+	// ScopedPrivileges and LegacyPrivileges are INDEPENDENT SETS, never to be
+	// paired by position: their lengths differ on 29 pro operations and their
+	// orders disagree on 9 more. The legacy form is published only for the Pro
+	// family. See privilegeSetsAreNotPairs.
+	// PrivilegeSource records where ScopedPrivileges came from, so a consumer
+	// can tell a spec-declared set from one this repo supplied out of band.
+	// Empty when the set is empty.
+	PrivilegeSource  string
 	PrivilegesKnown  bool
-	ScopedPrivileges []string // modern scoped privilege IDs, e.g. "create:pro:buildings"
+	ScopedPrivileges []string // GA capability permissions, {capability}:{action}, e.g. "buildings:create"
 	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"
 }
 
@@ -198,11 +292,20 @@ type GoApply struct {
 	MembershipRequestFieldIsPtr bool   // true when request.Assignments is *[]T
 
 	// Test generation paths (pre-computed from the source ops).
-	ListNamespace      string // namespace for the list/resolver call
-	ListVersion        string // version for the list/resolver call
-	ListPath           string // resource path for the list endpoint
-	ListNameField      string // JSON name field for resolver response stubs
-	ListIDField        string // JSON id field for resolver response stubs
+	ListNamespace string // namespace for the list/resolver call
+	ListVersion   string // version for the list/resolver call
+	ListPath      string // resource path for the list endpoint
+	ListNameField string // JSON name field for resolver response stubs
+	ListIDField   string // JSON id field for resolver response stubs
+	// ListResultsField is the envelope key holding the element array, mirrored
+	// from the resolver config so the generated Apply test stubs answer with
+	// the same shape the resolver actually reads. Empty means "results".
+	// Without this the stubs hardcode "results" and an Apply whose resolver
+	// declares a non-standard envelope (securitycloud device groups v2:
+	// {groups: []}) generates an _Update test that silently takes the *create*
+	// branch — the resolver finds nothing under the key it looks for, so the
+	// test fails on an unstubbed create path rather than on the real mismatch.
+	ListResultsField   string
 	CreateNS           string // namespace for create
 	CreateVer          string // version for create
 	CreatePath         string // resource path for create endpoint (e.g. "/buildings")

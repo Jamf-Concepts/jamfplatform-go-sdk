@@ -84,6 +84,71 @@ var funcMap = template.FuncMap{
 		return ", " + strings.Join(args, ", ")
 	},
 	"isStringSlice": func(s string) bool { return s == "[]string" },
+	// sliceElem is the element type of an "[]T" config value, for the
+	// generic call in the unwrap template. UnwrapResults is parameterised on
+	// the element, while unwrapResults is declared as the slice the method
+	// returns.
+	"sliceElem": func(s string) string { return strings.TrimPrefix(s, "[]") },
+	// queryValue is the expression that converts one query parameter's Go
+	// argument into the string sent on the wire; queryGuard is the zero-value
+	// condition deciding whether an optional one is sent at all.
+	//
+	// They are functions rather than a type switch inside the templates
+	// because that switch was written out three times — in
+	// "buildQueryParams", "paginated" and "paginatedCursor" — and every
+	// branch of all three had to honour required-ness. Three copies of a
+	// nine-branch switch is how a required param came to be emitted behind an
+	// optional param's guard in the first place; one copy is one place to be
+	// wrong.
+	"queryValue": func(qp ExtraParam) string {
+		switch qp.Type {
+		case "[]string":
+			return "strings.Join(" + qp.Go + `, ",")`
+		case "bool":
+			// An optional bool is only ever emitted when true, so the literal
+			// is exact. A required one has to carry a false the caller meant:
+			// omitting it is what this whole path exists to stop, and sending
+			// "true" for a false argument would be worse still.
+			if qp.AlwaysSend {
+				return "strconv.FormatBool(" + qp.Go + ")"
+			}
+			return `"true"`
+		case "int":
+			return "strconv.Itoa(" + qp.Go + ")"
+		case "int64":
+			return "strconv.FormatInt(" + qp.Go + ", 10)"
+		}
+		return qp.Go
+	},
+	"queryGuard": func(qp ExtraParam) string {
+		switch qp.Type {
+		case "[]string":
+			return "len(" + qp.Go + ") > 0"
+		case "bool":
+			return qp.Go
+		case "int", "int64":
+			return qp.Go + " != 0"
+		}
+		return qp.Go + ` != ""`
+	},
+	// requiredQueryAsserts emits, for each spec-required query param, a check
+	// that the generated method actually put it on the wire. The unit-test
+	// stubs call every method with zero-value arguments, so a required param
+	// emitted behind an optional param's zero-value guard is *absent* from
+	// the request and these fail — which makes each of them a standing
+	// regression test for the bug class, not just for the param it names.
+	// url.Values.Has is true for a present-but-empty key, which is exactly
+	// the distinction that matters here.
+	"requiredQueryAsserts": func(m GoMethod) string {
+		var b strings.Builder
+		for _, qp := range m.QueryParams {
+			if !qp.AlwaysSend {
+				continue
+			}
+			fmt.Fprintf(&b, "\n\t\tif !r.URL.Query().Has(%q) {\n\t\t\tt.Errorf(\"required query param %s not sent: %%q\", r.URL.RawQuery)\n\t\t}", qp.Spec, qp.Spec)
+		}
+		return b.String()
+	},
 	"requestArg": func(t string) string {
 		// Test stub's zero-value literal for the request parameter.
 		// Primitives can't be composite-literal'd (e.g. `&string{}`
@@ -138,6 +203,17 @@ var funcMap = template.FuncMap{
 			}
 		}
 		return ", " + strings.Join(args, ", ")
+	},
+	// applyResultsKey is the envelope key the apply method's resolver reads the
+	// element array from. Defaults to "results"; a resolver declaring
+	// resultsField (e.g. securitycloud device groups v2's {groups: []}) needs
+	// its stubs to answer under that key or the generated _Update test takes
+	// the create branch instead of the update one.
+	"applyResultsKey": func(a *GoApply) string {
+		if a.ListResultsField == "" {
+			return "results"
+		}
+		return a.ListResultsField
 	},
 	// applyListPath builds the test-server handler path for the list endpoint
 	// used by the apply method's resolver call.
@@ -273,6 +349,9 @@ type {{ .Name }} = json.RawMessage
 {{- else if .Discriminator }}
 // {{ .Comment }}
 type {{ .Name }} struct {
+{{- if .Discriminator.EnumTypeName }}
+	// Allowed values: see the {{ .Discriminator.EnumTypeName }} constants.
+{{- end }}
 	{{ .Discriminator.GoFieldName }} string ` + "`" + `json:"{{ .Discriminator.PropertyName }}"` + "`" + `
 {{- range .Discriminator.Variants }}
 	{{ .FieldName }} *{{ .TypeName }} ` + "`" + `json:"-"` + "`" + `
@@ -292,7 +371,7 @@ func (m *{{ .Name }}) UnmarshalJSON(data []byte) error {
 	m.{{ .Discriminator.GoFieldName }} = d.{{ .Discriminator.GoFieldName }}
 	switch d.{{ .Discriminator.GoFieldName }} {
 {{- range .Discriminator.Variants }}
-	case "{{ .Value }}":
+	case {{ range $i, $v := .Values }}{{ if $i }}, {{ end }}"{{ $v }}"{{ end }}:
 		m.{{ .FieldName }} = new({{ .TypeName }})
 		return json.Unmarshal(data, m.{{ .FieldName }})
 {{- end }}
@@ -305,11 +384,59 @@ func (m *{{ .Name }}) UnmarshalJSON(data []byte) error {
 func (m {{ .Name }}) MarshalJSON() ([]byte, error) {
 	switch m.{{ .Discriminator.GoFieldName }} {
 {{- range .Discriminator.Variants }}
-	case "{{ .Value }}":
+	case {{ range $i, $v := .Values }}{{ if $i }}, {{ end }}"{{ $v }}"{{ end }}:
 		return json.Marshal(m.{{ .FieldName }})
 {{- end }}
 	}
 	return json.Marshal(map[string]string{"{{ .Discriminator.PropertyName }}": m.{{ .Discriminator.GoFieldName }}})
+}
+{{- else if .Union }}
+// {{ .Comment }}
+type {{ .Name }} struct {
+{{- range .Union.Variants }}
+	{{ .FieldName }} *{{ .TypeName }} ` + "`" + `json:"-"` + "`" + `
+{{- end }}
+	// Raw holds the payload exactly as it arrived. Decoding cannot choose a
+	// variant — the spec declares no discriminator, so nothing inside the
+	// payload names one — so UnmarshalJSON stores the bytes here and leaves
+	// every variant pointer nil. Decode it into the variant whichever sibling
+	// field selects.
+	Raw json.RawMessage ` + "`" + `json:"-"` + "`" + `
+}
+
+// MarshalJSON emits the one variant that is set.
+//
+// More than one is an error rather than an arbitrary pick between them: the
+// wire has room for exactly one, and silently dropping the rest is how a
+// caller ships a body it did not write. With none set it emits Raw, or JSON
+// null when Raw is empty too — the zero value has to stay marshalable, since
+// it is what the enclosing request carries until the caller fills it in, and
+// null is what the server rejects with a message naming the field.
+func (u {{ .Name }}) MarshalJSON() ([]byte, error) {
+	var set []string
+	var payload any
+{{- range .Union.Variants }}
+	if u.{{ .FieldName }} != nil {
+		set = append(set, "{{ .FieldName }}")
+		payload = u.{{ .FieldName }}
+	}
+{{- end }}
+	switch {
+	case len(set) > 1:
+		return nil, fmt.Errorf("{{ .Name }}: %d variants set (%s); the payload carries exactly one", len(set), strings.Join(set, ", "))
+	case len(set) == 1:
+		return json.Marshal(payload)
+	case len(u.Raw) > 0:
+		return u.Raw, nil
+	}
+	return []byte("null"), nil
+}
+
+// UnmarshalJSON preserves the payload in Raw. See that field's comment for
+// why it does not populate a variant.
+func (u *{{ .Name }}) UnmarshalJSON(data []byte) error {
+	u.Raw = append(u.Raw[:0], data...)
+	return nil
 }
 {{- else if or .Fields (and (eq $.Format "xml") .XMLName) }}
 // {{ .Comment }}
@@ -345,16 +472,17 @@ func (t {{ .Name }}) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 }
 {{- end }}
 {{- else }}
+{{- $base := or .EnumBaseType "string" }}
 // {{ .Comment }}
-type {{ .Name }} = string
+type {{ .Name }} = {{ $base }}
 {{- if .EnumValues }}
 {{- $enumType := .Name }}
 
-// {{ .Name }} values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
+// {{ .Name }} values accepted by the Jamf API. The alias above is {{ if eq $base "string" }}a string{{ else }}an {{ $base }}{{ end }}, so
+// these constants pass to any parameter or field declared as a plain {{ $base }}.
 const (
 {{- range .EnumValues }}
-	{{ .Name }} {{ $enumType }} = "{{ .Value }}"
+	{{ .Name }} {{ $enumType }} = {{ .Literal }}
 {{- end }}
 )
 
@@ -362,7 +490,7 @@ const (
 // in the order the spec declares them. Returns a fresh slice per call, so no
 // caller can corrupt the set for the rest of the process — which a package
 // level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// {{ if eq $base "string" }}stringvalidator.OneOf{{ else }}int64validator.OneOf{{ end }}, say) and anything that needs to enumerate the set
 // rather than name one member.
 func {{ .Name }}Values() []{{ $enumType }} {
 	return []{{ $enumType }}{
@@ -378,6 +506,8 @@ func {{ .Name }}Values() []{{ $enumType }} {
 {{ range .Methods }}
 {{- if eq .Category "paginated" }}
 {{ template "paginated" . }}
+{{- else if eq .Category "paginatedCursor" }}
+{{ template "paginatedCursor" . }}
 {{- else if eq .Category "unwrap" }}
 {{ template "unwrap" . }}
 {{- else if eq .Category "get" }}
@@ -409,29 +539,21 @@ func {{ .Name }}Values() []{{ $enumType }} {
 
 {{/* ---- Shared sub-templates ---- */}}
 
+{{/* AlwaysSend (a spec-required param declaring no default — see
+     resolveQueryParams) is set unconditionally: dropping it because the caller
+     passed the zero value produces a request the server rejects with a 400
+     that reads like a fault rather than a caller error. Everything else keeps
+     the zero-value guard — omitting an unset optional param is correct and
+     load-bearing. */}}
 {{- define "buildQueryParams" -}}
 {{- if .QueryParams }}
 	params := url.Values{}
 {{- range .QueryParams }}
-{{- if eq .Type "[]string" }}
-	if len({{ .Go }}) > 0 {
-		params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
-	}
-{{- else if eq .Type "bool" }}
-	if {{ .Go }} {
-		params.Set("{{ .Spec }}", "true")
-	}
-{{- else if eq .Type "int" }}
-	if {{ .Go }} != 0 {
-		params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
-	}
-{{- else if eq .Type "int64" }}
-	if {{ .Go }} != 0 {
-		params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
-	}
+{{- if .AlwaysSend }}
+	params.Set("{{ .Spec }}", {{ queryValue . }})
 {{- else }}
-	if {{ .Go }} != "" {
-		params.Set("{{ .Spec }}", {{ .Go }})
+	if {{ queryGuard . }} {
+		params.Set("{{ .Spec }}", {{ queryValue . }})
 	}
 {{- end }}
 {{- end }}
@@ -466,18 +588,18 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "create" }}
 // {{ .Comment }}
 {{- if .ReturnsSlice }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
 {{- else }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}, request *{{ .RequestType }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 {{- if .ContentType }}
-	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
+	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
 {{- else }}
-	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, request, {{ statusConst .ExpectedStatus }}, &result); err != nil {
+	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, {{ statusConst .ExpectedStatus }}, &result); err != nil {
 {{- end }}
 		return nil, fmt.Errorf({{ errWrap . }})
 	}
@@ -632,6 +754,11 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- end }}
 {{ end }}
 
+{{/* An unpaginated list endpoint may answer with the {totalCount, results}
+     envelope its spec declares or with a bare JSON array, and the same
+     operation has served both: the account lists flipped from array to
+     envelope on 2026-09-01 and broke every caller. So the shape is decided
+     from the body rather than assumed here — see client.UnwrapResults. */}}
 {{- define "unwrap" }}
 // {{ .Comment }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .UnwrapResults }}, error) {
@@ -639,14 +766,11 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
 
-	var result struct {
-		TotalCount int              ` + "`" + `json:"totalCount"` + "`" + `
-		Results    {{ .UnwrapResults }} ` + "`" + `json:"results"` + "`" + `
-	}
-	if err := c.transport.Do(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, &result); err != nil {
+	results, err := client.UnwrapResults[{{ sliceElem .UnwrapResults }}](ctx, c.transport, {{ httpConst .HTTPMethod }}, endpoint, "{{ .ResultsField }}")
+	if err != nil {
 		return nil, fmt.Errorf({{ errWrap . }})
 	}
-	return result.Results, nil
+	return results, nil
 }
 {{ end }}
 
@@ -659,25 +783,11 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 		params.Set("page", strconv.Itoa(page))
 		params.Set("{{ .PageSizeParam }}", strconv.Itoa(pageSize))
 {{- range .QueryParams }}
-{{- if eq .Type "[]string" }}
-		if len({{ .Go }}) > 0 {
-			params.Set("{{ .Spec }}", strings.Join({{ .Go }}, ","))
-		}
-{{- else if eq .Type "bool" }}
-		if {{ .Go }} {
-			params.Set("{{ .Spec }}", "true")
-		}
-{{- else if eq .Type "int" }}
-		if {{ .Go }} != 0 {
-			params.Set("{{ .Spec }}", strconv.Itoa({{ .Go }}))
-		}
-{{- else if eq .Type "int64" }}
-		if {{ .Go }} != 0 {
-			params.Set("{{ .Spec }}", strconv.FormatInt({{ .Go }}, 10))
-		}
+{{- if .AlwaysSend }}
+		params.Set("{{ .Spec }}", {{ queryValue . }})
 {{- else }}
-		if {{ .Go }} != "" {
-			params.Set("{{ .Spec }}", {{ .Go }})
+		if {{ queryGuard . }} {
+			params.Set("{{ .Spec }}", {{ queryValue . }})
 		}
 {{- end }}
 {{- end }}
@@ -722,6 +832,43 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 		}
 		return result, len(result) >= pageSize && len(result) > 0, nil
 {{- end }}
+	})
+}
+{{ end }}
+
+{{- define "paginatedCursor" }}
+// {{ .Comment }}
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ([]{{ .ItemType }}, error) {
+	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
+	return client.ListAllCursorPages(ctx, {{ .MaxPageSize }}, func(ctx context.Context, cursor string, pageSize int) ([]{{ .ItemType }}, string, error) {
+		params := url.Values{}
+		params.Set("{{ .PageSizeParam }}", strconv.Itoa(pageSize))
+		if cursor != "" {
+			params.Set("{{ .CursorParam }}", cursor)
+		}
+{{- range .QueryParams }}
+{{- if .AlwaysSend }}
+		params.Set("{{ .Spec }}", {{ queryValue . }})
+{{- else }}
+		if {{ queryGuard . }} {
+			params.Set("{{ .Spec }}", {{ queryValue . }})
+		}
+{{- end }}
+{{- end }}
+
+		endpoint := {{ fmtPath . }}
+		if encoded := params.Encode(); encoded != "" {
+			endpoint += "?" + encoded
+		}
+
+		var result struct {
+			Results    []{{ .ItemType }} ` + "`" + `json:"{{ .ResultsField }}"` + "`" + `
+			NextCursor string ` + "`" + `json:"{{ .CursorField }}"` + "`" + `
+		}
+		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+			return nil, "", err
+		}
+		return result.Results, result.NextCursor, nil
 	})
 }
 {{ end }}
@@ -977,6 +1124,8 @@ import (
 <% range .Methods -%>
 <%- if eq .Category "paginated" %>
 <% template "testPaginated" . %>
+<%- else if eq .Category "paginatedCursor" %>
+<% template "testPaginatedCursor" . %>
 <%- else if eq .Category "unwrap" %>
 <% template "testUnwrap" . %>
 <%- else if eq .Category "get" %>
@@ -1012,10 +1161,10 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		<%- if eq .Format "xml" %>
 		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
-		<%- else if .ReturnsSlice %>
+		<%- else if .ResponseIsJSONArray %>
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 		<%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{})
@@ -1058,10 +1207,10 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 <%- if eq .Format "xml" %>
 		writeXML(t, w, <% statusConst .ExpectedStatus %>, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
-<%- else if .ReturnsSlice %>
+<%- else if .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 <%- else %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
@@ -1084,7 +1233,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
@@ -1101,7 +1250,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
@@ -1118,11 +1267,11 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
 			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
 		}
-		<%- if and .ResponseType .ReturnsSlice %>
+		<%- if and .ResponseType .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 		<%- else if .ResponseType %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
@@ -1153,7 +1302,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 		<%- if .ResponseType %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 		_, _ = w.Write([]byte("<ok/>"))
@@ -1183,25 +1332,58 @@ func Test<% .Name %>(t *testing.T) {
 <% end %>
 
 <%- define "testUnwrap" %>
+// The envelope shape the spec declares and the bare array the same endpoint
+// may answer with must both decode. Asserting only the declared one is what
+// let the account lists ship broken for five days: the stub served whatever
+// the method assumed, so the unit tests passed while every real call failed.
 func Test<% .Name %>(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != <% httpConst .HTTPMethod %> {
-			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+	bodies := []struct {
+		name string
+		body any
+	}{
 <%- if isStringSlice .UnwrapResults %>
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []string{"item-1"}})
+		{name: "envelope", body: map[string]any{"totalCount": 1, "results": []string{"item-1"}}},
+		{name: "bare_array", body: []string{"item-1"}},
 <%- else %>
-		writeJSON(t, w, http.StatusOK, map[string]any{"totalCount": 1, "results": []map[string]any{{"id": "item-1"}}})
+		{name: "envelope", body: map[string]any{"totalCount": 1, "results": []map[string]any{{}}}},
+		{name: "bare_array", body: []map[string]any{{}}},
 <%- end %>
+	}
+
+	for _, tc := range bodies {
+		t.Run(tc.name, func(t *testing.T) {
+			c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+			mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != <% httpConst .HTTPMethod %> {
+					t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
+				}<% requiredQueryAsserts . %>
+				writeJSON(t, w, http.StatusOK, tc.body)
+			})
+
+			results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(results) != 1 {
+				t.Fatalf("len = %d, want 1", len(results))
+			}
+		})
+	}
+}
+
+func Test<% .Name %>_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
 	})
 
-	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
+	_, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }
 <% end %>
@@ -1212,8 +1394,8 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
-<%- if .ReturnsSlice %>
+		}<% requiredQueryAsserts . %>
+<%- if .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 <%- else %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, map[string]any{})
@@ -1236,14 +1418,14 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}
+		}<% requiredQueryAsserts . %>
 <%- if eq .PaginationStyle "rawArray" %>
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 <%- else %>
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
+			"<% .ResultsField %>": []map[string]any{{}},
+			"totalCount":          1,
+			"hasNext":             false,
 		})
 <%- end %>
 	})
@@ -1254,6 +1436,41 @@ func Test<% .Name %>(t *testing.T) {
 	}
 	if len(results) != 1 {
 		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+<% end %>
+
+<%- define "testPaginatedCursor" %>
+func Test<% .Name %>(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	// Two pages, so the walk is actually exercised: the handler hands out a
+	// cursor on the first call and withholds one on the second. A single-page
+	// stub would pass even if the generated method ignored the cursor entirely.
+	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != <% httpConst .HTTPMethod %> {
+			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
+		}<% requiredQueryAsserts . %>
+		switch r.URL.Query().Get("<% .CursorParam %>") {
+		case "":
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"<% .ResultsField %>": []map[string]any{{}},
+				"<% .CursorField %>":  "page-2",
+			})
+		case "page-2":
+			writeJSON(t, w, http.StatusOK, map[string]any{
+				"<% .ResultsField %>": []map[string]any{{}},
+			})
+		default:
+			t.Errorf("unexpected cursor %q", r.URL.Query().Get("<% .CursorParam %>"))
+		}
+	})
+
+	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 2 {
+		t.Fatalf("len = %d, want 2", len(results))
 	}
 }
 <% end %>
@@ -1370,8 +1587,8 @@ func Test<% .Name %>_Create(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []any{},
-			"totalCount": 0,
+			"<% applyResultsKey .Apply %>": []any{},
+			"totalCount":                    0,
 		})
 	})
 	// Token upload creates the resource.
@@ -1419,8 +1636,8 @@ func Test<% .Name %>_Create(t *testing.T) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
-				"results":    []any{},
-				"totalCount": 0,
+				"<% applyResultsKey .Apply %>": []any{},
+				"totalCount":                    0,
 			})
 		case http.MethodPost:
 			writeJSON(t, w, <% applyCreateStatus .Apply %>, map[string]any{
@@ -1438,8 +1655,8 @@ func Test<% .Name %>_Create(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []any{},
-			"totalCount": 0,
+			"<% applyResultsKey .Apply %>": []any{},
+			"totalCount":                    0,
 		})
 	})
 	mux.HandleFunc("<% applyCreatePath .Apply %>", func(w http.ResponseWriter, r *http.Request) {
@@ -1482,7 +1699,7 @@ func Test<% .Name %>_Update(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
+			"<% applyResultsKey .Apply %>": []map[string]any{
 				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
 			},
 			"totalCount": 1,
@@ -1540,7 +1757,7 @@ func Test<% .Name %>_Update(t *testing.T) {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
+			"<% applyResultsKey .Apply %>": []map[string]any{
 				{"<% .Apply.ListIDField %>": "existing-id", "<% .Apply.ListNameField %>": "target"},
 			},
 			"totalCount": 1,
@@ -1624,13 +1841,18 @@ func Test<% .Name %>_Update(t *testing.T) {
 // testAPIBase builds the URL prefix the generated httptest handlers register,
 // for one namespace and version. It mirrors Transport.APIPrefix.
 //
-// There is no scope segment: the tenant travels in the X-Tenant-Id header, so
-// the path is identical for every tenant. A generated test therefore asserts
-// the path the transport actually builds, and a tenant ID appearing in one
-// would be a bug.
+// There is no /api segment: the GA gateway mounts each namespace at the root
+// (see Transport.APIPrefix). This file is a deliberate second copy of that
+// rule, because the generator is its own Go module and cannot import the SDK —
+// a divergence is self-detecting rather than silent, since the generated
+// handlers would register at a path the client never calls and make test fails.
+//
+// There is no scope segment either: the tenant travels in the X-Tenant-Id
+// header now, so the path is the same for every tenant. That also retired the
+// duplicated tenant-first namespace allowlist this file used to carry.
 func testAPIBase(namespace, version string) string {
 	if version == "" {
-		return fmt.Sprintf("/api/%s", namespace)
+		return fmt.Sprintf("/%s", namespace)
 	}
-	return fmt.Sprintf("/api/%s/%s", namespace, version)
+	return fmt.Sprintf("/%s/%s", namespace, version)
 }

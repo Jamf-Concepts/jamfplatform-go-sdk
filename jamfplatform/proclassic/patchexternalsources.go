@@ -17,7 +17,7 @@ import (
 
 // GetPatchExternalSourceByID finds a patch external source by ID.
 //
-// Required privileges: read:pro:patch-external-source.
+// Required privileges: patch-external-source:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetPatchExternalSourceByID(ctx context.Context, id string) (*Pa
 
 // CreatePatchExternalSourceByID create a new patch external source by ID.
 //
-// Required privileges: create:pro:patch-external-source.
+// Required privileges: patch-external-source:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreatePatchExternalSourceByID(ctx context.Context, id string, r
 
 // UpdatePatchExternalSourceByID updates a patch external source by ID.
 //
-// Required privileges: update:pro:patch-external-source.
+// Required privileges: patch-external-source:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdatePatchExternalSourceByID(ctx context.Context, id string, r
 
 // DeletePatchExternalSourceByID deletes a patch external source by ID.
 //
-// Required privileges: delete:pro:patch-external-source.
+// Required privileges: patch-external-source:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeletePatchExternalSourceByID(ctx context.Context, id string) e
 
 // GetPatchExternalSourceByName finds the first patch external source with the name provided.
 //
-// Required privileges: read:pro:patch-external-source.
+// Required privileges: patch-external-source:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetPatchExternalSourceByName(ctx context.Context, name string) 
 
 // ListPatchExternalSources finds all patch external sources.
 //
-// Required privileges: read:pro:patch-external-source.
+// Required privileges: patch-external-source:read.
 func (c *Client) ListPatchExternalSources(ctx context.Context) (*PatchExternalSources, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result PatchExternalSources
@@ -108,7 +108,7 @@ func (c *Client) ListPatchExternalSources(ctx context.Context) (*PatchExternalSo
 
 // CreatePatchExternalSourceByName create a new patch external source by name.
 //
-// Required privileges: create:pro:patch-external-source.
+// Required privileges: patch-external-source:create.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -124,7 +124,7 @@ func (c *Client) CreatePatchExternalSourceByName(ctx context.Context, name strin
 
 // UpdatePatchExternalSourceByName updates a patch external source by name.
 //
-// Required privileges: update:pro:patch-external-source.
+// Required privileges: patch-external-source:update.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -139,7 +139,7 @@ func (c *Client) UpdatePatchExternalSourceByName(ctx context.Context, name strin
 
 // DeletePatchExternalSourceByName deletes a patch external source by ID.
 //
-// Required privileges: delete:pro:patch-external-source.
+// Required privileges: patch-external-source:delete.
 //
 // Parameters:
 //   - name: ID value to filter by.

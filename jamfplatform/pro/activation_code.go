@@ -18,7 +18,7 @@ import (
 
 // UpdateActivationCodeV1 updates Activation Code.
 //
-// Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update License Information.
+// Required privileges: activation-code:update. Legacy Jamf Pro privilege name(s): Update License Information.
 func (c *Client) UpdateActivationCodeV1(ctx context.Context, request *ActivationCode) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/activation-code"
@@ -30,7 +30,7 @@ func (c *Client) UpdateActivationCodeV1(ctx context.Context, request *Activation
 
 // ListActivationCodeHistoryV1 get Activation Code history object.
 //
-// Required privileges: read:pro:activation-code. Legacy Jamf Pro privilege name(s): Read License Information.
+// Required privileges: activation-code:read. Legacy Jamf Pro privilege name(s): Read License Information.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Fields allowed in the
@@ -71,7 +71,7 @@ func (c *Client) ListActivationCodeHistoryV1(ctx context.Context, sort []string,
 
 // CreateActivationCodeHistoryNoteV1 add Activation Code object note.
 //
-// Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update License Information.
+// Required privileges: activation-code:update. Legacy Jamf Pro privilege name(s): Update License Information.
 func (c *Client) CreateActivationCodeHistoryNoteV1(ctx context.Context, request *ObjectHistoryNote) (*ObjectHistory, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
@@ -84,7 +84,7 @@ func (c *Client) CreateActivationCodeHistoryNoteV1(ctx context.Context, request 
 
 // ExportActivationCodeHistoryV1 export history object collection in specified format for Activation Code.
 //
-// Required privileges: read:pro:activation-code. Legacy Jamf Pro privilege name(s): Read License Information.
+// Required privileges: activation-code:read. Legacy Jamf Pro privilege name(s): Read License Information.
 func (c *Client) ExportActivationCodeHistoryV1(ctx context.Context, request *ExportParameters) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []byte
@@ -97,7 +97,7 @@ func (c *Client) ExportActivationCodeHistoryV1(ctx context.Context, request *Exp
 
 // UpdateActivationCodeOrganizationNameV1 updates Organization Name.
 //
-// Required privileges: update:pro:activation-code. Legacy Jamf Pro privilege name(s): Update License Information.
+// Required privileges: activation-code:update. Legacy Jamf Pro privilege name(s): Update License Information.
 func (c *Client) UpdateActivationCodeOrganizationNameV1(ctx context.Context, request *OrganizationName) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/activation-code/organization-name"

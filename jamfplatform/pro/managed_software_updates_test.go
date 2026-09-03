@@ -13,7 +13,7 @@ import (
 
 func TestListAvailableOsUpdatesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/available-updates", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/available-updates", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListAvailableOsUpdatesV1(t *testing.T) {
 
 func TestListAvailableOsUpdatesV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/available-updates", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/available-updates", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListAvailableOsUpdatesV1_NotFound(t *testing.T) {
 
 func TestListManagedSoftwareUpdatePlansV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -69,7 +69,7 @@ func TestListManagedSoftwareUpdatePlansV1(t *testing.T) {
 
 func TestCreateManagedSoftwareUpdatePlanV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestCreateManagedSoftwareUpdatePlanV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateFeatureToggleV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/feature-toggle", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/feature-toggle", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestGetManagedSoftwareUpdateFeatureToggleV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateFeatureToggleV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/feature-toggle", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/feature-toggle", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -121,7 +121,7 @@ func TestGetManagedSoftwareUpdateFeatureToggleV1_NotFound(t *testing.T) {
 
 func TestUpdateManagedSoftwareUpdateFeatureToggleV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/feature-toggle", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/feature-toggle", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -139,7 +139,7 @@ func TestUpdateManagedSoftwareUpdateFeatureToggleV1(t *testing.T) {
 
 func TestAbandonManagedSoftwareUpdateFeatureToggleV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/feature-toggle/abandon", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/feature-toggle/abandon", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -154,7 +154,7 @@ func TestAbandonManagedSoftwareUpdateFeatureToggleV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateFeatureToggleStatusV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/feature-toggle/status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/feature-toggle/status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -172,7 +172,7 @@ func TestGetManagedSoftwareUpdateFeatureToggleStatusV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateFeatureToggleStatusV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/feature-toggle/status", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/feature-toggle/status", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -188,7 +188,7 @@ func TestGetManagedSoftwareUpdateFeatureToggleStatusV1_NotFound(t *testing.T) {
 
 func TestCreateManagedSoftwareUpdateGroupPlanV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/group", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/group", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -206,9 +206,12 @@ func TestCreateManagedSoftwareUpdateGroupPlanV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateGroupPlansV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/group/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/group/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if !r.URL.Query().Has("group-type") {
+			t.Errorf("required query param group-type not sent: %q", r.URL.RawQuery)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
@@ -224,7 +227,7 @@ func TestGetManagedSoftwareUpdateGroupPlansV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateGroupPlansV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/group/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/group/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -240,7 +243,7 @@ func TestGetManagedSoftwareUpdateGroupPlansV1_NotFound(t *testing.T) {
 
 func TestGetManagedSoftwareUpdatePlanV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -258,7 +261,7 @@ func TestGetManagedSoftwareUpdatePlanV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdatePlanV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -274,7 +277,7 @@ func TestGetManagedSoftwareUpdatePlanV1_NotFound(t *testing.T) {
 
 func TestGetManagedSoftwareUpdatePlanDeclarationsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/test-id/declarations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/test-id/declarations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -292,7 +295,7 @@ func TestGetManagedSoftwareUpdatePlanDeclarationsV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdatePlanDeclarationsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/test-id/declarations", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/test-id/declarations", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -308,7 +311,7 @@ func TestGetManagedSoftwareUpdatePlanDeclarationsV1_NotFound(t *testing.T) {
 
 func TestGetManagedSoftwareUpdatePlanEventsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/test-id/events", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/test-id/events", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -326,7 +329,7 @@ func TestGetManagedSoftwareUpdatePlanEventsV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdatePlanEventsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/plans/test-id/events", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/plans/test-id/events", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -342,7 +345,7 @@ func TestGetManagedSoftwareUpdatePlanEventsV1_NotFound(t *testing.T) {
 
 func TestListManagedSoftwareUpdateStatusesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -360,7 +363,7 @@ func TestListManagedSoftwareUpdateStatusesV1(t *testing.T) {
 
 func TestListManagedSoftwareUpdateStatusesV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -376,7 +379,7 @@ func TestListManagedSoftwareUpdateStatusesV1_NotFound(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateStatusesForComputerGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/computer-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/computer-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -394,7 +397,7 @@ func TestGetManagedSoftwareUpdateStatusesForComputerGroupV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateStatusesForComputerGroupV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/computer-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/computer-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -410,7 +413,7 @@ func TestGetManagedSoftwareUpdateStatusesForComputerGroupV1_NotFound(t *testing.
 
 func TestGetManagedSoftwareUpdateStatusesForComputerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/computers/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/computers/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -428,7 +431,7 @@ func TestGetManagedSoftwareUpdateStatusesForComputerV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateStatusesForComputerV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/computers/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/computers/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -444,7 +447,7 @@ func TestGetManagedSoftwareUpdateStatusesForComputerV1_NotFound(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/mobile-device-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/mobile-device-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -462,7 +465,7 @@ func TestGetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/mobile-device-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/mobile-device-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -478,7 +481,7 @@ func TestGetManagedSoftwareUpdateStatusesForMobileDeviceGroupV1_NotFound(t *test
 
 func TestGetManagedSoftwareUpdateStatusesForMobileDeviceV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -496,7 +499,7 @@ func TestGetManagedSoftwareUpdateStatusesForMobileDeviceV1(t *testing.T) {
 
 func TestGetManagedSoftwareUpdateStatusesForMobileDeviceV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/managed-software-updates/update-statuses/mobile-devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/managed-software-updates/update-statuses/mobile-devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

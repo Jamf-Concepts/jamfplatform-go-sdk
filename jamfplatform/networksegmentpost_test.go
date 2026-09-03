@@ -34,7 +34,7 @@ func TestNetworkSegmentPost_CreateSendsRelatedEntityFields(t *testing.T) {
 			"expires_in":   3600,
 		})
 	})
-	mux.HandleFunc("/api/proclassic/networksegments/id/0", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/networksegments/id/0", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

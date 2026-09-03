@@ -9,11 +9,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"regexp"
-	"sort"
+	"net/http"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -99,6 +96,21 @@ func TestAcceptance_Pro_MdmUpdates_GetEnableAllApnsClientsStatusV1(t *testing.T)
 	status, err := pro.New(c).GetEnableAllApnsClientsStatusV1(context.Background())
 	if err != nil {
 		skipOnServerError(t, err)
+		// 404 here is "no enable-all request has ever been made on this
+		// instance", not a missing endpoint. Wire-verified 2026-09-03 on two
+		// instances running the identical build 11.31.1-t1787060595569: one had
+		// a real record (status COMPLETED, requestedTime 2026-08-30) and
+		// answered 200; the other had never had a request and answered 404 with
+		// an empty errors array. The endpoint reports the status OF a request,
+		// so with no request there is nothing to report.
+		//
+		// Not tolerated blindly: the body must be the empty-errors 404 that
+		// shape produces. Anything else still fails, and only EnableAllApnsClientsV1
+		// — which is state-changing on real MDM clients and so never called here —
+		// could make this return 200 on a fresh instance.
+		if apiErr := jamfplatform.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) && len(apiErr.FieldErrors()) == 0 {
+			t.Skip("no enable-all APNs request has been made on this instance, so there is no status to read (404)")
+		}
 		t.Fatalf("GetEnableAllApnsClientsStatusV1: %v", err)
 	}
 	t.Logf("Enable-all APNs clients status: %+v", status)
@@ -175,6 +187,61 @@ func TestAcceptance_Pro_MdmUpdates_ListManagedSoftwareUpdatePlansV1(t *testing.T
 	t.Logf("Managed software update plans: %d", len(plans))
 }
 
+// TestAcceptance_Pro_MdmUpdates_GetGroupPlansV1 covers the one
+// managed-software-update read that takes a spec-required query parameter.
+// group-type is required: true with a two-value enum, so the generated method
+// sends it unconditionally rather than dropping an empty one — see
+// resolveQueryParams in tools/generate.
+//
+// The server does NOT enforce it, which is the finding worth recording:
+// probed 2026-09-01 against group id 1 on Jamf Pro 11.31.1, all of
+// group-type=COMPUTER_GROUP, group-type=MOBILE_DEVICE_GROUP, group-type= and
+// the parameter omitted entirely answer 200 with the same body, while
+// group-type=BOGUS is 400 INVALID_REQUEST_PARAMETER_TYPE naming the Java enum.
+// So required-ness here is documentation, not validation, and the two group
+// types are not distinguished on a group that has no plans. A 400 for the
+// empty value appearing later means the server started enforcing it.
+func TestAcceptance_Pro_MdmUpdates_GetGroupPlansV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	groups, err := p.ListComputerGroupsV1(ctx)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputerGroupsV1: %v", err)
+	}
+	if len(groups) == 0 {
+		t.Skip("no computer groups on this tenant")
+	}
+	id := groups[0].ID
+
+	plans, err := p.GetManagedSoftwareUpdateGroupPlansV1(ctx, id, "COMPUTER_GROUP")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetManagedSoftwareUpdateGroupPlansV1(%s, COMPUTER_GROUP): %v", id, err)
+	}
+	t.Logf("Group %s has %d managed software update plans", id, len(plans.Results))
+
+	// An out-of-enum value is the only rejection this endpoint has.
+	_, err = p.GetManagedSoftwareUpdateGroupPlansV1(ctx, id, "BOGUS")
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusBadRequest) {
+		skipOnServerError(t, err)
+		t.Fatalf("GetManagedSoftwareUpdateGroupPlansV1(%s, BOGUS) = %v, want 400", id, err)
+	}
+	if d := apiErr.Details(); len(d) == 0 || d[0].Code != "INVALID_REQUEST_PARAMETER_TYPE" {
+		t.Errorf("details = %+v, want INVALID_REQUEST_PARAMETER_TYPE", d)
+	}
+
+	// The empty value travels (that is the point of the required-param
+	// emission) and the server accepts it, same as COMPUTER_GROUP.
+	if _, err := p.GetManagedSoftwareUpdateGroupPlansV1(ctx, id, ""); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("GetManagedSoftwareUpdateGroupPlansV1(%s, \"\") = %v, want nil: an empty group-type is accepted, so a failure here means the server began enforcing required-ness", id, err)
+	}
+}
+
 // TestAcceptance_Pro_MdmUpdates_FeatureToggleRoundTripV1 reads the
 // feature-toggle settings, writes them back unchanged, and reads status.
 // Doesn't abandon — that's a one-way action.
@@ -235,10 +302,10 @@ func TestAcceptance_Pro_MdmUpdates_UpdateStatusesForRealComputer(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	computers, err := p.ListComputersInventoryV3(ctx, nil, nil, "")
+	computers, err := p.ListComputersInventoryV4(ctx, nil, nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListComputersInventoryV3: %v", err)
+		t.Fatalf("ListComputersInventoryV4: %v", err)
 	}
 	if len(computers) == 0 {
 		t.Skip("tenant has no computers")
@@ -272,144 +339,19 @@ func TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV2(t *testing.T) {
 	t.Logf("Recent MDM commands (status==Pending): %d", len(cmds))
 }
 
-func TestAcceptance_Pro_MdmUpdates_SendMdmCommandV2(t *testing.T) {
-	t.Skip("sends an MDM command to real enrolled devices — manual curl against a disposable target only")
-}
-
-// nonexistentManagementID is a syntactically valid managementId that no device
-// can hold. Sending to it exercises the request path without any command
-// reaching a device — the same trick the mdm-renewal reads below use.
-const nonexistentManagementID = "00000000-0000-0000-0000-000000000000"
-
-// knownCommandTypesRe extracts the command ids from the server's type
-// resolution failure, which enumerates every id it accepts:
+// POST /api/pro/v2/mdm/commands is no longer covered. Jamf withdrew it from
+// the published spec in the GA cleanup (public-apis-oas#395; the GET is
+// retained), so the SDK no longer generates SendMdmCommandV2 and the request
+// types MDMCommandRequest / MDMCommandClientRequest are gone with it.
 //
-//	Could not resolve type id 'X' as a subtype of ...: known type ids = [A, B, …]
-var knownCommandTypesRe = regexp.MustCompile(`known type ids = \[([^\]]*)\]`)
-
-// TestAcceptance_Pro_MdmUpdates_CommandTypeEnumMatchesServer checks the
-// generated MDMCommandType constants against the live server's own list.
-//
-// An unresolvable commandType makes the server enumerate every id it knows, so
-// one deliberately-invalid request yields the authoritative set. That makes this
-// a standing check on the generated enum rather than a snapshot: when Jamf adds
-// a command type, this fails and tells us the name.
-//
-// Nothing is sent to a device — the payload is rejected during deserialisation,
-// before the target is even considered.
-func TestAcceptance_Pro_MdmUpdates_CommandTypeEnumMatchesServer(t *testing.T) {
-	c := accClient(t)
-	managementID := nonexistentManagementID
-
-	_, err := pro.New(c).SendMdmCommandV2(context.Background(), &pro.MDMCommandRequest{
-		ClientData:  &[]pro.MDMCommandClientRequest{{ManagementID: &managementID}},
-		CommandData: map[string]any{"commandType": "SDK_ACC_NOT_A_COMMAND_TYPE"},
-	})
-	if err == nil {
-		t.Fatal("SendMdmCommandV2 accepted an unknown commandType — expected a type resolution failure")
-	}
-	apiErr := jamfplatform.AsAPIError(err)
-	if apiErr == nil {
-		skipOnServerError(t, err)
-		t.Fatalf("SendMdmCommandV2: non-HTTP error: %v", err)
-	}
-	m := knownCommandTypesRe.FindStringSubmatch(apiErr.Summary())
-	if m == nil {
-		// The server changed how it reports this; the enum is unverified rather
-		// than wrong, so say so instead of failing on a message format.
-		t.Skipf("server no longer enumerates known command types; response was: %s", apiErr.Summary())
-	}
-
-	server := make(map[string]bool)
-	for _, v := range strings.Split(m[1], ",") {
-		if v = strings.TrimSpace(v); v != "" {
-			server[v] = true
-		}
-	}
-	emitted := make(map[string]bool)
-	for _, v := range pro.MDMCommandTypeValues() {
-		emitted[v] = true
-	}
-	t.Logf("server accepts %d command types; SDK emits %d constants", len(server), len(emitted))
-
-	var missing []string
-	for v := range server {
-		if !emitted[v] {
-			missing = append(missing, v)
-		}
-	}
-	sort.Strings(missing)
-	if len(missing) > 0 {
-		t.Errorf("server accepts command types the SDK does not emit: %v — the Pro spec is behind, add them via the generator", missing)
-	}
-
-	// The reverse is expected, not an error: Jamf retains a command type in the
-	// spec after the server stops accepting it. DEVICE_LOCATION is in that state
-	// as of 11.30 (Apple deprecated the command), and the SDK deliberately keeps
-	// spec-declared values until Jamf removes them. Logged so the drift stays
-	// visible.
-	var stale []string
-	for v := range emitted {
-		if !server[v] {
-			stale = append(stale, v)
-		}
-	}
-	sort.Strings(stale)
-	if len(stale) > 0 {
-		t.Logf("SDK emits command types the server no longer accepts (spec retains them): %v", stale)
-	}
-}
-
-// TestAcceptance_Pro_MdmUpdates_EnhancedLogCollectionCommands covers the two
-// command payloads added in Jamf Pro 11.30, without triggering log collection
-// on anything: the target managementId cannot exist, so the request fails at
-// the device rather than at the payload.
-//
-// What is being verified is that the server resolves both commandType values
-// and accepts the generated struct shapes. A type resolution failure here would
-// mean the generated enum value or payload does not match the server.
-func TestAcceptance_Pro_MdmUpdates_EnhancedLogCollectionCommands(t *testing.T) {
-	c := pro.New(accClient(t))
-	managementID := nonexistentManagementID
-
-	cases := []struct {
-		name string
-		data any
-	}{
-		{"trigger", pro.TriggerEnhancedLogCollectionCommand{
-			CommandType:    pro.MDMCommandTypeTriggerEnhancedLogCollection,
-			AppleCareToken: "sdk-acc-not-a-real-applecare-token",
-		}},
-		{"cancel", pro.CancelEnhancedLogCollectionCommand{
-			CommandType: pro.MDMCommandTypeCancelEnhancedLogCollection,
-		}},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := c.SendMdmCommandV2(context.Background(), &pro.MDMCommandRequest{
-				ClientData:  &[]pro.MDMCommandClientRequest{{ManagementID: &managementID}},
-				CommandData: tc.data,
-			})
-			if err == nil {
-				// Would mean the server queued a command for a device that
-				// cannot exist. Worth knowing about.
-				t.Fatalf("SendMdmCommandV2(%s) succeeded against managementId %s", tc.name, managementID)
-			}
-			apiErr := jamfplatform.AsAPIError(err)
-			if apiErr == nil {
-				skipOnServerError(t, err)
-				t.Fatalf("SendMdmCommandV2(%s): non-HTTP error: %v", tc.name, err)
-			}
-			if knownCommandTypesRe.MatchString(apiErr.Summary()) {
-				t.Fatalf("server did not recognise the commandType — generated enum or payload is wrong: %s", apiErr.Summary())
-			}
-			// Expected: rejected on the target, which is the property being
-			// relied on to keep this test harmless.
-			t.Logf("%s: commandType resolved; rejected at the device as expected — %s", tc.name, apiErr.Summary())
-		})
-	}
-}
+// Three tests went with it, and one is a real loss worth restoring if a
+// successor appears: CommandTypeEnumMatchesServer used the server's own type
+// resolution failure ("known type ids = [A, B, …]") as an oracle for the
+// MDMCommandType enum, which is the only wire confirmation that the generated
+// constants match what the server accepts. MDMCommandType itself survives, from
+// MDMCommand on the read side, so the enum is still emitted — just unverified.
+// The other two (SendMdmCommandV2, EnhancedLogCollectionCommands) only probed
+// the withdrawn path.
 
 func TestAcceptance_Pro_MdmUpdates_SendMdmBlankPushV2(t *testing.T) {
 	t.Skip("blank push to a real enrolled device — manual curl only")
@@ -496,13 +438,13 @@ func TestAcceptance_Pro_MdmUpdates_ListReturnToServiceV1(t *testing.T) {
 // The embedded .mobileconfig plist is a minimal unsigned Wi-Fi payload
 // with a fake SSID; it's valid enough for Jamf Pro to store but will
 // never be served to a real device. Override with an existing profile
-// via JAMFPLATFORM_WIFI_PROFILE_ID to skip the Classic-side fixture.
+// via JAMFPLATFORM_ACC_PRO_WIFI_PROFILE_ID to skip the Classic-side fixture.
 func TestAcceptance_Pro_MdmUpdates_ReturnToServiceCRUDV1(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	p := pro.New(c)
 
-	wifiProfileID := os.Getenv("JAMFPLATFORM_WIFI_PROFILE_ID")
+	wifiProfileID := accEnv("JAMFPLATFORM_ACC_PRO_WIFI_PROFILE_ID")
 	if wifiProfileID == "" {
 		wifiProfileID = createWifiProfileFixture(t)
 	}

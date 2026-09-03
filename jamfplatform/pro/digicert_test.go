@@ -13,7 +13,7 @@ import (
 
 func TestCreateDigicertTrustLifecycleManagerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestCreateDigicertTrustLifecycleManagerV1(t *testing.T) {
 
 func TestGetDigicertTrustLifecycleManagerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -49,7 +49,7 @@ func TestGetDigicertTrustLifecycleManagerV1(t *testing.T) {
 
 func TestGetDigicertTrustLifecycleManagerV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -65,7 +65,7 @@ func TestGetDigicertTrustLifecycleManagerV1_NotFound(t *testing.T) {
 
 func TestUpdateDigicertTrustLifecycleManagerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -80,7 +80,7 @@ func TestUpdateDigicertTrustLifecycleManagerV1(t *testing.T) {
 
 func TestDeleteDigicertTrustLifecycleManagerV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -95,7 +95,7 @@ func TestDeleteDigicertTrustLifecycleManagerV1(t *testing.T) {
 
 func TestGetDigicertTrustLifecycleManagerConnectionStatusV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/connection-status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/connection-status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -113,7 +113,7 @@ func TestGetDigicertTrustLifecycleManagerConnectionStatusV1(t *testing.T) {
 
 func TestGetDigicertTrustLifecycleManagerConnectionStatusV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/connection-status", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/connection-status", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -129,7 +129,7 @@ func TestGetDigicertTrustLifecycleManagerConnectionStatusV1_NotFound(t *testing.
 
 func TestGetDigicertTrustLifecycleManagerDependenciesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/dependencies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/dependencies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -147,7 +147,7 @@ func TestGetDigicertTrustLifecycleManagerDependenciesV1(t *testing.T) {
 
 func TestGetDigicertTrustLifecycleManagerDependenciesV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/dependencies", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/dependencies", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -163,7 +163,7 @@ func TestGetDigicertTrustLifecycleManagerDependenciesV1_NotFound(t *testing.T) {
 
 func TestCheckDigicertTrustLifecycleManagerPrivilegesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/privilege-check", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/test-id/privilege-check", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -178,7 +178,7 @@ func TestCheckDigicertTrustLifecycleManagerPrivilegesV1(t *testing.T) {
 
 func TestValidateDigicertClientCertificateV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/digicert/trust-lifecycle-manager/validate-client-certificate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/digicert/trust-lifecycle-manager/validate-client-certificate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}

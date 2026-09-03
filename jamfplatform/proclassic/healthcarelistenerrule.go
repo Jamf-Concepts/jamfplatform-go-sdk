@@ -14,7 +14,7 @@ import (
 
 // GetHealthcareListenerRuleByID finds Healthcare Listener rules by ID.
 //
-// Required privileges: read:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetHealthcareListenerRuleByID(ctx context.Context, id string) (
 
 // CreateHealthcareListenerRuleByID creates a new Healthcare Listener rule.
 //
-// Required privileges: create:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -46,7 +46,7 @@ func (c *Client) CreateHealthcareListenerRuleByID(ctx context.Context, id string
 
 // UpdateHealthcareListenerRuleByID updates an existing Healthcare Listener rule by ID.
 //
-// Required privileges: update:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -61,7 +61,7 @@ func (c *Client) UpdateHealthcareListenerRuleByID(ctx context.Context, id string
 
 // ListHealthcareListenerRules find all Healthcare Listener rules.
 //
-// Required privileges: read:pro:infrastructure-managers.
+// Required privileges: infrastructure-managers:read.
 func (c *Client) ListHealthcareListenerRules(ctx context.Context) (*HealthcareListenerRules, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result HealthcareListenerRules

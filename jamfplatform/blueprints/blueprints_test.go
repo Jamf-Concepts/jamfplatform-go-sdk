@@ -13,7 +13,7 @@ import (
 
 func TestListBlueprints(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListBlueprints(t *testing.T) {
 
 func TestCreateBlueprint(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestCreateBlueprint(t *testing.T) {
 
 func TestGetBlueprint(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -71,7 +71,7 @@ func TestGetBlueprint(t *testing.T) {
 
 func TestGetBlueprint_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -87,7 +87,7 @@ func TestGetBlueprint_NotFound(t *testing.T) {
 
 func TestUpdateBlueprint(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -102,7 +102,7 @@ func TestUpdateBlueprint(t *testing.T) {
 
 func TestDeleteBlueprint(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestDeleteBlueprint(t *testing.T) {
 
 func TestDeployBlueprint(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id/deploy", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id/deploy", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -132,7 +132,7 @@ func TestDeployBlueprint(t *testing.T) {
 
 func TestUndeployBlueprint(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id/undeploy", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id/undeploy", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -147,7 +147,7 @@ func TestUndeployBlueprint(t *testing.T) {
 
 func TestGetBlueprintReport(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id/report", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id/report", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -165,7 +165,7 @@ func TestGetBlueprintReport(t *testing.T) {
 
 func TestGetBlueprintReport_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints/test-id/report", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints/test-id/report", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -181,7 +181,7 @@ func TestGetBlueprintReport_NotFound(t *testing.T) {
 
 func TestListBlueprintComponents(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprint-components", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprint-components", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -203,7 +203,7 @@ func TestListBlueprintComponents(t *testing.T) {
 
 func TestGetBlueprintComponent(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprint-components/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprint-components/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -221,7 +221,7 @@ func TestGetBlueprintComponent(t *testing.T) {
 
 func TestGetBlueprintComponent_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprint-components/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprint-components/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -237,7 +237,7 @@ func TestGetBlueprintComponent_NotFound(t *testing.T) {
 
 func TestResolveBlueprintIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -260,7 +260,7 @@ func TestResolveBlueprintIDByName(t *testing.T) {
 
 func TestResolveBlueprintByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprints", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -283,7 +283,7 @@ func TestResolveBlueprintByName(t *testing.T) {
 
 func TestResolveBlueprintComponentIDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprint-components", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprint-components", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -306,7 +306,7 @@ func TestResolveBlueprintComponentIDByName(t *testing.T) {
 
 func TestResolveBlueprintComponentByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/blueprints/v1/blueprint-components", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/blueprints/v1/blueprint-components", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

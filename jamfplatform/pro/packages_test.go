@@ -15,7 +15,7 @@ import (
 
 func TestListPackagesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -37,7 +37,7 @@ func TestListPackagesV1(t *testing.T) {
 
 func TestCreatePackageV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -55,7 +55,7 @@ func TestCreatePackageV1(t *testing.T) {
 
 func TestGetPackageV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -73,7 +73,7 @@ func TestGetPackageV1(t *testing.T) {
 
 func TestGetPackageV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -89,7 +89,7 @@ func TestGetPackageV1_NotFound(t *testing.T) {
 
 func TestUpdatePackageV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -107,7 +107,7 @@ func TestUpdatePackageV1(t *testing.T) {
 
 func TestDeletePackageV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -122,7 +122,7 @@ func TestDeletePackageV1(t *testing.T) {
 
 func TestUploadPackageV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id/upload", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id/upload", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -142,7 +142,7 @@ func TestUploadPackageV1(t *testing.T) {
 
 func TestDeleteMultiplePackagesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -157,7 +157,7 @@ func TestDeleteMultiplePackagesV1(t *testing.T) {
 
 func TestExportPackagesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -175,7 +175,7 @@ func TestExportPackagesV1(t *testing.T) {
 
 func TestListPackageHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -197,7 +197,7 @@ func TestListPackageHistoryV1(t *testing.T) {
 
 func TestCreatePackageHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -215,7 +215,7 @@ func TestCreatePackageHistoryNoteV1(t *testing.T) {
 
 func TestExportPackageHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id/history/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id/history/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -233,7 +233,7 @@ func TestExportPackageHistoryV1(t *testing.T) {
 
 func TestUploadPackageManifestV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id/manifest", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id/manifest", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -253,7 +253,7 @@ func TestUploadPackageManifestV1(t *testing.T) {
 
 func TestDeletePackageManifestV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages/test-id/manifest", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/test-id/manifest", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -268,7 +268,7 @@ func TestDeletePackageManifestV1(t *testing.T) {
 
 func TestResolvePackageV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -291,7 +291,7 @@ func TestResolvePackageV1IDByName(t *testing.T) {
 
 func TestResolvePackageV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -315,7 +315,7 @@ func TestResolvePackageV1ByName(t *testing.T) {
 func TestApplyPackageV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -347,7 +347,7 @@ func TestApplyPackageV1_Create(t *testing.T) {
 func TestApplyPackageV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -358,7 +358,7 @@ func TestApplyPackageV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/packages/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/packages/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

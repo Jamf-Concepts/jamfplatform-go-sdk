@@ -5,31 +5,6 @@
 
 package ddmreport
 
-// DeclarationReportClientDtoValidityState is the set of values accepted by DeclarationReportClientDto.ValidityState.
-type DeclarationReportClientDtoValidityState = string
-
-// DeclarationReportClientDtoValidityState values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	DeclarationReportClientDtoValidityStateValid   DeclarationReportClientDtoValidityState = "VALID"
-	DeclarationReportClientDtoValidityStateInvalid DeclarationReportClientDtoValidityState = "INVALID"
-	DeclarationReportClientDtoValidityStateUnknown DeclarationReportClientDtoValidityState = "UNKNOWN"
-)
-
-// DeclarationReportClientDtoValidityStateValues returns every value the Jamf API accepts for DeclarationReportClientDtoValidityState,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func DeclarationReportClientDtoValidityStateValues() []DeclarationReportClientDtoValidityState {
-	return []DeclarationReportClientDtoValidityState{
-		DeclarationReportClientDtoValidityStateValid,
-		DeclarationReportClientDtoValidityStateInvalid,
-		DeclarationReportClientDtoValidityStateUnknown,
-	}
-}
-
 // FilteredResultDtoStatus is the set of values accepted by FilteredResultDto.Status.
 type FilteredResultDtoStatus = string
 
@@ -110,88 +85,5 @@ func FilteredResultDtoValidityStateValues() []FilteredResultDtoValidityState {
 		FilteredResultDtoValidityStateValid,
 		FilteredResultDtoValidityStateInvalid,
 		FilteredResultDtoValidityStateUnknown,
-	}
-}
-
-// StatusReportDeclarationDtoStatus is the set of values accepted by StatusReportDeclarationDto.Status.
-type StatusReportDeclarationDtoStatus = string
-
-// StatusReportDeclarationDtoStatus values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	StatusReportDeclarationDtoStatusPending      StatusReportDeclarationDtoStatus = "PENDING"
-	StatusReportDeclarationDtoStatusSuccessful   StatusReportDeclarationDtoStatus = "SUCCESSFUL"
-	StatusReportDeclarationDtoStatusAwaitingSync StatusReportDeclarationDtoStatus = "AWAITING_SYNC"
-	StatusReportDeclarationDtoStatusUnsuccessful StatusReportDeclarationDtoStatus = "UNSUCCESSFUL"
-	StatusReportDeclarationDtoStatusUnknown      StatusReportDeclarationDtoStatus = "UNKNOWN"
-)
-
-// StatusReportDeclarationDtoStatusValues returns every value the Jamf API accepts for StatusReportDeclarationDtoStatus,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func StatusReportDeclarationDtoStatusValues() []StatusReportDeclarationDtoStatus {
-	return []StatusReportDeclarationDtoStatus{
-		StatusReportDeclarationDtoStatusPending,
-		StatusReportDeclarationDtoStatusSuccessful,
-		StatusReportDeclarationDtoStatusAwaitingSync,
-		StatusReportDeclarationDtoStatusUnsuccessful,
-		StatusReportDeclarationDtoStatusUnknown,
-	}
-}
-
-// StatusReportDeclarationDtoType is the set of values accepted by StatusReportDeclarationDto.Type.
-type StatusReportDeclarationDtoType = string
-
-// StatusReportDeclarationDtoType values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	StatusReportDeclarationDtoTypeAsset         StatusReportDeclarationDtoType = "ASSET"
-	StatusReportDeclarationDtoTypeManagement    StatusReportDeclarationDtoType = "MANAGEMENT"
-	StatusReportDeclarationDtoTypeConfiguration StatusReportDeclarationDtoType = "CONFIGURATION"
-	StatusReportDeclarationDtoTypeActivation    StatusReportDeclarationDtoType = "ACTIVATION"
-	StatusReportDeclarationDtoTypeUnknown       StatusReportDeclarationDtoType = "UNKNOWN"
-)
-
-// StatusReportDeclarationDtoTypeValues returns every value the Jamf API accepts for StatusReportDeclarationDtoType,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func StatusReportDeclarationDtoTypeValues() []StatusReportDeclarationDtoType {
-	return []StatusReportDeclarationDtoType{
-		StatusReportDeclarationDtoTypeAsset,
-		StatusReportDeclarationDtoTypeManagement,
-		StatusReportDeclarationDtoTypeConfiguration,
-		StatusReportDeclarationDtoTypeActivation,
-		StatusReportDeclarationDtoTypeUnknown,
-	}
-}
-
-// StatusReportDeclarationDtoValidityState is the set of values accepted by StatusReportDeclarationDto.ValidityState.
-type StatusReportDeclarationDtoValidityState = string
-
-// StatusReportDeclarationDtoValidityState values accepted by the Jamf API. The alias above is a string, so
-// these constants pass to any parameter or field declared as a plain string.
-const (
-	StatusReportDeclarationDtoValidityStateValid   StatusReportDeclarationDtoValidityState = "VALID"
-	StatusReportDeclarationDtoValidityStateInvalid StatusReportDeclarationDtoValidityState = "INVALID"
-	StatusReportDeclarationDtoValidityStateUnknown StatusReportDeclarationDtoValidityState = "UNKNOWN"
-)
-
-// StatusReportDeclarationDtoValidityStateValues returns every value the Jamf API accepts for StatusReportDeclarationDtoValidityState,
-// in the order the spec declares them. Returns a fresh slice per call, so no
-// caller can corrupt the set for the rest of the process — which a package
-// level var would allow. Suits attribute validation (Terraform's
-// stringvalidator.OneOf, say) and anything that needs to enumerate the set
-// rather than name one member.
-func StatusReportDeclarationDtoValidityStateValues() []StatusReportDeclarationDtoValidityState {
-	return []StatusReportDeclarationDtoValidityState{
-		StatusReportDeclarationDtoValidityStateValid,
-		StatusReportDeclarationDtoValidityStateInvalid,
-		StatusReportDeclarationDtoValidityStateUnknown,
 	}
 }

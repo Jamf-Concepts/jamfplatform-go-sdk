@@ -14,7 +14,7 @@ import (
 
 // GetComputerCommandByUUID finds a computer command by UUID.
 //
-// Required privileges: read:pro:computer-commands.
+// Required privileges: device-actions:read.
 //
 // Parameters:
 //   - uuid: UUID to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetComputerCommandByUUID(ctx context.Context, uuid string) (*Co
 
 // IssueComputerCommandByID creates a new computer command using command name and device IDs.
 //
-// Required privileges: create:pro:computer-commands.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - command: Command to send (EnableRemoteDesktop and DisableRemoteDesktop require macOS 10.14.4).
@@ -48,7 +48,7 @@ func (c *Client) IssueComputerCommandByID(ctx context.Context, command string, i
 
 // GetComputerCommandByName finds all computer commands by name.
 //
-// Required privileges: read:pro:computer-commands.
+// Required privileges: device-actions:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -64,7 +64,7 @@ func (c *Client) GetComputerCommandByName(ctx context.Context, name string) (*Co
 
 // ListComputerCommands finds all computer commands.
 //
-// Required privileges: read:pro:computer-commands.
+// Required privileges: device-actions:read.
 func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result ComputerCommands
@@ -77,7 +77,7 @@ func (c *Client) ListComputerCommands(ctx context.Context) (*ComputerCommands, e
 
 // CreateComputerCommandByCommand creates a new computer command using command name.
 //
-// Required privileges: create:pro:computer-commands.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - command: Allowed values: "EnableRemoteDesktop (macOS 10.14.4 and later)", "DisableRemoteDesktop (macOS
@@ -94,7 +94,7 @@ func (c *Client) CreateComputerCommandByCommand(ctx context.Context, command str
 
 // GetComputerCommandsByCommand finds all computer commands by name.
 //
-// Required privileges: read:pro:computer-commands.
+// Required privileges: device-actions:read.
 //
 // Parameters:
 //   - command: Name to filter by.
@@ -110,7 +110,7 @@ func (c *Client) GetComputerCommandsByCommand(ctx context.Context, command strin
 
 // GetComputerCommandsByStatus finds a computer command by UUID.
 //
-// Required privileges: read:pro:computer-commands.
+// Required privileges: device-actions:read.
 //
 // Parameters:
 //   - uuid: UUID to filter by.

@@ -53,7 +53,7 @@ type BenchmarkRequestV2 struct {
 	SelectedOsVersions *[]OsVersion `json:"selectedOsVersions,omitempty"`
 	// The identifier of the source baseline from which this benchmark is derived.
 	SourceBaselineID string `json:"sourceBaselineId"`
-	// The target device groups for this benchmark.
+	// The target device group IDs to which a benchmark is deployed.
 	Target TargetV2 `json:"target"`
 	// A short, descriptive name for the benchmark.
 	Title string `json:"title"`
@@ -125,11 +125,9 @@ type DeviceRuleResult struct {
 	State      RuleResultState `json:"state"`
 }
 
-// ODVRecommendation The recommended organization-defined value for a rule on one OS version.
+// ODVRecommendation Recommended value and hint for an organization-defined value (ODV) field.
 type ODVRecommendation struct {
-	// Guidance on what values the rule accepts.
-	Hint string `json:"hint"`
-	// The recommended value for this OS version.
+	Hint  string `json:"hint"`
 	Value string `json:"value"`
 }
 
@@ -150,7 +148,7 @@ type OrganizationDefinedValue struct {
 	Value      string                 `json:"value"`
 }
 
-// OsInfo represents a os info.
+// OsInfo Operating system type, version, and management type, uniquely identifying a supported OS target.
 type OsInfo struct {
 	// Allowed values: see the OsInfoManagementType constants.
 	ManagementType string `json:"managementType"`
@@ -159,15 +157,15 @@ type OsInfo struct {
 	OsVersion int    `json:"osVersion"`
 }
 
-// OsSpecificRuleInfo Per-OS-version overrides of a rule's title, description and recommended organization-defined value.
+// OsSpecificRuleInfo OS-specific overrides for a compliance rule's title, description, and ODV recommendation.
 type OsSpecificRuleInfo struct {
 	Description string `json:"description"`
-	// The recommended organization-defined value for a rule on one OS version.
+	// Recommended value and hint for an organization-defined value (ODV) field.
 	ODV   *ODVRecommendation `json:"odv,omitempty"`
 	Title string             `json:"title"`
 }
 
-// OsVersion represents a os version.
+// OsVersion The selected OS versions for this benchmark, default is all available baseline OS versions.
 type OsVersion struct {
 	// Operating system type.
 	// Allowed values: see the OsVersionOsType constants.
@@ -182,9 +180,7 @@ type RuleInfo struct {
 	Enabled     bool   `json:"enabled"`
 	ID          string `json:"id"`
 	// An organization-defined value (ODV) that customizes a parameterized compliance rule.
-	ODV *OrganizationDefinedValue `json:"odv,omitempty"`
-	// Per-OS-version rule overrides, keyed by OS identifier (MAC_OS_13, MAC_OS_14, ...). Empty when the
-	// rule is identical on every supported OS.
+	ODV                *OrganizationDefinedValue     `json:"odv,omitempty"`
 	OsSpecificDefaults map[string]OsSpecificRuleInfo `json:"osSpecificDefaults"`
 	References         *[]string                     `json:"references,omitempty"`
 	Reportable         bool                          `json:"reportable"`

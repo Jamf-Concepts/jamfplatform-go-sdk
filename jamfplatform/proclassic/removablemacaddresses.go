@@ -17,7 +17,7 @@ import (
 
 // GetRemovableMacAddressByID finds removable Mac addresses by ID.
 //
-// Required privileges: read:pro:removable-mac-address.
+// Required privileges: removable-mac-address:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetRemovableMacAddressByID(ctx context.Context, id string) (*Re
 
 // CreateRemovableMacAddressByID creates a new removable Mac address by ID.
 //
-// Required privileges: create:pro:removable-mac-address.
+// Required privileges: removable-mac-address:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateRemovableMacAddressByID(ctx context.Context, id string, r
 
 // UpdateRemovableMacAddressByID updates an existing removable Mac address by ID.
 //
-// Required privileges: update:pro:removable-mac-address.
+// Required privileges: removable-mac-address:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateRemovableMacAddressByID(ctx context.Context, id string, r
 
 // DeleteRemovableMacAddressByID deletes a removable Mac address by ID.
 //
-// Required privileges: delete:pro:removable-mac-address.
+// Required privileges: removable-mac-address:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteRemovableMacAddressByID(ctx context.Context, id string) e
 
 // GetRemovableMacAddressByName finds removable Mac addresses by name.
 //
-// Required privileges: read:pro:removable-mac-address.
+// Required privileges: removable-mac-address:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetRemovableMacAddressByName(ctx context.Context, name string) 
 
 // UpdateRemovableMacAddressByName updates an existing removable Mac address by name.
 //
-// Required privileges: update:pro:removable-mac-address.
+// Required privileges: removable-mac-address:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateRemovableMacAddressByName(ctx context.Context, name strin
 
 // DeleteRemovableMacAddressByName deletes a removable Mac address by name.
 //
-// Required privileges: delete:pro:removable-mac-address.
+// Required privileges: removable-mac-address:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteRemovableMacAddressByName(ctx context.Context, name strin
 
 // ListRemovableMacAddresses finds all removable Mac addresses.
 //
-// Required privileges: read:pro:removable-mac-address.
+// Required privileges: removable-mac-address:read.
 func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAddresses, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result RemovableMacAddresses
@@ -138,7 +138,7 @@ func (c *Client) ListRemovableMacAddresses(ctx context.Context) (*RemovableMacAd
 
 // CreateRemovableMacAddressByName creates a new removable Mac address by ID.
 //
-// Required privileges: create:pro:removable-mac-address.
+// Required privileges: removable-mac-address:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

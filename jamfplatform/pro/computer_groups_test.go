@@ -13,7 +13,7 @@ import (
 
 func TestListComputerGroupsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListComputerGroupsV1(t *testing.T) {
 
 func TestListComputerGroupsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-groups", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-groups", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListComputerGroupsV1_NotFound(t *testing.T) {
 
 func TestListSmartComputerGroupsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -67,31 +67,9 @@ func TestListSmartComputerGroupsV3(t *testing.T) {
 	}
 }
 
-func TestListSmartComputerGroupsV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListSmartComputerGroupsV2(context.Background(), nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
 func TestCreateSmartComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -107,27 +85,9 @@ func TestCreateSmartComputerGroupV3(t *testing.T) {
 	}
 }
 
-func TestCreateSmartComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{})
-	})
-
-	result, err := c.CreateSmartComputerGroupV2(context.Background(), &SmartComputerGroupV2{}, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestGetSmartComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -145,7 +105,7 @@ func TestGetSmartComputerGroupV3(t *testing.T) {
 
 func TestGetSmartComputerGroupV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -159,43 +119,9 @@ func TestGetSmartComputerGroupV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetSmartComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetSmartComputerGroupV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetSmartComputerGroupV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetSmartComputerGroupV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestUpdateSmartComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -211,27 +137,9 @@ func TestUpdateSmartComputerGroupV3(t *testing.T) {
 	}
 }
 
-func TestUpdateSmartComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPut {
-			t.Errorf("method = %s, want PUT", r.Method)
-		}
-		writeJSON(t, w, http.StatusAccepted, map[string]any{})
-	})
-
-	result, err := c.UpdateSmartComputerGroupV2(context.Background(), "test-id", &SmartComputerGroupV2{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestDeleteSmartComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -244,24 +152,9 @@ func TestDeleteSmartComputerGroupV3(t *testing.T) {
 	}
 }
 
-func TestDeleteSmartComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Errorf("method = %s, want DELETE", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.DeleteSmartComputerGroupV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestGetSmartComputerGroupMembershipV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -279,7 +172,7 @@ func TestGetSmartComputerGroupMembershipV3(t *testing.T) {
 
 func TestGetSmartComputerGroupMembershipV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-group-membership/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-group-membership/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -293,43 +186,9 @@ func TestGetSmartComputerGroupMembershipV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetSmartComputerGroupMembershipV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-group-membership/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetSmartComputerGroupMembershipV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetSmartComputerGroupMembershipV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-group-membership/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetSmartComputerGroupMembershipV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestListStaticComputerGroupsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -349,31 +208,9 @@ func TestListStaticComputerGroupsV3(t *testing.T) {
 	}
 }
 
-func TestListStaticComputerGroupsV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListStaticComputerGroupsV2(context.Background(), nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
 func TestCreateStaticComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -389,27 +226,9 @@ func TestCreateStaticComputerGroupV3(t *testing.T) {
 	}
 }
 
-func TestCreateStaticComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{})
-	})
-
-	result, err := c.CreateStaticComputerGroupV2(context.Background(), &StaticComputerGroupAssignment{}, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestGetStaticComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -427,7 +246,7 @@ func TestGetStaticComputerGroupV3(t *testing.T) {
 
 func TestGetStaticComputerGroupV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -441,43 +260,9 @@ func TestGetStaticComputerGroupV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetStaticComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetStaticComputerGroupV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetStaticComputerGroupV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetStaticComputerGroupV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestUpdateStaticComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -493,27 +278,9 @@ func TestUpdateStaticComputerGroupV3(t *testing.T) {
 	}
 }
 
-func TestUpdateStaticComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPut {
-			t.Errorf("method = %s, want PUT", r.Method)
-		}
-		writeJSON(t, w, http.StatusAccepted, map[string]any{})
-	})
-
-	result, err := c.UpdateStaticComputerGroupV2(context.Background(), "test-id", &StaticComputerGroupAssignment{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestDeleteStaticComputerGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -526,24 +293,9 @@ func TestDeleteStaticComputerGroupV3(t *testing.T) {
 	}
 }
 
-func TestDeleteStaticComputerGroupV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Errorf("method = %s, want DELETE", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.DeleteStaticComputerGroupV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestResolveComputerGroupV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -566,7 +318,7 @@ func TestResolveComputerGroupV1IDByName(t *testing.T) {
 
 func TestResolveComputerGroupV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/computer-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/computer-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -589,7 +341,7 @@ func TestResolveComputerGroupV1ByName(t *testing.T) {
 
 func TestResolveSmartComputerGroupV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -612,7 +364,7 @@ func TestResolveSmartComputerGroupV3IDByName(t *testing.T) {
 
 func TestResolveSmartComputerGroupV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -633,55 +385,9 @@ func TestResolveSmartComputerGroupV3ByName(t *testing.T) {
 	}
 }
 
-func TestResolveSmartComputerGroupV2IDByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "resolved-id", "name": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	id, err := c.ResolveSmartComputerGroupV2IDByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if id != "resolved-id" {
-		t.Errorf("id = %q, want resolved-id", id)
-	}
-}
-
-func TestResolveSmartComputerGroupV2ByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "resolved-id", "name": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	result, err := c.ResolveSmartComputerGroupV2ByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestResolveStaticComputerGroupV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -704,7 +410,7 @@ func TestResolveStaticComputerGroupV3IDByName(t *testing.T) {
 
 func TestResolveStaticComputerGroupV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -725,56 +431,10 @@ func TestResolveStaticComputerGroupV3ByName(t *testing.T) {
 	}
 }
 
-func TestResolveStaticComputerGroupV2IDByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "resolved-id", "name": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	id, err := c.ResolveStaticComputerGroupV2IDByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if id != "resolved-id" {
-		t.Errorf("id = %q, want resolved-id", id)
-	}
-}
-
-func TestResolveStaticComputerGroupV2ByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "resolved-id", "name": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	result, err := c.ResolveStaticComputerGroupV2ByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestApplySmartComputerGroupV3_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -806,7 +466,7 @@ func TestApplySmartComputerGroupV3_Create(t *testing.T) {
 func TestApplySmartComputerGroupV3_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -817,7 +477,7 @@ func TestApplySmartComputerGroupV3_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v3/computer-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
 	})
 
@@ -833,72 +493,10 @@ func TestApplySmartComputerGroupV3_Update(t *testing.T) {
 	}
 }
 
-func TestApplySmartComputerGroupV2_Create(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			writeJSON(t, w, http.StatusOK, map[string]any{
-				"results":    []any{},
-				"totalCount": 0,
-			})
-		case http.MethodPost:
-			writeJSON(t, w, 201, map[string]any{
-				"id":   "new-id",
-				"href": "/new-id",
-			})
-		default:
-			t.Errorf("unexpected method %s", r.Method)
-		}
-	})
-
-	id, created, err := c.ApplySmartComputerGroupV2(context.Background(), &SmartComputerGroupV2{Name: "target"}, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !created {
-		t.Error("expected created = true")
-	}
-	if id != "new-id" {
-		t.Errorf("id = %q, want new-id", id)
-	}
-}
-
-func TestApplySmartComputerGroupV2_Update(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "existing-id", "name": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-	mux.HandleFunc("/api/pro/v2/computer-groups/smart-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
-	})
-
-	id, created, err := c.ApplySmartComputerGroupV2(context.Background(), &SmartComputerGroupV2{Name: "target"}, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if created {
-		t.Error("expected created = false")
-	}
-	if id != "existing-id" {
-		t.Errorf("id = %q, want existing-id", id)
-	}
-}
-
 func TestApplyStaticComputerGroupV3_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -930,7 +528,7 @@ func TestApplyStaticComputerGroupV3_Create(t *testing.T) {
 func TestApplyStaticComputerGroupV3_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -941,73 +539,11 @@ func TestApplyStaticComputerGroupV3_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v3/computer-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/computer-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
 	})
 
 	id, created, err := c.ApplyStaticComputerGroupV3(context.Background(), &StaticComputerGroupAssignment{Name: "target"}, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if created {
-		t.Error("expected created = false")
-	}
-	if id != "existing-id" {
-		t.Errorf("id = %q, want existing-id", id)
-	}
-}
-
-func TestApplyStaticComputerGroupV2_Create(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			writeJSON(t, w, http.StatusOK, map[string]any{
-				"results":    []any{},
-				"totalCount": 0,
-			})
-		case http.MethodPost:
-			writeJSON(t, w, 201, map[string]any{
-				"id":   "new-id",
-				"href": "/new-id",
-			})
-		default:
-			t.Errorf("unexpected method %s", r.Method)
-		}
-	})
-
-	id, created, err := c.ApplyStaticComputerGroupV2(context.Background(), &StaticComputerGroupAssignment{Name: "target"}, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !created {
-		t.Error("expected created = true")
-	}
-	if id != "new-id" {
-		t.Errorf("id = %q, want new-id", id)
-	}
-}
-
-func TestApplyStaticComputerGroupV2_Update(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "existing-id", "name": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-	mux.HandleFunc("/api/pro/v2/computer-groups/static-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(t, w, 202, map[string]any{"id": "existing-id"})
-	})
-
-	id, created, err := c.ApplyStaticComputerGroupV2(context.Background(), &StaticComputerGroupAssignment{Name: "target"}, false)
 	if err != nil {
 		t.Fatal(err)
 	}

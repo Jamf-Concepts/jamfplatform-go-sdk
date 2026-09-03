@@ -11,33 +11,14 @@ import (
 	"testing"
 )
 
-func TestListDeclarationReportClients(t *testing.T) {
+func TestListDeclarationReportClientsFiltered(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/declarations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/declarations/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListDeclarationReportClients(context.Background(), "test-id", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
-func TestListDeclarationReportClientsFiltered(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/ddm/report/v1/declarations/test-id/devices", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
+		if !r.URL.Query().Has("filter") {
+			t.Errorf("required query param filter not sent: %q", r.URL.RawQuery)
 		}
 		writeJSON(t, w, http.StatusOK, map[string]any{
 			"results":    []map[string]any{{}},

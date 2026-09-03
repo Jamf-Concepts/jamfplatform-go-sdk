@@ -14,7 +14,7 @@ import (
 
 // ListJamfPackagesV1 get the packages for a given Jamf application.
 //
-// Required privileges: read:pro:jamf-packages-action. Legacy Jamf Pro privilege name(s): Jamf Packages Action.
+// Required privileges: jamf-packages-action:read. Legacy Jamf Pro privilege name(s): Jamf Packages Action.
 //
 // Parameters:
 //   - application: The Jamf Application key. The only supported values are protect and connect.
@@ -23,9 +23,7 @@ func (c *Client) ListJamfPackagesV1(ctx context.Context, application string) ([]
 	var result []JamfPackageResponse
 	endpoint := prefix + "/jamf-package"
 	params := url.Values{}
-	if application != "" {
-		params.Set("application", application)
-	}
+	params.Set("application", application)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}
@@ -37,7 +35,7 @@ func (c *Client) ListJamfPackagesV1(ctx context.Context, application string) ([]
 
 // GetJamfPackageV2 get the packages for a given Jamf application.
 //
-// Required privileges: read:pro:jamf-packages-action. Legacy Jamf Pro privilege name(s): Jamf Packages Action.
+// Required privileges: jamf-packages-action:read. Legacy Jamf Pro privilege name(s): Jamf Packages Action.
 //
 // Parameters:
 //   - application: The Jamf Application key. The only supported values are protect and connect.
@@ -46,9 +44,7 @@ func (c *Client) GetJamfPackageV2(ctx context.Context, application string) (*Jam
 	var result JamfApplicationResponse
 	endpoint := prefix + "/jamf-package"
 	params := url.Values{}
-	if application != "" {
-		params.Set("application", application)
-	}
+	params.Set("application", application)
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}

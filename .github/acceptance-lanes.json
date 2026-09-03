@@ -1,0 +1,101 @@
+{
+  "_comment": [
+    "Single source of truth for acceptance-suite lanes, read by BOTH",
+    "tools/acclanes (a Go command, which builds the CI matrix) and",
+    "jamfplatform/acc_lanes_test.go (which proves the partition is honest).",
+    "A plain data file rather than Go, because tools/ is a separate module from",
+    "the root one: sharing a Go constant would mean either a cross-module import",
+    "or a duplicated table that drifts.",
+    "",
+    "A lane is a PRODUCT SPACE, and membership is a test-name prefix. That works",
+    "because the suite's naming convention already partitions by product: all 728",
+    "acceptance tests agree with the acc*Client factory they call, 728/728. The",
+    "conformance test pins that, so a misnamed test fails `make test` rather than",
+    "running in the wrong lane against the wrong credential.",
+    "",
+    "`require` is the JAMFPLATFORM_ACC_REQUIRE token for the lane, so a lane fails",
+    "for its own missing credential and never for another lane's.",
+    "",
+    "`lock` marks the lanes that mutate the shared Jamf Pro tenant and so must",
+    "serialise against each other. Only pro does; the rest use different",
+    "credentials against different tenants and share no fixtures, which is the",
+    "whole reason to split.",
+    "",
+    "A lane may be PLANNED: the name and pattern are reserved, but no test uses it",
+    "yet. A planned lane must match zero tests. The moment one matches, both the",
+    "conformance test and the plan step fail and name the wiring to finish \u2014 a",
+    "credential factory, a factoryLane row, a require token and the secrets. That",
+    "is deliberate: the alternative is a new product's tests silently joining the",
+    "pro lane and running against pro credentials, where the 403s read as broken",
+    "endpoints rather than as a misfiled lane.",
+    "",
+    "Reserving the name is the load-bearing half. It stops Protect tests being",
+    "called TestAcceptance_ProProtect* (which the pro lane would swallow), and it",
+    "is why the pro lane must never be given an explicit pattern: `^TestAcceptance_Pro`",
+    "would capture TestAcceptance_Protect*. pro is the DEFAULT lane, not a matched one.",
+    "",
+    "Do NOT add a credential factory for a planned lane ahead of the product. An",
+    "unused accXClient is dead code guessing at an API that does not exist yet, and",
+    "the stale-row check in TestEveryCredentialFactoryOwnsALane rejects it."
+  ],
+  "lanes": [
+    {
+      "lane": "account",
+      "match": "^TestAcceptance_Account",
+      "require": "organization",
+      "lock": false,
+      "why": "Jamf Account: licensing, partners, sso. Organization scope, US gateway only."
+    },
+    {
+      "lane": "securitycloud",
+      "match": "^TestAcceptance_SecurityCloud",
+      "require": "securitycloud",
+      "lock": false,
+      "why": "Security Cloud is its own product with its own tenant, reachable by an environment credential."
+    },
+    {
+      "lane": "platform-env",
+      "match": "^TestAcceptance_(AiGovernance|Audit|EnvironmentScope|Blueprint|ListBlueprint|GetBlueprint|ResolveBlueprint|Benchmark|ListBenchmark|ResolveBenchmark|ListBaselines|GetBaselineRules|ResolveBaseline|APIError_(Blueprints|ComplianceBenchmarks))",
+      "require": "environment",
+      "lock": false,
+      "why": "Environment-scoped platform surfaces. Audit lives here, NOT in account: scopes.yaml files it under organization but the wire refuses X-Organization-Id with 400 INVALID_REQUEST_CONTEXT_TYPE. Blueprints and compliance-benchmarks joined on 2026-09-03: their specs say tenant, and a legacy pre-GA tenant credential does read them, but a tenant integration created after GA cannot be granted the capabilities they need \u2014 so environment scope is the only one that works going forward, and accClient's silent tenant fallback would turn that into a 403 that reads as a broken endpoint. Device groups deliberately did NOT move: they remain reachable under both scopes, verified 200 on two tenant credentials and one environment credential. The pattern is an explicit alternation rather than a prefix because these tests are named for their operation (ListBaselines, GetBaselineRules) rather than their product; the conformance test is what keeps it honest, since a new test whose name lands in the wrong lane fails on the factory mismatch."
+    },
+    {
+      "lane": "pro-tenant",
+      "match": "^TestAcceptance_TenantScope",
+      "require": "pro-tenant",
+      "lock": false,
+      "why": "Scope coverage, not data coverage. accClient prefers environment scope whenever that credential set is complete, so once the environment secrets exist nothing else in the suite sends X-Tenant-Id \u2014 and WithTenantID is public, supported and used by terraform-provider-jamfplatform, on the LEGACY scope, which is exactly how a live consumer surface breaks unnoticed. accTenantClient forces tenant scope with no environment fallback. lock is false: the lane is read-only and generally points at a different tenant from the pro lane, so it neither mutates nor contends for the shared Pro tenant."
+    },
+    {
+      "lane": "protect",
+      "match": "^TestAcceptance_Protect",
+      "require": "protect",
+      "lock": false,
+      "planned": true,
+      "why": "Jamf Protect as its own Platform product, when it lands. NOT the same as JAMFPLATFORM_ACC_PRO_PROTECT_* \u2014 those three vars are a Protect API credential used BY a Jamf Pro test (Protect deployment via Pro) and stay in the pro lane. This lane would be Protect's own namespace with its own tenant, credentialed as JAMFPLATFORM_ACC_PROTECT_TENANT_*, unless an environment credential reaches it the way it reaches Security Cloud."
+    },
+    {
+      "lane": "school",
+      "match": "^TestAcceptance_School",
+      "require": "school",
+      "lock": false,
+      "planned": true,
+      "why": "Jamf School, if and when it gets a Platform namespace. Reserved on naming grounds only: no published spec exists today, and Jamf School currently appears in this SDK solely as a uem-connect vendor variant (JamfSchoolConnectorCreateRequest), which is a Security Cloud surface and belongs to the securitycloud lane. Credentials would be JAMFPLATFORM_ACC_SCHOOL_TENANT_*."
+    },
+    {
+      "lane": "android",
+      "match": "^TestAcceptance_Android",
+      "require": "android",
+      "lock": false,
+      "planned": true,
+      "why": "Jamf's Android management surface, if and when it gets a Platform namespace of its own. Reserved on naming grounds only, and the caveat is the same as school's: nothing Android-shaped is a lane today. No whitelisted operation path in config.json mentions android or google; Android reaches this SDK through Jamf Pro's Google Play / Android Enterprise integration, which is a pro-lane concern, and through uem-connect's GOOGLE vendor variant (GoogleConnectorCreateRequest), which is a Security Cloud surface and belongs to the securitycloud lane. The JAMFPLATFORM_GOOGLE_KEYSTORE_* / _DOMAIN_NAME variables in local .env files are read by nothing in the suite and are not this lane's credentials. If Android does land as its own product, credentials would be JAMFPLATFORM_ACC_ANDROID_TENANT_*."
+    }
+  ],
+  "default_lane": {
+    "lane": "pro",
+    "require": "platform",
+    "lock": true,
+    "why": "Everything else. Jamf Pro, Classic, devices, blueprints, benchmarks, ddmreport, resolvers and applies all reach one shared Pro tenant, so this lane holds the tenant lock and stays serial."
+  }
+}

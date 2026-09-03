@@ -9,16 +9,27 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 
 // Privileges maps each devices SDK method name to the Jamf API privileges it
 // requires, sourced from the x-required-privileges vendor extensions in the
-// Jamf OpenAPI specs. Methods that require no special privilege have an empty
-// Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// Jamf OpenAPI specs. Identifiers are GA capability permissions in
+// {capability}:{action} form and a multi-entry Scoped slice means all of them
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"DeleteDevice":           {Method: "DeleteDevice", HTTPMethod: "DELETE", Path: "/v1/devices/{id}", Scoped: []string{"delete:pro:devices"}, Legacy: nil},
-	"GetDevice":              {Method: "GetDevice", HTTPMethod: "GET", Path: "/v1/devices/{id}", Scoped: []string{"read:pro:devices"}, Legacy: nil},
-	"ListDeviceApplications": {Method: "ListDeviceApplications", HTTPMethod: "GET", Path: "/v1/devices/{id}/applications", Scoped: []string{"read:pro:devices"}, Legacy: nil},
-	"ListDevices":            {Method: "ListDevices", HTTPMethod: "GET", Path: "/v1/devices", Scoped: []string{"read:pro:devices"}, Legacy: nil},
-	"ListDevicesForUser":     {Method: "ListDevicesForUser", HTTPMethod: "GET", Path: "/v1/users/{id}/devices", Scoped: []string{"read:pro:devices"}, Legacy: nil},
-	"UpdateDevice":           {Method: "UpdateDevice", HTTPMethod: "PATCH", Path: "/v1/devices/{id}", Scoped: []string{"update:pro:devices"}, Legacy: nil},
+	"DeleteDevice":           {Method: "DeleteDevice", HTTPMethod: "DELETE", Path: "/v1/devices/{id}", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil, Source: "spec"},
+	"GetDevice":              {Method: "GetDevice", HTTPMethod: "GET", Path: "/v1/devices/{id}", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"ListDeviceApplications": {Method: "ListDeviceApplications", HTTPMethod: "GET", Path: "/v1/devices/{id}/applications", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"ListDevices":            {Method: "ListDevices", HTTPMethod: "GET", Path: "/v1/devices", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"ListDevicesForUser":     {Method: "ListDevicesForUser", HTTPMethod: "GET", Path: "/v1/users/{id}/devices", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"UpdateDevice":           {Method: "UpdateDevice", HTTPMethod: "PATCH", Path: "/v1/devices/{id}", Scoped: []string{"devices:update"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

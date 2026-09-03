@@ -19,7 +19,7 @@ import (
 
 // ListDevices get all devices.
 //
-// Required privileges: read:pro:devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - sort: Fields to sort by and their orders. Fields allowed in the query: `id`, `name`, `model`,
@@ -59,7 +59,7 @@ func (c *Client) ListDevices(ctx context.Context, sort []string, filter string) 
 
 // GetDevice get a device by ID.
 //
-// Required privileges: read:pro:devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - id: The ID of the device, in UUID format.
@@ -75,7 +75,7 @@ func (c *Client) GetDevice(ctx context.Context, id string) (*DeviceReadRepresent
 
 // UpdateDevice update a device.
 //
-// Required privileges: update:pro:devices.
+// Required privileges: devices:update.
 //
 // Parameters:
 //   - id: The ID of the device, in UUID format.
@@ -90,7 +90,7 @@ func (c *Client) UpdateDevice(ctx context.Context, id string, request *DeviceUpd
 
 // DeleteDevice delete a device.
 //
-// Required privileges: delete:pro:devices.
+// Required privileges: destructive-device-actions:execute.
 //
 // Parameters:
 //   - id: The ID of the device, in UUID format.
@@ -105,7 +105,7 @@ func (c *Client) DeleteDevice(ctx context.Context, id string) error {
 
 // ListDeviceApplications get installed applications for a device.
 //
-// Required privileges: read:pro:devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - id: The ID of the device, in UUID format.

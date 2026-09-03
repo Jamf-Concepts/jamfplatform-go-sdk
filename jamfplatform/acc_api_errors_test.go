@@ -201,7 +201,7 @@ func TestAcceptance_APIError_Classic_Categories_DuplicateName(t *testing.T) {
 	name := "sdk-acc-err-dup-classic-" + runSuffix()
 	prio := 9
 	first, err := pc.CreateCategoryByID(ctx, "0", &proclassic.Category{
-		Name:     classicStrPtr(name),
+		Name:     new(name),
 		Priority: &prio,
 	})
 	if err != nil {
@@ -215,7 +215,7 @@ func TestAcceptance_APIError_Classic_Categories_DuplicateName(t *testing.T) {
 	cleanupDelete(t, "DeleteCategoryByID", func() error { return pc.DeleteCategoryByID(ctx, intToStr(firstID)) })
 
 	_, err = pc.CreateCategoryByID(ctx, "0", &proclassic.Category{
-		Name:     classicStrPtr(name),
+		Name:     new(name),
 		Priority: &prio,
 	})
 	apiErr := requireAPIError(t, "CreateCategoryByID (duplicate)", err)
@@ -330,7 +330,7 @@ func TestAcceptance_APIError_DeviceActions_NotFound(t *testing.T) {
 // deep required structure (device group scope + steps); this test focuses
 // purely on error-accessor behaviour, not CRUD exercise.
 func TestAcceptance_APIError_Blueprints_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	bp := blueprints.New(c)
 
 	_, err := bp.GetBlueprint(context.Background(), "00000000-0000-0000-0000-000000000000")
@@ -349,7 +349,7 @@ func TestAcceptance_APIError_Blueprints_NotFound(t *testing.T) {
 // with a bogus UUID. Duplicate-title probe skipped due to CreateBenchmark's
 // deep required body (rules, sources, baseline, target).
 func TestAcceptance_APIError_ComplianceBenchmarks_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	cb := compliancebenchmarks.New(c)
 
 	_, err := cb.GetBenchmark(context.Background(), "00000000-0000-0000-0000-000000000000")
@@ -375,7 +375,9 @@ func TestAcceptance_APIError_DdmReport_NotFound(t *testing.T) {
 	c := accClient(t)
 	dr := ddmreport.New(c)
 
-	report, err := dr.GetDeviceDeclarationReport(context.Background(), "00000000-0000-0000-0000-000000000000")
+	// filter is required: true, so it travels even when empty; pass a real
+	// expression so the only unknown under test is the device id.
+	report, err := dr.GetDeviceDeclarationReportFiltered(context.Background(), "00000000-0000-0000-0000-000000000000", "active==true", nil)
 	if err != nil {
 		apiErr := jamfplatform.AsAPIError(err)
 		if apiErr != nil {
@@ -385,43 +387,4 @@ func TestAcceptance_APIError_DdmReport_NotFound(t *testing.T) {
 		t.Fatalf("expected empty report for unknown device; got error: %v", err)
 	}
 	t.Logf("DDM report for zero-UUID returned successfully (payload=%+v) — surface does not error on NotFound", report)
-}
-
-// ---------------------------------------------------------------------------
-// App Installers (Pro JSON sub-surface) — two-tier: titles + deployments
-// ---------------------------------------------------------------------------
-
-// TestAcceptance_APIError_AppInstallers_Titles_NotFound probes the read-only
-// titles catalog.
-func TestAcceptance_APIError_AppInstallers_Titles_NotFound(t *testing.T) {
-	c := accClient(t)
-	p := pro.New(c)
-
-	_, err := p.GetAppInstallerTitleV1(context.Background(), "sdk-acc-bogus-title-"+runSuffix())
-	apiErr := requireAPIError(t, "GetAppInstallerTitleV1(bogus)", err)
-	if apiErr.StatusCode < 400 || apiErr.StatusCode >= 500 {
-		t.Fatalf("expected 4xx, got StatusCode=%d", apiErr.StatusCode)
-	}
-	logAPIError(t, apiErr)
-}
-
-// TestAcceptance_APIError_AppInstallers_Deployments_InvalidFormat documents
-// that deployment ids are numeric (like Pro core resources) — a non-numeric
-// id returns 400 INVALID_ID with attribution on "deploymentId", not 404.
-// This parallels the building InvalidFormat probe and gives us a second
-// non-"id" field-attributed example.
-func TestAcceptance_APIError_AppInstallers_Deployments_InvalidFormat(t *testing.T) {
-	c := accClient(t)
-	p := pro.New(c)
-
-	_, err := p.GetAppInstallerDeploymentV1(context.Background(), "sdk-acc-bogus-deploy-"+runSuffix())
-	apiErr := requireAPIError(t, "GetAppInstallerDeploymentV1(bogus)", err)
-	if !apiErr.HasStatus(400) {
-		t.Fatalf("HasStatus(400) = false, StatusCode=%d, err=%v", apiErr.StatusCode, err)
-	}
-	logAPIError(t, apiErr)
-
-	if _, ok := apiErr.FieldErrors()["deploymentId"]; !ok {
-		t.Errorf("expected FieldErrors to contain \"deploymentId\" key, got %+v", apiErr.FieldErrors())
-	}
 }
