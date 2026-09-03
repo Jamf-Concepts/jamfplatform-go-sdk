@@ -15,7 +15,7 @@ import (
 
 // GetSchedulerJobsV1 retrieve all Jamf Pro Scheduler jobs.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetSchedulerJobsV1(ctx context.Context) (*SchedulerJobs, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SchedulerJobs
@@ -28,7 +28,7 @@ func (c *Client) GetSchedulerJobsV1(ctx context.Context) (*SchedulerJobs, error)
 
 // GetSchedulerJobTriggersV1 retrieve all triggers for a Jamf Pro Scheduler job.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - jobKey: Jamf Pro Scheduler Job Key.
@@ -59,7 +59,7 @@ func (c *Client) GetSchedulerJobTriggersV1(ctx context.Context, jobKey string, s
 
 // GetSchedulerSummaryV1 retrieve a summary of the Jamf Pro Scheduler.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetSchedulerSummaryV1(ctx context.Context) (*SchedulerSummary, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SchedulerSummary

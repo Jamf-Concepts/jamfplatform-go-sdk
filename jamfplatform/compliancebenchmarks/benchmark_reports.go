@@ -17,7 +17,7 @@ import (
 
 // ListBenchmarkRulesStats get benchmark rules for a tenant.
 //
-// Required privileges: read:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:read.
 //
 // Parameters:
 //   - id: Tenant's benchmark ID.
@@ -55,7 +55,7 @@ func (c *Client) ListBenchmarkRulesStats(ctx context.Context, id string, sort st
 
 // ListBenchmarkRuleDevices get devices for a benchmark report rule.
 //
-// Required privileges: read:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:read.
 //
 // Parameters:
 //   - id: Tenant's benchmark ID.
@@ -70,9 +70,7 @@ func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("page-size", strconv.Itoa(pageSize))
-		if ruleID != "" {
-			params.Set("rule-id", ruleID)
-		}
+		params.Set("rule-id", ruleID)
 		if sort != "" {
 			params.Set("sort", sort)
 		}
@@ -100,7 +98,7 @@ func (c *Client) ListBenchmarkRuleDevices(ctx context.Context, id string, ruleID
 
 // GetBenchmarkCompliancePercentage get compliance percentage for a benchmark report.
 //
-// Required privileges: read:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:read.
 //
 // Parameters:
 //   - id: Tenant's benchmark ID.

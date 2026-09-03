@@ -17,7 +17,7 @@ import (
 
 // GetIBeaconByID finds iBeacon regions by ID.
 //
-// Required privileges: read:pro:ibeacon.
+// Required privileges: ibeacon:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetIBeaconByID(ctx context.Context, id string) (*Ibeacon, error
 
 // CreateIBeaconByID creates a new iBeacon region by ID.
 //
-// Required privileges: create:pro:ibeacon.
+// Required privileges: ibeacon:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateIBeaconByID(ctx context.Context, id string, request *Ibea
 
 // UpdateIBeaconByID updates an existing iBeacon region by ID.
 //
-// Required privileges: update:pro:ibeacon.
+// Required privileges: ibeacon:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateIBeaconByID(ctx context.Context, id string, request *Ibea
 
 // DeleteIBeaconByID deletes an iBeacon region by ID.
 //
-// Required privileges: delete:pro:ibeacon.
+// Required privileges: ibeacon:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteIBeaconByID(ctx context.Context, id string) error {
 
 // GetIBeaconByName finds iBeacon regions by name.
 //
-// Required privileges: read:pro:ibeacon.
+// Required privileges: ibeacon:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetIBeaconByName(ctx context.Context, name string) (*Ibeacon, e
 
 // UpdateIBeaconByName updates an existing iBeacon region by name.
 //
-// Required privileges: update:pro:ibeacon.
+// Required privileges: ibeacon:update.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateIBeaconByName(ctx context.Context, name string, request *
 
 // DeleteIBeaconByName deletes an iBeacon region by name.
 //
-// Required privileges: delete:pro:ibeacon.
+// Required privileges: ibeacon:delete.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteIBeaconByName(ctx context.Context, name string) error {
 
 // ListIBeacons finds all iBeacon regions.
 //
-// Required privileges: read:pro:ibeacon.
+// Required privileges: ibeacon:read.
 func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ibeacons
@@ -138,7 +138,7 @@ func (c *Client) ListIBeacons(ctx context.Context) (*Ibeacons, error) {
 
 // CreateIBeaconByName creates a new iBeacon region by ID.
 //
-// Required privileges: create:pro:ibeacon.
+// Required privileges: ibeacon:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

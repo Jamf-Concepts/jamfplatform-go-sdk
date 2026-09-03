@@ -17,7 +17,7 @@ import (
 
 // GetAdvancedMobileDeviceSearchByID finds mobile device searches by ID.
 //
-// Required privileges: read:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetAdvancedMobileDeviceSearchByID(ctx context.Context, id strin
 
 // CreateAdvancedMobileDeviceSearchByID creates a new advanced mobile device search.
 //
-// Required privileges: create:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 
 // UpdateAdvancedMobileDeviceSearchByID updates an existing advanced mobile device search by ID.
 //
-// Required privileges: update:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 
 // DeleteAdvancedMobileDeviceSearchByID deletes a mobile device search by ID.
 //
-// Required privileges: delete:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByID(ctx context.Context, id st
 
 // GetAdvancedMobileDeviceSearchByName finds advanced mobile device searches by name.
 //
-// Required privileges: read:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetAdvancedMobileDeviceSearchByName(ctx context.Context, name s
 
 // DeleteAdvancedMobileDeviceSearchByName deletes a mobile device search by name.
 //
-// Required privileges: delete:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:delete.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -110,7 +110,7 @@ func (c *Client) DeleteAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 
 // ListAdvancedMobileDeviceSearches finds all advanced mobile device searches.
 //
-// Required privileges: read:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:read.
 func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*AdvancedMobileDeviceSearches, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AdvancedMobileDeviceSearches
@@ -123,7 +123,7 @@ func (c *Client) ListAdvancedMobileDeviceSearches(ctx context.Context) (*Advance
 
 // UpdateAdvancedMobileDeviceSearchByName updates an existing advanced mobile device search by name.
 //
-// Required privileges: update:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:update.
 //
 // Parameters:
 //   - name: Nameto filter by.
@@ -138,7 +138,7 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchByName(ctx context.Context, nam
 
 // CreateAdvancedMobileDeviceSearchByName creates a new advanced mobile device search.
 //
-// Required privileges: create:pro:advanced-mobile-device-searches.
+// Required privileges: advanced-device-searches:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

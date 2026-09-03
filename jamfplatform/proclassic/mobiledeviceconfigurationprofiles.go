@@ -17,7 +17,7 @@ import (
 
 // GetMobileDeviceConfigurationProfileByID finds mobile device configuration profiles by ID.
 //
-// Required privileges: read:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetMobileDeviceConfigurationProfileByID(ctx context.Context, id
 
 // CreateMobileDeviceConfigurationProfileByID creates a new mobile device configuration profile by ID.
 //
-// Required privileges: create:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateMobileDeviceConfigurationProfileByID(ctx context.Context,
 
 // UpdateMobileDeviceConfigurationProfileByID updates an existing mobile device configuration profile by ID.
 //
-// Required privileges: update:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateMobileDeviceConfigurationProfileByID(ctx context.Context,
 
 // DeleteMobileDeviceConfigurationProfileByID deletes a mobile device configuration profile by ID.
 //
-// Required privileges: delete:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteMobileDeviceConfigurationProfileByID(ctx context.Context,
 
 // GetMobileDeviceConfigurationProfileByName finds mobile device configuration profiles by name.
 //
-// Required privileges: read:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetMobileDeviceConfigurationProfileByName(ctx context.Context, 
 
 // UpdateMobileDeviceConfigurationProfileByName updates an existing mobile device configuration profile by name.
 //
-// Required privileges: update:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateMobileDeviceConfigurationProfileByName(ctx context.Contex
 
 // DeleteMobileDeviceConfigurationProfileByName deletes a mobile device configuration profile by name.
 //
-// Required privileges: delete:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteMobileDeviceConfigurationProfileByName(ctx context.Contex
 
 // ListMobileDeviceConfigurationProfiles finds all mobile device configuration profiles.
 //
-// Required privileges: read:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:read.
 func (c *Client) ListMobileDeviceConfigurationProfiles(ctx context.Context) (*MobileDeviceConfigurationProfiles, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceConfigurationProfiles
@@ -138,7 +138,7 @@ func (c *Client) ListMobileDeviceConfigurationProfiles(ctx context.Context) (*Mo
 
 // GetMobileDeviceConfigurationProfileByIDSubset finds a subset of data for a mobile device configuration profile by ID.
 //
-// Required privileges: read:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:read.
 //
 // Parameters:
 //   - id: ID to filter by.
@@ -156,7 +156,7 @@ func (c *Client) GetMobileDeviceConfigurationProfileByIDSubset(ctx context.Conte
 
 // GetMobileDeviceConfigurationProfileByNameSubset finds a subset of data for mobile device configuration profiles by name.
 //
-// Required privileges: read:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -174,7 +174,7 @@ func (c *Client) GetMobileDeviceConfigurationProfileByNameSubset(ctx context.Con
 
 // CreateMobileDeviceConfigurationProfileByName creates a new mobile device configuration profile by ID.
 //
-// Required privileges: create:pro:ios-configuration-profiles.
+// Required privileges: configuration-profiles:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

@@ -17,7 +17,7 @@ import (
 
 // GetLDAPServerByID finds LDAP servers by ID.
 //
-// Required privileges: read:pro:ldap-servers.
+// Required privileges: ldap-servers:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetLDAPServerByID(ctx context.Context, id string) (*LdapServer,
 
 // CreateLDAPServerByID creates a new LDAP server by ID.
 //
-// Required privileges: create:pro:ldap-servers.
+// Required privileges: ldap-servers:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateLDAPServerByID(ctx context.Context, id string, request *L
 
 // UpdateLDAPServerByID updates an existing LDAP server by ID.
 //
-// Required privileges: update:pro:ldap-servers.
+// Required privileges: ldap-servers:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateLDAPServerByID(ctx context.Context, id string, request *L
 
 // DeleteLDAPServerByID deletes an LDAP server by ID.
 //
-// Required privileges: delete:pro:ldap-servers.
+// Required privileges: ldap-servers:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteLDAPServerByID(ctx context.Context, id string) error {
 
 // GetLDAPServerByName finds LDAP servers by name.
 //
-// Required privileges: read:pro:ldap-servers.
+// Required privileges: ldap-servers:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetLDAPServerByName(ctx context.Context, name string) (*LdapSer
 
 // UpdateLDAPServerByName updates an existing LDAP server by name.
 //
-// Required privileges: update:pro:ldap-servers.
+// Required privileges: ldap-servers:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateLDAPServerByName(ctx context.Context, name string, reques
 
 // DeleteLDAPServerByName deletes an LDAP server by name.
 //
-// Required privileges: delete:pro:ldap-servers.
+// Required privileges: ldap-servers:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteLDAPServerByName(ctx context.Context, name string) error 
 
 // ListLDAPServers finds all LDAP servers.
 //
-// Required privileges: read:pro:ldap-servers.
+// Required privileges: ldap-servers:read.
 func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LdapServers
@@ -138,7 +138,7 @@ func (c *Client) ListLDAPServers(ctx context.Context) (*LdapServers, error) {
 
 // GetLDAPServerByIDGroup display information for matching groups for an LDAP server.
 //
-// Required privileges: read:pro:ldap-servers.
+// Required privileges: ldap-servers:read.
 //
 // Parameters:
 //   - id: Server ID to filter by.
@@ -155,7 +155,7 @@ func (c *Client) GetLDAPServerByIDGroup(ctx context.Context, id string, group st
 
 // GetLDAPServerByIDGroupUser display information about user membership in a group for an LDAP server.
 //
-// Required privileges: read:pro:ldap-servers.
+// Required privileges: ldap-servers:read.
 //
 // Parameters:
 //   - id: Server ID to filter by.
@@ -173,7 +173,7 @@ func (c *Client) GetLDAPServerByIDGroupUser(ctx context.Context, id string, grou
 
 // GetLDAPServerByIDUser display information for matching users for an LDAP server.
 //
-// Required privileges: read:pro:ldap-servers.
+// Required privileges: ldap-servers:read.
 //
 // Parameters:
 //   - id: Server ID to filter by.
@@ -190,7 +190,7 @@ func (c *Client) GetLDAPServerByIDUser(ctx context.Context, id string, user stri
 
 // CreateLDAPServerByName creates a new LDAP server by ID.
 //
-// Required privileges: create:pro:ldap-servers.
+// Required privileges: ldap-servers:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

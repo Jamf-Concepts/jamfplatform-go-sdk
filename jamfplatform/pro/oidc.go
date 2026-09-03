@@ -13,7 +13,7 @@ import (
 
 // GetOidcDirectIdpLoginUrlV1 retrieve the URL to directly login to the IdP.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetOidcDirectIdpLoginUrlV1(ctx context.Context) (*OidcDirectIdpLoginSkipURL, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result OidcDirectIdpLoginSkipURL
@@ -26,7 +26,7 @@ func (c *Client) GetOidcDirectIdpLoginUrlV1(ctx context.Context) (*OidcDirectIdp
 
 // GenerateOidcCertificateV1 generate a new keystore used for signing OIDC messages.
 //
-// Required privileges: update:pro:sso-settings. Legacy Jamf Pro privilege name(s): Update SSO Settings.
+// Required privileges: sso-settings:update. Legacy Jamf Pro privilege name(s): Update SSO Settings.
 func (c *Client) GenerateOidcCertificateV1(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/oidc/generate-certificate"
@@ -38,7 +38,7 @@ func (c *Client) GenerateOidcCertificateV1(ctx context.Context) error {
 
 // GetOidcPublicFeaturesV1 get the public features of the OIDC configuration.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetOidcPublicFeaturesV1(ctx context.Context) (*OidcPublicFeaturesResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result OidcPublicFeaturesResponse
@@ -51,7 +51,7 @@ func (c *Client) GetOidcPublicFeaturesV1(ctx context.Context) (*OidcPublicFeatur
 
 // GetOidcPublicKeyV1 get the public key of the keystore used for signing OIDC messages as a JWT.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetOidcPublicKeyV1(ctx context.Context) (*OidcJwksResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result OidcJwksResponse
@@ -64,28 +64,13 @@ func (c *Client) GetOidcPublicKeyV1(ctx context.Context) (*OidcJwksResponse, err
 
 // DispatchOidcLoginV2 provide the url to redirect for OIDC login.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) DispatchOidcLoginV2(ctx context.Context, request *OidcLoginDispatchRequest) (*OidcLoginDispatchResponseV2, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result OidcLoginDispatchResponseV2
 	endpoint := prefix + "/oidc/dispatch"
 	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("DispatchOidcLoginV2: %w", err)
-	}
-	return &result, nil
-}
-
-// DispatchOidcV1 provide the url to redirect for OIDC login.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-02-17) and may be removed in a future release.
-//
-// Required privileges: none (callable by any authenticated API client).
-func (c *Client) DispatchOidcV1(ctx context.Context, request *OidcLoginDispatchRequest) (*OidcLoginDispatchResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result OidcLoginDispatchResponse
-	endpoint := prefix + "/oidc/dispatch"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("DispatchOidcV1: %w", err)
 	}
 	return &result, nil
 }

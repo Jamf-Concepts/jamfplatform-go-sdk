@@ -17,7 +17,7 @@ import (
 
 // GetEbookByID finds ebooks by ID.
 //
-// Required privileges: read:pro:ebooks.
+// Required privileges: ebooks:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetEbookByID(ctx context.Context, id string) (*Ebook, error) {
 
 // CreateEbookByID creates a new ebook by ID.
 //
-// Required privileges: create:pro:ebooks.
+// Required privileges: ebooks:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateEbookByID(ctx context.Context, id string, request *EbookP
 
 // UpdateEbookByID updates an existing ebook by ID.
 //
-// Required privileges: update:pro:ebooks.
+// Required privileges: ebooks:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateEbookByID(ctx context.Context, id string, request *EbookP
 
 // DeleteEbookByID deletes an ebook by ID.
 //
-// Required privileges: delete:pro:ebooks.
+// Required privileges: ebooks:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteEbookByID(ctx context.Context, id string) error {
 
 // GetEbookByName finds ebooks by name.
 //
-// Required privileges: read:pro:ebooks.
+// Required privileges: ebooks:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetEbookByName(ctx context.Context, name string) (*Ebook, error
 
 // UpdateEbookByName updates an existing ebook by name.
 //
-// Required privileges: update:pro:ebooks.
+// Required privileges: ebooks:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateEbookByName(ctx context.Context, name string, request *Eb
 
 // DeleteEbookByName deletes an ebook by name.
 //
-// Required privileges: delete:pro:ebooks.
+// Required privileges: ebooks:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteEbookByName(ctx context.Context, name string) error {
 
 // ListEbooks finds all ebooks.
 //
-// Required privileges: read:pro:ebooks.
+// Required privileges: ebooks:read.
 func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Ebooks
@@ -138,7 +138,7 @@ func (c *Client) ListEbooks(ctx context.Context) (*Ebooks, error) {
 
 // GetEbookByIDSubset finds a subset of data for an ebook by ID.
 //
-// Required privileges: read:pro:ebooks.
+// Required privileges: ebooks:read.
 //
 // Parameters:
 //   - id: ID to filter by.
@@ -156,7 +156,7 @@ func (c *Client) GetEbookByIDSubset(ctx context.Context, id string, subset strin
 
 // CreateEbookByName creates a new ebook by ID.
 //
-// Required privileges: create:pro:ebooks.
+// Required privileges: ebooks:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

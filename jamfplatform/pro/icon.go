@@ -18,7 +18,7 @@ import (
 
 // UploadIconV1 upload an icon.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
 // implements io.Seeker) so the SDK can precompute an exact
@@ -40,7 +40,7 @@ func (c *Client) UploadIconV1(ctx context.Context, fileFilename string, file io.
 
 // GetIconV1 get an icon.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - id: id of the icon.
@@ -56,7 +56,7 @@ func (c *Client) GetIconV1(ctx context.Context, id string) (*IconResponse, error
 
 // DownloadIconV1 download a self service icon.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - id: id of the self service icon.

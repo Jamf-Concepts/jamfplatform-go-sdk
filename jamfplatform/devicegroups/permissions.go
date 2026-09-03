@@ -9,18 +9,29 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 
 // Privileges maps each devicegroups SDK method name to the Jamf API privileges it
 // requires, sourced from the x-required-privileges vendor extensions in the
-// Jamf OpenAPI specs. Methods that require no special privilege have an empty
-// Scoped slice. Synthetic Resolve<X>ByName / Apply<X> methods are not present;
-// document the privileges of the operations they call instead.
+// Jamf OpenAPI specs. Identifiers are GA capability permissions in
+// {capability}:{action} form and a multi-entry Scoped slice means all of them
+// are required.
+//
+// Source names where each entry's Scoped set came from: "spec" for the
+// operation's own x-required-privileges, "gateway-policy" for one the
+// published spec omits and this SDK supplies from the gateway's authorization
+// policy, and "" when Scoped is empty. An empty Scoped slice means nothing
+// declares a privilege for the endpoint, which is NOT the same as none being
+// required — see jamfplatform.MethodPrivileges. Do not render it as "no
+// permission needed".
+//
+// Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
+// privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CreateDeviceGroup":         {Method: "CreateDeviceGroup", HTTPMethod: "POST", Path: "/v1/device-groups", Scoped: []string{"create:pro:device-groups"}, Legacy: nil},
-	"DeleteDeviceGroup":         {Method: "DeleteDeviceGroup", HTTPMethod: "DELETE", Path: "/v1/device-groups/{id}", Scoped: []string{"delete:pro:device-groups"}, Legacy: nil},
-	"GetDeviceGroup":            {Method: "GetDeviceGroup", HTTPMethod: "GET", Path: "/v1/device-groups/{id}", Scoped: []string{"read:pro:device-groups"}, Legacy: nil},
-	"ListDeviceGroupMembers":    {Method: "ListDeviceGroupMembers", HTTPMethod: "GET", Path: "/v1/device-groups/{id}/members", Scoped: []string{"read:pro:device-groups"}, Legacy: nil},
-	"ListDeviceGroups":          {Method: "ListDeviceGroups", HTTPMethod: "GET", Path: "/v1/device-groups", Scoped: []string{"read:pro:device-groups"}, Legacy: nil},
-	"ListDeviceGroupsForDevice": {Method: "ListDeviceGroupsForDevice", HTTPMethod: "GET", Path: "/v1/devices/{id}/device-groups", Scoped: []string{"read:pro:device-groups"}, Legacy: nil},
-	"UpdateDeviceGroup":         {Method: "UpdateDeviceGroup", HTTPMethod: "PATCH", Path: "/v1/device-groups/{id}", Scoped: []string{"update:pro:device-groups"}, Legacy: nil},
-	"UpdateDeviceGroupMembers":  {Method: "UpdateDeviceGroupMembers", HTTPMethod: "PATCH", Path: "/v1/device-groups/{id}/members", Scoped: []string{"update:pro:device-groups"}, Legacy: nil},
+	"CreateDeviceGroup":         {Method: "CreateDeviceGroup", HTTPMethod: "POST", Path: "/v1/device-groups", Scoped: []string{"device-groups:create"}, Legacy: nil, Source: "spec"},
+	"DeleteDeviceGroup":         {Method: "DeleteDeviceGroup", HTTPMethod: "DELETE", Path: "/v1/device-groups/{id}", Scoped: []string{"device-groups:delete"}, Legacy: nil, Source: "spec"},
+	"GetDeviceGroup":            {Method: "GetDeviceGroup", HTTPMethod: "GET", Path: "/v1/device-groups/{id}", Scoped: []string{"device-groups:read"}, Legacy: nil, Source: "spec"},
+	"ListDeviceGroupMembers":    {Method: "ListDeviceGroupMembers", HTTPMethod: "GET", Path: "/v1/device-groups/{id}/members", Scoped: []string{"device-groups:read"}, Legacy: nil, Source: "spec"},
+	"ListDeviceGroups":          {Method: "ListDeviceGroups", HTTPMethod: "GET", Path: "/v1/device-groups", Scoped: []string{"device-groups:read"}, Legacy: nil, Source: "spec"},
+	"ListDeviceGroupsForDevice": {Method: "ListDeviceGroupsForDevice", HTTPMethod: "GET", Path: "/v1/devices/{id}/device-groups", Scoped: []string{"device-groups:read"}, Legacy: nil, Source: "spec"},
+	"UpdateDeviceGroup":         {Method: "UpdateDeviceGroup", HTTPMethod: "PATCH", Path: "/v1/device-groups/{id}", Scoped: []string{"device-groups:update"}, Legacy: nil, Source: "spec"},
+	"UpdateDeviceGroupMembers":  {Method: "UpdateDeviceGroupMembers", HTTPMethod: "PATCH", Path: "/v1/device-groups/{id}/members", Scoped: []string{"device-groups:update"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

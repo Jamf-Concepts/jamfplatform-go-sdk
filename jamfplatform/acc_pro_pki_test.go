@@ -36,8 +36,7 @@ func TestAcceptance_Pro_PKI_DigicertTLMProbe(t *testing.T) {
 		t.Log("GetDigicertTrustLifecycleManagerV1(-1) unexpectedly succeeded")
 		return
 	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 		if apiErr.StatusCode == 404 {
 			t.Logf("DigiCert TLM not configured on this tenant (404) — expected")
 			return
@@ -53,11 +52,23 @@ func TestAcceptance_Pro_PKI_DigicertTLMProbe(t *testing.T) {
 
 // CheckDigicertTrustLifecycleManagerPrivilegesV1 answers 204 when the linked
 // DigiCert account holds every permission needed to deploy certificates, and
-// 403 with the missing permission names when it does not. As of 2026-08-16 the
-// path is not routed by the API gateway either, which also answers 403 — the
-// two are indistinguishable from here, and both are non-fatal. Sibling
-// sub-paths under the same id (/dependencies, /connection-status) do reach Pro,
-// so the 204 in config's expectedStatus is spec-derived, not wire-verified.
+// 403 with the missing permission names when it does not. Sibling sub-paths
+// under the same id (/dependencies, /connection-status) do reach Pro, so the
+// 204 in config's expectedStatus is spec-derived, not wire-verified.
+//
+// The path IS routed — wire-verified 2026-08-29, correcting a note that had
+// claimed otherwise since 2026-08-16. An environment-scoped credential reached
+// Jamf Pro and got 400 NOT_FOUND on the bogus id (pretty-printed, so Pro's own
+// answer), while two tenant-scoped credentials — one EU, one US — were refused
+// 403 by the gateway. The rule is gated on `digicert-settings:read`
+// (jamf/authorization-policies jamf_pro_digicert_settings.rego), so the 403 is a
+// capability those credentials lack.
+//
+// That makes the old blanket `4xx -> log and return` branch actively misleading:
+// it collapsed a gateway refusal, a Pro validation verdict and a genuine DigiCert
+// permission failure into one tolerated outcome. They are separated below, and an
+// environment-scoped client — proven to get past the gateway — treats a 403 as
+// fatal rather than tolerable.
 func TestAcceptance_Pro_PKI_DigicertPrivilegeCheck(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -69,12 +80,22 @@ func TestAcceptance_Pro_PKI_DigicertPrivilegeCheck(t *testing.T) {
 		return
 	}
 	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
-		t.Logf("DigiCert privilege-check rejected: status=%d — expected without a DigiCert TLM fixture", apiErr.StatusCode)
-		return
+	if !errors.As(err, &apiErr) {
+		skipOnServerError(t, err)
+		t.Fatalf("CheckDigicertTrustLifecycleManagerPrivilegesV1: %v", err)
 	}
-	skipOnServerError(t, err)
-	t.Fatalf("CheckDigicertTrustLifecycleManagerPrivilegesV1: %v", err)
+	switch {
+	case apiErr.HasStatus(403):
+		if kind, _ := c.Scope(); kind == jamfplatform.ScopeEnvironment {
+			t.Fatalf("privilege-check: 403 on an environment-scoped client, which was wire-verified to reach Jamf Pro on this path on 2026-08-29 — the credential has lost digicert-settings:read, or the policy changed: %v", err)
+		}
+		t.Skipf("privilege-check: 403 on a tenant-scoped client — this credential lacks digicert-settings:read; an environment-scoped credential reaches Jamf Pro here: %v", err)
+	case apiErr.StatusCode >= 400 && apiErr.StatusCode < 500:
+		t.Logf("privilege-check rejected by Jamf Pro on a bogus id: status=%d %s — expected without a DigiCert TLM fixture", apiErr.StatusCode, apiErr.Summary())
+	default:
+		skipOnServerError(t, err)
+		t.Fatalf("CheckDigicertTrustLifecycleManagerPrivilegesV1: %v", err)
+	}
 }
 
 func TestAcceptance_Pro_PKI_DigicertValidateCertificate(t *testing.T) {

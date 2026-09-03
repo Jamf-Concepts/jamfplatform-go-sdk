@@ -14,7 +14,7 @@ import (
 
 // RecalculateSmartUserGroupV1 recalculate the smart group for the given id and then return the ids for the users in the smart group.
 //
-// Required privileges: update:pro:user-groups. Legacy Jamf Pro privilege name(s): Update Smart User Groups.
+// Required privileges: user-groups:update. Legacy Jamf Pro privilege name(s): Update Smart User Groups.
 //
 // Parameters:
 //   - id: instance id of smart group.
@@ -30,7 +30,7 @@ func (c *Client) RecalculateSmartUserGroupV1(ctx context.Context, id string) (*R
 
 // RecalculateUserSmartGroupsV1 recalculate a smart group for the given user id and then return the count of smart groups the user falls into.
 //
-// Required privileges: update:pro:user-groups. Legacy Jamf Pro privilege name(s): Update Smart User Groups.
+// Required privileges: user-groups:update. Legacy Jamf Pro privilege name(s): Update Smart User Groups.
 //
 // Parameters:
 //   - id: id of user.

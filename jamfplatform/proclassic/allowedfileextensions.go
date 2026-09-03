@@ -14,7 +14,7 @@ import (
 
 // GetAllowedFileExtensionByID finds an allowed file extension value by ID.
 //
-// Required privileges: read:pro:allowed-file-extension.
+// Required privileges: allowed-file-extension:read.
 //
 // Parameters:
 //   - id: Database ID of the extension.
@@ -30,7 +30,7 @@ func (c *Client) GetAllowedFileExtensionByID(ctx context.Context, id string) (*A
 
 // CreateAllowedFileExtensionByID creates a new allowed file extension value by ID.
 //
-// Required privileges: create:pro:allowed-file-extension.
+// Required privileges: allowed-file-extension:create.
 //
 // Parameters:
 //   - id: Database ID of the extension.
@@ -46,7 +46,7 @@ func (c *Client) CreateAllowedFileExtensionByID(ctx context.Context, id string, 
 
 // DeleteAllowedFileExtensionByID deletes an allowed file extension value by ID.
 //
-// Required privileges: delete:pro:allowed-file-extension.
+// Required privileges: allowed-file-extension:delete.
 //
 // Parameters:
 //   - id: Database ID of the extension.
@@ -61,7 +61,7 @@ func (c *Client) DeleteAllowedFileExtensionByID(ctx context.Context, id string) 
 
 // GetAllowedFileExtensionByExtension finds an allowed file extension value by name.
 //
-// Required privileges: read:pro:allowed-file-extension.
+// Required privileges: allowed-file-extension:read.
 //
 // Parameters:
 //   - extension: String value of extension.
@@ -77,7 +77,7 @@ func (c *Client) GetAllowedFileExtensionByExtension(ctx context.Context, extensi
 
 // ListAllowedFileExtensions finds the allowed file extensions.
 //
-// Required privileges: read:pro:allowed-file-extension.
+// Required privileges: allowed-file-extension:read.
 func (c *Client) ListAllowedFileExtensions(ctx context.Context) (*AllowedFileExtensions, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result AllowedFileExtensions

@@ -28,18 +28,78 @@ type MethodPrivileges struct {
 	// Path is the endpoint's resource path relative to the tenant prefix,
 	// e.g. "/buildings/{id}".
 	Path string
-	// Scoped lists the modern scoped privilege identifiers in
-	// action:scope:resource form, e.g. "create:pro:buildings". An empty
-	// slice means the endpoint requires no special privilege: any
-	// authenticated API client may call it. Where more than one identifier
-	// is present, the Jamf spec does not encode whether they are required
-	// together (AND) or as alternatives (OR); consumers should present the
-	// full set and avoid asserting a relationship.
+	// Scoped lists the GA capability permissions the endpoint requires, in
+	// {capability}:{action} form, e.g. "buildings:create". The capability is
+	// kebab-case and carries no product name — one capability is reached by
+	// endpoints across several products — and the action is one of exactly
+	// six, lowercase and case-sensitive: create, read, update, delete,
+	// deploy, execute. The three-part beta slug ("create:pro:buildings") is
+	// the retired form and never appears here.
+	//
+	// Where more than one identifier is present, ALL of them are required.
+	// The platform has exactly one route that accepts either of two
+	// capabilities rather than both — DELETE /proclassic/logflush takes
+	// flush-policy-logs:execute or policies:delete — and its specs declare
+	// only the first, so no entry in this registry is an alternatives set. A
+	// consumer can therefore render a multi-entry Scoped slice as "grant all
+	// of these".
+	//
+	// An empty slice means nothing declares a privilege for the endpoint,
+	// which is not the same as none being required. Most such endpoints are
+	// genuinely unauthenticated — /v1/jamf-pro-version,
+	// /v2/jamf-pro-information, the /v1/notifications list. A consumer
+	// rendering a permissions table must not print an empty slice as "no
+	// permission needed"; read Source to tell the two apart.
 	Scoped []string
+	// Source names where Scoped came from:
+	//
+	//   - "spec": the operation's own x-required-privileges extension.
+	//   - "gateway-policy": the published spec declares none and the SDK
+	//     supplies what the gateway's own authorization policy enforces. The
+	//     account package's 18 methods are this case, and permanently so:
+	//     these routes resolve the organization from the access token, which
+	//     exempts them from the transform the publishing pipeline attaches
+	//     x-required-privileges during, so the artifact ships without them by
+	//     construction. The values come from
+	//     public-apis-oas/redocly-implementation/teams/account-*/config.yaml
+	//     and the hand-written OPA rules in
+	//     authorization-policies/policies/tyk_external/account/account_api.rego,
+	//     which agree on all 18.
+	//   - "": Scoped is empty.
+	//
+	// Note for "gateway-policy": several account rules accept *either* the GA
+	// capability recorded here or a retired read:org:*/update:org:* permission.
+	// Only the GA form is carried, because Scoped is a conjunction and listing
+	// the alternative would read as "both required".
+	Source string
 	// Legacy lists the human-readable Jamf Pro privilege names, e.g.
 	// "Create Buildings". It is populated for the Pro API family only —
-	// other families do not publish legacy names. Legacy is NOT
-	// index-aligned with Scoped: a single legacy name may correspond to
-	// multiple scoped identifiers.
+	// other families do not publish legacy names.
+	//
+	// Scoped and Legacy are INDEPENDENT SETS, not parallel arrays. Do not
+	// match them by position, and do not assume equal length. Both are copied
+	// in spec order.
+	//
+	// Two things make a positional pairing wrong, and each on its own is
+	// sufficient (counts are pro at spec 11.31.0, 746 privileged operations):
+	//
+	//   - The lengths differ on 29 operations, because the GA capability
+	//     consolidation mapped several legacy privileges onto one capability.
+	//     GET /v1/computer-groups is Scoped ["device-groups:read"] against
+	//     Legacy ["Read Smart Computer Groups", "Read Static Computer
+	//     Groups"]. There is no bijection to zip.
+	//   - Where the lengths do match, the orders still disagree, in the spec
+	//     itself. POST /v1/jamf-management-framework/redeploy/{id} is Scoped
+	//     ["computer-check-in:read", "device-actions:execute"] against Legacy
+	//     ["Send Computer Remote Command to Install Package", "Read Computer
+	//     Check-In"] — reversed. 9 of the 24 equal-length multi-privilege
+	//     operations are like this.
+	//
+	// A consumer rendering a table of required privileges therefore has to
+	// present the two lists separately, or label from Scoped alone. Jamf does
+	// not publish the scoped-to-legacy mapping in the specs; its "Jamf Pro
+	// permissions map" documentation article is the only artefact that carries
+	// it, and until that is machine-readable a correct label per scoped
+	// identifier cannot be derived here.
 	Legacy []string
 }

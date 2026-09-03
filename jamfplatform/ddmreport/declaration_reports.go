@@ -16,47 +16,9 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// ListDeclarationReportClients get declaration report devices.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-05-17) and may be removed in a future release.
-//
-// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
-//
-// Parameters:
-//   - declarationIdentifier: The declarationIdentifier present on a status report.
-//   - sort: Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort
-//     criteria are supported.
-func (c *Client) ListDeclarationReportClients(ctx context.Context, declarationIdentifier string, sort []string) ([]DeclarationReportClientDto, error) {
-	prefix := c.transport.APIPrefix("ddm/report", "v1")
-	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]DeclarationReportClientDto, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("size", strconv.Itoa(pageSize))
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-
-		endpoint := fmt.Sprintf("%s/declarations/%s", prefix, url.PathEscape(declarationIdentifier))
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                          `json:"totalCount"`
-			Results    []DeclarationReportClientDto `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // ListDeclarationReportClientsFiltered get filtered declaration report devices.
 //
-// Required privileges: read:pro:declaration-reporting, read:school:declaration-reporting.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: declarations:read.
 //
 // Parameters:
 //   - declarationIdentifier: The declarationIdentifier present on a status report.
@@ -70,9 +32,7 @@ func (c *Client) ListDeclarationReportClientsFiltered(ctx context.Context, decla
 		params := url.Values{}
 		params.Set("page", strconv.Itoa(page))
 		params.Set("size", strconv.Itoa(pageSize))
-		if filter != "" {
-			params.Set("filter", filter)
-		}
+		params.Set("filter", filter)
 		if len(sort) > 0 {
 			params.Set("sort", strings.Join(sort, ","))
 		}

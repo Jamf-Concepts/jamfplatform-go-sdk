@@ -18,7 +18,7 @@ import (
 
 // ListJamfRemoteAssistSessionsV1 gets session history items.
 //
-// Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+// Required privileges: remote-assist:read. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 func (c *Client) ListJamfRemoteAssistSessionsV1(ctx context.Context) ([]SessionHistoryItem, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []SessionHistoryItem
@@ -31,7 +31,7 @@ func (c *Client) ListJamfRemoteAssistSessionsV1(ctx context.Context) ([]SessionH
 
 // GetJamfRemoteAssistSessionV1 gets single session history item.
 //
-// Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+// Required privileges: remote-assist:read. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 //
 // Parameters:
 //   - id: instance id of session.
@@ -47,7 +47,7 @@ func (c *Client) GetJamfRemoteAssistSessionV1(ctx context.Context, id string) (*
 
 // ListJamfRemoteAssistSessionsV2 gets session history items.
 //
-// Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+// Required privileges: remote-assist:read. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is sessionId:desc. Multiple sort
@@ -88,7 +88,7 @@ func (c *Client) ListJamfRemoteAssistSessionsV2(ctx context.Context, sort []stri
 
 // ExportJamfRemoteAssistSessionsV2 export Jamf Remote Assist sessions history.
 //
-// Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+// Required privileges: remote-assist:read. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 func (c *Client) ExportJamfRemoteAssistSessionsV2(ctx context.Context, request *ExportParameters) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result []byte
@@ -101,7 +101,7 @@ func (c *Client) ExportJamfRemoteAssistSessionsV2(ctx context.Context, request *
 
 // GetJamfRemoteAssistSessionV2 gets single session history item.
 //
-// Required privileges: read:pro:remote-assist. Legacy Jamf Pro privilege name(s): Read Remote Assist.
+// Required privileges: remote-assist:read. Legacy Jamf Pro privilege name(s): Read Remote Assist.
 //
 // Parameters:
 //   - id: instance id of session.

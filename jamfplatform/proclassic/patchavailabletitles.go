@@ -14,7 +14,7 @@ import (
 
 // ListPatchAvailableTitlesBySourceID finds all available title from a source by ID.
 //
-// Required privileges: read:pro:patch-management-software-titles.
+// Required privileges: patch-management-software-titles:read.
 //
 // Parameters:
 //   - id: ID of the internal or external patch source to filter by.

@@ -11,7 +11,7 @@
 // to call typed methods.
 //
 //	c := jamfplatform.NewClient(
-//		"https://your-tenant.apigw.jamf.com",
+//		"https://eu.api.jamfcloud.com",
 //		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 //		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
 //		jamfplatform.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),

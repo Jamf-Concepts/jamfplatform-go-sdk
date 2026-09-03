@@ -14,7 +14,7 @@ import (
 
 // DeleteCommandFlush flushes commands based on information specified in an XML file.
 //
-// Required privileges: delete:pro:computer-commands.
+// Required privileges: device-actions:delete.
 func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) error {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	endpoint := prefix + "/commandflush"
@@ -26,7 +26,7 @@ func (c *Client) DeleteCommandFlush(ctx context.Context, request *Commandflush) 
 
 // DeleteCommandFlushByIDTypeIDStatus flushes commands for devices.
 //
-// Required privileges: delete:pro:computer-commands.
+// Required privileges: device-actions:delete.
 //
 // Parameters:
 //   - idtype: Type of device to be flushed.

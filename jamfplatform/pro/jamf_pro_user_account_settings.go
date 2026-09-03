@@ -14,7 +14,7 @@ import (
 
 // GetUserPreferencesSettingsV1 get the user preferences for the authenticated user and key.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - keyID: user setting to be retrieved.
@@ -30,7 +30,7 @@ func (c *Client) GetUserPreferencesSettingsV1(ctx context.Context, keyID string)
 
 // GetUserPreferenceV1 get the user setting for the authenticated user and key.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - keyID: user setting to be retrieved.
@@ -46,7 +46,7 @@ func (c *Client) GetUserPreferenceV1(ctx context.Context, keyID string) (*UserPr
 
 // UpdateUserPreferenceV1 persist the user setting.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - keyID: unique key of user setting to be persisted.
@@ -62,7 +62,7 @@ func (c *Client) UpdateUserPreferenceV1(ctx context.Context, keyID string, reque
 
 // DeleteUserPreferenceV1 remove specified setting for authenticated user.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 //
 // Parameters:
 //   - keyID: unique key of user setting to be persisted.

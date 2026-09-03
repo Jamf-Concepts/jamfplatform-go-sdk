@@ -19,7 +19,7 @@ import (
 
 // ListUsersV1 retrieve users with pagination and filtering.
 //
-// Required privileges: read:pro:user. Legacy Jamf Pro privilege name(s): Read User.
+// Required privileges: users:read. Legacy Jamf Pro privilege name(s): Read User.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property(:asc|desc). Default sort order is ascending. Multiple sort
@@ -62,7 +62,7 @@ func (c *Client) ListUsersV1(ctx context.Context, sort []string, filter string, 
 
 // CreateUserV1 create a new user in inventory.
 //
-// Required privileges: create:pro:user. Legacy Jamf Pro privilege name(s): Create User.
+// Required privileges: users:create. Legacy Jamf Pro privilege name(s): Create User.
 //
 // Parameters:
 //   - platform: Internal platform request indicator.
@@ -85,7 +85,7 @@ func (c *Client) CreateUserV1(ctx context.Context, request *UserInventory, platf
 
 // GetUserV1 retrieve a user by ID.
 //
-// Required privileges: read:pro:user. Legacy Jamf Pro privilege name(s): Read User.
+// Required privileges: users:read. Legacy Jamf Pro privilege name(s): Read User.
 //
 // Parameters:
 //   - id: ID of the user to retrieve.
@@ -109,7 +109,7 @@ func (c *Client) GetUserV1(ctx context.Context, id string, platform bool) (*User
 
 // UpdateUserV1 update a user in inventory.
 //
-// Required privileges: update:pro:user. Legacy Jamf Pro privilege name(s): Update User.
+// Required privileges: users:update. Legacy Jamf Pro privilege name(s): Update User.
 //
 // Parameters:
 //   - id: ID of the user to update.
@@ -124,7 +124,7 @@ func (c *Client) UpdateUserV1(ctx context.Context, id string, request *UserInven
 
 // DeleteUserV1 delete a user from inventory.
 //
-// Required privileges: delete:pro:user. Legacy Jamf Pro privilege name(s): Delete User.
+// Required privileges: users:delete. Legacy Jamf Pro privilege name(s): Delete User.
 //
 // Parameters:
 //   - id: ID of the user to delete.

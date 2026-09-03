@@ -13,7 +13,7 @@ import (
 
 // GetM2MTenantIDV1 returns the M2M-sourced tenant ID.
 //
-// Required privileges: read:pro:m2m.
+// Required privileges: m2m:read.
 func (c *Client) GetM2MTenantIDV1(ctx context.Context) (*M2mTenantIDInfo, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result M2mTenantIDInfo

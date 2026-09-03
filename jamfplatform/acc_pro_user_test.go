@@ -8,7 +8,6 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -98,15 +97,15 @@ func TestAcceptance_Pro_User_ListUsersV1(t *testing.T) {
 	t.Logf("Found %d users", len(users))
 }
 
-// TestAcceptance_Pro_User_UserCRUD is gated behind JAMFPLATFORM_USER_WRITE_OK
+// TestAcceptance_Pro_User_UserCRUD is gated behind JAMFPLATFORM_ACC_PRO_USER_WRITE_OK
 // because the Pro users write path via the Platform gateway is currently
 // broken on the nmartin tenant: POST returns 500 but actually persists the
 // record, and DELETE returns 500 with no effect. Every invocation leaks an
 // orphan user until someone with direct Jamf Pro admin access cleans it up.
-// Set JAMFPLATFORM_USER_WRITE_OK=1 to opt in once the gateway is fixed.
+// Set JAMFPLATFORM_ACC_PRO_USER_WRITE_OK=1 to opt in once the gateway is fixed.
 func TestAcceptance_Pro_User_UserCRUD(t *testing.T) {
-	if os.Getenv("JAMFPLATFORM_USER_WRITE_OK") == "" {
-		t.Skip("gated behind JAMFPLATFORM_USER_WRITE_OK — Pro users POST+DELETE currently broken at the gateway; opting in leaks an orphan per run")
+	if accEnv("JAMFPLATFORM_ACC_PRO_USER_WRITE_OK") == "" {
+		t.Skip("gated behind JAMFPLATFORM_ACC_PRO_USER_WRITE_OK — Pro users POST+DELETE currently broken at the gateway; opting in leaks an orphan per run")
 	}
 
 	c := accClient(t)
@@ -202,28 +201,28 @@ func TestAcceptance_Pro_User_UserCRUD(t *testing.T) {
 // which is read-only for listing + patching existing groups. These tests
 // cover list + read-only probes; PATCH is exercised only if a group exists.
 
-func TestAcceptance_Pro_User_ListGroupsV1(t *testing.T) {
+func TestAcceptance_Pro_User_ListGroupsV2(t *testing.T) {
 	c := accClient(t)
 
-	groups, err := pro.New(c).ListGroupsV1(context.Background(), nil, "")
+	groups, err := pro.New(c).ListGroupsV2(context.Background(), nil, "")
 	if err != nil {
 		skipOnServerError(t, err)
-		t.Fatalf("ListGroupsV1: %v", err)
+		t.Fatalf("ListGroupsV2: %v", err)
 	}
 	t.Logf("Found %d groups (unified groups surface)", len(groups))
 	if len(groups) > 0 {
 		// Probe GET by platform id — unified groups expose a platformId
 		// distinct from the per-API (computer/mobile) Jamf Pro numeric id.
 		// Any group is fine for a read probe.
-		got, err := pro.New(c).GetGroupV1(context.Background(), groups[0].GroupPlatformID)
+		got, err := pro.New(c).GetGroupV2(context.Background(), groups[0].GroupPlatformID)
 		if err != nil {
 			skipOnServerError(t, err)
 			var apiErr *jamfplatform.APIResponseError
 			if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
-				t.Logf("GetGroupV1(%s): 404 — group shape not round-trippable via this surface", groups[0].GroupPlatformID)
+				t.Logf("GetGroupV2(%s): 404 — group shape not round-trippable via this surface", groups[0].GroupPlatformID)
 				return
 			}
-			t.Fatalf("GetGroupV1(%s): %v", groups[0].GroupPlatformID, err)
+			t.Fatalf("GetGroupV2(%s): %v", groups[0].GroupPlatformID, err)
 		}
 		t.Logf("Group %s: name=%q type=%s members=%d", got.GroupJamfProID, got.GroupName, got.GroupType, got.MembershipCount)
 	}

@@ -17,7 +17,7 @@ import (
 
 // GetLicensedSoftwareByID finds licensed software by ID.
 //
-// Required privileges: read:pro:licensed-software.
+// Required privileges: licensed-software:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetLicensedSoftwareByID(ctx context.Context, id string) (*Licen
 
 // CreateLicensedSoftwareByID creates new licensed software by ID.
 //
-// Required privileges: create:pro:licensed-software.
+// Required privileges: licensed-software:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateLicensedSoftwareByID(ctx context.Context, id string, requ
 
 // UpdateLicensedSoftwareByID updates existing licensed software by ID.
 //
-// Required privileges: update:pro:licensed-software.
+// Required privileges: licensed-software:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateLicensedSoftwareByID(ctx context.Context, id string, requ
 
 // DeleteLicensedSoftwareByID deletes licensed software by ID.
 //
-// Required privileges: delete:pro:licensed-software.
+// Required privileges: licensed-software:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteLicensedSoftwareByID(ctx context.Context, id string) erro
 
 // GetLicensedSoftwareByName finds licensed software by name.
 //
-// Required privileges: read:pro:licensed-software.
+// Required privileges: licensed-software:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetLicensedSoftwareByName(ctx context.Context, name string) (*L
 
 // UpdateLicensedSoftwareByName updates an existing licensed software by name.
 //
-// Required privileges: update:pro:licensed-software.
+// Required privileges: licensed-software:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateLicensedSoftwareByName(ctx context.Context, name string, 
 
 // DeleteLicensedSoftwareByName deletes licensed software by name.
 //
-// Required privileges: delete:pro:licensed-software.
+// Required privileges: licensed-software:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteLicensedSoftwareByName(ctx context.Context, name string) 
 
 // ListLicensedSoftware finds all licensed software.
 //
-// Required privileges: read:pro:licensed-software.
+// Required privileges: licensed-software:read.
 func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result LicensedSoftwareAll
@@ -138,7 +138,7 @@ func (c *Client) ListLicensedSoftware(ctx context.Context) (*LicensedSoftwareAll
 
 // CreateLicensedSoftwareByName creates new licensed software by ID.
 //
-// Required privileges: create:pro:licensed-software.
+// Required privileges: licensed-software:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

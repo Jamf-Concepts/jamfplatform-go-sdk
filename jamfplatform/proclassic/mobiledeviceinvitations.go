@@ -14,7 +14,7 @@ import (
 
 // GetMobileDeviceInvitationByID finds mobile device invitations by id.
 //
-// Required privileges: read:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetMobileDeviceInvitationByID(ctx context.Context, id string) (
 
 // CreateMobileDeviceInvitationByID creates a new mobile device invitation by id.
 //
-// Required privileges: create:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -46,7 +46,7 @@ func (c *Client) CreateMobileDeviceInvitationByID(ctx context.Context, id string
 
 // DeleteMobileDeviceInvitationByID deletes a mobile device invitation by id.
 //
-// Required privileges: delete:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -61,7 +61,7 @@ func (c *Client) DeleteMobileDeviceInvitationByID(ctx context.Context, id string
 
 // ListMobileDeviceInvitations finds all mobile device invitations.
 //
-// Required privileges: read:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:read.
 func (c *Client) ListMobileDeviceInvitations(ctx context.Context) (*MobileDeviceInvitations, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result MobileDeviceInvitations
@@ -74,7 +74,7 @@ func (c *Client) ListMobileDeviceInvitations(ctx context.Context) (*MobileDevice
 
 // DeleteMobileDeviceInvitationByInvitation deletes a mobile device invitation by invitation.
 //
-// Required privileges: delete:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:delete.
 //
 // Parameters:
 //   - invitation: Invitation value to filter by.
@@ -89,7 +89,7 @@ func (c *Client) DeleteMobileDeviceInvitationByInvitation(ctx context.Context, i
 
 // GetMobileDeviceInvitationByInvitation finds mobile device invitations by invitation.
 //
-// Required privileges: read:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:read.
 //
 // Parameters:
 //   - invitation: Invitation value to filter by.
@@ -105,7 +105,7 @@ func (c *Client) GetMobileDeviceInvitationByInvitation(ctx context.Context, invi
 
 // CreateMobileDeviceInvitationByInvitation creates a new mobile device invitation by invitation.
 //
-// Required privileges: create:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:create.
 //
 // Parameters:
 //   - invitation: Invitation value to filter by.
@@ -121,7 +121,7 @@ func (c *Client) CreateMobileDeviceInvitationByInvitation(ctx context.Context, i
 
 // UpdateMobileDeviceInvitationByInvitation creates a new mobile device invitation by id.
 //
-// Required privileges: update:pro:mobile-device-enrollment-invitations.
+// Required privileges: enrollment-invitations:update.
 //
 // Parameters:
 //   - invitation: ID value to filter by.

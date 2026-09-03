@@ -13,7 +13,7 @@ import (
 
 func TestListAppRequestFormInputFieldsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListAppRequestFormInputFieldsV1(t *testing.T) {
 
 func TestListAppRequestFormInputFieldsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestListAppRequestFormInputFieldsV1_NotFound(t *testing.T) {
 
 func TestCreateAppRequestFormInputFieldV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestCreateAppRequestFormInputFieldV1(t *testing.T) {
 
 func TestReorderAppRequestFormInputFieldsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestReorderAppRequestFormInputFieldsV1(t *testing.T) {
 
 func TestGetAppRequestFormInputFieldV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -101,7 +101,7 @@ func TestGetAppRequestFormInputFieldV1(t *testing.T) {
 
 func TestGetAppRequestFormInputFieldV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -117,7 +117,7 @@ func TestGetAppRequestFormInputFieldV1_NotFound(t *testing.T) {
 
 func TestUpdateAppRequestFormInputFieldV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -135,7 +135,7 @@ func TestUpdateAppRequestFormInputFieldV1(t *testing.T) {
 
 func TestDeleteAppRequestFormInputFieldV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -150,7 +150,7 @@ func TestDeleteAppRequestFormInputFieldV1(t *testing.T) {
 
 func TestGetAppRequestSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -168,7 +168,7 @@ func TestGetAppRequestSettingsV1(t *testing.T) {
 
 func TestGetAppRequestSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -184,7 +184,7 @@ func TestGetAppRequestSettingsV1_NotFound(t *testing.T) {
 
 func TestUpdateAppRequestSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -202,7 +202,7 @@ func TestUpdateAppRequestSettingsV1(t *testing.T) {
 
 func TestResolveAppRequestFormInputFieldV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -225,7 +225,7 @@ func TestResolveAppRequestFormInputFieldV1IDByName(t *testing.T) {
 
 func TestResolveAppRequestFormInputFieldV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -249,7 +249,7 @@ func TestResolveAppRequestFormInputFieldV1ByName(t *testing.T) {
 func TestApplyAppRequestFormInputFieldV1_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -281,7 +281,7 @@ func TestApplyAppRequestFormInputFieldV1_Create(t *testing.T) {
 func TestApplyAppRequestFormInputFieldV1_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -292,7 +292,7 @@ func TestApplyAppRequestFormInputFieldV1_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v1/app-request/form-input-fields/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/app-request/form-input-fields/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": 99})
 	})
 

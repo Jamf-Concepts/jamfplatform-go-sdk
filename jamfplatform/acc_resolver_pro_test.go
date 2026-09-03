@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
@@ -324,229 +323,11 @@ func TestAcceptance_ResolvePackageV1_NotFound(t *testing.T) {
 
 // ─── Smart Computer Groups (V2) ────────────────────────────────────────────
 
-func TestAcceptance_ResolveSmartComputerGroupV2_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-scg-" + runSuffix()
-
-	_, err := c.ResolveSmartComputerGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-
-	resp, err := c.CreateSmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{Name: name}, false)
-	if err != nil {
-		t.Fatalf("Create: %v", err)
-	}
-	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteSmartComputerGroupV2(ctx, id1) })
-
-	gotID, err := c.ResolveSmartComputerGroupV2IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-
-	got, err := c.ResolveSmartComputerGroupV2ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil || got.Name != name {
-		t.Errorf("typed Name = %v, want %q", got, name)
-	}
-
-	id2, dupCreated := tryCreateDuplicate(t, "smart computer group", func() (string, error) {
-		r, e := c.CreateSmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{Name: name}, false)
-		if e != nil {
-			return "", e
-		}
-		return r.ID, nil
-	}, func(id string) error { return c.DeleteSmartComputerGroupV2(ctx, id) })
-
-	if dupCreated {
-		_, err = c.ResolveSmartComputerGroupV2IDByName(ctx, name)
-		requireAmbiguousErr(t, "ambiguous", err)
-		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		_ = c.DeleteSmartComputerGroupV2(ctx, id2)
-	}
-
-	if err := c.DeleteSmartComputerGroupV2(ctx, id1); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = c.ResolveSmartComputerGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("lifecycle complete ✓")
-}
-
 // ─── Static Computer Groups (V2) ───────────────────────────────────────────
-
-func TestAcceptance_ResolveStaticComputerGroupV2_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-stcg-" + runSuffix()
-
-	_, err := c.ResolveStaticComputerGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-
-	emptyAssignments := []string{}
-	resp, err := c.CreateStaticComputerGroupV2(ctx, &pro.StaticComputerGroupAssignment{Name: name, Assignments: &emptyAssignments}, false)
-	if err != nil {
-		t.Fatalf("Create: %v", err)
-	}
-	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteStaticComputerGroupV2(ctx, id1) })
-
-	gotID, err := c.ResolveStaticComputerGroupV2IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-
-	got, err := c.ResolveStaticComputerGroupV2ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil || got.Name != name {
-		t.Errorf("typed Name = %v, want %q", got, name)
-	}
-
-	id2, dupCreated := tryCreateDuplicate(t, "static computer group", func() (string, error) {
-		r, e := c.CreateStaticComputerGroupV2(ctx, &pro.StaticComputerGroupAssignment{Name: name, Assignments: &emptyAssignments}, false)
-		if e != nil {
-			return "", e
-		}
-		return r.ID, nil
-	}, func(id string) error { return c.DeleteStaticComputerGroupV2(ctx, id) })
-
-	if dupCreated {
-		_, err = c.ResolveStaticComputerGroupV2IDByName(ctx, name)
-		requireAmbiguousErr(t, "ambiguous", err)
-		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		_ = c.DeleteStaticComputerGroupV2(ctx, id2)
-	}
-
-	if err := c.DeleteStaticComputerGroupV2(ctx, id1); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = c.ResolveStaticComputerGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("lifecycle complete ✓")
-}
 
 // ─── Smart Mobile Device Groups (V1) ───────────────────────────────────────
 
-func TestAcceptance_ResolveSmartMobileDeviceGroupV1_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-smg-" + runSuffix()
-
-	_, err := c.ResolveSmartMobileDeviceGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-
-	resp, err := c.CreateSmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{GroupName: name, SiteID: strPtr("-1")}, false)
-	if err != nil {
-		t.Fatalf("Create: %v", err)
-	}
-	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteSmartMobileDeviceGroupV1(ctx, id1) })
-
-	gotID, err := c.ResolveSmartMobileDeviceGroupV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-
-	got, err := c.ResolveSmartMobileDeviceGroupV1ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil || got.GroupName != name {
-		t.Errorf("typed GroupName = %v, want %q", got, name)
-	}
-
-	id2, dupCreated := tryCreateDuplicate(t, "smart mobile device group", func() (string, error) {
-		r, e := c.CreateSmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{GroupName: name, SiteID: strPtr("-1")}, false)
-		if e != nil {
-			return "", e
-		}
-		return r.ID, nil
-	}, func(id string) error { return c.DeleteSmartMobileDeviceGroupV1(ctx, id) })
-
-	if dupCreated {
-		_, err = c.ResolveSmartMobileDeviceGroupV1IDByName(ctx, name)
-		requireAmbiguousErr(t, "ambiguous", err)
-		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		_ = c.DeleteSmartMobileDeviceGroupV1(ctx, id2)
-	}
-
-	if err := c.DeleteSmartMobileDeviceGroupV1(ctx, id1); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = c.ResolveSmartMobileDeviceGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("lifecycle complete ✓")
-}
-
 // ─── Static Mobile Device Groups (V1) ──────────────────────────────────────
-
-func TestAcceptance_ResolveStaticMobileDeviceGroupV1_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-stmg-" + runSuffix()
-
-	_, err := c.ResolveStaticMobileDeviceGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-
-	emptyMobileAssignments := []pro.Assignment{}
-	resp, err := c.CreateStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyMobileAssignments}, false)
-	if err != nil {
-		t.Fatalf("Create: %v", err)
-	}
-	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteStaticMobileDeviceGroupV1(ctx, id1) })
-
-	gotID, err := c.ResolveStaticMobileDeviceGroupV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-
-	got, err := c.ResolveStaticMobileDeviceGroupV1ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil || got.GroupName != name {
-		t.Errorf("typed GroupName = %v, want %q", got, name)
-	}
-
-	id2, dupCreated := tryCreateDuplicate(t, "static mobile device group", func() (string, error) {
-		r, e := c.CreateStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyMobileAssignments}, false)
-		if e != nil {
-			return "", e
-		}
-		return r.ID, nil
-	}, func(id string) error { return c.DeleteStaticMobileDeviceGroupV1(ctx, id) })
-
-	if dupCreated {
-		_, err = c.ResolveStaticMobileDeviceGroupV1IDByName(ctx, name)
-		requireAmbiguousErr(t, "ambiguous", err)
-		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		_ = c.DeleteStaticMobileDeviceGroupV1(ctx, id2)
-	}
-
-	if err := c.DeleteStaticMobileDeviceGroupV1(ctx, id1); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = c.ResolveStaticMobileDeviceGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("lifecycle complete ✓")
-}
 
 // ─── Computer Extension Attributes (V1) ────────────────────────────────────
 
@@ -569,7 +350,7 @@ func TestAcceptance_ResolveComputerExtensionAttributeV1_Lifecycle(t *testing.T) 
 	// SCRIPT and enabled is false.
 	newCEA := func(n string) *pro.ComputerExtensionAttributes {
 		return &pro.ComputerExtensionAttributes{
-			Name: n, Enabled: ptr(true),
+			Name: n, Enabled: new(true),
 			DataType:             pro.ComputerExtensionAttributesDataTypeString,
 			InputType:            pro.ComputerExtensionAttributesInputTypeText,
 			InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
@@ -692,68 +473,8 @@ func TestAcceptance_ResolveMobileDeviceExtensionAttributeV1_Lifecycle(t *testing
 // ─── Platform Groups (V1) ──────────────────────────────────────────────────
 // Synced from identity providers — no create endpoint. Read-only probe.
 
-func TestAcceptance_ResolveGroupV1_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolveGroupV1IDByName(context.Background(), "sdk-does-not-exist-grp-"+runSuffix())
-	requireNotFoundErr(t, "ResolveGroupV1IDByName", err)
-	t.Log("not-found surfaced 404 ✓")
-}
-
-func TestAcceptance_ResolveGroupV1IDByName_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	groups, err := c.ListGroupsV1(ctx, nil, "")
-	if err != nil {
-		t.Fatalf("ListGroupsV1: %v", err)
-	}
-	if len(groups) == 0 {
-		t.Skip("no platform groups — skipping")
-	}
-	first := groups[0]
-	gotID, err := c.ResolveGroupV1IDByName(ctx, first.GroupName)
-	if err != nil {
-		t.Fatalf("resolve: %v", err)
-	}
-	if gotID != first.GroupPlatformID {
-		t.Errorf("resolved id = %q, want %q", gotID, first.GroupPlatformID)
-	}
-	t.Logf("resolved %q → %s ✓", first.GroupName, gotID)
-}
-
 // ─── Computer Inventory (V3) ───────────────────────────────────────────────
 // Computers are enrolled, not created via API. Read-only probe.
-
-func TestAcceptance_ResolveComputerInventoryV3_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolveComputerInventoryV3IDByName(context.Background(), "sdk-does-not-exist-ci-"+runSuffix())
-	requireNotFoundErr(t, "ResolveComputerInventoryV3IDByName", err)
-	t.Log("not-found surfaced 404 ✓")
-}
-
-func TestAcceptance_ResolveComputerInventoryV3IDByName_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	section := []string{"GENERAL"}
-	computers, err := c.ListComputersInventoryV3(ctx, section, nil, "")
-	if err != nil {
-		t.Fatalf("ListComputersInventoryV3: %v", err)
-	}
-	if len(computers) == 0 {
-		t.Skip("no computers — skipping")
-	}
-	first := computers[0]
-	if first.General == nil || first.General.Name == "" {
-		t.Skip("first computer has no name — skipping")
-	}
-	gotID, err := c.ResolveComputerInventoryV3IDByName(ctx, first.General.Name)
-	if err != nil {
-		t.Fatalf("resolve: %v", err)
-	}
-	if gotID != first.ID {
-		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
-	}
-	t.Logf("resolved %q → %s ✓", first.General.Name, gotID)
-}
 
 // ─── Computer Inventory (V4) ───────────────────────────────────────────────
 // V4 is the undeprecated successor to V1/V2/V3 (issue #50). The V4 resolvers
@@ -778,10 +499,30 @@ func TestAcceptance_ResolveComputerInventoryV4IDByName_Existing(t *testing.T) {
 	if len(computers) == 0 {
 		t.Skip("no computers — skipping")
 	}
-	first := computers[0]
-	if first.General == nil || first.General.Name == "" {
-		t.Skip("first computer has no name — skipping")
+	// Pick a name that occurs exactly once. The resolver refuses an ambiguous
+	// name by design, so a test that grabs computers[0] is asserting uniqueness
+	// it never checked — and it fails on any tenant that has two machines with
+	// the same name, which is normal: one instance probed on 2026-09-03 had
+	// three computers all called "admin's Virtual Machine". That refusal is the
+	// resolver working, so the test must supply a resolvable name rather than
+	// treat the tenant's data as a bug.
+	counts := map[string]int{}
+	for _, comp := range computers {
+		if comp.General != nil && comp.General.Name != "" {
+			counts[comp.General.Name]++
+		}
 	}
+	var unique *pro.ComputerInventoryV4
+	for i, comp := range computers {
+		if comp.General != nil && counts[comp.General.Name] == 1 {
+			unique = &computers[i]
+			break
+		}
+	}
+	if unique == nil {
+		t.Skipf("no uniquely-named computer among %d — every name is duplicated, so ResolveComputerInventoryV4IDByName cannot succeed by design", len(computers))
+	}
+	first := *unique
 	gotID, err := c.ResolveComputerInventoryV4IDByName(ctx, first.General.Name)
 	if err != nil {
 		t.Fatalf("resolve: %v", err)
@@ -872,7 +613,7 @@ func TestAcceptance_ResolveSiteV1IDByName_Existing(t *testing.T) {
 }
 
 // ─── Computer Groups (combined V1) ─────────────────────────────────────────
-// Combined smart+static list. Create via SmartComputerGroupV2 to test.
+// Combined smart+static list. Create via SmartComputerGroupV3 to test.
 
 func TestAcceptance_ResolveComputerGroupV1_Lifecycle(t *testing.T) {
 	c := pro.New(accClient(t))
@@ -883,17 +624,20 @@ func TestAcceptance_ResolveComputerGroupV1_Lifecycle(t *testing.T) {
 	requireNotFoundErr(t, "pre-create", err)
 
 	// Create a smart computer group — it should appear in the combined list.
-	resp, err := c.CreateSmartComputerGroupV2(ctx, &pro.SmartComputerGroupV2{Name: name}, false)
+	resp, err := c.CreateSmartComputerGroupV3(ctx, &pro.SmartComputerGroupV3{Name: name}, false)
 	if err != nil {
-		t.Fatalf("CreateSmartComputerGroupV2: %v", err)
+		t.Fatalf("CreateSmartComputerGroupV3: %v", err)
 	}
 	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteSmartComputerGroupV2(ctx, id1) })
+	t.Cleanup(func() { _ = c.DeleteSmartComputerGroupV3(ctx, id1) })
 
-	gotID, err := c.ResolveComputerGroupV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
+	// Group reads lag their own writes — see settleUntilFound.
+	var gotID string
+	settleUntilFound(t, "resolve ID", func() error {
+		var err error
+		gotID, err = c.ResolveComputerGroupV1IDByName(ctx, name)
+		return err
+	})
 	if gotID != id1 {
 		t.Errorf("resolve ID = %q, want %q", gotID, id1)
 	}
@@ -902,77 +646,32 @@ func TestAcceptance_ResolveComputerGroupV1_Lifecycle(t *testing.T) {
 	// Attempt duplicate via static group with same name
 	emptyAssignmentsCG := []string{}
 	id2, dupCreated := tryCreateDuplicate(t, "computer group (static)", func() (string, error) {
-		r, e := c.CreateStaticComputerGroupV2(ctx, &pro.StaticComputerGroupAssignment{Name: name, Assignments: &emptyAssignmentsCG}, false)
+		r, e := c.CreateStaticComputerGroupV3(ctx, &pro.StaticComputerGroupAssignment{Name: name, Assignments: &emptyAssignmentsCG}, false)
 		if e != nil {
 			return "", e
 		}
 		return r.ID, nil
-	}, func(id string) error { return c.DeleteStaticComputerGroupV2(ctx, id) })
+	}, func(id string) error { return c.DeleteStaticComputerGroupV3(ctx, id) })
 
 	if dupCreated {
 		_, err = c.ResolveComputerGroupV1IDByName(ctx, name)
 		requireAmbiguousErr(t, "ambiguous", err)
 		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		_ = c.DeleteStaticComputerGroupV2(ctx, id2)
+		_ = c.DeleteStaticComputerGroupV3(ctx, id2)
 	}
 
-	if err := c.DeleteSmartComputerGroupV2(ctx, id1); err != nil {
+	if err := c.DeleteSmartComputerGroupV3(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveComputerGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveComputerGroupV1IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
 // ─── Mobile Device Groups (combined V1) ────────────────────────────────────
 // Combined smart+static list. Create via SmartMobileDeviceGroupV1 to test.
-
-func TestAcceptance_ResolveMobileDeviceGroupV1_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-mdg-" + runSuffix()
-
-	_, err := c.ResolveMobileDeviceGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-
-	resp, err := c.CreateSmartMobileDeviceGroupV1(ctx, &pro.SmartGroupAssignment{GroupName: name, SiteID: strPtr("-1")}, false)
-	if err != nil {
-		t.Fatalf("CreateSmartMobileDeviceGroupV1: %v", err)
-	}
-	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteSmartMobileDeviceGroupV1(ctx, id1) })
-
-	gotID, err := c.ResolveMobileDeviceGroupV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
-	// MobileDeviceGroup.ID is int, resolver returns string
-	t.Logf("resolved %q → %s ✓", name, gotID)
-
-	// Attempt duplicate via static group with same name
-	emptyAssignmentsMDG := []pro.Assignment{}
-	id2, dupCreated := tryCreateDuplicate(t, "mobile device group (static)", func() (string, error) {
-		r, e := c.CreateStaticMobileDeviceGroupV1(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyAssignmentsMDG}, false)
-		if e != nil {
-			return "", e
-		}
-		return r.ID, nil
-	}, func(id string) error { return c.DeleteStaticMobileDeviceGroupV1(ctx, id) })
-
-	if dupCreated {
-		_, err = c.ResolveMobileDeviceGroupV1IDByName(ctx, name)
-		requireAmbiguousErr(t, "ambiguous", err)
-		t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		_ = c.DeleteStaticMobileDeviceGroupV1(ctx, id2)
-	}
-
-	if err := c.DeleteSmartMobileDeviceGroupV1(ctx, id1); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = c.ResolveMobileDeviceGroupV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("lifecycle complete ✓")
-}
 
 // ─── Advanced Mobile Device Searches ────────────────────────────────────────
 
@@ -1167,8 +866,8 @@ func TestAcceptance_ResolveDistributionPointV1_Lifecycle(t *testing.T) {
 	newDP := func(n string) *pro.DistributionPoint {
 		return &pro.DistributionPoint{
 			Name: n, FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb, ServerName: "localhost",
-			ShareName: strPtr("share"), ReadWriteUsername: strPtr("rw"), ReadWritePassword: strPtr("rw"),
-			ReadOnlyUsername: strPtr("ro"), ReadOnlyPassword: strPtr("ro"),
+			ShareName: new("share"), ReadWriteUsername: new("rw"), ReadWritePassword: new("rw"),
+			ReadOnlyUsername: new("ro"), ReadOnlyPassword: new("ro"),
 		}
 	}
 	resp, err := c.CreateDistributionPointV1(ctx, newDP(name))
@@ -1239,81 +938,6 @@ func TestAcceptance_ResolveEbookV1IDByName_Existing(t *testing.T) {
 		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
 	}
 	t.Logf("resolved %q → %s ✓", first.Name, gotID)
-}
-
-// ─── API Integrations ──────────────────────────────────────────────────────
-
-func TestAcceptance_ResolveApiIntegrationV1_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-ai-" + runSuffix()
-
-	_, err := c.ResolveApiIntegrationV1IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-
-	// Create an API role for the integration's authorization scopes.
-	roleName := "sdk-acc-res-ai-role-" + runSuffix()
-	role, err := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: roleName, Privileges: []string{"Read Buildings"}})
-	if err != nil {
-		t.Fatalf("CreateApiRoleV1 (prereq): %v", err)
-	}
-	t.Cleanup(func() { _ = c.DeleteApiRoleV1(ctx, role.ID) })
-
-	newAI := func(n string) *pro.ApiIntegrationRequest {
-		return &pro.ApiIntegrationRequest{DisplayName: n, AuthorizationScopes: []string{roleName}}
-	}
-	resp, err := c.CreateApiIntegrationV1(ctx, newAI(name))
-	if err != nil {
-		t.Fatalf("CreateApiIntegrationV1: %v", err)
-	}
-	id1 := strconv.Itoa(resp.ID)
-	t.Cleanup(func() { _ = c.DeleteApiIntegrationV1(ctx, id1) })
-
-	gotID, err := c.ResolveApiIntegrationV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve ID: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-	t.Logf("resolved %q → %s ✓", name, gotID)
-
-	got, err := c.ResolveApiIntegrationV1ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil || got.DisplayName != name {
-		t.Errorf("typed DisplayName = %v, want %q", got, name)
-	}
-
-	id2, dupCreated := tryCreateDuplicate(t, "api integration", func() (string, error) {
-		r, e := c.CreateApiIntegrationV1(ctx, newAI(name))
-		if e != nil {
-			return "", e
-		}
-		return strconv.Itoa(r.ID), nil
-	}, func(id string) error { return c.DeleteApiIntegrationV1(ctx, id) })
-
-	if dupCreated {
-		time.Sleep(2 * time.Second) // allow eventual consistency for RSQL index
-		_, err = c.ResolveApiIntegrationV1IDByName(ctx, name)
-		var amErr *jamfplatform.AmbiguousMatchError
-		if errors.As(err, &amErr) {
-			t.Logf("ambiguous with IDs %s, %s ✓", id1, id2)
-		} else {
-			// API integrations list endpoint has eventual consistency — dup may not
-			// appear in filtered results immediately. Log rather than fail.
-			t.Logf("NOTE: dup created (%s, %s) but resolver did not detect ambiguity (eventual consistency); err=%v", id1, id2, err)
-		}
-		_ = c.DeleteApiIntegrationV1(ctx, id2)
-	}
-
-	if err := c.DeleteApiIntegrationV1(ctx, id1); err != nil {
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = c.ResolveApiIntegrationV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("lifecycle complete ✓")
 }
 
 // ─── Supervision Identities ────────────────────────────────────────────────
@@ -1553,78 +1177,6 @@ func TestAcceptance_ResolveEnrollmentCustomizationV2_Lifecycle(t *testing.T) {
 	_, err = c.ResolveEnrollmentCustomizationV2IDByName(ctx, name)
 	requireNotFoundErr(t, "post-delete", err)
 	t.Log("lifecycle complete ✓")
-}
-
-// ─── ApiRoles ───────────────────────────────────────────────────────────────
-
-func TestAcceptance_ResolveApiRoleV1_Lifecycle(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	name := "sdk-acc-res-role-" + runSuffix()
-
-	// Step 1: Not found
-	_, err := c.ResolveApiRoleV1IDByName(ctx, name)
-	requireNotFoundErr(t, "pre-create", err)
-	t.Log("step 1: not-found ✓")
-
-	// Step 2: Create
-	resp, err := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: name, Privileges: []string{"Read Buildings"}})
-	if err != nil {
-		t.Fatalf("CreateApiRoleV1: %v", err)
-	}
-	id1 := resp.ID
-	t.Cleanup(func() { _ = c.DeleteApiRoleV1(ctx, id1) })
-	t.Logf("step 2: created %s", id1)
-
-	// Step 3: Resolve ID
-	gotID, err := c.ResolveApiRoleV1IDByName(ctx, name)
-	if err != nil {
-		t.Fatalf("ResolveApiRoleV1IDByName: %v", err)
-	}
-	if gotID != id1 {
-		t.Errorf("resolve ID = %q, want %q", gotID, id1)
-	}
-	t.Logf("step 3: resolve ID %q → %s ✓", name, gotID)
-
-	// Step 4: Resolve typed
-	got, err := c.ResolveApiRoleV1ByName(ctx, name)
-	if err != nil {
-		t.Fatalf("ResolveApiRoleV1ByName: %v", err)
-	}
-	if got == nil || got.DisplayName != name {
-		t.Errorf("typed DisplayName = %v, want %q", got, name)
-	}
-	t.Log("step 4: resolve typed ✓")
-
-	// Step 5: Attempt duplicate
-	id2, dupCreated := tryCreateDuplicate(t, "api role", func() (string, error) {
-		r, e := c.CreateApiRoleV1(ctx, &pro.ApiRoleRequest{DisplayName: name, Privileges: []string{"Read Buildings"}})
-		if e != nil {
-			return "", e
-		}
-		return r.ID, nil
-	}, func(id string) error { return c.DeleteApiRoleV1(ctx, id) })
-
-	// Step 6: Ambiguous
-	if dupCreated {
-		_, err = c.ResolveApiRoleV1IDByName(ctx, name)
-		requireAmbiguousErr(t, "ambiguous", err)
-		t.Logf("step 6: ambiguous with IDs %s, %s ✓", id1, id2)
-
-		if err := c.DeleteApiRoleV1(ctx, id2); err != nil {
-			t.Logf("early delete dup: %v", err)
-		}
-	}
-
-	// Step 7: Delete original
-	if err := c.DeleteApiRoleV1(ctx, id1); err != nil {
-		t.Fatalf("delete original: %v", err)
-	}
-
-	// Step 8: Not found after delete
-	_, err = c.ResolveApiRoleV1IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
-	t.Log("step 8: not-found after delete ✓")
 }
 
 // ─── AdvancedUserContentSearches ────────────────────────────────────────────
@@ -2141,130 +1693,6 @@ func TestAcceptance_ResolveVolumePurchasingSubscriptionV1_Lifecycle(t *testing.T
 	t.Log("step 8: not-found after delete ✓")
 }
 
-// ─── AppInstallerDeployments (read-only) ────────────────────────────────────
-
-func TestAcceptance_ResolveAppInstallerDeploymentV1IDByName_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolveAppInstallerDeploymentV1IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
-	if err == nil {
-		t.Fatal("expected not-found error, got nil")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
-		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
-	}
-	t.Log("not-found ✓")
-}
-
-func TestAcceptance_ResolveAppInstallerDeploymentV1IDByName_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-
-	items, err := c.ListAppInstallerDeploymentsV1(ctx)
-	if err != nil {
-		t.Fatalf("ListAppInstallerDeploymentsV1: %v", err)
-	}
-	if len(items) == 0 {
-		t.Skip("no app installer deployments in tenant — skipping")
-	}
-	first := items[0]
-	gotID, err := c.ResolveAppInstallerDeploymentV1IDByName(ctx, first.Name)
-	if err != nil {
-		t.Fatalf("resolve: %v", err)
-	}
-	if gotID != first.ID {
-		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
-	}
-	t.Logf("resolved %q → %s ✓", first.Name, gotID)
-}
-
-func TestAcceptance_ResolveAppInstallerDeploymentV1ByName_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-
-	items, err := c.ListAppInstallerDeploymentsV1(ctx)
-	if err != nil {
-		t.Fatalf("ListAppInstallerDeploymentsV1: %v", err)
-	}
-	if len(items) == 0 {
-		t.Skip("no app installer deployments in tenant — skipping")
-	}
-	first := items[0]
-	got, err := c.ResolveAppInstallerDeploymentV1ByName(ctx, first.Name)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil {
-		t.Fatal("resolve returned nil")
-	}
-	if got.Name != first.Name {
-		t.Errorf("typed Name = %q, want %q", got.Name, first.Name)
-	}
-	t.Logf("resolved typed %q → %s ✓", first.Name, got.ID)
-}
-
-// ─── AppInstallerTitles (read-only) ─────────────────────────────────────────
-
-func TestAcceptance_ResolveAppInstallerTitleV1IDByName_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolveAppInstallerTitleV1IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
-	if err == nil {
-		t.Fatal("expected not-found error, got nil")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
-		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
-	}
-	t.Log("not-found ✓")
-}
-
-func TestAcceptance_ResolveAppInstallerTitleV1IDByName_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-
-	items, err := c.ListAppInstallerTitlesV1(ctx)
-	if err != nil {
-		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
-	}
-	if len(items) == 0 {
-		t.Skip("no app installer titles in tenant — skipping")
-	}
-	first := items[0]
-	gotID, err := c.ResolveAppInstallerTitleV1IDByName(ctx, first.TitleName)
-	if err != nil {
-		t.Fatalf("resolve: %v", err)
-	}
-	if gotID != first.ID {
-		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
-	}
-	t.Logf("resolved %q → %s ✓", first.TitleName, gotID)
-}
-
-func TestAcceptance_ResolveAppInstallerTitleV1ByName_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-
-	items, err := c.ListAppInstallerTitlesV1(ctx)
-	if err != nil {
-		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
-	}
-	if len(items) == 0 {
-		t.Skip("no app installer titles in tenant — skipping")
-	}
-	first := items[0]
-	got, err := c.ResolveAppInstallerTitleV1ByName(ctx, first.TitleName)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil {
-		t.Fatal("resolve returned nil")
-	}
-	if got.TitleName != first.TitleName {
-		t.Errorf("typed TitleName = %q, want %q", got.TitleName, first.TitleName)
-	}
-	t.Logf("resolved typed %q → %s ✓", first.TitleName, got.ID)
-}
-
 // ─── CloudIdp (read-only) ───────────────────────────────────────────────────
 
 func TestAcceptance_ResolveCloudIdpV1IDByName_NotFound(t *testing.T) {
@@ -2401,32 +1829,19 @@ func TestAcceptance_ResolveDeviceEnrollmentV1ByName_Existing(t *testing.T) {
 
 // ─── PatchSoftwareTitleConfigurations (read-only) ───────────────────────────
 
-func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2IDByName_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolvePatchSoftwareTitleConfigurationV2IDByName(context.Background(), "sdk-does-not-exist-"+runSuffix())
-	if err == nil {
-		t.Fatal("expected not-found error, got nil")
-	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
-		t.Fatalf("expected APIResponseError(404), got %T: %v", err, err)
-	}
-	t.Log("not-found ✓")
-}
-
-func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2IDByName_Existing(t *testing.T) {
+func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV3IDByName_Existing(t *testing.T) {
 	c := pro.New(accClient(t))
 	ctx := context.Background()
 
-	items, err := c.ListPatchSoftwareTitleConfigurationsV2(ctx)
+	items, err := c.ListPatchSoftwareTitleConfigurationsV3(ctx)
 	if err != nil {
-		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
+		t.Fatalf("ListPatchSoftwareTitleConfigurationsV3: %v", err)
 	}
 	if len(items) == 0 {
 		t.Skip("no patch software title configurations in tenant — skipping")
 	}
 	first := items[0]
-	gotID, err := c.ResolvePatchSoftwareTitleConfigurationV2IDByName(ctx, first.DisplayName)
+	gotID, err := c.ResolvePatchSoftwareTitleConfigurationV3IDByName(ctx, first.DisplayName)
 	if err != nil {
 		t.Fatalf("resolve: %v", err)
 	}
@@ -2434,31 +1849,6 @@ func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2IDByName_Existing(t 
 		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
 	}
 	t.Logf("resolved %q → %s ✓", first.DisplayName, gotID)
-}
-
-func TestAcceptance_ResolvePatchSoftwareTitleConfigurationV2ByName_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-
-	items, err := c.ListPatchSoftwareTitleConfigurationsV2(ctx)
-	if err != nil {
-		t.Fatalf("ListPatchSoftwareTitleConfigurationsV2: %v", err)
-	}
-	if len(items) == 0 {
-		t.Skip("no patch software title configurations in tenant — skipping")
-	}
-	first := items[0]
-	got, err := c.ResolvePatchSoftwareTitleConfigurationV2ByName(ctx, first.DisplayName)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil {
-		t.Fatal("resolve returned nil")
-	}
-	if got.DisplayName != first.DisplayName {
-		t.Errorf("typed DisplayName = %q, want %q", got.DisplayName, first.DisplayName)
-	}
-	t.Logf("resolved typed %q → %s ✓", first.DisplayName, got.ID)
 }
 
 // ─── PatchSoftwareTitleConfigurations V3 ────────────────────────────────────
@@ -2524,95 +1914,6 @@ func TestAcceptance_ResolveComputerInventoryV4IDByUDID_NotFound(t *testing.T) {
 }
 
 // ─── ComputerInventoryV3 alternate resolvers ───────────────────────────────
-
-func TestAcceptance_ResolveComputerInventoryV3IDBySerialNumber_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolveComputerInventoryV3IDBySerialNumber(context.Background(), "SDKNOTEXIST"+runSuffix())
-	requireNotFoundErr(t, "ResolveComputerInventoryV3IDBySerialNumber", err)
-	t.Log("not-found surfaced 404 ✓")
-}
-
-func TestAcceptance_ResolveComputerInventoryV3IDBySerialNumber_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	computers, err := c.ListComputersInventoryV3(ctx, []string{"HARDWARE"}, nil, "")
-	if err != nil {
-		t.Fatalf("ListComputersInventoryV3: %v", err)
-	}
-	if len(computers) == 0 {
-		t.Skip("no computers — skipping")
-	}
-	first := computers[0]
-	if first.Hardware == nil || first.Hardware.SerialNumber == "" {
-		t.Skip("first computer has no serial number — skipping")
-	}
-	gotID, err := c.ResolveComputerInventoryV3IDBySerialNumber(ctx, first.Hardware.SerialNumber)
-	if err != nil {
-		t.Fatalf("resolve: %v", err)
-	}
-	if gotID != first.ID {
-		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
-	}
-	t.Logf("resolved serial %q → %s ✓", first.Hardware.SerialNumber, gotID)
-}
-
-func TestAcceptance_ResolveComputerInventoryV3BySerialNumber_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	computers, err := c.ListComputersInventoryV3(ctx, []string{"HARDWARE"}, nil, "")
-	if err != nil {
-		t.Fatalf("ListComputersInventoryV3: %v", err)
-	}
-	if len(computers) == 0 {
-		t.Skip("no computers — skipping")
-	}
-	first := computers[0]
-	if first.Hardware == nil || first.Hardware.SerialNumber == "" {
-		t.Skip("first computer has no serial number — skipping")
-	}
-	got, err := c.ResolveComputerInventoryV3BySerialNumber(ctx, first.Hardware.SerialNumber)
-	if err != nil {
-		t.Fatalf("resolve typed: %v", err)
-	}
-	if got == nil {
-		t.Fatal("resolve returned nil")
-	}
-	if got.ID != first.ID {
-		t.Errorf("typed ID = %q, want %q", got.ID, first.ID)
-	}
-	t.Logf("resolved typed serial %q → %s ✓", first.Hardware.SerialNumber, got.ID)
-}
-
-func TestAcceptance_ResolveComputerInventoryV3IDByUDID_NotFound(t *testing.T) {
-	c := pro.New(accClient(t))
-	_, err := c.ResolveComputerInventoryV3IDByUDID(context.Background(), "00000000-0000-0000-0000-000000000000")
-	requireNotFoundErr(t, "ResolveComputerInventoryV3IDByUDID", err)
-	t.Log("not-found surfaced 404 ✓")
-}
-
-func TestAcceptance_ResolveComputerInventoryV3IDByUDID_Existing(t *testing.T) {
-	c := pro.New(accClient(t))
-	ctx := context.Background()
-	computers, err := c.ListComputersInventoryV3(ctx, []string{"GENERAL"}, nil, "")
-	if err != nil {
-		t.Fatalf("ListComputersInventoryV3: %v", err)
-	}
-	if len(computers) == 0 {
-		t.Skip("no computers — skipping")
-	}
-	first := computers[0]
-	if first.UDID == "" {
-		t.Skip("first computer has no UDID — skipping")
-	}
-	gotID, err := c.ResolveComputerInventoryV3IDByUDID(ctx, first.UDID)
-	if err != nil {
-		t.Fatalf("resolve: %v", err)
-	}
-	if gotID != first.ID {
-		t.Errorf("resolved id = %q, want %q", gotID, first.ID)
-	}
-	t.Logf("resolved UDID %q → %s ✓", first.UDID, gotID)
-}
 
 // ─── MobileDeviceDetailV2 resolvers ─────────────────────────────────────────
 // Enrolled devices, not created via API. Read-only probe.
@@ -3045,8 +2346,11 @@ func TestAcceptance_ResolveSmartComputerGroupV3_Lifecycle(t *testing.T) {
 	if err := c.DeleteSmartComputerGroupV3(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveSmartComputerGroupV3IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveSmartComputerGroupV3IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -3102,8 +2406,11 @@ func TestAcceptance_ResolveStaticComputerGroupV3_Lifecycle(t *testing.T) {
 	if err := c.DeleteStaticComputerGroupV3(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveStaticComputerGroupV3IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveStaticComputerGroupV3IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -3117,7 +2424,7 @@ func TestAcceptance_ResolveSmartMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	_, err := c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
 	requireNotFoundErr(t, "pre-create", err)
 
-	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("Create: %v", err)
 	}
@@ -3142,7 +2449,7 @@ func TestAcceptance_ResolveSmartMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	t.Logf("resolve typed: groupName field on V2 schema = %+v", got)
 
 	id2, dupCreated := tryCreateDuplicate(t, "smart mobile device group v2", func() (string, error) {
-		r, e := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+		r, e := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 		if e != nil {
 			return "", e
 		}
@@ -3159,8 +2466,11 @@ func TestAcceptance_ResolveSmartMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	if err := c.DeleteSmartMobileDeviceGroupV2(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -3175,7 +2485,7 @@ func TestAcceptance_ResolveStaticMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	requireNotFoundErr(t, "pre-create", err)
 
 	emptyAssignments := []pro.Assignment{}
-	resp, err := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyAssignments}, false)
+	resp, err := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: new("-1"), Assignments: &emptyAssignments}, false)
 	if err != nil {
 		t.Fatalf("Create: %v", err)
 	}
@@ -3201,8 +2511,11 @@ func TestAcceptance_ResolveStaticMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	if err := c.DeleteStaticMobileDeviceGroupV2(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveStaticMobileDeviceGroupV2IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 
@@ -3217,7 +2530,7 @@ func TestAcceptance_ResolveMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	_, err := c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
 	requireNotFoundErr(t, "pre-create", err)
 
-	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("CreateSmartMobileDeviceGroupV2: %v", err)
 	}
@@ -3233,7 +2546,7 @@ func TestAcceptance_ResolveMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 
 	emptyAssignmentsMDG := []pro.Assignment{}
 	id2, dupCreated := tryCreateDuplicate(t, "mobile device group v2 (static)", func() (string, error) {
-		r, e := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyAssignmentsMDG}, false)
+		r, e := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: new("-1"), Assignments: &emptyAssignmentsMDG}, false)
 		if e != nil {
 			return "", e
 		}
@@ -3250,8 +2563,11 @@ func TestAcceptance_ResolveMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	if err := c.DeleteSmartMobileDeviceGroupV2(ctx, id1); err != nil {
 		t.Fatalf("delete: %v", err)
 	}
-	_, err = c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
-	requireNotFoundErr(t, "post-delete", err)
+	// Group reads lag their own writes — see settleUntilGone.
+	settleUntilGone(t, "post-delete", func() error {
+		_, err := c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
+		return err
+	})
 	t.Log("lifecycle complete ✓")
 }
 

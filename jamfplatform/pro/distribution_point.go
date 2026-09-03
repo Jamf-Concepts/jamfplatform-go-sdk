@@ -19,7 +19,7 @@ import (
 
 // ListDistributionPointsV1 finds all Distribution Points.
 //
-// Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
+// Required privileges: distribution-points:read. Legacy Jamf Pro privilege name(s): Read Distribution Points.
 //
 // Parameters:
 //   - sort: Sorts results by one or more criteria, following the format property:asc/desc. Default sort is
@@ -58,7 +58,7 @@ func (c *Client) ListDistributionPointsV1(ctx context.Context, sort []string, fi
 
 // CreateDistributionPointV1 create distribution point.
 //
-// Required privileges: create:pro:distribution-points. Legacy Jamf Pro privilege name(s): Create Distribution Points.
+// Required privileges: distribution-points:create. Legacy Jamf Pro privilege name(s): Create Distribution Points.
 func (c *Client) CreateDistributionPointV1(ctx context.Context, request *DistributionPoint) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -71,7 +71,7 @@ func (c *Client) CreateDistributionPointV1(ctx context.Context, request *Distrib
 
 // DeleteMultipleDistributionPointsV1 delete multiple distribution points at once.
 //
-// Required privileges: delete:pro:distribution-points. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
+// Required privileges: distribution-points:delete. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
 func (c *Client) DeleteMultipleDistributionPointsV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/distribution-points/delete-multiple"
@@ -83,7 +83,7 @@ func (c *Client) DeleteMultipleDistributionPointsV1(ctx context.Context, request
 
 // GetDistributionPointV1 get specified distribution point.
 //
-// Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
+// Required privileges: distribution-points:read. Legacy Jamf Pro privilege name(s): Read Distribution Points.
 //
 // Parameters:
 //   - id: instance id of distribution point.
@@ -99,8 +99,9 @@ func (c *Client) GetDistributionPointV1(ctx context.Context, id string) (*Distri
 
 // UpdateDistributionPointV1 update specified distribution point object.
 //
-// Required privileges: read:pro:distribution-points, update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: distribution-points:read, distribution-points:update. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
+// All of them are required, not alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: Instance id of distribution point.
@@ -116,7 +117,7 @@ func (c *Client) UpdateDistributionPointV1(ctx context.Context, id string, reque
 
 // DeleteDistributionPointV1 remove specified distribution point.
 //
-// Required privileges: delete:pro:distribution-points. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
+// Required privileges: distribution-points:delete. Legacy Jamf Pro privilege name(s): Delete Distribution Points.
 //
 // Parameters:
 //   - id: Instance id of distribution point.
@@ -131,8 +132,9 @@ func (c *Client) DeleteDistributionPointV1(ctx context.Context, id string) error
 
 // PatchDistributionPointV1 update specified distribution point object.
 //
-// Required privileges: read:pro:distribution-points, update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: distribution-points:read, distribution-points:update. Legacy Jamf Pro privilege name(s): Read Distribution Points, Update Distribution Points.
+// All of them are required, not alternatives.
+// The scoped and legacy lists are independent sets, not pairs: do not match them by position.
 //
 // Parameters:
 //   - id: Instance id of distribution point.
@@ -148,7 +150,7 @@ func (c *Client) PatchDistributionPointV1(ctx context.Context, id string, reques
 
 // ListDistributionPointHistoryV1 get specified distribution point History object.
 //
-// Required privileges: read:pro:distribution-points. Legacy Jamf Pro privilege name(s): Read Distribution Points.
+// Required privileges: distribution-points:read. Legacy Jamf Pro privilege name(s): Read Distribution Points.
 //
 // Parameters:
 //   - id: Instance id of distribution point history.
@@ -188,7 +190,7 @@ func (c *Client) ListDistributionPointHistoryV1(ctx context.Context, id string, 
 
 // CreateDistributionPointHistoryNoteV1 add specified distribution point History object notes.
 //
-// Required privileges: update:pro:distribution-points. Legacy Jamf Pro privilege name(s): Update Distribution Points.
+// Required privileges: distribution-points:update. Legacy Jamf Pro privilege name(s): Update Distribution Points.
 //
 // Parameters:
 //   - id: Instance id of distribution point history.

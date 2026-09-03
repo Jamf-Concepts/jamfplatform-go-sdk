@@ -13,7 +13,7 @@ import (
 
 func TestListPatchPolicyLogsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListPatchPolicyLogsV2(t *testing.T) {
 
 func TestGetPatchPolicyEligibleRetryCountV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/eligible-retry-count", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/eligible-retry-count", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -53,7 +53,7 @@ func TestGetPatchPolicyEligibleRetryCountV2(t *testing.T) {
 
 func TestGetPatchPolicyEligibleRetryCountV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/eligible-retry-count", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/eligible-retry-count", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -69,7 +69,7 @@ func TestGetPatchPolicyEligibleRetryCountV2_NotFound(t *testing.T) {
 
 func TestRetryPatchPolicyLogsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/retry", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/retry", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -84,7 +84,7 @@ func TestRetryPatchPolicyLogsV2(t *testing.T) {
 
 func TestRetryAllPatchPolicyLogsV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/retry-all", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/retry-all", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -99,7 +99,7 @@ func TestRetryAllPatchPolicyLogsV2(t *testing.T) {
 
 func TestGetPatchPolicyLogForDeviceV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -117,7 +117,7 @@ func TestGetPatchPolicyLogForDeviceV2(t *testing.T) {
 
 func TestGetPatchPolicyLogForDeviceV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -133,7 +133,7 @@ func TestGetPatchPolicyLogForDeviceV2_NotFound(t *testing.T) {
 
 func TestListPatchPolicyLogDetailsForDeviceV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/test-id/details", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/test-id/details", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -151,7 +151,7 @@ func TestListPatchPolicyLogDetailsForDeviceV2(t *testing.T) {
 
 func TestListPatchPolicyLogDetailsForDeviceV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-policies/test-id/logs/test-id/details", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/patch-policies/test-id/logs/test-id/details", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",

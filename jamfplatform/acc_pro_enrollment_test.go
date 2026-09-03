@@ -10,7 +10,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"os"
 	"strings"
 	"testing"
 
@@ -27,18 +26,18 @@ import (
 // plain integer field through the request and response structs.
 
 // depTokenBytes returns the raw S/MIME envelope bytes from the
-// JAMFPLATFORM_DEP_TOKEN env var (base64 of the entire smime.p7m file
+// JAMFPLATFORM_ACC_PRO_DEP_TOKEN env var (base64 of the entire smime.p7m file
 // as downloaded from Apple Business Manager). Skips the calling test
 // when the env var is unset or malformed.
 func depTokenBytes(t *testing.T) []byte {
 	t.Helper()
-	raw := strings.Join(strings.Fields(os.Getenv("JAMFPLATFORM_DEP_TOKEN")), "")
+	raw := strings.Join(strings.Fields(accEnv("JAMFPLATFORM_ACC_PRO_DEP_TOKEN")), "")
 	if raw == "" {
-		t.Skip("JAMFPLATFORM_DEP_TOKEN not set — DEP-token-dependent test skipped")
+		t.Skip("JAMFPLATFORM_ACC_PRO_DEP_TOKEN not set — DEP-token-dependent test skipped")
 	}
 	decoded, err := base64.StdEncoding.DecodeString(raw)
 	if err != nil {
-		t.Skipf("JAMFPLATFORM_DEP_TOKEN not valid base64: %v", err)
+		t.Skipf("JAMFPLATFORM_ACC_PRO_DEP_TOKEN not valid base64: %v", err)
 	}
 	return decoded
 }

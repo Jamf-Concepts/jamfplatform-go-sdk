@@ -19,8 +19,7 @@ import (
 
 // ListBlueprints list blueprints.
 //
-// Required privileges: read:pro:blueprints, read:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:read.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format:
@@ -58,8 +57,7 @@ func (c *Client) ListBlueprints(ctx context.Context, sort []string, search strin
 
 // CreateBlueprint create a new blueprint.
 //
-// Required privileges: create:pro:blueprints, create:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:create.
 func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRequest) (*CreateResponse, error) {
 	prefix := c.transport.APIPrefix("blueprints", "v1")
 	var result CreateResponse
@@ -72,8 +70,7 @@ func (c *Client) CreateBlueprint(ctx context.Context, request *CreateBlueprintRe
 
 // GetBlueprint get a blueprint.
 //
-// Required privileges: read:pro:blueprints, read:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:read.
 //
 // Parameters:
 //   - blueprintID: Blueprint ID.
@@ -89,8 +86,7 @@ func (c *Client) GetBlueprint(ctx context.Context, blueprintID string) (*Bluepri
 
 // UpdateBlueprint updates a blueprint configuration.
 //
-// Required privileges: update:pro:blueprints, update:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:update.
 //
 // Parameters:
 //   - blueprintID: Blueprint ID.
@@ -105,8 +101,7 @@ func (c *Client) UpdateBlueprint(ctx context.Context, blueprintID string, reques
 
 // DeleteBlueprint delete a blueprint.
 //
-// Required privileges: delete:pro:blueprints, delete:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:delete.
 //
 // Parameters:
 //   - blueprintID: Blueprint ID.
@@ -121,8 +116,7 @@ func (c *Client) DeleteBlueprint(ctx context.Context, blueprintID string) error 
 
 // DeployBlueprint deploy blueprint.
 //
-// Required privileges: deploy:pro:blueprints, deploy:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:deploy.
 //
 // Parameters:
 //   - blueprintID: Blueprint ID.
@@ -137,8 +131,7 @@ func (c *Client) DeployBlueprint(ctx context.Context, blueprintID string) error 
 
 // UndeployBlueprint undeploy blueprint.
 //
-// Required privileges: deploy:pro:blueprints, deploy:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:deploy.
 //
 // Parameters:
 //   - blueprintID: Blueprint ID.
@@ -153,8 +146,7 @@ func (c *Client) UndeployBlueprint(ctx context.Context, blueprintID string) erro
 
 // GetBlueprintReport get blueprint status report.
 //
-// Required privileges: read:pro:blueprints, read:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:read.
 //
 // Parameters:
 //   - blueprintID: Blueprint ID.
@@ -170,8 +162,7 @@ func (c *Client) GetBlueprintReport(ctx context.Context, blueprintID string) (*B
 
 // ListBlueprintComponents list available blueprint components.
 //
-// Required privileges: read:pro:blueprints, read:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:read.
 func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescription, error) {
 	prefix := c.transport.APIPrefix("blueprints", "v1")
 	return client.ListAllPages(ctx, 100, func(ctx context.Context, page, pageSize int) ([]ComponentDescription, bool, error) {
@@ -196,8 +187,7 @@ func (c *Client) ListBlueprintComponents(ctx context.Context) ([]ComponentDescri
 
 // GetBlueprintComponent get component.
 //
-// Required privileges: read:pro:blueprints, read:school:blueprints.
-// The Jamf API spec does not encode whether these are required together or as alternatives.
+// Required privileges: blueprints:read.
 //
 // Parameters:
 //   - identifier: Identifier of the component.

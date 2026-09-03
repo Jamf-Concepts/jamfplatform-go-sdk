@@ -17,7 +17,7 @@ import (
 
 // ListAdvancedMobileDeviceSearchesV1 get Advanced Search objects.
 //
-// Required privileges: read:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
+// Required privileges: advanced-device-searches:read. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
 func (c *Client) ListAdvancedMobileDeviceSearchesV1(ctx context.Context) (*AdvancedSearchSearchResults, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedSearchSearchResults
@@ -30,7 +30,7 @@ func (c *Client) ListAdvancedMobileDeviceSearchesV1(ctx context.Context) (*Advan
 
 // CreateAdvancedMobileDeviceSearchV1 create Advanced Search object.
 //
-// Required privileges: create:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Create Advanced Mobile Device Searches.
+// Required privileges: advanced-device-searches:create. Legacy Jamf Pro privilege name(s): Create Advanced Mobile Device Searches.
 func (c *Client) CreateAdvancedMobileDeviceSearchV1(ctx context.Context, request *AdvancedSearch) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -43,7 +43,7 @@ func (c *Client) CreateAdvancedMobileDeviceSearchV1(ctx context.Context, request
 
 // DeleteMultipleAdvancedMobileDeviceSearchesV1 remove specified Advanced Search objects.
 //
-// Required privileges: delete:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Delete Advanced Mobile Device Searches.
+// Required privileges: advanced-device-searches:delete. Legacy Jamf Pro privilege name(s): Delete Advanced Mobile Device Searches.
 func (c *Client) DeleteMultipleAdvancedMobileDeviceSearchesV1(ctx context.Context, request *Ids) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/advanced-mobile-device-searches/delete-multiple"
@@ -55,15 +55,13 @@ func (c *Client) DeleteMultipleAdvancedMobileDeviceSearchesV1(ctx context.Contex
 
 // ListAdvancedMobileDeviceSearchChoicesV1 get Mobile Device Advanced Search criteria choices.
 //
-// Required privileges: read:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
+// Required privileges: advanced-device-searches:read. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
 func (c *Client) ListAdvancedMobileDeviceSearchChoicesV1(ctx context.Context, criteria string, site string, contains string) (*AdvancedSearchCriteriaChoices, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AdvancedSearchCriteriaChoices
 	endpoint := prefix + "/advanced-mobile-device-searches/choices"
 	params := url.Values{}
-	if criteria != "" {
-		params.Set("criteria", criteria)
-	}
+	params.Set("criteria", criteria)
 	if site != "" {
 		params.Set("site", site)
 	}
@@ -81,7 +79,7 @@ func (c *Client) ListAdvancedMobileDeviceSearchChoicesV1(ctx context.Context, cr
 
 // GetAdvancedMobileDeviceSearchV1 get specified Advanced Search object.
 //
-// Required privileges: read:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
+// Required privileges: advanced-device-searches:read. Legacy Jamf Pro privilege name(s): Read Advanced Mobile Device Searches.
 //
 // Parameters:
 //   - id: id of target Advanced Search.
@@ -97,7 +95,7 @@ func (c *Client) GetAdvancedMobileDeviceSearchV1(ctx context.Context, id string)
 
 // UpdateAdvancedMobileDeviceSearchV1 get specified Advanced Search object.
 //
-// Required privileges: update:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Update Advanced Mobile Device Searches.
+// Required privileges: advanced-device-searches:update. Legacy Jamf Pro privilege name(s): Update Advanced Mobile Device Searches.
 //
 // Parameters:
 //   - id: id of target Advanced Search.
@@ -113,7 +111,7 @@ func (c *Client) UpdateAdvancedMobileDeviceSearchV1(ctx context.Context, id stri
 
 // DeleteAdvancedMobileDeviceSearchV1 remove specified Advanced Search object.
 //
-// Required privileges: delete:pro:advanced-mobile-device-searches. Legacy Jamf Pro privilege name(s): Delete Advanced Mobile Device Searches.
+// Required privileges: advanced-device-searches:delete. Legacy Jamf Pro privilege name(s): Delete Advanced Mobile Device Searches.
 //
 // Parameters:
 //   - id: instance id of advanced search record.

@@ -10,10 +10,10 @@ import (
 	"testing"
 )
 
-func TestListDeclarationReportClients_MultiPage(t *testing.T) {
+func TestListDeclarationReportClientsFiltered_MultiPage(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	callCount := 0
-	mux.HandleFunc("/api/ddm/report/v1/declarations/decl-1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/ddm/report/v1/declarations/decl-1/devices", func(w http.ResponseWriter, r *http.Request) {
 		callCount++
 		page := r.URL.Query().Get("page")
 		switch page {
@@ -41,7 +41,7 @@ func TestListDeclarationReportClients_MultiPage(t *testing.T) {
 		}
 	})
 
-	clients, err := c.ListDeclarationReportClients(context.Background(), "decl-1", nil)
+	clients, err := c.ListDeclarationReportClientsFiltered(context.Background(), "decl-1", "", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

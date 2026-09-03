@@ -13,7 +13,7 @@ import (
 
 func TestListPatchSoftwareTitleConfigurationsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestListPatchSoftwareTitleConfigurationsV3(t *testing.T) {
 
 func TestListPatchSoftwareTitleConfigurationsV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -45,43 +45,9 @@ func TestListPatchSoftwareTitleConfigurationsV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestListPatchSoftwareTitleConfigurationsV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
-	})
-
-	result, err := c.ListPatchSoftwareTitleConfigurationsV2(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestListPatchSoftwareTitleConfigurationsV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.ListPatchSoftwareTitleConfigurationsV2(context.Background())
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestCreatePatchSoftwareTitleConfigurationV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -97,27 +63,9 @@ func TestCreatePatchSoftwareTitleConfigurationV3(t *testing.T) {
 	}
 }
 
-func TestCreatePatchSoftwareTitleConfigurationV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{})
-	})
-
-	result, err := c.CreatePatchSoftwareTitleConfigurationV2(context.Background(), &PatchSoftwareTitleConfigurationBase{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestGetPatchSoftwareTitleConfigurationV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -135,7 +83,7 @@ func TestGetPatchSoftwareTitleConfigurationV3(t *testing.T) {
 
 func TestGetPatchSoftwareTitleConfigurationV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -149,43 +97,9 @@ func TestGetPatchSoftwareTitleConfigurationV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetPatchSoftwareTitleConfigurationV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetPatchSoftwareTitleConfigurationV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetPatchSoftwareTitleConfigurationV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetPatchSoftwareTitleConfigurationV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestDeletePatchSoftwareTitleConfigurationV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -198,24 +112,9 @@ func TestDeletePatchSoftwareTitleConfigurationV3(t *testing.T) {
 	}
 }
 
-func TestDeletePatchSoftwareTitleConfigurationV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Errorf("method = %s, want DELETE", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.DeletePatchSoftwareTitleConfigurationV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestUpdatePatchSoftwareTitleConfigurationV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -231,27 +130,9 @@ func TestUpdatePatchSoftwareTitleConfigurationV3(t *testing.T) {
 	}
 }
 
-func TestUpdatePatchSoftwareTitleConfigurationV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("method = %s, want PATCH", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.UpdatePatchSoftwareTitleConfigurationV2(context.Background(), "test-id", &PatchSoftwareTitleConfigurationPatch{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestGetPatchSoftwareTitleDashboardStatusV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -269,7 +150,7 @@ func TestGetPatchSoftwareTitleDashboardStatusV3(t *testing.T) {
 
 func TestGetPatchSoftwareTitleDashboardStatusV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -283,43 +164,9 @@ func TestGetPatchSoftwareTitleDashboardStatusV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetPatchSoftwareTitleDashboardStatusV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetPatchSoftwareTitleDashboardStatusV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetPatchSoftwareTitleDashboardStatusV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetPatchSoftwareTitleDashboardStatusV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestAddPatchSoftwareTitleToDashboardV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -332,24 +179,9 @@ func TestAddPatchSoftwareTitleToDashboardV3(t *testing.T) {
 	}
 }
 
-func TestAddPatchSoftwareTitleToDashboardV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.AddPatchSoftwareTitleToDashboardV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestRemovePatchSoftwareTitleFromDashboardV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -362,24 +194,9 @@ func TestRemovePatchSoftwareTitleFromDashboardV3(t *testing.T) {
 	}
 }
 
-func TestRemovePatchSoftwareTitleFromDashboardV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/dashboard", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Errorf("method = %s, want DELETE", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.RemovePatchSoftwareTitleFromDashboardV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestListPatchSoftwareTitleDefinitionsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/definitions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/definitions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -399,31 +216,9 @@ func TestListPatchSoftwareTitleDefinitionsV3(t *testing.T) {
 	}
 }
 
-func TestListPatchSoftwareTitleDefinitionsV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/definitions", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListPatchSoftwareTitleDefinitionsV2(context.Background(), "test-id", nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
 func TestGetPatchSoftwareTitleDependenciesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/dependencies", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/dependencies", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -441,7 +236,7 @@ func TestGetPatchSoftwareTitleDependenciesV3(t *testing.T) {
 
 func TestGetPatchSoftwareTitleDependenciesV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/dependencies", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/dependencies", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -455,43 +250,9 @@ func TestGetPatchSoftwareTitleDependenciesV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetPatchSoftwareTitleDependenciesV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/dependencies", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetPatchSoftwareTitleDependenciesV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetPatchSoftwareTitleDependenciesV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/dependencies", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetPatchSoftwareTitleDependenciesV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestExportPatchSoftwareTitleReportV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/export-report", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/export-report", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -509,7 +270,7 @@ func TestExportPatchSoftwareTitleReportV3(t *testing.T) {
 
 func TestExportPatchSoftwareTitleReportV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/export-report", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/export-report", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -523,43 +284,9 @@ func TestExportPatchSoftwareTitleReportV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestExportPatchSoftwareTitleReportV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/export-report", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
-	})
-
-	result, err := c.ExportPatchSoftwareTitleReportV2(context.Background(), "test-id", "", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestExportPatchSoftwareTitleReportV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/export-report", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.ExportPatchSoftwareTitleReportV2(context.Background(), "test-id", "", nil)
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestListPatchSoftwareTitleExtensionAttributesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/extension-attributes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/extension-attributes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -577,7 +304,7 @@ func TestListPatchSoftwareTitleExtensionAttributesV3(t *testing.T) {
 
 func TestListPatchSoftwareTitleExtensionAttributesV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/extension-attributes", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/extension-attributes", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -591,43 +318,9 @@ func TestListPatchSoftwareTitleExtensionAttributesV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestListPatchSoftwareTitleExtensionAttributesV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/extension-attributes", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
-	})
-
-	result, err := c.ListPatchSoftwareTitleExtensionAttributesV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestListPatchSoftwareTitleExtensionAttributesV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/extension-attributes", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.ListPatchSoftwareTitleExtensionAttributesV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestListPatchSoftwareTitleHistoryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -647,31 +340,9 @@ func TestListPatchSoftwareTitleHistoryV3(t *testing.T) {
 	}
 }
 
-func TestListPatchSoftwareTitleHistoryV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListPatchSoftwareTitleHistoryV2(context.Background(), "test-id", nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
 func TestCreatePatchSoftwareTitleHistoryNoteV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -687,27 +358,9 @@ func TestCreatePatchSoftwareTitleHistoryNoteV3(t *testing.T) {
 	}
 }
 
-func TestCreatePatchSoftwareTitleHistoryNoteV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/history", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		writeJSON(t, w, http.StatusCreated, map[string]any{})
-	})
-
-	result, err := c.CreatePatchSoftwareTitleHistoryNoteV2(context.Background(), "test-id", &ObjectHistoryNote{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestListPatchSoftwareTitlePatchReportV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/patch-report", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/patch-report", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -727,31 +380,9 @@ func TestListPatchSoftwareTitlePatchReportV3(t *testing.T) {
 	}
 }
 
-func TestListPatchSoftwareTitlePatchReportV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/patch-report", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results":    []map[string]any{{}},
-			"totalCount": 1,
-			"hasNext":    false,
-		})
-	})
-
-	results, err := c.ListPatchSoftwareTitlePatchReportV2(context.Background(), "test-id", nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(results) != 1 {
-		t.Fatalf("len = %d, want 1", len(results))
-	}
-}
-
 func TestGetPatchSoftwareTitlePatchSummaryV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/patch-summary", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/patch-summary", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -769,7 +400,7 @@ func TestGetPatchSoftwareTitlePatchSummaryV3(t *testing.T) {
 
 func TestGetPatchSoftwareTitlePatchSummaryV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/patch-summary", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/patch-summary", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -783,43 +414,9 @@ func TestGetPatchSoftwareTitlePatchSummaryV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestGetPatchSoftwareTitlePatchSummaryV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/patch-summary", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{})
-	})
-
-	result, err := c.GetPatchSoftwareTitlePatchSummaryV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestGetPatchSoftwareTitlePatchSummaryV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/patch-summary", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.GetPatchSoftwareTitlePatchSummaryV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestListPatchSoftwareTitlePatchSummaryVersionsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/patch-summary/versions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/patch-summary/versions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -837,7 +434,7 @@ func TestListPatchSoftwareTitlePatchSummaryVersionsV3(t *testing.T) {
 
 func TestListPatchSoftwareTitlePatchSummaryVersionsV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/test-id/patch-summary/versions", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/test-id/patch-summary/versions", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -851,43 +448,9 @@ func TestListPatchSoftwareTitlePatchSummaryVersionsV3_NotFound(t *testing.T) {
 	}
 }
 
-func TestListPatchSoftwareTitlePatchSummaryVersionsV2(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/patch-summary/versions", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
-	})
-
-	result, err := c.ListPatchSoftwareTitlePatchSummaryVersionsV2(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
-func TestListPatchSoftwareTitlePatchSummaryVersionsV2_NotFound(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/test-id/patch-summary/versions", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(t, w, http.StatusNotFound, map[string]any{
-			"httpStatus": 404,
-			"traceId":    "trace-nf",
-			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
-		})
-	})
-
-	_, err := c.ListPatchSoftwareTitlePatchSummaryVersionsV2(context.Background(), "test-id")
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
 func TestResolvePatchSoftwareTitleConfigurationV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -910,7 +473,7 @@ func TestResolvePatchSoftwareTitleConfigurationV3IDByName(t *testing.T) {
 
 func TestResolvePatchSoftwareTitleConfigurationV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -931,56 +494,10 @@ func TestResolvePatchSoftwareTitleConfigurationV3ByName(t *testing.T) {
 	}
 }
 
-func TestResolvePatchSoftwareTitleConfigurationV2IDByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "resolved-id", "displayName": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	id, err := c.ResolvePatchSoftwareTitleConfigurationV2IDByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if id != "resolved-id" {
-		t.Errorf("id = %q, want resolved-id", id)
-	}
-}
-
-func TestResolvePatchSoftwareTitleConfigurationV2ByName(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "resolved-id", "displayName": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-
-	result, err := c.ResolvePatchSoftwareTitleConfigurationV2ByName(context.Background(), "target")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result == nil {
-		t.Fatal("expected non-nil result")
-	}
-}
-
 func TestApplyPatchSoftwareTitleConfigurationV3_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -1012,7 +529,7 @@ func TestApplyPatchSoftwareTitleConfigurationV3_Create(t *testing.T) {
 func TestApplyPatchSoftwareTitleConfigurationV3_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -1023,73 +540,11 @@ func TestApplyPatchSoftwareTitleConfigurationV3_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v3/patch-software-title-configurations/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/patch-software-title-configurations/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 
 	id, created, err := c.ApplyPatchSoftwareTitleConfigurationV3(context.Background(), &PatchSoftwareTitleConfigurationBase{DisplayName: "target"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if created {
-		t.Error("expected created = false")
-	}
-	if id != "existing-id" {
-		t.Errorf("id = %q, want existing-id", id)
-	}
-}
-
-func TestApplyPatchSoftwareTitleConfigurationV2_Create(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			writeJSON(t, w, http.StatusOK, map[string]any{
-				"results":    []any{},
-				"totalCount": 0,
-			})
-		case http.MethodPost:
-			writeJSON(t, w, 201, map[string]any{
-				"id":   "new-id",
-				"href": "/new-id",
-			})
-		default:
-			t.Errorf("unexpected method %s", r.Method)
-		}
-	})
-
-	id, created, err := c.ApplyPatchSoftwareTitleConfigurationV2(context.Background(), &PatchSoftwareTitleConfigurationBase{DisplayName: "target"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !created {
-		t.Error("expected created = true")
-	}
-	if id != "new-id" {
-		t.Errorf("id = %q, want new-id", id)
-	}
-}
-
-func TestApplyPatchSoftwareTitleConfigurationV2_Update(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("method = %s, want GET", r.Method)
-		}
-		writeJSON(t, w, http.StatusOK, map[string]any{
-			"results": []map[string]any{
-				{"id": "existing-id", "displayName": "target"},
-			},
-			"totalCount": 1,
-		})
-	})
-	mux.HandleFunc("/api/pro/v2/patch-software-title-configurations/existing-id", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
-	})
-
-	id, created, err := c.ApplyPatchSoftwareTitleConfigurationV2(context.Background(), &PatchSoftwareTitleConfigurationBase{DisplayName: "target"})
 	if err != nil {
 		t.Fatal(err)
 	}

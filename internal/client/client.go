@@ -243,13 +243,22 @@ func WithMinRequestInterval(d time.Duration) Option {
 
 // WithRetryPolicy overrides the transport's automatic-retry timing for
 // transient failures (see retry.go's isRetryableWriteStatus for what gets
-// retried). Exists primarily for test harnesses that mock a
-// persistently-failing transient status (e.g. an always-500 GET) and need
-// the retry loop to run in milliseconds rather than the production 1s-60s
-// window with up to 5 total attempts — without this, such a test would hang
-// for the full backoff duration on every run. maxRetries follows
-// retryablehttp's own semantics: total attempts = maxRetries+1, so 0 means
-// no retries at all.
+// retried, and jamfBackoff for the curve). waitMin seeds an exponential
+// backoff and waitMax caps it; maxRetries follows retryablehttp's own
+// semantics, so total attempts = maxRetries+1 and 0 disables retrying
+// entirely.
+//
+// Two distinct uses, both legitimate:
+//
+//   - A test harness mocking a persistently-failing transient status (e.g.
+//     an always-500 GET) wants the loop to run in milliseconds rather than
+//     the production window. Pass a few milliseconds and a low maxRetries.
+//   - An interactive caller (a CLI) wants a bound far tighter than the
+//     production default, so a transient failure surfaces promptly instead
+//     of appearing to hang.
+//
+// An overall time bound is better expressed as a context deadline, which
+// bounds the whole call including every retry and needs no policy change.
 func WithRetryPolicy(waitMin, waitMax time.Duration, maxRetries int) Option {
 	return func(c *Transport) {
 		c.retry.RetryWaitMin = waitMin
@@ -285,6 +294,12 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 		throttle:     throttle,
 		retry:        retry,
 	}
+	// Installed here rather than in newRetryClient because both hooks are
+	// methods on c, which does not exist yet at that point. Each reads
+	// c.logger at call time, so they work regardless of when a logger is
+	// installed.
+	retry.RequestLogHook = c.logRetryAttempt
+	retry.ResponseLogHook = c.logRetriedResponse
 	for _, opt := range opts {
 		opt(c)
 	}
@@ -394,26 +409,36 @@ func (c *Transport) Scope() (ScopeKind, string) {
 	return c.scopeKind, c.scopeID
 }
 
-// APIPrefix returns the /api/{namespace}/{version} URL prefix for a namespace.
+// APIPrefix returns the /{namespace}/{version} URL prefix for a namespace.
 // An empty version collapses that segment, for the APIs that carry no version
 // in the URL (proclassic, Pro preview paths).
 //
-// The scope is NOT in the path. Until 2026-08-25 every Jamf URL embedded it —
-// /api/{namespace}/{version}/tenant/{tenantID} — and the gateway's Tyk config
-// resolved the request context from `path`. `header` was added as an allowed
-// source in prod on that date (tyk-gateway-management 0793131b, "JSC-73421
-// Enable header context support - Prod"), and the published specs dropped the
-// path segment in GitOps build v1495 in favour of a required X-Tenant-Id
-// header. Both forms answered 200 during the transition, wire-verified across
-// EU securitycloud and US pro/blueprints/compliance-benchmarks/devices, so
-// this moved to headers only rather than carrying a selectable mode: a second
-// code path nothing exercises is how an earlier URL-shape bug went unnoticed
-// for weeks.
+// There is NO /api segment. The GA gateway at {region}.api.jamfcloud.com
+// mounts each namespace at the root, and answers 404 "page not found" — the
+// unknown-namespace tell — for anything under /api. The retired
+// {region}.apigw.jamf.com gateway required that segment; it is gone at GA
+// (2026-09-01), so callers must set a base URL of https://{region}.api.jamfcloud.com.
+// Wire-verified 2026-08-28 against EU with both a tenant- and an
+// environment-scoped credential: every namespace this SDK generates returns
+// byte-identical statuses on the new host once the segment is dropped, and
+// tokens minted at either host work on both.
+//
+// Dropped outright rather than selected per host, the same call as the scope
+// migration below: a second code path nothing exercises is how an earlier
+// URL-shape bug went unnoticed for weeks.
+//
+// The scope is NOT in the path either. Until 2026-08-25 every Jamf URL
+// embedded it — /api/{namespace}/{version}/tenant/{tenantID} — and the
+// gateway's Tyk config resolved the request context from `path`. `header` was
+// added as an allowed source in prod on that date (tyk-gateway-management
+// 0793131b, "JSC-73421 Enable header context support - Prod"), and the
+// published specs dropped the path segment in GitOps build v1495 in favour of
+// a required X-Tenant-Id header.
 func (c *Transport) APIPrefix(namespace, version string) string {
 	if version == "" {
-		return "/api/" + namespace
+		return "/" + namespace
 	}
-	return "/api/" + namespace + "/" + version
+	return "/" + namespace + "/" + version
 }
 
 // ValidateCredentials tests authentication by requesting an OAuth token.

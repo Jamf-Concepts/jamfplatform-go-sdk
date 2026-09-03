@@ -8,7 +8,6 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"os"
 	"strings"
 	"testing"
 
@@ -17,7 +16,7 @@ import (
 )
 
 // Batch 11 — volume-purchasing-locations + volume-purchasing-
-// subscriptions. Requires JAMFPLATFORM_VPP_TOKEN (base64 serviceToken
+// subscriptions. Requires JAMFPLATFORM_ACC_PRO_VPP_TOKEN (base64 serviceToken
 // from Apple Business Manager). Destructive ops (reclaim,
 // revoke-licenses) are exercised against a self-created throwaway
 // location registered from the env token — the location has no
@@ -26,9 +25,9 @@ import (
 
 func vppToken(t *testing.T) string {
 	t.Helper()
-	v := strings.Join(strings.Fields(os.Getenv("JAMFPLATFORM_VPP_TOKEN")), "")
+	v := strings.Join(strings.Fields(accEnv("JAMFPLATFORM_ACC_PRO_VPP_TOKEN")), "")
 	if v == "" {
-		t.Skip("JAMFPLATFORM_VPP_TOKEN not set")
+		t.Skip("JAMFPLATFORM_ACC_PRO_VPP_TOKEN not set")
 	}
 	return v
 }

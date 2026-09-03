@@ -17,7 +17,7 @@ import (
 
 // GetPrinterByID finds printers by ID.
 //
-// Required privileges: read:pro:printers.
+// Required privileges: printers:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetPrinterByID(ctx context.Context, id string) (*Printer, error
 
 // CreatePrinterByID creates a new printer by ID.
 //
-// Required privileges: create:pro:printers.
+// Required privileges: printers:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreatePrinterByID(ctx context.Context, id string, request *Prin
 
 // UpdatePrinterByID updates an existing printer by ID.
 //
-// Required privileges: update:pro:printers.
+// Required privileges: printers:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdatePrinterByID(ctx context.Context, id string, request *Prin
 
 // DeletePrinterByID deletes a printer by ID.
 //
-// Required privileges: delete:pro:printers.
+// Required privileges: printers:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeletePrinterByID(ctx context.Context, id string) error {
 
 // GetPrinterByName finds printers by name.
 //
-// Required privileges: read:pro:printers.
+// Required privileges: printers:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetPrinterByName(ctx context.Context, name string) (*Printer, e
 
 // UpdatePrinterByName updates an existing printer by name.
 //
-// Required privileges: update:pro:printers.
+// Required privileges: printers:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdatePrinterByName(ctx context.Context, name string, request *
 
 // DeletePrinterByName deletes a printer by name.
 //
-// Required privileges: delete:pro:printers.
+// Required privileges: printers:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeletePrinterByName(ctx context.Context, name string) error {
 
 // ListPrinters finds all printers.
 //
-// Required privileges: read:pro:printers.
+// Required privileges: printers:read.
 func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Printers
@@ -138,7 +138,7 @@ func (c *Client) ListPrinters(ctx context.Context) (*Printers, error) {
 
 // CreatePrinterByName creates a new printer by ID.
 //
-// Required privileges: create:pro:printers.
+// Required privileges: printers:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

@@ -17,7 +17,7 @@ import (
 
 // GetWebhookByID finds webhooks by ID.
 //
-// Required privileges: read:pro:webhooks.
+// Required privileges: webhooks:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetWebhookByID(ctx context.Context, id string) (*Webhook, error
 
 // CreateWebhookByID creates a new webhook by ID.
 //
-// Required privileges: create:pro:webhooks.
+// Required privileges: webhooks:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateWebhookByID(ctx context.Context, id string, request *Webh
 
 // UpdateWebhookByID updates an existing webhook by ID.
 //
-// Required privileges: update:pro:webhooks.
+// Required privileges: webhooks:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateWebhookByID(ctx context.Context, id string, request *Webh
 
 // DeleteWebhookByID deletes a webhook by ID.
 //
-// Required privileges: delete:pro:webhooks.
+// Required privileges: webhooks:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteWebhookByID(ctx context.Context, id string) error {
 
 // GetWebhookByName finds webhooks by name.
 //
-// Required privileges: read:pro:webhooks.
+// Required privileges: webhooks:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetWebhookByName(ctx context.Context, name string) (*Webhook, e
 
 // UpdateWebhookByName updates an existing webhook by name.
 //
-// Required privileges: update:pro:webhooks.
+// Required privileges: webhooks:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateWebhookByName(ctx context.Context, name string, request *
 
 // DeleteWebhookByName deletes a webhook by name.
 //
-// Required privileges: delete:pro:webhooks.
+// Required privileges: webhooks:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteWebhookByName(ctx context.Context, name string) error {
 
 // ListWebhooks finds all webhooks.
 //
-// Required privileges: read:pro:webhooks.
+// Required privileges: webhooks:read.
 func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Webhooks
@@ -138,7 +138,7 @@ func (c *Client) ListWebhooks(ctx context.Context) (*Webhooks, error) {
 
 // CreateWebhookByName creates a new webhook by ID.
 //
-// Required privileges: create:pro:webhooks.
+// Required privileges: webhooks:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

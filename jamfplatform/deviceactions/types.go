@@ -5,7 +5,7 @@
 
 package deviceactions
 
-// ApiError represents a api error.
+// ApiError Standard error response returned when a request cannot be completed.
 type ApiError struct {
 	Errors []ApiErrorErrorsItem `json:"errors"`
 	// HTTP status of the response.
@@ -26,7 +26,7 @@ type ApiErrorErrorsItem struct {
 	ID string `json:"id"`
 }
 
-// DeviceCommandResponse represents a device command response.
+// DeviceCommandResponse The result of a management action command issued to a device, including the created command's identifier.
 type DeviceCommandResponse struct {
 	// The ID of the command that was created to perform the requested action.
 	CommandID string `json:"commandId"`
@@ -34,7 +34,7 @@ type DeviceCommandResponse struct {
 	DeviceID string `json:"deviceId"`
 }
 
-// EraseDeviceRequest represents a erase device request.
+// EraseDeviceRequest Options that control how a device is erased.
 type EraseDeviceRequest struct {
 	// Clear the activation lock on the device. Applies to mobile devices only.
 	ClearActivationLock *bool `json:"clearActivationLock,omitempty"`

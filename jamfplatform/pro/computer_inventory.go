@@ -18,45 +18,9 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// EraseComputerV1 erase a computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
-//
-// Parameters:
-//   - id: Id of the computer to erase.
-func (c *Client) EraseComputerV1(ctx context.Context, id string, request *EraseDeviceComputerRequest) (*EraseDeviceComputerResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result EraseDeviceComputerResponse
-	endpoint := fmt.Sprintf("%s/computer-inventory/%s/erase", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("EraseComputerV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// RemoveMdmProfileFromComputerV1 remove a computer's MDM profile.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
-//
-// Parameters:
-//   - id: Id of the computer to remove the MDM profile from.
-func (c *Client) RemoveMdmProfileFromComputerV1(ctx context.Context, id string) (*RemoveComputerMDMProfileResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result RemoveComputerMDMProfileResponse
-	endpoint := fmt.Sprintf("%s/computer-inventory/%s/remove-mdm-profile", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodPost, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("RemoveMdmProfileFromComputerV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // EraseComputerV4 erase a computer.
 //
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send Computer Remote Wipe Command.
 //
 // Parameters:
 //   - id: Id of the computer to erase.
@@ -72,7 +36,7 @@ func (c *Client) EraseComputerV4(ctx context.Context, id string, request *EraseD
 
 // RemoveMdmProfileFromComputerV4 remove a computer's MDM profile.
 //
-// Required privileges: execute:pro:computer-commands. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send Computer Unmanage Command.
 //
 // Parameters:
 //   - id: Id of the computer to remove the MDM profile from.
@@ -86,188 +50,14 @@ func (c *Client) RemoveMdmProfileFromComputerV4(ctx context.Context, id string) 
 	return &result, nil
 }
 
-// ListComputersInventoryV1 return paginated Computer Inventory records.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - section: section of computer details, if not specified, General section data is returned. Multiple section
-//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
-//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
-//     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
-//     sort criteria are supported and must be separated with a comma.
-//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
-//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
-//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
-//     `general.platform`, `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp` `hardware.make`, `hardware.model`,
-//     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
-//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
-//     Example: `sort=udid:desc,general.name:asc`.
-//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
-//     query - returning all results for the requested page.
-//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
-//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
-//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
-//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
-//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
-//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
-//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
-//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
-//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
-//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
-//     `hardware.modelIdentifier`, `hardware.serialNumber`,
-//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
-//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
-//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
-//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
-//     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
-//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
-//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
-//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
-//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
-//     `purchasing.warrantyDate`,.
-//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
-func (c *Client) ListComputersInventoryV1(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventory, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventory, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(section) > 0 {
-			params.Set("section", strings.Join(section, ","))
-		}
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/computers-inventory"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                 `json:"totalCount"`
-			Results    []ComputerInventory `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// ListComputersInventoryV2 return paginated Computer Inventory records.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - section: section of computer details, if not specified, General section data is returned. Multiple section
-//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
-//     sort criteria are supported and must be separated with a comma.
-//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
-//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
-//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
-//     `general.platform`, `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`, `hardware.model`,
-//     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
-//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
-//     Example: `sort=udid:desc,general.name:asc`.
-//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
-//     query - returning all results for the requested page.
-//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
-//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
-//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
-//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
-//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
-//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
-//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
-//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
-//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
-//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
-//     `hardware.modelIdentifier`, `hardware.serialNumber`,
-//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
-//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
-//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
-//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
-//     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
-//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
-//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
-//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
-//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
-//     `purchasing.warrantyDate`,.
-//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
-func (c *Client) ListComputersInventoryV2(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV2, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(section) > 0 {
-			params.Set("section", strings.Join(section, ","))
-		}
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/computers-inventory"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                   `json:"totalCount"`
-			Results    []ComputerInventoryV2 `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // ListComputersInventoryV4 return paginated Computer Inventory records.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV4 constants.
 //   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
 //     sort criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
@@ -339,124 +129,9 @@ func (c *Client) ListComputersInventoryV4(ctx context.Context, section []string,
 	})
 }
 
-// ListComputersInventoryV3 return paginated Computer Inventory records.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - section: section of computer details, if not specified, General section data is returned. Multiple section
-//     parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-//   - sort: Sorting criteria in the format: `property:asc/desc`. Default sort is `general.name:asc`. Multiple
-//     sort criteria are supported and must be separated with a comma.
-//     Fields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,
-//     `general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`,
-//     `general.lastCloudBackupDate`, `general.reportDate`, `general.mdmCertificateExpiration`,
-//     `general.platform`, `general.lastLoggedInUsernameSelfService`,
-//     `general.lastLoggedInUsernameSelfServiceTimestamp`, `general.lastLoggedInUsernameBinary`,
-//     `general.lastLoggedInUsernameBinaryTimestamp`, `general.lastLoggedInUsernameMdm`,
-//     `general.lastLoggedInUsernameMdmTimestamp`, `hardware.make`, `hardware.model`,
-//     `operatingSystem.build`, `operatingSystem.supplementalBuildVersion`,
-//     `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,
-//     `userAndLocation.realname`, `purchasing.lifeExpectancy`, `purchasing.warrantyDate`.
-//     Example: `sort=udid:desc,general.name:asc`.
-//   - filter: Query in the RSQL format, allowing to filter computer inventory collection. Default filter is empty
-//     query - returning all results for the requested page.
-//     Fields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`,
-//     `general.barcode2`, `general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`,
-//     `general.itunesStoreAccountActive`, `general.jamfBinaryVersion`, `general.lastContactTime`,
-//     `general.lastEnrolledDate`, `general.lastCloudBackupDate`, `general.reportDate`,
-//     `general.lastReportedIp`, `general.lastReportedIpV4`, `general.lastReportedIpV6`,
-//     `general.managementId`, `general.remoteManagement.managed`, `general.mdmCapable.capable`,
-//     `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`,
-//     `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`,
-//     `general.lastLoggedInUsernameSelfService`, `general.lastLoggedInUsernameSelfServiceTimestamp`,
-//     `general.lastLoggedInUsernameBinary`, `general.lastLoggedInUsernameBinaryTimestamp`,
-//     `general.lastLoggedInUsernameMdm`, `general.lastLoggedInUsernameMdmTimestamp`,
-//     `hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`,
-//     `hardware.modelIdentifier`, `hardware.serialNumber`,
-//     `hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`,
-//     `operatingSystem.fileVault2Status`, `operatingSystem.build`,
-//     `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`,
-//     `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,
-//     `security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`,
-//     `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,
-//     `userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`,
-//     `userAndLocation.username`, `diskEncryption.fileVault2Enabled`, `purchasing.appleCareId`,
-//     `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`,
-//     `purchasing.warrantyDate`,.
-//     This param can be combined with paging and sorting. Example: `filter=general.name=="Orchard"`.
-func (c *Client) ListComputersInventoryV3(ctx context.Context, section []string, sort []string, filter string) ([]ComputerInventoryV3, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryV3, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-		if len(section) > 0 {
-			params.Set("section", strings.Join(section, ","))
-		}
-		if len(sort) > 0 {
-			params.Set("sort", strings.Join(sort, ","))
-		}
-		if filter != "" {
-			params.Set("filter", filter)
-		}
-
-		endpoint := prefix + "/computers-inventory"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                   `json:"totalCount"`
-			Results    []ComputerInventoryV3 `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// CreateComputerInventoryV1 create Computer Inventory record.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
-func (c *Client) CreateComputerInventoryV1(ctx context.Context, request *ComputerInventoryCreateRequest) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result HrefResponse
-	endpoint := prefix + "/computers-inventory"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateComputerInventoryV1: %w", err)
-	}
-	return &result, nil
-}
-
-// CreateComputerInventoryV2 create Computer Inventory record.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
-func (c *Client) CreateComputerInventoryV2(ctx context.Context, request *ComputerInventoryCreateRequestV2) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result HrefResponse
-	endpoint := prefix + "/computers-inventory"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateComputerInventoryV2: %w", err)
-	}
-	return &result, nil
-}
-
 // CreateComputerInventoryV4 create Computer Inventory record.
 //
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
+// Required privileges: devices:create. Legacy Jamf Pro privilege name(s): Create Computers.
 func (c *Client) CreateComputerInventoryV4(ctx context.Context, request *ComputerInventoryCreateRequestV4) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v4")
 	var result HrefResponse
@@ -467,80 +142,9 @@ func (c *Client) CreateComputerInventoryV4(ctx context.Context, request *Compute
 	return &result, nil
 }
 
-// CreateComputerInventoryV3 create Computer Inventory record.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: create:pro:computers. Legacy Jamf Pro privilege name(s): Create Computers.
-func (c *Client) CreateComputerInventoryV3(ctx context.Context, request *ComputerInventoryCreateRequestV2) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result HrefResponse
-	endpoint := prefix + "/computers-inventory"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("CreateComputerInventoryV3: %w", err)
-	}
-	return &result, nil
-}
-
-// ListComputerInventoryFileVaultsV1 return paginated FileVault information for all computers.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
-func (c *Client) ListComputerInventoryFileVaultsV1(ctx context.Context) ([]ComputerInventoryFileVault, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-
-		endpoint := prefix + "/computers-inventory/filevault"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                          `json:"totalCount"`
-			Results    []ComputerInventoryFileVault `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// ListComputerInventoryFileVaultsV2 return paginated FileVault information for all computers.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
-func (c *Client) ListComputerInventoryFileVaultsV2(ctx context.Context) ([]ComputerInventoryFileVault, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-
-		endpoint := prefix + "/computers-inventory/filevault"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                          `json:"totalCount"`
-			Results    []ComputerInventoryFileVault `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
 // ListComputerInventoryFileVaultsV4 return paginated FileVault information for all computers.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]ComputerInventoryFileVault, error) {
 	prefix := c.transport.APIPrefix("pro", "v4")
 	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
@@ -564,111 +168,15 @@ func (c *Client) ListComputerInventoryFileVaultsV4(ctx context.Context) ([]Compu
 	})
 }
 
-// ListComputerInventoryFileVaultsV3 return paginated FileVault information for all computers.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
-func (c *Client) ListComputerInventoryFileVaultsV3(ctx context.Context) ([]ComputerInventoryFileVault, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	return client.ListAllPages(ctx, 2000, func(ctx context.Context, page, pageSize int) ([]ComputerInventoryFileVault, bool, error) {
-		params := url.Values{}
-		params.Set("page", strconv.Itoa(page))
-		params.Set("page-size", strconv.Itoa(pageSize))
-
-		endpoint := prefix + "/computers-inventory/filevault"
-		if encoded := params.Encode(); encoded != "" {
-			endpoint += "?" + encoded
-		}
-		var result struct {
-			TotalCount int                          `json:"totalCount"`
-			Results    []ComputerInventoryFileVault `json:"results"`
-		}
-		if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-			return nil, false, err
-		}
-		hasNext := (page+1)*pageSize < result.TotalCount
-		return result.Results, hasNext, nil
-	})
-}
-
-// GetComputerInventoryV1 return General section of a Computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - section: section of computer details, if not specified, General section data is returned. Multiple section
-//     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PLUGINS", "PACKAGE_RECEIPTS", "FONTS",
-//     "SECURITY", "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES",
-//     "EXTENSION_ATTRIBUTES", "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-func (c *Client) GetComputerInventoryV1(ctx context.Context, id string, section []string) (*ComputerInventory, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventory
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
-	params := url.Values{}
-	if len(section) > 0 {
-		params.Set("section", strings.Join(section, ","))
-	}
-	if encoded := params.Encode(); encoded != "" {
-		endpoint += "?" + encoded
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// GetComputerInventoryV2 return General section of a Computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - section: section of computer details, if not specified, General section data is returned. Multiple section
-//     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-func (c *Client) GetComputerInventoryV2(ctx context.Context, id string, section []string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result ComputerInventoryV2
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
-	params := url.Values{}
-	if len(section) > 0 {
-		params.Set("section", strings.Join(section, ","))
-	}
-	if encoded := params.Encode(); encoded != "" {
-		endpoint += "?" + encoded
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // GetComputerInventoryV4 return General section of a Computer.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
 //   - section: section of computer details, if not specified, General section data is returned. Multiple section
 //     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
+//     Allowed values: see the ComputerSectionV4 constants.
 func (c *Client) GetComputerInventoryV4(ctx context.Context, id string, section []string) (*ComputerInventoryV4, error) {
 	prefix := c.transport.APIPrefix("pro", "v4")
 	var result ComputerInventoryV4
@@ -686,75 +194,9 @@ func (c *Client) GetComputerInventoryV4(ctx context.Context, id string, section 
 	return &result, nil
 }
 
-// GetComputerInventoryV3 return General section of a Computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - section: section of computer details, if not specified, General section data is returned. Multiple section
-//     parameters are supported, e.g. section=general&section=hardware.
-//     Allowed values: "GENERAL", "DISK_ENCRYPTION", "PURCHASING", "APPLICATIONS", "STORAGE",
-//     "USER_AND_LOCATION", "CONFIGURATION_PROFILES", "PRINTERS", "SERVICES", "HARDWARE",
-//     "LOCAL_USER_ACCOUNTS", "CERTIFICATES", "ATTACHMENTS", "PACKAGE_RECEIPTS", "SECURITY",
-//     "OPERATING_SYSTEM", "LICENSED_SOFTWARE", "IBEACONS", "SOFTWARE_UPDATES", "EXTENSION_ATTRIBUTES",
-//     "CONTENT_CACHING", "GROUP_MEMBERSHIPS".
-func (c *Client) GetComputerInventoryV3(ctx context.Context, id string, section []string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result ComputerInventoryV3
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
-	params := url.Values{}
-	if len(section) > 0 {
-		params.Set("section", strings.Join(section, ","))
-	}
-	if encoded := params.Encode(); encoded != "" {
-		endpoint += "?" + encoded
-	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryV3(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// DeleteComputerInventoryV1 remove specified Computer record.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) DeleteComputerInventoryV1(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteComputerInventoryV1(%s): %w", id, err)
-	}
-	return nil
-}
-
-// DeleteComputerInventoryV2 remove specified Computer record.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) DeleteComputerInventoryV2(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteComputerInventoryV2(%s): %w", id, err)
-	}
-	return nil
-}
-
 // DeleteComputerInventoryV4 remove specified Computer record.
 //
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Delete Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -767,62 +209,9 @@ func (c *Client) DeleteComputerInventoryV4(ctx context.Context, id string) error
 	return nil
 }
 
-// DeleteComputerInventoryV3 remove specified Computer record.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: delete:pro:computers. Legacy Jamf Pro privilege name(s): Delete Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) DeleteComputerInventoryV3(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteComputerInventoryV3(%s): %w", id, err)
-	}
-	return nil
-}
-
-// GetComputerInventoryDetailV1 return all sections of a computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerInventoryDetailV1(ctx context.Context, id string) (*ComputerInventory, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventory
-	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryDetailV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// GetComputerInventoryDetailV2 return all sections of a computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerInventoryDetailV2(ctx context.Context, id string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result ComputerInventoryV2
-	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryDetailV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // GetComputerInventoryDetailV4 return all sections of a computer.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -836,62 +225,9 @@ func (c *Client) GetComputerInventoryDetailV4(ctx context.Context, id string) (*
 	return &result, nil
 }
 
-// GetComputerInventoryDetailV3 return all sections of a computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerInventoryDetailV3(ctx context.Context, id string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result ComputerInventoryV3
-	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryDetailV3(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// UpdateComputerInventoryDetailV1 update specific fields on a computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) UpdateComputerInventoryDetailV1(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) (*ComputerInventory, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventory
-	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateComputerInventoryDetailV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// UpdateComputerInventoryDetailV2 update specific fields on a computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) UpdateComputerInventoryDetailV2(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("UpdateComputerInventoryDetailV2(%s): %w", id, err)
-	}
-	return nil
-}
-
 // UpdateComputerInventoryDetailV4 update specific fields on a computer.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -904,80 +240,9 @@ func (c *Client) UpdateComputerInventoryDetailV4(ctx context.Context, id string,
 	return nil
 }
 
-// UpdateComputerInventoryDetailV3 update specific fields on a computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) UpdateComputerInventoryDetailV3(ctx context.Context, id string, request *ComputerInventoryUpdateRequest) error {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	endpoint := fmt.Sprintf("%s/computers-inventory-detail/%s", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("UpdateComputerInventoryDetailV3(%s): %w", id, err)
-	}
-	return nil
-}
-
-// UploadComputerInventoryAttachmentV1 upload attachment and assign to computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//
-// For file parts, pass an *os.File or *bytes.Reader (anything that
-// implements io.Seeker) so the SDK can precompute an exact
-// Content-Length and retry once on a 429/Retry-After. A plain
-// io.Reader is accepted too but the upload falls back to chunked
-// transfer encoding and is not retried on 429.
-func (c *Client) UploadComputerInventoryAttachmentV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result HrefResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments", prefix, url.PathEscape(id))
-	parts := []client.MultipartField{
-		{Name: "file", Filename: fileFilename, Content: file},
-	}
-	if err := c.transport.DoMultipart(ctx, http.MethodPost, endpoint, parts, http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("UploadComputerInventoryAttachmentV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// UploadComputerInventoryAttachmentV2 upload attachment and assign to computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//
-// For file parts, pass an *os.File or *bytes.Reader (anything that
-// implements io.Seeker) so the SDK can precompute an exact
-// Content-Length and retry once on a 429/Retry-After. A plain
-// io.Reader is accepted too but the upload falls back to chunked
-// transfer encoding and is not retried on 429.
-func (c *Client) UploadComputerInventoryAttachmentV2(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result HrefResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments", prefix, url.PathEscape(id))
-	parts := []client.MultipartField{
-		{Name: "file", Filename: fileFilename, Content: file},
-	}
-	if err := c.transport.DoMultipart(ctx, http.MethodPost, endpoint, parts, http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("UploadComputerInventoryAttachmentV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // UploadComputerInventoryAttachmentV4 upload attachment and assign to computer.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1000,74 +265,9 @@ func (c *Client) UploadComputerInventoryAttachmentV4(ctx context.Context, id str
 	return &result, nil
 }
 
-// UploadComputerInventoryAttachmentV3 upload attachment and assign to computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//
-// For file parts, pass an *os.File or *bytes.Reader (anything that
-// implements io.Seeker) so the SDK can precompute an exact
-// Content-Length and retry once on a 429/Retry-After. A plain
-// io.Reader is accepted too but the upload falls back to chunked
-// transfer encoding and is not retried on 429.
-func (c *Client) UploadComputerInventoryAttachmentV3(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result HrefResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments", prefix, url.PathEscape(id))
-	parts := []client.MultipartField{
-		{Name: "file", Filename: fileFilename, Content: file},
-	}
-	if err := c.transport.DoMultipart(ctx, http.MethodPost, endpoint, parts, http.StatusCreated, &result); err != nil {
-		return nil, fmt.Errorf("UploadComputerInventoryAttachmentV3(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// DownloadComputerInventoryAttachmentV1 download attachment file.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - attachmentID: instance id of attachment object.
-func (c *Client) DownloadComputerInventoryAttachmentV1(ctx context.Context, id string, attachmentID string) ([]byte, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result []byte
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("DownloadComputerInventoryAttachmentV1(%s): %w", id, err)
-	}
-	return result, nil
-}
-
-// DownloadComputerInventoryAttachmentV2 download attachment file.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - attachmentID: instance id of attachment object.
-func (c *Client) DownloadComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) ([]byte, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result []byte
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("DownloadComputerInventoryAttachmentV2(%s): %w", id, err)
-	}
-	return result, nil
-}
-
 // DownloadComputerInventoryAttachmentV4 download attachment file.
 //
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1082,64 +282,9 @@ func (c *Client) DownloadComputerInventoryAttachmentV4(ctx context.Context, id s
 	return result, nil
 }
 
-// DownloadComputerInventoryAttachmentV3 download attachment file.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:computers. Legacy Jamf Pro privilege name(s): Read Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - attachmentID: instance id of attachment object.
-func (c *Client) DownloadComputerInventoryAttachmentV3(ctx context.Context, id string, attachmentID string) ([]byte, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result []byte
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("DownloadComputerInventoryAttachmentV3(%s): %w", id, err)
-	}
-	return result, nil
-}
-
-// DeleteComputerInventoryAttachmentV1 remove attachment.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - attachmentID: instance id of attachment object.
-func (c *Client) DeleteComputerInventoryAttachmentV1(ctx context.Context, id string, attachmentID string) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteComputerInventoryAttachmentV1(%s): %w", id, err)
-	}
-	return nil
-}
-
-// DeleteComputerInventoryAttachmentV2 remove attachment.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - attachmentID: instance id of attachment object.
-func (c *Client) DeleteComputerInventoryAttachmentV2(ctx context.Context, id string, attachmentID string) error {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteComputerInventoryAttachmentV2(%s): %w", id, err)
-	}
-	return nil
-}
-
 // DeleteComputerInventoryAttachmentV4 remove attachment.
 //
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Computers.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1153,63 +298,9 @@ func (c *Client) DeleteComputerInventoryAttachmentV4(ctx context.Context, id str
 	return nil
 }
 
-// DeleteComputerInventoryAttachmentV3 remove attachment.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: update:pro:computers. Legacy Jamf Pro privilege name(s): Update Computers.
-//
-// Parameters:
-//   - id: instance id of computer record.
-//   - attachmentID: instance id of attachment object.
-func (c *Client) DeleteComputerInventoryAttachmentV3(ctx context.Context, id string, attachmentID string) error {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/attachments/%s", prefix, url.PathEscape(id), url.PathEscape(attachmentID))
-	if err := c.transport.DoExpect(ctx, http.MethodDelete, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("DeleteComputerInventoryAttachmentV3(%s): %w", id, err)
-	}
-	return nil
-}
-
-// GetComputerInventoryFileVaultV1 return FileVault information for a specific computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerInventoryFileVaultV1(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventoryFileVault
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/filevault", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryFileVaultV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// GetComputerInventoryFileVaultV2 return FileVault information for a specific computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerInventoryFileVaultV2(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result ComputerInventoryFileVault
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/filevault", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryFileVaultV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // GetComputerInventoryFileVaultV4 return FileVault information for a specific computer.
 //
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
+// Required privileges: disk-encryption-recovery-key:read. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1223,63 +314,9 @@ func (c *Client) GetComputerInventoryFileVaultV4(ctx context.Context, id string)
 	return &result, nil
 }
 
-// GetComputerInventoryFileVaultV3 return FileVault information for a specific computer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:disk-encryption-recovery-key. Legacy Jamf Pro privilege name(s): View Disk Encryption Recovery Key.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerInventoryFileVaultV3(ctx context.Context, id string) (*ComputerInventoryFileVault, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result ComputerInventoryFileVault
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/filevault", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerInventoryFileVaultV3(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// GetComputerDeviceLockPinV1 return a computer's Device Lock PIN.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerDeviceLockPinV1(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventoryDeviceLockPinResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-device-lock-pin", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerDeviceLockPinV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// GetComputerDeviceLockPinV2 return a computer's Device Lock PIN.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerDeviceLockPinV2(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result ComputerInventoryDeviceLockPinResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-device-lock-pin", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerDeviceLockPinV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // GetComputerDeviceLockPinV4 return a computer's Device Lock PIN.
 //
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
+// Required privileges: computer-device-lock-pin:read. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1293,63 +330,9 @@ func (c *Client) GetComputerDeviceLockPinV4(ctx context.Context, id string) (*Co
 	return &result, nil
 }
 
-// GetComputerDeviceLockPinV3 return a computer's Device Lock PIN.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:computer-device-lock-pin. Legacy Jamf Pro privilege name(s): View Computer Device Lock Pin.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerDeviceLockPinV3(ctx context.Context, id string) (*ComputerInventoryDeviceLockPinResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result ComputerInventoryDeviceLockPinResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-device-lock-pin", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerDeviceLockPinV3(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// GetComputerRecoveryLockPasswordV1 return a Computers Recovery Lock Password.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerRecoveryLockPasswordV1(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	var result ComputerInventoryRecoveryLockPasswordResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-recovery-lock-password", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerRecoveryLockPasswordV1(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// GetComputerRecoveryLockPasswordV2 return a Computers Recovery Lock Password.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-11-06) and may be removed in a future release.
-//
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerRecoveryLockPasswordV2(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result ComputerInventoryRecoveryLockPasswordResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-recovery-lock-password", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerRecoveryLockPasswordV2(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
 // GetComputerRecoveryLockPasswordV4 return a Computers Recovery Lock Password.
 //
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
+// Required privileges: recovery-lock:read. Legacy Jamf Pro privilege name(s): View Recovery Lock.
 //
 // Parameters:
 //   - id: instance id of computer record.
@@ -1361,180 +344,6 @@ func (c *Client) GetComputerRecoveryLockPasswordV4(ctx context.Context, id strin
 		return nil, fmt.Errorf("GetComputerRecoveryLockPasswordV4(%s): %w", id, err)
 	}
 	return &result, nil
-}
-
-// GetComputerRecoveryLockPasswordV3 return a Computers Recovery Lock Password.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-07-14) and may be removed in a future release.
-//
-// Required privileges: read:pro:recovery-lock. Legacy Jamf Pro privilege name(s): View Recovery Lock.
-//
-// Parameters:
-//   - id: instance id of computer record.
-func (c *Client) GetComputerRecoveryLockPasswordV3(ctx context.Context, id string) (*ComputerInventoryRecoveryLockPasswordResponse, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	var result ComputerInventoryRecoveryLockPasswordResponse
-	endpoint := fmt.Sprintf("%s/computers-inventory/%s/view-recovery-lock-password", prefix, url.PathEscape(id))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetComputerRecoveryLockPasswordV3(%s): %w", id, err)
-	}
-	return &result, nil
-}
-
-// ResolveComputerInventoryV1IDByName looks up a ComputerInventoryV1 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/computers-inventory?section=GENERAL"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV1IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV1ByName looks up a ComputerInventoryV1 by its general.name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV1ByName(ctx context.Context, name string) (*ComputerInventory, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/computers-inventory?section=GENERAL"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV1ByName(%s): %w", name, err)
-	}
-	var out ComputerInventory
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV1ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV1IDBySerialNumber looks up a ComputerInventoryV1 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV1IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/computers-inventory?section=HARDWARE"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV1IDBySerialNumber(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV1BySerialNumber looks up a ComputerInventoryV1 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV1BySerialNumber(ctx context.Context, name string) (*ComputerInventory, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/computers-inventory?section=HARDWARE"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV1BySerialNumber(%s): %w", name, err)
-	}
-	var out ComputerInventory
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV1BySerialNumber(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV1IDByUDID looks up a ComputerInventoryV1 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV1IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/computers-inventory"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV1IDByUDID(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV1ByUDID looks up a ComputerInventoryV1 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV1ByUDID(ctx context.Context, name string) (*ComputerInventory, error) {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	listPath := prefix + "/computers-inventory"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV1ByUDID(%s): %w", name, err)
-	}
-	var out ComputerInventory
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV1ByUDID(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV2IDByName looks up a ComputerInventoryV2 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV2IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/computers-inventory?section=GENERAL"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV2IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV2ByName looks up a ComputerInventoryV2 by its general.name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV2ByName(ctx context.Context, name string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/computers-inventory?section=GENERAL"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV2ByName(%s): %w", name, err)
-	}
-	var out ComputerInventoryV2
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV2ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV2IDBySerialNumber looks up a ComputerInventoryV2 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV2IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/computers-inventory?section=HARDWARE"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV2IDBySerialNumber(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV2BySerialNumber looks up a ComputerInventoryV2 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV2BySerialNumber(ctx context.Context, name string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/computers-inventory?section=HARDWARE"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV2BySerialNumber(%s): %w", name, err)
-	}
-	var out ComputerInventoryV2
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV2BySerialNumber(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV2IDByUDID looks up a ComputerInventoryV2 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV2IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/computers-inventory"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV2IDByUDID(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV2ByUDID looks up a ComputerInventoryV2 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV2ByUDID(ctx context.Context, name string) (*ComputerInventoryV2, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	listPath := prefix + "/computers-inventory"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV2ByUDID(%s): %w", name, err)
-	}
-	var out ComputerInventoryV2
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV2ByUDID(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
 }
 
 // ResolveComputerInventoryV4IDByName looks up a ComputerInventoryV4 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
@@ -1611,84 +420,6 @@ func (c *Client) ResolveComputerInventoryV4ByUDID(ctx context.Context, name stri
 	var out ComputerInventoryV4
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return nil, fmt.Errorf("ResolveComputerInventoryV4ByUDID(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV3IDByName looks up a ComputerInventoryV3 by its general.name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV3IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	listPath := prefix + "/computers-inventory?section=GENERAL"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV3IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV3ByName looks up a ComputerInventoryV3 by its general.name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV3ByName(ctx context.Context, name string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	listPath := prefix + "/computers-inventory?section=GENERAL"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "general.name", "general.name", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV3ByName(%s): %w", name, err)
-	}
-	var out ComputerInventoryV3
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV3ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV3IDBySerialNumber looks up a ComputerInventoryV3 by its hardware.serialNumber field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV3IDBySerialNumber(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	listPath := prefix + "/computers-inventory?section=HARDWARE"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV3IDBySerialNumber(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV3BySerialNumber looks up a ComputerInventoryV3 by its hardware.serialNumber field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV3BySerialNumber(ctx context.Context, name string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	listPath := prefix + "/computers-inventory?section=HARDWARE"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "hardware.serialNumber", "hardware.serialNumber", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV3BySerialNumber(%s): %w", name, err)
-	}
-	var out ComputerInventoryV3
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV3BySerialNumber(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
-// ResolveComputerInventoryV3IDByUDID looks up a ComputerInventoryV3 by its udid field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveComputerInventoryV3IDByUDID(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	listPath := prefix + "/computers-inventory"
-	id, _, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveComputerInventoryV3IDByUDID(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveComputerInventoryV3ByUDID looks up a ComputerInventoryV3 by its udid field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveComputerInventoryV3ByUDID(ctx context.Context, name string) (*ComputerInventoryV3, error) {
-	prefix := c.transport.APIPrefix("pro", "v3")
-	listPath := prefix + "/computers-inventory"
-	_, raw, err := c.transport.ResolveByNameFiltered(ctx, listPath, "", "udid", "udid", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV3ByUDID(%s): %w", name, err)
-	}
-	var out ComputerInventoryV3
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveComputerInventoryV3ByUDID(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
 }

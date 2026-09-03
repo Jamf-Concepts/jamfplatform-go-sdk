@@ -8,7 +8,6 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"os"
 	"strconv"
 	"testing"
 
@@ -16,61 +15,21 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
 )
 
-func classicStrPtr(s string) *string { return &s }
+//go:fix inline
+func classicStrPtr(s string) *string { return new(s) }
 func intToStr(i int) string          { return strconv.Itoa(i) }
 
-// TestAcceptance_Classic_GetComputerByID exercises the Classic XML path
-// end-to-end. Uses JAMFPLATFORM_CLASSIC_COMPUTER_ID if set; otherwise
-// pulls the first id from ListComputers. Skips only when the tenant
-// has no computers enrolled.
-func TestAcceptance_Classic_GetComputerByID(t *testing.T) {
-	c := accClient(t)
-	pc := proclassic.New(c)
-	ctx := context.Background()
-
-	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
-	if id == "" {
-		list, err := pc.ListComputers(ctx)
-		if err != nil {
-			skipOnServerError(t, err)
-			t.Fatalf("ListComputers: %v", err)
-		}
-		if list == nil || len(list.Computers) == 0 {
-			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_ID to override")
-		}
-		first := list.Computers[0]
-		if first.ID == nil {
-			t.Fatalf("first computer has no ID: %+v", first)
-		}
-		id = intToStr(*first.ID)
-	}
-
-	comp, err := pc.GetComputerByID(ctx, id)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetComputerByID(%s): %v", id, err)
-	}
-	if comp == nil || comp.General == nil {
-		t.Fatalf("expected Computer.General populated, got %+v", comp)
-	}
-	deref := func(p *string) string {
-		if p == nil {
-			return ""
-		}
-		return *p
-	}
-	cid := 0
-	if comp.General.ID != nil {
-		cid = *comp.General.ID
-	}
-	t.Logf("Computer id=%d name=%q serial=%q udid=%q", cid, deref(comp.General.Name), deref(comp.General.SerialNumber), deref(comp.General.UDID))
-}
-
-// TestAcceptance_Classic_ComputerCRUD exercises the Classic computer CRUD
-// lifecycle using a synthetic record — no real enrolled device is touched.
-// Creates via POST /computers/id/0, round-trips via GET by serial number
-// (the create endpoint's 201 response body is server-generated and needs
-// the post-hoc lookup to recover the numeric id), updates, then deletes.
+// TestAcceptance_Classic_ComputerCRUD exercises the Classic computer create
+// and delete using a synthetic record — no real enrolled device is touched.
+//
+// It covers only create and delete because those are the only verbs the
+// published spec still declares on this path: v1993 withdrew
+// GET and PUT /computers/id/{id} along with every alternate-identifier read,
+// update and delete, leaving POST and DELETE on /computers/id/{id} and POST
+// on the four alternate-identifier paths. The numeric id the create does not
+// return is recovered through MatchComputers, the only computer lookup left in
+// the package, and the post-delete assertion is that the match no longer
+// resolves rather than a 404 from a read that no longer exists.
 func TestAcceptance_Classic_ComputerCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -81,63 +40,75 @@ func TestAcceptance_Classic_ComputerCRUD(t *testing.T) {
 
 	err := pc.CreateComputerByID(ctx, "0", &proclassic.ComputerPost{
 		General: &proclassic.ComputerPostGeneral{
-			Name:         classicStrPtr(name),
-			SerialNumber: classicStrPtr(serial),
+			Name:         new(name),
+			SerialNumber: new(serial),
 		},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateComputerByID(0): %v", err)
 	}
-	cleanupDelete(t, "DeleteComputerBySerialNumber", func() error { return pc.DeleteComputerBySerialNumber(ctx, serial) })
 	t.Logf("Created computer name=%q serial=%q", name, serial)
 
-	got, err := pc.GetComputerBySerialNumber(ctx, serial)
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetComputerBySerialNumber(%q): %v", serial, err)
-	}
-	if got == nil || got.General == nil || got.General.ID == nil {
-		t.Fatalf("expected Computer.General.ID populated after round-trip, got %+v", got)
-	}
-	id := *got.General.ID
-	if got.General.Name == nil || *got.General.Name != name {
-		t.Errorf("Computer.General.Name = %v, want %q", got.General.Name, name)
-	}
+	id := matchComputerIDBySerial(t, pc, serial)
 
-	// Update — rename the record via id.
-	newName := name + "-updated"
-	if err := pc.UpdateComputerByID(ctx, intToStr(id), &proclassic.ComputerPost{
-		General: &proclassic.ComputerPostGeneral{Name: classicStrPtr(newName)},
-	}); err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("UpdateComputerByID(%d): %v", id, err)
-	}
+	// The delete below is the assertion, so the safety net only fires when the
+	// test bailed before reaching it — registering an unconditional cleanup
+	// would log a 404 from a second delete on every green run and hide a real
+	// cleanup failure in that noise.
+	deleted := false
+	cleanupDelete(t, "DeleteComputerByID", func() error {
+		if deleted {
+			return nil
+		}
+		return pc.DeleteComputerByID(ctx, intToStr(id))
+	})
 
-	afterUpdate, err := pc.GetComputerByID(ctx, intToStr(id))
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetComputerByID(%d) after update: %v", id, err)
-	}
-	if afterUpdate.General == nil || afterUpdate.General.Name == nil || *afterUpdate.General.Name != newName {
-		t.Errorf("after UpdateComputerByID Name = %v, want %q", afterUpdate.General.Name, newName)
-	}
-
-	// Delete.
 	if err := pc.DeleteComputerByID(ctx, intToStr(id)); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("DeleteComputerByID(%d): %v", id, err)
 	}
+	deleted = true
 
-	// Verify gone.
-	_, err = pc.GetComputerByID(ctx, intToStr(id))
-	if err == nil {
-		t.Fatalf("GetComputerByID(%d) after delete should 404, succeeded", id)
+	// Verify gone. MatchComputers answers 200 with an empty list rather than
+	// 404, so absence — not an error — is the assertion.
+	after, err := pc.MatchComputers(ctx, serial)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("MatchComputers(%q) after delete: %v", serial, err)
 	}
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("GetComputerByID(%d) after delete: want 404, got %v", id, err)
+	if after != nil {
+		for _, comp := range after.Computers {
+			if comp.ID != nil && *comp.ID == id {
+				t.Fatalf("computer %d still matches %q after delete", id, serial)
+			}
+		}
 	}
+}
+
+// matchComputerIDBySerial recovers a Classic computer's numeric id from its
+// serial number. It exists because POST /computers/id/0 returns a
+// server-generated body without a usable id and v1993 withdrew every
+// by-identifier read, leaving GET /computers/match/{match} as the only lookup.
+func matchComputerIDBySerial(t *testing.T, pc *proclassic.Client, serial string) int {
+	t.Helper()
+	ctx := context.Background()
+
+	matched, err := pc.MatchComputers(ctx, serial)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("MatchComputers(%q): %v", serial, err)
+	}
+	if matched == nil || len(matched.Computers) == 0 {
+		t.Fatalf("MatchComputers(%q) returned no computer for a record just created", serial)
+	}
+	for _, comp := range matched.Computers {
+		if comp.ID != nil {
+			return *comp.ID
+		}
+	}
+	t.Fatalf("MatchComputers(%q) returned %d computers, none carrying an id", serial, len(matched.Computers))
+	return 0
 }
 
 func TestAcceptance_Classic_BuildingCRUD(t *testing.T) {
@@ -146,7 +117,7 @@ func TestAcceptance_Classic_BuildingCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-classic-building-" + runSuffix()
-	created, err := pc.CreateBuildingByID(ctx, "0", &proclassic.Building{Name: classicStrPtr(name)})
+	created, err := pc.CreateBuildingByID(ctx, "0", &proclassic.Building{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateBuildingByID: %v", err)
@@ -168,7 +139,7 @@ func TestAcceptance_Classic_BuildingCRUD(t *testing.T) {
 	}
 
 	newName := name + "-updated"
-	if err := pc.UpdateBuildingByID(ctx, intToStr(id), &proclassic.Building{Name: classicStrPtr(newName)}); err != nil {
+	if err := pc.UpdateBuildingByID(ctx, intToStr(id), &proclassic.Building{Name: new(newName)}); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateBuildingByID(%d): %v", id, err)
 	}
@@ -194,7 +165,7 @@ func TestAcceptance_Classic_DepartmentCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-classic-dept-" + runSuffix()
-	created, err := pc.CreateDepartmentByID(ctx, "0", &proclassic.Department{Name: classicStrPtr(name)})
+	created, err := pc.CreateDepartmentByID(ctx, "0", &proclassic.Department{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDepartmentByID: %v", err)
@@ -232,7 +203,7 @@ func TestAcceptance_Classic_CategoryCRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-cat-" + runSuffix()
 	prio := 5
-	created, err := pc.CreateCategoryByID(ctx, "0", &proclassic.Category{Name: classicStrPtr(name), Priority: &prio})
+	created, err := pc.CreateCategoryByID(ctx, "0", &proclassic.Category{Name: new(name), Priority: &prio})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateCategoryByID: %v", err)
@@ -271,9 +242,9 @@ func TestAcceptance_Classic_ScriptCRUD(t *testing.T) {
 	name := "sdk-acc-classic-script-" + runSuffix()
 	contents := "#!/bin/sh\necho hello\n"
 	created, err := pc.CreateScriptByID(ctx, "0", &proclassic.Script{
-		Name:           classicStrPtr(name),
-		ScriptContents: classicStrPtr(contents),
-		Priority:       classicStrPtr(proclassic.ScriptPriorityAfter),
+		Name:           new(name),
+		ScriptContents: new(contents),
+		Priority:       new(proclassic.ScriptPriorityAfter),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -295,7 +266,7 @@ func TestAcceptance_Classic_ScriptCRUD(t *testing.T) {
 	}
 
 	newName := name + "-updated"
-	if err := pc.UpdateScriptByID(ctx, intToStr(id), &proclassic.Script{Name: classicStrPtr(newName)}); err != nil {
+	if err := pc.UpdateScriptByID(ctx, intToStr(id), &proclassic.Script{Name: new(newName)}); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateScriptByID(%d): %v", id, err)
 	}
@@ -319,8 +290,8 @@ func TestAcceptance_Classic_UserCRUD(t *testing.T) {
 	name := "sdk-acc-classic-user-" + runSuffix()
 	email := name + "@example.test"
 	created, err := pc.CreateUserByID(ctx, "0", &proclassic.UserPost{
-		Name:  classicStrPtr(name),
-		Email: classicStrPtr(email),
+		Name:  new(name),
+		Email: new(email),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -359,8 +330,8 @@ func TestAcceptance_Classic_ComputerEACRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-ea-" + runSuffix()
 	created, err := pc.CreateComputerExtensionAttributeByID(ctx, "0", &proclassic.ComputerExtensionAttribute{
-		Name:     classicStrPtr(name),
-		DataType: classicStrPtr(proclassic.ComputerExtensionAttributeDataTypeString),
+		Name:     new(name),
+		DataType: new(proclassic.ComputerExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -399,8 +370,8 @@ func TestAcceptance_Classic_MobileDeviceEACRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-mdea-" + runSuffix()
 	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
-		Name:     classicStrPtr(name),
-		DataType: classicStrPtr(proclassic.MobileDeviceExtensionAttributeDataTypeString),
+		Name:     new(name),
+		DataType: new(proclassic.MobileDeviceExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -430,8 +401,8 @@ func TestAcceptance_Classic_UserEACRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-uea-" + runSuffix()
 	created, err := pc.CreateUserExtensionAttributeByID(ctx, "0", &proclassic.UserExtensionAttribute{
-		Name:     classicStrPtr(name),
-		DataType: classicStrPtr(proclassic.UserExtensionAttributeDataTypeString),
+		Name:     new(name),
+		DataType: new(proclassic.UserExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -462,7 +433,7 @@ func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
 	name := "sdk-acc-cg-" + runSuffix()
 	isSmart := false
 	created, err := pc.CreateComputerGroupByID(ctx, "0", &proclassic.ComputerGroupPost{
-		Name:    classicStrPtr(name),
+		Name:    new(name),
 		IsSmart: &isSmart,
 	})
 	if err != nil {
@@ -476,18 +447,20 @@ func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
 	cleanupDelete(t, "DeleteComputerGroupByID", func() error { return pc.DeleteComputerGroupByID(ctx, intToStr(id)) })
 	t.Logf("Created computer group id=%d name=%q", id, name)
 
-	got, err := pc.GetComputerGroupByID(ctx, intToStr(id))
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("GetComputerGroupByID(%d): %v", id, err)
-	}
+	// Group reads lag their own writes — see settleUntilFound.
+	var got *proclassic.ComputerGroup
+	settleUntilFound(t, "GetComputerGroupByID("+intToStr(id)+")", func() error {
+		var err error
+		got, err = pc.GetComputerGroupByID(ctx, intToStr(id))
+		return err
+	})
 	if got.Name == nil || *got.Name != name {
 		t.Errorf("GetComputerGroupByID Name = %v, want %q", got.Name, name)
 	}
 
 	newName := name + "-updated"
 	if err := pc.UpdateComputerGroupByID(ctx, intToStr(id), &proclassic.ComputerGroupPost{
-		Name:    classicStrPtr(newName),
+		Name:    new(newName),
 		IsSmart: &isSmart,
 	}); err != nil {
 		skipOnServerError(t, err)
@@ -499,11 +472,10 @@ func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
 		t.Fatalf("DeleteComputerGroupByID(%d): %v", id, err)
 	}
 
-	_, err = pc.GetComputerGroupByID(ctx, intToStr(id))
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("after delete: want 404, got %v", err)
-	}
+	settleUntilGone(t, "GetComputerGroupByID("+intToStr(id)+") after delete", func() error {
+		_, err := pc.GetComputerGroupByID(ctx, intToStr(id))
+		return err
+	})
 }
 
 func TestAcceptance_Classic_MobileDeviceGroupCRUD(t *testing.T) {
@@ -514,7 +486,7 @@ func TestAcceptance_Classic_MobileDeviceGroupCRUD(t *testing.T) {
 	name := "sdk-acc-mdg-" + runSuffix()
 	isSmart := false
 	created, err := pc.CreateMobileDeviceGroupByID(ctx, "0", &proclassic.MobileDeviceGroup{
-		Name:    classicStrPtr(name),
+		Name:    new(name),
 		IsSmart: &isSmart,
 	})
 	if err != nil {
@@ -546,7 +518,7 @@ func TestAcceptance_Classic_UserGroupCRUD(t *testing.T) {
 	name := "sdk-acc-ug-" + runSuffix()
 	isSmart := false
 	created, err := pc.CreateUserGroupByID(ctx, "0", &proclassic.UserGroup{
-		Name:    classicStrPtr(name),
+		Name:    new(name),
 		IsSmart: &isSmart,
 	})
 	if err != nil {
@@ -577,7 +549,7 @@ func TestAcceptance_Classic_AdvancedComputerSearchCRUD(t *testing.T) {
 
 	name := "sdk-acc-acs-" + runSuffix()
 	created, err := pc.CreateAdvancedComputerSearchByID(ctx, "0", &proclassic.AdvancedComputerSearch{
-		Name: classicStrPtr(name),
+		Name: new(name),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -607,7 +579,7 @@ func TestAcceptance_Classic_AdvancedMobileDeviceSearchCRUD(t *testing.T) {
 
 	name := "sdk-acc-amds-" + runSuffix()
 	created, err := pc.CreateAdvancedMobileDeviceSearchByID(ctx, "0", &proclassic.AdvancedMobileDeviceSearch{
-		Name: classicStrPtr(name),
+		Name: new(name),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -637,7 +609,7 @@ func TestAcceptance_Classic_AdvancedUserSearchCRUD(t *testing.T) {
 
 	name := "sdk-acc-aus-" + runSuffix()
 	created, err := pc.CreateAdvancedUserSearchByID(ctx, "0", &proclassic.AdvancedUserSearch{
-		Name: classicStrPtr(name),
+		Name: new(name),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -669,7 +641,7 @@ func TestAcceptance_Classic_PolicyCRUD(t *testing.T) {
 	enabled := false
 	created, err := pc.CreatePolicyByID(ctx, "0", &proclassic.PolicyPost{
 		General: &proclassic.PolicyPostGeneral{
-			Name:    classicStrPtr(name),
+			Name:    new(name),
 			Enabled: &enabled,
 		},
 	})
@@ -711,7 +683,7 @@ func TestAcceptance_Classic_OSXConfigurationProfileCRUD(t *testing.T) {
 	name := "sdk-acc-osxcp-" + runSuffix()
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name: classicStrPtr(name),
+			Name: new(name),
 		},
 	})
 	if err != nil {
@@ -743,7 +715,7 @@ func TestAcceptance_Classic_MobileDeviceConfigurationProfileCRUD(t *testing.T) {
 	name := "sdk-acc-mdcp-" + runSuffix()
 	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name: classicStrPtr(name),
+			Name: new(name),
 		},
 	})
 	if err != nil {
@@ -784,9 +756,9 @@ func TestAcceptance_Classic_MobileDeviceCRUD(t *testing.T) {
 
 	_, err := pc.CreateMobileDeviceByID(ctx, "0", &proclassic.MobileDevicePost{
 		General: &proclassic.MobileDevicePostGeneral{
-			DeviceName:   classicStrPtr(name),
-			SerialNumber: classicStrPtr(serial),
-			UDID:         classicStrPtr(udid),
+			DeviceName:   new(name),
+			SerialNumber: new(serial),
+			UDID:         new(udid),
 		},
 	})
 	if err != nil {
@@ -811,7 +783,7 @@ func TestAcceptance_Classic_MobileDeviceCRUD(t *testing.T) {
 
 	newName := name + "-updated"
 	if err := pc.UpdateMobileDeviceByID(ctx, intToStr(id), &proclassic.MobileDevicePost{
-		General: &proclassic.MobileDevicePostGeneral{DeviceName: classicStrPtr(newName)},
+		General: &proclassic.MobileDevicePostGeneral{DeviceName: new(newName)},
 	}); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateMobileDeviceByID(%d): %v", id, err)
@@ -838,7 +810,7 @@ func TestAcceptance_Classic_MobileDeviceCRUD(t *testing.T) {
 }
 
 // TestAcceptance_Classic_GetMobileDeviceByID exercises the endpoint
-// against a real enrolled device. If JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID
+// against a real enrolled device. If JAMFPLATFORM_ACC_PROCLASSIC_MOBILE_DEVICE_ID
 // is set, uses that id; otherwise pulls the first entry from the live
 // /mobiledevices list and probes it. Skipped only when the tenant has
 // zero enrolled mobile devices.
@@ -847,7 +819,7 @@ func TestAcceptance_Classic_GetMobileDeviceByID(t *testing.T) {
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
-	id := os.Getenv("JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID")
+	id := accEnv("JAMFPLATFORM_ACC_PROCLASSIC_MOBILE_DEVICE_ID")
 	if id == "" {
 		list, err := pc.ListMobileDevices(ctx)
 		if err != nil {
@@ -855,7 +827,7 @@ func TestAcceptance_Classic_GetMobileDeviceByID(t *testing.T) {
 			t.Fatalf("ListMobileDevices: %v", err)
 		}
 		if list == nil || len(list.MobileDevices) == 0 {
-			t.Skip("tenant has no enrolled mobile devices; set JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID to override")
+			t.Skip("tenant has no enrolled mobile devices; set JAMFPLATFORM_ACC_PROCLASSIC_MOBILE_DEVICE_ID to override")
 		}
 		first := list.MobileDevices[0]
 		if first.ID == nil {
@@ -882,9 +854,9 @@ func TestAcceptance_Classic_PrinterCRUD(t *testing.T) {
 
 	name := "sdk-acc-printer-" + runSuffix()
 	created, err := pc.CreatePrinterByID(ctx, "0", &proclassic.Printer{
-		Name:     classicStrPtr(name),
-		CUPSName: classicStrPtr("PDF"),
-		URI:      classicStrPtr("lpd://printer.local/queue"),
+		Name:     new(name),
+		CUPSName: new("PDF"),
+		URI:      new("lpd://printer.local/queue"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -914,9 +886,9 @@ func TestAcceptance_Classic_DirectoryBindingCRUD(t *testing.T) {
 
 	name := "sdk-acc-dirbind-" + runSuffix()
 	created, err := pc.CreateDirectoryBindingByID(ctx, "0", &proclassic.DirectoryBinding{
-		Name:   classicStrPtr(name),
-		Domain: classicStrPtr("example.test"),
-		Type:   classicStrPtr("Active Directory"),
+		Name:   new(name),
+		Domain: new("example.test"),
+		Type:   new("Active Directory"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -954,26 +926,26 @@ func TestAcceptance_Classic_DirectoryBindingNestedAD(t *testing.T) {
 	bp := func(b bool) *bool { return &b }
 	name := "sdk-acc-dirbind-ad-" + runSuffix()
 	want := &proclassic.DirectoryBinding{
-		Name:       classicStrPtr(name),
+		Name:       new(name),
 		Priority:   func(i int) *int { return &i }(9),
-		Domain:     classicStrPtr("acc.test"),
-		Username:   classicStrPtr("accuser"),
-		Password:   classicStrPtr("placeholder-pw"),
-		ComputerOu: classicStrPtr("OU=acc"),
-		Type:       classicStrPtr("Active Directory"),
+		Domain:     new("acc.test"),
+		Username:   new("accuser"),
+		Password:   new("placeholder-pw"),
+		ComputerOu: new("OU=acc"),
+		Type:       new("Active Directory"),
 		ActiveDirectory: &proclassic.DirectoryBindingActiveDirectory{
 			CacheLastUser:       bp(true),
 			RequireConfirmation: bp(false),
 			LocalHome:           bp(true),
 			UseUncPath:          bp(false),
-			MountStyle:          classicStrPtr("smb"),
-			DefaultShell:        classicStrPtr("/bin/bash"),
-			Uid:                 classicStrPtr("accuid"),
-			UserGid:             classicStrPtr("accugid"),
-			Gid:                 classicStrPtr("accgid"),
+			MountStyle:          new("smb"),
+			DefaultShell:        new("/bin/bash"),
+			Uid:                 new("accuid"),
+			UserGid:             new("accugid"),
+			Gid:                 new("accgid"),
 			MultipleDomains:     bp(false),
-			PreferredDomain:     classicStrPtr("accpref"),
-			AdminGroups:         classicStrPtr("accgrp"),
+			PreferredDomain:     new("accpref"),
+			AdminGroups:         new("accgrp"),
 		},
 	}
 
@@ -1040,14 +1012,15 @@ func derefStr(p *string) string {
 
 func TestAcceptance_Classic_ClassicPackageCRUD(t *testing.T) {
 	c := accClient(t)
+	requirePackageStore(t, c)
 	ctx := context.Background()
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-classic-pkg-" + runSuffix()
 	filename := name + ".pkg"
 	created, err := pc.CreateClassicPackageByID(ctx, "0", &proclassic.Package{
-		Name:     classicStrPtr(name),
-		Filename: classicStrPtr(filename),
+		Name:     new(name),
+		Filename: new(filename),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1077,9 +1050,9 @@ func TestAcceptance_Classic_NetworkSegmentCRUD(t *testing.T) {
 
 	name := "sdk-acc-ns-" + runSuffix()
 	created, err := pc.CreateNetworkSegmentByID(ctx, "0", &proclassic.NetworkSegmentPost{
-		Name:            classicStrPtr(name),
-		StartingAddress: classicStrPtr("10.200.0.1"),
-		EndingAddress:   classicStrPtr("10.200.0.255"),
+		Name:            new(name),
+		StartingAddress: new("10.200.0.1"),
+		EndingAddress:   new("10.200.0.255"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1110,11 +1083,11 @@ func TestAcceptance_Classic_DistributionPointCRUD(t *testing.T) {
 	name := "sdk-acc-dp-" + runSuffix()
 	noAuth := true
 	created, err := pc.CreateDistributionPointByID(ctx, "0", &proclassic.DistributionPointPost{
-		Name:                     classicStrPtr(name),
-		IPAddress:                classicStrPtr("dp.example.test"),
-		ShareName:                classicStrPtr("CasperShare"),
-		ReadOnlyUsername:         classicStrPtr("ro-user"),
-		ReadWriteUsername:        classicStrPtr("rw-user"),
+		Name:                     new(name),
+		IPAddress:                new("dp.example.test"),
+		ShareName:                new("CasperShare"),
+		ReadOnlyUsername:         new("ro-user"),
+		ReadWriteUsername:        new("rw-user"),
 		NoAuthenticationRequired: &noAuth,
 	})
 	if err != nil {
@@ -1148,11 +1121,11 @@ func TestAcceptance_Classic_LDAPServerCRUD(t *testing.T) {
 	port := 389
 	created, err := pc.CreateLDAPServerByID(ctx, "0", &proclassic.LdapServerPost{
 		Connection: &proclassic.LdapServerPostConnection{
-			Name:               classicStrPtr(name),
-			Hostname:           classicStrPtr(hostname),
+			Name:               new(name),
+			Hostname:           new(hostname),
 			Port:               &port,
-			ServerType:         classicStrPtr(proclassic.LdapServerPostConnectionServerTypeActiveDirectory),
-			AuthenticationType: classicStrPtr(proclassic.LdapServerPostConnectionAuthenticationTypeNone),
+			ServerType:         new(proclassic.LdapServerPostConnectionServerTypeActiveDirectory),
+			AuthenticationType: new(proclassic.LdapServerPostConnectionAuthenticationTypeNone),
 		},
 	})
 	if err != nil {
@@ -1190,10 +1163,10 @@ func TestAcceptance_Classic_MacApplicationCRUD(t *testing.T) {
 	bundle := "com.example.sdk-" + runSuffix()
 	created, err := pc.CreateMacApplicationByID(ctx, "0", &proclassic.MacApplication{
 		General: &proclassic.MacApplicationGeneral{
-			Name:     classicStrPtr(name),
-			BundleID: classicStrPtr(bundle),
-			Version:  classicStrPtr("1.0.0"),
-			URL:      classicStrPtr("https://apps.apple.com/us/app/id123456"),
+			Name:     new(name),
+			BundleID: new(bundle),
+			Version:  new("1.0.0"),
+			URL:      new("https://apps.apple.com/us/app/id123456"),
 		},
 	})
 	if err != nil {
@@ -1232,9 +1205,9 @@ func TestAcceptance_Classic_MobileDeviceApplicationCRUD(t *testing.T) {
 	version := "1.0.0"
 	created, err := pc.CreateMobileDeviceApplicationByID(ctx, "0", &proclassic.MobileDeviceApplication{
 		General: &proclassic.MobileDeviceApplicationGeneral{
-			Name:     classicStrPtr(name),
-			BundleID: classicStrPtr(bundle),
-			Version:  classicStrPtr(version),
+			Name:     new(name),
+			BundleID: new(bundle),
+			Version:  new(version),
 		},
 	})
 	if err != nil {
@@ -1264,7 +1237,7 @@ func TestAcceptance_Classic_EbookCRUD(t *testing.T) {
 	name := "sdk-acc-ebook-" + runSuffix()
 	created, err := pc.CreateEbookByID(ctx, "0", &proclassic.EbookPost{
 		General: &proclassic.EbookPostGeneral{
-			Name: classicStrPtr(name),
+			Name: new(name),
 		},
 	})
 	if err != nil {
@@ -1285,7 +1258,7 @@ func TestAcceptance_Classic_ClassCRUD(t *testing.T) {
 	ctx := context.Background()
 	pc := proclassic.New(c)
 	name := "sdk-acc-class-" + runSuffix()
-	created, err := pc.CreateClassByID(ctx, "0", &proclassic.ClassPost{Name: classicStrPtr(name)})
+	created, err := pc.CreateClassByID(ctx, "0", &proclassic.ClassPost{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateClassByID: %v", err)
@@ -1312,7 +1285,7 @@ func TestAcceptance_Classic_LicensedSoftwareCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-licsw-" + runSuffix()
 	created, err := pc.CreateLicensedSoftwareByID(ctx, "0", &proclassic.LicensedSoftware{
-		General: &proclassic.LicensedSoftwareGeneral{Name: classicStrPtr(name)},
+		General: &proclassic.LicensedSoftwareGeneral{Name: new(name)},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1340,7 +1313,7 @@ func TestAcceptance_Classic_RestrictedSoftwareCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-restsw-" + runSuffix()
 	created, err := pc.CreateRestrictedSoftwareByID(ctx, "0", &proclassic.RestrictedSoftware{
-		General: &proclassic.RestrictedSoftwareGeneral{Name: classicStrPtr(name), ProcessName: classicStrPtr("evil.app")},
+		General: &proclassic.RestrictedSoftwareGeneral{Name: new(name), ProcessName: new("evil.app")},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1362,41 +1335,15 @@ func TestAcceptance_Classic_RestrictedSoftwareCRUD(t *testing.T) {
 	}
 }
 
-func TestAcceptance_Classic_PeripheralTypeCRUD(t *testing.T) {
-	c := accClient(t)
-	ctx := context.Background()
-	pc := proclassic.New(c)
-	name := "sdk-acc-ptype-" + runSuffix()
-	created, err := pc.CreatePeripheralTypeByID(ctx, "0", &proclassic.PeripheralType{Name: classicStrPtr(name)})
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("CreatePeripheralTypeByID: %v", err)
-	}
-	if created == nil || created.ID == nil {
-		t.Fatalf("no ID: %+v", created)
-	}
-	id := *created.ID
-	cleanupDelete(t, "DeletePeripheralTypeByID", func() error { return pc.DeletePeripheralTypeByID(ctx, intToStr(id)) })
-	if err := pc.DeletePeripheralTypeByID(ctx, intToStr(id)); err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("delete: %v", err)
-	}
-	_, err = pc.GetPeripheralTypeByID(ctx, intToStr(id))
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("after delete: want 404, got %v", err)
-	}
-}
-
 func TestAcceptance_Classic_DiskEncryptionConfigurationCRUD(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	pc := proclassic.New(c)
 	name := "sdk-acc-dec-" + runSuffix()
 	created, err := pc.CreateDiskEncryptionConfigurationByID(ctx, "0", &proclassic.DiskEncryptionConfiguration{
-		Name:                  classicStrPtr(name),
-		KeyType:               classicStrPtr(proclassic.DiskEncryptionConfigurationKeyTypeIndividual),
-		FileVaultEnabledUsers: classicStrPtr(proclassic.DiskEncryptionConfigurationFileVaultEnabledUsersManagementAccount),
+		Name:                  new(name),
+		KeyType:               new(proclassic.DiskEncryptionConfigurationKeyTypeIndividual),
+		FileVaultEnabledUsers: new(proclassic.DiskEncryptionConfigurationFileVaultEnabledUsersManagementAccount),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1424,8 +1371,8 @@ func TestAcceptance_Classic_IBeaconCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-ibeacon-" + runSuffix()
 	created, err := pc.CreateIBeaconByID(ctx, "0", &proclassic.Ibeacon{
-		Name: classicStrPtr(name),
-		UUID: classicStrPtr("12345678-1234-1234-1234-123456789012"),
+		Name: new(name),
+		UUID: new("12345678-1234-1234-1234-123456789012"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1453,9 +1400,9 @@ func TestAcceptance_Classic_DockItemCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-dock-" + runSuffix()
 	created, err := pc.CreateDockItemByID(ctx, "0", &proclassic.DockItem{
-		Name: classicStrPtr(name),
-		Path: classicStrPtr("file:///Applications/Safari.app/"),
-		Type: classicStrPtr(proclassic.DockItemTypeApp),
+		Name: new(name),
+		Path: new("file:///Applications/Safari.app/"),
+		Type: new(proclassic.DockItemTypeApp),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1482,7 +1429,7 @@ func TestAcceptance_Classic_RemovableMacAddressCRUD(t *testing.T) {
 	ctx := context.Background()
 	pc := proclassic.New(c)
 	name := "AA:BB:CC:DD:EE:" + runSuffix()[len(runSuffix())-2:]
-	created, err := pc.CreateRemovableMacAddressByID(ctx, "0", &proclassic.RemovableMacAddress{Name: classicStrPtr(name)})
+	created, err := pc.CreateRemovableMacAddressByID(ctx, "0", &proclassic.RemovableMacAddress{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateRemovableMacAddressByID: %v", err)
@@ -1508,7 +1455,7 @@ func TestAcceptance_Classic_AllowedFileExtensionCRUD(t *testing.T) {
 	ctx := context.Background()
 	pc := proclassic.New(c)
 	ext := "sdk" + runSuffix()
-	created, err := pc.CreateAllowedFileExtensionByID(ctx, "0", &proclassic.AllowedFileExtension{Extension: classicStrPtr(ext)})
+	created, err := pc.CreateAllowedFileExtensionByID(ctx, "0", &proclassic.AllowedFileExtension{Extension: new(ext)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateAllowedFileExtensionByID: %v", err)
@@ -1540,8 +1487,8 @@ func TestAcceptance_Classic_JsonWebTokenConfigurationCRUD(t *testing.T) {
 
 	name := "sdk-acc-jwt-" + runSuffix()
 	created, err := pc.CreateJsonWebTokenConfigurationByID(ctx, "0", &proclassic.JsonWebTokenConfiguration{
-		Name:          classicStrPtr(name),
-		EncryptionKey: classicStrPtr("sdk-acc-jwt-key-" + runSuffix()),
+		Name:          new(name),
+		EncryptionKey: new("sdk-acc-jwt-key-" + runSuffix()),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1583,10 +1530,10 @@ func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-wh-" + runSuffix()
 	created, err := pc.CreateWebhookByID(ctx, "0", &proclassic.Webhook{
-		Name:        classicStrPtr(name),
-		URL:         classicStrPtr("https://webhook.example.test/receiver"),
-		Event:       classicStrPtr(proclassic.WebhookEventComputerAdded),
-		ContentType: classicStrPtr(proclassic.WebhookContentTypeApplicationJson),
+		Name:        new(name),
+		URL:         new("https://webhook.example.test/receiver"),
+		Event:       new(proclassic.WebhookEventComputerAdded),
+		ContentType: new(proclassic.WebhookContentTypeApplicationJson),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1619,12 +1566,12 @@ func TestAcceptance_Classic_AccountUserCRUD(t *testing.T) {
 
 	name := "sdk-acc-user-" + runSuffix()
 	created, err := pc.CreateAccountByUserID(ctx, "0", &proclassic.Account{
-		Name:         classicStrPtr(name),
-		FullName:     classicStrPtr("SDK Acceptance User"),
-		Email:        classicStrPtr(name + "@sdk.test"),
-		Password:     classicStrPtr("SDK-acc-pw-" + runSuffix() + "!"),
-		AccessLevel:  classicStrPtr(proclassic.AccountAccessLevelFullAccess),
-		PrivilegeSet: classicStrPtr(proclassic.AccountPrivilegeSetAdministrator),
+		Name:         new(name),
+		FullName:     new("SDK Acceptance User"),
+		Email:        new(name + "@sdk.test"),
+		Password:     new("SDK-acc-pw-" + runSuffix() + "!"),
+		AccessLevel:  new(proclassic.AccountAccessLevelFullAccess),
+		PrivilegeSet: new(proclassic.AccountPrivilegeSetAdministrator),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1666,9 +1613,9 @@ func TestAcceptance_Classic_AccountGroupCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-grp-" + runSuffix()
 	created, err := pc.CreateAccountGroupByID(ctx, "0", &proclassic.Group{
-		Name:         classicStrPtr(name),
-		AccessLevel:  classicStrPtr(proclassic.GroupAccessLevelFullAccess),
-		PrivilegeSet: classicStrPtr(proclassic.GroupPrivilegeSetAdministrator),
+		Name:         new(name),
+		AccessLevel:  new(proclassic.GroupAccessLevelFullAccess),
+		PrivilegeSet: new(proclassic.GroupPrivilegeSetAdministrator),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1708,9 +1655,9 @@ func TestAcceptance_Classic_ComputerInvitationCRUD(t *testing.T) {
 
 	createAccount := false
 	created, err := pc.CreateComputerInvitationByID(ctx, "0", &proclassic.ComputerInvitation{
-		InvitationType:              classicStrPtr("USER_INITIATED_URL"),
-		SshUsername:                 classicStrPtr("sdk-acc"),
-		SshPassword:                 classicStrPtr("sdk-acc-pw"),
+		InvitationType:              new("USER_INITIATED_URL"),
+		SshUsername:                 new("sdk-acc"),
+		SshPassword:                 new("sdk-acc-pw"),
 		CreateAccountIfDoesNotExist: &createAccount,
 	})
 	if err != nil {
@@ -1759,7 +1706,7 @@ func TestAcceptance_Classic_MobileDeviceInvitationCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	created, err := pc.CreateMobileDeviceInvitationByID(ctx, "0", &proclassic.MobileDeviceInvitationPost{
-		InvitationType: classicStrPtr("USER_INITIATED_URL"),
+		InvitationType: new("USER_INITIATED_URL"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1802,7 +1749,7 @@ func TestAcceptance_Classic_MobileDeviceEnrollmentProfileCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-mdep-" + runSuffix()
 	created, err := pc.CreateMobileDeviceEnrollmentProfileByID(ctx, "0", &proclassic.MobileDeviceEnrollmentProfilePost{
-		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: classicStrPtr(name)},
+		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: new(name)},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1840,8 +1787,8 @@ func TestAcceptance_Classic_PatchExternalSourceCRUD(t *testing.T) {
 	port := 443
 	sslEnabled := true
 	created, err := pc.CreatePatchExternalSourceByID(ctx, "0", &proclassic.PatchExternalSource{
-		Name:       classicStrPtr(name),
-		HostName:   classicStrPtr("patches.example.test"),
+		Name:       new(name),
+		HostName:   new("patches.example.test"),
 		Port:       &port,
 		SslEnabled: &sslEnabled,
 	})
@@ -1987,8 +1934,8 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 	name := "sdk-acc-sus-" + runSuffix()
 	port := 8088
 	created, err := pc.CreateSoftwareUpdateServerByID(ctx, "0", &proclassic.SoftwareUpdateServer{
-		Name:      classicStrPtr(name),
-		IPAddress: classicStrPtr("sus.example.test"),
+		Name:      new(name),
+		IPAddress: new("sus.example.test"),
 		Port:      &port,
 	})
 	if err != nil {
@@ -2028,13 +1975,13 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 // default to "2", which 404s on any tenant that never had that record — the
 // acceptance tenant has zero VPP invitations (wire-probed 2026-07-31), so the
 // test was reporting a missing fixture as an endpoint failure. Set
-// JAMFPLATFORM_VPP_INVITATION_ID to pin a specific record.
+// JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID to pin a specific record.
 func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
-	id := os.Getenv("JAMFPLATFORM_VPP_INVITATION_ID")
+	id := accEnv("JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID")
 	if id == "" {
 		list, err := pc.ListVPPInvitations(ctx)
 		if err != nil {
@@ -2042,7 +1989,7 @@ func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 			t.Fatalf("ListVPPInvitations: %v", err)
 		}
 		if list == nil || len(list.VppInvitations) == 0 {
-			t.Skip("tenant has no VPP invitations; set JAMFPLATFORM_VPP_INVITATION_ID to override")
+			t.Skip("tenant has no VPP invitations; set JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID to override")
 		}
 		first := list.VppInvitations[0]
 		if first.ID == nil {
@@ -2169,15 +2116,15 @@ func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
-	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
+	id := accEnv("JAMFPLATFORM_ACC_PROCLASSIC_COMPUTER_ID")
 	if id == "" {
-		list, err := pc.ListComputers(ctx)
+		list, err := pc.MatchComputers(ctx, "*")
 		if err != nil {
 			skipOnServerError(t, err)
-			t.Fatalf("ListComputers: %v", err)
+			t.Fatalf("MatchComputers(*): %v", err)
 		}
 		if list == nil || len(list.Computers) == 0 {
-			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_ID to override")
+			t.Skip("tenant has no computers; set JAMFPLATFORM_ACC_PROCLASSIC_COMPUTER_ID to override")
 		}
 		first := list.Computers[0]
 		if first.ID == nil {
@@ -2202,7 +2149,7 @@ func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-classic-site-" + runSuffix()
-	created, err := pc.CreateSiteByID(ctx, "0", &proclassic.Site{Name: classicStrPtr(name)})
+	created, err := pc.CreateSiteByID(ctx, "0", &proclassic.Site{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateSiteByID: %v", err)

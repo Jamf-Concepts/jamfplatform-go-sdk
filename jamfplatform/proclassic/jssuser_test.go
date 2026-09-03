@@ -13,7 +13,7 @@ import (
 
 func TestGetJSSUser(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/jssuser", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/jssuser", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetJSSUser(t *testing.T) {
 
 func TestGetJSSUser_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/jssuser", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/jssuser", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 

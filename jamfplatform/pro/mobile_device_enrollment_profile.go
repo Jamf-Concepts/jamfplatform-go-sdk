@@ -14,7 +14,7 @@ import (
 
 // DownloadMobileDeviceEnrollmentProfileV1 retrieve the MDM Enrollment Profile.
 //
-// Required privileges: read:pro:enrollment-profiles. Legacy Jamf Pro privilege name(s): Read Enrollment Profiles.
+// Required privileges: enrollment-profiles:read. Legacy Jamf Pro privilege name(s): Read Enrollment Profiles.
 //
 // Parameters:
 //   - id: MDM Enrollment Profile identifier.

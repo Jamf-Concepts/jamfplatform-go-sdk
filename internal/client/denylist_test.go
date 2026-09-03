@@ -85,14 +85,14 @@ func TestTransportAPIPrefix(t *testing.T) {
 		version   string
 		want      string
 	}{
-		{"devices", "devices", "v1", "/api/devices/v1"},
-		{"device groups", "device-groups", "v1", "/api/device-groups/v1"},
-		{"device actions", "device-actions", "v1", "/api/device-actions/v1"},
-		{"blueprints", "blueprints", "v1", "/api/blueprints/v1"},
-		{"compliance benchmarks", "compliance-benchmarks", "v1", "/api/compliance-benchmarks/v1"},
-		{"slashed namespace", "ddm/report", "v1", "/api/ddm/report/v1"},
-		{"version-less pro", "pro", "", "/api/pro"},
-		{"proclassic has no version", "proclassic", "", "/api/proclassic"},
+		{"devices", "devices", "v1", "/devices/v1"},
+		{"device groups", "device-groups", "v1", "/device-groups/v1"},
+		{"device actions", "device-actions", "v1", "/device-actions/v1"},
+		{"blueprints", "blueprints", "v1", "/blueprints/v1"},
+		{"compliance benchmarks", "compliance-benchmarks", "v1", "/compliance-benchmarks/v1"},
+		{"slashed namespace", "ddm/report", "v1", "/ddm/report/v1"},
+		{"version-less pro", "pro", "", "/pro"},
+		{"proclassic has no version", "proclassic", "", "/proclassic"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

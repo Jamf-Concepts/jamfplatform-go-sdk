@@ -61,6 +61,12 @@ func TestValidateCredentials_NonJSONBodyIsDiagnosed(t *testing.T) {
 		contentType string
 		body        string
 		wantInError []string
+		// wantGuidance is the remedy sentence this status should steer the
+		// caller towards. A 404 means a wrong baseURL far more often than a
+		// WAF, and pointing at the network team instead costs real debugging
+		// time — especially at GA, where every consumer has to change the
+		// base URL from apigw.jamf.com to {region}.api.jamfcloud.com.
+		wantGuidance string
 	}{
 		{
 			name:        "nginx 403",
@@ -68,7 +74,8 @@ func TestValidateCredentials_NonJSONBodyIsDiagnosed(t *testing.T) {
 			contentType: "text/html",
 			body:        nginxForbidden,
 			// The body is echoed on this path, so the proxy's own words survive.
-			wantInError: []string{"403", "text/html", "403 Forbidden"},
+			wantInError:  []string{"403", "text/html", "403 Forbidden"},
+			wantGuidance: "security policy (WAF or IP allowlist)",
 		},
 		{
 			name:        "200 with app shell",
@@ -76,14 +83,28 @@ func TestValidateCredentials_NonJSONBodyIsDiagnosed(t *testing.T) {
 			contentType: "text/html",
 			body:        spaShell,
 			// x/oauth2 drops the body on the 2xx path; only the guidance remains.
-			wantInError: []string{"success status with a non-JSON body"},
+			wantInError:  []string{"success status with a non-JSON body"},
+			wantGuidance: "security policy (WAF or IP allowlist)",
 		},
 		{
-			name:        "503 with empty body",
-			status:      http.StatusServiceUnavailable,
-			contentType: "",
-			body:        "",
-			wantInError: []string{"503"},
+			name:         "503 with empty body",
+			status:       http.StatusServiceUnavailable,
+			contentType:  "",
+			body:         "",
+			wantInError:  []string{"503"},
+			wantGuidance: "security policy (WAF or IP allowlist)",
+		},
+		{
+			// The token endpoint is {baseURL}/auth/token, so a baseURL of
+			// https://host/api sends the exchange to /api/auth/token — which
+			// neither eu.api.jamfcloud.com nor eu.apigw.jamf.com serves
+			// (wire-verified 2026-08-28, plain-text "404 page not found").
+			name:         "404 points at the base URL, not a WAF",
+			status:       http.StatusNotFound,
+			contentType:  "text/plain; charset=utf-8",
+			body:         "404 page not found\n",
+			wantInError:  []string{"404"},
+			wantGuidance: "{baseURL}/auth/token",
 		},
 	}
 
@@ -101,8 +122,8 @@ func TestValidateCredentials_NonJSONBodyIsDiagnosed(t *testing.T) {
 			if !errors.Is(err, ErrUnexpectedResponse) {
 				t.Errorf("expected ErrUnexpectedResponse in the chain, got: %v", err)
 			}
-			if !strings.Contains(err.Error(), "security policy (WAF or IP allowlist)") {
-				t.Errorf("expected the WAF guidance in the error, got: %v", err)
+			if !strings.Contains(err.Error(), tc.wantGuidance) {
+				t.Errorf("expected guidance %q in the error, got: %v", tc.wantGuidance, err)
 			}
 			for _, want := range tc.wantInError {
 				if !strings.Contains(err.Error(), want) {

@@ -181,6 +181,16 @@ func TestAcceptance_ResolveDeviceGroup_StaticUniqueWithinType(t *testing.T) {
 	shared := "sdk-acc-resolver-dg-within-type-" + runSuffix()
 	createStaticTestGroup(t, dg, shared)
 
+	// The server's own uniqueness check reads the existing set, and group
+	// reads lag group writes (see settleUntilFound) — so a duplicate submitted
+	// immediately is intermittently accepted, which reads as the server not
+	// enforcing uniqueness at all. Wait for the first group to be visible
+	// before probing, or this test asserts a race rather than the rule.
+	settleUntilFound(t, "ResolveDeviceGroupIDByName before duplicate probe", func() error {
+		_, err := dg.ResolveDeviceGroupIDByName(ctx, shared)
+		return err
+	})
+
 	desc := "SDK acceptance test — within-type uniqueness probe"
 	empty := []string{}
 	_, err := dg.CreateDeviceGroup(ctx, &devicegroups.DeviceGroupCreateRepresentationV1{

@@ -7,7 +7,6 @@ package jamfplatform_test
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -102,20 +101,20 @@ func TestAcceptance_EnvironmentScope(t *testing.T) {
 // Read-only, and it cannot mutate anything — every request is refused. It needs
 // both credential sets, because the whole point is to cross them over.
 func TestAcceptance_EnvironmentScopeMismatch(t *testing.T) {
-	envID := os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID")
-	tenantID := os.Getenv("JAMFPLATFORM_TENANT_ID")
+	envID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
+	tenantID := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_ID")
 	if envID == "" || tenantID == "" {
-		t.Skip("needs both JAMFPLATFORM_ENVIRONMENT_ID and JAMFPLATFORM_TENANT_ID to cross the scopes over")
+		t.Skip("needs both JAMFPLATFORM_ACC_ENVIRONMENT_ID and JAMFPLATFORM_ACC_PRO_TENANT_ID to cross the scopes over")
 	}
 	ctx := context.Background()
 
 	// An environment-scoped credential told to send a tenant header.
 	t.Run("environment credential, tenant header", func(t *testing.T) {
-		baseURL := os.Getenv("JAMFPLATFORM_ENV_BASE_URL")
+		baseURL := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL")
 		if baseURL == "" {
-			baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+			baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
 		}
-		id, secret := os.Getenv("JAMFPLATFORM_ENV_CLIENT_ID"), os.Getenv("JAMFPLATFORM_ENV_CLIENT_SECRET")
+		id, secret := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID"), accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET")
 		if baseURL == "" || id == "" || secret == "" {
 			t.Skip("environment-scoped credentials not configured")
 		}
@@ -127,7 +126,7 @@ func TestAcceptance_EnvironmentScopeMismatch(t *testing.T) {
 	// And the reverse: a tenant-scoped credential told to send an environment
 	// header, using the main tenant credential set.
 	t.Run("tenant credential, environment header", func(t *testing.T) {
-		baseURL, id, secret := os.Getenv("JAMFPLATFORM_BASE_URL"), os.Getenv("JAMFPLATFORM_CLIENT_ID"), os.Getenv("JAMFPLATFORM_CLIENT_SECRET")
+		baseURL, id, secret := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL"), accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID"), accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET")
 		if baseURL == "" || id == "" || secret == "" {
 			t.Skip("tenant credentials not configured")
 		}

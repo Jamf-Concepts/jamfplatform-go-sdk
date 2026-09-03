@@ -15,7 +15,7 @@ import (
 //
 // This endpoint is rate-limited. The transport automatically retries a 429 with backoff (honoring a server-supplied Retry-After when present, clamped to a ceiling), giving up only after exhausting its retry budget — at which point the 429 surfaces as an APIResponseError so the caller can apply its own backoff policy.
 //
-// Required privileges: execute:pro:change-password. Legacy Jamf Pro privilege name(s): Change Password.
+// Required privileges: change-password:execute. Legacy Jamf Pro privilege name(s): Change Password.
 func (c *Client) ChangeUserPasswordV1(ctx context.Context, request *ChangePassword) error {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	endpoint := prefix + "/user/change-password"

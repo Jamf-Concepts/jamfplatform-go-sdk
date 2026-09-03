@@ -13,7 +13,7 @@ import (
 
 func TestCreateVenafiV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestCreateVenafiV1(t *testing.T) {
 
 func TestGetVenafiV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -49,7 +49,7 @@ func TestGetVenafiV1(t *testing.T) {
 
 func TestGetVenafiV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -65,7 +65,7 @@ func TestGetVenafiV1_NotFound(t *testing.T) {
 
 func TestUpdateVenafiV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -83,7 +83,7 @@ func TestUpdateVenafiV1(t *testing.T) {
 
 func TestDeleteVenafiV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -98,7 +98,7 @@ func TestDeleteVenafiV1(t *testing.T) {
 
 func TestGetVenafiConnectionStatusV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/connection-status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/connection-status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -116,7 +116,7 @@ func TestGetVenafiConnectionStatusV1(t *testing.T) {
 
 func TestGetVenafiConnectionStatusV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/connection-status", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/connection-status", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -132,7 +132,7 @@ func TestGetVenafiConnectionStatusV1_NotFound(t *testing.T) {
 
 func TestGetVenafiDependentProfilesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/dependent-profiles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/dependent-profiles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -150,7 +150,7 @@ func TestGetVenafiDependentProfilesV1(t *testing.T) {
 
 func TestGetVenafiDependentProfilesV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/dependent-profiles", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/dependent-profiles", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -166,7 +166,7 @@ func TestGetVenafiDependentProfilesV1_NotFound(t *testing.T) {
 
 func TestListVenafiHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -188,7 +188,7 @@ func TestListVenafiHistoryV1(t *testing.T) {
 
 func TestCreateVenafiHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -206,7 +206,7 @@ func TestCreateVenafiHistoryNoteV1(t *testing.T) {
 
 func TestGetVenafiJamfPublicKeyV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/jamf-public-key", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/jamf-public-key", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -224,7 +224,7 @@ func TestGetVenafiJamfPublicKeyV1(t *testing.T) {
 
 func TestGetVenafiJamfPublicKeyV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/jamf-public-key", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/jamf-public-key", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -240,7 +240,7 @@ func TestGetVenafiJamfPublicKeyV1_NotFound(t *testing.T) {
 
 func TestRegenerateVenafiJamfPublicKeyV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/jamf-public-key/regenerate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/jamf-public-key/regenerate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -255,7 +255,7 @@ func TestRegenerateVenafiJamfPublicKeyV1(t *testing.T) {
 
 func TestGetVenafiProxyTrustStoreV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -273,7 +273,7 @@ func TestGetVenafiProxyTrustStoreV1(t *testing.T) {
 
 func TestGetVenafiProxyTrustStoreV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -289,7 +289,7 @@ func TestGetVenafiProxyTrustStoreV1_NotFound(t *testing.T) {
 
 func TestUploadVenafiProxyTrustStoreV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -304,7 +304,7 @@ func TestUploadVenafiProxyTrustStoreV1(t *testing.T) {
 
 func TestDeleteVenafiProxyTrustStoreV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/pki/venafi/test-id/proxy-trust-store", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}

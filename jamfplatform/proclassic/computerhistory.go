@@ -14,7 +14,7 @@ import (
 
 // GetComputerHistoryByID finds computer history by ID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetComputerHistoryByID(ctx context.Context, id string) (*Comput
 
 // GetComputerHistoryByName finds computer history by name.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - name: Computer Name to filter by.
@@ -46,7 +46,7 @@ func (c *Client) GetComputerHistoryByName(ctx context.Context, name string) (*Co
 
 // GetComputerHistoryByUDID finds computer history by UDID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - udid: Computer UDID to filter by.
@@ -62,7 +62,7 @@ func (c *Client) GetComputerHistoryByUDID(ctx context.Context, udid string) (*Co
 
 // GetComputerHistoryBySerialNumber finds computer history by serial number.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - serialNumber: Computer Serial Number to filter by.
@@ -78,7 +78,7 @@ func (c *Client) GetComputerHistoryBySerialNumber(ctx context.Context, serialNum
 
 // GetComputerHistoryByMacAddress finds computer history by MAC address.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - macAddress: Computer Mac Address to filter by.
@@ -94,7 +94,7 @@ func (c *Client) GetComputerHistoryByMacAddress(ctx context.Context, macAddress 
 
 // GetComputerHistoryByIDSubset finds a subset of computer history data by ID.
 //
-// Required privileges: read:pro:computers.
+// Required privileges: device-history:read.
 //
 // Parameters:
 //   - id: Computer ID to filter by.

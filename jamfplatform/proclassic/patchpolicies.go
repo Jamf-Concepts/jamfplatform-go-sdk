@@ -14,7 +14,7 @@ import (
 
 // GetPatchPolicyByID finds a patch policy by ID.
 //
-// Required privileges: read:pro:patch-policies.
+// Required privileges: patch-policies:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetPatchPolicyByID(ctx context.Context, id string) (*PatchPolic
 
 // CreatePatchPolicyBySoftwareTitleConfigID create a new patch policy associated with a patch software title configuration ID.
 //
-// Required privileges: create:pro:patch-policies.
+// Required privileges: patch-policies:create.
 //
 // Parameters:
 //   - softwareTitleConfigID: Patch software title config ID value to filter by.
@@ -46,7 +46,7 @@ func (c *Client) CreatePatchPolicyBySoftwareTitleConfigID(ctx context.Context, s
 
 // UpdatePatchPolicyByID updates an existing patch policy by ID.
 //
-// Required privileges: update:pro:patch-policies.
+// Required privileges: patch-policies:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -61,7 +61,7 @@ func (c *Client) UpdatePatchPolicyByID(ctx context.Context, id string, request *
 
 // DeletePatchPolicyByID deletes a patch policy by ID.
 //
-// Required privileges: delete:pro:patch-policies.
+// Required privileges: patch-policies:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -74,42 +74,9 @@ func (c *Client) DeletePatchPolicyByID(ctx context.Context, id string) error {
 	return nil
 }
 
-// ListPatchPoliciesBySoftwareTitleConfigID finds all patch policies by patch software title configuration ID (Deprecated). Please transition use to Jamf Pro API endpoint "/v2/patch-policies".
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
-//
-// Required privileges: read:pro:patch-policies.
-//
-// Parameters:
-//   - softwareTitleConfigID: Patch software title config ID value to filter by.
-func (c *Client) ListPatchPoliciesBySoftwareTitleConfigID(ctx context.Context, softwareTitleConfigID string) (*PatchPolicy, error) {
-	prefix := c.transport.APIPrefix("proclassic", "")
-	var result PatchPolicy
-	endpoint := fmt.Sprintf("%s/patchpolicies/softwaretitleconfig/id/%s", prefix, url.PathEscape(softwareTitleConfigID))
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListPatchPoliciesBySoftwareTitleConfigID(%s): %w", softwareTitleConfigID, err)
-	}
-	return &result, nil
-}
-
-// ListPatchPolicies finds all patch policies. (Deprecated). Please transition use to Jamf Pro API endpoint "/v2/patch-policies".
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
-//
-// Required privileges: read:pro:patch-policies.
-func (c *Client) ListPatchPolicies(ctx context.Context) (*PatchPolicies, error) {
-	prefix := c.transport.APIPrefix("proclassic", "")
-	var result PatchPolicies
-	endpoint := prefix + "/patchpolicies"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListPatchPolicies: %w", err)
-	}
-	return &result, nil
-}
-
 // GetPatchPolicyByIDSubset display subsets of information for a patch policy.
 //
-// Required privileges: read:pro:patch-policies.
+// Required privileges: patch-policies:read.
 //
 // Parameters:
 //   - id: ID to filter by.

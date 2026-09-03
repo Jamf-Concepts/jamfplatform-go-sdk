@@ -19,14 +19,12 @@ import (
 
 // ListMobileDevicesDetailV2 return paginated Mobile Device Inventory records.
 //
-// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 //
 // Parameters:
 //   - section: section of mobile device details, if not specified, General section data is returned. Multiple
 //     section parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING", "SECURITY",
-//     "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS", "CERTIFICATES", "PROFILES",
-//     "USER_PROFILES", "PROVISIONING_PROFILES", "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
+//     Allowed values: see the MobileDeviceSection constants.
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is displayName:asc. Multiple sort
 //     criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
@@ -112,7 +110,7 @@ func (c *Client) ListMobileDevicesDetailV2(ctx context.Context, section []string
 
 // ListMobileDevicesV2 get Mobile Device objects.
 //
-// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
@@ -145,7 +143,7 @@ func (c *Client) ListMobileDevicesV2(ctx context.Context, sort []string) ([]Mobi
 
 // GetMobileDeviceV2 get Mobile Device.
 //
-// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 //
 // Parameters:
 //   - id: instance id of mobile device record.
@@ -161,7 +159,7 @@ func (c *Client) GetMobileDeviceV2(ctx context.Context, id string) (*MobileDevic
 
 // PatchMobileDeviceV2 update fields on a mobile device that are allowed to be modified by users.
 //
-// Required privileges: update:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Update Mobile Devices.
+// Required privileges: devices:update. Legacy Jamf Pro privilege name(s): Update Mobile Devices.
 //
 // Parameters:
 //   - id: instance id of mobile device record.
@@ -177,7 +175,7 @@ func (c *Client) PatchMobileDeviceV2(ctx context.Context, id string, request *Up
 
 // GetMobileDeviceDetailV2 get Mobile Device.
 //
-// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 //
 // Parameters:
 //   - id: instance id of mobile device record.
@@ -193,7 +191,7 @@ func (c *Client) GetMobileDeviceDetailV2(ctx context.Context, id string) (*Mobil
 
 // EraseMobileDeviceV2 erase a Mobile Device.
 //
-// Required privileges: execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Send Mobile Device Remote Wipe Command.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Send Mobile Device Remote Wipe Command.
 //
 // Parameters:
 //   - id: Id of the Mobile Device to erase.
@@ -209,15 +207,13 @@ func (c *Client) EraseMobileDeviceV2(ctx context.Context, id string, request *Er
 
 // ListMobileDevicePairedDevicesV2 return paginated Mobile Device Inventory records of all paired devices for the device.
 //
-// Required privileges: read:pro:mobile-devices. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
+// Required privileges: devices:read. Legacy Jamf Pro privilege name(s): Read Mobile Devices.
 //
 // Parameters:
 //   - id: instance id of mobile device record.
 //   - section: section of mobile device details, if not specified, Paired Devices section data is returned.
 //     Multiple section parameters are supported, e.g. section=GENERAL&section=HARDWARE.
-//     Allowed values: "GENERAL", "HARDWARE", "USER_AND_LOCATION", "PURCHASING", "SECURITY",
-//     "APPLICATIONS", "EBOOKS", "NETWORK", "SERVICE_SUBSCRIPTIONS", "CERTIFICATES", "PROFILES",
-//     "USER_PROFILES", "PROVISIONING_PROFILES", "SHARED_USERS", "GROUPS", "EXTENSION_ATTRIBUTES".
+//     Allowed values: see the MobileDeviceSection constants.
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is displayName:asc. Multiple sort
 //     criteria are supported and must be separated with a comma.
 //     Fields allowed in the sort: `airPlayPassword`, `appAnalyticsEnabled`, `assetTag`,
@@ -300,7 +296,7 @@ func (c *Client) ListMobileDevicePairedDevicesV2(ctx context.Context, id string,
 
 // UnmanageMobileDeviceV2 unmanage a Mobile Device.
 //
-// Required privileges: execute:pro:mobile-device-commands. Legacy Jamf Pro privilege name(s): Unmanage Mobile Devices.
+// Required privileges: destructive-device-actions:execute. Legacy Jamf Pro privilege name(s): Unmanage Mobile Devices.
 //
 // Parameters:
 //   - id: Id of the mobile device to remove the MDM profile from.

@@ -13,7 +13,7 @@ import (
 
 func TestGetJamfConnectSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -28,7 +28,7 @@ func TestGetJamfConnectSettingsV1(t *testing.T) {
 
 func TestListJamfConnectConfigProfilesV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -50,7 +50,7 @@ func TestListJamfConnectConfigProfilesV1(t *testing.T) {
 
 func TestUpdateJamfConnectConfigProfileV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/config-profiles/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/config-profiles/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -68,7 +68,7 @@ func TestUpdateJamfConnectConfigProfileV1(t *testing.T) {
 
 func TestListJamfConnectDeploymentTasksV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/deployments/test-id/tasks", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/deployments/test-id/tasks", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -90,7 +90,7 @@ func TestListJamfConnectDeploymentTasksV1(t *testing.T) {
 
 func TestRetryJamfConnectDeploymentTasksV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/deployments/test-id/tasks/retry", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/deployments/test-id/tasks/retry", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestRetryJamfConnectDeploymentTasksV1(t *testing.T) {
 
 func TestListJamfConnectHistoryV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -127,7 +127,7 @@ func TestListJamfConnectHistoryV1(t *testing.T) {
 
 func TestCreateJamfConnectHistoryNoteV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -145,7 +145,7 @@ func TestCreateJamfConnectHistoryNoteV1(t *testing.T) {
 
 func TestResolveJamfConnectConfigProfileV1IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -168,7 +168,7 @@ func TestResolveJamfConnectConfigProfileV1IDByName(t *testing.T) {
 
 func TestResolveJamfConnectConfigProfileV1ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/jamf-connect/config-profiles", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

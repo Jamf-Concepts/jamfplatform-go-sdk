@@ -13,7 +13,7 @@ import (
 
 // IssueTomcatSslCertificate generate a SSL Certificate using Jamf Certificate Authority.
 //
-// Required privileges: update:pro:apache-tomcat-settings. Legacy Jamf Pro privilege name(s): Update Apache Tomcat Settings.
+// Required privileges: apache-tomcat-settings:update. Legacy Jamf Pro privilege name(s): Update Apache Tomcat Settings.
 func (c *Client) IssueTomcatSslCertificate(ctx context.Context) error {
 	prefix := c.transport.APIPrefix("pro", "")
 	endpoint := prefix + "/settings/issueTomcatSslCertificate"

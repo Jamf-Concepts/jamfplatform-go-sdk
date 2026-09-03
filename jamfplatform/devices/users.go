@@ -18,7 +18,7 @@ import (
 
 // ListDevicesForUser get devices for a user.
 //
-// Required privileges: read:pro:devices.
+// Required privileges: devices:read.
 //
 // Parameters:
 //   - userID: The ID of the user, in UUID format.

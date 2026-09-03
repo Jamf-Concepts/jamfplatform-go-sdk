@@ -19,7 +19,7 @@ import (
 
 // ListPatchPoliciesV2 retrieve Patch Policies.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
@@ -60,7 +60,7 @@ func (c *Client) ListPatchPoliciesV2(ctx context.Context, sort []string, filter 
 
 // ListPatchPolicyDetailsV2 retrieve Patch Policies.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria
@@ -102,7 +102,7 @@ func (c *Client) ListPatchPolicyDetailsV2(ctx context.Context, sort []string, fi
 
 // GetPatchPolicyDashboardStatusV2 return whether or not the requested patch policy is on the dashboard.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.
@@ -118,7 +118,7 @@ func (c *Client) GetPatchPolicyDashboardStatusV2(ctx context.Context, id string)
 
 // AddPatchPolicyToDashboardV2 add a patch policy to the dashboard.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.
@@ -133,7 +133,7 @@ func (c *Client) AddPatchPolicyToDashboardV2(ctx context.Context, id string) err
 
 // RemovePatchPolicyFromDashboardV2 remove a patch policy from the dashboard.
 //
-// Required privileges: read:pro:patch-policies. Legacy Jamf Pro privilege name(s): Read Patch Policies.
+// Required privileges: patch-policies:read. Legacy Jamf Pro privilege name(s): Read Patch Policies.
 //
 // Parameters:
 //   - id: patch policy id.

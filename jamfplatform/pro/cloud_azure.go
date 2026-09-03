@@ -14,7 +14,7 @@ import (
 
 // CreateCloudAzureV1 create Azure Cloud Identity Provider configuration.
 //
-// Required privileges: create:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
+// Required privileges: ldap-servers:create. Legacy Jamf Pro privilege name(s): Create LDAP Servers.
 func (c *Client) CreateCloudAzureV1(ctx context.Context, request *AzureConfigurationRequest) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -27,7 +27,7 @@ func (c *Client) CreateCloudAzureV1(ctx context.Context, request *AzureConfigura
 
 // GetCloudAzureDefaultServerConfigurationV1 get default server configuration.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) GetCloudAzureDefaultServerConfigurationV1(ctx context.Context) (*AzureServerConfiguration, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result AzureServerConfiguration
@@ -40,7 +40,7 @@ func (c *Client) GetCloudAzureDefaultServerConfigurationV1(ctx context.Context) 
 
 // GetCloudAzureV1 get Azure Cloud Identity Provider configuration with given ID.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -56,7 +56,7 @@ func (c *Client) GetCloudAzureV1(ctx context.Context, id string) (*AzureConfigur
 
 // UpdateCloudAzureV1 update Azure Cloud Identity Provider configuration.
 //
-// Required privileges: update:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
+// Required privileges: ldap-servers:update. Legacy Jamf Pro privilege name(s): Update LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -72,7 +72,7 @@ func (c *Client) UpdateCloudAzureV1(ctx context.Context, id string, request *Azu
 
 // DeleteCloudAzureV1 delete Cloud Identity Provider configuration.
 //
-// Required privileges: delete:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Delete LDAP Servers.
+// Required privileges: ldap-servers:delete. Legacy Jamf Pro privilege name(s): Delete LDAP Servers.
 //
 // Parameters:
 //   - id: Cloud Identity Provider identifier.
@@ -83,4 +83,19 @@ func (c *Client) DeleteCloudAzureV1(ctx context.Context, id string) error {
 		return fmt.Errorf("DeleteCloudAzureV1(%s): %w", id, err)
 	}
 	return nil
+}
+
+// GetCloudAzureDefaultMappingsV1 get default mappings.
+//
+// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-05-21) and may be removed in a future release.
+//
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+func (c *Client) GetCloudAzureDefaultMappingsV1(ctx context.Context) (*AzureMappings, error) {
+	prefix := c.transport.APIPrefix("pro", "v1")
+	var result AzureMappings
+	endpoint := prefix + "/cloud-azure/defaults/mappings"
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetCloudAzureDefaultMappingsV1: %w", err)
+	}
+	return &result, nil
 }

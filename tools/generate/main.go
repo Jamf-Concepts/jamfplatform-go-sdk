@@ -52,6 +52,7 @@ func main() {
 	}
 
 	emittedTypes := make(map[string]bool) // dedup types across root-package specs
+	var rootTypes []GoType                // every type emitted to the root package, fields included
 	pkgBuckets := make(map[string][]loadedSpec)
 	hasSourceSpecs := true
 	for _, spec := range cfg.Specs {
@@ -63,7 +64,7 @@ func main() {
 			hasSourceSpecs = false
 		}
 		if spec.Package == "" {
-			if err := processSpec(*rootDir, cfg, spec, specPath, usedFallback, emittedTypes); err != nil {
+			if err := processSpec(*rootDir, cfg, spec, specPath, usedFallback, emittedTypes, &rootTypes); err != nil {
 				log.Fatalf("spec %s: %v", spec.File, err)
 			}
 		} else {
@@ -87,9 +88,23 @@ func main() {
 	// Only publish filtered specs when source specs are available.
 	// In CI the source specs are private; the generator reads from the
 	// already-published api/ specs and only regenerates Go code.
+	publishedSpecs := false
 	if cfg.SpecDir != "" && hasSourceSpecs {
 		if err := publishSpecs(*rootDir, cfg); err != nil {
 			log.Fatalf("publishing specs: %v", err)
+		}
+		publishedSpecs = true
+	}
+
+	// Delete generated files this run did not write. Must come after every
+	// emitter, since a file is only stale once nothing has claimed it. Specs are
+	// pruned only when they were actually republished — see pruneStaleSpecs.
+	if err := pruneStale(*rootDir); err != nil {
+		log.Fatalf("pruning stale generated files: %v", err)
+	}
+	if publishedSpecs {
+		if err := pruneStaleSpecs(*rootDir, cfg.SpecDir); err != nil {
+			log.Fatalf("pruning stale published specs: %v", err)
 		}
 	}
 	log.Println("generation complete")

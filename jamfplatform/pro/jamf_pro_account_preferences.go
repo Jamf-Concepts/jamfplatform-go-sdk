@@ -11,24 +11,9 @@ import (
 	"net/http"
 )
 
-// GetAccountPreferencesV2 get Jamf Pro account preferences.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: none (callable by any authenticated API client).
-func (c *Client) GetAccountPreferencesV2(ctx context.Context) (*AccountPreferencesV5, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result AccountPreferencesV5
-	endpoint := prefix + "/account-preferences"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetAccountPreferencesV2: %w", err)
-	}
-	return &result, nil
-}
-
 // GetAccountPreferencesV3 get Jamf Pro account preferences.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferencesV6, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result AccountPreferencesV6
@@ -39,24 +24,9 @@ func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferenc
 	return &result, nil
 }
 
-// UpdateAccountPreferencesV2 update Jamf Pro account preferences.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2025-06-30) and may be removed in a future release.
-//
-// Required privileges: none (callable by any authenticated API client).
-func (c *Client) UpdateAccountPreferencesV2(ctx context.Context, request *AccountPreferencesV5) (*AccountPreferencesV5, error) {
-	prefix := c.transport.APIPrefix("pro", "v2")
-	var result AccountPreferencesV5
-	endpoint := prefix + "/account-preferences"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateAccountPreferencesV2: %w", err)
-	}
-	return &result, nil
-}
-
 // UpdateAccountPreferencesV3 update Jamf Pro account preferences.
 //
-// Required privileges: none (callable by any authenticated API client).
+// Required privileges: the spec declares none.
 func (c *Client) UpdateAccountPreferencesV3(ctx context.Context, request *AccountPreferencesV6) error {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := prefix + "/account-preferences"

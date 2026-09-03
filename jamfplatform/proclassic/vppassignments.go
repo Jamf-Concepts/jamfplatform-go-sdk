@@ -14,7 +14,7 @@ import (
 
 // GetVPPAssignmentByID finds VPP Assignment by ID.
 //
-// Required privileges: read:pro:vpp-assignment.
+// Required privileges: volume-purchasing-locations:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetVPPAssignmentByID(ctx context.Context, id string) (*VppAssig
 
 // CreateVPPAssignmentByID creates a new VPP assignment by ID.
 //
-// Required privileges: create:pro:vpp-assignment.
+// Required privileges: volume-purchasing-locations:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -46,7 +46,7 @@ func (c *Client) CreateVPPAssignmentByID(ctx context.Context, id string, request
 
 // UpdateVPPAssignmentByID updates a VPP assignment by ID.
 //
-// Required privileges: update:pro:vpp-assignment.
+// Required privileges: volume-purchasing-locations:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -61,7 +61,7 @@ func (c *Client) UpdateVPPAssignmentByID(ctx context.Context, id string, request
 
 // DeleteVPPAssignmentByID deletes a VPP assignment by ID.
 //
-// Required privileges: delete:pro:vpp-assignment.
+// Required privileges: volume-purchasing-locations:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -76,7 +76,7 @@ func (c *Client) DeleteVPPAssignmentByID(ctx context.Context, id string) error {
 
 // ListVPPAssignments finds all VPP Assignments.
 //
-// Required privileges: read:pro:vpp-assignment.
+// Required privileges: volume-purchasing-locations:read.
 func (c *Client) ListVPPAssignments(ctx context.Context) (*VppAssignments, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAssignments

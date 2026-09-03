@@ -357,7 +357,7 @@ func TestAcceptance_Pro_Core_ScriptCRUD(t *testing.T) {
 
 	created, err := p.CreateScriptV1(ctx, &pro.Script{
 		Name:           name,
-		ScriptContents: ptr("#!/bin/sh\necho initial\n"),
+		ScriptContents: new("#!/bin/sh\necho initial\n"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -418,7 +418,7 @@ func TestAcceptance_Pro_Core_ScriptHistoryV1(t *testing.T) {
 
 	created, err := p.CreateScriptV1(ctx, &pro.Script{
 		Name:           "sdk-acc-script-hist-" + runSuffix(),
-		ScriptContents: ptr("#!/bin/sh\necho hist\n"),
+		ScriptContents: new("#!/bin/sh\necho hist\n"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -445,7 +445,8 @@ func TestAcceptance_Pro_Core_ScriptHistoryV1(t *testing.T) {
 	t.Logf("Script %s history has %d entries", created.ID, len(hist))
 }
 
-func ptr[T any](v T) *T { return &v }
+//go:fix inline
+func ptr[T any](v T) *T { return new(v) }
 
 func derefStrPtr(p *string) string {
 	if p == nil {

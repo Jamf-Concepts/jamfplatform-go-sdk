@@ -14,7 +14,7 @@ import (
 
 // SearchLdapGroupsPreview retrieve the configured access groups that contain the text in the search param.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - q: Will perform a "contains" search on the names of access groups.
@@ -37,7 +37,7 @@ func (c *Client) SearchLdapGroupsPreview(ctx context.Context, q string) (*LdapGr
 
 // ListLdapServersPreview retrieve all Servers including LDAP and Cloud Identity Providers.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListLdapServersPreview(ctx context.Context) ([]LdapServer, error) {
 	prefix := c.transport.APIPrefix("pro", "")
 	var result []LdapServer
@@ -50,7 +50,7 @@ func (c *Client) ListLdapServersPreview(ctx context.Context) ([]LdapServer, erro
 
 // SearchLdapGroupsV1 retrieve the configured access groups that contain the text in the search param.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 //
 // Parameters:
 //   - q: Will perform a "contains" search on the names of access groups.
@@ -73,7 +73,7 @@ func (c *Client) SearchLdapGroupsV1(ctx context.Context, q string) (*LdapGroupSe
 
 // ListLdapLdapServersV1 retrieve all LDAP Servers.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListLdapLdapServersV1(ctx context.Context) ([]LdapServer, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []LdapServer
@@ -86,7 +86,7 @@ func (c *Client) ListLdapLdapServersV1(ctx context.Context) ([]LdapServer, error
 
 // ListLdapServersV1 retrieve all Servers including LDAP and Cloud Identity Providers.
 //
-// Required privileges: read:pro:ldap-servers. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
+// Required privileges: ldap-servers:read. Legacy Jamf Pro privilege name(s): Read LDAP Servers.
 func (c *Client) ListLdapServersV1(ctx context.Context) ([]LdapServer, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []LdapServer

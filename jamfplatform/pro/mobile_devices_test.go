@@ -13,7 +13,7 @@ import (
 
 func TestListMobileDevicesDetailV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -35,7 +35,7 @@ func TestListMobileDevicesDetailV2(t *testing.T) {
 
 func TestListMobileDevicesV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -57,7 +57,7 @@ func TestListMobileDevicesV2(t *testing.T) {
 
 func TestGetMobileDeviceV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -75,7 +75,7 @@ func TestGetMobileDeviceV2(t *testing.T) {
 
 func TestGetMobileDeviceV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -91,7 +91,7 @@ func TestGetMobileDeviceV2_NotFound(t *testing.T) {
 
 func TestPatchMobileDeviceV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
@@ -109,7 +109,7 @@ func TestPatchMobileDeviceV2(t *testing.T) {
 
 func TestGetMobileDeviceDetailV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -127,7 +127,7 @@ func TestGetMobileDeviceDetailV2(t *testing.T) {
 
 func TestGetMobileDeviceDetailV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id/detail", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id/detail", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -143,7 +143,7 @@ func TestGetMobileDeviceDetailV2_NotFound(t *testing.T) {
 
 func TestEraseMobileDeviceV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id/erase", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -161,7 +161,7 @@ func TestEraseMobileDeviceV2(t *testing.T) {
 
 func TestListMobileDevicePairedDevicesV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id/paired-devices", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id/paired-devices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -183,7 +183,7 @@ func TestListMobileDevicePairedDevicesV2(t *testing.T) {
 
 func TestUnmanageMobileDeviceV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id/unmanage", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id/unmanage", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -201,7 +201,7 @@ func TestUnmanageMobileDeviceV2(t *testing.T) {
 
 func TestUnmanageMobileDeviceV2_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/test-id/unmanage", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/test-id/unmanage", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -217,7 +217,7 @@ func TestUnmanageMobileDeviceV2_NotFound(t *testing.T) {
 
 func TestResolveMobileDeviceDetailV2IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -240,7 +240,7 @@ func TestResolveMobileDeviceDetailV2IDByName(t *testing.T) {
 
 func TestResolveMobileDeviceDetailV2ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -263,7 +263,7 @@ func TestResolveMobileDeviceDetailV2ByName(t *testing.T) {
 
 func TestResolveMobileDeviceDetailV2IDBySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -286,7 +286,7 @@ func TestResolveMobileDeviceDetailV2IDBySerialNumber(t *testing.T) {
 
 func TestResolveMobileDeviceDetailV2BySerialNumber(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -309,7 +309,7 @@ func TestResolveMobileDeviceDetailV2BySerialNumber(t *testing.T) {
 
 func TestResolveMobileDeviceDetailV2IDByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -332,7 +332,7 @@ func TestResolveMobileDeviceDetailV2IDByUDID(t *testing.T) {
 
 func TestResolveMobileDeviceDetailV2ByUDID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/mobile-devices/detail", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}

@@ -16,7 +16,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:read.
 func (c *Client) ListSavedSearches(ctx context.Context) (*SavedSearches, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SavedSearches
@@ -31,7 +31,7 @@ func (c *Client) ListSavedSearches(ctx context.Context) (*SavedSearches, error) 
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) GetSavedSearchByID(ctx context.Context, id string) (*SavedSearc
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:advanced-computer-searches.
+// Required privileges: advanced-device-searches:read.
 //
 // Parameters:
 //   - name: Name to filter by.

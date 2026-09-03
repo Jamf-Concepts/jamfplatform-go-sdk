@@ -14,7 +14,7 @@ import (
 
 // GetVPPAccountByID finds VPP Account by ID.
 //
-// Required privileges: read:pro:volume-purchasing-locations.
+// Required privileges: volume-purchasing-locations:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -30,7 +30,7 @@ func (c *Client) GetVPPAccountByID(ctx context.Context, id string) (*VppAccount,
 
 // CreateVPPAccountByID creates a new VPP account by ID.
 //
-// Required privileges: create:pro:volume-purchasing-locations.
+// Required privileges: volume-purchasing-locations:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -46,7 +46,7 @@ func (c *Client) CreateVPPAccountByID(ctx context.Context, id string, request *V
 
 // UpdateVPPAccountByID updates a VPP account by ID.
 //
-// Required privileges: update:pro:volume-purchasing-locations.
+// Required privileges: volume-purchasing-locations:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -61,7 +61,7 @@ func (c *Client) UpdateVPPAccountByID(ctx context.Context, id string, request *V
 
 // DeleteVPPAccountByID deletes a VPP account by ID.
 //
-// Required privileges: delete:pro:volume-purchasing-locations.
+// Required privileges: volume-purchasing-locations:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -76,7 +76,7 @@ func (c *Client) DeleteVPPAccountByID(ctx context.Context, id string) error {
 
 // ListVPPAccounts finds all VPP Accounts.
 //
-// Required privileges: read:pro:volume-purchasing-locations.
+// Required privileges: volume-purchasing-locations:read.
 func (c *Client) ListVPPAccounts(ctx context.Context) (*VppAccounts, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result VppAccounts

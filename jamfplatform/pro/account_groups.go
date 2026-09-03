@@ -19,7 +19,7 @@ import (
 
 // ListAccountGroupsV1 get account groups.
 //
-// Required privileges: read:pro:account-groups. Legacy Jamf Pro privilege name(s): Read Account Groups.
+// Required privileges: account-groups:read. Legacy Jamf Pro privilege name(s): Read Account Groups.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
@@ -59,7 +59,7 @@ func (c *Client) ListAccountGroupsV1(ctx context.Context, sort []string, filter 
 
 // GetAccountGroupV1 gets the account group.
 //
-// Required privileges: read:pro:account-groups. Legacy Jamf Pro privilege name(s): Read Account Groups.
+// Required privileges: account-groups:read. Legacy Jamf Pro privilege name(s): Read Account Groups.
 //
 // Parameters:
 //   - id: id of target account group.

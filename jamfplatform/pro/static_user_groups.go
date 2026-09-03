@@ -15,7 +15,7 @@ import (
 
 // ListStaticUserGroupsV1 return a list of all Static User Groups.
 //
-// Required privileges: read:pro:user-groups. Legacy Jamf Pro privilege name(s): Read Static User Groups.
+// Required privileges: user-groups:read. Legacy Jamf Pro privilege name(s): Read Static User Groups.
 func (c *Client) ListStaticUserGroupsV1(ctx context.Context) ([]StaticUserGroup, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result []StaticUserGroup
@@ -28,7 +28,7 @@ func (c *Client) ListStaticUserGroupsV1(ctx context.Context) ([]StaticUserGroup,
 
 // GetStaticUserGroupV1 return a specific Static User Group by id.
 //
-// Required privileges: read:pro:user-groups. Legacy Jamf Pro privilege name(s): Read Static User Groups.
+// Required privileges: user-groups:read. Legacy Jamf Pro privilege name(s): Read Static User Groups.
 //
 // Parameters:
 //   - id: Instance id of static user group record.

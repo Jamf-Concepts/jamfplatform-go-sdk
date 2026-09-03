@@ -14,7 +14,7 @@ import (
 
 // GetConditionalAccessFeatureToggleV1 retrieves Status of the Feature Toggle.
 //
-// Required privileges: read:pro:conditional-access. Legacy Jamf Pro privilege name(s): Read Conditional Access.
+// Required privileges: conditional-access:read. Legacy Jamf Pro privilege name(s): Read Conditional Access.
 func (c *Client) GetConditionalAccessFeatureToggleV1(ctx context.Context) (*SharedDeviceComplianceFeatureToggle, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result SharedDeviceComplianceFeatureToggle
@@ -27,7 +27,7 @@ func (c *Client) GetConditionalAccessFeatureToggleV1(ctx context.Context) (*Shar
 
 // GetConditionalAccessComputerComplianceV1 get compliance information for a single computer device.
 //
-// Required privileges: read:pro:device-compliance-information. Legacy Jamf Pro privilege name(s): Read Device Compliance Information.
+// Required privileges: device-compliance-information:read. Legacy Jamf Pro privilege name(s): Read Device Compliance Information.
 //
 // Parameters:
 //   - deviceID: ID of the device the query pertains.
@@ -43,7 +43,7 @@ func (c *Client) GetConditionalAccessComputerComplianceV1(ctx context.Context, d
 
 // GetConditionalAccessMobileComplianceV1 get compliance information for a single mobile device.
 //
-// Required privileges: read:pro:device-compliance-information. Legacy Jamf Pro privilege name(s): Read Device Compliance Information.
+// Required privileges: device-compliance-information:read. Legacy Jamf Pro privilege name(s): Read Device Compliance Information.
 //
 // Parameters:
 //   - deviceID: ID of the device the query pertains.

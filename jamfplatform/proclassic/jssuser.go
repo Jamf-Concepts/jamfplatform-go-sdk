@@ -15,7 +15,7 @@ import (
 //
 // Deprecated: this endpoint is marked deprecated in the Jamf API spec and may be removed in a future release.
 //
-// Required privileges: read:pro:accounts.
+// Required privileges: accounts:read.
 func (c *Client) GetJSSUser(ctx context.Context) (*JssUser, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result JssUser

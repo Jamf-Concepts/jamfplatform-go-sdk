@@ -17,7 +17,7 @@ import (
 
 // GetSoftwareUpdateServerByID finds software update servers by ID.
 //
-// Required privileges: read:pro:software-update-servers.
+// Required privileges: software-update-servers:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetSoftwareUpdateServerByID(ctx context.Context, id string) (*S
 
 // CreateSoftwareUpdateServerByID creates a new software update server by ID.
 //
-// Required privileges: create:pro:software-update-servers.
+// Required privileges: software-update-servers:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateSoftwareUpdateServerByID(ctx context.Context, id string, 
 
 // UpdateSoftwareUpdateServerByID updates an existing software update server by ID.
 //
-// Required privileges: update:pro:software-update-servers.
+// Required privileges: software-update-servers:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateSoftwareUpdateServerByID(ctx context.Context, id string, 
 
 // DeleteSoftwareUpdateServerByID deletes a software update server by ID.
 //
-// Required privileges: delete:pro:software-update-servers.
+// Required privileges: software-update-servers:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteSoftwareUpdateServerByID(ctx context.Context, id string) 
 
 // GetSoftwareUpdateServerByName finds software update servers by name.
 //
-// Required privileges: read:pro:software-update-servers.
+// Required privileges: software-update-servers:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetSoftwareUpdateServerByName(ctx context.Context, name string)
 
 // UpdateSoftwareUpdateServerByName updates an existing software update server by name.
 //
-// Required privileges: update:pro:software-update-servers.
+// Required privileges: software-update-servers:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateSoftwareUpdateServerByName(ctx context.Context, name stri
 
 // DeleteSoftwareUpdateServerByName deletes a software update server by name.
 //
-// Required privileges: delete:pro:software-update-servers.
+// Required privileges: software-update-servers:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteSoftwareUpdateServerByName(ctx context.Context, name stri
 
 // ListSoftwareUpdateServers finds all software update servers.
 //
-// Required privileges: read:pro:software-update-servers.
+// Required privileges: software-update-servers:read.
 func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdateServers, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result SoftwareUpdateServers
@@ -138,7 +138,7 @@ func (c *Client) ListSoftwareUpdateServers(ctx context.Context) (*SoftwareUpdate
 
 // CreateSoftwareUpdateServerByName creates a new software update server by ID.
 //
-// Required privileges: create:pro:software-update-servers.
+// Required privileges: software-update-servers:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

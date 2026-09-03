@@ -13,7 +13,7 @@ import (
 
 func TestGetADUESessionTokenSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/adue-session-token-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/adue-session-token-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetADUESessionTokenSettingsV1(t *testing.T) {
 
 func TestGetADUESessionTokenSettingsV1_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/adue-session-token-settings", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v1/adue-session-token-settings", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -47,7 +47,7 @@ func TestGetADUESessionTokenSettingsV1_NotFound(t *testing.T) {
 
 func TestUpdateADUESessionTokenSettingsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v1/adue-session-token-settings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v1/adue-session-token-settings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -65,7 +65,7 @@ func TestUpdateADUESessionTokenSettingsV1(t *testing.T) {
 
 func TestListEnrollmentHistoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/enrollment/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/enrollment/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -87,7 +87,7 @@ func TestListEnrollmentHistoryV2(t *testing.T) {
 
 func TestCreateEnrollmentHistoryNoteV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/enrollment/history", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/enrollment/history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -105,7 +105,7 @@ func TestCreateEnrollmentHistoryNoteV2(t *testing.T) {
 
 func TestExportEnrollmentHistoryV2(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v2/enrollment/history/export", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v2/enrollment/history/export", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -123,7 +123,7 @@ func TestExportEnrollmentHistoryV2(t *testing.T) {
 
 func TestListEnrollmentAccessGroupsV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -145,7 +145,7 @@ func TestListEnrollmentAccessGroupsV3(t *testing.T) {
 
 func TestCreateEnrollmentAccessGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -163,7 +163,7 @@ func TestCreateEnrollmentAccessGroupV3(t *testing.T) {
 
 func TestGetEnrollmentAccessGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -181,7 +181,7 @@ func TestGetEnrollmentAccessGroupV3(t *testing.T) {
 
 func TestGetEnrollmentAccessGroupV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -197,7 +197,7 @@ func TestGetEnrollmentAccessGroupV3_NotFound(t *testing.T) {
 
 func TestUpdateEnrollmentAccessGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -215,7 +215,7 @@ func TestUpdateEnrollmentAccessGroupV3(t *testing.T) {
 
 func TestDeleteEnrollmentAccessGroupV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -230,7 +230,7 @@ func TestDeleteEnrollmentAccessGroupV3(t *testing.T) {
 
 func TestListFilteredEnrollmentLanguageCodesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/filtered-language-codes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/filtered-language-codes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -248,7 +248,7 @@ func TestListFilteredEnrollmentLanguageCodesV3(t *testing.T) {
 
 func TestListFilteredEnrollmentLanguageCodesV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/filtered-language-codes", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/filtered-language-codes", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -264,7 +264,7 @@ func TestListFilteredEnrollmentLanguageCodesV3_NotFound(t *testing.T) {
 
 func TestListEnrollmentLanguageCodesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/language-codes", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/language-codes", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -282,7 +282,7 @@ func TestListEnrollmentLanguageCodesV3(t *testing.T) {
 
 func TestListEnrollmentLanguageCodesV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/language-codes", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/language-codes", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -298,7 +298,7 @@ func TestListEnrollmentLanguageCodesV3_NotFound(t *testing.T) {
 
 func TestListEnrollmentLanguagesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -320,7 +320,7 @@ func TestListEnrollmentLanguagesV3(t *testing.T) {
 
 func TestDeleteMultipleEnrollmentLanguagesV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages/delete-multiple", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -335,7 +335,7 @@ func TestDeleteMultipleEnrollmentLanguagesV3(t *testing.T) {
 
 func TestGetEnrollmentLanguageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -353,7 +353,7 @@ func TestGetEnrollmentLanguageV3(t *testing.T) {
 
 func TestGetEnrollmentLanguageV3_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -369,7 +369,7 @@ func TestGetEnrollmentLanguageV3_NotFound(t *testing.T) {
 
 func TestUpdateEnrollmentLanguageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -387,7 +387,7 @@ func TestUpdateEnrollmentLanguageV3(t *testing.T) {
 
 func TestDeleteEnrollmentLanguageV3(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -402,7 +402,7 @@ func TestDeleteEnrollmentLanguageV3(t *testing.T) {
 
 func TestGetEnrollmentSettingsV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/enrollment", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v4/enrollment", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -420,7 +420,7 @@ func TestGetEnrollmentSettingsV4(t *testing.T) {
 
 func TestGetEnrollmentSettingsV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/enrollment", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v4/enrollment", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -436,7 +436,7 @@ func TestGetEnrollmentSettingsV4_NotFound(t *testing.T) {
 
 func TestUpdateEnrollmentSettingsV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/enrollment", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v4/enrollment", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}
@@ -454,7 +454,7 @@ func TestUpdateEnrollmentSettingsV4(t *testing.T) {
 
 func TestGetEnrollmentAccessManagementV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/enrollment/access-management", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v4/enrollment/access-management", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -472,7 +472,7 @@ func TestGetEnrollmentAccessManagementV4(t *testing.T) {
 
 func TestGetEnrollmentAccessManagementV4_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/enrollment/access-management", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/pro/v4/enrollment/access-management", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(t, w, http.StatusNotFound, map[string]any{
 			"httpStatus": 404,
 			"traceId":    "trace-nf",
@@ -488,7 +488,7 @@ func TestGetEnrollmentAccessManagementV4_NotFound(t *testing.T) {
 
 func TestUpdateEnrollmentAccessManagementV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v4/enrollment/access-management", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v4/enrollment/access-management", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -506,7 +506,7 @@ func TestUpdateEnrollmentAccessManagementV4(t *testing.T) {
 
 func TestResolveEnrollmentAccessGroupV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -529,7 +529,7 @@ func TestResolveEnrollmentAccessGroupV3IDByName(t *testing.T) {
 
 func TestResolveEnrollmentAccessGroupV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -552,7 +552,7 @@ func TestResolveEnrollmentAccessGroupV3ByName(t *testing.T) {
 
 func TestResolveEnrollmentLanguageV3IDByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -575,7 +575,7 @@ func TestResolveEnrollmentLanguageV3IDByName(t *testing.T) {
 
 func TestResolveEnrollmentLanguageV3ByName(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/pro/v3/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/languages", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -599,7 +599,7 @@ func TestResolveEnrollmentLanguageV3ByName(t *testing.T) {
 func TestApplyEnrollmentAccessGroupV3_Create(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List and create share the same path — single handler dispatches on method.
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -631,7 +631,7 @@ func TestApplyEnrollmentAccessGroupV3_Create(t *testing.T) {
 func TestApplyEnrollmentAccessGroupV3_Update(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	// List returns a match → resolver succeeds → apply updates.
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -642,7 +642,7 @@ func TestApplyEnrollmentAccessGroupV3_Update(t *testing.T) {
 			"totalCount": 1,
 		})
 	})
-	mux.HandleFunc("/api/pro/v3/enrollment/access-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/pro/v3/enrollment/access-groups/existing-id", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(t, w, 200, map[string]any{"id": "existing-id"})
 	})
 

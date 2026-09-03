@@ -15,7 +15,7 @@ import (
 
 // ListBenchmarks returns list of tenant benchmarks.
 //
-// Required privileges: read:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:read.
 func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, error) {
 	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result BenchmarksResponseV2
@@ -28,7 +28,7 @@ func (c *Client) ListBenchmarks(ctx context.Context) (*BenchmarksResponseV2, err
 
 // CreateBenchmark creates a new benchmark from provided benchmark request.
 //
-// Required privileges: create:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:create.
 func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV2) (*BenchmarkResponseV2, error) {
 	prefix := c.transport.APIPrefix("compliance-benchmarks", "v1")
 	var result BenchmarkResponseV2
@@ -41,7 +41,7 @@ func (c *Client) CreateBenchmark(ctx context.Context, request *BenchmarkRequestV
 
 // GetBenchmark returns benchmark for given benchmark ID.
 //
-// Required privileges: read:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:read.
 //
 // Parameters:
 //   - id: Given benchmark ID.
@@ -57,7 +57,7 @@ func (c *Client) GetBenchmark(ctx context.Context, id string) (*BenchmarkRespons
 
 // DeleteBenchmark removes benchmark with given benchmark ID.
 //
-// Required privileges: delete:pro:compliance-benchmarks.
+// Required privileges: compliance-benchmarks:delete.
 //
 // Parameters:
 //   - id: Given benchmark ID.

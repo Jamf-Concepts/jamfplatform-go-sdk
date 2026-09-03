@@ -13,7 +13,7 @@ import (
 )
 
 func TestAcceptance_ListBaselines(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	baselines, err := compliancebenchmarks.New(c).ListBaselines(context.Background())
 	if err != nil {
@@ -31,7 +31,7 @@ func TestAcceptance_ListBaselines(t *testing.T) {
 }
 
 func TestAcceptance_GetBaselineRules(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -64,7 +64,7 @@ func TestAcceptance_GetBaselineRules(t *testing.T) {
 }
 
 func TestAcceptance_ListBenchmarks(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	benchmarks, err := compliancebenchmarks.New(c).ListBenchmarks(context.Background())
 	if err != nil {
@@ -78,7 +78,7 @@ func TestAcceptance_ListBenchmarks(t *testing.T) {
 }
 
 func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -105,10 +105,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 
 	// Build rule requests — enable first 5 rules (or fewer), including ODV values
 	var ruleRequests []compliancebenchmarks.RuleRequest
-	limit := 5
-	if len(rules.Rules) < limit {
-		limit = len(rules.Rules)
-	}
+	limit := min(len(rules.Rules), 5)
 	for _, r := range rules.Rules[:limit] {
 		rr := compliancebenchmarks.RuleRequest{
 			ID:      r.ID,
@@ -159,7 +156,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 }
 
 func TestAcceptance_Benchmark_Reporting(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -185,10 +182,7 @@ func TestAcceptance_Benchmark_Reporting(t *testing.T) {
 	}
 
 	var ruleRequests []compliancebenchmarks.RuleRequest
-	limit := 3
-	if len(rules.Rules) < limit {
-		limit = len(rules.Rules)
-	}
+	limit := min(len(rules.Rules), 3)
 	for _, r := range rules.Rules[:limit] {
 		rr := compliancebenchmarks.RuleRequest{
 			ID:      r.ID,

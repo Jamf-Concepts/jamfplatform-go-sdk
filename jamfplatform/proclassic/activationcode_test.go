@@ -13,7 +13,7 @@ import (
 
 func TestGetActivationCode(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/activationcode", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/activationcode", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetActivationCode(t *testing.T) {
 
 func TestGetActivationCode_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/activationcode", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/activationcode", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetActivationCode_NotFound(t *testing.T) {
 
 func TestUpdateActivationCode(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/activationcode", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/activationcode", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {
 			t.Errorf("method = %s, want PUT", r.Method)
 		}

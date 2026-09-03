@@ -13,7 +13,7 @@ import (
 
 func TestGetAllowedFileExtensionByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -31,7 +31,7 @@ func TestGetAllowedFileExtensionByID(t *testing.T) {
 
 func TestGetAllowedFileExtensionByID_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -43,7 +43,7 @@ func TestGetAllowedFileExtensionByID_NotFound(t *testing.T) {
 
 func TestCreateAllowedFileExtensionByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("method = %s, want POST", r.Method)
 		}
@@ -61,7 +61,7 @@ func TestCreateAllowedFileExtensionByID(t *testing.T) {
 
 func TestDeleteAllowedFileExtensionByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions/id/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Errorf("method = %s, want DELETE", r.Method)
 		}
@@ -76,7 +76,7 @@ func TestDeleteAllowedFileExtensionByID(t *testing.T) {
 
 func TestGetAllowedFileExtensionByExtension(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions/extension/test-id", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions/extension/test-id", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -94,7 +94,7 @@ func TestGetAllowedFileExtensionByExtension(t *testing.T) {
 
 func TestGetAllowedFileExtensionByExtension_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions/extension/test-id", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions/extension/test-id", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 
@@ -106,7 +106,7 @@ func TestGetAllowedFileExtensionByExtension_NotFound(t *testing.T) {
 
 func TestListAllowedFileExtensions(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
@@ -124,7 +124,7 @@ func TestListAllowedFileExtensions(t *testing.T) {
 
 func TestListAllowedFileExtensions_NotFound(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/api/proclassic/allowedfileextensions", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/proclassic/allowedfileextensions", func(w http.ResponseWriter, _ *http.Request) {
 		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
 	})
 

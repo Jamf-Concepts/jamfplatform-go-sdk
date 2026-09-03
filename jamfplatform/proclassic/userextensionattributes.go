@@ -17,7 +17,7 @@ import (
 
 // GetUserExtensionAttributeByID finds user extension attributes by ID.
 //
-// Required privileges: read:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetUserExtensionAttributeByID(ctx context.Context, id string) (
 
 // CreateUserExtensionAttributeByID creates a new user extension attribute by ID.
 //
-// Required privileges: create:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateUserExtensionAttributeByID(ctx context.Context, id string
 
 // UpdateUserExtensionAttributeByID updates an existing user extension attribute by ID.
 //
-// Required privileges: update:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateUserExtensionAttributeByID(ctx context.Context, id string
 
 // DeleteUserExtensionAttributeByID deletes a user extension attribute by ID.
 //
-// Required privileges: delete:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteUserExtensionAttributeByID(ctx context.Context, id string
 
 // GetUserExtensionAttributeByName finds user extension attributes by name.
 //
-// Required privileges: read:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetUserExtensionAttributeByName(ctx context.Context, name strin
 
 // UpdateUserExtensionAttributeByName updates an existing user extension attribute by name.
 //
-// Required privileges: update:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateUserExtensionAttributeByName(ctx context.Context, name st
 
 // DeleteUserExtensionAttributeByName deletes a user extension attribute by name.
 //
-// Required privileges: delete:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteUserExtensionAttributeByName(ctx context.Context, name st
 
 // ListUserExtensionAttributes finds all user extension attributes.
 //
-// Required privileges: read:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:read.
 func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensionAttributes, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserExtensionAttributes
@@ -138,7 +138,7 @@ func (c *Client) ListUserExtensionAttributes(ctx context.Context) (*UserExtensio
 
 // CreateUserExtensionAttributeByName creates a new user extension attribute by ID.
 //
-// Required privileges: create:pro:user-extension-attributes.
+// Required privileges: user-extension-attributes:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

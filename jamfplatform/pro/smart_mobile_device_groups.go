@@ -14,7 +14,7 @@ import (
 
 // RecalculateSmartMobileDeviceGroupV1 recalculate a smart group for the given id then return the ids for the devices in the smart group.
 //
-// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
+// Required privileges: device-groups:update. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
 //
 // Parameters:
 //   - id: instance id of smart group.
@@ -30,7 +30,7 @@ func (c *Client) RecalculateSmartMobileDeviceGroupV1(ctx context.Context, id str
 
 // RecalculateMobileDeviceSmartGroupsV1 recalculate all smart groups for the given device id and then return count of smart groups that device fall into.
 //
-// Required privileges: update:pro:mobile-device-groups. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
+// Required privileges: device-groups:update. Legacy Jamf Pro privilege name(s): Update Smart Mobile Device Groups.
 //
 // Parameters:
 //   - id: id of mobile device.

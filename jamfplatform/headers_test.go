@@ -40,7 +40,7 @@ func proxyStub(t *testing.T) (baseURL string, seen func() map[string]http.Header
 			t.Errorf("writing token response: %v", err)
 		}
 	})
-	mux.HandleFunc("/proxypath/api/pro/v1/buildings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/proxypath/pro/v1/buildings", func(w http.ResponseWriter, r *http.Request) {
 		record("api", r)
 		w.Header().Set("Content-Type", "application/json")
 		if _, err := w.Write([]byte(`{"totalCount":0,"results":[]}`)); err != nil {
@@ -79,7 +79,7 @@ func TestWithHeaders_ReachesTheWireThroughNewClient(t *testing.T) {
 	)
 
 	var out map[string]any
-	if err := c.Transport().Do(context.Background(), http.MethodGet, "/api/pro/v1/buildings", nil, &out); err != nil {
+	if err := c.Transport().Do(context.Background(), http.MethodGet, "/pro/v1/buildings", nil, &out); err != nil {
 		t.Fatalf("Do: %v", err)
 	}
 

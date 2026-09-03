@@ -17,7 +17,7 @@ import (
 
 // GetUserGroupByID finds user groups by ID.
 //
-// Required privileges: read:pro:user-groups.
+// Required privileges: user-groups:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetUserGroupByID(ctx context.Context, id string) (*UserGroup, e
 
 // CreateUserGroupByID creates user groups by ID.
 //
-// Required privileges: create:pro:user-groups.
+// Required privileges: user-groups:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -49,7 +49,7 @@ func (c *Client) CreateUserGroupByID(ctx context.Context, id string, request *Us
 
 // UpdateUserGroupByID updates user groups by ID.
 //
-// Required privileges: update:pro:user-groups.
+// Required privileges: user-groups:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -64,7 +64,7 @@ func (c *Client) UpdateUserGroupByID(ctx context.Context, id string, request *Us
 
 // DeleteUserGroupByID deletes user groups by ID.
 //
-// Required privileges: delete:pro:user-groups.
+// Required privileges: user-groups:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -79,7 +79,7 @@ func (c *Client) DeleteUserGroupByID(ctx context.Context, id string) error {
 
 // GetUserGroupByName finds user groups by name.
 //
-// Required privileges: read:pro:user-groups.
+// Required privileges: user-groups:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -95,7 +95,7 @@ func (c *Client) GetUserGroupByName(ctx context.Context, name string) (*UserGrou
 
 // UpdateUserGroupByName updates user groups by name.
 //
-// Required privileges: update:pro:user-groups.
+// Required privileges: user-groups:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) UpdateUserGroupByName(ctx context.Context, name string, request
 
 // DeleteUserGroupByName deletes user groups by name.
 //
-// Required privileges: delete:pro:user-groups.
+// Required privileges: user-groups:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeleteUserGroupByName(ctx context.Context, name string) error {
 
 // ListUserGroups finds all user groups.
 //
-// Required privileges: read:pro:user-groups.
+// Required privileges: user-groups:read.
 func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result UserGroups
@@ -138,7 +138,7 @@ func (c *Client) ListUserGroups(ctx context.Context) (*UserGroups, error) {
 
 // CreateUserGroupByName creates user groups by ID.
 //
-// Required privileges: create:pro:user-groups.
+// Required privileges: user-groups:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

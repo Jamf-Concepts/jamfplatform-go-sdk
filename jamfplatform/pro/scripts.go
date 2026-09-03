@@ -19,7 +19,7 @@ import (
 
 // ListScriptsV1 search for sorted and paged Scripts.
 //
-// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+// Required privileges: scripts:read. Legacy Jamf Pro privilege name(s): Read Scripts.
 //
 // Parameters:
 //   - sort: Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria
@@ -62,7 +62,7 @@ func (c *Client) ListScriptsV1(ctx context.Context, sort []string, filter string
 
 // CreateScriptV1 create a Script.
 //
-// Required privileges: create:pro:scripts. Legacy Jamf Pro privilege name(s): Create Scripts.
+// Required privileges: scripts:create. Legacy Jamf Pro privilege name(s): Create Scripts.
 func (c *Client) CreateScriptV1(ctx context.Context, request *Script) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -75,7 +75,7 @@ func (c *Client) CreateScriptV1(ctx context.Context, request *Script) (*HrefResp
 
 // GetScriptV1 retrieve a full script object.
 //
-// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+// Required privileges: scripts:read. Legacy Jamf Pro privilege name(s): Read Scripts.
 //
 // Parameters:
 //   - id: Script object identifier.
@@ -91,7 +91,7 @@ func (c *Client) GetScriptV1(ctx context.Context, id string) (*Script, error) {
 
 // UpdateScriptV1 replace the script at the id with the supplied information.
 //
-// Required privileges: update:pro:scripts. Legacy Jamf Pro privilege name(s): Update Scripts.
+// Required privileges: scripts:update. Legacy Jamf Pro privilege name(s): Update Scripts.
 //
 // Parameters:
 //   - id: Script object identifier.
@@ -107,7 +107,7 @@ func (c *Client) UpdateScriptV1(ctx context.Context, id string, request *Script)
 
 // DeleteScriptV1 delete a Script at the specified id.
 //
-// Required privileges: delete:pro:scripts. Legacy Jamf Pro privilege name(s): Delete Scripts.
+// Required privileges: scripts:delete. Legacy Jamf Pro privilege name(s): Delete Scripts.
 //
 // Parameters:
 //   - id: Script object identifier.
@@ -122,7 +122,7 @@ func (c *Client) DeleteScriptV1(ctx context.Context, id string) error {
 
 // DownloadScriptV1 download a text file of the Script contents.
 //
-// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+// Required privileges: scripts:read. Legacy Jamf Pro privilege name(s): Read Scripts.
 //
 // Parameters:
 //   - id: id of the script to be downloaded.
@@ -138,7 +138,7 @@ func (c *Client) DownloadScriptV1(ctx context.Context, id string) ([]byte, error
 
 // ListScriptHistoryV1 get specified Script history object.
 //
-// Required privileges: read:pro:scripts. Legacy Jamf Pro privilege name(s): Read Scripts.
+// Required privileges: scripts:read. Legacy Jamf Pro privilege name(s): Read Scripts.
 //
 // Parameters:
 //   - id: id of script history record.
@@ -179,7 +179,7 @@ func (c *Client) ListScriptHistoryV1(ctx context.Context, id string, sort []stri
 
 // CreateScriptHistoryNoteV1 add specified Script history object notes.
 //
-// Required privileges: update:pro:scripts. Legacy Jamf Pro privilege name(s): Update Scripts.
+// Required privileges: scripts:update. Legacy Jamf Pro privilege name(s): Update Scripts.
 //
 // Parameters:
 //   - id: instance id of script history record.

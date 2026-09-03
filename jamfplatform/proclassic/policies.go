@@ -17,7 +17,7 @@ import (
 
 // GetPolicyByID finds policies by ID.
 //
-// Required privileges: read:pro:policies.
+// Required privileges: policies:read.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -33,7 +33,7 @@ func (c *Client) GetPolicyByID(ctx context.Context, id string) (*Policy, error) 
 
 // GetPolicyByName finds policies by name.
 //
-// Required privileges: read:pro:policies.
+// Required privileges: policies:read.
 //
 // Parameters:
 //   - name: Name to filter by.
@@ -49,7 +49,7 @@ func (c *Client) GetPolicyByName(ctx context.Context, name string) (*Policy, err
 
 // CreatePolicyByID creates a new policy by ID.
 //
-// Required privileges: create:pro:policies.
+// Required privileges: policies:create.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -65,7 +65,7 @@ func (c *Client) CreatePolicyByID(ctx context.Context, id string, request *Polic
 
 // UpdatePolicyByID updates an existing policy by ID.
 //
-// Required privileges: update:pro:policies.
+// Required privileges: policies:update.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -80,7 +80,7 @@ func (c *Client) UpdatePolicyByID(ctx context.Context, id string, request *Polic
 
 // UpdatePolicyByName updates an existing policy by name.
 //
-// Required privileges: update:pro:policies.
+// Required privileges: policies:update.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -95,7 +95,7 @@ func (c *Client) UpdatePolicyByName(ctx context.Context, name string, request *P
 
 // DeletePolicyByID deletes a policy by ID.
 //
-// Required privileges: delete:pro:policies.
+// Required privileges: policies:delete.
 //
 // Parameters:
 //   - id: ID value to filter by.
@@ -110,7 +110,7 @@ func (c *Client) DeletePolicyByID(ctx context.Context, id string) error {
 
 // DeletePolicyByName deletes a policy by name.
 //
-// Required privileges: delete:pro:policies.
+// Required privileges: policies:delete.
 //
 // Parameters:
 //   - name: Name value to filter by.
@@ -125,7 +125,7 @@ func (c *Client) DeletePolicyByName(ctx context.Context, name string) error {
 
 // ListPolicies finds all policies.
 //
-// Required privileges: read:pro:policies.
+// Required privileges: policies:read.
 func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
 	prefix := c.transport.APIPrefix("proclassic", "")
 	var result Policies
@@ -138,7 +138,7 @@ func (c *Client) ListPolicies(ctx context.Context) (*Policies, error) {
 
 // GetPolicyByCategory finds all policies by category.
 //
-// Required privileges: read:pro:policies.
+// Required privileges: policies:read.
 //
 // Parameters:
 //   - category: Category to filter by.
@@ -154,7 +154,7 @@ func (c *Client) GetPolicyByCategory(ctx context.Context, category string) (*Pol
 
 // GetPolicyByCreatedBy finds all policies by type.
 //
-// Required privileges: read:pro:policies.
+// Required privileges: policies:read.
 //
 // Parameters:
 //   - createdBy: Type to filter by.
@@ -171,7 +171,7 @@ func (c *Client) GetPolicyByCreatedBy(ctx context.Context, createdBy string) (*P
 
 // GetPolicyByIDSubset finds a subset of data for a policy.
 //
-// Required privileges: read:pro:policies.
+// Required privileges: policies:read.
 //
 // Parameters:
 //   - id: ID to filter by.
@@ -191,7 +191,7 @@ func (c *Client) GetPolicyByIDSubset(ctx context.Context, id string, subset stri
 
 // CreatePolicyByName creates a new policy by ID.
 //
-// Required privileges: create:pro:policies.
+// Required privileges: policies:create.
 //
 // Parameters:
 //   - name: ID value to filter by.

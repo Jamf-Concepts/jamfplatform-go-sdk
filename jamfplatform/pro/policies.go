@@ -13,7 +13,7 @@ import (
 
 // GetPolicyPropertiesV1 get Policy Properties object.
 //
-// Required privileges: read:pro:policies. Legacy Jamf Pro privilege name(s): Read Policies.
+// Required privileges: policies:read. Legacy Jamf Pro privilege name(s): Read Policies.
 func (c *Client) GetPolicyPropertiesV1(ctx context.Context) (*PolicyPropertiesV1, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result PolicyPropertiesV1
@@ -26,7 +26,7 @@ func (c *Client) GetPolicyPropertiesV1(ctx context.Context) (*PolicyPropertiesV1
 
 // UpdatePolicyPropertiesV1 update Policy Properties object.
 //
-// Required privileges: update:pro:policies. Legacy Jamf Pro privilege name(s): Update Policies.
+// Required privileges: policies:update. Legacy Jamf Pro privilege name(s): Update Policies.
 func (c *Client) UpdatePolicyPropertiesV1(ctx context.Context, request *PolicyPropertiesV1) (*PolicyPropertiesV1, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result PolicyPropertiesV1

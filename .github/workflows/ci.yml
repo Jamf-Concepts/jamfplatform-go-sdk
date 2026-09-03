@@ -2,6 +2,14 @@ name: CI
 
 on:
   pull_request:
+  # Manual runs. No inputs: every job here is cheap, hermetic and side-effect
+  # free — no tenant, no credentials, no writes — so there is nothing worth
+  # selecting between, and a job filter would mean an `if:` on all seven.
+  #
+  # Useful because CI is otherwise pull_request-only: a branch with no PR open
+  # gets no coverage at all, which is exactly when the gates matter most (the
+  # first acceptance matrix run went out on a PR-less branch).
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,10 +27,11 @@ jobs:
       # Separate module: the root run never reaches the generator's own unit
       # tests (config validation, parameter doc rendering, enum naming).
       - run: cd tools/generate && go test -count=1 -timeout=120s ./...
-      # acctargets lives in the tools module, which the root run also misses.
-      # Scoped to the subpackage rather than ./... because tools/tools.go is a
-      # build-tagged blank import of copywrite that typecheck rejects by design.
-      - run: cd tools && go test -count=1 -timeout=120s ./acctargets/...
+      # acctargets and acclanes live in the tools module, which the root run
+      # also misses. Scoped to the subpackages rather than ./... because
+      # tools/tools.go is a build-tagged blank import of copywrite that
+      # typecheck rejects by design.
+      - run: cd tools && go test -count=1 -timeout=120s ./acctargets/... ./acclanes/...
 
   vet:
     name: Vet
@@ -33,6 +42,84 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go vet ./...
+      # The acceptance suite is behind //go:build acceptance, so the run above
+      # never compiles it and a signature change can break it silently and stay
+      # broken. This is the CI half of the `go vet -tags acceptance` rule that
+      # until now existed only as a pre-commit convention.
+      - run: go vet -tags acceptance ./jamfplatform/...
+
+      # Formatting and modernisation drift, including behind the build tag. An
+      # untagged `go fix ./...` cannot see 56 of jamfplatform/'s files, so the
+      # rewrites accumulated there unnoticed until 8a38c91 cleared 26 files'
+      # worth. Checking the tagged path here stops that recurring.
+      # The acceptance workflow's credential secrets must sit on the step that
+      # runs `go test`, not on a neighbouring step. Both yamllint and actionlint
+      # accept them anywhere — a workflow with the secrets attached to the wrong
+      # step is structurally valid and semantically dead, and the only symptom is
+      # every lane failing with "credentials not configured", which reads as a
+      # missing secret rather than a misplaced one. That happened on the first
+      # matrix run (33744831062): all 16 landed on the summary step.
+      - name: Acceptance credentials are on the test step
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys, yaml
+          wf = yaml.safe_load(open(".github/workflows/acceptance.yml"))
+          steps = wf["jobs"]["acceptance"]["steps"]
+          by_name = {s.get("name"): (s.get("env") or {}) for s in steps}
+
+          runner = next(s for s in steps if "go test" in (s.get("run") or ""))
+          creds = {k for k in (runner.get("env") or {})
+                   if k.startswith("JAMFPLATFORM_") and k != "JAMFPLATFORM_ACC_REQUIRE"}
+          if not creds:
+              sys.exit("the step running `go test` carries no JAMFPLATFORM_* credentials")
+
+          # Every lane's require token must have a credential set behind it.
+          lanes = yaml.safe_load(open(".github/acceptance-lanes.json"))
+          wanted = {"organization": "JAMFPLATFORM_ACC_ORGANIZATION_",
+                    "environment": "JAMFPLATFORM_ACC_ENVIRONMENT_",
+                    "platform": "JAMFPLATFORM_ACC_ENVIRONMENT_",
+                    "pro-tenant": "JAMFPLATFORM_ACC_PRO_TENANT_"}
+          active = [l for l in lanes["lanes"] if not l.get("planned")] + [lanes["default_lane"]]
+          for lane in active:
+              prefix = wanted.get(lane["require"])
+              if prefix and not any(c.startswith(prefix) for c in creds):
+                  sys.exit(f'lane {lane["lane"]!r} requires {lane["require"]!r} but no {prefix}* is set on the test step')
+
+          # Nothing else may carry them: a stray copy on another step is how the
+          # originals got orphaned in the first place.
+          for name, env in by_name.items():
+              if env is (runner.get("env") or {}):
+                  continue
+              stray = {k for k in env if k.startswith("JAMFPLATFORM_")}
+              if stray:
+                  sys.exit(f"step {name!r} carries credentials that belong on the test step: {sorted(stray)}")
+          print(f"OK: {len(creds)} credential vars on the test step, none stranded elsewhere")
+          PY
+
+      - name: Formatting and go fix drift
+        run: |
+          set -euo pipefail
+          unformatted="$(gofmt -l . | grep -v '^testing/' || true)"
+          if [ -n "$unformatted" ]; then
+            echo "gofmt would rewrite:"; echo "$unformatted"; exit 1
+          fi
+          # One pass of each, tagged and untagged. A single pass is all a
+          # DRIFT CHECK needs: go fix is not idempotent in one pass (a pass
+          # that adds `//go:fix inline` to a helper only enables the NEXT pass
+          # to inline its call sites), but a tree that is already at a fixpoint
+          # yields no diff from one pass by definition. Iterating here would
+          # only let CI *reach* the fixpoint on the author's behalf, which is
+          # not the gate's job — and the earlier loop could not do that anyway,
+          # because `git diff` compares against HEAD rather than against the
+          # previous pass, so it never cleared once any pass had written.
+          go fix ./... >/dev/null
+          go fix -tags acceptance ./jamfplatform/... >/dev/null
+          git diff --exit-code || {
+            echo "go fix produced changes — run these to a fixpoint locally and commit the result with your change:"
+            echo "  go fix ./... && go fix -tags acceptance ./jamfplatform/... (repeat until clean)"
+            exit 1
+          }
 
   lint:
     name: Lint
@@ -42,17 +129,47 @@ jobs:
       matrix:
         # One entry per Go module. The generator is its own module, so the
         # root-only run never descended into it and its findings went
-        # unreported. tools/ is entered only at tools/acctargets: linting the
+        # unreported. tools/ is entered at its command subpackages only:
+        # linting the
         # module root would pull in tools/tools.go, a build-tagged blank import
         # of copywrite (a main package) that typecheck rejects by design and
         # which exists solely to pin the dependency.
+        #
+        # The fourth entry is the root module again, this time behind
+        # //go:build acceptance. Without it the 56 files of that suite are
+        # linted by NOTHING: golangci-lint typechecks in the default build
+        # context, so the untagged root run does not even parse them, and the
+        # blind spot this PR closed for `go vet` and `go fix` stayed open here.
+        #
+        # It runs errcheck and ineffassign only, and that is a floor rather
+        # than the intent. The default set's other three cannot be turned on
+        # yet: the tagged suite carries 39 pre-existing findings (staticcheck
+        # 31, unused 5, govet 3), so a full-set gate is red on arrival, and
+        # `only-new-issues` does not rescue it — 18 of the 39 sit on lines this
+        # branch already touches.
+        #
+        # 28 of the 31 are SA1019 (deprecated-symbol use), and those are NOT a
+        # backlog to burn down: every generated method gets an acceptance test,
+        # deprecated ones included, so this suite calls deprecated surfaces by
+        # policy and always will. Turning staticcheck on here therefore needs a
+        # `.golangci.yml` narrowing `staticcheck.checks` for acc_*_test.go —
+        # check selection is config-only in v2, there is no CLI flag — and the
+        # repo has no config file at all today. That, plus the ~11 genuine
+        # findings behind it (unused helpers, SA4004, ST1005, QF1002), is a
+        # separate change. errcheck is the one worth having immediately anyway:
+        # an ignored error in an acceptance test is exactly the "silently
+        # tolerate a real error to make one pass" that the suite's own policy
+        # bans.
         include:
           - module: "."
             path: "./..."
           - module: "tools/generate"
             path: "./..."
           - module: "tools"
-            path: "./acctargets/..."
+            path: "./acctargets/... ./acclanes/..."
+          - module: "."
+            path: "./jamfplatform/..."
+            extra: "--build-tags=acceptance --enable-only=errcheck,ineffassign"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -61,7 +178,29 @@ jobs:
       - uses: golangci/golangci-lint-action@v9
         with:
           working-directory: ${{ matrix.module }}
-          args: ${{ matrix.path }}
+          # `args` goes verbatim to `golangci-lint run`, so the tag and linter
+          # selection ride here. Flag spellings confirmed against the tool
+          # (`golangci-lint run --help`, v2.13.2): `--build-tags` takes a
+          # comma-separated list, `--enable-only` overrides the enabled set.
+          # matrix.extra is unset on the three untagged entries and expands to
+          # nothing.
+          args: ${{ matrix.extra }} ${{ matrix.path }}
+
+  race:
+    name: Race Detector
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      # The transport is concurrent by construction — a request throttle, a
+      # sync.OnceValue token cache and a shared cookie jar, all reached from
+      # however many goroutines the consumer runs (Terraform's default
+      # parallelism is 10). None of that is exercised under -race by the plain
+      # test job. Root module only: the acceptance suite needs credentials and
+      # a live tenant, so -race there would buy nothing CI can run.
+      - run: go test -race -count=1 -timeout=300s ./...
 
   generate:
     name: Generated Code
