@@ -61,6 +61,13 @@
       "why": "Environment-scoped platform surfaces. Audit lives here, NOT in account: scopes.yaml files it under organization but the wire refuses X-Organization-Id with 400 INVALID_REQUEST_CONTEXT_TYPE."
     },
     {
+      "lane": "pro-tenant",
+      "match": "^TestAcceptance_TenantScope",
+      "require": "pro-tenant",
+      "lock": false,
+      "why": "Scope coverage, not data coverage. accClient prefers environment scope whenever that credential set is complete, so once the environment secrets exist nothing else in the suite sends X-Tenant-Id \u2014 and WithTenantID is public, supported and used by terraform-provider-jamfplatform, on the LEGACY scope, which is exactly how a live consumer surface breaks unnoticed. accTenantClient forces tenant scope with no environment fallback. lock is false: the lane is read-only and generally points at a different tenant from the pro lane, so it neither mutates nor contends for the shared Pro tenant."
+    },
+    {
       "lane": "protect",
       "match": "^TestAcceptance_Protect",
       "require": "protect",

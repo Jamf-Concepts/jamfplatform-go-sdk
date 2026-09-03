@@ -78,6 +78,7 @@ var factoryLane = []struct {
 	lane    string
 }{
 	{"accSecurityCloudClient", "securitycloud"},
+	{"accTenantClient", "pro-tenant"},
 	{"accOrgClient", "account"},
 	{"accEnvClient", "platform-env"},
 	{"accClient", "pro"},

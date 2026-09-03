@@ -383,6 +383,55 @@ func accSecurityCloudClient(t *testing.T) *securitycloud.Client {
 	return securitycloud.New(c)
 }
 
+// errAccTenantCredsUnset marks an absent tenant-scoped credential set.
+var errAccTenantCredsUnset = errors.New("tenant-scoped acceptance credentials not configured")
+
+// initTenantAcceptanceClient creates and validates a client that is FORCED onto
+// tenant scope, with no environment fallback.
+//
+// It exists because accClient prefers environment scope whenever that credential
+// set is complete — the right default, since environment is the scope Jamf
+// intends new integrations to use. The consequence is that once the environment
+// secrets are configured, nothing in the suite sends X-Tenant-Id any more, and
+// WithTenantID stops being exercised. That option is public, supported, and used
+// by terraform-provider-jamfplatform, and tenant is the LEGACY scope — precisely
+// the kind of surface that breaks without anyone noticing. So one lane pins it.
+//
+// This is scope coverage, not data coverage: it deliberately reads only, and it
+// asserts the scope the client actually settled on rather than trusting that the
+// credential set it was handed implies it.
+var initTenantAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
+	baseURL := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+	clientID := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID")
+	clientSecret := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET")
+	tenantID := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_ID")
+
+	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL, JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID, JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET, JAMFPLATFORM_ACC_PRO_TENANT_ID", errAccTenantCredsUnset)
+	}
+
+	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
+		append(accTraceOpts(), jamfplatform.WithTenantID(tenantID))...)
+	if err := c.ValidateCredentials(context.Background()); err != nil {
+		return nil, fmt.Errorf("failed to validate tenant-scoped credentials: %w", err)
+	}
+	return c, nil
+})
+
+// accTenantClient returns a live tenant-scoped client. Unset credentials skip;
+// supplied-but-rejected credentials fail, the same distinction accClient draws.
+func accTenantClient(t *testing.T) *jamfplatform.Client {
+	t.Helper()
+	c, err := initTenantAcceptanceClient()
+	switch {
+	case errors.Is(err, errAccTenantCredsUnset):
+		skipOrFailUnset(t, "pro-tenant", err)
+	case err != nil:
+		t.Fatal(credentialRejectedMessage(err))
+	}
+	return c
+}
+
 // errAccEnvCredsUnset marks an absent environment-scoped credential set, the
 // same way errAccCredsUnset marks an absent tenant one.
 var errAccEnvCredsUnset = errors.New("environment-scoped acceptance credentials not configured")
