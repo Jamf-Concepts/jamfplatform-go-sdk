@@ -101,7 +101,7 @@ limitation on compressed bodies.
 
 ## 3. Wire-probe every behavioural change before ingesting
 
-Credentials: the Security Cloud sandbox (`JAMFPLATFORM_JSC_*`). Tenant segment
+Credentials: the Security Cloud sandbox (`JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_*`). Tenant segment
 must be the tenant **UUID**. Path shape is
 `/api/securitycloud/tenant/{uuid}/{version}/…` (tenant-first — see
 `tenantFirstNamespaces`).
@@ -175,7 +175,7 @@ breaks the acceptance file silently, since `make test` never compiles it.
 Then run the live suite:
 
 ```
-JAMFPLATFORM_ACC=1 JAMFPLATFORM_JSC_* … \
+JAMFPLATFORM_ACC=1 JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_* … \
   go test -v -tags acceptance -count=1 -run TestAcceptance_SecurityCloud ./jamfplatform/
 ```
 
@@ -188,13 +188,13 @@ four permanent skips into four passes. Creating by hand fixes one run; making
 the test self-provision fixes every run.
 
 Keep the safety gate when the fixture provisions real infrastructure — the
-point is not to remove `JAMFPLATFORM_JSC_GATEWAY_WRITE_OK`, it is that on a
+point is not to remove `JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK`, it is that on a
 tenant reserved for the suite nothing skips, and where a skip remains it names
 the variable that would fix it instead of an absent fixture the reader cannot
 act on. One skip is expected and correct: UEM Connect writes need live
 credentials for a *separate* Jamf Pro or Intune tenant.
 
-Gateway writes additionally need `JAMFPLATFORM_JSC_GATEWAY_WRITE_OK`.
+Gateway writes additionally need `JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK`.
 
 **Add an acceptance test for each behavioural change you probed**, pinning the
 observed status, `code` and field attribution. Prefer a test that cannot

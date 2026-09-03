@@ -52,6 +52,7 @@ func main() {
 	}
 
 	emittedTypes := make(map[string]bool) // dedup types across root-package specs
+	var rootTypes []GoType                // every type emitted to the root package, fields included
 	pkgBuckets := make(map[string][]loadedSpec)
 	hasSourceSpecs := true
 	for _, spec := range cfg.Specs {
@@ -63,7 +64,7 @@ func main() {
 			hasSourceSpecs = false
 		}
 		if spec.Package == "" {
-			if err := processSpec(*rootDir, cfg, spec, specPath, usedFallback, emittedTypes); err != nil {
+			if err := processSpec(*rootDir, cfg, spec, specPath, usedFallback, emittedTypes, &rootTypes); err != nil {
 				log.Fatalf("spec %s: %v", spec.File, err)
 			}
 		} else {

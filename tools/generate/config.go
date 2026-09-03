@@ -25,7 +25,7 @@ type SpecDef struct {
 	File               string                       `json:"file"`
 	Namespace          string                       `json:"namespace"`
 	SpecFile           string                       `json:"specFile,omitempty"`     // override published spec filename
-	Package            string                       `json:"package,omitempty"`      // target Go sub-package under jamfplatform/; empty emits to root (legacy)
+	Package            string                       `json:"package,omitempty"`      // target Go sub-package under jamfplatform/; validateConfig requires it — an empty value takes the legacy root path (processSpec), which nothing has used since sub-packages landed
 	SplitByTag         bool                         `json:"splitByTag,omitempty"`   // emit one methods file per OpenAPI tag instead of one per spec
 	Format             string                       `json:"format,omitempty"`       // "json" (default) or "xml" — drives struct tag style and transport codec
 	RawBody            bool                         `json:"rawBody,omitempty"`      // generate methods that take/return []byte instead of typed structs; consumer owns marshaling (used for Classic where spec has no useful types)
@@ -416,11 +416,32 @@ type ExtraParam struct {
 }
 
 // validateConfig rejects misconfigured specs before generation runs.
-// Currently enforces that no operation in Operations appears in ExcludePaths —
-// the deny list is meant to catch accidental re-adds, so a conflict means
-// either the entry should be removed from one side or the other.
+//
+// Enforces that no operation in Operations appears in ExcludePaths — the deny
+// list is meant to catch accidental re-adds, so a conflict means either the
+// entry should be removed from one side or the other — and that every spec
+// names a target Package.
+//
+// The Package requirement is a guard on a path nothing exercises. An empty
+// Package routes the spec through processSpec, the pre-sub-package emitter,
+// which has no consumer: all of config.json's specs name a package and the
+// root holds only the handwritten client.go. Every generator change since is
+// therefore only ever exercised on the processPackage path, and the root one
+// silently rots — validateNoUntypedFields shipped wired against name-only
+// GoTypes there, unable to fire at all, precisely because no config could
+// reach it. Refusing the empty value makes that impossible to trip over by
+// accident: re-enabling root emission now means deleting this check, which is
+// the point at which the path's wiring gets re-read.
+//
+// Rejecting a nil Fields slice inside validateNoUntypedFields would have been
+// the wrong guard for the same problem: an enum alias, an IsRawJSON type and
+// an XML-name-only struct all legitimately carry no fields, so it would fail
+// generation on every spec that declares an enum.
 func validateConfig(cfg Config) error {
 	for _, spec := range cfg.Specs {
+		if spec.Package == "" {
+			return fmt.Errorf("spec %q: \"package\" is required — an empty package emits to the legacy root path, which no spec has used since sub-packages landed and which is not maintained; set a sub-package name", spec.File)
+		}
 		if spec.TypesOnly && len(spec.Operations) > 0 {
 			return fmt.Errorf("spec %q: typesOnly specs must not declare operations", spec.File)
 		}

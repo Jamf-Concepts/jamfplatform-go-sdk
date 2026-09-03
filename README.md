@@ -30,7 +30,7 @@ func main() {
 		"https://eu.api.jamfcloud.com",
 		os.Getenv("JAMFPLATFORM_CLIENT_ID"),
 		os.Getenv("JAMFPLATFORM_CLIENT_SECRET"),
-		jamfplatform.WithTenantID(os.Getenv("JAMFPLATFORM_TENANT_ID")),
+		jamfplatform.WithEnvironmentID(os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID")),
 	)
 
 	ctx := context.Background()
@@ -76,17 +76,52 @@ The client uses OAuth 2.0 client credentials. Create API credentials in your Jam
 
 Token refresh is handled automatically.
 
+### Scope
+
+A client carries exactly one scope, chosen at construction and sent as a request
+header on every call:
+
+| Scope | Option | Header |
+|---|---|---|
+| Environment | `WithEnvironmentID` | `X-Environment-Id` |
+| Tenant | `WithTenantID` | `X-Tenant-Id` |
+| Organization | none | none |
+
+Prefer environment scope. An environment groups a customer's tenants, and it is
+the scope Jamf intends new integrations to be created with. Tenant scope is the
+legacy form and remains supported — some surfaces are only reachable that way.
+Organization scope is the **absence** of a scope option: the gateway resolves the
+organization from the access token, and it is what the `account` package uses.
+
+The two ID-bearing scopes are alternatives, not aliases — **the header must match
+the credential.** An integration is minted against one scope, and crossing them
+over is refused with `403 OWNERSHIP_FORBIDDEN` even when both IDs belong to the
+same customer, so this is a choice between two integrations rather than two IDs
+for one. Setting both options is a configuration mistake rather than a
+combination; environment takes precedence whichever order they are passed in.
+
+Read the scope back with `Client.Scope() (ScopeKind, string)`. It is three-valued
+— `ScopeTenant`, `ScopeEnvironment`, or the zero kind with an empty ID for the
+organization case — so a caller switching on the kind has to handle all three
+rather than assume a scope is always present.
+
 ### Client options
 
 ```go
 client := jamfplatform.NewClient(baseURL, clientID, clientSecret,
-	jamfplatform.WithTenantID(tenantID),
+	jamfplatform.WithEnvironmentID(environmentID),
 	jamfplatform.WithUserAgent("my-app/1.0"),
 	jamfplatform.WithHTTPClient(customHTTPClient),
 	jamfplatform.WithLogger(myLogger),
 	jamfplatform.WithFileTokenCache("/tmp/tokens"),
 )
 ```
+
+`WithHeaders` adds headers to every request, including the token exchange, and
+`WithAuthorizationHeaderName` moves the bearer credential to a header of your
+choosing. Both exist for callers behind a reverse proxy that authenticates
+callers itself; prefer them over `WithHTTPClient`, which replaces the SDK's tuned
+transport. See the godoc for the details.
 
 ### Error handling
 
@@ -174,6 +209,10 @@ Each API family lives in its own sub-package under `jamfplatform/`. Construct a 
 | `jamfplatform/compliancebenchmarks` | Platform compliance benchmarks |
 | `jamfplatform/pro` | Jamf Pro JSON API (buildings, packages, policies, MDM, enrollment, settings, PKI, etc.) |
 | `jamfplatform/proclassic` | Jamf Classic XML API (computers, mobile devices, groups, profiles, policies, etc.) |
+| `jamfplatform/securitycloud` | Jamf Security Cloud — DNS, ZTNA, content categories, device groups, activation profiles, UEM Connect. 54 operations across six specs; Security Cloud is a separate product with its own tenant identifier, so it needs a Security Cloud credential and its own `WithTenantID` value (an environment-scoped credential also reaches it) |
+| `jamfplatform/account` | Jamf Account — licensing, partners, SSO. **Organization-scoped**: pass no scope option and let the gateway resolve the organization from the token. **US gateway only** |
+| `jamfplatform/aigovernance` | AI Governance policies and tools. Environment-scoped |
+| `jamfplatform/audit` | Platform audit events (read-only). Environment-scoped, and **not usable yet**: the gateway refuses every call, because these routes need an `audit:read` grant that is not currently issued to external credentials |
 
 All list methods handle pagination automatically. Pro's versioned endpoints emit version-suffixed Go methods (`ListBuildingsV1`, `GetCheckInSettingsV3`) so consumers pin to a specific API version. Exact method lists are generated from the OpenAPI specs under `testing/` — see the published specs in [`api/`](api/) for the current surface.
 

@@ -24,9 +24,17 @@ import (
 // createAccPackage creates a minimal metadata-only package record
 // with cleanup registered. Returns the package id. Used by the
 // history / manifest / bulk-delete tests that don't need a real .pkg.
-func createAccPackage(t *testing.T, p *pro.Client, suffix string) string {
+//
+// It takes the root client rather than a *pro.Client so the package-store gate
+// lives here, at the one choke point every package-creating test goes through:
+// on an instance with no Jamf Cloud distribution point the create succeeds and
+// the delete 500s, stranding an undeletable record, so a test that creates a
+// package must not run there. See requirePackageStore for the wire evidence.
+func createAccPackage(t *testing.T, c *jamfplatform.Client, suffix string) string {
 	t.Helper()
+	requirePackageStore(t, c)
 	ctx := context.Background()
+	p := pro.New(c)
 	created, err := p.CreatePackageV1(ctx, &pro.Package{
 		PackageName:          "sdk-acc-pkg-" + suffix,
 		FileName:             "sdk-acc-" + suffix + ".pkg",
@@ -146,7 +154,7 @@ func TestAcceptance_Pro_PackageHistoryV1(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	id := createAccPackage(t, p, runSuffix())
+	id := createAccPackage(t, c, runSuffix())
 
 	if _, err := p.CreatePackageHistoryNoteV1(ctx, id, &pro.ObjectHistoryNote{
 		Note: "sdk-acc test package history entry",
@@ -187,7 +195,7 @@ func TestAcceptance_Pro_PackageManifestV1(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	id := createAccPackage(t, p, runSuffix()+"-manifest")
+	id := createAccPackage(t, c, runSuffix()+"-manifest")
 
 	// Minimal plist manifest — the server accepts this shape against a
 	// test tenant but may reject stricter validation elsewhere.
@@ -217,12 +225,16 @@ func TestAcceptance_Pro_PackagesDeleteMultipleV1(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	a := createAccPackage(t, p, runSuffix()+"-a")
-	b := createAccPackage(t, p, runSuffix()+"-b")
+	a := createAccPackage(t, c, runSuffix()+"-a")
+	b := createAccPackage(t, c, runSuffix()+"-b")
 
+	// No skipOnServerError here: createAccPackage has already gated this test on
+	// a Jamf Cloud distribution point, which is the one 5xx on a package delete
+	// that is an instance limitation rather than a defect. Anything else is a
+	// real server fault and must fail, not skip — this is the bulk equivalent of
+	// the single delete, and a swallowed 500 here strands both records.
 	ids := []string{a, b}
 	if err := p.DeleteMultiplePackagesV1(ctx, &pro.Ids{IDs: &ids}); err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("DeleteMultiplePackagesV1: %v", err)
 	}
 	t.Logf("DeleteMultiplePackagesV1 succeeded for ids %v", ids)

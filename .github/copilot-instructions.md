@@ -65,11 +65,16 @@ Generator-emitted `Resolve<X>IDByName` and `Resolve<X>ByName` methods. Three mod
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.
 - Conventional commits: `feat:`, `fix:`, `test:`, `refactor:`, `chore:`, `docs:`.
 - Copyright headers managed by HashiCorp `copywrite` (uses `--plan` flag, not `--check`).
-- PRs target `dev` branch.
+- PRs target `main`. Both `acceptance.yml` and `codeql.yml` only trigger on PRs to `main`.
 
 ## Acceptance tests
 
-Written in `jamfplatform/acc_<pkg>_test.go` (external `jamfplatform_test` package, `//go:build acceptance`). Require env vars: `JAMFPLATFORM_BASE_URL`, `JAMFPLATFORM_CLIENT_ID`, `JAMFPLATFORM_CLIENT_SECRET`.
+Written in `jamfplatform/acc_<pkg>_test.go` (external `jamfplatform_test` package, `//go:build acceptance`). Credentials are named `JAMFPLATFORM_ACC_<PRODUCT>_<SCOPE>_<FIELD>`; the environment set
+(`JAMFPLATFORM_ACC_ENVIRONMENT_{BASE_URL,ID,CLIENT_ID,CLIENT_SECRET}`) is the workhorse and
+reaches pro, devices, blueprints, compliance-benchmarks, ai/governance and securitycloud.
+The bare `JAMFPLATFORM_CLIENT_ID`/`_CLIENT_SECRET`/`_TENANT_ID` names are the *consumer*
+convention documented in `jamfplatform/doc.go` and are deliberately NOT read by the suite.
+See CONTRIBUTING.md for the full table.
 
 - Read-only endpoints: call directly, log shape.
 - Mutating endpoints: CRUD lifecycle with `t.Cleanup` deferring delete.

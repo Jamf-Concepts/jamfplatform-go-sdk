@@ -248,12 +248,9 @@ var errAccCredsUnset = errors.New("acceptance credentials not configured")
 // data. Expect fixture-dependent tests to change behaviour, and read
 // accScopeInUse in the log before concluding that the secrets broke CI.
 var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
-	envBase, envID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL"), accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
+	envBase, envID := accEnvironmentBaseURL(), accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
 	envClient, envSecret := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID"), accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET")
-	if envBase == "" {
-		envBase = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
-	}
-	if envBase != "" && envClient != "" && envSecret != "" && envID != "" {
+	if accEnvironmentSetComplete() {
 		c := jamfplatform.NewClient(envBase, envClient, envSecret,
 			append(accTraceOpts(), jamfplatform.WithEnvironmentID(envID))...)
 		if err := c.ValidateCredentials(context.Background()); err != nil {
@@ -321,19 +318,12 @@ var initJSCAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, erro
 	// here — Security Cloud is itself tenant-scoped, on the same X-Tenant-Id
 	// header as Jamf Pro, so "environment vs Security Cloud" is a difference of
 	// which credential, not of which scope kind.
-	baseURL := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL")
-	if baseURL == "" {
-		baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
-	}
 	clientID := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID")
 	clientSecret := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET")
 	tenantID := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")
 
-	if clientID == "" || clientSecret == "" || tenantID == "" {
-		envBase := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL")
-		if envBase == "" {
-			envBase = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
-		}
+	if !accSecurityCloudSetComplete() {
+		envBase := accEnvironmentBaseURL()
 		envID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
 		envClientID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID")
 		envSecret := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET")
@@ -348,6 +338,9 @@ var initJSCAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, erro
 		}
 		return nil, fmt.Errorf("%w: set the JAMFPLATFORM_ACC_ENVIRONMENT_* set, or JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID, JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET and JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID", errAccJSCCredsUnset)
 	}
+	// The dedicated set being complete, accSecurityCloudBaseURL resolves to its
+	// chain — the same value the failure report will name.
+	baseURL := accSecurityCloudBaseURL()
 	if baseURL == "" {
 		return nil, fmt.Errorf("%w: JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL or JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL must be set", errAccJSCCredsUnset)
 	}
@@ -379,10 +372,27 @@ func accSecurityCloudClient(t *testing.T) *securitycloud.Client {
 	case errors.Is(err, errAccJSCCredsUnset):
 		skipOrFailUnset(t, "securitycloud", err)
 	case err != nil:
-		t.Fatal(credentialRejectedMessage(err))
+		t.Fatal(credentialRejectedMessage(accSecurityCloudBaseURL(), err))
 	}
+	logAccJSCCredSourceOnce()
 	return securitycloud.New(c)
 }
+
+// logAccJSCCredSourceOnce announces which credential the Security Cloud client
+// was built from, once per run. The dedicated Security Cloud set and the
+// environment set land on DIFFERENT Security Cloud tenants with different
+// fixtures, so a run that does not say which one it settled on leaves that
+// switch looking like the tenant's data having changed. It matters now rather
+// than in principle: the dedicated secrets are commented out in
+// .github/workflows/acceptance.yml, so the environment fallback is the active
+// path on every CI run.
+//
+// Logged from the accessor rather than from initJSCAcceptanceClient so the line
+// appears whenever a run builds a Security Cloud client, independent of which
+// tests select the credential. Same reasoning, same shape, as logAccScopeOnce.
+var logAccJSCCredSourceOnce = sync.OnceFunc(func() {
+	fmt.Fprintf(os.Stderr, "acceptance: Security Cloud built from %s credentials\n", accJSCCredSource)
+})
 
 // errAccTenantCredsUnset marks an absent tenant-scoped credential set.
 var errAccTenantCredsUnset = errors.New("tenant-scoped acceptance credentials not configured")
@@ -428,7 +438,7 @@ func accTenantClient(t *testing.T) *jamfplatform.Client {
 	case errors.Is(err, errAccTenantCredsUnset):
 		skipOrFailUnset(t, "pro-tenant", err)
 	case err != nil:
-		t.Fatal(credentialRejectedMessage(err))
+		t.Fatal(credentialRejectedMessage(accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL"), err))
 	}
 	return c
 }
@@ -447,10 +457,7 @@ var errAccEnvCredsUnset = errors.New("environment-scoped acceptance credentials 
 // belong to the same customer. Wire-verified against securitycloud in prod on
 // 2026-08-25, which is what TestAcceptance_EnvironmentScope pins.
 var initEnvAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
-	baseURL := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL")
-	if baseURL == "" {
-		baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
-	}
+	baseURL := accEnvironmentBaseURL()
 	clientID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID")
 	clientSecret := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET")
 	environmentID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
@@ -476,7 +483,7 @@ func accEnvClient(t *testing.T) *jamfplatform.Client {
 	case errors.Is(err, errAccEnvCredsUnset):
 		skipOrFailUnset(t, "environment", err)
 	case err != nil:
-		t.Fatal(credentialRejectedMessage(err))
+		t.Fatal(credentialRejectedMessage(accEnvironmentBaseURL(), err))
 	}
 	return c
 }
@@ -497,10 +504,7 @@ var errAccOrgCredsUnset = errors.New("organization-scoped acceptance credentials
 // Jamf Account api-product ships only use1 api-definitions: an EU base URL
 // cannot reach these endpoints at all, and the failure does not look regional.
 var initOrgAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
-	baseURL := accEnv("JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL")
-	if baseURL == "" {
-		baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
-	}
+	baseURL := accOrgBaseURL()
 	clientID := accEnv("JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID")
 	clientSecret := accEnv("JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET")
 
@@ -524,7 +528,7 @@ func accOrgClient(t *testing.T) *jamfplatform.Client {
 	case errors.Is(err, errAccOrgCredsUnset):
 		skipOrFailUnset(t, "organization", err)
 	case err != nil:
-		t.Fatal(credentialRejectedMessage(err))
+		t.Fatal(credentialRejectedMessage(accOrgBaseURL(), err))
 	}
 	return c
 }
@@ -630,9 +634,6 @@ var accLegacyEnvNames = map[string]string{
 	"JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD":               "JAMFPLATFORM_PROTECT_PASSWORD",
 	"JAMFPLATFORM_ACC_PRO_PROTECT_URL":                    "JAMFPLATFORM_PROTECT_URL",
 	"JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL":                "JAMFPLATFORM_BASE_URL",
-	"JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID":               "JAMFPLATFORM_CLIENT_ID",
-	"JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET":           "JAMFPLATFORM_CLIENT_SECRET",
-	"JAMFPLATFORM_ACC_PRO_TENANT_ID":                      "JAMFPLATFORM_TENANT_ID",
 	"JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK":     "JAMFPLATFORM_JSC_GATEWAY_WRITE_OK",
 	"JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL":      "JAMFPLATFORM_JSC_BASE_URL",
 	"JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID":     "JAMFPLATFORM_JSC_CLIENT_ID",
@@ -643,6 +644,20 @@ var accLegacyEnvNames = map[string]string{
 	"JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID":              "JAMFPLATFORM_VPP_INVITATION_ID",
 	"JAMFPLATFORM_ACC_PRO_VPP_TOKEN":                      "JAMFPLATFORM_VPP_TOKEN",
 	"JAMFPLATFORM_ACC_PRO_WIFI_PROFILE_ID":                "JAMFPLATFORM_WIFI_PROFILE_ID",
+
+	// Deliberately NOT shimmed — do not add them back:
+	// JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID  <- JAMFPLATFORM_CLIENT_ID
+	// JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET  <- JAMFPLATFORM_CLIENT_SECRET
+	// JAMFPLATFORM_ACC_PRO_TENANT_ID  <- JAMFPLATFORM_TENANT_ID
+	//
+	// Those three bare names are the published CONSUMER convention —
+	// jamfplatform/doc.go uses them verbatim in the example a consumer copies —
+	// so a fallback is the very borrowing the rename existed to stop. It would
+	// point ~650 mutating tests at whatever tenant a consumer credential
+	// sitting in the same shell happens to name, announced only by one
+	// deduplicated log line. An unrenamed .env must fail its completeness check
+	// and skip, which is loud and recoverable; silently mutating the wrong
+	// tenant is neither.
 }
 
 // accLegacyEnvUsed remembers which legacy names this run fell back to, so the
@@ -657,6 +672,12 @@ var accLegacyEnvUsed sync.Map
 // scope or skip the lane. That failure is invisible, which is the whole class of
 // bug JAMFPLATFORM_ACC_REQUIRE exists to close. Remove this shim once the
 // secrets and every local .env have moved.
+//
+// The Pro TENANT CREDENTIAL is the deliberate exception: its client ID, secret
+// and tenant ID have no fallback, because their old names are the consumer
+// convention doc.go publishes — see accLegacyEnvNames. A .env still carrying
+// only those three loses the tenant lane to a skip (or, under
+// JAMFPLATFORM_ACC_REQUIRE, to a failure) and must be renamed.
 func accEnv(name string) string {
 	if v := os.Getenv(name); v != "" {
 		return v
@@ -672,6 +693,73 @@ func accEnv(name string) string {
 		}
 	}
 	return v
+}
+
+// firstAccEnv returns the first of names that is set. It exists so a base-URL
+// fallback chain is written once and read identically by the client that dials
+// it and by the failure report that names it.
+func firstAccEnv(names ...string) string {
+	for _, name := range names {
+		if v := accEnv(name); v != "" {
+			return v
+		}
+	}
+	return ""
+}
+
+// accEnvironmentBaseURL is the base URL an environment-scoped client dials:
+// its own variable when set, the Pro tenant's otherwise, both products being
+// served by the same regional gateway.
+func accEnvironmentBaseURL() string {
+	return firstAccEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL", "JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+}
+
+// accOrgBaseURL is the base URL the organization-scoped client dials. The
+// fallback is a convenience only: the Jamf Account api-product ships US
+// api-definitions alone, so a non-US Pro base URL cannot serve it — which is
+// exactly why the report must name this URL rather than the Pro one.
+func accOrgBaseURL() string {
+	return firstAccEnv("JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL", "JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+}
+
+// accEnvironmentSetComplete reports whether the environment credential set is
+// fully configured. It is the condition initAcceptanceClient prefers
+// environment scope on and initJSCAcceptanceClient falls back to, stated once
+// so the base-URL resolvers below cannot drift from the branch they describe.
+func accEnvironmentSetComplete() bool {
+	return accEnvironmentBaseURL() != "" &&
+		accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID") != "" &&
+		accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET") != "" &&
+		accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID") != ""
+}
+
+// accSecurityCloudSetComplete reports whether the dedicated Security Cloud
+// credential set is fully configured. The base URL is not part of it: that one
+// falls back to the Pro tenant's, the credentials do not.
+func accSecurityCloudSetComplete() bool {
+	return accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID") != "" &&
+		accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET") != "" &&
+		accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID") != ""
+}
+
+// accPlatformBaseURL is the base URL initAcceptanceClient dials, mirroring its
+// preference for environment scope over tenant scope.
+func accPlatformBaseURL() string {
+	if accEnvironmentSetComplete() {
+		return accEnvironmentBaseURL()
+	}
+	return accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+}
+
+// accSecurityCloudBaseURL is the base URL initJSCAcceptanceClient dials,
+// mirroring its preference for the dedicated Security Cloud credential over the
+// environment one — the two can be on different regional gateways, so which
+// credential was used decides which URL the rejected request went to.
+func accSecurityCloudBaseURL() string {
+	if accSecurityCloudSetComplete() {
+		return firstAccEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL", "JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+	}
+	return accEnvironmentBaseURL()
 }
 
 // accRequiredSets names the credential sets this run must have configured, read
@@ -722,10 +810,14 @@ func skipOrFailUnset(t *testing.T, set string, err error) {
 // a CI runner nobody can go and check afterwards — the egress IP is gone with the
 // runner. Capturing it in the failure output is the only chance to have it.
 //
-// The base URL is read from the environment rather than the client, which was
-// never successfully constructed. In CI it renders as *** because it is a secret;
-// that is fine, whoever opens the ticket has it.
-func credentialRejectedMessage(err error) string {
+// The base URL is passed in rather than read from the client, which was never
+// successfully constructed — and it is passed in per credential set rather than
+// read from one variable, because the sets do not share a gateway: an
+// organization failure is always on the US gateway, an environment or Security
+// Cloud one can be on any region. Naming the Pro tenant's URL for all of them
+// sent support a URL the failing request never used. In CI it renders as ***
+// because it is a secret; that is fine, whoever opens the ticket has it.
+func credentialRejectedMessage(baseURL string, err error) string {
 	ip := egressIP()
 	if ip == "" {
 		ip = "(unable to determine — run `curl -s https://checkip.amazonaws.com` on this host)"
@@ -740,7 +832,7 @@ If this is an edge or WAF block rather than a bad secret, give Jamf Support:
 
 Technical details: %v`,
 		time.Now().UTC().Format(time.RFC3339),
-		accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL"),
+		baseURL,
 		ip,
 		err)
 }
@@ -755,7 +847,7 @@ func accClient(t *testing.T) *jamfplatform.Client {
 	case errors.Is(err, errAccCredsUnset):
 		skipOrFailUnset(t, "platform", err)
 	case err != nil:
-		t.Fatal(credentialRejectedMessage(err))
+		t.Fatal(credentialRejectedMessage(accPlatformBaseURL(), err))
 	}
 	logAccScopeOnce()
 	return c

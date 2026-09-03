@@ -169,17 +169,27 @@ Tenant scope stays supported, but should not be the default choice.
 
 **The two options are alternatives, not aliases: the header must match the
 credential.** Crossing them over is `403 OWNERSHIP_FORBIDDEN` even within one
-customer. A client carries exactly one scope; setting both means the last wins.
+customer. A client carries exactly one scope, and setting both is a configuration
+mistake rather than a combination: **environment takes precedence whichever order
+the options are passed in**, because a client built from an environment-scoped
+credential cannot use a tenant header anyway. `WithEnvironmentID`'s godoc is the
+authority.
 
-**Consumers read the scope back via `Client.Scope() (ScopeKind, string)`.**
-`TenantID()` is kept but is a **partial view** — it returns `""` for both
-environment and organization scope, so it cannot distinguish them and **must not be
-used to infer the scope**. A zero kind with an empty ID is the organization case,
+**Consumers read the scope back via `Client.Scope() (ScopeKind, string)`**, which is
+the only scope accessor on the exported client. The transport's `TenantID()` is still
+reachable through `Client.Transport()` but is a **partial view** — it returns `""` for
+both environment and organization scope, so it cannot distinguish them and **must not
+be used to infer the scope**. A zero kind with an empty ID is the organization case,
 which a caller switching on the kind has to handle.
 
-Security Cloud is a separate product with its own tenant identifier, registered
-via `WithSecurityCloudTenantID` (exported) / `WithNamespaceTenantID` (internal). An
-override matches the namespace exactly or on its first path segment.
+Security Cloud is a separate product with its own tenant identifier, but it travels
+in the same `X-Tenant-Id` header as Jamf Pro's, so it is supplied with plain
+`WithTenantID`. The per-namespace override that used to carry it —
+`WithSecurityCloudTenantID` / `WithNamespaceTenantID` — **was deleted with the move to
+header scoping and exists nowhere in the code**; a client reaches exactly one
+product's Security Cloud tenant at a time. An environment credential also reaches
+`/securitycloud` (wire-verified 2026-09-03), which is what lets the acceptance suite
+fall back to one.
 
 ### Custom request headers (reverse-proxy support)
 

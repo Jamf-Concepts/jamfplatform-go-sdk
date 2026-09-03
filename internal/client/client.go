@@ -294,10 +294,12 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 		throttle:     throttle,
 		retry:        retry,
 	}
-	// Installed here rather than in newRetryClient because the hook is a
-	// method on c, which does not exist yet at that point. It reads c.logger
-	// at call time, so it works regardless of when a logger is installed.
+	// Installed here rather than in newRetryClient because both hooks are
+	// methods on c, which does not exist yet at that point. Each reads
+	// c.logger at call time, so they work regardless of when a logger is
+	// installed.
 	retry.RequestLogHook = c.logRetryAttempt
+	retry.ResponseLogHook = c.logRetriedResponse
 	for _, opt := range opts {
 		opt(c)
 	}

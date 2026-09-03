@@ -104,16 +104,17 @@ jobs:
           if [ -n "$unformatted" ]; then
             echo "gofmt would rewrite:"; echo "$unformatted"; exit 1
           fi
-          # go fix is NOT idempotent in one pass: a pass that adds `//go:fix
-          # inline` to a helper only enables the NEXT pass to inline its call
-          # sites. Running once left three files still to rewrite, so the gate
-          # iterates to a fixpoint — otherwise it fails on a tree that a correct
-          # single local run produced.
-          for _ in 1 2 3 4 5; do
-            go fix ./... >/dev/null
-            go fix -tags acceptance ./jamfplatform/... >/dev/null
-            git diff --quiet && break
-          done
+          # One pass of each, tagged and untagged. A single pass is all a
+          # DRIFT CHECK needs: go fix is not idempotent in one pass (a pass
+          # that adds `//go:fix inline` to a helper only enables the NEXT pass
+          # to inline its call sites), but a tree that is already at a fixpoint
+          # yields no diff from one pass by definition. Iterating here would
+          # only let CI *reach* the fixpoint on the author's behalf, which is
+          # not the gate's job — and the earlier loop could not do that anyway,
+          # because `git diff` compares against HEAD rather than against the
+          # previous pass, so it never cleared once any pass had written.
+          go fix ./... >/dev/null
+          go fix -tags acceptance ./jamfplatform/... >/dev/null
           git diff --exit-code || {
             echo "go fix produced changes — run these to a fixpoint locally and commit the result with your change:"
             echo "  go fix ./... && go fix -tags acceptance ./jamfplatform/... (repeat until clean)"
@@ -133,6 +134,32 @@ jobs:
         # module root would pull in tools/tools.go, a build-tagged blank import
         # of copywrite (a main package) that typecheck rejects by design and
         # which exists solely to pin the dependency.
+        #
+        # The fourth entry is the root module again, this time behind
+        # //go:build acceptance. Without it the 56 files of that suite are
+        # linted by NOTHING: golangci-lint typechecks in the default build
+        # context, so the untagged root run does not even parse them, and the
+        # blind spot this PR closed for `go vet` and `go fix` stayed open here.
+        #
+        # It runs errcheck and ineffassign only, and that is a floor rather
+        # than the intent. The default set's other three cannot be turned on
+        # yet: the tagged suite carries 39 pre-existing findings (staticcheck
+        # 31, unused 5, govet 3), so a full-set gate is red on arrival, and
+        # `only-new-issues` does not rescue it — 18 of the 39 sit on lines this
+        # branch already touches.
+        #
+        # 28 of the 31 are SA1019 (deprecated-symbol use), and those are NOT a
+        # backlog to burn down: every generated method gets an acceptance test,
+        # deprecated ones included, so this suite calls deprecated surfaces by
+        # policy and always will. Turning staticcheck on here therefore needs a
+        # `.golangci.yml` narrowing `staticcheck.checks` for acc_*_test.go —
+        # check selection is config-only in v2, there is no CLI flag — and the
+        # repo has no config file at all today. That, plus the ~11 genuine
+        # findings behind it (unused helpers, SA4004, ST1005, QF1002), is a
+        # separate change. errcheck is the one worth having immediately anyway:
+        # an ignored error in an acceptance test is exactly the "silently
+        # tolerate a real error to make one pass" that the suite's own policy
+        # bans.
         include:
           - module: "."
             path: "./..."
@@ -140,6 +167,9 @@ jobs:
             path: "./..."
           - module: "tools"
             path: "./acctargets/... ./acclanes/..."
+          - module: "."
+            path: "./jamfplatform/..."
+            extra: "--build-tags=acceptance --enable-only=errcheck,ineffassign"
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -148,7 +178,29 @@ jobs:
       - uses: golangci/golangci-lint-action@v9
         with:
           working-directory: ${{ matrix.module }}
-          args: ${{ matrix.path }}
+          # `args` goes verbatim to `golangci-lint run`, so the tag and linter
+          # selection ride here. Flag spellings confirmed against the tool
+          # (`golangci-lint run --help`, v2.13.2): `--build-tags` takes a
+          # comma-separated list, `--enable-only` overrides the enabled set.
+          # matrix.extra is unset on the three untagged entries and expands to
+          # nothing.
+          args: ${{ matrix.extra }} ${{ matrix.path }}
+
+  race:
+    name: Race Detector
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      # The transport is concurrent by construction — a request throttle, a
+      # sync.OnceValue token cache and a shared cookie jar, all reached from
+      # however many goroutines the consumer runs (Terraform's default
+      # parallelism is 10). None of that is exercised under -race by the plain
+      # test job. Root module only: the acceptance suite needs credentials and
+      # a live tenant, so -race there would buy nothing CI can run.
+      - run: go test -race -count=1 -timeout=300s ./...
 
   generate:
     name: Generated Code

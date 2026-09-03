@@ -152,8 +152,8 @@ jobs:
         include: ${{ fromJson(needs.plan.outputs.matrix) }}
     # Job-level: serialise each lane against ITSELF across all PRs, branches and
     # the scheduled run, while letting different lanes overlap. Previously one
-    # `acceptance-tenant` group serialised everything, which is right for the 681
-    # tests that mutate the shared Jamf Pro tenant and pointless for the 46 that
+    # `acceptance-tenant` group serialised everything, which is right for the 650
+    # tests that mutate the shared Jamf Pro tenant and pointless for the 78 that
     # do not — a ten-test account run waited for a two-hour Pro suite.
     #
     # Per-lane rather than keyed on matrix.lock, because two runs of the SAME
@@ -161,7 +161,9 @@ jobs:
     # Security Cloud groups is a collision even though neither touches Pro. The
     # group is a constant per lane (NOT github.ref) so the second run queues
     # instead of racing, and cancel-in-progress: false never kills a running
-    # suite. Same-PR supersede is handled by the workflow-level group above.
+    # suite. Same-PR supersede is handled by the "Skip if superseded" step below,
+    # not by a workflow-level concurrency group — this workflow deliberately has
+    # none, for the reason set out at the top of the file.
     concurrency:
       group: acceptance-lane-${{ matrix.lane }}
       cancel-in-progress: false
@@ -185,6 +187,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           PR: ${{ github.event.pull_request.number }}
           RAN_FOR: ${{ github.event.pull_request.head.sha }}
+          LANE: ${{ matrix.lane }}
         run: |
           set -euo pipefail
           if [ "$EVENT" != "pull_request" ]; then
@@ -196,7 +199,7 @@ jobs:
             echo "superseded=true" >> "$GITHUB_OUTPUT"
             echo "This run is for ${RAN_FOR}, but the PR head is now ${head}. Skipping."
             {
-              echo "## Acceptance — lane \`${{ matrix.lane }}\` skipped"
+              echo "## Acceptance — lane \`${LANE}\` skipped"
               echo
               echo "Superseded: queued for \`${RAN_FOR:0:8}\`, PR head is now \`${head:0:8}\`."
               echo "A running suite is never cancelled, so obsolete runs decline to start rather than"
@@ -219,7 +222,7 @@ jobs:
           # acclanes always emits an explicit -run pattern, including for ALL, so
           # there is no unscoped branch here: a lane must never run a test that
           # was assigned to another lane's credential. On a full run that makes
-          # the pro pattern a ~33 KB alternation of 681 names. That is deliberate
+          # the pro pattern a ~30 KB alternation of 650 names. That is deliberate
           # and within every limit that applies (job outputs cap at 1 MB, RE2 has
           # no practical pattern-size limit, and the whole matrix JSON is 34 KB);
           # the alternative — leaving pro unscoped — would re-run the other
@@ -310,11 +313,13 @@ jobs:
           JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID }}
           JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD }}
 
-      # Surface what this lane actually ran, failed or self-skipped, so a
-      # suite that never executes — a missing fixture, an unset write gate — is
-      # visible instead of vanishing into a green check, and a failure is
-      # nameable from the summary without opening the raw log. Counts top-level
-      # TestAcceptance_* results only; subtests are indented and excluded.
+      # Surface what this lane actually ran, failed or self-skipped, and FAIL the
+      # job when a lane planned tests and executed none — a missing fixture, an
+      # unset write gate, or a -run pattern that matches nothing. `go test -run`
+      # with a pattern matching no test exits 0, so without this the lane would
+      # report green having asserted nothing. A failure is also nameable from the
+      # summary without opening the raw log. Counts top-level TestAcceptance_*
+      # results only; subtests are indented and excluded.
       #
       # A skip is worth reading here even though JAMFPLATFORM_ACC_REQUIRE makes a
       # missing CREDENTIAL fatal: the remaining skips are the deliberate ones,
@@ -345,6 +350,12 @@ jobs:
               echo "> [!WARNING]"
               echo "> This lane executed **no** tests despite planning ${COUNT}."
               echo
+              # Everything above is already appended to $GITHUB_STEP_SUMMARY, so
+              # exiting here keeps the banner and still fails the job — which is
+              # what acceptance-gate needs, since needs.acceptance.result cannot
+              # otherwise tell "ran and passed" from "ran nothing".
+              echo "Lane ${LANE} ran zero of its planned ${COUNT} tests." >&2
+              exit 1
             fi
             if [ "${fail:-0}" -gt 0 ]; then
               # Open by default: a failure is the one thing nobody should have to

@@ -7,6 +7,8 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"slices"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -482,5 +484,136 @@ func TestRetryAttemptsAreLogged(t *testing.T) {
 	// double-log the request execute() already emitted.
 	if got := logged.Load(); got != 3 {
 		t.Errorf("expected 3 logged requests (one per attempt), got %d", got)
+	}
+}
+
+// retryStatusLogger records every status handed to LogResponse, plus a count
+// of LogRequest calls, so a test can assert on the *shape* of a retry
+// sequence in the log rather than just its length.
+type retryStatusLogger struct {
+	mu       sync.Mutex
+	requests int
+	statuses []int
+}
+
+func (l *retryStatusLogger) LogRequest(_ context.Context, _, _ string, _ []byte) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.requests++
+}
+
+func (l *retryStatusLogger) LogResponse(_ context.Context, statusCode int, _ http.Header, _ []byte) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.statuses = append(l.statuses, statusCode)
+}
+
+func (l *retryStatusLogger) snapshot() (int, []int) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.requests, slices.Clone(l.statuses)
+}
+
+// TestRetriedStatusIsLogged is the other half of TestRetryAttemptsAreLogged,
+// and it guards a diagnosis cost this SDK has already paid: a package DELETE
+// that 500s and is retried can answer 404 on the retry, and with only the
+// request half of the retry logging in place the log read "request, request,
+// 404" — the 500 that caused the retry was nowhere, so four package tests
+// failed on a 404 whose real cause took a wire probe to establish (see
+// requirePackageStore in jamfplatform/acc_helpers_test.go). Both statuses
+// must now be in the log.
+func TestRetriedStatusIsLogged(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 1*time.Millisecond, 2*time.Millisecond)
+
+	logger := &retryStatusLogger{}
+	c.SetLogger(logger)
+
+	var calls atomic.Int32
+	mux.HandleFunc("/api/packages/1", func(w http.ResponseWriter, _ *http.Request) {
+		if calls.Add(1) == 1 {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	err := c.DoExpect(context.Background(), http.MethodDelete, "/api/packages/1", nil, http.StatusNoContent, nil)
+	if err == nil {
+		t.Fatal("expected the retry's 404 to surface as an error")
+	}
+	var apiErr *APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(http.StatusNotFound) {
+		t.Fatalf("expected APIResponseError(404), got %v", err)
+	}
+	if got := calls.Load(); got != 2 {
+		t.Fatalf("expected 2 attempts (500 then 404), got %d", got)
+	}
+
+	requests, statuses := logger.snapshot()
+	if requests != 2 {
+		t.Errorf("expected 2 logged requests (execute() for attempt 1, the hook for the retry), got %d", requests)
+	}
+	// The 500 comes from the ResponseLogHook, the 404 from handleResponse.
+	// Order matters: the log has to read 500-then-404 for the first failure to
+	// be attributable to the attempt it belongs to.
+	if !slices.Equal(statuses, []int{http.StatusInternalServerError, http.StatusNotFound}) {
+		t.Errorf("logged statuses = %v, want [500 404] — the 500 that caused the retry must be in the log", statuses)
+	}
+}
+
+// TestNonRetriedResponseIsLoggedOnce pins the gate on logRetriedResponse: the
+// hook fires after *every* attempt's response, including the final successful
+// one that handleResponse already logs, so an ungated hook would double-log
+// every request the SDK makes.
+func TestNonRetriedResponseIsLoggedOnce(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+
+	logger := &retryStatusLogger{}
+	c.SetLogger(logger)
+
+	mux.HandleFunc("/api/fine", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	if err := c.Do(context.Background(), http.MethodGet, "/api/fine", nil, nil); err != nil {
+		t.Fatalf("Do: %v", err)
+	}
+
+	requests, statuses := logger.snapshot()
+	if requests != 1 {
+		t.Errorf("expected 1 logged request, got %d", requests)
+	}
+	if !slices.Equal(statuses, []int{http.StatusOK}) {
+		t.Errorf("logged statuses = %v, want exactly [200] (the hook must not double-log a response nothing retried)", statuses)
+	}
+}
+
+// TestNonRetryablePostErrorIsLoggedOnce covers the same gate on the path where
+// the status *is* a 5xx but the method makes it non-retryable: a POST 500 is
+// surfaced immediately (see TestRetryOn500_PostDoesNotRetry), so it must
+// appear once, from handleResponse. The gate reuses jamfCheckRetry precisely
+// so it cannot disagree with that decision.
+func TestNonRetryablePostErrorIsLoggedOnce(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, 1*time.Millisecond, 2*time.Millisecond)
+
+	logger := &retryStatusLogger{}
+	c.SetLogger(logger)
+
+	mux.HandleFunc("/api/create-logged", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	if err := c.Do(context.Background(), http.MethodPost, "/api/create-logged", nil, nil); err == nil {
+		t.Fatal("expected error, got nil")
+	}
+
+	_, statuses := logger.snapshot()
+	if !slices.Equal(statuses, []int{http.StatusInternalServerError}) {
+		t.Errorf("logged statuses = %v, want exactly [500] (a non-retried 500 must not be logged twice)", statuses)
 	}
 }

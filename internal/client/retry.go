@@ -170,6 +170,67 @@ func (c *Transport) logRetryAttempt(_ retryablehttp.Logger, req *http.Request, a
 	c.logger.LogRequest(req.Context(), req.Method, req.URL.String(), nil)
 }
 
+// logRetriedResponse is the ResponseLogHook: retryablehttp calls it after
+// every attempt that produced a response, before it decides whether to wait
+// and try again.
+//
+// It is the other half of logRetryAttempt. Logging the retried *requests*
+// alone leaves the log reading "request, request, 404" — the status that
+// actually caused each retry never appears, because handleResponse only ever
+// sees the response that survives the loop. That cost is documented in this
+// SDK: requirePackageStore's doc in jamfplatform/acc_helpers_test.go records
+// four package tests failing on a 404 whose real cause was a 500 two hops
+// earlier, which took a wire probe to establish. With this hook the 500 is in
+// the log next to the 404 that replaced it.
+//
+// Gating is the whole design problem: the hook fires for every attempt's
+// response, including the last one, and handleResponse already logs that one.
+// Logging unconditionally would double-log every single request in the SDK.
+// So the same predicate that drives the retry decides whether to log —
+// jamfCheckRetry (and through it isRetryableWriteStatus), consulted with a nil
+// error exactly as retryablehttp consults it — which means the statuses logged
+// here can never drift from the statuses actually retried. err is nil rather
+// than resp's own error because retryablehttp does not call this hook at all
+// when the attempt failed at the transport layer (resp would be nil), so a
+// response reaching here always came back from the server.
+//
+// One duplicate survives that gate deliberately: when retries are exhausted,
+// the final attempt is retryable by policy but not retried, because
+// retryablehttp checks the remaining budget after this hook and passes no
+// attempt number here to reconstruct it. That response is logged twice — once
+// as retryable, once by handleResponse as the surviving response. One extra
+// line at the end of an exhausted sequence is a better trade than either
+// tracking per-request attempt state in a Transport shared by concurrent
+// callers, or dropping the last (and most interesting) failure from the log.
+//
+// Headers and body are both nil, which is the same discipline as
+// logRetryAttempt's nil body. The body especially must not be read here:
+// retryablehttp drains it to reuse the connection when it retries, and on the
+// not-retried path it is the body handleResponse decodes for the caller —
+// consuming it would break decoding. A nil http.Header is safe for a consumer
+// logger, since Get and range are both nil-safe. The status is the only thing
+// a retry sequence adds: the method and URL are already on the LogRequest line
+// this response answers, and the Logger interface's LogResponse carries no
+// place for them anyway.
+//
+// As in logRetryAttempt, the retryablehttp.Logger argument is always nil
+// (newRetryClient sets rc.Logger = nil, and retryablehttp's hook dispatch
+// passes nil through its default branch), and the SDK's own Logger is read
+// from the Transport at call time so a logger installed later via SetLogger or
+// WithLogger is picked up. Installed next to logRetryAttempt in NewTransport
+// rather than in newRetryClient, for the same reason: it is a method on the
+// Transport, which does not exist when newRetryClient runs.
+func (c *Transport) logRetriedResponse(_ retryablehttp.Logger, resp *http.Response) {
+	if c.logger == nil || resp == nil {
+		return
+	}
+	ctx := resp.Request.Context()
+	if shouldRetry, err := jamfCheckRetry(ctx, resp, nil); err != nil || !shouldRetry {
+		return
+	}
+	c.logger.LogResponse(ctx, resp.StatusCode, nil, nil)
+}
+
 // newRetryClient builds a retryablehttp.Client around authed — the
 // oauth2+throttle-wrapped client also used directly (unwrapped) for
 // multipart uploads, see multipart.go. authed is deliberately the

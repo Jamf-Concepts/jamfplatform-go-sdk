@@ -1125,17 +1125,20 @@ choice between two integrations rather than two IDs for one. `accScopeInUse`
 records which it settled on, because a silent switch between scopes is
 indistinguishable from the tenant's data changing underneath the suite.
 
-Security Cloud tests use their own credential set (`JAMFPLATFORM_JSC_CLIENT_ID`,
-`JAMFPLATFORM_JSC_CLIENT_SECRET`, `JAMFPLATFORM_JSC_TENANT_ID`, and optionally
-`JAMFPLATFORM_JSC_BASE_URL`) via
-`accSecurityCloudClient`, because a Security Cloud client answers 403 on
-`/api/pro` and vice versa — a second tenant ID alone is not enough. The tenant is
-passed through `WithSecurityCloudTenantID` rather than `WithTenantID` so the suite
-exercises the per-namespace override a dual-product consumer relies on. Unset
-credentials skip; supplied-but-rejected credentials fail.
+Security Cloud tests go through `accSecurityCloudClient`, because a Security Cloud
+client answers 403 on `/pro` and vice versa — a second tenant ID alone is not enough.
+They prefer their own credential set
+(`JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID`,
+`..._CLIENT_SECRET`, `..._TENANT_ID`, and optionally `..._BASE_URL`) and fall back to
+the environment set, which also reaches `/securitycloud` (wire-verified 2026-09-03).
+The tenant goes through plain `WithTenantID`: the per-namespace override this used to
+exercise (`WithSecurityCloudTenantID`) went away with header scoping. Which of the two
+credentials a run settled on is logged once, because the two land on different Security
+Cloud tenants with different fixtures. Unset credentials skip; supplied-but-rejected
+credentials fail.
 
 Opt-in gates exist where a write provisions real infrastructure:
-`JAMFPLATFORM_JSC_GATEWAY_WRITE_OK` (creating a ZTNA gateway provisions real
+`JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK` (creating a ZTNA gateway provisions real
 network egress; deleting one severs traffic for every access policy routed through
 it) and `JAMFPLATFORM_AIGOV_WRITE_OK` (every create leaves a permanent row,
 because archive is not a readable soft delete). IPSec *rejection* cases are

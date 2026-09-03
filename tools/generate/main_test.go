@@ -18,6 +18,7 @@ func TestValidateConfig(t *testing.T) {
 			name: "no exclude paths passes",
 			cfg: Config{Specs: []SpecDef{{
 				File:       "a.yaml",
+				Package:    "things",
 				Operations: []OperationDef{{Op: "GET /v1/x", Name: "GetX"}},
 			}}},
 		},
@@ -25,6 +26,7 @@ func TestValidateConfig(t *testing.T) {
 			name: "non-overlapping exclude passes",
 			cfg: Config{Specs: []SpecDef{{
 				File:         "a.yaml",
+				Package:      "things",
 				Operations:   []OperationDef{{Op: "GET /v1/x", Name: "GetX"}},
 				ExcludePaths: []string{"POST /v1/auth/token"},
 			}}},
@@ -33,6 +35,7 @@ func TestValidateConfig(t *testing.T) {
 			name: "exact overlap fails",
 			cfg: Config{Specs: []SpecDef{{
 				File:         "a.yaml",
+				Package:      "things",
 				Operations:   []OperationDef{{Op: "GET /v1/x", Name: "GetX"}},
 				ExcludePaths: []string{"GET /v1/x"},
 			}}},
@@ -42,15 +45,27 @@ func TestValidateConfig(t *testing.T) {
 			name: "case-insensitive method overlap fails",
 			cfg: Config{Specs: []SpecDef{{
 				File:         "a.yaml",
+				Package:      "things",
 				Operations:   []OperationDef{{Op: "GET /v1/x", Name: "GetX"}},
 				ExcludePaths: []string{"get /v1/x"},
 			}}},
 			wantErr: "both operations and excludePaths",
 		},
 		{
+			// An empty package routes the spec through the unmaintained legacy
+			// root emitter (processSpec). See validateConfig.
+			name: "missing package fails",
+			cfg: Config{Specs: []SpecDef{{
+				File:       "a.yaml",
+				Operations: []OperationDef{{Op: "GET /v1/x", Name: "GetX"}},
+			}}},
+			wantErr: `"package" is required`,
+		},
+		{
 			name: "duplicate exclude entry fails",
 			cfg: Config{Specs: []SpecDef{{
 				File:         "a.yaml",
+				Package:      "things",
 				ExcludePaths: []string{"POST /v1/auth/token", "POST /v1/auth/token"},
 			}}},
 			wantErr: "duplicate entry in excludePaths",

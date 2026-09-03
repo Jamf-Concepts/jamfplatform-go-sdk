@@ -273,7 +273,7 @@ func resolveSpecPath(root string, cfg Config, spec SpecDef) (path string, usedFa
 	return fallback, true, nil
 }
 
-func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFallback bool, emittedTypes map[string]bool) error {
+func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFallback bool, emittedTypes map[string]bool, rootTypes *[]GoType) error {
 	doc, err := loadSpec(specPath, allowedOpsSet(spec))
 	if err != nil {
 		return fmt.Errorf("loading spec: %w", err)
@@ -342,17 +342,24 @@ func processSpec(root string, cfg Config, spec SpecDef, specPath string, usedFal
 		emittedTypes[t.Name] = true
 	}
 
-	// All root-package specs share a single Go package (legacy path), so the
-	// validator has visibility into every type already emitted across prior
-	// specs — any method reference must resolve against that accumulated set.
-	declared := make([]GoType, 0, len(emittedTypes))
-	for name := range emittedTypes {
-		declared = append(declared, GoType{Name: name})
-	}
-	if err := validateNoUntypedFields(fmt.Sprintf("spec %s", spec.File), declared); err != nil {
+	// All root-package specs share a single Go package (legacy path), so both
+	// validators have visibility into every type already emitted across prior
+	// specs — a method reference must resolve against that accumulated set, and
+	// a field emitted by an earlier spec is still a field in this package.
+	//
+	// rootTypes accumulates the whole GoType, fields included, the way
+	// processPackage's allTypes does. Handing the validators a slice rebuilt
+	// from emittedTypes — a set of type *names* — is what silently disabled
+	// validateNoUntypedFields here: every element had a nil Fields slice, so
+	// its loop body never ran and it returned success whatever was emitted.
+	// validateTypeReferences only reads .Name and was unaffected, which is why
+	// nothing failed. Pinned by TestProcessSpecRejectsUntypedFieldOnRootPath.
+	*rootTypes = append(*rootTypes, types...)
+
+	if err := validateNoUntypedFields(fmt.Sprintf("spec %s", spec.File), *rootTypes); err != nil {
 		return err
 	}
-	if err := validateTypeReferences(fmt.Sprintf("spec %s", spec.File), declared, methods); err != nil {
+	if err := validateTypeReferences(fmt.Sprintf("spec %s", spec.File), *rootTypes, methods); err != nil {
 		return err
 	}
 	if err := validateUnwrapCodec(fmt.Sprintf("spec %s", spec.File), methods); err != nil {

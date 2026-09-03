@@ -4,6 +4,8 @@
 package main
 
 import (
+	"maps"
+	"slices"
 	"testing"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -376,5 +378,138 @@ func TestPruneUnreferencedSchemasRunsBeforeHoistNaming(t *testing.T) {
 	post := doc.Components.Schemas["computer_post"].Value
 	if _, ok := post.Properties["general"]; !ok {
 		t.Fatal("computer_post lost the inherited general section — prune ran before post-symmetry")
+	}
+}
+
+// objectVariant builds a `type: object` schema with the named string
+// properties, of which those in required are required.
+func objectVariant(properties []string, required ...string) *openapi3.SchemaRef {
+	s := openapi3.NewObjectSchema()
+	for _, p := range properties {
+		s.Properties[p] = &openapi3.SchemaRef{Value: openapi3.NewStringSchema()}
+	}
+	s.Required = required
+	return &openapi3.SchemaRef{Value: s}
+}
+
+// mergeOneOfVariants collapses a structurally discriminated union — a
+// discriminator-less `oneOf` with no properties of its own — into one struct,
+// and the whole correctness of that struct is in its required list. The
+// required set is *intersected*: a field only some variants require has to
+// become optional, or the generated struct claims a presence guarantee no
+// single variant makes and audit's AuditEnvelope (gateway events carry
+// actor+requestContext, service events carry data) marshals a lie. Getting it
+// backwards — a union rather than an intersection — produces a struct that
+// still compiles, still round-trips in the generated test, and is wrong only
+// in which fields a caller may leave nil.
+func TestMergeOneOfVariants(t *testing.T) {
+	tests := []struct {
+		name         string
+		schema       *openapi3.Schema
+		wantProps    []string
+		wantRequired []string
+	}{
+		{
+			// Required by every variant: the merged struct can promise it.
+			name: "required by all variants stays required",
+			schema: &openapi3.Schema{OneOf: openapi3.SchemaRefs{
+				objectVariant([]string{"id", "actor"}, "id"),
+				objectVariant([]string{"id", "data"}, "id"),
+			}},
+			wantProps:    []string{"actor", "data", "id"},
+			wantRequired: []string{"id"},
+		},
+		{
+			// Required by one variant only: optional in the merge, or the
+			// service-event variant is unrepresentable.
+			name: "required by some variants drops to optional",
+			schema: &openapi3.Schema{OneOf: openapi3.SchemaRefs{
+				objectVariant([]string{"id", "actor"}, "id", "actor"),
+				objectVariant([]string{"id", "data"}, "id"),
+			}},
+			wantProps:    []string{"actor", "data", "id"},
+			wantRequired: []string{"id"},
+		},
+		{
+			name: "no variant requires anything",
+			schema: &openapi3.Schema{OneOf: openapi3.SchemaRefs{
+				objectVariant([]string{"actor"}),
+				objectVariant([]string{"data"}),
+			}},
+			wantProps:    []string{"actor", "data"},
+			wantRequired: []string{},
+		},
+		{
+			// The union root's own required list is not subject to the
+			// intersection — nothing about a variant can make a root-declared
+			// requirement optional. auditSource is the live shape: declared on
+			// the root alongside the oneOf, required there, absent from both
+			// variants' required lists.
+			name: "root required field survives the intersection",
+			schema: func() *openapi3.Schema {
+				s := openapi3.NewObjectSchema()
+				s.Properties["auditSource"] = &openapi3.SchemaRef{Value: openapi3.NewStringSchema()}
+				s.Required = []string{"auditSource"}
+				s.OneOf = openapi3.SchemaRefs{
+					objectVariant([]string{"actor"}, "actor"),
+					objectVariant([]string{"data"}),
+				}
+				return s
+			}(),
+			wantProps:    []string{"actor", "auditSource", "data"},
+			wantRequired: []string{"auditSource"},
+		},
+		{
+			// Root-required *and* declared by one variant that does not
+			// require it: still required, and listed once.
+			name: "root required field declared by a variant is not duplicated",
+			schema: func() *openapi3.Schema {
+				s := openapi3.NewObjectSchema()
+				s.Properties["id"] = &openapi3.SchemaRef{Value: openapi3.NewStringSchema()}
+				s.Required = []string{"id"}
+				s.OneOf = openapi3.SchemaRefs{
+					objectVariant([]string{"id", "actor"}, "id"),
+					objectVariant([]string{"data"}),
+				}
+				return s
+			}(),
+			wantProps:    []string{"actor", "data", "id"},
+			wantRequired: []string{"id"},
+		},
+		{
+			// A nil or unresolved variant is skipped, and — the part that is
+			// easy to get wrong — it does not count toward the number of
+			// variants a field must be required by. Counting it would silently
+			// demote every required field in the union.
+			name: "nil variants are skipped without raising the intersection bar",
+			schema: &openapi3.Schema{OneOf: openapi3.SchemaRefs{
+				nil,
+				{Value: nil},
+				objectVariant([]string{"id"}, "id"),
+			}},
+			wantProps:    []string{"id"},
+			wantRequired: []string{"id"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			merged := mergeOneOfVariants(tc.schema)
+
+			got := slices.Sorted(maps.Keys(merged.Properties))
+			if !slices.Equal(got, tc.wantProps) {
+				t.Errorf("properties = %v, want %v", got, tc.wantProps)
+			}
+			// mergeOneOfVariants sorts its own output, so compare as-is: an
+			// unsorted result is a bug in its own right (the field order of
+			// every generated struct would follow Go's map iteration).
+			gotRequired := merged.Required
+			if len(gotRequired) == 0 {
+				gotRequired = []string{}
+			}
+			if !slices.Equal(gotRequired, tc.wantRequired) {
+				t.Errorf("required = %v, want %v", gotRequired, tc.wantRequired)
+			}
+		})
 	}
 }

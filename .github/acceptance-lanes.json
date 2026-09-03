@@ -1,15 +1,15 @@
 {
   "_comment": [
     "Single source of truth for acceptance-suite lanes, read by BOTH",
-    ".github/scripts/acceptance-lanes.py (which builds the CI matrix) and",
+    "tools/acclanes (a Go command, which builds the CI matrix) and",
     "jamfplatform/acc_lanes_test.go (which proves the partition is honest).",
     "A plain data file rather than Go, because tools/ is a separate module from",
     "the root one: sharing a Go constant would mean either a cross-module import",
     "or a duplicated table that drifts.",
     "",
     "A lane is a PRODUCT SPACE, and membership is a test-name prefix. That works",
-    "because the suite's naming convention already partitions by product: all 727",
-    "acceptance tests agree with the acc*Client factory they call, 727/727. The",
+    "because the suite's naming convention already partitions by product: all 728",
+    "acceptance tests agree with the acc*Client factory they call, 728/728. The",
     "conformance test pins that, so a misnamed test fails `make test` rather than",
     "running in the wrong lane against the wrong credential.",
     "",
