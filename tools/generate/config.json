@@ -4340,15 +4340,6 @@
           "expectedStatus": 201
         },
         {
-          "op": "GET /settings/obj/policyProperties",
-          "name": "GetPolicyPropertiesSettings"
-        },
-        {
-          "op": "PUT /settings/obj/policyProperties",
-          "name": "UpdatePolicyPropertiesSettings",
-          "expectedStatus": 200
-        },
-        {
           "op": "GET /v1/cloud-azure/defaults/mappings",
           "name": "GetCloudAzureDefaultMappingsV1"
         },
@@ -4382,11 +4373,6 @@
           "params": [
             "start-version:string:startVersion"
           ]
-        },
-        {
-          "op": "POST /v1/app-installers/titles/{id}/cache-update",
-          "name": "RefreshAppInstallerTitleCacheV1",
-          "expectedStatus": 204
         },
         {
           "op": "GET /v1/app-installers/deployments",

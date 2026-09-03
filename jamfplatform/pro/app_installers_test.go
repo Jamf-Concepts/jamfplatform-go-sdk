@@ -135,21 +135,6 @@ func TestListAppInstallerTitleVersionsV1_NotFound(t *testing.T) {
 	}
 }
 
-func TestRefreshAppInstallerTitleCacheV1(t *testing.T) {
-	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
-	mux.HandleFunc("/pro/v1/app-installers/titles/test-id/cache-update", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("method = %s, want POST", r.Method)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-
-	err := c.RefreshAppInstallerTitleCacheV1(context.Background(), "test-id")
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestListAppInstallerDeploymentsV1(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v1/app-installers/deployments", func(w http.ResponseWriter, r *http.Request) {

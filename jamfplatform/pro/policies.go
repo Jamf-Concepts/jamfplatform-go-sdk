@@ -36,33 +36,3 @@ func (c *Client) UpdatePolicyPropertiesV1(ctx context.Context, request *PolicyPr
 	}
 	return &result, nil
 }
-
-// GetPolicyPropertiesSettings get Policy Properties object.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2021-11-07) and may be removed in a future release.
-//
-// Required privileges: policies:read. Legacy Jamf Pro privilege name(s): Read Policies.
-func (c *Client) GetPolicyPropertiesSettings(ctx context.Context) (*PolicyProperties, error) {
-	prefix := c.transport.APIPrefix("pro", "")
-	var result PolicyProperties
-	endpoint := prefix + "/settings/obj/policyProperties"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("GetPolicyPropertiesSettings: %w", err)
-	}
-	return &result, nil
-}
-
-// UpdatePolicyPropertiesSettings update Policy Properties object.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2021-11-07) and may be removed in a future release.
-//
-// Required privileges: policies:update. Legacy Jamf Pro privilege name(s): Update Policies.
-func (c *Client) UpdatePolicyPropertiesSettings(ctx context.Context, request *PolicyProperties) (*PolicyProperties, error) {
-	prefix := c.transport.APIPrefix("pro", "")
-	var result PolicyProperties
-	endpoint := prefix + "/settings/obj/policyProperties"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdatePolicyPropertiesSettings: %w", err)
-	}
-	return &result, nil
-}

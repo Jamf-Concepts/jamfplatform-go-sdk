@@ -116,21 +116,6 @@ func (c *Client) ListAppInstallerTitleVersionsV1(ctx context.Context, id string,
 	return &result, nil
 }
 
-// RefreshAppInstallerTitleCacheV1 refresh app title versions in cache for given App Title.
-//
-// Required privileges: applications:update. Legacy Jamf Pro privilege name(s): Update Mac Applications.
-//
-// Parameters:
-//   - id: App Title identifier.
-func (c *Client) RefreshAppInstallerTitleCacheV1(ctx context.Context, id string) error {
-	prefix := c.transport.APIPrefix("pro", "v1")
-	endpoint := fmt.Sprintf("%s/app-installers/titles/%s/cache-update", prefix, url.PathEscape(id))
-	if err := c.transport.DoExpect(ctx, http.MethodPost, endpoint, nil, http.StatusNoContent, nil); err != nil {
-		return fmt.Errorf("RefreshAppInstallerTitleCacheV1(%s): %w", id, err)
-	}
-	return nil
-}
-
 // ListAppInstallerDeploymentsV1 read App Installer deployments summary.
 //
 // Required privileges: applications:read. Legacy Jamf Pro privilege name(s): Read Mac Applications.

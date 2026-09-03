@@ -18096,20 +18096,6 @@
         },
         "type": "object"
       },
-      "PolicyProperties": {
-        "properties": {
-          "isAllowNetworkStateChangeTriggers": {
-            "default": true,
-            "type": "boolean"
-          },
-          "isPoliciesRequireNetworkStateChange": {
-            "default": false,
-            "description": "This field always returns false.",
-            "type": "boolean"
-          }
-        },
-        "type": "object"
-      },
       "PolicyPropertiesV1": {
         "properties": {
           "allowNetworkStateChangeTriggers": {
@@ -23705,98 +23691,6 @@
         ]
       }
     },
-    "/settings/obj/policyProperties": {
-      "get": {
-        "deprecated": true,
-        "description": "Gets `Policy Properties` object.\n\n\n**Required Permissions:** `policies:read`",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/X-Tenant-Id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PolicyProperties"
-                }
-              }
-            },
-            "description": "Successful response"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "policies:read"
-            ]
-          }
-        ],
-        "summary": "Get Policy Properties object\n",
-        "tags": [
-          "policies-preview"
-        ],
-        "x-deprecation-date": "2021-11-07",
-        "x-required-privileges": [
-          "policies:read"
-        ],
-        "x-required-privileges-legacy": [
-          "Read Policies"
-        ]
-      },
-      "put": {
-        "deprecated": true,
-        "description": "Update Policy Properties object\n\n\n**Required Permissions:** `policies:update`",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/X-Tenant-Id"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PolicyProperties"
-              }
-            }
-          },
-          "description": "Policy Properties object to update",
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PolicyProperties"
-                }
-              }
-            },
-            "description": "Policy Properties was updated"
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "policies:update"
-            ]
-          }
-        ],
-        "summary": "Update Policy Properties object\n",
-        "tags": [
-          "policies-preview"
-        ],
-        "x-deprecation-date": "2021-11-07",
-        "x-jamf-expected-status": 200,
-        "x-required-privileges": [
-          "policies:update"
-        ],
-        "x-required-privileges-legacy": [
-          "Update Policies"
-        ]
-      }
-    },
     "/startup-status": {
       "get": {
         "description": "Retrieves information about application startup. Current startup operation taking place (if any) and overall startup completion percentage.",
@@ -27067,62 +26961,6 @@
         ],
         "x-required-privileges-legacy": [
           "Read Mac Applications"
-        ]
-      }
-    },
-    "/v1/app-installers/titles/{id}/cache-update": {
-      "post": {
-        "description": "Refresh app title versions in cache for given App Title\n\n**Required Permissions:** `applications:update`",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/X-Tenant-Id"
-          },
-          {
-            "description": "App Title identifier",
-            "example": "0B3",
-            "explode": false,
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "style": "simple"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Cache refreshed"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            },
-            "description": "Cloud Services Connection has not been established."
-          }
-        },
-        "security": [
-          {
-            "oauth2": [
-              "applications:update"
-            ]
-          }
-        ],
-        "summary": "Refresh app title versions in cache for given App Title",
-        "tags": [
-          "app-installers"
-        ],
-        "x-action": true,
-        "x-jamf-expected-status": 204,
-        "x-required-privileges": [
-          "applications:update"
-        ],
-        "x-required-privileges-legacy": [
-          "Update Mac Applications"
         ]
       }
     },

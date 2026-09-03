@@ -230,43 +230,6 @@ func TestAcceptance_Pro_AppInstallers_Export(t *testing.T) {
 	t.Logf("export returned %d bytes", len(out))
 }
 
-// TestAcceptance_Pro_AppInstallers_CacheUpdateNeedsDebugMode pins a block rather
-// than asserting success.
-//
-// POST /v1/app-installers/titles/{id}/cache-update calls jss's
-// assertDebugModeEnabled() and answers 404 unless the DEBUG_MODE feature toggle
-// is set, which it is not on a normal instance. public-apis-oas#430 published it
-// anyway, and its own PR body flagged that as the one call resting on a decision
-// rather than on the spec. So this asserts the 404 and fails the day it lifts,
-// the same shape as the SDK's other generated-but-refused operations.
-func TestAcceptance_Pro_AppInstallers_CacheUpdateNeedsDebugMode(t *testing.T) {
-	p := pro.New(accClient(t))
-	ctx := context.Background()
-
-	titles, err := p.ListAppInstallerTitlesV1(ctx, nil, "")
-	if err != nil {
-		skipOnServerError(t, err)
-		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
-	}
-	if len(titles) == 0 || titles[0].ID == "" {
-		t.Skip("no title to address")
-	}
-
-	err = p.RefreshAppInstallerTitleCacheV1(ctx, titles[0].ID)
-	if err == nil {
-		t.Fatalf("RefreshAppInstallerTitleCacheV1(%s) succeeded — DEBUG_MODE is enabled on this instance, "+
-			"or the assertDebugModeEnabled() guard has been removed. Replace this test with real coverage.", titles[0].ID)
-	}
-	apiErr := jamfplatform.AsAPIError(err)
-	if apiErr == nil {
-		t.Fatalf("RefreshAppInstallerTitleCacheV1: non-API error, the request did not reach the endpoint: %v", err)
-	}
-	if !apiErr.HasStatus(404) {
-		t.Fatalf("RefreshAppInstallerTitleCacheV1: want 404 (DEBUG_MODE off), got %d: %v", apiErr.StatusCode, err)
-	}
-	t.Log("RefreshAppInstallerTitleCacheV1: still gated behind DEBUG_MODE (404), as published")
-}
-
 // TestAcceptance_Pro_AppInstallers_Writes is deliberately gated.
 //
 // Every operation here changes what is installed on real computers:

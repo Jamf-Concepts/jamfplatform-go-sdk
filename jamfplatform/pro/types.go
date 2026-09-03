@@ -6274,13 +6274,6 @@ type PlanStatus struct {
 	State string `json:"state"`
 }
 
-// PolicyProperties represents a policy properties.
-type PolicyProperties struct {
-	IsAllowNetworkStateChangeTriggers *bool `json:"isAllowNetworkStateChangeTriggers,omitempty"`
-	// This field always returns false.
-	IsPoliciesRequireNetworkStateChange *bool `json:"isPoliciesRequireNetworkStateChange,omitempty"`
-}
-
 // PolicyPropertiesV1 represents a policy properties v1.
 type PolicyPropertiesV1 struct {
 	AllowNetworkStateChangeTriggers *bool `json:"allowNetworkStateChangeTriggers,omitempty"`
