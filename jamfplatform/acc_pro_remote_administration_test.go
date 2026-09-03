@@ -8,7 +8,6 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -40,7 +39,7 @@ const teamViewerBogusID = "00000000-0000-0000-0000-000000000000"
 // hold and Jamf Pro validates it against TeamViewer before the configuration
 // exists.
 func teamViewerScriptToken() string {
-	return os.Getenv("JAMFPLATFORM_ACC_TEAMVIEWER_SCRIPT_TOKEN")
+	return accEnv("JAMFPLATFORM_ACC_PRO_TEAMVIEWER_SCRIPT_TOKEN")
 }
 
 // requireTeamViewerInvalidID asserts err is the server's own path-parameter
@@ -223,7 +222,7 @@ func TestAcceptance_Pro_RemoteAdministration_CreateConfigurationPreview(t *testi
 			t.Fatalf("CreateTeamViewerConfigurationPreview: 400 but no INVALID_FIELD detail: %v", err)
 		}
 		t.Logf("CreateTeamViewerConfigurationPreview reached Jamf Pro's validator; required fields: %v", fields)
-		t.Logf("Set JAMFPLATFORM_ACC_TEAMVIEWER_SCRIPT_TOKEN to a real TeamViewer script token to run the full create/update/delete chain")
+		t.Logf("Set JAMFPLATFORM_ACC_PRO_TEAMVIEWER_SCRIPT_TOKEN to a real TeamViewer script token to run the full create/update/delete chain")
 		return
 	}
 

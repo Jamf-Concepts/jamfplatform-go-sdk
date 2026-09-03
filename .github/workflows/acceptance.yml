@@ -121,49 +121,76 @@ jobs:
           fi
         env:
           SCOPE: ${{ needs.plan.outputs.run }}
-          # Tenant-scoped credentials — most suites fail/skip without these.
-          JAMFPLATFORM_BASE_URL: ${{ secrets.JAMFPLATFORM_BASE_URL }}
-          JAMFPLATFORM_CLIENT_ID: ${{ secrets.JAMFPLATFORM_CLIENT_ID }}
-          JAMFPLATFORM_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_CLIENT_SECRET }}
-          JAMFPLATFORM_TENANT_ID: ${{ secrets.JAMFPLATFORM_TENANT_ID }}
-          # Environment-scoped credentials. A separate integration, not a second
-          # ID: the header must match the credential, so an environment scope
-          # cannot be exercised with the tenant credential above. Without these
-          # the environment-scope suite skips entirely, which is why they are
-          # wired rather than left to local runs — environment is becoming the
-          # predominant scope, with tenant the fallback.
-          JAMFPLATFORM_ENVIRONMENT_ID: ${{ secrets.JAMFPLATFORM_ENVIRONMENT_ID }}
-          JAMFPLATFORM_ENV_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ENV_CLIENT_ID }}
-          JAMFPLATFORM_ENV_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ENV_CLIENT_SECRET }}
-          JAMFPLATFORM_ENV_BASE_URL: ${{ secrets.JAMFPLATFORM_ENV_BASE_URL }}
-          # Security Cloud credentials. A different product with its own
-          # organization and tenant: neither the tenant nor the environment
-          # credential above reaches /api/securitycloud (403 both ways), so the
-          # whole Security Cloud suite skips without these.
-          JAMFPLATFORM_JSC_CLIENT_ID: ${{ secrets.JAMFPLATFORM_JSC_CLIENT_ID }}
-          JAMFPLATFORM_JSC_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_JSC_CLIENT_SECRET }}
-          JAMFPLATFORM_JSC_TENANT_ID: ${{ secrets.JAMFPLATFORM_JSC_TENANT_ID }}
-          JAMFPLATFORM_JSC_BASE_URL: ${{ secrets.JAMFPLATFORM_JSC_BASE_URL }}
-          # JAMFPLATFORM_JSC_GATEWAY_WRITE_OK is deliberately NOT wired: creating
-          # a ZTNA gateway provisions real network egress and deleting one severs
-          # traffic for every access policy routed through it. Opt in locally on
-          # a tenant reserved for it.
-          # Optional tokens — when present, the suite exercises real
-          # register/lifecycle flows instead of probe-only paths.
-          JAMFPLATFORM_DEP_TOKEN: ${{ secrets.JAMFPLATFORM_DEP_TOKEN }}
-          JAMFPLATFORM_VPP_TOKEN: ${{ secrets.JAMFPLATFORM_VPP_TOKEN }}
-          JAMFPLATFORM_PROTECT_URL: ${{ secrets.JAMFPLATFORM_PROTECT_URL }}
-          JAMFPLATFORM_PROTECT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_PROTECT_CLIENT_ID }}
-          JAMFPLATFORM_PROTECT_PASSWORD: ${{ secrets.JAMFPLATFORM_PROTECT_PASSWORD }}
-          # Fixture-ID env vars (JAMFPLATFORM_CLASSIC_COMPUTER_ID,
-          # JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID,
-          # JAMFPLATFORM_DEVICE_GROUP_ID, JAMFPLATFORM_WIFI_PROFILE_ID,
-          # JAMFPLATFORM_VPP_INVITATION_ID) are intentionally NOT
-          # wired — tests auto-discover or self-create those fixtures
-          # when the vars are unset. The vars exist as local-run
-          # overrides only.
+          # ---------------------------------------------------------------
+          # Credentials. One set per (product, scope), named
+          # JAMFPLATFORM_ACC_<PRODUCT>_<SCOPE>_<FIELD>. The product token appears
+          # only where the scope is product-bound: tenant is per-product, while
+          # environment and organization span a customer's tenants. ACC_ marks
+          # these as acceptance-only and keeps them clear of
+          # JAMFPLATFORM_CLIENT_ID and friends, which jamfplatform/doc.go
+          # documents as the *consumer* convention.
+          # ---------------------------------------------------------------
           #
-          # Destructive opt-in gates (JAMFPLATFORM_PRELOAD_WIPE_OK,
-          # JAMFPLATFORM_USER_WRITE_OK) are also NOT wired — they
-          # would wipe inventory-preload records / leak orphan users
-          # on every run. Enable locally only when intended.
+          # Environment scope is the workhorse: one environment credential is
+          # wire-verified (2026-09-03) to reach pro, devices, blueprints,
+          # compliance-benchmarks, ai/governance AND securitycloud. Prefer it.
+          JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL }}
+          JAMFPLATFORM_ACC_ENVIRONMENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_ID }}
+          JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID }}
+          JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET }}
+          # Organization scope is the ABSENCE of a scope header — the gateway
+          # derives the organization from the token — so there is no ID to wire
+          # and supplying one would be wrong. Jamf Account ships only use1
+          # api-definitions, so BASE_URL must be the US gateway; an EU one fails
+          # in a way that does not look regional. Missing entirely until
+          # 2026-09-03, so all ten account tests skipped on every run.
+          JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL }}
+          JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID }}
+          JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET }}
+          # Tenant scope, kept for COVERAGE rather than data: WithTenantID is a
+          # supported public option the Terraform provider uses, and tenant is
+          # the legacy scope — so if CI only ever sent X-Environment-Id a
+          # regression in the ScopeTenant path would ship unnoticed. One lane
+          # uses it; everything else runs on the environment credential.
+          JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL }}
+          JAMFPLATFORM_ACC_PRO_TENANT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_ID }}
+          JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID }}
+          JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET }}
+          #
+          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_* is deliberately NOT wired.
+          # The environment credential above reaches /api/securitycloud, so a
+          # dedicated Security Cloud credential is redundant here. It remains
+          # supported and PREFERRED when set, because it lands on a different
+          # Security Cloud tenant carrying the suite's long-lived fixtures — set
+          # it locally if a test needs those. accJSCCredSource logs which
+          # credential the run actually used.
+          #
+          # Credential sets whose absence must FAIL rather than skip. Unset
+          # credentials skip by design so a contributor without a tenant can run
+          # the suite, but in a pipeline that wires the secrets a skip is
+          # invisible: the package prints `ok` and the check goes green having
+          # asserted nothing. That is how the account tests went unnoticed above,
+          # and how a 2026-08-04 WAF block turned 146 skips into a passing run.
+          # Add `environment` once its secrets are confirmed populated.
+          JAMFPLATFORM_ACC_REQUIRE: platform,organization
+          # Optional Pro fixtures and material — when present the suite exercises
+          # real register/lifecycle flows instead of probe-only paths. Namespaced
+          # by product for the same reason the credentials are.
+          JAMFPLATFORM_ACC_PRO_DEP_TOKEN: ${{ secrets.JAMFPLATFORM_ACC_PRO_DEP_TOKEN }}
+          JAMFPLATFORM_ACC_PRO_VPP_TOKEN: ${{ secrets.JAMFPLATFORM_ACC_PRO_VPP_TOKEN }}
+          JAMFPLATFORM_ACC_PRO_PROTECT_URL: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_URL }}
+          JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID }}
+          JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD }}
+          # Fixture-ID overrides (JAMFPLATFORM_ACC_PROCLASSIC_COMPUTER_ID,
+          # ..._PROCLASSIC_MOBILE_DEVICE_ID, ..._PRO_DEVICE_GROUP_ID,
+          # ..._PRO_WIFI_PROFILE_ID, ..._PRO_VPP_INVITATION_ID) are
+          # intentionally NOT wired — tests auto-discover or self-create those
+          # fixtures when the vars are unset. They exist as local-run overrides.
+          #
+          # Destructive opt-in gates are also NOT wired:
+          # ..._PRO_PRELOAD_WIPE_OK would wipe inventory-preload records,
+          # ..._PRO_USER_WRITE_OK leaks orphan users,
+          # ..._AIGOVERNANCE_WRITE_OK and ..._ORGANIZATION_WRITE_OK mutate
+          # shared state, and ..._SECURITYCLOUD_GATEWAY_WRITE_OK provisions real
+          # network egress whose deletion severs traffic for every access policy
+          # routed through it. Enable locally only when intended.

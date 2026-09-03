@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"testing"
 
@@ -424,13 +423,13 @@ func TestAcceptance_Pro_MdmUpdates_ListReturnToServiceV1(t *testing.T) {
 // The embedded .mobileconfig plist is a minimal unsigned Wi-Fi payload
 // with a fake SSID; it's valid enough for Jamf Pro to store but will
 // never be served to a real device. Override with an existing profile
-// via JAMFPLATFORM_WIFI_PROFILE_ID to skip the Classic-side fixture.
+// via JAMFPLATFORM_ACC_PRO_WIFI_PROFILE_ID to skip the Classic-side fixture.
 func TestAcceptance_Pro_MdmUpdates_ReturnToServiceCRUDV1(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
 	p := pro.New(c)
 
-	wifiProfileID := os.Getenv("JAMFPLATFORM_WIFI_PROFILE_ID")
+	wifiProfileID := accEnv("JAMFPLATFORM_ACC_PRO_WIFI_PROFILE_ID")
 	if wifiProfileID == "" {
 		wifiProfileID = createWifiProfileFixture(t)
 	}

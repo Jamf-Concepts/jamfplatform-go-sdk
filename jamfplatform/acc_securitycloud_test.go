@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 
@@ -22,7 +21,7 @@ import (
 // Jamf Security Cloud acceptance coverage.
 //
 // Every test here runs against the Security Cloud credential set
-// (JAMFPLATFORM_JSC_*), never the Jamf Pro one — the two products have separate
+// (JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_*), never the Jamf Pro one — the two products have separate
 // tenants and separate API clients, and neither credential reaches the other's
 // surface (probed 2026-08-17: 403 BAD_PERMISSIONS in both directions).
 //
@@ -98,7 +97,7 @@ func assertCreateHrefEmpty(t *testing.T, href, what string) {
 // jscCleanupDelete, so a run leaves the tenant as it found it.
 //
 // Creating one still provisions real infrastructure, so it stays behind
-// JAMFPLATFORM_JSC_GATEWAY_WRITE_OK. The difference from a bare skip is that on
+// JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK. The difference from a bare skip is that on
 // a tenant reserved for this suite nothing skips, and on a shared tenant the
 // skip names the variable that would fix it rather than an absent fixture the
 // reader cannot act on. Pre-existing gateways are used as-is and never deleted.
@@ -115,8 +114,8 @@ func jscEnsureGateways(t *testing.T, sc *securitycloud.Client, n int) []security
 	if len(existing) >= n {
 		return existing
 	}
-	if os.Getenv("JAMFPLATFORM_JSC_GATEWAY_WRITE_OK") == "" {
-		t.Skipf("need %d dedicated ZTNA gateways, tenant has %d, and creating one provisions real network egress — set JAMFPLATFORM_JSC_GATEWAY_WRITE_OK to let this test create and delete its own on a tenant reserved for it", n, len(existing))
+	if accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK") == "" {
+		t.Skipf("need %d dedicated ZTNA gateways, tenant has %d, and creating one provisions real network egress — set JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK to let this test create and delete its own on a tenant reserved for it", n, len(existing))
 	}
 
 	enabled := false
@@ -125,7 +124,7 @@ func jscEnsureGateways(t *testing.T, sc *securitycloud.Client, n int) []security
 			Name:       jscName("fixture-gateway"),
 			Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 			Enabled:    &enabled,
-			TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+			TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
 			Contact: securitycloud.GatewayContact{
 				Email: "sdk-acc@example.invalid",
 				Name:  "SDK acceptance fixture",
@@ -505,7 +504,7 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 	created, err := sc.CreateZtnaGroupedGatewayV1(ctx, &securitycloud.GroupedGatewayCreateRequest{
 		Name:            name,
 		GatewayIds:      []string{gateways[0].ID, gateways[1].ID},
-		TenantIds:       []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		TenantIds:       []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
 		RoutingStrategy: "NEAREST",
 		// Required on create even for NEAREST, where the server ignores it
 		// (spec v1401, wire-confirmed). Leaving the Go zero value in place
@@ -573,7 +572,7 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayRecoveryDelay(t *testing.T) {
 		return &securitycloud.GroupedGatewayCreateRequest{
 			Name:               jscName("grouped-delay"),
 			GatewayIds:         members,
-			TenantIds:          []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+			TenantIds:          []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
 			RoutingStrategy:    "ACTIVE_STANDBY",
 			RecoveryDelayInSec: delay,
 		}
@@ -646,8 +645,8 @@ func assertRecoveryDelayRejected(t *testing.T, err error) {
 // rather than a permanent skip.
 func jscGatewayWriteOK(t *testing.T) {
 	t.Helper()
-	if os.Getenv("JAMFPLATFORM_JSC_GATEWAY_WRITE_OK") == "" {
-		t.Skip("gated behind JAMFPLATFORM_JSC_GATEWAY_WRITE_OK — gateway writes provision real network egress and deleting one severs traffic for every access policy routed through it; opt in only on a tenant reserved for it")
+	if accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK") == "" {
+		t.Skip("gated behind JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK — gateway writes provision real network egress and deleting one severs traffic for every access policy routed through it; opt in only on a tenant reserved for it")
 	}
 }
 
@@ -679,7 +678,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		Name:       name,
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
-		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
 		Contact: securitycloud.GatewayContact{
 			Email: "sdk-acc@example.invalid",
 			Name:  "SDK acceptance",
@@ -758,7 +757,7 @@ func TestAcceptance_SecurityCloudZtnaGatewayLifecycle(t *testing.T) {
 		Name:       jscName("gateway-leftpair"),
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
-		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
 		Contact:    securitycloud.GatewayContact{Email: "sdk-acc@example.invalid", Name: "SDK acceptance"},
 		Ipsec: &securitycloud.GatewayIpSecRequest{
 			KeyExchange: "ikev2",
@@ -1580,7 +1579,7 @@ func TestAcceptance_SecurityCloudUemConnectReads(t *testing.T) {
 		var apiErr *jamfplatform.APIResponseError
 		if errors.As(err, &apiErr) && apiErr.HasStatus(403) {
 			t.Fatalf("403 on uem-connect: uem-connect is a separate capability from device-groups and the JSC "+
-				"sandbox has credentials that hold one and not the other — point JAMFPLATFORM_JSC_CLIENT_ID at "+
+				"sandbox has credentials that hold one and not the other — point JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID at "+
 				"one granted uem-connect:read (or the legacy read:jsc:all). Underlying error: %v", err)
 		}
 		t.Fatalf("ListUemConnectorsV1 failed: %v", err)
@@ -1657,7 +1656,7 @@ func TestAcceptance_SecurityCloudUemConnectSyncSettingsValidation(t *testing.T) 
 	if apiErr.HasStatus(403) {
 		t.Fatalf("403 on uem-connect: this credential holds neither uem-connect:read/update nor the legacy "+
 			"update:jsc:all, so it cannot exercise UEM Connect at all. The JSC sandbox has more than one "+
-			"credential and they differ in capability — point JAMFPLATFORM_JSC_CLIENT_ID at one granted "+
+			"credential and they differ in capability — point JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID at one granted "+
 			"uem-connect. Underlying error: %v", err)
 	}
 	if !apiErr.HasStatus(422) {
@@ -1819,7 +1818,7 @@ func TestAcceptance_SecurityCloudUemConnectVendorMismatch(t *testing.T) {
 //
 // Three sources, in order:
 //
-//   - JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID, when the target instance is not the
+//   - JAMFPLATFORM_ACC_SECURITYCLOUD_UEM_PRO_TENANT_ID, when the target instance is not the
 //     one the suite's own Jamf Pro credential reaches.
 //   - GET /api/pro/v1/m2m/tenant-id, which asks the instance for its own
 //     platform tenant ID. This is the one that works whichever scope the suite
@@ -1830,14 +1829,14 @@ func TestAcceptance_SecurityCloudUemConnectVendorMismatch(t *testing.T) {
 //     platform tenant ID of the Jamf Pro this suite is pointed at, and costs no
 //     request. Only a fallback, for a credential without m2m:read.
 //
-// Needs the Jamf Pro credential set (JAMFPLATFORM_* or JAMFPLATFORM_ENV_*),
+// Needs the Jamf Pro credential set (JAMFPLATFORM_* or JAMFPLATFORM_ACC_ENVIRONMENT_*),
 // which is a different product and a different tenant from the Security Cloud
 // one — see errAccJSCCredsUnset.
 func jscProUemTenantID(t *testing.T) string {
 	t.Helper()
 
-	if id := os.Getenv("JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID"); id != "" {
-		t.Logf("Jamf Pro tenant %s (from JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID)", id)
+	if id := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_UEM_PRO_TENANT_ID"); id != "" {
+		t.Logf("Jamf Pro tenant %s (from JAMFPLATFORM_ACC_SECURITYCLOUD_UEM_PRO_TENANT_ID)", id)
 		return id
 	}
 
@@ -1856,7 +1855,7 @@ func jscProUemTenantID(t *testing.T) string {
 		return id
 	}
 
-	t.Skip("cannot determine the target Jamf Pro platform tenant ID: /v1/m2m/tenant-id is unavailable (grant m2m:read) and this suite is not tenant-scoped — set JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID")
+	t.Skip("cannot determine the target Jamf Pro platform tenant ID: /v1/m2m/tenant-id is unavailable (grant m2m:read) and this suite is not tenant-scoped — set JAMFPLATFORM_ACC_SECURITYCLOUD_UEM_PRO_TENANT_ID")
 	return ""
 }
 
@@ -2360,7 +2359,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGroupedGateway(t *testing.T) {
 	req := &securitycloud.GroupedGatewayCreateRequest{
 		Name:               name,
 		GatewayIds:         []string{gateways[0].ID, gateways[1].ID},
-		TenantIds:          []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		TenantIds:          []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
 		RoutingStrategy:    "NEAREST",
 		RecoveryDelayInSec: 3600,
 	}
@@ -2410,7 +2409,7 @@ func TestAcceptance_SecurityCloudApplyZtnaGateway(t *testing.T) {
 		Name:       jscName("apply-gateway"),
 		Datacenter: securitycloud.GatewayCreateRequestDatacenterEuWest2,
 		Enabled:    &enabled,
-		TenantIds:  []string{os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")},
+		TenantIds:  []string{accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")},
 		Contact: securitycloud.GatewayContact{
 			Email: "sdk-acc@example.invalid",
 			Name:  "SDK acceptance",
@@ -2503,13 +2502,13 @@ func boolValue(b *bool) bool {
 func jscClientWithHeaders(t *testing.T, h http.Header) *securitycloud.Client {
 	t.Helper()
 
-	baseURL := os.Getenv("JAMFPLATFORM_JSC_BASE_URL")
+	baseURL := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL")
 	if baseURL == "" {
-		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+		baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
 	}
-	clientID := os.Getenv("JAMFPLATFORM_JSC_CLIENT_ID")
-	clientSecret := os.Getenv("JAMFPLATFORM_JSC_CLIENT_SECRET")
-	tenantID := os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")
+	clientID := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID")
+	clientSecret := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET")
+	tenantID := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")
 	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
 		t.Skipf("Skipping Security Cloud acceptance test: %v", errAccJSCCredsUnset)
 	}

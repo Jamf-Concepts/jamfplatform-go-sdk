@@ -8,7 +8,6 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"os"
 	"strconv"
 	"testing"
 
@@ -810,7 +809,7 @@ func TestAcceptance_Classic_MobileDeviceCRUD(t *testing.T) {
 }
 
 // TestAcceptance_Classic_GetMobileDeviceByID exercises the endpoint
-// against a real enrolled device. If JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID
+// against a real enrolled device. If JAMFPLATFORM_ACC_PROCLASSIC_MOBILE_DEVICE_ID
 // is set, uses that id; otherwise pulls the first entry from the live
 // /mobiledevices list and probes it. Skipped only when the tenant has
 // zero enrolled mobile devices.
@@ -819,7 +818,7 @@ func TestAcceptance_Classic_GetMobileDeviceByID(t *testing.T) {
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
-	id := os.Getenv("JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID")
+	id := accEnv("JAMFPLATFORM_ACC_PROCLASSIC_MOBILE_DEVICE_ID")
 	if id == "" {
 		list, err := pc.ListMobileDevices(ctx)
 		if err != nil {
@@ -827,7 +826,7 @@ func TestAcceptance_Classic_GetMobileDeviceByID(t *testing.T) {
 			t.Fatalf("ListMobileDevices: %v", err)
 		}
 		if list == nil || len(list.MobileDevices) == 0 {
-			t.Skip("tenant has no enrolled mobile devices; set JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID to override")
+			t.Skip("tenant has no enrolled mobile devices; set JAMFPLATFORM_ACC_PROCLASSIC_MOBILE_DEVICE_ID to override")
 		}
 		first := list.MobileDevices[0]
 		if first.ID == nil {
@@ -1974,13 +1973,13 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 // default to "2", which 404s on any tenant that never had that record — the
 // acceptance tenant has zero VPP invitations (wire-probed 2026-07-31), so the
 // test was reporting a missing fixture as an endpoint failure. Set
-// JAMFPLATFORM_VPP_INVITATION_ID to pin a specific record.
+// JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID to pin a specific record.
 func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 	c := accClient(t)
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
-	id := os.Getenv("JAMFPLATFORM_VPP_INVITATION_ID")
+	id := accEnv("JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID")
 	if id == "" {
 		list, err := pc.ListVPPInvitations(ctx)
 		if err != nil {
@@ -1988,7 +1987,7 @@ func TestAcceptance_Classic_VPPInvitationRead(t *testing.T) {
 			t.Fatalf("ListVPPInvitations: %v", err)
 		}
 		if list == nil || len(list.VppInvitations) == 0 {
-			t.Skip("tenant has no VPP invitations; set JAMFPLATFORM_VPP_INVITATION_ID to override")
+			t.Skip("tenant has no VPP invitations; set JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID to override")
 		}
 		first := list.VppInvitations[0]
 		if first.ID == nil {
@@ -2115,7 +2114,7 @@ func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {
 	pc := proclassic.New(c)
 	ctx := context.Background()
 
-	id := os.Getenv("JAMFPLATFORM_CLASSIC_COMPUTER_ID")
+	id := accEnv("JAMFPLATFORM_ACC_PROCLASSIC_COMPUTER_ID")
 	if id == "" {
 		list, err := pc.MatchComputers(ctx, "*")
 		if err != nil {
@@ -2123,7 +2122,7 @@ func TestAcceptance_Classic_GetComputerHistoryByID(t *testing.T) {
 			t.Fatalf("MatchComputers(*): %v", err)
 		}
 		if list == nil || len(list.Computers) == 0 {
-			t.Skip("tenant has no computers; set JAMFPLATFORM_CLASSIC_COMPUTER_ID to override")
+			t.Skip("tenant has no computers; set JAMFPLATFORM_ACC_PROCLASSIC_COMPUTER_ID to override")
 		}
 		first := list.Computers[0]
 		if first.ID == nil {

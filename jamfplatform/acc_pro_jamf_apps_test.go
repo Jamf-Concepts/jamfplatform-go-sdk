@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -24,7 +23,7 @@ import (
 // Batch 12 — jamf-connect, jamf-protect, jamf-remote-assist. Most
 // surface is probe-only (read + history note). Protect has a real
 // register → settings → plans-sync → unregister lifecycle when
-// JAMFPLATFORM_PROTECT_URL / _CLIENT_ID / _PASSWORD are supplied via
+// JAMFPLATFORM_ACC_PRO_PROTECT_URL / _CLIENT_ID / _PASSWORD are supplied via
 // an API client in the Jamf Protect web console. The Jamf Connect
 // lifecycle posts a minimal com.jamf.connect.login-payload macOS
 // config profile via the Classic API, polls Connect's discovery
@@ -237,11 +236,11 @@ func TestAcceptance_Pro_JamfProtect_HistoryNoteV1(t *testing.T) {
 // creds at the end. If there was no prior registration, cleanup
 // leaves the tenant unregistered.
 func TestAcceptance_Pro_JamfProtect_LifecycleV1(t *testing.T) {
-	protectURL := strings.TrimSpace(os.Getenv("JAMFPLATFORM_PROTECT_URL"))
-	clientID := strings.TrimSpace(os.Getenv("JAMFPLATFORM_PROTECT_CLIENT_ID"))
-	password := strings.TrimSpace(os.Getenv("JAMFPLATFORM_PROTECT_PASSWORD"))
+	protectURL := strings.TrimSpace(accEnv("JAMFPLATFORM_ACC_PRO_PROTECT_URL"))
+	clientID := strings.TrimSpace(accEnv("JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID"))
+	password := strings.TrimSpace(accEnv("JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD"))
 	if protectURL == "" || clientID == "" || password == "" {
-		t.Skip("JAMFPLATFORM_PROTECT_{URL,CLIENT_ID,PASSWORD} not all set — Protect lifecycle needs a Jamf Protect API client")
+		t.Skip("JAMFPLATFORM_ACC_PRO_PROTECT_{URL,CLIENT_ID,PASSWORD} not all set — Protect lifecycle needs a Jamf Protect API client")
 	}
 	// Protect register expects the GraphQL endpoint URL. Accept a
 	// bare console URL (…jamfcloud.com) and append /graphql.

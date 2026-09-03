@@ -8,7 +8,6 @@ package jamfplatform_test
 import (
 	"context"
 	"errors"
-	"os"
 	"strings"
 	"testing"
 
@@ -506,10 +505,10 @@ func TestAcceptance_Pro_Inventory_PreloadExportV2(t *testing.T) {
 
 // TestAcceptance_Pro_Inventory_PreloadDeleteAllV2 is gated — bulk-deletes
 // every inventory-preload record on the tenant. Acceptable in a fresh test
-// tenant but not in one with real data. Opt in with JAMFPLATFORM_PRELOAD_WIPE_OK.
+// tenant but not in one with real data. Opt in with JAMFPLATFORM_ACC_PRO_PRELOAD_WIPE_OK.
 func TestAcceptance_Pro_Inventory_PreloadDeleteAllV2(t *testing.T) {
-	if os.Getenv("JAMFPLATFORM_PRELOAD_WIPE_OK") == "" {
-		t.Skip("gated behind JAMFPLATFORM_PRELOAD_WIPE_OK — wipes every inventory-preload record on the tenant")
+	if accEnv("JAMFPLATFORM_ACC_PRO_PRELOAD_WIPE_OK") == "" {
+		t.Skip("gated behind JAMFPLATFORM_ACC_PRO_PRELOAD_WIPE_OK — wipes every inventory-preload record on the tenant")
 	}
 	c := accClient(t)
 	if err := pro.New(c).DeleteAllInventoryPreloadRecordsV2(context.Background()); err != nil {

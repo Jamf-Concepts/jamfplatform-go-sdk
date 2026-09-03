@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"slices"
@@ -55,7 +56,7 @@ var runSuffix = sync.OnceValue(func() string {
 // test is swallowed and a trace of a hanging one appears only once it ends.
 func accTraceOpts() []jamfplatform.Option {
 	var opts []jamfplatform.Option
-	if os.Getenv("JAMFPLATFORM_ACC_TRACE") != "" {
+	if accEnv("JAMFPLATFORM_ACC_TRACE") != "" {
 		opts = append(opts, jamfplatform.WithLogger(&accTracer{max: traceBodyLimit()}))
 	}
 	opts = append(opts, accRetryOpts()...)
@@ -80,7 +81,7 @@ func accTraceOpts() []jamfplatform.Option {
 // 50ms/500ms/2 keeps a retry in the loop — so a genuinely transient failure is
 // still absorbed — while bounding the wait to about a second.
 func accRetryOpts() []jamfplatform.Option {
-	if os.Getenv("JAMFPLATFORM_ACC_FAST_RETRY") == "" {
+	if accEnv("JAMFPLATFORM_ACC_FAST_RETRY") == "" {
 		return nil
 	}
 	return []jamfplatform.Option{jamfplatform.WithRetryPolicy(50*time.Millisecond, 500*time.Millisecond, 2)}
@@ -92,7 +93,7 @@ func accRetryOpts() []jamfplatform.Option {
 // against a genuinely huge list body (the account licence list is ~245 rows)
 // rather than trying to keep output tidy. Set it to 0 for no cap.
 func traceBodyLimit() int {
-	if v := os.Getenv("JAMFPLATFORM_ACC_TRACE_MAX"); v != "" {
+	if v := accEnv("JAMFPLATFORM_ACC_TRACE_MAX"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil {
 			return n
 		}
@@ -246,10 +247,10 @@ var errAccCredsUnset = errors.New("acceptance credentials not configured")
 // data. Expect fixture-dependent tests to change behaviour, and read
 // accScopeInUse in the log before concluding that the secrets broke CI.
 var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
-	envBase, envID := os.Getenv("JAMFPLATFORM_ENV_BASE_URL"), os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID")
-	envClient, envSecret := os.Getenv("JAMFPLATFORM_ENV_CLIENT_ID"), os.Getenv("JAMFPLATFORM_ENV_CLIENT_SECRET")
+	envBase, envID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL"), accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
+	envClient, envSecret := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID"), accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET")
 	if envBase == "" {
-		envBase = os.Getenv("JAMFPLATFORM_BASE_URL")
+		envBase = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
 	}
 	if envBase != "" && envClient != "" && envSecret != "" && envID != "" {
 		c := jamfplatform.NewClient(envBase, envClient, envSecret,
@@ -261,13 +262,13 @@ var initAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) 
 		return c, nil
 	}
 
-	baseURL := os.Getenv("JAMFPLATFORM_BASE_URL")
-	clientID := os.Getenv("JAMFPLATFORM_CLIENT_ID")
-	clientSecret := os.Getenv("JAMFPLATFORM_CLIENT_SECRET")
-	tenantID := os.Getenv("JAMFPLATFORM_TENANT_ID")
+	baseURL := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+	clientID := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID")
+	clientSecret := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET")
+	tenantID := accEnv("JAMFPLATFORM_ACC_PRO_TENANT_ID")
 
 	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
-		return nil, fmt.Errorf("%w: set JAMFPLATFORM_BASE_URL, JAMFPLATFORM_CLIENT_ID, JAMFPLATFORM_CLIENT_SECRET, JAMFPLATFORM_TENANT_ID (or the JAMFPLATFORM_ENV_* set for environment scope)", errAccCredsUnset)
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL, JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID, JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET, JAMFPLATFORM_ACC_PRO_TENANT_ID (or the JAMFPLATFORM_ACC_ENVIRONMENT_* set for environment scope)", errAccCredsUnset)
 	}
 
 	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
@@ -295,21 +296,61 @@ var accScopeInUse = "(client not yet built)"
 var errAccJSCCredsUnset = errors.New("Security Cloud acceptance credentials not configured")
 
 // initJSCAcceptanceClient creates and validates the singleton Security Cloud
-// acceptance client. JAMFPLATFORM_JSC_BASE_URL is optional and defaults to the
+// acceptance client. JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL is optional and defaults to the
 // Jamf Pro base URL, since both products are served by the same regional
 // gateway; the credentials and tenant are not optional.
-var initJSCAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
-	baseURL := os.Getenv("JAMFPLATFORM_JSC_BASE_URL")
-	if baseURL == "" {
-		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
-	}
-	clientID := os.Getenv("JAMFPLATFORM_JSC_CLIENT_ID")
-	clientSecret := os.Getenv("JAMFPLATFORM_JSC_CLIENT_SECRET")
-	tenantID := os.Getenv("JAMFPLATFORM_JSC_TENANT_ID")
+// accJSCCredSource records which credential the Security Cloud client was built
+// from, because the two reach different Security Cloud tenants with different
+// fixtures and a silent switch would look like the tenant's data changing.
+var accJSCCredSource = "(client not yet built)"
 
-	if baseURL == "" || clientID == "" || clientSecret == "" || tenantID == "" {
-		return nil, fmt.Errorf("%w: set JAMFPLATFORM_JSC_CLIENT_ID, JAMFPLATFORM_JSC_CLIENT_SECRET, JAMFPLATFORM_JSC_TENANT_ID (and JAMFPLATFORM_JSC_BASE_URL when it differs from JAMFPLATFORM_BASE_URL)", errAccJSCCredsUnset)
+var initJSCAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
+	// An environment-scoped credential reaches Security Cloud: wire-verified
+	// 2026-09-03, GET /securitycloud/v1/groups and /v2/groups both 200 with
+	// X-Environment-Id, alongside 200 on pro, devices, blueprints,
+	// compliance-benchmarks and ai/governance on the same token. That is why the
+	// dedicated Security Cloud credential is no longer required — an environment
+	// credential covers all four product spaces this suite touches.
+	//
+	// It is still preferred over the environment credential when configured,
+	// because the two land on DIFFERENT Security Cloud tenants: the dedicated one
+	// carries the suite's long-lived fixtures. Prefer-then-fall-back rather than
+	// replace, so removing the secret is a deliberate migration rather than a
+	// silent change of tenant. Note the environment credential is tenant-agnostic
+	// here — Security Cloud is itself tenant-scoped, on the same X-Tenant-Id
+	// header as Jamf Pro, so "environment vs Security Cloud" is a difference of
+	// which credential, not of which scope kind.
+	baseURL := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL")
+	if baseURL == "" {
+		baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
 	}
+	clientID := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID")
+	clientSecret := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET")
+	tenantID := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")
+
+	if clientID == "" || clientSecret == "" || tenantID == "" {
+		envBase := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL")
+		if envBase == "" {
+			envBase = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
+		}
+		envID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
+		envClientID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID")
+		envSecret := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET")
+		if envBase != "" && envID != "" && envClientID != "" && envSecret != "" {
+			c := jamfplatform.NewClient(envBase, envClientID, envSecret,
+				append(accTraceOpts(), jamfplatform.WithEnvironmentID(envID))...)
+			if err := c.ValidateCredentials(context.Background()); err != nil {
+				return nil, fmt.Errorf("failed to validate environment-scoped credentials for Security Cloud: %w", err)
+			}
+			accJSCCredSource = "environment " + envID
+			return c, nil
+		}
+		return nil, fmt.Errorf("%w: set the JAMFPLATFORM_ACC_ENVIRONMENT_* set, or JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID, JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET and JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID", errAccJSCCredsUnset)
+	}
+	if baseURL == "" {
+		return nil, fmt.Errorf("%w: JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL or JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL must be set", errAccJSCCredsUnset)
+	}
+	accJSCCredSource = "securitycloud tenant " + tenantID
 
 	// Plain WithTenantID: this client is built from Security Cloud credentials
 	// and only ever reaches /api/securitycloud, so there is nothing to scope
@@ -335,7 +376,7 @@ func accSecurityCloudClient(t *testing.T) *securitycloud.Client {
 	c, err := initJSCAcceptanceClient()
 	switch {
 	case errors.Is(err, errAccJSCCredsUnset):
-		t.Skipf("Skipping Security Cloud acceptance test: %v", err)
+		skipOrFailUnset(t, "securitycloud", err)
 	case err != nil:
 		t.Fatal(credentialRejectedMessage(err))
 	}
@@ -356,16 +397,16 @@ var errAccEnvCredsUnset = errors.New("environment-scoped acceptance credentials 
 // belong to the same customer. Wire-verified against securitycloud in prod on
 // 2026-08-25, which is what TestAcceptance_EnvironmentScope pins.
 var initEnvAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
-	baseURL := os.Getenv("JAMFPLATFORM_ENV_BASE_URL")
+	baseURL := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL")
 	if baseURL == "" {
-		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+		baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
 	}
-	clientID := os.Getenv("JAMFPLATFORM_ENV_CLIENT_ID")
-	clientSecret := os.Getenv("JAMFPLATFORM_ENV_CLIENT_SECRET")
-	environmentID := os.Getenv("JAMFPLATFORM_ENVIRONMENT_ID")
+	clientID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID")
+	clientSecret := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET")
+	environmentID := accEnv("JAMFPLATFORM_ACC_ENVIRONMENT_ID")
 
 	if baseURL == "" || clientID == "" || clientSecret == "" || environmentID == "" {
-		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ENV_CLIENT_ID, JAMFPLATFORM_ENV_CLIENT_SECRET, JAMFPLATFORM_ENVIRONMENT_ID (and JAMFPLATFORM_ENV_BASE_URL when it differs from JAMFPLATFORM_BASE_URL)", errAccEnvCredsUnset)
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID, JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET, JAMFPLATFORM_ACC_ENVIRONMENT_ID (and JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL when it differs from JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL)", errAccEnvCredsUnset)
 	}
 
 	c := jamfplatform.NewClient(baseURL, clientID, clientSecret,
@@ -383,7 +424,7 @@ func accEnvClient(t *testing.T) *jamfplatform.Client {
 	c, err := initEnvAcceptanceClient()
 	switch {
 	case errors.Is(err, errAccEnvCredsUnset):
-		t.Skipf("Skipping environment-scope acceptance test: %v", err)
+		skipOrFailUnset(t, "environment", err)
 	case err != nil:
 		t.Fatal(credentialRejectedMessage(err))
 	}
@@ -402,19 +443,19 @@ var errAccOrgCredsUnset = errors.New("organization-scoped acceptance credentials
 // empty ID. Passing either option would be actively wrong — it would make the
 // gateway resolve a different context type and refuse the request.
 //
-// JAMFPLATFORM_ORG_BASE_URL is separate from JAMFPLATFORM_BASE_URL because the
+// JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL is separate from JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL because the
 // Jamf Account api-product ships only use1 api-definitions: an EU base URL
 // cannot reach these endpoints at all, and the failure does not look regional.
 var initOrgAcceptanceClient = sync.OnceValues(func() (*jamfplatform.Client, error) {
-	baseURL := os.Getenv("JAMFPLATFORM_ORG_BASE_URL")
+	baseURL := accEnv("JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL")
 	if baseURL == "" {
-		baseURL = os.Getenv("JAMFPLATFORM_BASE_URL")
+		baseURL = accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL")
 	}
-	clientID := os.Getenv("JAMFPLATFORM_ORG_CLIENT_ID")
-	clientSecret := os.Getenv("JAMFPLATFORM_ORG_CLIENT_SECRET")
+	clientID := accEnv("JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID")
+	clientSecret := accEnv("JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET")
 
 	if baseURL == "" || clientID == "" || clientSecret == "" {
-		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ORG_CLIENT_ID, JAMFPLATFORM_ORG_CLIENT_SECRET (and JAMFPLATFORM_ORG_BASE_URL — must be the US gateway)", errAccOrgCredsUnset)
+		return nil, fmt.Errorf("%w: set JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID, JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET (and JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL — must be the US gateway)", errAccOrgCredsUnset)
 	}
 
 	c := jamfplatform.NewClient(baseURL, clientID, clientSecret, accTraceOpts()...)
@@ -431,7 +472,7 @@ func accOrgClient(t *testing.T) *jamfplatform.Client {
 	c, err := initOrgAcceptanceClient()
 	switch {
 	case errors.Is(err, errAccOrgCredsUnset):
-		t.Skipf("Skipping organization-scope acceptance test: %v", err)
+		skipOrFailUnset(t, "organization", err)
 	case err != nil:
 		t.Fatal(credentialRejectedMessage(err))
 	}
@@ -472,6 +513,122 @@ var egressIP = sync.OnceValue(func() string {
 	return strings.TrimSpace(string(body))
 })
 
+// accLegacyEnvNames maps each current acceptance variable to the name it had
+// before the 2026-09-03 rename, so an existing local .env keeps working.
+//
+// The rename gave every credential set the shape
+// JAMFPLATFORM_ACC_<PRODUCT>_<SCOPE>_<FIELD>, with the product token present only
+// where the scope is product-bound. Tenant is per-product; environment and
+// organization span a customer's tenants, so they carry no product token — which
+// is why the previous scheme was misleading: it listed ENV/ORG/JSC as if they
+// were three scope kinds when Security Cloud is itself tenant-scoped, on the same
+// X-Tenant-Id header as Jamf Pro. The ACC_ prefix also frees
+// JAMFPLATFORM_CLIENT_ID and friends, which jamfplatform/doc.go documents as the
+// *consumer* convention and which the suite was quietly borrowing.
+var accLegacyEnvNames = map[string]string{
+	"JAMFPLATFORM_ACC_AIGOVERNANCE_WRITE_OK":              "JAMFPLATFORM_AIGOV_WRITE_OK",
+	"JAMFPLATFORM_ACC_PROCLASSIC_COMPUTER_ID":             "JAMFPLATFORM_CLASSIC_COMPUTER_ID",
+	"JAMFPLATFORM_ACC_PROCLASSIC_MOBILE_DEVICE_ID":        "JAMFPLATFORM_CLASSIC_MOBILE_DEVICE_ID",
+	"JAMFPLATFORM_ACC_PRO_DEP_TOKEN":                      "JAMFPLATFORM_DEP_TOKEN",
+	"JAMFPLATFORM_ACC_PRO_DEVICE_GROUP_ID":                "JAMFPLATFORM_DEVICE_GROUP_ID",
+	"JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL":               "JAMFPLATFORM_ENV_BASE_URL",
+	"JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID":              "JAMFPLATFORM_ENV_CLIENT_ID",
+	"JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET":          "JAMFPLATFORM_ENV_CLIENT_SECRET",
+	"JAMFPLATFORM_ACC_ENVIRONMENT_ID":                     "JAMFPLATFORM_ENVIRONMENT_ID",
+	"JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL":              "JAMFPLATFORM_ORG_BASE_URL",
+	"JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID":             "JAMFPLATFORM_ORG_CLIENT_ID",
+	"JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET":         "JAMFPLATFORM_ORG_CLIENT_SECRET",
+	"JAMFPLATFORM_ACC_ORGANIZATION_WRITE_OK":              "JAMFPLATFORM_ORG_WRITE_OK",
+	"JAMFPLATFORM_ACC_PRO_PRELOAD_WIPE_OK":                "JAMFPLATFORM_PRELOAD_WIPE_OK",
+	"JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID":              "JAMFPLATFORM_PROTECT_CLIENT_ID",
+	"JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD":               "JAMFPLATFORM_PROTECT_PASSWORD",
+	"JAMFPLATFORM_ACC_PRO_PROTECT_URL":                    "JAMFPLATFORM_PROTECT_URL",
+	"JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL":                "JAMFPLATFORM_BASE_URL",
+	"JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID":               "JAMFPLATFORM_CLIENT_ID",
+	"JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET":           "JAMFPLATFORM_CLIENT_SECRET",
+	"JAMFPLATFORM_ACC_PRO_TENANT_ID":                      "JAMFPLATFORM_TENANT_ID",
+	"JAMFPLATFORM_ACC_SECURITYCLOUD_GATEWAY_WRITE_OK":     "JAMFPLATFORM_JSC_GATEWAY_WRITE_OK",
+	"JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL":      "JAMFPLATFORM_JSC_BASE_URL",
+	"JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID":     "JAMFPLATFORM_JSC_CLIENT_ID",
+	"JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET": "JAMFPLATFORM_JSC_CLIENT_SECRET",
+	"JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID":            "JAMFPLATFORM_JSC_TENANT_ID",
+	"JAMFPLATFORM_ACC_SECURITYCLOUD_UEM_PRO_TENANT_ID":    "JAMFPLATFORM_JSC_UEM_PRO_TENANT_ID",
+	"JAMFPLATFORM_ACC_PRO_USER_WRITE_OK":                  "JAMFPLATFORM_USER_WRITE_OK",
+	"JAMFPLATFORM_ACC_PRO_VPP_INVITATION_ID":              "JAMFPLATFORM_VPP_INVITATION_ID",
+	"JAMFPLATFORM_ACC_PRO_VPP_TOKEN":                      "JAMFPLATFORM_VPP_TOKEN",
+	"JAMFPLATFORM_ACC_PRO_WIFI_PROFILE_ID":                "JAMFPLATFORM_WIFI_PROFILE_ID",
+}
+
+// accLegacyEnvUsed remembers which legacy names this run fell back to, so the
+// warning is emitted once per name rather than once per lookup.
+var accLegacyEnvUsed sync.Map
+
+// accEnv reads an acceptance variable, falling back to its pre-rename name.
+//
+// Dual-read rather than a hard cutover, deliberately: a stale .env carrying only
+// the old names would otherwise not error but silently drop a credential set
+// below its completeness check, and the suite would fall back to a different
+// scope or skip the lane. That failure is invisible, which is the whole class of
+// bug JAMFPLATFORM_ACC_REQUIRE exists to close. Remove this shim once the
+// secrets and every local .env have moved.
+func accEnv(name string) string {
+	if v := os.Getenv(name); v != "" {
+		return v
+	}
+	old, ok := accLegacyEnvNames[name]
+	if !ok {
+		return ""
+	}
+	v := os.Getenv(old)
+	if v != "" {
+		if _, seen := accLegacyEnvUsed.LoadOrStore(old, true); !seen {
+			log.Printf("acceptance: %s is deprecated, rename it to %s", old, name)
+		}
+	}
+	return v
+}
+
+// accRequiredSets names the credential sets this run must have configured, read
+// from JAMFPLATFORM_ACC_REQUIRE as a comma-separated list of
+// platform | environment | organization | securitycloud.
+//
+// It exists because "unset credentials skip" is right locally and wrong in CI.
+// A contributor with no tenant must be able to run `make testacc` and get skips
+// rather than a wall of failures, so absence cannot be fatal by default. But in
+// a pipeline that wires the secrets, absence means the secret is missing or
+// misnamed — and a skip there is invisible: the package still prints `ok` and
+// the check goes green having asserted nothing against the tenant. That is not
+// hypothetical twice over. On 2026-08-04 a WAF block made all 146 scoped tests
+// skip and the run reported success. And the organization set was wired in
+// exactly zero places in .github/workflows/acceptance.yml from the day
+// accOrgClient was written, so all ten Jamf Account tests skipped on every run
+// for the whole life of the file without anyone seeing a red build.
+//
+// The unit is one set per lane rather than a single boolean, because the
+// acceptance matrix runs lanes that legitimately need different credentials: the
+// Pro lane must not fail for a missing organization secret it never uses.
+var accRequiredSets = sync.OnceValue(func() map[string]bool {
+	required := map[string]bool{}
+	for _, name := range strings.Split(accEnv("JAMFPLATFORM_ACC_REQUIRE"), ",") {
+		if name = strings.ToLower(strings.TrimSpace(name)); name != "" {
+			required[name] = true
+		}
+	}
+	return required
+})
+
+// skipOrFailUnset ends the test for an unconfigured credential set: fatally when
+// this run declared the set required, otherwise as a skip. Call it only for a
+// genuinely-unset set — credentials that were supplied and refused must always
+// fail, which is the distinction credentialRejectedMessage carries.
+func skipOrFailUnset(t *testing.T, set string, err error) {
+	t.Helper()
+	if accRequiredSets()[set] {
+		t.Fatalf("JAMFPLATFORM_ACC_REQUIRE names %q but its credentials are not configured, so these tests would silently skip: %v", set, err)
+	}
+	t.Skipf("Skipping %s acceptance test: %v", set, err)
+}
+
 // credentialRejectedMessage builds the report to hand Jamf Support when the tenant
 // refuses credentials that were supplied, mirroring what
 // terraform-provider-jamfprotect emits for the same failure. The first question
@@ -497,7 +654,7 @@ If this is an edge or WAF block rather than a bad secret, give Jamf Support:
 
 Technical details: %v`,
 		time.Now().UTC().Format(time.RFC3339),
-		os.Getenv("JAMFPLATFORM_BASE_URL"),
+		accEnv("JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL"),
 		ip,
 		err)
 }
@@ -510,7 +667,7 @@ func accClient(t *testing.T) *jamfplatform.Client {
 	c, err := initAcceptanceClient()
 	switch {
 	case errors.Is(err, errAccCredsUnset):
-		t.Skipf("Skipping acceptance test: %v", err)
+		skipOrFailUnset(t, "platform", err)
 	case err != nil:
 		t.Fatal(credentialRejectedMessage(err))
 	}
@@ -567,7 +724,7 @@ func requireSmartGroupFixture(t *testing.T) string {
 		// If a device group ID is provided via env var, use it directly.
 		// This is useful when the device groups API is not available with the
 		// current credentials (e.g. tenant-scoped credentials for blueprints/benchmarks).
-		if id := os.Getenv("JAMFPLATFORM_DEVICE_GROUP_ID"); id != "" {
+		if id := accEnv("JAMFPLATFORM_ACC_PRO_DEVICE_GROUP_ID"); id != "" {
 			smartGroupID = id
 			return
 		}
@@ -618,10 +775,10 @@ func requireSmartGroupFixture(t *testing.T) string {
 }
 
 // cleanupSmartGroupFixture deletes the shared fixture. Call from TestMain.
-// Skips cleanup when the group was provided via JAMFPLATFORM_DEVICE_GROUP_ID
+// Skips cleanup when the group was provided via JAMFPLATFORM_ACC_PRO_DEVICE_GROUP_ID
 // since we don't own that resource.
 func cleanupSmartGroupFixture() {
-	if smartGroupID == "" || os.Getenv("JAMFPLATFORM_DEVICE_GROUP_ID") != "" {
+	if smartGroupID == "" || accEnv("JAMFPLATFORM_ACC_PRO_DEVICE_GROUP_ID") != "" {
 		return
 	}
 	if c, err := initAcceptanceClient(); err == nil {

@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -1024,7 +1023,7 @@ func TestAcceptance_ApplyVolumePurchasingLocationV1(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	token := vppToken(t) // skips if JAMFPLATFORM_VPP_TOKEN not set
+	token := vppToken(t) // skips if JAMFPLATFORM_ACC_PRO_VPP_TOKEN not set
 	name := "sdk-acc-apply-vpl-" + runSuffix()
 
 	// 1. Apply creates (VolumePurchasingLocationPost has ServiceToken; update type VolumePurchasingLocationPatch doesn't require it)
@@ -1358,9 +1357,9 @@ func TestAcceptance_ApplyDeviceEnrollmentV1(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	token := strings.Join(strings.Fields(os.Getenv("JAMFPLATFORM_DEP_TOKEN")), "")
+	token := strings.Join(strings.Fields(accEnv("JAMFPLATFORM_ACC_PRO_DEP_TOKEN")), "")
 	if token == "" {
-		t.Skip("JAMFPLATFORM_DEP_TOKEN not set — DEP-token-dependent test skipped")
+		t.Skip("JAMFPLATFORM_ACC_PRO_DEP_TOKEN not set — DEP-token-dependent test skipped")
 	}
 
 	name := "sdk-acc-apply-dep-" + runSuffix()

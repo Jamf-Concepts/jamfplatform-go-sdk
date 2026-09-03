@@ -387,7 +387,7 @@ func TestAcceptance_AiGovernanceReadRejections(t *testing.T) {
 // (they leave the list and 404 on read, but the row and its versions remain),
 // so every run of this test permanently adds one.
 func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
-	requireWriteOptIn(t, "JAMFPLATFORM_AIGOV_WRITE_OK",
+	requireWriteOptIn(t, "JAMFPLATFORM_ACC_AIGOVERNANCE_WRITE_OK",
 		"Creates and publishes a policy in a real environment. Publishing only creates a version row — a policy reaches devices only via a blueprint, which this suite never touches. The policy is archived on cleanup, but archived policies are retained permanently, so each run leaves one behind.")
 
 	g := aigovernance.New(accEnvClient(t))
