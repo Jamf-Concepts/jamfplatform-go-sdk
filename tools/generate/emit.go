@@ -2689,12 +2689,16 @@ func readJamfProAPIVersion(root string, cfg Config) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("readJamfProAPIVersion: reading %s: %w", specPath, err)
 	}
+	// yaml.Unmarshal, not json.Unmarshal: the source spec in testing/ is the
+	// bundle's own YAML, copied verbatim, while the api/ fallback is JSON.
+	// YAML is a JSON superset, so one decoder reads both; json.Unmarshal reads
+	// only the fallback and fails on the primary path.
 	var doc struct {
 		Info struct {
-			Version string `json:"version"`
-		} `json:"info"`
+			Version string `json:"version" yaml:"version"`
+		} `json:"info" yaml:"info"`
 	}
-	if err := json.Unmarshal(data, &doc); err != nil {
+	if err := yaml.Unmarshal(data, &doc); err != nil {
 		return "", fmt.Errorf("readJamfProAPIVersion: parsing %s: %w", specPath, err)
 	}
 	if doc.Info.Version == "" {
