@@ -22,6 +22,8 @@ tests are generated from OpenAPI spec files. OAuth2 client-credentials auth via
 ## Commands
 
 ```bash
+make ingest ZIP=path/to/gitops.zip   # Refresh testing/ source specs from a GitOps bundle
+make permmap     # Refresh the committed snapshot of the published permissions map
 make generate    # Regenerate Go code, tests, and published API specs from OpenAPI specs
 make test        # Unit tests: go test -v -cover -count=1 -timeout=120s ./...
 make testacc     # Acceptance tests (requires credentials, -tags acceptance): real API calls
@@ -53,6 +55,45 @@ Operations are **whitelist-based** — only endpoints listed in
 
 CI enforces that generated output is current on every PR
 (`git diff --exit-code -- jamfplatform/`).
+
+**`testing/` is populated by `tools/generate/ingest` from one GitOps bundle, and
+every spec is copied verbatim.** `make ingest ZIP=…` writes each archive member
+byte for byte — no re-emission, no YAML-to-JSON conversion — so a bundle diff is
+exactly the delta. That is not cosmetic: three specs shipped as re-emitted YAML
+(the account trio, AI Governance, uem-connect) and each had to be repaired by
+hand before its diffs became readable, because hundreds of lines of indentation
+churn hide the change.
+
+Verbatim copying is why **every `config.json` spec entry names a `.yaml` file**,
+including the seven families historically carried as JSON. `loadSpec` dispatches
+on the extension and the YAML branch is a strict superset of the JSON one — it
+additionally strips external parameter `$ref`s kin-openapi cannot resolve — so
+the rename is inert to the generated tree, verified by converting all seven and
+regenerating to an empty diff across `jamfplatform/` and `api/`. The one place
+that had to change is `readJamfProAPIVersion`, which now decodes with
+`yaml.Unmarshal`: it reads the verbatim YAML on the primary path and the JSON
+`api/` spec on the fallback, and YAML is a JSON superset so one decoder does
+both.
+
+**Privileges are checked against a third, independent oracle.**
+`tools/generate/permissions-map.md` is a committed snapshot of developer.jamf.com's
+published permissions map, and `TestScopedPrivilegesUseGAVocabulary` asserts all
+337 generated `{capability}:{action}` identifiers against its parsed capability
+tables. The specs are where the values come from and `_permissions/routes.yaml`
+cannot corroborate them — it is generated from the same extensions, so its
+agreement is tautological — whereas the published map is authored from the
+gateway's capability model. It currently agrees on **every one**, including all
+eighteen `account` privileges that no published spec carries, so
+`permissionsMapExceptions` is empty. `make permmap` refreshes the snapshot; a
+new capability upstream makes the test fail, which is the notification to
+refresh, not an accusation. Mechanism, the two guards that keep the parse
+honest, and why the *path* dimension is deliberately not checked:
+[docs/STYLE.md](docs/STYLE.md#required-privileges).
+
+The ingest command also records `testing/.ingest-manifest.json` — which build each
+spec and each `_permissions` file came from, plus the hash of the bytes written
+— so a later run reports `unchanged (since vNNNN)` rather than merely
+"differs", and the holds below are machine-checkable rather than prose only.
 
 Every key config accepts, with its current usage count and the traps attached to
 it, is inventoried in
@@ -309,43 +350,98 @@ table: [docs/STYLE.md](docs/STYLE.md#config-key-inventory); observed shapes:
 
 ### Ingesting a new GitOps bundle
 
-1. **Hash the bundle first.** A build number advancing is not evidence of a spec
-   change — an interior build can be a pure pipeline re-run, and two builds can
-   land the same day. v1725 was byte-identical to v1700 across all 66
-   `external/` + `internal/stage/` specs. `shasum` the archive against the last one
-   and read nothing until you know what moved.
-2. **Do not diff against `internal/dev`.** It carries a per-spec `x-generated`
-   block (`commitHash`, `runId`, `timestamp`), so *every* spec reports as changed
-   and a no-op build looks like a bundle-wide rewrite. Stage differs from dev only
-   in `info.title`, the host, and that block. **Take stage** when a spec is not in
-   `external/`.
-3. **Map source → destination by `info.title` and path set, not directory name.**
-   Directory names are not stable: v1401 renamed the Security Cloud specs
-   (`securitycloud-dns` → `jsc-dns`), and **v1865 dropped the `-beta` suffix from
-   every directory while keeping the beta *content*** — the surviving spec is the
-   beta one, byte-identical. A name-keyed ingest step finds nothing and reports
-   "no changes" rather than failing. A 45% smaller archive was the tell.
-4. **Diff the operation set, the schemas, `required`, enums, privileges *and*
-   config's overrides.** `expectedStatus` and `responseType` have no tripwire, and
-   a silent override going redundant has happened three times in five builds.
-5. **Wire-probe every behavioural claim before ingesting it**, with a control in
-   the same invocation. Several builds shipped specs *ahead of the server*; see
-   the holds below.
+The procedure is the `ingest-specs` skill; what follows is the position and the
+reasoning behind it.
 
-**Security Cloud provenance, and the one trap that silently replaces a spec:**
+**Every spec the SDK carries is published to `external/`, so an ingest is one
+command.** As of the GA builds all nineteen resolve there — the last four
+Security Cloud specs arrived at v1981 and `securitycloud-enrollment` at v1993 —
+and none is sourced from `internal/stage/` any more.
+
+```bash
+make ingest ZIP=~/Downloads/jamf-platform-apis-gitops-vNNNN-*.zip INGEST_FLAGS=-dry-run
+make ingest ZIP=~/Downloads/jamf-platform-apis-gitops-vNNNN-*.zip
+make generate
+```
+
+**Start with the dry run, because a build number advancing is not evidence of a
+spec change.** An interior build can be a pure pipeline re-run and two builds
+can land the same day; v1725 was byte-identical to v1700 and v2024 to v2018.
+The report prints the archive's SHA-256 and, per spec, `unchanged (since
+vNNNN)` / `updated (was vNNNN)` / `new` against the ingest manifest — so step
+one is now automatic rather than a hand `shasum`.
+
+Three conditions the command **refuses** rather than reports, each because the
+silent version of the failure has happened here:
+
+- **An `external/` family that neither the provenance table nor
+  `knownUnmapped` accounts for.** A newly published API appears in no diff of
+  the specs already carried, which makes it the easiest thing in a build to
+  miss. `users` is the one deliberate exclusion.
+- **An `info.title` that does not match the row's assertion**, which is the
+  "map by title, not by directory name" rule made executable. Directory names
+  are not stable — v1401 renamed `securitycloud-dns` → `jsc-dns`, and v1865
+  dropped the `-beta` suffix from every directory while keeping the beta
+  *content* (a 45% smaller archive was the tell) — and a name-keyed match that
+  finds nothing reports "no changes" rather than failing.
+- **A selected family absent from the archive.** A *held* row absent is
+  tolerated, since reconstructing an older build legitimately predates a
+  family's publication.
+
+**Held specs are skipped and their reason printed on every run**, so a hold
+cannot rot unnoticed; `-only <dest>` or `-include-held` takes one, and the
+holds table below must move in the same change.
+
+**Never ingest from `internal/dev`.** It carries a per-spec `x-generated` block
+(`commitHash`, `runId`, `timestamp`), so *every* spec reports as changed and a
+no-op build looks like a bundle-wide rewrite. Comparing operation *sets* across
+environments is what it is good for — that is how v1942's publishing filter was
+caught. `internal/stage` differs from dev only in `info.title`, the host and
+that block, and declares a stage host and an `(STAGE)` title that would leak
+into the `api/*.json` a consumer reads; `-env internal/stage` exists only for a
+family that has not reached `external/`, and there is currently no such family.
+
+After ingesting, **diff the operation set, the schemas, `required`, enums,
+privileges *and* config's own overrides.** `expectedStatus` and `responseType`
+have no tripwire, and a silent override going redundant has happened three
+times in five builds. Then **wire-probe every behavioural claim**, with a
+control in the same invocation: several builds shipped specs *ahead of the
+server*, which is what the holds are.
+
+**Provenance — the full table. `specs` in `tools/generate/ingest/main.go` is
+the executable authority; this is the prose copy, and the two must agree.**
 
 | `testing/` file | bundle source | at |
 |---|---|---|
-| `securitycloud-dns-api.yaml` | `external/jsc-dns` | **v1981** |
-| `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v1981** |
-| `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v1981** |
-| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2018** |
-| `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v1993** (new) |
+| `openapi-jpapi.yaml` | `external/jpapi` | **v2056** |
+| `Classic-openapi.yaml` | `external/capi` | v1897 (**held**) |
+| `blueprints-api.yaml` | `external/blueprints` | **v2056** |
+| `device-groups-api.yaml` | `external/device-groups` | **v2056** |
+| `device-inventory-api.yaml` | `external/devices` | **v2056** |
+| `device-management-actions-api.yaml` | `external/device-management-action` | **v2056** |
+| `Declaration-reporting-openapi.yaml` | `external/declaration-reporting` | **v2056** |
+| `jamf-compliance-benchmark-engine-api.yaml` | `external/compliance-benchmarks` | **v2056** |
+| `securitycloud-dns-api.yaml` | `external/jsc-dns` | **v2056** |
+| `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v2056** |
+| `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v2056** |
+| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2056** |
+| `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v2056** |
 | `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
-| `ai-governance-api.yaml` | `external/ai-governance` | v1897 |
-| `audit-api.yaml` | `external/audit` | v1897 |
-| `openapi-jpapi.json` | `external/jpapi` | **v1942** |
-| `Classic-openapi.json` | `external/capi` | v1897 (**held**) |
+| `ai-governance-api.yaml` | `external/ai-governance` | **v2056** |
+| `audit-api.yaml` | `external/audit` | **v2056** |
+| `account-licensing-api.yaml` | `external/account-licensing` | v1865 (**held**) |
+| `account-partners-api.yaml` | `external/account-partners` | **v2056** |
+| `account-sso-api.yaml` | `external/account-sso` | v1865 (**held**) |
+
+Every row was verified semantically identical to its named bundle's YAML before
+the filenames moved to `.yaml`, so the whole tree is reconstructible from
+bundles and every future diff is exact.
+
+**`users` is the one `external/` family deliberately not carried** — the User
+Inventory API is prod-published with real privileges but every path 404s, since
+`platform-users-directory` is flag-gated to dev. It is recorded in the
+command's `knownUnmapped` with that reason, which is what stops the
+unmapped-family check firing on it every build.
 
 The `securitycloud-device-groups-api.yaml` row is named for its *tag*
 (`device-groups`) but the spec is the **Security Cloud Devices API**.
@@ -399,9 +495,41 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v2024** (2026-09-02), except `capi` and `securitycloud-devices`,
-both **held at v1897** — see the holds table. Only `jpapi` and
+Ingested through **v2056** (2026-09-03), except `capi` and
+`securitycloud-devices` (**held at v1897**) and `account-licensing` /
+`account-sso` (**held at v1865**) — see the holds table. Only `jpapi` and
 `declaration-reporting` took v1942's withdrawals.
+
+**v2056 is `audit` and nothing else, and the spec has caught up with the wire.**
+Every other file outside `internal/dev` is byte-identical to v2051 — `capi`
+included, every Security Cloud spec included — so the only other diffs were the
+manifest and the two unified rollups. The whole change is the **withdrawal of
+organization scope**: `x-scope-types` goes `[environment, organization]` →
+`[environment]`, `X-Environment-Id` flips `required: false` → `true` and loses
+the sentence offering the header-less organization form, and the four
+`**Required Permissions:** audit:read (environment scope … or organization
+scope, when X-Environment-Id header not present)` lines shorten to
+`audit:read`. `_permissions` agrees on both halves: `routes.yaml` drops the four
+`audit:read` routes typed `organization` and `scopes.yaml` drops the whole
+`organization` block, leaving **`environment` as its only top-level key**.
+
+**Wire-confirmed 2026-09-03 with a two-sided control, and the spec is right.**
+An organization credential that reads `/licensing/v1/licenses` at 200 in the
+same session — so genuinely organization-scoped, resolving the org from the
+token with no header — gets `400 REQUEST_CONTEXT_NOT_PROVIDED` on
+`/audit/v1/audit/sources`. The environment credential answers 200 with
+`X-Environment-Id` and the same 400 without it, so `required: true` is correct
+too. The refusal is a pre-routing scope check rather than an audit-specific
+answer: a bogus path in the same namespace returns the identical body. This is
+the spec catching up with tyk `3e99c347`, recorded here as a wire fact since
+2026-09-01 and now published.
+
+**Generated impact: docs only, zero Go.** The generator does not emit scope
+headers as parameters — the transport stamps them — so the diff is 14 lines in
+`api/audit_api.json` and nothing in `jamfplatform/`. `account-partners` moved
+v1872 → v2056 in the same run and is inert for the same reason: 4 lines in
+`api/account_partners_api.json` narrowing the `servers` region enum to `us`,
+which documents the US-only fact recorded below and which the SDK never reads.
 
 **v2024 is a pure pipeline re-run — zero spec content changed in any
 environment.** Not one file outside `internal/dev` differs from v2018:
@@ -1003,7 +1131,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 
 | held | why |
 |---|---|
-| `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. `account-partners` produced no Go diff and is at v1872. |
+| `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**: `License.type` removed though populated on 16/16 rows, and `DomainAllocationConnection.authZeroRegion` → `authRegion` though the wire sends the old name on 5/5. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. Re-probe and take in one ingest. **Licensing re-probed 2026-09-03 on a second organization tenant and the hold stands**: `type` is populated 16/16 there too, alongside `licenseType` at 8/16, so the two are distinct fields and not a rename. **SSO could not be re-probed** — `/sso/v1/domain-allocations` answers `403 BAD_PERMISSIONS` for that credential while `/sso/v1/connections` answers 200 in the same session, so the capability is ungranted rather than the endpoint being absent; it needs a credential holding `sso-domains`. `account-partners` is inert (`servers` only) and moved to v2056. |
 | `capi` at v1897 — **`POST /patchsoftwaretitles/id/{id}` only** | The spec file stays at v1897, but the whitelist took 31 of the 32 withdrawn operations on 2026-09-02, so the hold is now one operation wide. `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints: taking it makes patch software titles unseedable, breaks `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves the provider's `patch_software_title` resource with no create path. Upstream has said the family is coming back after the SDK team's feedback — **when it reappears in a published spec, ingest `capi` and drop this row.** Note the surface the config now mirrors is incoherent by upstream's own doing: four alternate-identifier computer paths are `POST`-only, `/computers/id/{id}` is `POST`+`DELETE` with no read, none of the 31 declares a successor, and all 31 are live on the wire. |
 | `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update that works — 200 on the wire, re-probed 2026-09-03. **`authorization-policies#265` (`07791a1`, merged 2026-09-02 10:13Z, `PUT` only) HAS now deployed, and the hold still stands for a different reason.** At 2026-09-03 12:29Z the v2 PUT stopped answering 403 `BAD_PERMISSIONS` and started answering a service-level **`404 NOT_FOUND`** — stable 3/3, on a real group that `GET /v2/groups` itself lists in the same invocation, with `GET`/`PUT /v1/groups/{id}` both 200 as controls. 403 `BAD_PERMISSIONS` is this namespace's unrouted signature, confirmed by two controls in that invocation (`PUT /securitycloud/v2/bogus-control/{uuid}` and `GET /securitycloud/v9/groups`, both 403), so the request now clears authorization and reaches the service — and the service cannot find a group it had just returned. **That is a v2 update-handler defect, not an authorization one, so the owner changed: it is no longer a `jamf/authorization-service` rollout to wait on.** `GET /v2/groups/{id}` is still 403, consistent with `#265` granting `PUT` alone and the other item-level verbs being undeclared. Hold until the v2 PUT answers 2xx. The rollout lag, for the record, was between 3h42m and 26h. `authorization-policies#264` (still DRAFT) would deny the v1 update and named the missing v2 rule as its own blocker — it was rebased onto `main` at 2026-09-02 13:22Z (`fa4cb07`) so `07791a1` is an ancestor of its head, which structurally excludes the out-of-order deploy on the merge path; re-check on any force-push, and note that #264 landing now would remove the only working device-group update. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
@@ -1119,7 +1247,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | `securitycloud` | `securitycloud` | tenant (own identifier) | 54 ops across six specs |
 | `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** The only package whose privileges come from `requiredPrivileges` rather than the spec |
 | `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
-| `audit` | `audit` | environment | **reachable as of 2026-09-03** — a credential granted `audit:read` under `X-Environment-Id` reads it; 1014 events walked. `ListAuditEvents` needs `since` **and** one of `actor`/`audit-source`/`audit-type`/`resource-id`, neither expressed in the signature |
+| `audit` | `audit` | environment (**only**, as of v2056) | **reachable as of 2026-09-03** — a credential granted `audit:read` under `X-Environment-Id` reads it; 1014 events walked. `ListAuditEvents` needs `since` **and** one of `actor`/`audit-source`/`audit-type`/`resource-id`, neither expressed in the signature |
 
 `account` is the documented exception to package-follows-namespace. It is also the
 SDK's first organization-scoped API, and **organization scope is the absence of a
@@ -1156,10 +1284,16 @@ the signature writes a call that cannot succeed.** `ListAuditEvents` requires
 200. Every one of those parameters is an optional string in Go. Both refusals are
 pinned by `TestAcceptance_AuditReachableUnderEnvironmentScope`.
 
-The organization form is still refused — an organization credential sending no
-scope header answers `400 REQUEST_CONTEXT_NOT_PROVIDED` — consistent with tyk
-`3e99c347` removing organization scoping. **Do not reintroduce path scoping** —
-the mechanism deliberately deleted at GA — and do not add it speculatively.
+**The organization form is refused, and as of v2056 the spec says so.** An
+organization credential sending no scope header answers
+`400 REQUEST_CONTEXT_NOT_PROVIDED`, consistent with tyk `3e99c347` removing
+organization scoping; v2056 withdrew `organization` from `x-scope-types` and
+made `X-Environment-Id` required, so this is no longer a spec/wire
+disagreement. Re-confirmed 2026-09-03 against a credential that reaches
+`/licensing/v1/licenses` at 200 with no header in the same session — which is
+what rules out "the credential is not organization-scoped" as the explanation.
+**Do not reintroduce path scoping** — the mechanism deliberately deleted at GA —
+and do not add it speculatively.
 
 One data-shape note for anyone writing coverage: `api-gateway` emits
 `http.request` events that carry no `resourceId`, so a test that reads

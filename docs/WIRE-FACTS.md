@@ -2785,3 +2785,119 @@ one.
   `header` source — the external one is
   `prod/api-products/jamf-pro/api-definitions-external-*.yaml`, found by grepping
   for `listen_path: /api/pro/`, not by directory name.
+
+### v2056 withdrew organization scope from the spec, and the wire agrees (2026-09-03)
+
+The spec has caught up with tyk `3e99c347`. `x-scope-types` goes
+`[environment, organization]` → `[environment]`, `X-Environment-Id` flips
+`required: false` → `true` and loses the sentence offering the header-less
+organization form, and `_permissions` agrees on both halves: `routes.yaml` drops
+the four `audit:read` routes typed `organization`, and `scopes.yaml` drops the
+whole `organization` block, leaving `environment` as its only top-level key.
+
+The probe that matters is the **control**, because "an organization credential
+is refused" has two explanations and only one of them is about audit:
+
+| credential | request | result |
+|---|---|---|
+| organization (`8a2d0ff2`, us), no scope header | `GET /licensing/v1/licenses` | **200** — 16 real licence rows |
+| organization (`8a2d0ff2`, us), no scope header | `GET /audit/v1/audit/sources` | **400** `REQUEST_CONTEXT_NOT_PROVIDED` |
+| environment (`aee3ec71`, eu), `X-Environment-Id` | `GET /audit/v1/audit/sources` | **200** — `api-gateway`, `blueprints`, `ai-policy`, all `hasEvents: true` |
+| environment (`aee3ec71`, eu), **no** scope header | `GET /audit/v1/audit/sources` | **400** `REQUEST_CONTEXT_NOT_PROVIDED` |
+| organization (`8a2d0ff2`, us), no scope header | `GET /audit/v1/bogus-control` | **400** `REQUEST_CONTEXT_NOT_PROVIDED` |
+
+```json
+{"httpStatus":400,"traceId":"8997900a14884822ef2e455a4ba86800","errors":[
+  {"code":"REQUEST_CONTEXT_NOT_PROVIDED","field":"","description":"The request context could not be detected.","id":""}]}
+```
+
+Row 1 is what rules out "that credential is not organization-scoped": it
+resolves an organization from the token with no header and reads a genuinely
+organization-scoped API. So the refusal on row 2 is audit declining
+organization scope, not the credential failing to establish one. Row 4 confirms
+`required: true` is right rather than merely tightened documentation.
+
+Row 5 is the limit of the probe: **the scope check runs before routing**, so a
+path that does not exist in the namespace returns the identical body. This
+probe therefore establishes that audit cannot be reached without an
+environment header — it does not establish anything audit-specific about the
+`organization` value, and no probe through this gateway can.
+
+### The published permissions map, cross-checked against the whole registry (2026-09-03)
+
+`TestScopedPrivilegesUseGAVocabulary` now parses a committed snapshot of
+developer.jamf.com's permissions map instead of a hand-typed transcription of
+it, and checks all **337** distinct generated `{capability}:{action}`
+identifiers against it. Result: **it declares every one, action for action**, so
+`permissionsMapExceptions` is empty. That is the first machine-checked
+corroboration of the specs' `x-required-privileges` by a source not derived from
+them — `_permissions/routes.yaml` is generated from those same extensions, so
+its agreement has always been tautological.
+
+Most valuable where it is most needed: the map's *Organization management scope*
+section declares `licensing:{r}`, `deal-registration:{c,r}`,
+`distributor-actions:{c,r,u}`, `sso-connections:{c,r,u,d}` and
+`sso-domains:{c,r,u,d}` — all eighteen `account` privileges that no published
+spec carries and `config.json` supplies by hand.
+
+**Two coverage gaps came out of the other direction**, where the map declares
+something the SDK's surface never uses. Neither is a defect in the SDK, and both
+are worth reporting:
+
+- **`deal-registration:create` has no endpoint.** The map declares
+  `deal-registration:{c,r}`, but `external/account-partners` declares only
+  `GET /v1/deal-registrations`. So the gateway's capability model carries a deal
+  registration *create* that the published spec does not — in the package whose
+  privilege publishing is already known to be broken.
+- **`devices:delete` has no endpoint either**, and here the SDK's answer looks
+  like the better one: Classic's `DELETE /computers/id/{id}` declares
+  `destructive-device-actions:execute`, not `devices:delete`. Either the map
+  declares an action the gateway never enforces, or a device-delete endpoint
+  exists that the whitelist does not reach.
+
+Seven further capabilities are declared and unreached —
+`detection-analytics`, `prevent-lists`, `protection-plans`,
+`security-audit-log`, `threat-alerts`, `threat-definition-versions`,
+`unified-logging-filters`. All seven are Jamf Protect, addressed through its
+GraphQL API rather than by path (their Endpoints cells list operation names like
+`listThreatAlerts`), so their absence is correct and not a gap.
+
+One trap, recorded because it produced a false report before the check was
+written: **a capability is declared across as many rows as its resources need**,
+and the rows must be unioned. `compliance-benchmarks` appears twice — `{c,r,d}`
+over `/benchmarks`, `{r}` over `/baselines` — and a parser keeping only the last
+row reports the spec's `compliance-benchmarks:create` and `:delete` as
+undeclared. They are declared. `parsePermissionsMap` unions, and
+`TestParsePermissionsMapUnionsRowsForOneCapability` pins it.
+
+### The organization credential's own capability map (2026-09-03)
+
+Incidental to the above and useful for the `account` holds: on organization
+tenant `8a2d0ff2` the grant is partial, and the split is per capability rather
+than per spec.
+
+| request | result |
+|---|---|
+| `GET /licensing/v1/licenses` | **200** — 16 rows |
+| `GET /sso/v1/connections` | **200** — 5 connections |
+| `GET /partners/v1/partners` | **403** `BAD_PERMISSIONS` |
+| `GET /sso/v1/domain-allocations` | **403** `BAD_PERMISSIONS` |
+
+Two consequences:
+
+- **The `account-licensing` hold stands, re-established on a second
+  organization tenant.** `type` is populated on 16/16 rows here too, and
+  `licenseType` on 8/16 — so they are distinct fields, not a rename, and
+  v1872's removal of `type` would still be a silent regression.
+- **The `account-sso` hold could not be re-probed.**
+  `DomainAllocationConnection.authZeroRegion` lives on
+  `/sso/v1/domain-allocations`, which this credential cannot reach while
+  `/sso/v1/connections` answers 200 in the same session — an ungranted
+  capability (`sso-domains`), not an absent endpoint. Note the published
+  permissions map types those as two capabilities,
+  `sso-connections:{c,r,u,d}` and `sso-domains:{c,r,u,d}`, which is exactly
+  the split observed. Lifting that hold needs a credential holding
+  `sso-domains`.
+
+The token is opaque — 342 characters, not a JWT — so none of this is readable
+from the credential itself; it has to be probed.
