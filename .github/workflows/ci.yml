@@ -19,10 +19,11 @@ jobs:
       # Separate module: the root run never reaches the generator's own unit
       # tests (config validation, parameter doc rendering, enum naming).
       - run: cd tools/generate && go test -count=1 -timeout=120s ./...
-      # acctargets lives in the tools module, which the root run also misses.
-      # Scoped to the subpackage rather than ./... because tools/tools.go is a
-      # build-tagged blank import of copywrite that typecheck rejects by design.
-      - run: cd tools && go test -count=1 -timeout=120s ./acctargets/...
+      # acctargets and acclanes live in the tools module, which the root run
+      # also misses. Scoped to the subpackages rather than ./... because
+      # tools/tools.go is a build-tagged blank import of copywrite that
+      # typecheck rejects by design.
+      - run: cd tools && go test -count=1 -timeout=120s ./acctargets/... ./acclanes/...
 
   vet:
     name: Vet
@@ -42,7 +43,8 @@ jobs:
       matrix:
         # One entry per Go module. The generator is its own module, so the
         # root-only run never descended into it and its findings went
-        # unreported. tools/ is entered only at tools/acctargets: linting the
+        # unreported. tools/ is entered at its command subpackages only:
+        # linting the
         # module root would pull in tools/tools.go, a build-tagged blank import
         # of copywrite (a main package) that typecheck rejects by design and
         # which exists solely to pin the dependency.
@@ -52,7 +54,7 @@ jobs:
           - module: "tools/generate"
             path: "./..."
           - module: "tools"
-            path: "./acctargets/..."
+            path: "./acctargets/... ./acclanes/..."
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
