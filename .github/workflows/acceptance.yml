@@ -36,6 +36,8 @@ jobs:
     timeout-minutes: 10
     outputs:
       run: ${{ steps.scope.outputs.run }}
+      matrix: ${{ steps.lanes.outputs.matrix }}
+      lanes: ${{ steps.lanes.outputs.summary }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -69,6 +71,35 @@ jobs:
           echo "run=$scope" >> "$GITHUB_OUTPUT"
           echo "Scope: $scope"
 
+      # Split the scope into product lanes. account, securitycloud and the
+      # environment-scoped platform surfaces use different credentials against
+      # different tenants and share no fixtures with pro, so they need not queue
+      # behind it. tools/acclanes owns the partition; .github/acceptance-lanes.json
+      # owns the lane table, and jamfplatform/acc_lanes_test.go proves the
+      # name-based partition matches the credential each test actually uses.
+      #
+      # `go test -list` supplies the authoritative test names for ALL. The lane
+      # table's default lane is "everything unclaimed", which cannot be written
+      # as a pattern — `go test -run` uses RE2 and rejects negative lookahead —
+      # so the split is a partition of a real list, not a regex complement.
+      - name: Compute lanes
+        id: lanes
+        env:
+          SCOPE: ${{ steps.scope.outputs.run }}
+        run: |
+          set -euo pipefail
+          if [ "$SCOPE" = "NONE" ]; then
+            echo 'matrix=[]' >> "$GITHUB_OUTPUT"
+            echo 'summary=' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          go test -tags acceptance -list '.*' ./jamfplatform/ > /tmp/acc-tests.txt
+          matrix="$(cd tools && go run ./acclanes -scope "$SCOPE" < /tmp/acc-tests.txt)"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          summary="$(printf '%s' "$matrix" | jq -r 'map("\(.lane) (\(.count))") | join(", ")')"
+          echo "summary=$summary" >> "$GITHUB_OUTPUT"
+          echo "Lanes: $summary"
+
       - name: Scope summary
         # SCOPE goes through the environment rather than being interpolated into
         # the script: the value is a regex full of shell metacharacters.
@@ -90,19 +121,32 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   acceptance:
-    name: Acceptance Tests
+    name: Acceptance (${{ matrix.lane }})
     needs: plan
-    if: needs.plan.outputs.run != 'NONE'
+    if: needs.plan.outputs.matrix != '[]'
     runs-on: ubuntu-latest
     environment: acceptance
-    # Job-level: serialise across ALL PRs, branches, and the scheduled run. The
-    # suite mutates a single shared Jamf tenant, so only one acceptance run may
-    # execute at a time. The group is a constant (NOT github.ref) so a second run
-    # queues behind the in-progress one instead of racing it for the same
-    # fixtures, and cancel-in-progress: false never kills a running suite.
-    # Same-PR supersede is handled by the workflow-level group above.
+    strategy:
+      # One job per product lane. fail-fast off: a credential problem in one
+      # product must not cancel another product's evidence, which is the whole
+      # reason for splitting.
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.plan.outputs.matrix) }}
+    # Job-level: serialise each lane against ITSELF across all PRs, branches and
+    # the scheduled run, while letting different lanes overlap. Previously one
+    # `acceptance-tenant` group serialised everything, which is right for the 681
+    # tests that mutate the shared Jamf Pro tenant and pointless for the 46 that
+    # do not — a ten-test account run waited for a two-hour Pro suite.
+    #
+    # Per-lane rather than keyed on matrix.lock, because two runs of the SAME
+    # non-pro lane still race each other's fixtures: PR A and PR B both creating
+    # Security Cloud groups is a collision even though neither touches Pro. The
+    # group is a constant per lane (NOT github.ref) so the second run queues
+    # instead of racing, and cancel-in-progress: false never kills a running
+    # suite. Same-PR supersede is handled by the workflow-level group above.
     concurrency:
-      group: acceptance-tenant
+      group: acceptance-lane-${{ matrix.lane }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7
@@ -112,15 +156,94 @@ jobs:
       - name: Acceptance tests
         run: |
           set -euo pipefail
-          if [ "$SCOPE" = "ALL" ]; then
-            echo "Running full suite."
-            go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 ./...
-          else
-            echo "Running scoped subset: $SCOPE"
-            go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 -run "$SCOPE" ./...
-          fi
+          echo "Lane ${LANE}: ${COUNT} test(s), require=${JAMFPLATFORM_ACC_REQUIRE}, tenant-lock=${LOCK}"
+          # tee so the summary step can classify results without re-running
+          # anything; pipefail keeps the job's status as go test's, not tee's.
+          go test -v -cover -count=1 -tags acceptance -timeout 120m -p=1 -run "$RUN" ./... 2>&1 \
+            | tee test-output.log
         env:
-          SCOPE: ${{ needs.plan.outputs.run }}
+          # acclanes always emits an explicit -run pattern, including for ALL, so
+          # there is no unscoped branch here: a lane must never run a test that
+          # was assigned to another lane's credential. On a full run that makes
+          # the pro pattern a ~33 KB alternation of 681 names. That is deliberate
+          # and within every limit that applies (job outputs cap at 1 MB, RE2 has
+          # no practical pattern-size limit, and the whole matrix JSON is 34 KB);
+          # the alternative — leaving pro unscoped — would re-run the other
+          # lanes' tests under pro's credential.
+          RUN: ${{ matrix.run }}
+          LANE: ${{ matrix.lane }}
+          COUNT: ${{ matrix.count }}
+          LOCK: ${{ matrix.lock }}
+          # Each lane requires only its OWN credential set, so a missing
+          # organization secret fails the account lane and leaves the other three
+          # reporting real results. Absence is fatal rather than a skip: a
+          # pipeline that wires a secret and then skips prints `ok` having
+          # asserted nothing.
+          JAMFPLATFORM_ACC_REQUIRE: ${{ matrix.require }}
+
+      # Surface what this lane actually ran, failed or self-skipped, so a
+      # suite that never executes — a missing fixture, an unset write gate — is
+      # visible instead of vanishing into a green check, and a failure is
+      # nameable from the summary without opening the raw log. Counts top-level
+      # TestAcceptance_* results only; subtests are indented and excluded.
+      #
+      # A skip is worth reading here even though JAMFPLATFORM_ACC_REQUIRE makes a
+      # missing CREDENTIAL fatal: the remaining skips are the deliberate ones,
+      # the destructive opt-in gates and the fixture-dependent tests, and a
+      # sudden change in that count is how you notice a fixture disappeared.
+      - name: Lane summary
+        if: always()
+        run: |
+          log=test-output.log
+          {
+            echo "## Acceptance — lane \`${LANE}\`"
+            echo
+            echo "**Planned:** ${COUNT} test(s) · **Credential:** \`${REQUIRE}\` · **Tenant lock:** ${LOCK}"
+            echo
+            if [ ! -s "$log" ]; then
+              echo "_No test output captured (the job failed before tests ran)._"
+              exit 0
+            fi
+            pass=$(grep -cE '^--- PASS: TestAcceptance_[^/]+\(' "$log" || true)
+            fail=$(grep -cE '^--- FAIL: TestAcceptance_[^/]+\(' "$log" || true)
+            skip=$(grep -cE '^--- SKIP: TestAcceptance_[^/]+\(' "$log" || true)
+            echo "**Ran:** ${pass:-0} passed, ${fail:-0} failed · **Skipped:** ${skip:-0}"
+            echo
+            # A lane that planned N tests and ran none is the failure mode the
+            # lane split exists to make visible, so say so rather than leaving a
+            # reader to compare two numbers.
+            if [ "$(( ${pass:-0} + ${fail:-0} + ${skip:-0} ))" -eq 0 ]; then
+              echo "> [!WARNING]"
+              echo "> This lane executed **no** tests despite planning ${COUNT}."
+              echo
+            fi
+            if [ "${fail:-0}" -gt 0 ]; then
+              # Open by default: a failure is the one thing nobody should have to
+              # click to see.
+              echo "<details open><summary>Failed (${fail})</summary>"
+              echo
+              echo '```'
+              grep -E '^--- FAIL: TestAcceptance_[^/]+\(' "$log" | sed -E 's/^--- FAIL: //' | sort -u || true
+              echo '```'
+              echo
+              echo "</details>"
+              echo
+            fi
+            if [ "${skip:-0}" -gt 0 ]; then
+              echo "<details><summary>Skipped (${skip}) — opt-in gates and absent fixtures</summary>"
+              echo
+              echo '```'
+              grep -E '^--- SKIP: TestAcceptance_[^/]+\(' "$log" | sed -E 's/^--- SKIP: //' | sort -u || true
+              echo '```'
+              echo
+              echo "</details>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          LANE: ${{ matrix.lane }}
+          COUNT: ${{ matrix.count }}
+          LOCK: ${{ matrix.lock }}
+          REQUIRE: ${{ matrix.require }}
           # ---------------------------------------------------------------
           # Credentials. One set per (product, scope), named
           # JAMFPLATFORM_ACC_<PRODUCT>_<SCOPE>_<FIELD>. The product token appears
@@ -165,14 +288,8 @@ jobs:
           # it locally if a test needs those. accJSCCredSource logs which
           # credential the run actually used.
           #
-          # Credential sets whose absence must FAIL rather than skip. Unset
-          # credentials skip by design so a contributor without a tenant can run
-          # the suite, but in a pipeline that wires the secrets a skip is
-          # invisible: the package prints `ok` and the check goes green having
-          # asserted nothing. That is how the account tests went unnoticed above,
-          # and how a 2026-08-04 WAF block turned 146 skips into a passing run.
-          # Add `environment` once its secrets are confirmed populated.
-          JAMFPLATFORM_ACC_REQUIRE: platform,organization
+          # JAMFPLATFORM_ACC_REQUIRE is set per lane from matrix.require above,
+          # not once for the whole run.
           # Optional Pro fixtures and material — when present the suite exercises
           # real register/lifecycle flows instead of probe-only paths. Namespaced
           # by product for the same reason the credentials are.
@@ -194,3 +311,47 @@ jobs:
           # shared state, and ..._SECURITYCLOUD_GATEWAY_WRITE_OK provisions real
           # network egress whose deletion severs traffic for every access policy
           # routed through it. Enable locally only when intended.
+
+  # A single required check for branch protection. Without it the protected-branch
+  # config would have to list every lane by name and be edited whenever a lane is
+  # added — and a lane that failed to start would look like a check that simply
+  # was not required. `if: always()` so this runs even when a lane fails, and the
+  # result is asserted rather than inferred: `needs.<job>.result` is 'skipped'
+  # when the matrix was empty, which is a pass only because NONE means there was
+  # nothing to run.
+  acceptance-gate:
+    name: Acceptance
+    needs: [plan, acceptance]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        env:
+          PLAN: ${{ needs.plan.result }}
+          LANES: ${{ needs.acceptance.result }}
+          SUMMARY: ${{ needs.plan.outputs.lanes }}
+          SCOPE: ${{ needs.plan.outputs.run }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## Acceptance"
+            echo
+            echo "- scope: \`${SCOPE:-?}\`"
+            echo "- lanes: ${SUMMARY:-none}"
+            echo "- plan: $PLAN"
+            echo "- lanes result: $LANES"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$PLAN" != "success" ]; then
+            echo "plan job did not succeed ($PLAN)"; exit 1
+          fi
+          case "$LANES" in
+            success) echo "all lanes passed" ;;
+            skipped)
+              if [ "$SCOPE" = "NONE" ]; then
+                echo "no acceptance-relevant changes; nothing to run"
+              else
+                echo "lanes were skipped but scope was '$SCOPE' — the matrix did not start"; exit 1
+              fi ;;
+            *) echo "one or more lanes failed ($LANES)"; exit 1 ;;
+          esac

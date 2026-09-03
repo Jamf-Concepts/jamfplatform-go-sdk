@@ -29,3 +29,6 @@ coverage.html
 # Testing
 testing/
 tools/generate/generate
+
+# acceptance lane log, tee'd for the CI summary step
+test-output.log
