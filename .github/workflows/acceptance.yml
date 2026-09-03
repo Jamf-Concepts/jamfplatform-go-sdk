@@ -313,6 +313,25 @@ jobs:
           JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID }}
           JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD }}
 
+          # The one write gate that IS wired, and a repository/environment
+          # *variable* rather than a secret because it is a boolean flag with
+          # nothing to hide — a secret would also mask its value in the logs,
+          # turning "1" into "***" everywhere it appeared. Unset in the
+          # `acceptance` environment it expands to the empty string and the test
+          # skips itself, so wiring it is inert until someone sets it in the UI.
+          #
+          # Safe to enable, unlike the gates below: the test creates a
+          # DISABLED, UNSCOPED SELF_SERVICE/MANUAL app-installer deployment,
+          # which installs software on nothing, asserts that it came back
+          # disabled and unscoped before touching anything else, and deletes it
+          # in the test body with a t.Cleanup delete behind that. What it costs
+          # is one incrementing deployment id per run and two history rows.
+          #
+          # It does mutate GLOBAL settings, via a round-trip that writes back
+          # exactly what it read and then asserts equality — so it is a no-op
+          # unless the PUT is lossy, in which case failing is the point.
+          JAMFPLATFORM_ACC_PRO_APP_INSTALLERS_WRITE_OK: ${{ vars.JAMFPLATFORM_ACC_PRO_APP_INSTALLERS_WRITE_OK }}
+
       # Surface what this lane actually ran, failed or self-skipped, and FAIL the
       # job when a lane planned tests and executed none — a missing fixture, an
       # unset write gate, or a -run pattern that matches nothing. `go test -run`
@@ -390,7 +409,10 @@ jobs:
           # intentionally NOT wired — tests auto-discover or self-create those
           # fixtures when the vars are unset. They exist as local-run overrides.
           #
-          # Destructive opt-in gates are also NOT wired:
+          # Destructive opt-in gates are NOT wired, with one exception —
+          # ..._PRO_APP_INSTALLERS_WRITE_OK is wired to a repository variable on
+          # the `go test` step above, because that test installs nothing and
+          # deletes what it creates. The rest stay off:
           # ..._PRO_PRELOAD_WIPE_OK would wipe inventory-preload records,
           # ..._PRO_USER_WRITE_OK leaks orphan users,
           # ..._AIGOVERNANCE_WRITE_OK and ..._ORGANIZATION_WRITE_OK mutate
