@@ -14,16 +14,28 @@ on:
 
 permissions:
   contents: read
+  # The superseded check reads the PR's current head SHA.
+  pull-requests: read
 
-# Workflow-level: supersede this PR's own earlier run when a new commit lands.
-# Without it every push queues another full suite behind the last one, which on a
-# CI-touching PR means hours of tenant time spent on superseded commits. Scoped by
-# ref, so PRs (refs/pull/N/merge) never cancel each other or the scheduled run
-# (refs/heads/main). Cross-PR serialisation is a SEPARATE, job-level group below —
-# GitHub allows one group per scope, and the two scopes compose.
-concurrency:
-  group: acceptance-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# NO workflow-level concurrency, deliberately. A workflow-level group with
+# cancel-in-progress: true is the usual way to supersede a PR's earlier run, and
+# it is wrong for this suite: it cancels the whole run including a RUNNING
+# acceptance job, and the job-level cancel-in-progress: false below cannot
+# prevent that — that setting only governs contention between different runs for
+# the same lane group.
+#
+# Cancelling mid-suite orphans tenant state. The suite registers 53 t.Cleanup
+# handlers and 10 defers to delete what it creates; a cancel SIGKILLs `go test`
+# and none of them run, leaving real objects behind on a shared tenant. That
+# litter is not free — duplicate names later collide (device groups 422,
+# benchmarks 409), and some objects cannot be deleted at all, so the cost of one
+# cancelled run is paid by every run after it.
+#
+# So a running suite is never cancelled: superseded runs QUEUE. What stops that
+# turning into hours of tenant time on obsolete commits is the "Skip if
+# superseded" guard in the acceptance job, which lets a queued run for a stale
+# commit exit in seconds once it reaches the front. Cancellation is applied only
+# to the plan job, which is cheap and touches nothing.
 
 jobs:
   # Decide which acceptance tests this run needs. PRs get the change-scoped
@@ -34,6 +46,11 @@ jobs:
     name: Plan Acceptance Scope
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Safe to cancel: this job only reads git and computes a regex, so
+    # superseding it wastes nothing and leaves no state behind.
+    concurrency:
+      group: acceptance-plan-${{ github.ref }}
+      cancel-in-progress: true
     outputs:
       run: ${{ steps.scope.outputs.run }}
       matrix: ${{ steps.lanes.outputs.matrix }}
@@ -153,7 +170,44 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+
+      # Queued-but-obsolete runs exit here instead of spending tenant time on a
+      # commit nobody is waiting for. This is the half of "supersede" that is
+      # safe: it declines to START work, where cancel-in-progress would abort
+      # work already holding tenant fixtures.
+      #
+      # Only meaningful for pull_request. The scheduled run and workflow_dispatch
+      # have no newer head to be superseded by, so they always proceed.
+      - name: Skip if superseded
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          PR: ${{ github.event.pull_request.number }}
+          RAN_FOR: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" != "pull_request" ]; then
+            echo "superseded=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          head="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR}" -q .head.sha)"
+          if [ "$head" != "$RAN_FOR" ]; then
+            echo "superseded=true" >> "$GITHUB_OUTPUT"
+            echo "This run is for ${RAN_FOR}, but the PR head is now ${head}. Skipping."
+            {
+              echo "## Acceptance — lane \`${{ matrix.lane }}\` skipped"
+              echo
+              echo "Superseded: queued for \`${RAN_FOR:0:8}\`, PR head is now \`${head:0:8}\`."
+              echo "A running suite is never cancelled, so obsolete runs decline to start rather than"
+              echo "aborting mid-test and orphaning tenant fixtures."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "superseded=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Acceptance tests
+        if: steps.guard.outputs.superseded != 'true'
         run: |
           set -euo pipefail
           echo "Lane ${LANE}: ${COUNT} test(s), require=${JAMFPLATFORM_ACC_REQUIRE}, tenant-lock=${LOCK}"
@@ -192,7 +246,7 @@ jobs:
       # the destructive opt-in gates and the fixture-dependent tests, and a
       # sudden change in that count is how you notice a fixture disappeared.
       - name: Lane summary
-        if: always()
+        if: always() && steps.guard.outputs.superseded != 'true'
         run: |
           log=test-output.log
           {
