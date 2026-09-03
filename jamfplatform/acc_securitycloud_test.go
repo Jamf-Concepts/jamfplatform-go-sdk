@@ -1584,25 +1584,41 @@ func TestAcceptance_SecurityCloudDeviceGroupsV2(t *testing.T) {
 	t.Logf("v2 returned %d device groups", len(groups.Groups))
 }
 
-// TestAcceptance_SecurityCloudUpdateDeviceGroupV2 pins a gateway gap, not a
-// client bug. UpdateDeviceGroupV1 is marked deprecated as of 2026-08-25 and the
-// spec names PUT /v2/groups/{groupId} as its successor, but that path is not
-// routed: it answers 403 BAD_PERMISSIONS on a real group that the v1 PUT
-// updates successfully in this same test. Wire-verified 2026-08-29, 7/7
-// attempts, eu tenant wisconsam.
+// TestAcceptance_SecurityCloudUpdateDeviceGroupV2 pins a SERVICE defect. Until
+// 2026-09-03 it pinned a gateway gap, and the difference matters because it
+// changes who fixes it.
 //
-// The method is generated and whitelisted anyway so the deprecation marker on
-// UpdateDeviceGroupV1 names something that exists in Go rather than leaving
-// consumers' staticcheck SA1019 pointing at nothing.
+// UpdateDeviceGroupV1 is deprecated as of 2026-08-25 and the spec names
+// PUT /v2/groups/{groupId} as its successor. That path answered
+// 403 BAD_PERMISSIONS — this namespace's unrouted tell — for five weeks, and this
+// test asserted the 403 so the suite would fail when it changed. It changed at
+// 12:29Z on 2026-09-03, and this is the rewrite that failure asked for.
 //
-// This asserts the 403 so the suite FAILS when routing lands. On that day:
-// flip this to assert success, and drop the corresponding note from CLAUDE.md's
-// v1865 section. Do not weaken it to a skip — a blanket 403 tolerance is what
-// hid this class of gap before.
+// **authorization-policies#265 (07791a1) has deployed.** The 403 became a
+// service-level 404 NOT_FOUND, and the request now clears authorization and
+// reaches the service. What it does not do is work: the service answers 404 for a
+// group that exists — created by v1 in this very test, updated by v1 as the
+// control below, and listed by GET /v2/groups in the same invocation.
 //
-// One caution learned while probing it: the first attempt returned 500 on both
-// v1 and v2, which reads as "v2 is routed and merely faulting" — the opposite
-// of the truth. Repeat a routing probe before believing a single result.
+// The classification rests on controls rather than on the status alone, because
+// 404 could plausibly be a router miss. In the same invocation,
+// PUT /securitycloud/v2/bogus-control/{uuid} and GET /securitycloud/v9/groups
+// both still answer 403 BAD_PERMISSIONS, so 403 remains what an unrouted path
+// gives here and a 404 means something downstream answered. Verified across five
+// probes and two credentials on 2026-09-03.
+//
+// So the outcome to wait for is a 2xx, not the 403 clearing — that already
+// happened. GET and DELETE on the v2 item path are still 403 and undeclared;
+// #265 granted PUT alone, which is consistent.
+//
+// Do not weaken any branch to a skip. A blanket tolerance is what hid this class
+// of gap before, and the three states below have three different owners: a 403 is
+// an authorization regression, a 404 is the service, a 2xx is the day the
+// securitycloud-devices hold lifts.
+//
+// One caution retained from the original: an early probe returned 500 on both v1
+// and v2, which reads as "v2 is routed and merely faulting" — the opposite of the
+// truth. Repeat a routing probe before believing a single result.
 func TestAcceptance_SecurityCloudUpdateDeviceGroupV2(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
@@ -1617,27 +1633,37 @@ func TestAcceptance_SecurityCloudUpdateDeviceGroupV2(t *testing.T) {
 		return sc.DeleteDeviceGroupV1(context.Background(), created.ID)
 	})
 
-	// Control: the deprecated v1 write works on this exact group, so a v2
-	// failure below cannot be blamed on the group, the credential or the tenant.
+	// Control: the deprecated v1 write works on this exact group, so the v2
+	// result below cannot be blamed on the group, the credential or the tenant.
+	// This is also what makes the v2 404 a contradiction rather than a plausible
+	// answer — the group demonstrably exists.
 	if _, err := sc.UpdateDeviceGroupV1(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v1ok"}); err != nil {
 		t.Fatalf("control UpdateDeviceGroupV1(%s) failed, so the v2 result below is not interpretable: %v", created.ID, err)
 	}
 
 	err = sc.UpdateDeviceGroupV2(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v2"})
 	if err == nil {
-		t.Fatalf("UpdateDeviceGroupV2(%s) succeeded — the gateway now routes PUT /v2/groups/{groupId}. "+
-			"That is the outcome this test is waiting for: flip it to assert success and update CLAUDE.md's v1865 section.", created.ID)
+		t.Fatalf("UpdateDeviceGroupV2(%s) SUCCEEDED — the v2 update handler is fixed. That is the outcome this "+
+			"test waits for: flip it to assert success, and lift the securitycloud-devices hold in CLAUDE.md, since "+
+			"v1 is no longer the only device-group update that works.", created.ID)
 	}
 
 	var apiErr *jamfplatform.APIResponseError
 	if !errors.As(err, &apiErr) {
-		t.Fatalf("UpdateDeviceGroupV2 failed with a non-API error, want 403 BAD_PERMISSIONS: %v", err)
+		t.Fatalf("UpdateDeviceGroupV2 failed with a non-API error, want 404 NOT_FOUND: %v", err)
 	}
-	if !apiErr.HasStatus(403) {
-		t.Fatalf("UpdateDeviceGroupV2 returned %v, want 403 BAD_PERMISSIONS (the unrouted-path tell). "+
-			"A different status means the gateway's behaviour changed — re-probe before adjusting this test.", err)
+	switch {
+	case apiErr.HasStatus(404):
+		t.Logf("PUT /v2/groups/{groupId} reaches the service and answers 404 for a group v1 just updated "+
+			"(authorization-policies#265 deployed, handler defective), as expected: %s", apiErr.Summary())
+	case apiErr.HasStatus(403):
+		t.Fatalf("UpdateDeviceGroupV2 is back to 403 — authorization-policies#265 (07791a1) appears to have been "+
+			"withdrawn or rolled back, which is an authorization regression rather than the service defect this "+
+			"test pins: %v", err)
+	default:
+		t.Fatalf("UpdateDeviceGroupV2 returned %v, want 404 NOT_FOUND. Neither the deployed-rule state nor the "+
+			"old unrouted 403 — re-probe with controls in the same invocation before adjusting this test.", err)
 	}
-	t.Logf("PUT /v2/groups/{groupId} still unrouted (403 BAD_PERMISSIONS), as expected; v1 control succeeded")
 }
 
 // ---------------------------------------------------------------------------
