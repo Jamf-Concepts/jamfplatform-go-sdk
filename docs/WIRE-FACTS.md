@@ -819,6 +819,63 @@ the v2 settings response, so a probe that tidies up by reading v2 will leave the
 behind. Read `/pro/v1/computer-inventory-collection-settings`, which lists all
 three collections, and delete by id.
 
+### App Installers: the write surface exercised (2026-09-03)
+
+The ingest at v2043 covered the reads and probed the deployment-scoped ones with
+an impossible ID. The write surface has now been run end to end on the eu
+sandbox under `JAMFPLATFORM_ACC_PRO_APP_INSTALLERS_WRITE_OK`, creating a
+**disabled, unscoped `SELF_SERVICE`/`MANUAL` draft** — which installs nothing —
+and deleting it in the same test. Four things came out of it that the spec does
+not say, all confirmed curl-direct with
+`GET /pro/v1/jamf-pro-version` → 200 and
+`GET /pro/v1/app-installers/bogus-control` → 403 as controls in the same
+invocation.
+
+**Both history-note `POST`s answer `200`, and the spec declares only `201`.**
+`POST /v1/app-installers/deployments/{id}/history` and
+`POST /v1/app-installers/global-settings/history` each return the created
+`ObjectHistory` under HTTP 200. The spec's `responses` map carries `201` (plus
+`404`/`503`) and no `200` at all, so the generator derived `http.StatusCreated`
+and **both methods failed on every successful call** — the transport reported
+`API request failed with status 200 OK` while quoting the object it had just
+created. Same defect class as `CreateInventoryPreloadHistoryNoteV1`, and the same
+fix: an explicit `"expectedStatus": 200` in `config.json`. Note that *deleting*
+the override is inert — absent one, the generator reads the spec's 201 — so the
+value has to be stated. Report upstream. `POST /v1/app-installers/deployments`
+itself is genuinely `201`, so this is per-operation, not a family-wide error.
+
+**The create returns a real `id`; the `href` beside it is not callable.**
+`HrefResponse` carries both, and the body is
+`{"id": "7", "href": "https://<instance>.jamfcloud.com/api/v1/app-installers/deployments/7"}`
+— the Jamf Pro **instance** hostname with an `/api` prefix, not the gateway root.
+So take `created.ID` and never dereference the href: the SDK's base URL cannot
+reach that host, and the `/api` segment does not exist on the GA gateway.
+
+**An omitted `smartGroupId` reads back as `"-1"`, never `""`.** `-1` is this
+API's no-assignment sentinel — the same one `categoryId` and `siteId` document in
+their own descriptions, but `smartGroupId`'s description says only that a null
+means the installer will not be deployed. So an unscoped-draft assertion has to
+accept both spellings; treating `""` as the only unscoped value fails on a
+deployment that is in fact targeting nothing.
+
+**Both installation retries answer `404` with an empty `errors` array when there
+is nothing to retry**, and that is Jamf Pro's own response rather than a routing
+gap. `POST /v1/app-installers/deployments/{id}/computers/installation-retry`
+returned `{"httpStatus": 404, "errors": []}` for a deployment `GET` returned 200
+for in the same invocation, and the idless
+`POST /v1/app-installers/deployments/computers/installation-retry` answered
+identically. The unrouted tell in this namespace is `403 BAD_PERMISSIONS`, which
+the bogus-path control returned, so these requests are routed and refused on
+state. The spec documents no status for the empty case. Both are asserted as 404
+in `TestAcceptance_Pro_AppInstallers_Writes`, so a change to 2xx fails the test
+rather than passing silently.
+
+Still unexercised, and needing a deployment that targets real machines:
+`RetryAppInstallerDeploymentComputerInstallationV1` and
+`UpdateAppInstallerDeploymentVersionV1`. Both keep their impossible-ID probes.
+Also still unverified: whether a post-GA **tenant** credential reaches any of
+this — only an environment credential has been live since the gateway opened.
+
 ### The gateway-bypass technique
 
 When a gateway 403 blocks verification, separate "Jamf Pro can't do this" from

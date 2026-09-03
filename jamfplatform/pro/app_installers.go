@@ -414,7 +414,7 @@ func (c *Client) CreateAppInstallerDeploymentHistoryNoteV1(ctx context.Context, 
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := fmt.Sprintf("%s/app-installers/deployments/%s/history", prefix, url.PathEscape(id))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("CreateAppInstallerDeploymentHistoryNoteV1(%s): %w", id, err)
 	}
 	return &result, nil
@@ -506,7 +506,7 @@ func (c *Client) CreateAppInstallerGlobalSettingsHistoryNoteV1(ctx context.Conte
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result ObjectHistory
 	endpoint := prefix + "/app-installers/global-settings/history"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
 		return nil, fmt.Errorf("CreateAppInstallerGlobalSettingsHistoryNoteV1: %w", err)
 	}
 	return &result, nil

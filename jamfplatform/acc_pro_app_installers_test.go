@@ -31,6 +31,7 @@ package jamfplatform_test
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
@@ -230,63 +231,237 @@ func TestAcceptance_Pro_AppInstallers_Export(t *testing.T) {
 	t.Logf("export returned %d bytes", len(out))
 }
 
-// TestAcceptance_Pro_AppInstallers_Writes is deliberately gated.
+// TestAcceptance_Pro_AppInstallers_Writes exercises the real write surface under
+// its gate: create, read back, update, history note, delete, and the three
+// deployment-scoped reads against an actual deployment rather than an impossible
+// ID.
 //
-// Every operation here changes what is installed on real computers:
-// Create/Update/Delete a deployment, the three installation retries, the version
-// update, and the two history notes that write to a real object's audit trail.
-// A deployment has no dry-run and no scope-free form, so there is no safe
-// probe-only path the way there is for the reads above.
+// # Why this is safe to run, and what makes it safe
+//
+// A deployment normally installs software on every computer in its scope. Two
+// spec-documented properties remove that entirely, and both are asserted rather
+// than assumed:
+//
+//   - enabled defaults to false — "is deployment active or is it a draft"
+//   - smartGroupId null means "the app installer will not be deployed"
+//
+// So the deployment created here is a disabled draft scoped to nothing. It is
+// also SELF_SERVICE with MANUAL updates, which is the least automatic
+// combination the two enums allow, and it is deleted on cleanup. If a future
+// spec change makes either default active, the create below asserts the
+// round-tripped values and will fail rather than silently install anything.
+//
+// Still gated despite that, because the gate is about the operation's potential
+// rather than this particular body: anyone editing this test to add a
+// smartGroupId or flip enabled needs the deliberate opt-in already in place.
 func TestAcceptance_Pro_AppInstallers_Writes(t *testing.T) {
 	requireWriteOptIn(t, appInstallersWriteGate,
-		"Creating an App Installer deployment installs software on every computer in its scope, and the "+
-			"retries and version update act on real installations. Needs an instance reserved for it.")
+		"Creates a real App Installer deployment. It is a disabled draft scoped to no smart group, so it "+
+			"installs nothing, but the operation can install software on every computer in a scope and the "+
+			"retries act on real installations.")
 
 	p := pro.New(accClient(t))
 	ctx := context.Background()
 
-	// Reached only under the gate, so the shape is asserted rather than the
-	// blast radius risked: the doomed-ID probes confirm the retry, version-update
-	// and history-note methods build the right URL and decode their errors.
-	assertNotFound(t, "RetryAppInstallerDeploymentInstallationsV1", func() error {
-		return p.RetryAppInstallerDeploymentInstallationsV1(ctx, noSuchDeployment)
+	titles, err := p.ListAppInstallerTitlesV1(ctx, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListAppInstallerTitlesV1: %v", err)
+	}
+	if len(titles) == 0 || titles[0].ID == "" {
+		t.Skip("no app title to deploy")
+	}
+	title := titles[0]
+
+	disabled := false
+	name := "sdk-acc-appinst-" + runSuffix()
+	created, err := p.CreateAppInstallerDeploymentV1(ctx, &pro.AppTitleDeployment{
+		Name:           name,
+		AppTitleID:     title.ID,
+		DeploymentType: pro.AppTitleDeploymentDeploymentTypeSelfService,
+		UpdateBehavior: pro.AppTitleDeploymentUpdateBehaviorManual,
+		Enabled:        &disabled,
 	})
-	assertNotFound(t, "RetryAppInstallerDeploymentComputerInstallationV1", func() error {
-		return p.RetryAppInstallerDeploymentComputerInstallationV1(ctx, noSuchDeployment, noSuchComputer)
-	})
-	assertNotFound(t, "UpdateAppInstallerDeploymentVersionV1", func() error {
-		return p.UpdateAppInstallerDeploymentVersionV1(ctx, noSuchDeployment, &pro.AppTitleVersion{})
-	})
-	assertNotFound(t, "CreateAppInstallerDeploymentHistoryNoteV1", func() error {
-		_, err := p.CreateAppInstallerDeploymentHistoryNoteV1(ctx, noSuchDeployment, &pro.ObjectHistoryNote{Note: "sdk-acc probe"})
-		return err
-	})
-	assertNotFound(t, "DeleteAppInstallerDeploymentV1", func() error {
-		return p.DeleteAppInstallerDeploymentV1(ctx, noSuchDeployment)
-	})
-	assertNotFound(t, "UpdateAppInstallerDeploymentV1", func() error {
-		_, err := p.UpdateAppInstallerDeploymentV1(ctx, noSuchDeployment, &pro.AppTitleDeployment{})
-		return err
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateAppInstallerDeploymentV1: %v", err)
+	}
+	id := created.ID
+	if id == "" {
+		t.Fatalf("CreateAppInstallerDeploymentV1 returned no id (href=%q)", created.Href)
+	}
+	// The href names the Jamf Pro instance hostname and an /api prefix, not the
+	// gateway, so it is not a URL this SDK can call. Recorded rather than used.
+	t.Logf("create href points at the instance, not the gateway: %s", created.Href)
+	t.Logf("created deployment %s (%s) for title %s", id, name, title.ID)
+	cleanupDelete(t, "DeleteAppInstallerDeploymentV1", func() error {
+		return p.DeleteAppInstallerDeploymentV1(context.Background(), id)
 	})
 
-	// RetryAppInstallerInstallationsV1 takes no ID at all, so it cannot be
-	// probed harmlessly — it retries across the tenant. Only its reachability is
-	// asserted, and only under the gate.
-	if err := p.RetryAppInstallerInstallationsV1(ctx); err != nil {
-		if apiErr := jamfplatform.AsAPIError(err); apiErr == nil {
-			t.Errorf("RetryAppInstallerInstallationsV1: non-API error: %v", err)
-		} else {
-			t.Logf("RetryAppInstallerInstallationsV1 -> %d: %s", apiErr.StatusCode, apiErr.Summary())
-		}
-	} else {
-		t.Log("RetryAppInstallerInstallationsV1 accepted (204)")
+	// The safety properties are assertions, not assumptions. If a spec change
+	// ever makes a create active by default, this is what catches it before
+	// anything installs.
+	got, err := p.GetAppInstallerDeploymentV1(ctx, id)
+	if err != nil {
+		t.Fatalf("GetAppInstallerDeploymentV1(%s): %v", id, err)
+	}
+	if got.Enabled {
+		t.Errorf("deployment %s came back ENABLED despite being created disabled — it may be installing software", id)
+	}
+	// "-1" is this API's no-assignment sentinel, the same one categoryId and
+	// siteId document. An omitted smartGroupId reads back as "-1", never "", so
+	// both spellings mean unscoped and anything else is a real smart group.
+	if got.SmartGroupID != "" && got.SmartGroupID != "-1" {
+		t.Errorf("deployment %s came back scoped to smart group %q despite being created unscoped", id, got.SmartGroupID)
+	}
+	if got.Name != name {
+		t.Errorf("Name = %q, want %q", got.Name, name)
 	}
 
-	// CreateAppInstallerDeploymentV1 and the global-settings writers are left to
-	// a human even under the gate: the first installs software, the second
-	// replaces a real tenant's configuration wholesale.
-	t.Log("CreateAppInstallerDeploymentV1, UpdateAppInstallerGlobalSettingsV1 and " +
-		"CreateAppInstallerGlobalSettingsHistoryNoteV1 are not exercised even under the gate — see the file comment")
+	// The scoped reads, now against a real deployment — coverage the
+	// impossible-ID probes in TestAcceptance_Pro_AppInstallers_DeploymentReads
+	// cannot give, since they only ever prove the URL and the error decode.
+	if sum, err := p.GetAppInstallerDeploymentInstallationSummaryV1(ctx, id); err != nil {
+		t.Errorf("GetAppInstallerDeploymentInstallationSummaryV1(%s): %v", id, err)
+	} else {
+		t.Logf("installation summary: %+v", sum)
+	}
+	if computers, err := p.ListAppInstallerDeploymentComputersV1(ctx, id, nil, ""); err != nil {
+		t.Errorf("ListAppInstallerDeploymentComputersV1(%s): %v", id, err)
+	} else if len(computers) != 0 {
+		t.Errorf("unscoped deployment reports %d computers, want 0 — it is targeting machines", len(computers))
+	} else {
+		t.Log("deployment targets 0 computers, as an unscoped draft should")
+	}
+
+	note := "sdk-acc app installer probe"
+	if entry, err := p.CreateAppInstallerDeploymentHistoryNoteV1(ctx, id, &pro.ObjectHistoryNote{Note: note}); err != nil {
+		t.Errorf("CreateAppInstallerDeploymentHistoryNoteV1(%s): %v", id, err)
+	} else {
+		t.Logf("history note created: %+v", entry)
+		hist, err := p.ListAppInstallerDeploymentHistoryV1(ctx, id, nil, "")
+		if err != nil {
+			t.Errorf("ListAppInstallerDeploymentHistoryV1(%s): %v", id, err)
+		} else {
+			var found bool
+			for _, h := range hist {
+				if h.Note == note {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Errorf("the note just created is not in the %d history entries — the write did not round-trip", len(hist))
+			} else {
+				t.Logf("note round-tripped through %d history entries", len(hist))
+			}
+		}
+	}
+
+	// PUT is a full replacement, so every required field goes back with it.
+	renamed := name + "-updated"
+	updated, err := p.UpdateAppInstallerDeploymentV1(ctx, id, &pro.AppTitleDeployment{
+		Name:           renamed,
+		AppTitleID:     title.ID,
+		DeploymentType: pro.AppTitleDeploymentDeploymentTypeSelfService,
+		UpdateBehavior: pro.AppTitleDeploymentUpdateBehaviorManual,
+		Enabled:        &disabled,
+	})
+	if err != nil {
+		t.Errorf("UpdateAppInstallerDeploymentV1(%s): %v", id, err)
+	} else {
+		if updated.Name != renamed {
+			t.Errorf("after update Name = %q, want %q", updated.Name, renamed)
+		}
+		if updated.Enabled {
+			t.Errorf("deployment %s became ENABLED through the update", id)
+		}
+		t.Logf("renamed to %q", updated.Name)
+	}
+
+	// Retry against a deployment that targets nothing answers 404 with an empty
+	// errors array, on a deployment GET returns 200 for in the same run
+	// (wire-verified 2026-09-03, curl-direct). That is Jamf Pro's own response,
+	// not the gateway's: the unrouted tell in this namespace is
+	// 403 BAD_PERMISSIONS, which /pro/v1/app-installers/bogus-control returned
+	// as the control. So the 404 means "nothing to retry", and the spec
+	// documents no status for the empty case. Asserted rather than logged so
+	// the day it starts answering 2xx is the day this test says so.
+	assertNotFoundFor(t, "RetryAppInstallerDeploymentInstallationsV1 on an empty deployment", id, func() error {
+		return p.RetryAppInstallerDeploymentInstallationsV1(ctx, id)
+	})
+
+	// Delete here rather than leaving it to cleanup, so the 404-after-delete is
+	// asserted. cleanupDelete stays registered and tolerates the second delete.
+	if err := p.DeleteAppInstallerDeploymentV1(ctx, id); err != nil {
+		t.Fatalf("DeleteAppInstallerDeploymentV1(%s): %v", id, err)
+	}
+	assertNotFoundFor(t, "GetAppInstallerDeploymentV1 after delete", id, func() error {
+		_, err := p.GetAppInstallerDeploymentV1(ctx, id)
+		return err
+	})
+
+	// Global settings: a round-trip that writes back exactly what was read, so a
+	// successful PUT changes nothing. The read afterwards is the assertion.
+	before, err := p.GetAppInstallerGlobalSettingsV1(ctx)
+	if err != nil {
+		t.Fatalf("GetAppInstallerGlobalSettingsV1: %v", err)
+	}
+	if _, err := p.UpdateAppInstallerGlobalSettingsV1(ctx, before); err != nil {
+		t.Errorf("UpdateAppInstallerGlobalSettingsV1 (no-op round-trip): %v", err)
+	} else if after, err := p.GetAppInstallerGlobalSettingsV1(ctx); err != nil {
+		t.Errorf("GetAppInstallerGlobalSettingsV1 after the round-trip: %v", err)
+	} else if !reflect.DeepEqual(before, after) {
+		t.Errorf("the no-op settings round-trip changed something:\n before %+v\n after  %+v", before, after)
+	} else {
+		t.Log("global settings survived a no-op round-trip unchanged")
+	}
+
+	if entry, err := p.CreateAppInstallerGlobalSettingsHistoryNoteV1(ctx, &pro.ObjectHistoryNote{Note: note}); err != nil {
+		t.Errorf("CreateAppInstallerGlobalSettingsHistoryNoteV1: %v", err)
+	} else {
+		t.Logf("global settings history note created: %+v", entry)
+	}
+
+	// The idless retry acts across the whole tenant, so it is only ever reached
+	// under the gate. On a tenant with nothing to retry it answers 404 the same
+	// way the scoped one does — same empty errors array, same routed-and-refused
+	// shape — so it is asserted on the same grounds.
+	assertNotFound(t, "RetryAppInstallerInstallationsV1 with nothing to retry", func() error {
+		return p.RetryAppInstallerInstallationsV1(ctx)
+	})
+
+	// Two operations remain unexercised even here, both needing a deployment
+	// that actually targets machines: the per-computer retry and the version
+	// update. Their URL construction and error decoding are covered by the
+	// impossible-ID probes below.
+	assertNotFoundFor(t, "RetryAppInstallerDeploymentComputerInstallationV1", noSuchDeployment, func() error {
+		return p.RetryAppInstallerDeploymentComputerInstallationV1(ctx, noSuchDeployment, noSuchComputer)
+	})
+	assertNotFoundFor(t, "UpdateAppInstallerDeploymentVersionV1", noSuchDeployment, func() error {
+		return p.UpdateAppInstallerDeploymentVersionV1(ctx, noSuchDeployment, &pro.AppTitleVersion{})
+	})
+}
+
+// assertNotFoundFor is assertNotFound with the identifier named explicitly, for
+// callers probing something other than noSuchDeployment.
+func assertNotFoundFor(t *testing.T, op, id string, call func() error) {
+	t.Helper()
+	err := call()
+	if err == nil {
+		t.Errorf("%s succeeded for id %s, which should not resolve", op, id)
+		return
+	}
+	apiErr := jamfplatform.AsAPIError(err)
+	if apiErr == nil {
+		t.Errorf("%s: non-API error, the request did not reach the endpoint: %v", op, err)
+		return
+	}
+	if !apiErr.HasStatus(404) {
+		t.Errorf("%s: want 404 for id %s, got %d: %s", op, id, apiErr.StatusCode, apiErr.Summary())
+		return
+	}
+	t.Logf("%s: 404 for id %s, as expected", op, id)
 }
 
 // assertNotFound runs an operation expected to 404 for an identifier that cannot

@@ -26401,7 +26401,7 @@
         "tags": [
           "app-installers"
         ],
-        "x-jamf-expected-status": 201,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "applications:update"
         ],
@@ -26803,7 +26803,7 @@
         "tags": [
           "app-installers"
         ],
-        "x-jamf-expected-status": 201,
+        "x-jamf-expected-status": 200,
         "x-required-privileges": [
           "applications:update"
         ],

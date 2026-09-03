@@ -4454,7 +4454,7 @@
         {
           "op": "POST /v1/app-installers/deployments/{id}/history",
           "name": "CreateAppInstallerDeploymentHistoryNoteV1",
-          "expectedStatus": 201
+          "expectedStatus": 200
         },
         {
           "op": "GET /v1/app-installers/global-settings",
@@ -4480,7 +4480,7 @@
         {
           "op": "POST /v1/app-installers/global-settings/history",
           "name": "CreateAppInstallerGlobalSettingsHistoryNoteV1",
-          "expectedStatus": 201
+          "expectedStatus": 200
         }
       ]
     },
