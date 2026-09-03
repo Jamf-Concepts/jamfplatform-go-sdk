@@ -1119,7 +1119,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | `securitycloud` | `securitycloud` | tenant (own identifier) | 54 ops across six specs |
 | `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** The only package whose privileges come from `requiredPrivileges` rather than the spec |
 | `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
-| `audit` | `audit` | environment | compiles; every call 403s pending an `audit:read` grant |
+| `audit` | `audit` | environment | **reachable as of 2026-09-03** — a credential granted `audit:read` under `X-Environment-Id` reads it; 1014 events walked. `ListAuditEvents` needs `since` **and** one of `actor`/`audit-source`/`audit-type`/`resource-id`, neither expressed in the signature |
 
 `account` is the documented exception to package-follows-namespace. It is also the
 SDK's first organization-scoped API, and **organization scope is the absence of a
@@ -1139,10 +1139,32 @@ empty, and an empty set was being rendered downstream as "no permission needed",
 which is false. Evidence and the alternatives-vs-conjunction trap:
 [docs/STYLE.md](docs/STYLE.md#required-privileges).
 
-`audit` is correct as generated and unusable, which is the honest state. The
-blocker is a missing capability grant, confirmed independently by the gateway
-config and the OPA policy. **Do not reintroduce path scoping for it** — the
-mechanism deliberately deleted at GA — and do not add it speculatively.
+**`audit` became usable on 2026-09-03**, after being correct-but-unreachable for
+its whole life here. A credential granted `audit:read`, sending
+`X-Environment-Id`, reads it: `ListAuditSources` returns real sources
+(`api-gateway`, `blueprints`, `ai-policy`) and `ListAuditEvents` walked **1014
+events** through the cursor paginator — the first time that walker has met real
+data. `GetTransactionTimeline` and `GetResourceLineage` both answer (20
+transactions on a blueprint resource). The blocker was only ever the grant, as
+recorded; four earlier credentials lacked it.
+
+**Two things the generated signature does not express, and a caller reading only
+the signature writes a call that cannot succeed.** `ListAuditEvents` requires
+`since` **and** at least one of `actor`, `audit-source`, `audit-type`,
+`resource-id`: `since` alone is `400 MISSING_REQUIRED_FILTER`, a filter without
+`since` is `400 MISSING_REQUIRED_PARAMETER` on `since`, and both together answer
+200. Every one of those parameters is an optional string in Go. Both refusals are
+pinned by `TestAcceptance_AuditReachableUnderEnvironmentScope`.
+
+The organization form is still refused — an organization credential sending no
+scope header answers `400 REQUEST_CONTEXT_NOT_PROVIDED` — consistent with tyk
+`3e99c347` removing organization scoping. **Do not reintroduce path scoping** —
+the mechanism deliberately deleted at GA — and do not add it speculatively.
+
+One data-shape note for anyone writing coverage: `api-gateway` emits
+`http.request` events that carry no `resourceId`, so a test that reads
+`events[0]` leaves `GetResourceLineage` uncovered. Resource-bearing events come
+from the service sources.
 
 **App Installers were removed 2026-08-27 and must not be re-added without a
 published spec.** They were generated from three hand-carried YAML files flagged
