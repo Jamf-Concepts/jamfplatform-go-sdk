@@ -861,6 +861,279 @@ func ApnsPushEnableRequestStatusValues() []ApnsPushEnableRequestStatus {
 	}
 }
 
+// AppInstallersDeploymentProcessControlsDaysOfWeek is the set of values accepted by AppInstallersDeploymentProcessControls.DaysOfWeek.
+type AppInstallersDeploymentProcessControlsDaysOfWeek = string
+
+// AppInstallersDeploymentProcessControlsDaysOfWeek values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallersDeploymentProcessControlsDaysOfWeekMonday    AppInstallersDeploymentProcessControlsDaysOfWeek = "MONDAY"
+	AppInstallersDeploymentProcessControlsDaysOfWeekTuesday   AppInstallersDeploymentProcessControlsDaysOfWeek = "TUESDAY"
+	AppInstallersDeploymentProcessControlsDaysOfWeekWednesday AppInstallersDeploymentProcessControlsDaysOfWeek = "WEDNESDAY"
+	AppInstallersDeploymentProcessControlsDaysOfWeekThursday  AppInstallersDeploymentProcessControlsDaysOfWeek = "THURSDAY"
+	AppInstallersDeploymentProcessControlsDaysOfWeekFriday    AppInstallersDeploymentProcessControlsDaysOfWeek = "FRIDAY"
+	AppInstallersDeploymentProcessControlsDaysOfWeekSaturday  AppInstallersDeploymentProcessControlsDaysOfWeek = "SATURDAY"
+	AppInstallersDeploymentProcessControlsDaysOfWeekSunday    AppInstallersDeploymentProcessControlsDaysOfWeek = "SUNDAY"
+)
+
+// AppInstallersDeploymentProcessControlsDaysOfWeekValues returns every value the Jamf API accepts for AppInstallersDeploymentProcessControlsDaysOfWeek,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppInstallersDeploymentProcessControlsDaysOfWeekValues() []AppInstallersDeploymentProcessControlsDaysOfWeek {
+	return []AppInstallersDeploymentProcessControlsDaysOfWeek{
+		AppInstallersDeploymentProcessControlsDaysOfWeekMonday,
+		AppInstallersDeploymentProcessControlsDaysOfWeekTuesday,
+		AppInstallersDeploymentProcessControlsDaysOfWeekWednesday,
+		AppInstallersDeploymentProcessControlsDaysOfWeekThursday,
+		AppInstallersDeploymentProcessControlsDaysOfWeekFriday,
+		AppInstallersDeploymentProcessControlsDaysOfWeekSaturday,
+		AppInstallersDeploymentProcessControlsDaysOfWeekSunday,
+	}
+}
+
+// AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek is the set of values accepted by AppInstallersDeploymentProcessControlsDefaultSettings.DaysOfWeek.
+type AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = string
+
+// AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekMonday    AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = "MONDAY"
+	AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekTuesday   AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = "TUESDAY"
+	AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekWednesday AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = "WEDNESDAY"
+	AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekThursday  AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = "THURSDAY"
+	AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekFriday    AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = "FRIDAY"
+	AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekSaturday  AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = "SATURDAY"
+	AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekSunday    AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek = "SUNDAY"
+)
+
+// AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekValues returns every value the Jamf API accepts for AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekValues() []AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek {
+	return []AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek{
+		AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekMonday,
+		AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekTuesday,
+		AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekWednesday,
+		AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekThursday,
+		AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekFriday,
+		AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekSaturday,
+		AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeekSunday,
+	}
+}
+
+// AppTitleDeploymentDeploymentType is the set of values accepted by AppTitleDeployment.DeploymentType.
+type AppTitleDeploymentDeploymentType = string
+
+// AppTitleDeploymentDeploymentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDeploymentDeploymentTypeInstallAutomatically AppTitleDeploymentDeploymentType = "INSTALL_AUTOMATICALLY"
+	AppTitleDeploymentDeploymentTypeSelfService          AppTitleDeploymentDeploymentType = "SELF_SERVICE"
+)
+
+// AppTitleDeploymentDeploymentTypeValues returns every value the Jamf API accepts for AppTitleDeploymentDeploymentType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDeploymentDeploymentTypeValues() []AppTitleDeploymentDeploymentType {
+	return []AppTitleDeploymentDeploymentType{
+		AppTitleDeploymentDeploymentTypeInstallAutomatically,
+		AppTitleDeploymentDeploymentTypeSelfService,
+	}
+}
+
+// AppTitleDeploymentReadDeploymentType is the set of values accepted by AppTitleDeploymentRead.DeploymentType.
+type AppTitleDeploymentReadDeploymentType = string
+
+// AppTitleDeploymentReadDeploymentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDeploymentReadDeploymentTypeInstallAutomatically AppTitleDeploymentReadDeploymentType = "INSTALL_AUTOMATICALLY"
+	AppTitleDeploymentReadDeploymentTypeSelfService          AppTitleDeploymentReadDeploymentType = "SELF_SERVICE"
+)
+
+// AppTitleDeploymentReadDeploymentTypeValues returns every value the Jamf API accepts for AppTitleDeploymentReadDeploymentType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDeploymentReadDeploymentTypeValues() []AppTitleDeploymentReadDeploymentType {
+	return []AppTitleDeploymentReadDeploymentType{
+		AppTitleDeploymentReadDeploymentTypeInstallAutomatically,
+		AppTitleDeploymentReadDeploymentTypeSelfService,
+	}
+}
+
+// AppTitleDeploymentReadUpdateBehavior is the set of values accepted by AppTitleDeploymentRead.UpdateBehavior.
+type AppTitleDeploymentReadUpdateBehavior = string
+
+// AppTitleDeploymentReadUpdateBehavior values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDeploymentReadUpdateBehaviorManual    AppTitleDeploymentReadUpdateBehavior = "MANUAL"
+	AppTitleDeploymentReadUpdateBehaviorAutomatic AppTitleDeploymentReadUpdateBehavior = "AUTOMATIC"
+)
+
+// AppTitleDeploymentReadUpdateBehaviorValues returns every value the Jamf API accepts for AppTitleDeploymentReadUpdateBehavior,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDeploymentReadUpdateBehaviorValues() []AppTitleDeploymentReadUpdateBehavior {
+	return []AppTitleDeploymentReadUpdateBehavior{
+		AppTitleDeploymentReadUpdateBehaviorManual,
+		AppTitleDeploymentReadUpdateBehaviorAutomatic,
+	}
+}
+
+// AppTitleDeploymentSummaryAppMediaSourceType is the set of values accepted by AppTitleDeploymentSummaryApp.MediaSourceType.
+type AppTitleDeploymentSummaryAppMediaSourceType = string
+
+// AppTitleDeploymentSummaryAppMediaSourceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDeploymentSummaryAppMediaSourceTypeExternalURL AppTitleDeploymentSummaryAppMediaSourceType = "EXTERNAL_URL"
+	AppTitleDeploymentSummaryAppMediaSourceTypeJamfServer  AppTitleDeploymentSummaryAppMediaSourceType = "JAMF_SERVER"
+)
+
+// AppTitleDeploymentSummaryAppMediaSourceTypeValues returns every value the Jamf API accepts for AppTitleDeploymentSummaryAppMediaSourceType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDeploymentSummaryAppMediaSourceTypeValues() []AppTitleDeploymentSummaryAppMediaSourceType {
+	return []AppTitleDeploymentSummaryAppMediaSourceType{
+		AppTitleDeploymentSummaryAppMediaSourceTypeExternalURL,
+		AppTitleDeploymentSummaryAppMediaSourceTypeJamfServer,
+	}
+}
+
+// AppTitleDeploymentSummaryDeploymentType is the set of values accepted by AppTitleDeploymentSummary.DeploymentType.
+type AppTitleDeploymentSummaryDeploymentType = string
+
+// AppTitleDeploymentSummaryDeploymentType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDeploymentSummaryDeploymentTypeInstallAutomatically AppTitleDeploymentSummaryDeploymentType = "INSTALL_AUTOMATICALLY"
+	AppTitleDeploymentSummaryDeploymentTypeSelfService          AppTitleDeploymentSummaryDeploymentType = "SELF_SERVICE"
+)
+
+// AppTitleDeploymentSummaryDeploymentTypeValues returns every value the Jamf API accepts for AppTitleDeploymentSummaryDeploymentType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDeploymentSummaryDeploymentTypeValues() []AppTitleDeploymentSummaryDeploymentType {
+	return []AppTitleDeploymentSummaryDeploymentType{
+		AppTitleDeploymentSummaryDeploymentTypeInstallAutomatically,
+		AppTitleDeploymentSummaryDeploymentTypeSelfService,
+	}
+}
+
+// AppTitleDeploymentSummaryUpdateBehavior is the set of values accepted by AppTitleDeploymentSummary.UpdateBehavior.
+type AppTitleDeploymentSummaryUpdateBehavior = string
+
+// AppTitleDeploymentSummaryUpdateBehavior values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDeploymentSummaryUpdateBehaviorManual    AppTitleDeploymentSummaryUpdateBehavior = "MANUAL"
+	AppTitleDeploymentSummaryUpdateBehaviorAutomatic AppTitleDeploymentSummaryUpdateBehavior = "AUTOMATIC"
+)
+
+// AppTitleDeploymentSummaryUpdateBehaviorValues returns every value the Jamf API accepts for AppTitleDeploymentSummaryUpdateBehavior,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDeploymentSummaryUpdateBehaviorValues() []AppTitleDeploymentSummaryUpdateBehavior {
+	return []AppTitleDeploymentSummaryUpdateBehavior{
+		AppTitleDeploymentSummaryUpdateBehaviorManual,
+		AppTitleDeploymentSummaryUpdateBehaviorAutomatic,
+	}
+}
+
+// AppTitleDeploymentUpdateBehavior is the set of values accepted by AppTitleDeployment.UpdateBehavior.
+type AppTitleDeploymentUpdateBehavior = string
+
+// AppTitleDeploymentUpdateBehavior values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDeploymentUpdateBehaviorManual    AppTitleDeploymentUpdateBehavior = "MANUAL"
+	AppTitleDeploymentUpdateBehaviorAutomatic AppTitleDeploymentUpdateBehavior = "AUTOMATIC"
+)
+
+// AppTitleDeploymentUpdateBehaviorValues returns every value the Jamf API accepts for AppTitleDeploymentUpdateBehavior,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDeploymentUpdateBehaviorValues() []AppTitleDeploymentUpdateBehavior {
+	return []AppTitleDeploymentUpdateBehavior{
+		AppTitleDeploymentUpdateBehaviorManual,
+		AppTitleDeploymentUpdateBehaviorAutomatic,
+	}
+}
+
+// AppTitleDetailsMediaSourceType is the set of values accepted by AppTitleDetails.MediaSourceType.
+type AppTitleDetailsMediaSourceType = string
+
+// AppTitleDetailsMediaSourceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleDetailsMediaSourceTypeExternalURL AppTitleDetailsMediaSourceType = "EXTERNAL_URL"
+	AppTitleDetailsMediaSourceTypeJamfServer  AppTitleDetailsMediaSourceType = "JAMF_SERVER"
+)
+
+// AppTitleDetailsMediaSourceTypeValues returns every value the Jamf API accepts for AppTitleDetailsMediaSourceType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleDetailsMediaSourceTypeValues() []AppTitleDetailsMediaSourceType {
+	return []AppTitleDetailsMediaSourceType{
+		AppTitleDetailsMediaSourceTypeExternalURL,
+		AppTitleDetailsMediaSourceTypeJamfServer,
+	}
+}
+
+// AppTitleVersionAndMediaSourceTypeMediaSourceType is the set of values accepted by AppTitleVersionAndMediaSourceType.MediaSourceType.
+type AppTitleVersionAndMediaSourceTypeMediaSourceType = string
+
+// AppTitleVersionAndMediaSourceTypeMediaSourceType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppTitleVersionAndMediaSourceTypeMediaSourceTypeExternalURL AppTitleVersionAndMediaSourceTypeMediaSourceType = "EXTERNAL_URL"
+	AppTitleVersionAndMediaSourceTypeMediaSourceTypeJamfServer  AppTitleVersionAndMediaSourceTypeMediaSourceType = "JAMF_SERVER"
+)
+
+// AppTitleVersionAndMediaSourceTypeMediaSourceTypeValues returns every value the Jamf API accepts for AppTitleVersionAndMediaSourceTypeMediaSourceType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppTitleVersionAndMediaSourceTypeMediaSourceTypeValues() []AppTitleVersionAndMediaSourceTypeMediaSourceType {
+	return []AppTitleVersionAndMediaSourceTypeMediaSourceType{
+		AppTitleVersionAndMediaSourceTypeMediaSourceTypeExternalURL,
+		AppTitleVersionAndMediaSourceTypeMediaSourceTypeJamfServer,
+	}
+}
+
 // AzureServerConfigurationRequestType is the set of values accepted by AzureServerConfigurationRequest.Type.
 type AzureServerConfigurationRequestType = string
 
@@ -2212,6 +2485,35 @@ func DashboardSetupSetupTaskOptionsSetupTaskValues() []DashboardSetupSetupTaskOp
 		DashboardSetupSetupTaskOptionsSetupTaskTypePushNotificationSettingsSetupTask,
 		DashboardSetupSetupTaskOptionsSetupTaskTypeSmtpServerSetupTask,
 		DashboardSetupSetupTaskOptionsSetupTaskTypeSslSetupTask,
+	}
+}
+
+// DeploymentComputerStatus is the set of values accepted by DeploymentComputer.Status.
+type DeploymentComputerStatus = string
+
+// DeploymentComputerStatus values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DeploymentComputerStatusUnqualified DeploymentComputerStatus = "UNQUALIFIED"
+	DeploymentComputerStatusAvailable   DeploymentComputerStatus = "AVAILABLE"
+	DeploymentComputerStatusInProgress  DeploymentComputerStatus = "IN_PROGRESS"
+	DeploymentComputerStatusInstalled   DeploymentComputerStatus = "INSTALLED"
+	DeploymentComputerStatusFailed      DeploymentComputerStatus = "FAILED"
+)
+
+// DeploymentComputerStatusValues returns every value the Jamf API accepts for DeploymentComputerStatus,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeploymentComputerStatusValues() []DeploymentComputerStatus {
+	return []DeploymentComputerStatus{
+		DeploymentComputerStatusUnqualified,
+		DeploymentComputerStatusAvailable,
+		DeploymentComputerStatusInProgress,
+		DeploymentComputerStatusInstalled,
+		DeploymentComputerStatusFailed,
 	}
 }
 
@@ -3920,6 +4222,29 @@ func OnboardingItemSelfServiceEntityTypeValues() []OnboardingItemSelfServiceEnti
 		OnboardingItemSelfServiceEntityTypeOsXEbook,
 		OnboardingItemSelfServiceEntityTypeOsXPatchPolicy,
 		OnboardingItemSelfServiceEntityTypeUnknown,
+	}
+}
+
+// OriginalMediaSourceHashType is the set of values accepted by OriginalMediaSource.HashType.
+type OriginalMediaSourceHashType = string
+
+// OriginalMediaSourceHashType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	OriginalMediaSourceHashTypeMd5    OriginalMediaSourceHashType = "MD5"
+	OriginalMediaSourceHashTypeSha256 OriginalMediaSourceHashType = "SHA256"
+)
+
+// OriginalMediaSourceHashTypeValues returns every value the Jamf API accepts for OriginalMediaSourceHashType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func OriginalMediaSourceHashTypeValues() []OriginalMediaSourceHashType {
+	return []OriginalMediaSourceHashType{
+		OriginalMediaSourceHashTypeMd5,
+		OriginalMediaSourceHashTypeSha256,
 	}
 }
 

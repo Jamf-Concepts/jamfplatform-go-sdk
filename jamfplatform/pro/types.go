@@ -350,6 +350,97 @@ type AppConfigReinstallCode struct {
 	ReinstallCode *string `json:"reinstallCode,omitempty"`
 }
 
+// AppInstallerFeatureState represents a app installer feature state.
+type AppInstallerFeatureState struct {
+	// Describes if client is authorized for App Installers.
+	CloudServicesEnabled bool `json:"cloudServicesEnabled"`
+	// An array of enabled features.
+	Features []string `json:"features"`
+}
+
+// AppInstallersCategory represents a app installers category.
+type AppInstallersCategory struct {
+	// An identifier of a category to which the deployment is assigned. A value of '-1' means no
+	// assignment.
+	ID string `json:"id"`
+	// A name of a category to which the deployment is assigned. A value of null means no assignment or no
+	// permission to read categories.
+	Name *string `json:"name,omitempty"`
+}
+
+// AppInstallersDeploymentProcessControls Controls time and frequency when deployments are queued for device delivery.
+type AppInstallersDeploymentProcessControls struct {
+	// The frequency in minutes at which batches of deployments are queued. Must be between 10 and 1440.
+	BatchFrequencyInMinutes *int `json:"batchFrequencyInMinutes,omitempty"`
+	// The size of the batch of deployments to be processed. Must be between 1 and 50,000.
+	CommandsBatchSize *int `json:"commandsBatchSize,omitempty"`
+	// The days of the week when the deployments are going to be queued for device delivery.
+	// Allowed values: see the AppInstallersDeploymentProcessControlsDaysOfWeek constants.
+	DaysOfWeek *[]string `json:"daysOfWeek,omitempty"`
+	// The UTC start time of day when the deployments are going to be queued for device delivery.
+	FromTimeOfDay *string `json:"fromTimeOfDay,omitempty"`
+	// The UTC end time of day when the deployments are going to be queued for device delivery.
+	ToTimeOfDay *string `json:"toTimeOfDay,omitempty"`
+}
+
+// AppInstallersDeploymentProcessControlsDefaultSettings Default settings for App Installers Deployment Process Controls.
+type AppInstallersDeploymentProcessControlsDefaultSettings struct {
+	// The frequency in minutes at which batches of deployments are queued.
+	BatchFrequencyInMinutes int `json:"batchFrequencyInMinutes"`
+	// The size of the batch of deployments to be processed.
+	CommandsBatchSize int `json:"commandsBatchSize"`
+	// The days of the week when the deployments are going to be queued for device delivery.
+	// Allowed values: see the AppInstallersDeploymentProcessControlsDefaultSettingsDaysOfWeek constants.
+	DaysOfWeek []string `json:"daysOfWeek"`
+	// The UTC start time of day when the deployments are going to be queued for device delivery.
+	FromTimeOfDay string `json:"fromTimeOfDay"`
+	// The UTC end time of day when the deployments are going to be queued for device delivery.
+	ToTimeOfDay string `json:"toTimeOfDay"`
+}
+
+// AppInstallersGlobalSettings Global settings for app installers.
+type AppInstallersGlobalSettings struct {
+	// Controls time and frequency when deployments are queued for device delivery.
+	DeploymentProcessControls *AppInstallersDeploymentProcessControls `json:"deploymentProcessControls,omitempty"`
+	// End user experience settings in global app installers settings.
+	EndUserExperienceSettings GlobalSettingsEndUserExperience `json:"endUserExperienceSettings"`
+}
+
+// AppInstallersInstallationSummary represents a app installers installation summary.
+type AppInstallersInstallationSummary struct {
+	// Number of computers with an available app from the App Installer deployment in Self Service. If the
+	// App Installer deployment has distribution method different than 'SELF_SERVICE', this value will be
+	// always indicate 0.
+	Available int `json:"available"`
+	// Number of computers with failed installation of app from App Installer deployment.
+	Failed int `json:"failed"`
+	// Number of computers with in progress installation of app from App Installer deployment.
+	InProgress int `json:"inProgress"`
+	// Number of computers with installed app from App Installer deployment.
+	Installed int `json:"installed"`
+	// Number of computers in scope for App Installer deployment but assign to another deployment.
+	Unqualified int `json:"unqualified"`
+}
+
+// AppInstallersSite represents a app installers site.
+type AppInstallersSite struct {
+	// An identifier of a site to which the deployment is assigned. A value of '-1' means no assignment.
+	ID string `json:"id"`
+	// A name of a site to which the deployment is assigned. A value of null means no assignment or no
+	// permission to read the sites.
+	Name *string `json:"name,omitempty"`
+}
+
+// AppInstallersSmartGroup represents a app installers smart group.
+type AppInstallersSmartGroup struct {
+	// An identifier of a smart group to which the deployment is assigned. A value of '-1' means no
+	// assignment.
+	ID string `json:"id"`
+	// A name of a smart group to which the deployment is assigned. A value of null means no assignment or
+	// no permission to read the smart groups.
+	Name *string `json:"name,omitempty"`
+}
+
 // AppPath represents a app path.
 type AppPath struct {
 	// A "-1" id indicates a built-in path that cannot be deleted or modified.
@@ -380,6 +471,296 @@ type AppRequestSettings struct {
 	ApproverEmails       *[]string `json:"approverEmails,omitempty"`
 	IsEnabled            *bool     `json:"isEnabled,omitempty"`
 	RequesterUserGroupID *int      `json:"requesterUserGroupId,omitempty"`
+}
+
+// AppTitle represents a app title.
+type AppTitle struct {
+	// Bundle ID.
+	BundleID string `json:"bundleId"`
+	// URL that provides an icon for the application.
+	IconURL string `json:"iconUrl"`
+	// Unique App Title identifier that represents an application in the App Installers system.
+	ID string `json:"id"`
+	// If set to true - another App ID might be installed on the same path.
+	InstallationPathShared bool `json:"installationPathShared"`
+	// Publisher name.
+	Publisher string `json:"publisher"`
+	// Human readable name of the application.
+	TitleName string `json:"titleName"`
+	// Version.
+	Version string `json:"version"`
+}
+
+// AppTitleDeployment represents a app title deployment.
+type AppTitleDeployment struct {
+	// ID of app titles to be deployed.
+	AppTitleID string `json:"appTitleId"`
+	// A category that this deployment should be assigned to, '-1' means no assignment.
+	CategoryID *string `json:"categoryId,omitempty"`
+	// Defines the 'deployment type' for an App Title. - **INSTALL_AUTOMATICALLY** - the app will be
+	// installed as soon as possible - **SELF_SERVICE** - the app will be available in Self Service where
+	// user can decide if the app should be installed.
+	// Allowed values: see the AppTitleDeploymentDeploymentType constants.
+	DeploymentType string `json:"deploymentType"`
+	// Is deployment active or is it a draft.
+	Enabled *bool   `json:"enabled,omitempty"`
+	ID      *string `json:"id,omitempty"`
+	// Determines whether the predefined configuration profiles will be automatically installed on client
+	// computers.
+	InstallPredefinedConfigProfiles *bool `json:"installPredefinedConfigProfiles,omitempty"`
+	// Human readable name of the deployment.
+	Name string `json:"name"`
+	// Computer notification settings for running app with pending update; Settings are used only if
+	// version of the app supports notifications.
+	NotificationSettings *AppTitleDeploymentNotificationSettings `json:"notificationSettings,omitempty"`
+	// Self Service settings to be used when deployment type is set to SELF_SERVICE.
+	SelfServiceSettings *AppTitleDeploymentSelfServiceSettings `json:"selfServiceSettings,omitempty"`
+	// A site that this deployment should be assigned to, '-1' means no assigment.
+	SiteID *string `json:"siteId,omitempty"`
+	// A smart group to which the app should be deployed. Default value, which means that the app installer
+	// will not be deployed, will be used if it is set to null and deployment is not active.
+	SmartGroupID *string `json:"smartGroupId,omitempty"`
+	// If the app title is available in App Installer Service.
+	TitleAvailableInAis *bool `json:"titleAvailableInAis,omitempty"`
+	// Determines whether events related to this deployment will trigger admin notifications.
+	TriggerAdminNotifications *bool `json:"triggerAdminNotifications,omitempty"`
+	// Strategy for app updates. - **MANUAL** - the app will not get automatic updates without admin
+	// interaction - **AUTOMATIC** - the app will get automatic updates.
+	// Allowed values: see the AppTitleDeploymentUpdateBehavior constants.
+	UpdateBehavior string `json:"updateBehavior"`
+}
+
+// AppTitleDeploymentNotificationSettings Computer notification settings for running app with pending update; Settings are used only if version of the app supports notifications.
+type AppTitleDeploymentNotificationSettings struct {
+	// Custom notification displayed on computers when an app update has been successfully completed.
+	// Default value will be used if set to null.
+	CompleteMessage *string `json:"completeMessage,omitempty"`
+	// Duration in hours before the app is forcefully closed.
+	Deadline *int64 `json:"deadline,omitempty"`
+	// Custom notification message displayed on computers when app is about to be forcefully closed.
+	// Default value will be used if set to null.
+	DeadlineMessage *string `json:"deadlineMessage,omitempty"`
+	// Custom interval in hours to display notifications on computers. Default value will be used if set to
+	// null.
+	NotificationInterval *int64 `json:"notificationInterval,omitempty"`
+	// Custom notification message to display on computers when app update is available but the app is
+	// running. Default value will be used if set to null.
+	NotificationMessage *string `json:"notificationMessage,omitempty"`
+	// Additional duration in minutes before the app is forcefully closed. Default value will be used if
+	// set to null.
+	QuitDelay *int64 `json:"quitDelay,omitempty"`
+	// Determines whether the app should be restarted after a successful update.
+	Relaunch *bool `json:"relaunch,omitempty"`
+	// Determines whether all notifications should be suppressed.
+	Suppress *bool `json:"suppress,omitempty"`
+}
+
+// AppTitleDeploymentRead represents a app title deployment read.
+type AppTitleDeploymentRead struct {
+	// ID of app titles to be deployed.
+	AppTitleID string `json:"appTitleId"`
+	// A category that this deployment should be assigned to, '-1' means no assignment.
+	CategoryID string `json:"categoryId"`
+	// Defines the 'deployment type' for an App Title. - **INSTALL_AUTOMATICALLY** - the app will be
+	// installed as soon as possible - **SELF_SERVICE** - the app will be available in Self Service where
+	// user can decide if the app should be installed.
+	// Allowed values: see the AppTitleDeploymentReadDeploymentType constants.
+	DeploymentType string `json:"deploymentType"`
+	// Is deployment active or is it a draft.
+	Enabled bool   `json:"enabled"`
+	ID      string `json:"id"`
+	// Determines whether the predefined configuration profiles will be automatically installed on client
+	// computers.
+	InstallPredefinedConfigProfiles bool `json:"installPredefinedConfigProfiles"`
+	// Latest available app version.
+	LatestAvailableVersion string `json:"latestAvailableVersion"`
+	// Human readable name of the deployment.
+	Name string `json:"name"`
+	// Computer notification settings for running app with pending update; Settings are used only if
+	// version of the app supports notifications.
+	NotificationSettings *AppTitleDeploymentNotificationSettings `json:"notificationSettings,omitempty"`
+	// App version to use for this deployment, contains value only if 'update behavior' is set to
+	// **MANUAL**.
+	SelectedVersion string `json:"selectedVersion"`
+	// Self Service settings to be used when deployment type is set to SELF_SERVICE.
+	SelfServiceSettings *AppTitleDeploymentSelfServiceSettings `json:"selfServiceSettings,omitempty"`
+	// A site that this deployment should be assigned to, '-1' means no assigment.
+	SiteID string `json:"siteId"`
+	// A smart group to which the app should be deployed. Default value, which means that the app installer
+	// will not be deployed, will be used if it is set to null and deployment is not active.
+	SmartGroupID string `json:"smartGroupId"`
+	// If the app title is available in App Installer Service.
+	TitleAvailableInAis bool `json:"titleAvailableInAis"`
+	// Determines whether events related to this deployment will trigger admin notifications.
+	TriggerAdminNotifications bool `json:"triggerAdminNotifications"`
+	// Strategy for app updates. - **MANUAL** - the app will not get automatic updates without admin
+	// interaction - **AUTOMATIC** - the app will get automatic updates.
+	// Allowed values: see the AppTitleDeploymentReadUpdateBehavior constants.
+	UpdateBehavior string `json:"updateBehavior"`
+	// If the app title version was removed from App Installer Service.
+	VersionRemoved bool `json:"versionRemoved"`
+}
+
+// AppTitleDeploymentSelfServiceSettings Self Service settings to be used when deployment type is set to SELF_SERVICE.
+type AppTitleDeploymentSelfServiceSettings struct {
+	// List of categories.
+	Categories *[]AppTitleDeploymentSelfServiceSettingsCategoriesItem `json:"categories,omitempty"`
+	// Custom text to display as a description for the app.
+	Description *string `json:"description,omitempty"`
+	// Computer user will be forced to view description when installing the app.
+	ForceViewDescription *bool `json:"forceViewDescription,omitempty"`
+	// App will be displayed in 'Compliance' category if system configuration supports it.
+	IncludeInComplianceCategory *bool `json:"includeInComplianceCategory,omitempty"`
+	// App will be displayed in 'Featured' category.
+	IncludeInFeaturedCategory *bool `json:"includeInFeaturedCategory,omitempty"`
+}
+
+// AppTitleDeploymentSelfServiceSettingsCategoriesItem represents a app title deployment self service settings categories item.
+type AppTitleDeploymentSelfServiceSettingsCategoriesItem struct {
+	// App will be featured in given displayed category.
+	Featured *bool `json:"featured,omitempty"`
+	// category id.
+	ID string `json:"id"`
+}
+
+// AppTitleDeploymentSummary represents a app title deployment summary.
+type AppTitleDeploymentSummary struct {
+	App              *AppTitleDeploymentSummaryApp     `json:"app,omitempty"`
+	Category         *AppInstallersCategory            `json:"category,omitempty"`
+	ComputerStatuses *AppInstallersInstallationSummary `json:"computerStatuses,omitempty"`
+	// Defines the 'deployment type' for an App Title. - **INSTALL_AUTOMATICALLY** - the app will be
+	// installed as soon as possible - **SELF_SERVICE** - the app will be available in Self Service where
+	// user can decide if the app should be installed.
+	// Allowed values: see the AppTitleDeploymentSummaryDeploymentType constants.
+	DeploymentType string `json:"deploymentType"`
+	// Is deployment active or is it a draft.
+	Enabled bool `json:"enabled"`
+	// Deployment id.
+	ID string `json:"id"`
+	// Human readable name of the deployment.
+	Name       string                   `json:"name"`
+	Site       *AppInstallersSite       `json:"site,omitempty"`
+	SmartGroup *AppInstallersSmartGroup `json:"smartGroup,omitempty"`
+	// Strategy for app updates. - **MANUAL** - the app will not get automatic updates without admin
+	// interaction - **AUTOMATIC** - the app will get automatic updates.
+	// Allowed values: see the AppTitleDeploymentSummaryUpdateBehavior constants.
+	UpdateBehavior string `json:"updateBehavior"`
+}
+
+// AppTitleDeploymentSummaryApp represents a app title deployment summary app.
+type AppTitleDeploymentSummaryApp struct {
+	// Bundle ID of app title from deployment.
+	BundleID *string `json:"bundleId,omitempty"`
+	// App version to be deployed on end user's computers.
+	DeployedVersion string `json:"deployedVersion"`
+	// URL that provides an icon for the application.
+	IconURL *string `json:"iconUrl,omitempty"`
+	// App Title identifier.
+	ID string `json:"id"`
+	// Latest version of app title from deployment.
+	LatestVersion *string `json:"latestVersion,omitempty"`
+	// Indication on the source which app is downloaded from Values: - **EXTERNAL_URL** - app is downloaded
+	// from external source which usually means vendor site - **JAMF_SERVER** - app is downloaded from JAMF
+	// server.
+	// Allowed values: see the AppTitleDeploymentSummaryAppMediaSourceType constants.
+	MediaSourceType string `json:"mediaSourceType"`
+	// App version to use for this deployment, contains value only if 'update behavior' is set to
+	// **MANUAL**.
+	SelectedVersion string `json:"selectedVersion"`
+	// If the app title is available in App Installer Service.
+	TitleAvailableInAis bool `json:"titleAvailableInAis"`
+	// If selected app title version was removed from App Installer Service.
+	VersionRemoved bool `json:"versionRemoved"`
+}
+
+// AppTitleDeploymentsSummaryResult represents a app title deployments summary result.
+type AppTitleDeploymentsSummaryResult struct {
+	Results    []AppTitleDeploymentSummary `json:"results"`
+	TotalCount int                         `json:"totalCount"`
+}
+
+// AppTitleDetails represents a app title details.
+type AppTitleDetails struct {
+	// Computer architecture type supported by this version of the App. Values: - **universal** - the app
+	// can be installed on computers with arm64 or x86_64 processor - **x86_64** - the app can be installed
+	// on computers with x86_64 processor - **arm64** - the app can be installed on computers with arm64
+	// processor.
+	Architecture string `json:"architecture"`
+	// Date when the app version was made available in Jamf App Catalog.
+	AvailabilityDate string `json:"availabilityDate"`
+	// Bundle ID.
+	BundleID string `json:"bundleId"`
+	// URL that provides an icon for the application.
+	IconURL string `json:"iconUrl"`
+	// Unique App Title identifier that represents an application in the App Installers system.
+	ID string `json:"id"`
+	// If set to true - another App ID might be installed on the same path.
+	InstallationPathShared bool `json:"installationPathShared"`
+	// Hash used to verify integrity of the final package.
+	InstallerPackageHash string `json:"installerPackageHash"`
+	// Type of package integrity hash for final package.
+	InstallerPackageHashType string `json:"installerPackageHashType"`
+	// Language included if app has locale-specific build.
+	Language string `json:"language"`
+	// If a launch daemon is included.
+	LaunchDaemonIncluded bool `json:"launchDaemonIncluded"`
+	// Indication on the source which app is downloaded from Values: - **EXTERNAL_URL** - app is downloaded
+	// from external source which usually means vendor site - **JAMF_SERVER** - app is downloaded from JAMF
+	// server.
+	// Allowed values: see the AppTitleDetailsMediaSourceType constants.
+	MediaSourceType string `json:"mediaSourceType"`
+	// Minimal operating system version required for this app.
+	MinimumOsVersion string `json:"minimumOsVersion"`
+	// If notifications are enabled.
+	NotificationAvailable bool `json:"notificationAvailable"`
+	// An array of original media sources.
+	OriginalMediaSources []OriginalMediaSource `json:"originalMediaSources"`
+	// An array of terms and conditions URLs provided by the software vendor.
+	OriginalTermsAndConditions []string `json:"originalTermsAndConditions"`
+	// Entity that signed the final package.
+	PackageSigningIdentity string `json:"packageSigningIdentity"`
+	// Publisher name.
+	Publisher string `json:"publisher"`
+	// Application version string visible on device.
+	ShortVersion string `json:"shortVersion"`
+	// Package size in bytes.
+	SizeInBytes int `json:"sizeInBytes"`
+	// If auto update of the App Title are suppressed.
+	SuppressAutoUpdate bool `json:"suppressAutoUpdate"`
+	// Human readable name of the application.
+	TitleName string `json:"titleName"`
+	// Version.
+	Version string `json:"version"`
+}
+
+// AppTitleVersion represents a app title version.
+type AppTitleVersion struct {
+	// App Installer version.
+	Version *string `json:"version,omitempty"`
+}
+
+// AppTitleVersionAndMediaSourceType represents a app title version and media source type.
+type AppTitleVersionAndMediaSourceType struct {
+	// Indication on the source which app is downloaded from Values: - **EXTERNAL_URL** - app is downloaded
+	// from external source which usually means vendor site - **JAMF_SERVER** - app is downloaded from JAMF
+	// server.
+	// Allowed values: see the AppTitleVersionAndMediaSourceTypeMediaSourceType constants.
+	MediaSourceType string `json:"mediaSourceType"`
+	// App Installer version.
+	Version *string `json:"version,omitempty"`
+}
+
+// AppTitleVersionsResult represents a app title versions result.
+type AppTitleVersionsResult struct {
+	// list of available versions for app installer.
+	Results    []AppTitleVersionAndMediaSourceType `json:"results"`
+	TotalCount int                                 `json:"totalCount"`
+}
+
+// AppTitlesResult represents a app titles result.
+type AppTitlesResult struct {
+	Results    []AppTitle `json:"results"`
+	TotalCount int        `json:"totalCount"`
 }
 
 // AssignRemoveProfileResponseSyncState represents a assign remove profile response sync state.
@@ -2284,6 +2665,27 @@ type DependencyObjectResultsResultsItem struct {
 	ObjectID int `json:"objectId"`
 }
 
+// DeploymentComputer represents a deployment computer.
+type DeploymentComputer struct {
+	// Human readable name of the computer.
+	ComputerName string `json:"computerName"`
+	// Optional error code describing deployment failure.
+	Error string `json:"error"`
+	// ID of computer.
+	ID string `json:"id"`
+	// Is it possible to retry app installation for the current computer.
+	Retryable bool `json:"retryable"`
+	// Current status of deploying app on computer.
+	// Allowed values: see the DeploymentComputerStatus constants.
+	Status string `json:"status"`
+}
+
+// DeploymentComputersResult represents a deployment computers result.
+type DeploymentComputersResult struct {
+	Results    []DeploymentComputer `json:"results"`
+	TotalCount int                  `json:"totalCount"`
+}
+
 // DeploymentTask represents a deployment task.
 type DeploymentTask struct {
 	ComputerID   *json.Number `json:"computerId,omitempty"`
@@ -3250,6 +3652,31 @@ type GetMobileDevicePrestageV3 struct {
 	UseStorageQuotaSize                    bool                             `json:"useStorageQuotaSize"`
 	UserSessionTimeout                     int                              `json:"userSessionTimeout"`
 	VersionLock                            int                              `json:"versionLock"`
+}
+
+// GlobalSettingsEndUserExperience End user experience settings in global app installers settings.
+type GlobalSettingsEndUserExperience struct {
+	// Custom notification displayed on computers when an app update has been successfully completed.
+	// Default value will be used if set to null.
+	CompleteMessage *string `json:"completeMessage,omitempty"`
+	// Duration in hours before the app is forcefully closed.
+	Deadline *int64 `json:"deadline,omitempty"`
+	// Custom notification message displayed on computers when app is about to be forcefully closed.
+	// Default value will be used if set to null.
+	DeadlineMessage *string `json:"deadlineMessage,omitempty"`
+	// Custom interval in hours to display notifications on computers. Default value will be used if set to
+	// null.
+	NotificationInterval *int64 `json:"notificationInterval,omitempty"`
+	// Custom notification message to display on computers when app update is available but the app is
+	// running. Default value will be used if set to null.
+	NotificationMessage *string `json:"notificationMessage,omitempty"`
+	// Additional duration in minutes before the app is forcefully closed. Default value will be used if
+	// set to null.
+	QuitDelay *int64 `json:"quitDelay,omitempty"`
+	// Determines whether the app should be restarted after a successful update.
+	Relaunch *bool `json:"relaunch,omitempty"`
+	// Determines whether all notifications should be suppressed.
+	Suppress *bool `json:"suppress,omitempty"`
 }
 
 // GroupDtoV1 represents a group dto v1.
@@ -5433,6 +5860,17 @@ type OnboardingItem struct {
 type OrganizationName struct {
 	// The Organization Name for Jamf Pro.
 	OrganizationName string `json:"organizationName"`
+}
+
+// OriginalMediaSource represents a original media source.
+type OriginalMediaSource struct {
+	// Hash used to verify integrity of the source package.
+	Hash string `json:"hash"`
+	// Type of package integrity hash for source package.
+	// Allowed values: see the OriginalMediaSourceHashType constants.
+	HashType string `json:"hashType"`
+	// Source URL for the app.
+	URL string `json:"url"`
 }
 
 // Package represents a package.
