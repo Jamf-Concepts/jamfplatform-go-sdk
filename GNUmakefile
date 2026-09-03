@@ -7,6 +7,14 @@ default: test lint
 ingest:
 	cd tools/generate && go run ./ingest -root "$(CURDIR)" -zip "$(ZIP)" $(INGEST_FLAGS)
 
+# Refresh the committed snapshot of the published permissions map, which
+# `make generate` checks every emitted privilege against. Hits the network, so
+# it is an explicit maintainer step and never part of generate or CI.
+permmap:
+	curl -fsS https://developer.jamf.com/platform-api/reference/jamf-pro-permissions-map.md \
+		-o tools/generate/permissions-map.md
+	@echo "refreshed tools/generate/permissions-map.md — now run: make generate"
+
 generate:
 	cd tools/generate && go run . -root $(CURDIR)
 
@@ -33,4 +41,4 @@ lint:
 	cd tools/generate && golangci-lint run ./...
 	cd tools && golangci-lint run ./acctargets/... ./acclanes/...
 
-.PHONY: default ingest generate test testacc lint
+.PHONY: default ingest permmap generate test testacc lint
