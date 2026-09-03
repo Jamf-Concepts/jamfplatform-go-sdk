@@ -997,6 +997,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 | `capi` at v1897 — **`POST /patchsoftwaretitles/id/{id}` only** | The spec file stays at v1897, but the whitelist took 31 of the 32 withdrawn operations on 2026-09-02, so the hold is now one operation wide. `POST /patchsoftwaretitles/id/0` is the only source of a `softwareTitleId` for the Pro v3 patch-configuration endpoints: taking it makes patch software titles unseedable, breaks `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves the provider's `patch_software_title` resource with no create path. Upstream has said the family is coming back after the SDK team's feedback — **when it reappears in a published spec, ingest `capi` and drop this row.** Note the surface the config now mirrors is incoherent by upstream's own doing: four alternate-identifier computer paths are `POST`-only, `/computers/id/{id}` is `POST`+`DELETE` with no read, none of the 31 declares a successor, and all 31 are live on the wire. |
 | `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update the gateway routes — 200 on the wire, re-probed 2026-09-02 — and its declared successor `PUT /v2/groups/{groupId}` still answers 403 `BAD_PERMISSIONS` (3/3 that day, v1 control 200 in the same invocation). **The OPA rule now exists**: `authorization-policies#265` merged 2026-09-02 10:13Z as `07791a1`, `PUT` only, requiring the same `tenantPermissions` the v1 PUT does — so the 403 is a bundle not yet rolled out, not a missing rule. Hold until the wire says 200; nothing in tyk has to change, and the rollout happens in `jamf/authorization-service`, which publishes no signal this repo can read. Re-probed **2026-09-02 13:55Z**, 3h42m after the merge: still 403 (real id and bogus uuid alike, v1 control 200 in the same invocation), so that is a floor on the rollout lag, not a defect. `authorization-policies#264` (still DRAFT) would deny the v1 update, and it named the missing v2 rule as its own blocker — **it was rebased onto the current `main` at 2026-09-02 13:22Z (`fa4cb07`), so `07791a1` is now an ancestor of its head and its own rego keeps the v2 `PUT` allow.** The out-of-order deploy is therefore structurally excluded on the merge path, not merely unlikely; re-check that on any force-push. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
+| App Installers (`/v1/app-installers/**`) | **Wanted as soon as it lands.** 24 operations returning as a documented `pro` surface, but `public-apis-oas#429` is still DRAFT so no bundle carries them and the gateway still refuses all 24. Watch for `app-installer` appearing in `external/jpapi` and ingest in that build — see the App Installers section under Packages. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
 
 **A verbatim copy of the bundle YAML into `testing/` is safe and worth adopting.**
@@ -1142,6 +1143,65 @@ exist only in Jamf's internal hidden-endpoint inventory. `schemaRenames`,
 all **kept** — each is general-purpose and tested. Re-adding is an ingest, not a
 revert: take it from the GitOps bundle and drop the flag; do not restore the YAML
 from git history, which is unversioned against upstream.
+
+**That published spec is now in flight, and this surface is wanted as soon as it
+lands — 24 operations, not the 9.** Two upstream PRs, both 2026-09-02:
+
+- **`jamf/authorization-policies#267` is MERGED** (16:59Z, `dcbb49d`), adding
+  `policies/tyk_external/jamf_pro_external/jamf_pro_app_installers.rego`. It grants all
+  24 `/api/pro/v1/app-installers/**` operations on the `applications` capability —
+  `read`/`create`/`update`/`delete`, with `GET /deployments/{id}/computers` the file's one
+  `has_all_permissions` rule, requiring `applications:read` **and** `devices:read`.
+- **`jamf/public-apis-oas#429` is still DRAFT.** It publishes the 24 into
+  `teams/jpapi/openapi.json`, copied verbatim from `jamf/jss` `develop`
+  (`app-installers/…/swagger_docs/hiddenapi/AppInstallersRs.yaml` plus
+  `AppInstallersFeatureGuard.yaml`). Both files sit under `hiddenapi/`, which the jss
+  bundle excludes — that is why nothing about these endpoints has ever reached the
+  specs, and why the deleted YAML was reverse-engineered rather than sourced.
+
+**Nothing to ingest yet: `app-installer` appears zero times anywhere in v2024** —
+`external/`, `internal/stage/`, `internal/dev/` and both
+`_permissions/{routes,scopes}.yaml`. **The ingest trigger is `app-installer` appearing in
+`external/jpapi`**, and it comes with the whole `pro` spec, so it is a `jpapi` ingest
+and not a new spec block.
+
+**The gateway still refuses all 24, and the refusal is the undeployed policy bundle
+rather than a missing grant** (probed 2026-09-02 17:08Z, nine minutes after the merge,
+tenant `ff584e5b…` on `eu.api.jamfcloud.com` / `nmartin.jamfcloud.com`, Pro `11.31.1`).
+Every one of the six collection-level paths answered `403 BAD_PERMISSIONS` with a body
+byte-identical to `GET /pro/v1/bogus-control-path`, against a `GET /pro/v1/jamf-pro-version`
+200 control in the same invocation. What classifies it is the third control:
+**`GET /proclassic/macapplications` answered 200**, and `_permissions/routes.yaml` maps that
+GET to `applications:read` — the exact capability the new rego requires — so the credential
+holds the grant and only the rollout is missing. That happens in `jamf/authorization-service`,
+which publishes no signal this repo can read, so re-probe rather than watch.
+
+**Two path shapes in the deleted config were wrong, and the rego is the authority.** The
+defaults path is `GET /v1/app-installers/global-settings/defaults/deployment-controls`, not
+the `/deployment-controls/defaults` the old config implied. And the operations that had
+existed only in the hidden inventory are all now declared: `GET /v1/app-installers` (the
+feature-availability probe), `POST /deployments/export`,
+`POST /deployments/computers/installation-retry` (idless) alongside
+`POST /deployments/{id}/computers/{computerId}/installation-retry`,
+`GET`+`POST /deployments/{id}/history`, `GET`+`POST /global-settings/history`,
+`GET /titles/{id}/versions` and `POST /titles/{id}/cache-update`.
+
+**Three traps to plan the ingest around.** `POST /titles/{id}/cache-update` calls jss's
+`assertDebugModeEnabled()` and **404s unless the `DEBUG_MODE` toggle is set**, so it cannot
+carry a passing acceptance test on a normal tenant — it needs a test that pins the 404 and
+fails the day the toggle is on, the same shape as the other generated-but-refused operations.
+It and `GET /v1/app-installers` are both `@InternalOnlyApiCall` in jss and published
+deliberately. And **Jamf Pro 11.31.1's 524 API-role privileges contain no App Installers
+string at all** (`GET /pro/v1/api-role-privileges`, grepped); the nearest are the six
+`* Mac Applications` and `* Automatic Mac App Updates Settings` entries. So what Pro itself
+gates these on is unverified, and the gateway's `applications:*` mapping is upstream's claim
+until the 403 lifts and it can be probed.
+
+**`jamf_pro_app_installers_ui.rego` on `main` is not related coverage.** It matches
+`/ui/jamfpro/v1/app-installers/…` and requires an Auth0 token with the `elevate.jamf.com`
+audience and `env:elevate` permissions. That prefix answers **`404 page not found`** on the
+GA gateway root — a different listener, not the M2M surface — so do not read its survival as
+the API being reachable.
 
 ---
 
