@@ -269,14 +269,35 @@ jobs:
           JAMFPLATFORM_ACC_PRO_TENANT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_ID }}
           JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID }}
           JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET }}
+          # Security Cloud, deliberately NOT wired — but wired HERE rather than
+          # only mentioned, so enabling it is uncommenting four lines.
           #
-          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_* is deliberately NOT wired.
           # The environment credential above reaches /api/securitycloud, so a
-          # dedicated Security Cloud credential is redundant here. It remains
-          # supported and PREFERRED when set, because it lands on a different
-          # Security Cloud tenant carrying the suite's long-lived fixtures — set
-          # it locally if a test needs those. accJSCCredSource logs which
-          # credential the run actually used.
+          # dedicated credential is redundant for 26 of the 27 Security Cloud
+          # tests. It stays supported and PREFERRED when set, because it lands on
+          # a different Security Cloud tenant; accJSCCredSource logs which
+          # credential a run actually used, so the switch is never silent.
+          #
+          # The one test that needs it is the ZTNA gateway family. Those creates
+          # require tenantIds, which is FIXTURE DATA rather than a scope header —
+          # the list of tenants a gateway grants access to — and it is not
+          # discoverable: no securitycloud operation exposes a tenant ID, and the
+          # two Jamf Pro endpoints that look like they would
+          # (GET /pro/v1/csa/tenant-id and /pro/v1/m2m/tenant-id) return the same
+          # Jamf Pro tenant UUID, which those creates reject exactly as they
+          # reject a bogus one. jscTenantIDs therefore skips unless the whole set
+          # is present, and skips too if only the ID is — the client would then be
+          # the environment credential while the body named a different tenant.
+          #
+          # Setting these switches the entire securitycloud lane to that tenant.
+          # It is also the only way to restore the recoveryDelayInSec enum
+          # coverage, since the environment credential's Security Cloud tenant is
+          # not provisioned for ZTNA at all (its apps, zones and grouped gateways
+          # are all empty, and every id it supplies is unmappable).
+          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_BASE_URL }}
+          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID: ${{ secrets.JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID }}
+          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_ID }}
+          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_CLIENT_SECRET }}
           #
           # JAMFPLATFORM_ACC_REQUIRE is set per lane from matrix.require above,
           # not once for the whole run.

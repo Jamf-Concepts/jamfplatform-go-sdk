@@ -564,9 +564,17 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 //
 // # Two dead ends, so nobody retries them
 //
-// GetCsaTenantIdV1 looks like the answer — it returns a real tenant UUID for the
-// caller's Jamf Pro environment, and tenantIds is documented as "validated
-// against the caller's organization". It is not. Probed 2026-09-03 on the
+// GetCsaTenantIdV1 and GetM2MTenantIDV1 both look like the answer — they return a
+// real tenant UUID for the caller's Jamf Pro environment, and tenantIds is
+// documented as "validated against the caller's organization". They are not, and
+// they are the same dead end twice: probed 2026-09-03, GET /pro/v1/csa/tenant-id
+// and GET /pro/v1/m2m/tenant-id return the IDENTICAL value, and a Security Cloud
+// credential cannot call either — the pro namespace answers with an HTML page for
+// it. Nor is there any securitycloud operation with "tenant" in its path or name;
+// the only two types in that package carrying a tenantId are uem-connect's
+// ConnectorConfig and JamfProConnectorCreateRequest, where the field is the Jamf
+// Pro tenant a connector points AT rather than the Security Cloud tenant itself.
+// Probed 2026-09-03 on the
 // environment credential's Security Cloud tenant, a grouped-gateway create
 // answered 400 "No mapping found for one of the supplied ids" for ALL FOUR
 // combinations: CSA id + real shared gateways, bogus id + real gateways, CSA id +
@@ -586,9 +594,20 @@ func TestAcceptance_SecurityCloudZtnaGroupedGatewayLifecycle(t *testing.T) {
 // tenant id.
 func jscTenantIDs(t *testing.T) []string {
 	t.Helper()
+
+	// Coherence, not just presence. The ID has to be the tenant the CLIENT
+	// authenticates as, so reading the variable alone is a footgun: set it
+	// without the rest of the Security Cloud credential set and
+	// initJSCAcceptanceClient falls back to the environment credential while
+	// these bodies carry a different tenant's ID — which is the exact mismatch
+	// that produced the original 400. accJSCCredSource records which credential
+	// the client was built from, so that combination skips instead.
 	id := accEnv("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID")
 	if id == "" {
-		t.Skip("needs JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID: Security Cloud creates take tenantIds, and the ID is neither derivable from an environment-scoped client nor discoverable from any read on this surface")
+		t.Skip("needs the JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_* credential set: Security Cloud creates take tenantIds, and the ID is neither derivable from the client nor discoverable from any read on this surface")
+	}
+	if want := "securitycloud tenant " + id; accJSCCredSource != want {
+		t.Skipf("JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_ID is set but the client was built from %q, so the body would name a tenant the credential does not authenticate as; set the whole JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_* set or none of it", accJSCCredSource)
 	}
 	return []string{id}
 }
