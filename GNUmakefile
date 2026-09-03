@@ -1,5 +1,23 @@
 default: test lint
 
+# Refresh the private testing/ source specs from a Jamf Platform APIs GitOps
+# archive, then regenerate: `make ingest ZIP=~/Downloads/jamf-platform-apis-gitops-vNNNN-*.zip`.
+# Specs the SDK holds at an older build are skipped and the hold reported; add
+# INGEST_FLAGS=-include-held to take them, or -dry-run to report and write nothing.
+ingest:
+	cd tools/generate && go run ./ingest -root "$(CURDIR)" -zip "$(ZIP)" $(INGEST_FLAGS)
+
+# Refresh the committed snapshot of the published permissions map, which
+# `make test` checks every emitted privilege against (TestScopedPrivilegesUseGAVocabulary).
+# Hits the network, so it is an explicit maintainer step and never part of
+# generate or CI. Fetches to a temp file first so a dropped connection or a
+# failed rename can never truncate or corrupt the tracked snapshot in place.
+permmap:
+	curl -fsS --remove-on-error https://developer.jamf.com/platform-api/reference/jamf-pro-permissions-map.md \
+		-o tools/generate/permissions-map.md.tmp
+	mv tools/generate/permissions-map.md.tmp tools/generate/permissions-map.md
+	@echo "refreshed tools/generate/permissions-map.md — review its diff, then run: make test"
+
 generate:
 	cd tools/generate && go run . -root $(CURDIR)
 
@@ -26,4 +44,4 @@ lint:
 	cd tools/generate && golangci-lint run ./...
 	cd tools && golangci-lint run ./acctargets/... ./acclanes/...
 
-.PHONY: default generate test testacc lint
+.PHONY: default ingest permmap generate test testacc lint

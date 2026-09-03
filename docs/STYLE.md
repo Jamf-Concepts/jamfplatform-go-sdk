@@ -972,13 +972,42 @@ What the article does settle, and what now depends on it:
   underlying endpoints"* and was about to publish that to the Terraform Registry.
   `MethodPrivileges.Source` is what makes the distinction machine-readable —
   `"spec"`, `"gateway-policy"`, or `""` when the set is empty.
-- **The capability reference is a closed vocabulary, so it is a tripwire.**
-  `gaCapabilityActions` in `tools/generate/privileges_test.go` transcribes it and
-  `TestScopedPrivilegesUseGAVocabulary` asserts all 314 distinct generated
+- **The capability reference is a closed vocabulary, so it is a tripwire — and
+  the vocabulary is now parsed, not transcribed.** A committed snapshot of the
+  article lives at `tools/generate/permissions-map.md`, `parsePermissionsMap` in
+  `permmap.go` reads its capability tables, and
+  `TestScopedPrivilegesUseGAVocabulary` asserts all **337** distinct generated
   identifiers against it: unknown capability, an action the capability does not
-  offer, or a return to the three-part form each fail. A new capability upstream
-  is expected — extend the table in the ingest that introduces it, and never
-  delete the assertion to make an ingest pass.
+  offer, or a return to the three-part form each fail. It used to assert against
+  `gaCapabilityActions`, a hand-typed copy of the same tables — that caught real
+  defects but drifted silently from its source and had to be extended by hand on
+  every ingest that met a new capability. **`make permmap` refreshes the
+  snapshot**; a new capability upstream is expected, so the failure is the
+  notification to refresh, and the assertion is never to be deleted to make an
+  ingest pass. A disagreement that survives a refresh is real: wire-probe it,
+  report it upstream, and record it in `permissionsMapExceptions`, which is
+  self-expiring in both directions like `schemaPatchesRequireAbsent` — an entry
+  the map has caught up with, and an entry for a permission the SDK no longer
+  emits, both fail. It is currently **empty**.
+
+  Two guards make the parse trustworthy. `minDeclaredCapabilities` fails a
+  snapshot that parsed to fewer than 100 capabilities, because a parser that
+  silently finds nothing reports perfect agreement — the one failure mode this
+  check must not have. And **rows contribute the union of their action sets**: a
+  capability is declared across as many rows as its resources need, and reading
+  one row as the whole declaration manufactures a disagreement. That is not
+  hypothetical — it is how two spurious `compliance-benchmarks` exceptions came
+  to be written, from a parser that kept `{r}` over `/baselines` and dropped
+  `{c,r,d}` over `/benchmarks`.
+
+  **The path dimension is deliberately not checked.** The map's Endpoints column
+  looks mechanical — resource-root prefixes, versions collapsed,
+  longest-prefix-wins — but the cells abbreviate continuation roots:
+  `disk-encryption-recovery-key` reads
+  "Pro `/computers-inventory/filevault`, `/{id}/filevault`", and the second
+  entry's prefix has to be inferred from the first. Guessing it wrong either
+  manufactures a disagreement or hides one, so the checker does not guess.
+  `permmap.go`'s header carries the full reasoning.
 
 `x-required-privileges` feeds a per-package `Privileges` registry plus a
 `// Required privileges:` godoc line, and downstream a Terraform provider
@@ -1008,12 +1037,18 @@ that honest:
 - **They never enter the spec document.** `api/*.json` still declares none, which
   is what upstream publishes. Unlike `schemaPatches`, this key is not part of the
   spec-patch pipeline.
-- **Three independent sources agree on all 18.** The `config.yaml` blocks above;
-  the hand-written OPA rules in
+- **Three independent sources agree on all 18, and the agreement is now checked
+  rather than asserted.** The `config.yaml` blocks above; the hand-written OPA
+  rules in
   `authorization-policies/policies/tyk_external/account/account_api.rego`; and
-  `TestScopedPrivilegesUseGAVocabulary`, which validated every one of the 18
-  against the published capability reference without a single addition to
-  `gaCapabilityActions`. Note the rego accepts *either* the GA capability or a
+  the published permissions map, whose *Organization management scope* section
+  declares `licensing:{r}`, `deal-registration:{c,r}`,
+  `distributor-actions:{c,r,u}`, `sso-connections:{c,r,u,d}` and
+  `sso-domains:{c,r,u,d}` — every one of the 18, action for action. That third
+  source is the only one independent of the specs, and
+  `TestScopedPrivilegesUseGAVocabulary` fails the build if it stops agreeing. It
+  matters most here, because `account` is the one package whose privileges no
+  spec carries. Note the rego accepts *either* the GA capability or a
   retired `read:org:*`/`update:org:*` permission
   (`lib.has_any_of_permissions`), and only the GA form is carried: `Scoped` is a
   conjunction, so listing the alternative would read as "both required".
