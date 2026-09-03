@@ -1220,6 +1220,32 @@ computer in its scope and has no dry-run. The reads that need a deployment are
 probed with an impossible ID instead, where a 404 proves the URL construction and
 the error decode without provisioning anything.
 
+**The gated surface has now been run (2026-09-03), and it found a shipped
+break.** The write test creates a **disabled, unscoped `SELF_SERVICE`/`MANUAL`
+draft** — which installs nothing — asserts the safety properties round-trip so a
+spec change cannot silently make a create active, then covers the real scoped
+reads, a history note, the rename, delete-then-404, and a no-op global-settings
+round-trip. Four wire facts came out of it, evidenced with controls in
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#app-installers-the-write-surface-exercised-2026-09-03):
+
+- **Both history-note `POST`s answer 200 against a spec that declares only 201**,
+  so `CreateAppInstallerDeploymentHistoryNoteV1` and
+  `CreateAppInstallerGlobalSettingsHistoryNoteV1` were **failing on every
+  successful call** — the same defect as `CreateInventoryPreloadHistoryNoteV1`.
+  Fixed with an explicit `"expectedStatus": 200`; **deleting the override is
+  inert**, since absent one the generator reads the spec's 201. The deployment
+  create itself is genuinely 201. Report upstream.
+- **The create's `href` names the Jamf Pro instance host and an `/api` prefix**,
+  not the gateway, so it is not callable by this SDK. `HrefResponse.ID` carries
+  the real identifier — use it.
+- **An omitted `smartGroupId` reads back as `"-1"`**, the no-assignment
+  sentinel, never `""`. Both mean unscoped.
+- **Both installation retries answer 404 with an empty `errors` array** when
+  there is nothing to retry, on a deployment `GET` answers 200 for in the same
+  invocation. Routed and refused on state, not a gateway gap (the unrouted tell
+  here is `403 BAD_PERMISSIONS`, which the bogus-path control returned). Both are
+  asserted as 404 so a change to 2xx fails.
+
 **Still unverified: whether a post-GA *tenant* credential reaches these.** Only an
 environment credential was live when the gateway opened — every tenant credential
 in that session had been revoked within the hour — so `accClient` is used like
