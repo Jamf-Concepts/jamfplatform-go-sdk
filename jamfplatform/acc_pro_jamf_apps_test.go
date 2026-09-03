@@ -534,7 +534,7 @@ func TestAcceptance_Pro_RemoteAssist_ExportV2(t *testing.T) {
 func TestAcceptance_Pro_RemoteAssist_ExportV2ColumnSubset(t *testing.T) {
 	c := accClient(t)
 
-	fields := []pro.ExportField{{FieldName: strPtr("sessionId")}}
+	fields := []pro.ExportField{{FieldName: new("sessionId")}}
 	body, err := pro.New(c).ExportJamfRemoteAssistSessionsV2(context.Background(), &pro.ExportParameters{
 		Fields: &fields,
 	})
@@ -550,4 +550,5 @@ func TestAcceptance_Pro_RemoteAssist_ExportV2ColumnSubset(t *testing.T) {
 	t.Logf("Remote Assist export (v2, sessionId only): %d bytes", len(body))
 }
 
-func strPtr(s string) *string { return &s }
+//go:fix inline
+func strPtr(s string) *string { return new(s) }

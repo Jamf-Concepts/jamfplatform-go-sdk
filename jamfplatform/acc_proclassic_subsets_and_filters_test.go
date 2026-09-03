@@ -654,8 +654,7 @@ func TestAcceptance_Classic_ComputerCommandsByCommand(t *testing.T) {
 	got, err := proclassic.New(c).GetComputerCommandsByCommand(ctx, "BlankPush")
 	if err != nil {
 		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
+		if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 			t.Logf("GetComputerCommandsByCommand(BlankPush): API error %d — accepted", apiErr.StatusCode)
 			return
 		}
@@ -672,8 +671,7 @@ func TestAcceptance_Classic_ComputerCommandsByStatus(t *testing.T) {
 	got, err := proclassic.New(c).GetComputerCommandsByStatus(ctx, "Pending")
 	if err != nil {
 		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
+		if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 			t.Logf("GetComputerCommandsByStatus(Pending): API error %d — accepted", apiErr.StatusCode)
 			return
 		}

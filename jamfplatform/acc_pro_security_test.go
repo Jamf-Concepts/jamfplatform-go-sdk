@@ -784,11 +784,3 @@ func TestAcceptance_Pro_Security_LocalAdminPasswordBogusClient(t *testing.T) {
 		t.Logf("%s(bogus): 404 %s ✓", tc.label, apiErr.Summary())
 	}
 }
-
-// min is a tiny helper used in PEM slicing above.
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}

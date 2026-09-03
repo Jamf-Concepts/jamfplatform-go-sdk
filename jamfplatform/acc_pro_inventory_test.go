@@ -166,14 +166,14 @@ func TestAcceptance_Pro_Inventory_ComputerCRUDV4(t *testing.T) {
 			Name: name,
 		},
 		Hardware: &pro.ComputerHardwareCreate{
-			Make:            ptr("Apple"),
-			Model:           ptr("SDK Acceptance Virtual"),
-			ModelIdentifier: ptr("SDKAcc1,1"),
+			Make:            new("Apple"),
+			Model:           new("SDK Acceptance Virtual"),
+			ModelIdentifier: new("SDKAcc1,1"),
 		},
 		OperatingSystem: &pro.ComputerOperatingSystemCreate{
-			Name:    ptr("macOS"),
-			Version: ptr("14.0"),
-			Build:   ptr("23A344"),
+			Name:    new("macOS"),
+			Version: new("14.0"),
+			Build:   new("23A344"),
 		},
 	})
 	if err != nil {
@@ -367,8 +367,7 @@ func TestAcceptance_Pro_Inventory_PreloadCsvV2(t *testing.T) {
 	if _, err := p.ValidateInventoryPreloadCsvV2(ctx, "probe.csv", strings.NewReader(csv)); err != nil {
 		skipOnServerError(t, err)
 		// Validation errors are expected in some tenant configs — log + move on.
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
+		if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 			t.Logf("ValidateInventoryPreloadCsvV2 rejected probe row: status=%d", apiErr.StatusCode)
 		} else {
 			t.Errorf("ValidateInventoryPreloadCsvV2: %v", err)
@@ -472,8 +471,7 @@ func TestAcceptance_Pro_Inventory_PreloadUploadCsvV2(t *testing.T) {
 		skipOnServerError(t, err)
 		// CSV upload may 400 due to tenant-specific validation rules; plumbing
 		// is the only thing exercised here.
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) {
+		if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 			t.Logf("UploadInventoryPreloadCsvV2 rejected probe: status=%d", apiErr.StatusCode)
 			return
 		}

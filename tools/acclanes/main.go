@@ -173,7 +173,7 @@ func parseScope(scope string, stdin *bufio.Scanner) ([]string, error) {
 
 	body := strings.TrimSuffix(strings.TrimPrefix(scope, "^("), ")$")
 	var names []string
-	for _, n := range strings.Split(body, "|") {
+	for n := range strings.SplitSeq(body, "|") {
 		if n = strings.TrimSpace(n); n != "" {
 			names = append(names, n)
 		}

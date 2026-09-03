@@ -609,7 +609,7 @@ func accEnv(name string) string {
 // Pro lane must not fail for a missing organization secret it never uses.
 var accRequiredSets = sync.OnceValue(func() map[string]bool {
 	required := map[string]bool{}
-	for _, name := range strings.Split(accEnv("JAMFPLATFORM_ACC_REQUIRE"), ",") {
+	for name := range strings.SplitSeq(accEnv("JAMFPLATFORM_ACC_REQUIRE"), ",") {
 		if name = strings.ToLower(strings.TrimSpace(name)); name != "" {
 			required[name] = true
 		}

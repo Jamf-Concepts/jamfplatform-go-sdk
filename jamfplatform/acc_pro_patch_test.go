@@ -316,7 +316,7 @@ func seedPatchSoftwareTitleFixture(t *testing.T) string {
 		seeded, err := proclassic.New(c).CreatePatchSoftwareTitleByID(ctx, "0", &proclassic.PatchSoftwareTitle{
 			Name:     at.AppName,
 			NameID:   at.NameID,
-			SourceID: ptr(1),
+			SourceID: new(1),
 		})
 		if err != nil {
 			// A title already configured on the tenant is rejected as a

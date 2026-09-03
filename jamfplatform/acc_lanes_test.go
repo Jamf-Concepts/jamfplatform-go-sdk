@@ -32,6 +32,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -150,10 +151,8 @@ func nameLane(table laneTable, name string) string {
 
 func expectedLane(called []string) string {
 	for _, fl := range factoryLane {
-		for _, c := range called {
-			if c == fl.factory {
-				return fl.lane
-			}
+		if slices.Contains(called, fl.factory) {
+			return fl.lane
 		}
 	}
 	return "" // credential-free: valid in any lane

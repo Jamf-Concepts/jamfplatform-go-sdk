@@ -48,8 +48,7 @@ func probeCreateHandleErr(t *testing.T, resource string, err error) (rejected bo
 		return false
 	}
 	skipOnServerError(t, err)
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) {
+	if _, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 		return true
 	}
 	t.Fatalf("%s transport error: %v", resource, err)

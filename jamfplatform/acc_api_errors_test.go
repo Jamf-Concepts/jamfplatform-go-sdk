@@ -201,7 +201,7 @@ func TestAcceptance_APIError_Classic_Categories_DuplicateName(t *testing.T) {
 	name := "sdk-acc-err-dup-classic-" + runSuffix()
 	prio := 9
 	first, err := pc.CreateCategoryByID(ctx, "0", &proclassic.Category{
-		Name:     classicStrPtr(name),
+		Name:     new(name),
 		Priority: &prio,
 	})
 	if err != nil {
@@ -215,7 +215,7 @@ func TestAcceptance_APIError_Classic_Categories_DuplicateName(t *testing.T) {
 	cleanupDelete(t, "DeleteCategoryByID", func() error { return pc.DeleteCategoryByID(ctx, intToStr(firstID)) })
 
 	_, err = pc.CreateCategoryByID(ctx, "0", &proclassic.Category{
-		Name:     classicStrPtr(name),
+		Name:     new(name),
 		Priority: &prio,
 	})
 	apiErr := requireAPIError(t, "CreateCategoryByID (duplicate)", err)

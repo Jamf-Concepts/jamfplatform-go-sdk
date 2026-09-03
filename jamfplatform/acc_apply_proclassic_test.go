@@ -39,9 +39,14 @@ func ptrProclassicPayloads(s string) *proclassic.PayloadsXMLText {
 // The user explicitly instructed: do NOT skip 500 errors.
 // ---------------------------------------------------------------------------
 
-func ptrStr(s string) *string { return &s }
-func ptrInt(i int) *int       { return &i }
-func ptrBool(b bool) *bool    { return &b }
+//go:fix inline
+func ptrStr(s string) *string { return new(s) }
+
+//go:fix inline
+func ptrInt(i int) *int { return new(i) }
+
+//go:fix inline
+func ptrBool(b bool) *bool { return new(b) }
 
 // Minimal mobileconfig plist payload used for configuration profile tests.
 const minimalProfilePayload = `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>PayloadContent</key><array/><key>PayloadDisplayName</key><string>SDK Test Profile</string><key>PayloadIdentifier</key><string>com.jamf.sdk.test</string><key>PayloadType</key><string>Configuration</string><key>PayloadUUID</key><string>A1B2C3D4-E5F6-7890-ABCD-EF1234567890</string><key>PayloadVersion</key><integer>1</integer></dict></plist>`
@@ -56,9 +61,9 @@ func TestAcceptance_ApplyAccountGroup(t *testing.T) {
 	name := "sdk-acc-apply-acctgrp-" + runSuffix()
 
 	id, created, err := pc.ApplyAccountGroup(ctx, &proclassic.Group{
-		Name:         ptrStr(name),
-		AccessLevel:  ptrStr("Full Access"),
-		PrivilegeSet: ptrStr("Custom"),
+		Name:         new(name),
+		AccessLevel:  new("Full Access"),
+		PrivilegeSet: new("Custom"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -70,9 +75,9 @@ func TestAcceptance_ApplyAccountGroup(t *testing.T) {
 	t.Logf("created account group id=%s", id)
 
 	id2, created2, err := pc.ApplyAccountGroup(ctx, &proclassic.Group{
-		Name:         ptrStr(name),
-		AccessLevel:  ptrStr("Full Access"),
-		PrivilegeSet: ptrStr("Administrator"),
+		Name:         new(name),
+		AccessLevel:  new("Full Access"),
+		PrivilegeSet: new("Administrator"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -105,7 +110,7 @@ func TestAcceptance_ApplyAdvancedComputerSearch(t *testing.T) {
 
 	name := "sdk-acc-apply-advcompsearch-" + runSuffix()
 
-	id, created, err := pc.ApplyAdvancedComputerSearch(ctx, &proclassic.AdvancedComputerSearch{Name: ptrStr(name)})
+	id, created, err := pc.ApplyAdvancedComputerSearch(ctx, &proclassic.AdvancedComputerSearch{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -115,7 +120,7 @@ func TestAcceptance_ApplyAdvancedComputerSearch(t *testing.T) {
 	}
 	t.Logf("created advanced computer search id=%s", id)
 
-	id2, created2, err := pc.ApplyAdvancedComputerSearch(ctx, &proclassic.AdvancedComputerSearch{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyAdvancedComputerSearch(ctx, &proclassic.AdvancedComputerSearch{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -147,7 +152,7 @@ func TestAcceptance_ApplyAdvancedMobileDeviceSearch(t *testing.T) {
 
 	name := "sdk-acc-apply-advmdsearch-" + runSuffix()
 
-	id, created, err := pc.ApplyAdvancedMobileDeviceSearch(ctx, &proclassic.AdvancedMobileDeviceSearch{Name: ptrStr(name)})
+	id, created, err := pc.ApplyAdvancedMobileDeviceSearch(ctx, &proclassic.AdvancedMobileDeviceSearch{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -157,7 +162,7 @@ func TestAcceptance_ApplyAdvancedMobileDeviceSearch(t *testing.T) {
 	}
 	t.Logf("created advanced mobile device search id=%s", id)
 
-	id2, created2, err := pc.ApplyAdvancedMobileDeviceSearch(ctx, &proclassic.AdvancedMobileDeviceSearch{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyAdvancedMobileDeviceSearch(ctx, &proclassic.AdvancedMobileDeviceSearch{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -189,7 +194,7 @@ func TestAcceptance_ApplyAdvancedUserSearch(t *testing.T) {
 
 	name := "sdk-acc-apply-advusersearch-" + runSuffix()
 
-	id, created, err := pc.ApplyAdvancedUserSearch(ctx, &proclassic.AdvancedUserSearch{Name: ptrStr(name)})
+	id, created, err := pc.ApplyAdvancedUserSearch(ctx, &proclassic.AdvancedUserSearch{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -199,7 +204,7 @@ func TestAcceptance_ApplyAdvancedUserSearch(t *testing.T) {
 	}
 	t.Logf("created advanced user search id=%s", id)
 
-	id2, created2, err := pc.ApplyAdvancedUserSearch(ctx, &proclassic.AdvancedUserSearch{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyAdvancedUserSearch(ctx, &proclassic.AdvancedUserSearch{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -231,7 +236,7 @@ func TestAcceptance_ApplyBuilding(t *testing.T) {
 
 	name := "sdk-acc-apply-building-" + runSuffix()
 
-	id, created, err := pc.ApplyBuilding(ctx, &proclassic.Building{Name: ptrStr(name)})
+	id, created, err := pc.ApplyBuilding(ctx, &proclassic.Building{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -241,7 +246,7 @@ func TestAcceptance_ApplyBuilding(t *testing.T) {
 	}
 	t.Logf("created building id=%s", id)
 
-	id2, created2, err := pc.ApplyBuilding(ctx, &proclassic.Building{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyBuilding(ctx, &proclassic.Building{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -273,7 +278,7 @@ func TestAcceptance_ApplyCategory(t *testing.T) {
 
 	name := "sdk-acc-apply-category-" + runSuffix()
 
-	id, created, err := pc.ApplyCategory(ctx, &proclassic.Category{Name: ptrStr(name)})
+	id, created, err := pc.ApplyCategory(ctx, &proclassic.Category{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -283,7 +288,7 @@ func TestAcceptance_ApplyCategory(t *testing.T) {
 	}
 	t.Logf("created category id=%s", id)
 
-	id2, created2, err := pc.ApplyCategory(ctx, &proclassic.Category{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyCategory(ctx, &proclassic.Category{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -315,7 +320,7 @@ func TestAcceptance_ApplyClass(t *testing.T) {
 
 	name := "sdk-acc-apply-class-" + runSuffix()
 
-	id, created, err := pc.ApplyClass(ctx, &proclassic.ClassPost{Name: ptrStr(name)})
+	id, created, err := pc.ApplyClass(ctx, &proclassic.ClassPost{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -325,7 +330,7 @@ func TestAcceptance_ApplyClass(t *testing.T) {
 	}
 	t.Logf("created class id=%s", id)
 
-	id2, created2, err := pc.ApplyClass(ctx, &proclassic.ClassPost{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyClass(ctx, &proclassic.ClassPost{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -358,8 +363,8 @@ func TestAcceptance_ApplyClassicPackage(t *testing.T) {
 	name := "sdk-acc-apply-pkg-" + runSuffix()
 
 	id, created, err := pc.ApplyClassicPackage(ctx, &proclassic.Package{
-		Name:     ptrStr(name),
-		Filename: ptrStr(name + ".pkg"),
+		Name:     new(name),
+		Filename: new(name + ".pkg"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -371,8 +376,8 @@ func TestAcceptance_ApplyClassicPackage(t *testing.T) {
 	t.Logf("created package id=%s", id)
 
 	id2, created2, err := pc.ApplyClassicPackage(ctx, &proclassic.Package{
-		Name:     ptrStr(name),
-		Filename: ptrStr(name + ".pkg"),
+		Name:     new(name),
+		Filename: new(name + ".pkg"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -405,7 +410,7 @@ func TestAcceptance_ApplyComputerExtensionAttribute(t *testing.T) {
 
 	name := "sdk-acc-apply-compea-" + runSuffix()
 
-	id, created, err := pc.ApplyComputerExtensionAttribute(ctx, &proclassic.ComputerExtensionAttribute{Name: ptrStr(name)})
+	id, created, err := pc.ApplyComputerExtensionAttribute(ctx, &proclassic.ComputerExtensionAttribute{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -416,8 +421,8 @@ func TestAcceptance_ApplyComputerExtensionAttribute(t *testing.T) {
 	t.Logf("created computer extension attribute id=%s", id)
 
 	id2, created2, err := pc.ApplyComputerExtensionAttribute(ctx, &proclassic.ComputerExtensionAttribute{
-		Name:        ptrStr(name),
-		Description: ptrStr("updated"),
+		Name:        new(name),
+		Description: new("updated"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -451,8 +456,8 @@ func TestAcceptance_ApplyComputerGroup(t *testing.T) {
 	name := "sdk-acc-apply-compgrp-" + runSuffix()
 
 	id, created, err := pc.ApplyComputerGroup(ctx, &proclassic.ComputerGroupPost{
-		Name:    ptrStr(name),
-		IsSmart: ptrBool(false),
+		Name:    new(name),
+		IsSmart: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -476,8 +481,8 @@ func TestAcceptance_ApplyComputerGroup(t *testing.T) {
 	})
 
 	id2, created2, err := pc.ApplyComputerGroup(ctx, &proclassic.ComputerGroupPost{
-		Name:    ptrStr(name),
-		IsSmart: ptrBool(false),
+		Name:    new(name),
+		IsSmart: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -507,7 +512,7 @@ func TestAcceptance_ApplyDepartment(t *testing.T) {
 
 	name := "sdk-acc-apply-dept-" + runSuffix()
 
-	id, created, err := pc.ApplyDepartment(ctx, &proclassic.Department{Name: ptrStr(name)})
+	id, created, err := pc.ApplyDepartment(ctx, &proclassic.Department{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -517,7 +522,7 @@ func TestAcceptance_ApplyDepartment(t *testing.T) {
 	}
 	t.Logf("created department id=%s", id)
 
-	id2, created2, err := pc.ApplyDepartment(ctx, &proclassic.Department{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyDepartment(ctx, &proclassic.Department{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -558,9 +563,9 @@ func TestAcceptance_ApplyDiskEncryptionConfiguration(t *testing.T) {
 	name := "sdk-acc-apply-diskenc-" + runSuffix()
 
 	id, created, err := pc.ApplyDiskEncryptionConfiguration(ctx, &proclassic.DiskEncryptionConfiguration{
-		Name:                  ptrStr(name),
-		KeyType:               ptrStr("Institutional"),
-		FileVaultEnabledUsers: ptrStr("Management Account"),
+		Name:                  new(name),
+		KeyType:               new("Institutional"),
+		FileVaultEnabledUsers: new("Management Account"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -572,9 +577,9 @@ func TestAcceptance_ApplyDiskEncryptionConfiguration(t *testing.T) {
 	t.Logf("created disk encryption configuration id=%s", id)
 
 	id2, created2, err := pc.ApplyDiskEncryptionConfiguration(ctx, &proclassic.DiskEncryptionConfiguration{
-		Name:                  ptrStr(name),
-		KeyType:               ptrStr("Institutional"),
-		FileVaultEnabledUsers: ptrStr("Management Account"),
+		Name:                  new(name),
+		KeyType:               new("Institutional"),
+		FileVaultEnabledUsers: new("Management Account"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -608,15 +613,15 @@ func TestAcceptance_ApplyDistributionPoint(t *testing.T) {
 	name := "sdk-acc-apply-dp-" + runSuffix()
 
 	id, created, err := pc.ApplyDistributionPoint(ctx, &proclassic.DistributionPointPost{
-		Name:              ptrStr(name),
-		IPAddress:         ptrStr("10.0.0.1"),
-		ConnectionType:    ptrStr("SMB"),
-		ShareName:         ptrStr("share"),
-		SharePort:         ptrInt(445),
-		ReadOnlyUsername:  ptrStr("readonly"),
-		ReadOnlyPassword:  ptrStr("pass"),
-		ReadWriteUsername: ptrStr("readwrite"),
-		ReadWritePassword: ptrStr("pass"),
+		Name:              new(name),
+		IPAddress:         new("10.0.0.1"),
+		ConnectionType:    new("SMB"),
+		ShareName:         new("share"),
+		SharePort:         new(445),
+		ReadOnlyUsername:  new("readonly"),
+		ReadOnlyPassword:  new("pass"),
+		ReadWriteUsername: new("readwrite"),
+		ReadWritePassword: new("pass"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -628,15 +633,15 @@ func TestAcceptance_ApplyDistributionPoint(t *testing.T) {
 	t.Logf("created distribution point id=%s", id)
 
 	id2, created2, err := pc.ApplyDistributionPoint(ctx, &proclassic.DistributionPointPost{
-		Name:              ptrStr(name),
-		IPAddress:         ptrStr("10.0.0.2"),
-		ConnectionType:    ptrStr("SMB"),
-		ShareName:         ptrStr("share"),
-		SharePort:         ptrInt(445),
-		ReadOnlyUsername:  ptrStr("readonly"),
-		ReadOnlyPassword:  ptrStr("pass"),
-		ReadWriteUsername: ptrStr("readwrite"),
-		ReadWritePassword: ptrStr("pass"),
+		Name:              new(name),
+		IPAddress:         new("10.0.0.2"),
+		ConnectionType:    new("SMB"),
+		ShareName:         new("share"),
+		SharePort:         new(445),
+		ReadOnlyUsername:  new("readonly"),
+		ReadOnlyPassword:  new("pass"),
+		ReadWriteUsername: new("readwrite"),
+		ReadWritePassword: new("pass"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -670,9 +675,9 @@ func TestAcceptance_ApplyDockItem(t *testing.T) {
 	name := "sdk-acc-apply-dockitem-" + runSuffix()
 
 	id, created, err := pc.ApplyDockItem(ctx, &proclassic.DockItem{
-		Name: ptrStr(name),
-		Type: ptrStr("App"),
-		Path: ptrStr("/Applications/Safari.app"),
+		Name: new(name),
+		Type: new("App"),
+		Path: new("/Applications/Safari.app"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -684,9 +689,9 @@ func TestAcceptance_ApplyDockItem(t *testing.T) {
 	t.Logf("created dock item id=%s", id)
 
 	id2, created2, err := pc.ApplyDockItem(ctx, &proclassic.DockItem{
-		Name: ptrStr(name),
-		Type: ptrStr("App"),
-		Path: ptrStr("/Applications/Calculator.app"),
+		Name: new(name),
+		Type: new("App"),
+		Path: new("/Applications/Calculator.app"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -721,8 +726,8 @@ func TestAcceptance_ApplyEbook(t *testing.T) {
 
 	id, created, err := pc.ApplyEbook(ctx, &proclassic.EbookPost{
 		General: &proclassic.EbookPostGeneral{
-			Name:           ptrStr(name),
-			DeploymentType: ptrStr("Install Automatically/Prompt Users to Install"),
+			Name:           new(name),
+			DeploymentType: new("Install Automatically/Prompt Users to Install"),
 		},
 	})
 	if err != nil {
@@ -736,9 +741,9 @@ func TestAcceptance_ApplyEbook(t *testing.T) {
 
 	id2, created2, err := pc.ApplyEbook(ctx, &proclassic.EbookPost{
 		General: &proclassic.EbookPostGeneral{
-			Name:           ptrStr(name),
-			DeploymentType: ptrStr("Install Automatically/Prompt Users to Install"),
-			Author:         ptrStr("SDK Test"),
+			Name:           new(name),
+			DeploymentType: new("Install Automatically/Prompt Users to Install"),
+			Author:         new("SDK Test"),
 		},
 	})
 	if err != nil {
@@ -766,10 +771,10 @@ func TestAcceptance_ApplyIBeacon(t *testing.T) {
 	name := "sdk-acc-apply-ibeacon-" + runSuffix()
 
 	id, created, err := pc.ApplyIBeacon(ctx, &proclassic.Ibeacon{
-		Name:  ptrStr(name),
-		UUID:  ptrStr("E2C56DB5-DFFB-48D2-B060-D0F5A71096E0"),
-		Major: ptrStr("1"),
-		Minor: ptrStr("1"),
+		Name:  new(name),
+		UUID:  new("E2C56DB5-DFFB-48D2-B060-D0F5A71096E0"),
+		Major: new("1"),
+		Minor: new("1"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -781,10 +786,10 @@ func TestAcceptance_ApplyIBeacon(t *testing.T) {
 	t.Logf("created ibeacon id=%s", id)
 
 	id2, created2, err := pc.ApplyIBeacon(ctx, &proclassic.Ibeacon{
-		Name:  ptrStr(name),
-		UUID:  ptrStr("E2C56DB5-DFFB-48D2-B060-D0F5A71096E0"),
-		Major: ptrStr("2"),
-		Minor: ptrStr("2"),
+		Name:  new(name),
+		UUID:  new("E2C56DB5-DFFB-48D2-B060-D0F5A71096E0"),
+		Major: new("2"),
+		Minor: new("2"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -829,11 +834,11 @@ func TestAcceptance_ApplyLDAPServer(t *testing.T) {
 
 	id, created, err := pc.ApplyLDAPServer(ctx, &proclassic.LdapServerPost{
 		Connection: &proclassic.LdapServerPostConnection{
-			Name:               ptrStr(name),
-			Hostname:           ptrStr("ldap.example.com"),
-			ServerType:         ptrStr("Active Directory"),
-			Port:               ptrInt(389),
-			AuthenticationType: ptrStr("simple"),
+			Name:               new(name),
+			Hostname:           new("ldap.example.com"),
+			ServerType:         new("Active Directory"),
+			Port:               new(389),
+			AuthenticationType: new("simple"),
 		},
 	})
 	if err != nil {
@@ -847,11 +852,11 @@ func TestAcceptance_ApplyLDAPServer(t *testing.T) {
 
 	id2, created2, err := pc.ApplyLDAPServer(ctx, &proclassic.LdapServerPost{
 		Connection: &proclassic.LdapServerPostConnection{
-			Name:               ptrStr(name),
-			Hostname:           ptrStr("ldap2.example.com"),
-			ServerType:         ptrStr("Active Directory"),
-			Port:               ptrInt(389),
-			AuthenticationType: ptrStr("simple"),
+			Name:               new(name),
+			Hostname:           new("ldap2.example.com"),
+			ServerType:         new("Active Directory"),
+			Port:               new(389),
+			AuthenticationType: new("simple"),
 		},
 	})
 	if err != nil {
@@ -886,7 +891,7 @@ func TestAcceptance_ApplyLicensedSoftware(t *testing.T) {
 	name := "sdk-acc-apply-licsoft-" + runSuffix()
 
 	id, created, err := pc.ApplyLicensedSoftware(ctx, &proclassic.LicensedSoftware{
-		General: &proclassic.LicensedSoftwareGeneral{Name: ptrStr(name)},
+		General: &proclassic.LicensedSoftwareGeneral{Name: new(name)},
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -899,8 +904,8 @@ func TestAcceptance_ApplyLicensedSoftware(t *testing.T) {
 
 	id2, created2, err := pc.ApplyLicensedSoftware(ctx, &proclassic.LicensedSoftware{
 		General: &proclassic.LicensedSoftwareGeneral{
-			Name:  ptrStr(name),
-			Notes: ptrStr("updated"),
+			Name:  new(name),
+			Notes: new("updated"),
 		},
 	})
 	if err != nil {
@@ -936,11 +941,11 @@ func TestAcceptance_ApplyMacApplication(t *testing.T) {
 
 	id, created, err := pc.ApplyMacApplication(ctx, &proclassic.MacApplication{
 		General: &proclassic.MacApplicationGeneral{
-			Name:     ptrStr(name),
-			Version:  ptrStr("1.0"),
-			IsFree:   ptrBool(true),
-			BundleID: ptrStr("com.test." + runSuffix()),
-			URL:      ptrStr("https://example.com"),
+			Name:     new(name),
+			Version:  new("1.0"),
+			IsFree:   new(true),
+			BundleID: new("com.test." + runSuffix()),
+			URL:      new("https://example.com"),
 		},
 	})
 	if err != nil {
@@ -954,11 +959,11 @@ func TestAcceptance_ApplyMacApplication(t *testing.T) {
 
 	id2, created2, err := pc.ApplyMacApplication(ctx, &proclassic.MacApplication{
 		General: &proclassic.MacApplicationGeneral{
-			Name:     ptrStr(name),
-			Version:  ptrStr("2.0"),
-			IsFree:   ptrBool(true),
-			BundleID: ptrStr("com.test." + runSuffix()),
-			URL:      ptrStr("https://example.com"),
+			Name:     new(name),
+			Version:  new("2.0"),
+			IsFree:   new(true),
+			BundleID: new("com.test." + runSuffix()),
+			URL:      new("https://example.com"),
 		},
 	})
 	if err != nil {
@@ -994,14 +999,14 @@ func TestAcceptance_ApplyMobileDeviceApplication(t *testing.T) {
 
 	id, created, err := pc.ApplyMobileDeviceApplication(ctx, &proclassic.MobileDeviceApplication{
 		General: &proclassic.MobileDeviceApplicationGeneral{
-			Name:           ptrStr(name),
-			DisplayName:    ptrStr(name),
-			BundleID:       ptrStr("com.example.sdktest"),
-			Version:        ptrStr("1.0"),
-			Free:           ptrBool(true),
-			InternalApp:    ptrBool(false),
-			ItunesStoreURL: ptrStr("https://apps.apple.com/app/id0000000000"),
-			DeploymentType: ptrStr("Install Automatically/Prompt Users to Install"),
+			Name:           new(name),
+			DisplayName:    new(name),
+			BundleID:       new("com.example.sdktest"),
+			Version:        new("1.0"),
+			Free:           new(true),
+			InternalApp:    new(false),
+			ItunesStoreURL: new("https://apps.apple.com/app/id0000000000"),
+			DeploymentType: new("Install Automatically/Prompt Users to Install"),
 		},
 	})
 	if err != nil {
@@ -1015,14 +1020,14 @@ func TestAcceptance_ApplyMobileDeviceApplication(t *testing.T) {
 
 	id2, created2, err := pc.ApplyMobileDeviceApplication(ctx, &proclassic.MobileDeviceApplication{
 		General: &proclassic.MobileDeviceApplicationGeneral{
-			Name:           ptrStr(name),
-			DisplayName:    ptrStr(name),
-			BundleID:       ptrStr("com.example.sdktest"),
-			Version:        ptrStr("2.0"),
-			Free:           ptrBool(true),
-			InternalApp:    ptrBool(false),
-			ItunesStoreURL: ptrStr("https://apps.apple.com/app/id0000000000"),
-			DeploymentType: ptrStr("Install Automatically/Prompt Users to Install"),
+			Name:           new(name),
+			DisplayName:    new(name),
+			BundleID:       new("com.example.sdktest"),
+			Version:        new("2.0"),
+			Free:           new(true),
+			InternalApp:    new(false),
+			ItunesStoreURL: new("https://apps.apple.com/app/id0000000000"),
+			DeploymentType: new("Install Automatically/Prompt Users to Install"),
 		},
 	})
 	if err != nil {
@@ -1049,7 +1054,7 @@ func TestAcceptance_ApplyMobileDeviceConfigurationProfile(t *testing.T) {
 
 	id, created, err := pc.ApplyMobileDeviceConfigurationProfile(ctx, &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name:     ptrStr(name),
+			Name:     new(name),
 			Payloads: ptrProclassicPayloads(minimalProfilePayload),
 		},
 	})
@@ -1066,9 +1071,9 @@ func TestAcceptance_ApplyMobileDeviceConfigurationProfile(t *testing.T) {
 
 	id2, created2, err := pc.ApplyMobileDeviceConfigurationProfile(ctx, &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name:        ptrStr(name),
+			Name:        new(name),
 			Payloads:    ptrProclassicPayloads(minimalProfilePayload),
-			Description: ptrStr("updated"),
+			Description: new("updated"),
 		},
 	})
 	if err != nil {
@@ -1103,7 +1108,7 @@ func TestAcceptance_ApplyMobileDeviceEnrollmentProfile(t *testing.T) {
 	name := "sdk-acc-apply-mdenroll-" + runSuffix()
 
 	id, created, err := pc.ApplyMobileDeviceEnrollmentProfile(ctx, &proclassic.MobileDeviceEnrollmentProfilePost{
-		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: ptrStr(name)},
+		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: new(name)},
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1118,8 +1123,8 @@ func TestAcceptance_ApplyMobileDeviceEnrollmentProfile(t *testing.T) {
 
 	id2, created2, err := pc.ApplyMobileDeviceEnrollmentProfile(ctx, &proclassic.MobileDeviceEnrollmentProfilePost{
 		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{
-			Name:        ptrStr(name),
-			Description: ptrStr("updated"),
+			Name:        new(name),
+			Description: new("updated"),
 		},
 	})
 	if err != nil {
@@ -1154,11 +1159,11 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttribute(t *testing.T) {
 	name := "sdk-acc-apply-mdea-" + runSuffix()
 
 	id, created, err := pc.ApplyMobileDeviceExtensionAttribute(ctx, &proclassic.MobileDeviceExtensionAttribute{
-		Name:             ptrStr(name),
-		DataType:         ptrStr("String"),
-		InventoryDisplay: ptrStr("General"),
+		Name:             new(name),
+		DataType:         new("String"),
+		InventoryDisplay: new("General"),
 		InputType: &proclassic.MobileDeviceExtensionAttributeInputType{
-			Type: ptrStr("Text Field"),
+			Type: new("Text Field"),
 		},
 	})
 	if err != nil {
@@ -1173,12 +1178,12 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttribute(t *testing.T) {
 	t.Logf("created mobile device extension attribute id=%s", id)
 
 	id2, created2, err := pc.ApplyMobileDeviceExtensionAttribute(ctx, &proclassic.MobileDeviceExtensionAttribute{
-		Name:             ptrStr(name),
-		DataType:         ptrStr("String"),
-		InventoryDisplay: ptrStr("General"),
-		Description:      ptrStr("updated"),
+		Name:             new(name),
+		DataType:         new("String"),
+		InventoryDisplay: new("General"),
+		Description:      new("updated"),
 		InputType: &proclassic.MobileDeviceExtensionAttributeInputType{
-			Type: ptrStr("Text Field"),
+			Type: new("Text Field"),
 		},
 	})
 	if err != nil {
@@ -1213,8 +1218,8 @@ func TestAcceptance_ApplyMobileDeviceGroup(t *testing.T) {
 	name := "sdk-acc-apply-mdgrp-" + runSuffix()
 
 	id, created, err := pc.ApplyMobileDeviceGroup(ctx, &proclassic.MobileDeviceGroup{
-		Name:    ptrStr(name),
-		IsSmart: ptrBool(false),
+		Name:    new(name),
+		IsSmart: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1226,8 +1231,8 @@ func TestAcceptance_ApplyMobileDeviceGroup(t *testing.T) {
 	t.Logf("created mobile device group id=%s", id)
 
 	id2, created2, err := pc.ApplyMobileDeviceGroup(ctx, &proclassic.MobileDeviceGroup{
-		Name:    ptrStr(name),
-		IsSmart: ptrBool(false),
+		Name:    new(name),
+		IsSmart: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1272,9 +1277,9 @@ func TestAcceptance_ApplyNetworkSegment(t *testing.T) {
 	octet := suffix[len(suffix)-2:]
 
 	id, created, err := pc.ApplyNetworkSegment(ctx, &proclassic.NetworkSegmentPost{
-		Name:            ptrStr(name),
-		StartingAddress: ptrStr("10." + octet + ".0.0"),
-		EndingAddress:   ptrStr("10." + octet + ".255.255"),
+		Name:            new(name),
+		StartingAddress: new("10." + octet + ".0.0"),
+		EndingAddress:   new("10." + octet + ".255.255"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1286,9 +1291,9 @@ func TestAcceptance_ApplyNetworkSegment(t *testing.T) {
 	t.Logf("created network segment id=%s", id)
 
 	id2, created2, err := pc.ApplyNetworkSegment(ctx, &proclassic.NetworkSegmentPost{
-		Name:            ptrStr(name),
-		StartingAddress: ptrStr("10." + octet + ".0.0"),
-		EndingAddress:   ptrStr("10." + octet + ".127.255"),
+		Name:            new(name),
+		StartingAddress: new("10." + octet + ".0.0"),
+		EndingAddress:   new("10." + octet + ".127.255"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1323,7 +1328,7 @@ func TestAcceptance_ApplyOSXConfigurationProfile(t *testing.T) {
 
 	id, created, err := pc.ApplyOSXConfigurationProfile(ctx, &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:     ptrStr(name),
+			Name:     new(name),
 			Payloads: ptrProclassicPayloads(minimalProfilePayload),
 		},
 	})
@@ -1340,9 +1345,9 @@ func TestAcceptance_ApplyOSXConfigurationProfile(t *testing.T) {
 
 	id2, created2, err := pc.ApplyOSXConfigurationProfile(ctx, &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name:        ptrStr(name),
+			Name:        new(name),
 			Payloads:    ptrProclassicPayloads(minimalProfilePayload),
-			Description: ptrStr("updated"),
+			Description: new("updated"),
 		},
 	})
 	if err != nil {
@@ -1377,10 +1382,10 @@ func TestAcceptance_ApplyPatchExternalSource(t *testing.T) {
 	name := "sdk-acc-apply-patchext-" + runSuffix()
 
 	id, created, err := pc.ApplyPatchExternalSource(ctx, &proclassic.PatchExternalSource{
-		Name:       ptrStr(name),
-		HostName:   ptrStr("patch.example.com"),
-		Port:       ptrInt(443),
-		SslEnabled: ptrBool(true),
+		Name:       new(name),
+		HostName:   new("patch.example.com"),
+		Port:       new(443),
+		SslEnabled: new(true),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1392,10 +1397,10 @@ func TestAcceptance_ApplyPatchExternalSource(t *testing.T) {
 	t.Logf("created patch external source id=%s", id)
 
 	id2, created2, err := pc.ApplyPatchExternalSource(ctx, &proclassic.PatchExternalSource{
-		Name:       ptrStr(name),
-		HostName:   ptrStr("patch2.example.com"),
-		Port:       ptrInt(443),
-		SslEnabled: ptrBool(true),
+		Name:       new(name),
+		HostName:   new("patch2.example.com"),
+		Port:       new(443),
+		SslEnabled: new(true),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1430,8 +1435,8 @@ func TestAcceptance_ApplyPolicy(t *testing.T) {
 
 	id, created, err := pc.ApplyPolicy(ctx, &proclassic.PolicyPost{
 		General: &proclassic.PolicyPostGeneral{
-			Name:    ptrStr(name),
-			Enabled: ptrBool(false),
+			Name:    new(name),
+			Enabled: new(false),
 		},
 	})
 	if err != nil {
@@ -1445,8 +1450,8 @@ func TestAcceptance_ApplyPolicy(t *testing.T) {
 
 	id2, created2, err := pc.ApplyPolicy(ctx, &proclassic.PolicyPost{
 		General: &proclassic.PolicyPostGeneral{
-			Name:    ptrStr(name),
-			Enabled: ptrBool(true),
+			Name:    new(name),
+			Enabled: new(true),
 		},
 	})
 	if err != nil {
@@ -1468,30 +1473,30 @@ func TestAcceptance_ApplyPolicy(t *testing.T) {
 	// IDs and would make the test brittle.
 	_, _, err = pc.ApplyPolicy(ctx, &proclassic.PolicyPost{
 		General: &proclassic.PolicyPostGeneral{
-			Name:    ptrStr(name),
-			Enabled: ptrBool(true),
+			Name:    new(name),
+			Enabled: new(true),
 			DateTimeLimitations: &proclassic.PolicyGeneralDateTimeLimitations{
 				NoExecuteOn: &proclassic.PolicyGeneralDateTimeLimitationsNoExecuteOn{
 					Day: &[]string{"Sun", "Sat"},
 				},
-				NoExecuteStart: ptrStr("2:00 AM"),
-				NoExecuteEnd:   ptrStr("4:00 AM"),
+				NoExecuteStart: new("2:00 AM"),
+				NoExecuteEnd:   new("4:00 AM"),
 			},
 		},
 		Reboot: &proclassic.PolicyPostReboot{
-			Message:                     ptrStr("SDK acceptance test reboot."),
-			MinutesUntilReboot:          ptrInt(10),
-			StartRebootTimerImmediately: ptrBool(true),
-			FileVault2Reboot:            ptrBool(false),
+			Message:                     new("SDK acceptance test reboot."),
+			MinutesUntilReboot:          new(10),
+			StartRebootTimerImmediately: new(true),
+			FileVault2Reboot:            new(false),
 		},
 		SelfService: &proclassic.PolicyPostSelfService{
-			UseForSelfService:   ptrBool(true),
-			InstallButtonText:   ptrStr("Install"),
-			ReinstallButtonText: ptrStr("Reinstall"),
-			Notification:        &proclassic.NotificationValue{Enabled: ptrBool(true)},
-			NotificationType:    ptrStr("Self Service"),
-			NotificationSubject: ptrStr("SDK acceptance"),
-			NotificationMessage: ptrStr("hello"),
+			UseForSelfService:   new(true),
+			InstallButtonText:   new("Install"),
+			ReinstallButtonText: new("Reinstall"),
+			Notification:        &proclassic.NotificationValue{Enabled: new(true)},
+			NotificationType:    new("Self Service"),
+			NotificationSubject: new("SDK acceptance"),
+			NotificationMessage: new("hello"),
 		},
 		// AccountMaintenance accounts block omitted: action=Create is
 		// semantically validated by the server ("Problem with create
@@ -1500,9 +1505,9 @@ func TestAcceptance_ApplyPolicy(t *testing.T) {
 		// PasswordSha256 additions are still covered by the unit-level
 		// round-trip in policy_classic_roundtrip_test.go.
 		UserInteraction: &proclassic.PolicyPostUserInteraction{
-			MessageStart:         ptrStr("SDK acceptance start."),
-			AllowUsersToDefer:    ptrBool(true),
-			AllowDeferralMinutes: ptrInt(1440),
+			MessageStart:         new("SDK acceptance start."),
+			AllowUsersToDefer:    new(true),
+			AllowDeferralMinutes: new(1440),
 		},
 	})
 	if err != nil {
@@ -1556,15 +1561,15 @@ func TestAcceptance_ApplyPrinter(t *testing.T) {
 	name := "sdk-acc-apply-printer-" + runSuffix()
 
 	id, created, err := pc.ApplyPrinter(ctx, &proclassic.Printer{
-		Name:        ptrStr(name),
-		Category:    ptrStr("No category assigned"),
-		URI:         ptrStr("lpd://example.com/printer"),
-		CUPSName:    ptrStr("test_printer"),
-		Location:    ptrStr("Test"),
-		Model:       ptrStr("Generic"),
-		Ppd:         ptrStr("test.ppd"),
-		PpdContents: ptrStr("test"),
-		PpdPath:     ptrStr("/usr/share/cups/model/test.ppd"),
+		Name:        new(name),
+		Category:    new("No category assigned"),
+		URI:         new("lpd://example.com/printer"),
+		CUPSName:    new("test_printer"),
+		Location:    new("Test"),
+		Model:       new("Generic"),
+		Ppd:         new("test.ppd"),
+		PpdContents: new("test"),
+		PpdPath:     new("/usr/share/cups/model/test.ppd"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1576,15 +1581,15 @@ func TestAcceptance_ApplyPrinter(t *testing.T) {
 	t.Logf("created printer id=%s", id)
 
 	id2, created2, err := pc.ApplyPrinter(ctx, &proclassic.Printer{
-		Name:        ptrStr(name),
-		Category:    ptrStr("No category assigned"),
-		URI:         ptrStr("lpd://example.com/printer2"),
-		CUPSName:    ptrStr("test_printer"),
-		Location:    ptrStr("Updated"),
-		Model:       ptrStr("Generic"),
-		Ppd:         ptrStr("test.ppd"),
-		PpdContents: ptrStr("test"),
-		PpdPath:     ptrStr("/usr/share/cups/model/test.ppd"),
+		Name:        new(name),
+		Category:    new("No category assigned"),
+		URI:         new("lpd://example.com/printer2"),
+		CUPSName:    new("test_printer"),
+		Location:    new("Updated"),
+		Model:       new("Generic"),
+		Ppd:         new("test.ppd"),
+		PpdContents: new("test"),
+		PpdPath:     new("/usr/share/cups/model/test.ppd"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1617,7 +1622,7 @@ func TestAcceptance_ApplyRemovableMacAddress(t *testing.T) {
 
 	name := "sdk-acc-apply-rmaddr-" + runSuffix()
 
-	id, created, err := pc.ApplyRemovableMacAddress(ctx, &proclassic.RemovableMacAddress{Name: ptrStr(name)})
+	id, created, err := pc.ApplyRemovableMacAddress(ctx, &proclassic.RemovableMacAddress{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -1627,7 +1632,7 @@ func TestAcceptance_ApplyRemovableMacAddress(t *testing.T) {
 	}
 	t.Logf("created removable mac address id=%s", id)
 
-	id2, created2, err := pc.ApplyRemovableMacAddress(ctx, &proclassic.RemovableMacAddress{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplyRemovableMacAddress(ctx, &proclassic.RemovableMacAddress{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -1661,12 +1666,12 @@ func TestAcceptance_ApplyRestrictedSoftware(t *testing.T) {
 
 	id, created, err := pc.ApplyRestrictedSoftware(ctx, &proclassic.RestrictedSoftware{
 		General: &proclassic.RestrictedSoftwareGeneral{
-			Name:                  ptrStr(name),
-			ProcessName:           ptrStr("TestProcess"),
-			MatchExactProcessName: ptrBool(true),
-			SendNotification:      ptrBool(false),
-			KillProcess:           ptrBool(false),
-			DeleteExecutable:      ptrBool(false),
+			Name:                  new(name),
+			ProcessName:           new("TestProcess"),
+			MatchExactProcessName: new(true),
+			SendNotification:      new(false),
+			KillProcess:           new(false),
+			DeleteExecutable:      new(false),
 		},
 	})
 	if err != nil {
@@ -1680,12 +1685,12 @@ func TestAcceptance_ApplyRestrictedSoftware(t *testing.T) {
 
 	id2, created2, err := pc.ApplyRestrictedSoftware(ctx, &proclassic.RestrictedSoftware{
 		General: &proclassic.RestrictedSoftwareGeneral{
-			Name:                  ptrStr(name),
-			ProcessName:           ptrStr("TestProcessUpdated"),
-			MatchExactProcessName: ptrBool(true),
-			SendNotification:      ptrBool(false),
-			KillProcess:           ptrBool(false),
-			DeleteExecutable:      ptrBool(false),
+			Name:                  new(name),
+			ProcessName:           new("TestProcessUpdated"),
+			MatchExactProcessName: new(true),
+			SendNotification:      new(false),
+			KillProcess:           new(false),
+			DeleteExecutable:      new(false),
 		},
 	})
 	if err != nil {
@@ -1720,8 +1725,8 @@ func TestAcceptance_ApplyScript(t *testing.T) {
 	name := "sdk-acc-apply-script-" + runSuffix()
 
 	id, created, err := pc.ApplyScript(ctx, &proclassic.Script{
-		Name:           ptrStr(name),
-		ScriptContents: ptrStr("#!/bin/bash\necho hello"),
+		Name:           new(name),
+		ScriptContents: new("#!/bin/bash\necho hello"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1733,8 +1738,8 @@ func TestAcceptance_ApplyScript(t *testing.T) {
 	t.Logf("created script id=%s", id)
 
 	id2, created2, err := pc.ApplyScript(ctx, &proclassic.Script{
-		Name:           ptrStr(name),
-		ScriptContents: ptrStr("#!/bin/bash\necho updated"),
+		Name:           new(name),
+		ScriptContents: new("#!/bin/bash\necho updated"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1767,7 +1772,7 @@ func TestAcceptance_ApplySite(t *testing.T) {
 
 	name := "sdk-acc-apply-site-" + runSuffix()
 
-	id, created, err := pc.ApplySite(ctx, &proclassic.Site{Name: ptrStr(name)})
+	id, created, err := pc.ApplySite(ctx, &proclassic.Site{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -1777,7 +1782,7 @@ func TestAcceptance_ApplySite(t *testing.T) {
 	}
 	t.Logf("created site id=%s", id)
 
-	id2, created2, err := pc.ApplySite(ctx, &proclassic.Site{Name: ptrStr(name)})
+	id2, created2, err := pc.ApplySite(ctx, &proclassic.Site{Name: new(name)})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}
@@ -1810,10 +1815,10 @@ func TestAcceptance_ApplySoftwareUpdateServer(t *testing.T) {
 	name := "sdk-acc-apply-sus-" + runSuffix()
 
 	id, created, err := pc.ApplySoftwareUpdateServer(ctx, &proclassic.SoftwareUpdateServer{
-		Name:          ptrStr(name),
-		IPAddress:     ptrStr("sus.example.com"),
-		Port:          ptrInt(8088),
-		SetSystemWide: ptrBool(false),
+		Name:          new(name),
+		IPAddress:     new("sus.example.com"),
+		Port:          new(8088),
+		SetSystemWide: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1825,10 +1830,10 @@ func TestAcceptance_ApplySoftwareUpdateServer(t *testing.T) {
 	t.Logf("created software update server id=%s", id)
 
 	id2, created2, err := pc.ApplySoftwareUpdateServer(ctx, &proclassic.SoftwareUpdateServer{
-		Name:          ptrStr(name),
-		IPAddress:     ptrStr("sus2.example.com"),
-		Port:          ptrInt(8088),
-		SetSystemWide: ptrBool(false),
+		Name:          new(name),
+		IPAddress:     new("sus2.example.com"),
+		Port:          new(8088),
+		SetSystemWide: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1862,8 +1867,8 @@ func TestAcceptance_ApplyUser(t *testing.T) {
 	name := "sdk-acc-apply-user-" + runSuffix()
 
 	id, created, err := pc.ApplyUser(ctx, &proclassic.UserPost{
-		Name:  ptrStr(name),
-		Email: ptrStr("test@example.com"),
+		Name:  new(name),
+		Email: new("test@example.com"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1875,8 +1880,8 @@ func TestAcceptance_ApplyUser(t *testing.T) {
 	t.Logf("created user id=%s", id)
 
 	id2, created2, err := pc.ApplyUser(ctx, &proclassic.UserPost{
-		Name:  ptrStr(name),
-		Email: ptrStr("updated@example.com"),
+		Name:  new(name),
+		Email: new("updated@example.com"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1910,8 +1915,8 @@ func TestAcceptance_ApplyUserExtensionAttribute(t *testing.T) {
 	name := "sdk-acc-apply-userea-" + runSuffix()
 
 	id, created, err := pc.ApplyUserExtensionAttribute(ctx, &proclassic.UserExtensionAttribute{
-		Name:     ptrStr(name),
-		DataType: ptrStr("String"),
+		Name:     new(name),
+		DataType: new("String"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1923,9 +1928,9 @@ func TestAcceptance_ApplyUserExtensionAttribute(t *testing.T) {
 	t.Logf("created user extension attribute id=%s", id)
 
 	id2, created2, err := pc.ApplyUserExtensionAttribute(ctx, &proclassic.UserExtensionAttribute{
-		Name:        ptrStr(name),
-		DataType:    ptrStr("String"),
-		Description: ptrStr("updated"),
+		Name:        new(name),
+		DataType:    new("String"),
+		Description: new("updated"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -1959,8 +1964,8 @@ func TestAcceptance_ApplyUserGroup(t *testing.T) {
 	name := "sdk-acc-apply-usergrp-" + runSuffix()
 
 	id, created, err := pc.ApplyUserGroup(ctx, &proclassic.UserGroup{
-		Name:    ptrStr(name),
-		IsSmart: ptrBool(false),
+		Name:    new(name),
+		IsSmart: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -1972,8 +1977,8 @@ func TestAcceptance_ApplyUserGroup(t *testing.T) {
 	t.Logf("created user group id=%s", id)
 
 	id2, created2, err := pc.ApplyUserGroup(ctx, &proclassic.UserGroup{
-		Name:    ptrStr(name),
-		IsSmart: ptrBool(false),
+		Name:    new(name),
+		IsSmart: new(false),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
@@ -2007,11 +2012,11 @@ func TestAcceptance_ApplyWebhook(t *testing.T) {
 	name := "sdk-acc-apply-webhook-" + runSuffix()
 
 	id, created, err := pc.ApplyWebhook(ctx, &proclassic.Webhook{
-		Name:        ptrStr(name),
-		Enabled:     ptrBool(false),
-		URL:         ptrStr("https://example.com/webhook"),
-		ContentType: ptrStr("application/json"),
-		Event:       ptrStr("ComputerAdded"),
+		Name:        new(name),
+		Enabled:     new(false),
+		URL:         new("https://example.com/webhook"),
+		ContentType: new("application/json"),
+		Event:       new("ComputerAdded"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -2023,11 +2028,11 @@ func TestAcceptance_ApplyWebhook(t *testing.T) {
 	t.Logf("created webhook id=%s", id)
 
 	id2, created2, err := pc.ApplyWebhook(ctx, &proclassic.Webhook{
-		Name:        ptrStr(name),
-		Enabled:     ptrBool(false),
-		URL:         ptrStr("https://example.com/webhook-updated"),
-		ContentType: ptrStr("application/json"),
-		Event:       ptrStr("ComputerAdded"),
+		Name:        new(name),
+		Enabled:     new(false),
+		URL:         new("https://example.com/webhook-updated"),
+		ContentType: new("application/json"),
+		Event:       new("ComputerAdded"),
 	})
 	if err != nil {
 		t.Fatalf("apply update: %v", err)

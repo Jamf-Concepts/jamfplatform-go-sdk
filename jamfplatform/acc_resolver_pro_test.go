@@ -350,7 +350,7 @@ func TestAcceptance_ResolveComputerExtensionAttributeV1_Lifecycle(t *testing.T) 
 	// SCRIPT and enabled is false.
 	newCEA := func(n string) *pro.ComputerExtensionAttributes {
 		return &pro.ComputerExtensionAttributes{
-			Name: n, Enabled: ptr(true),
+			Name: n, Enabled: new(true),
 			DataType:             pro.ComputerExtensionAttributesDataTypeString,
 			InputType:            pro.ComputerExtensionAttributesInputTypeText,
 			InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
@@ -846,8 +846,8 @@ func TestAcceptance_ResolveDistributionPointV1_Lifecycle(t *testing.T) {
 	newDP := func(n string) *pro.DistributionPoint {
 		return &pro.DistributionPoint{
 			Name: n, FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb, ServerName: "localhost",
-			ShareName: strPtr("share"), ReadWriteUsername: strPtr("rw"), ReadWritePassword: strPtr("rw"),
-			ReadOnlyUsername: strPtr("ro"), ReadOnlyPassword: strPtr("ro"),
+			ShareName: new("share"), ReadWriteUsername: new("rw"), ReadWritePassword: new("rw"),
+			ReadOnlyUsername: new("ro"), ReadOnlyPassword: new("ro"),
 		}
 	}
 	resp, err := c.CreateDistributionPointV1(ctx, newDP(name))
@@ -2404,7 +2404,7 @@ func TestAcceptance_ResolveSmartMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	_, err := c.ResolveSmartMobileDeviceGroupV2IDByName(ctx, name)
 	requireNotFoundErr(t, "pre-create", err)
 
-	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("Create: %v", err)
 	}
@@ -2429,7 +2429,7 @@ func TestAcceptance_ResolveSmartMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	t.Logf("resolve typed: groupName field on V2 schema = %+v", got)
 
 	id2, dupCreated := tryCreateDuplicate(t, "smart mobile device group v2", func() (string, error) {
-		r, e := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+		r, e := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 		if e != nil {
 			return "", e
 		}
@@ -2465,7 +2465,7 @@ func TestAcceptance_ResolveStaticMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	requireNotFoundErr(t, "pre-create", err)
 
 	emptyAssignments := []pro.Assignment{}
-	resp, err := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyAssignments}, false)
+	resp, err := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: new("-1"), Assignments: &emptyAssignments}, false)
 	if err != nil {
 		t.Fatalf("Create: %v", err)
 	}
@@ -2510,7 +2510,7 @@ func TestAcceptance_ResolveMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 	_, err := c.ResolveMobileDeviceGroupV2IDByName(ctx, name)
 	requireNotFoundErr(t, "pre-create", err)
 
-	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	resp, err := c.CreateSmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("CreateSmartMobileDeviceGroupV2: %v", err)
 	}
@@ -2526,7 +2526,7 @@ func TestAcceptance_ResolveMobileDeviceGroupV2_Lifecycle(t *testing.T) {
 
 	emptyAssignmentsMDG := []pro.Assignment{}
 	id2, dupCreated := tryCreateDuplicate(t, "mobile device group v2 (static)", func() (string, error) {
-		r, e := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: strPtr("-1"), Assignments: &emptyAssignmentsMDG}, false)
+		r, e := c.CreateStaticMobileDeviceGroupV2(ctx, &pro.StaticGroupAssignment{GroupName: name, SiteID: new("-1"), Assignments: &emptyAssignmentsMDG}, false)
 		if e != nil {
 			return "", e
 		}

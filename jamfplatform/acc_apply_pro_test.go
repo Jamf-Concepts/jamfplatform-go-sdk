@@ -216,7 +216,7 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
 		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   strPtr("SDK acceptance test"),
+		Description:                   new("SDK acceptance test"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
 		PopupMenuChoices:              &emptySlice,
@@ -235,7 +235,7 @@ func TestAcceptance_ApplyComputerExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.ComputerExtensionAttributesDataTypeString,
 		InputType:                     pro.ComputerExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   strPtr("SDK acceptance test updated"),
+		Description:                   new("SDK acceptance test updated"),
 		LdapAttributeMapping:          &emptyStr,
 		LdapExtensionAttributeAllowed: &boolFalse,
 		PopupMenuChoices:              &emptySlice,
@@ -273,9 +273,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
 		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   ptr("SDK acceptance test"),
-		LdapAttributeMapping:          ptr(""),
-		LdapExtensionAttributeAllowed: ptr(false),
+		Description:                   new("SDK acceptance test"),
+		LdapAttributeMapping:          new(""),
+		LdapExtensionAttributeAllowed: new(false),
 		PopupMenuChoices:              &[]string{},
 	})
 	if err != nil {
@@ -291,9 +291,9 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 		DataType:                      pro.MobileDeviceExtensionAttributesDataTypeString,
 		InputType:                     pro.MobileDeviceExtensionAttributesInputTypeText,
 		InventoryDisplayType:          pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
-		Description:                   ptr("SDK acceptance test updated"),
-		LdapAttributeMapping:          ptr(""),
-		LdapExtensionAttributeAllowed: ptr(false),
+		Description:                   new("SDK acceptance test updated"),
+		LdapAttributeMapping:          new(""),
+		LdapExtensionAttributeAllowed: new(false),
 		PopupMenuChoices:              &[]string{},
 	})
 	if err != nil {
@@ -397,11 +397,11 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 		Name:                      name,
 		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server.example.com",
-		ShareName:                 strPtr("share"),
-		ReadOnlyUsername:          strPtr("rouser"),
-		ReadOnlyPassword:          strPtr("ropass"),
-		ReadWriteUsername:         strPtr("rwuser"),
-		ReadWritePassword:         strPtr("rwpass"),
+		ShareName:                 new("share"),
+		ReadOnlyUsername:          new("rouser"),
+		ReadOnlyPassword:          new("ropass"),
+		ReadWriteUsername:         new("rwuser"),
+		ReadWritePassword:         new("rwpass"),
 	})
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
@@ -415,11 +415,11 @@ func TestAcceptance_ApplyDistributionPointV1(t *testing.T) {
 		Name:                      name,
 		FileSharingConnectionType: pro.DistributionPointFileSharingConnectionTypeSmb,
 		ServerName:                "test-server-updated.example.com",
-		ShareName:                 strPtr("share"),
-		ReadOnlyUsername:          strPtr("rouser"),
-		ReadOnlyPassword:          strPtr("ropass"),
-		ReadWriteUsername:         strPtr("rwuser"),
-		ReadWritePassword:         strPtr("rwpass"),
+		ShareName:                 new("share"),
+		ReadOnlyUsername:          new("rouser"),
+		ReadOnlyPassword:          new("ropass"),
+		ReadWriteUsername:         new("rwuser"),
+		ReadWritePassword:         new("rwpass"),
 		Principal:                 &principal,
 	})
 	if err != nil {
@@ -1581,7 +1581,7 @@ func TestAcceptance_ApplySmartMobileDeviceGroupV2(t *testing.T) {
 
 	name := "sdk-acc-apply-smdg-v2-" + runSuffix()
 
-	id, created, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	id, created, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("apply create: %v", err)
 	}
@@ -1590,7 +1590,7 @@ func TestAcceptance_ApplySmartMobileDeviceGroupV2(t *testing.T) {
 		t.Error("expected created = true")
 	}
 
-	id2, created2, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: strPtr("-1")}, false)
+	id2, created2, err := p.ApplySmartMobileDeviceGroupV2(ctx, &pro.SmartGroupAssignmentV2{GroupName: name, SiteID: new("-1")}, false)
 	if err != nil {
 		t.Fatalf("apply update: %v", err)
 	}

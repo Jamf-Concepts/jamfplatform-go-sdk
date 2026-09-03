@@ -427,7 +427,7 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 					Value: &blueprints.BetaSettings{
 						ProgramEnrollment: blueprints.BetaSettingsProgramEnrollmentAllowed,
 						OfferPrograms: &[]blueprints.BetaProgram{
-							{Token: strPtr("test"), Description: strPtr("test")},
+							{Token: new("test"), Description: new("test")},
 						},
 					},
 				},
@@ -577,7 +577,7 @@ func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 					},
 					DetailsURL: &blueprints.DetailsURL{
 						Included: &boolFalse,
-						Value:    strPtr(""),
+						Value:    new(""),
 					},
 				},
 			},

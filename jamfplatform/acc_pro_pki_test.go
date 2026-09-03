@@ -36,8 +36,7 @@ func TestAcceptance_Pro_PKI_DigicertTLMProbe(t *testing.T) {
 		t.Log("GetDigicertTrustLifecycleManagerV1(-1) unexpectedly succeeded")
 		return
 	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 		if apiErr.StatusCode == 404 {
 			t.Logf("DigiCert TLM not configured on this tenant (404) — expected")
 			return

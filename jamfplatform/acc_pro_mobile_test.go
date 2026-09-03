@@ -158,7 +158,7 @@ func TestAcceptance_Pro_Mobile_MDEACRUD(t *testing.T) {
 	// to the API team). TEXT is simplest for round-tripping.
 	created, err := p.CreateMobileDeviceExtensionAttributeV1(ctx, &pro.MobileDeviceExtensionAttributes{
 		Name:                 name,
-		Description:          ptr("SDK acceptance test fixture"),
+		Description:          new("SDK acceptance test fixture"),
 		InputType:            pro.MobileDeviceExtensionAttributesInputTypeText,
 		InventoryDisplayType: pro.MobileDeviceExtensionAttributesInventoryDisplayTypeGeneral,
 		DataType:             pro.MobileDeviceExtensionAttributesDataTypeString,
@@ -182,7 +182,7 @@ func TestAcceptance_Pro_Mobile_MDEACRUD(t *testing.T) {
 		t.Errorf("Name = %q, want %q", got.Name, name)
 	}
 
-	got.Description = ptr("updated")
+	got.Description = new("updated")
 	if _, err := p.UpdateMobileDeviceExtensionAttributeV1(ctx, created.ID, got); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateMobileDeviceExtensionAttributeV1(%s): %v", created.ID, err)
@@ -287,7 +287,7 @@ func TestAcceptance_Pro_Mobile_SmartGroupCRUD(t *testing.T) {
 
 	update := &pro.SmartGroupAssignmentV2{
 		GroupName:        got.GroupName,
-		GroupDescription: ptr(desc + " (updated)"),
+		GroupDescription: new(desc + " (updated)"),
 		SiteID:           &siteID,
 	}
 	if _, err := p.UpdateSmartMobileDeviceGroupV2(ctx, created.ID, update); err != nil {
@@ -348,7 +348,7 @@ func TestAcceptance_Pro_Mobile_StaticGroupCRUD(t *testing.T) {
 	// PATCH — partial update. Same non-null assignments guard.
 	patch := &pro.StaticGroupAssignment{
 		GroupName:        name,
-		GroupDescription: ptr(desc + " (patched)"),
+		GroupDescription: new(desc + " (patched)"),
 		Assignments:      &emptyAssignments,
 		SiteID:           &siteID,
 	}
@@ -460,7 +460,7 @@ func TestAcceptance_Pro_Mobile_PatchMobileDeviceV2(t *testing.T) {
 	ctx := context.Background()
 
 	_, err := pro.New(c).PatchMobileDeviceV2(ctx, "99999999", &pro.UpdateMobileDeviceV2{
-		Name: ptr("sdk-acc-should-not-apply"),
+		Name: new("sdk-acc-should-not-apply"),
 	})
 	if err == nil {
 		t.Fatal("PatchMobileDeviceV2 against bogus id succeeded — expected 4xx")

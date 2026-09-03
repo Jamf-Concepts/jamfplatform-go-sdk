@@ -15,7 +15,8 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
 )
 
-func classicStrPtr(s string) *string { return &s }
+//go:fix inline
+func classicStrPtr(s string) *string { return new(s) }
 func intToStr(i int) string          { return strconv.Itoa(i) }
 
 // TestAcceptance_Classic_ComputerCRUD exercises the Classic computer create
@@ -39,8 +40,8 @@ func TestAcceptance_Classic_ComputerCRUD(t *testing.T) {
 
 	err := pc.CreateComputerByID(ctx, "0", &proclassic.ComputerPost{
 		General: &proclassic.ComputerPostGeneral{
-			Name:         classicStrPtr(name),
-			SerialNumber: classicStrPtr(serial),
+			Name:         new(name),
+			SerialNumber: new(serial),
 		},
 	})
 	if err != nil {
@@ -116,7 +117,7 @@ func TestAcceptance_Classic_BuildingCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-classic-building-" + runSuffix()
-	created, err := pc.CreateBuildingByID(ctx, "0", &proclassic.Building{Name: classicStrPtr(name)})
+	created, err := pc.CreateBuildingByID(ctx, "0", &proclassic.Building{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateBuildingByID: %v", err)
@@ -138,7 +139,7 @@ func TestAcceptance_Classic_BuildingCRUD(t *testing.T) {
 	}
 
 	newName := name + "-updated"
-	if err := pc.UpdateBuildingByID(ctx, intToStr(id), &proclassic.Building{Name: classicStrPtr(newName)}); err != nil {
+	if err := pc.UpdateBuildingByID(ctx, intToStr(id), &proclassic.Building{Name: new(newName)}); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateBuildingByID(%d): %v", id, err)
 	}
@@ -164,7 +165,7 @@ func TestAcceptance_Classic_DepartmentCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-classic-dept-" + runSuffix()
-	created, err := pc.CreateDepartmentByID(ctx, "0", &proclassic.Department{Name: classicStrPtr(name)})
+	created, err := pc.CreateDepartmentByID(ctx, "0", &proclassic.Department{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateDepartmentByID: %v", err)
@@ -202,7 +203,7 @@ func TestAcceptance_Classic_CategoryCRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-cat-" + runSuffix()
 	prio := 5
-	created, err := pc.CreateCategoryByID(ctx, "0", &proclassic.Category{Name: classicStrPtr(name), Priority: &prio})
+	created, err := pc.CreateCategoryByID(ctx, "0", &proclassic.Category{Name: new(name), Priority: &prio})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateCategoryByID: %v", err)
@@ -241,8 +242,8 @@ func TestAcceptance_Classic_ScriptCRUD(t *testing.T) {
 	name := "sdk-acc-classic-script-" + runSuffix()
 	contents := "#!/bin/sh\necho hello\n"
 	created, err := pc.CreateScriptByID(ctx, "0", &proclassic.Script{
-		Name:           classicStrPtr(name),
-		ScriptContents: classicStrPtr(contents),
+		Name:           new(name),
+		ScriptContents: new(contents),
 		Priority:       classicStrPtr(proclassic.ScriptPriorityAfter),
 	})
 	if err != nil {
@@ -265,7 +266,7 @@ func TestAcceptance_Classic_ScriptCRUD(t *testing.T) {
 	}
 
 	newName := name + "-updated"
-	if err := pc.UpdateScriptByID(ctx, intToStr(id), &proclassic.Script{Name: classicStrPtr(newName)}); err != nil {
+	if err := pc.UpdateScriptByID(ctx, intToStr(id), &proclassic.Script{Name: new(newName)}); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateScriptByID(%d): %v", id, err)
 	}
@@ -289,8 +290,8 @@ func TestAcceptance_Classic_UserCRUD(t *testing.T) {
 	name := "sdk-acc-classic-user-" + runSuffix()
 	email := name + "@example.test"
 	created, err := pc.CreateUserByID(ctx, "0", &proclassic.UserPost{
-		Name:  classicStrPtr(name),
-		Email: classicStrPtr(email),
+		Name:  new(name),
+		Email: new(email),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -329,7 +330,7 @@ func TestAcceptance_Classic_ComputerEACRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-ea-" + runSuffix()
 	created, err := pc.CreateComputerExtensionAttributeByID(ctx, "0", &proclassic.ComputerExtensionAttribute{
-		Name:     classicStrPtr(name),
+		Name:     new(name),
 		DataType: classicStrPtr(proclassic.ComputerExtensionAttributeDataTypeString),
 	})
 	if err != nil {
@@ -369,7 +370,7 @@ func TestAcceptance_Classic_MobileDeviceEACRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-mdea-" + runSuffix()
 	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
-		Name:     classicStrPtr(name),
+		Name:     new(name),
 		DataType: classicStrPtr(proclassic.MobileDeviceExtensionAttributeDataTypeString),
 	})
 	if err != nil {
@@ -400,7 +401,7 @@ func TestAcceptance_Classic_UserEACRUD(t *testing.T) {
 
 	name := "sdk-acc-classic-uea-" + runSuffix()
 	created, err := pc.CreateUserExtensionAttributeByID(ctx, "0", &proclassic.UserExtensionAttribute{
-		Name:     classicStrPtr(name),
+		Name:     new(name),
 		DataType: classicStrPtr(proclassic.UserExtensionAttributeDataTypeString),
 	})
 	if err != nil {
@@ -432,7 +433,7 @@ func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
 	name := "sdk-acc-cg-" + runSuffix()
 	isSmart := false
 	created, err := pc.CreateComputerGroupByID(ctx, "0", &proclassic.ComputerGroupPost{
-		Name:    classicStrPtr(name),
+		Name:    new(name),
 		IsSmart: &isSmart,
 	})
 	if err != nil {
@@ -459,7 +460,7 @@ func TestAcceptance_Classic_ComputerGroupCRUD(t *testing.T) {
 
 	newName := name + "-updated"
 	if err := pc.UpdateComputerGroupByID(ctx, intToStr(id), &proclassic.ComputerGroupPost{
-		Name:    classicStrPtr(newName),
+		Name:    new(newName),
 		IsSmart: &isSmart,
 	}); err != nil {
 		skipOnServerError(t, err)
@@ -485,7 +486,7 @@ func TestAcceptance_Classic_MobileDeviceGroupCRUD(t *testing.T) {
 	name := "sdk-acc-mdg-" + runSuffix()
 	isSmart := false
 	created, err := pc.CreateMobileDeviceGroupByID(ctx, "0", &proclassic.MobileDeviceGroup{
-		Name:    classicStrPtr(name),
+		Name:    new(name),
 		IsSmart: &isSmart,
 	})
 	if err != nil {
@@ -517,7 +518,7 @@ func TestAcceptance_Classic_UserGroupCRUD(t *testing.T) {
 	name := "sdk-acc-ug-" + runSuffix()
 	isSmart := false
 	created, err := pc.CreateUserGroupByID(ctx, "0", &proclassic.UserGroup{
-		Name:    classicStrPtr(name),
+		Name:    new(name),
 		IsSmart: &isSmart,
 	})
 	if err != nil {
@@ -548,7 +549,7 @@ func TestAcceptance_Classic_AdvancedComputerSearchCRUD(t *testing.T) {
 
 	name := "sdk-acc-acs-" + runSuffix()
 	created, err := pc.CreateAdvancedComputerSearchByID(ctx, "0", &proclassic.AdvancedComputerSearch{
-		Name: classicStrPtr(name),
+		Name: new(name),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -578,7 +579,7 @@ func TestAcceptance_Classic_AdvancedMobileDeviceSearchCRUD(t *testing.T) {
 
 	name := "sdk-acc-amds-" + runSuffix()
 	created, err := pc.CreateAdvancedMobileDeviceSearchByID(ctx, "0", &proclassic.AdvancedMobileDeviceSearch{
-		Name: classicStrPtr(name),
+		Name: new(name),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -608,7 +609,7 @@ func TestAcceptance_Classic_AdvancedUserSearchCRUD(t *testing.T) {
 
 	name := "sdk-acc-aus-" + runSuffix()
 	created, err := pc.CreateAdvancedUserSearchByID(ctx, "0", &proclassic.AdvancedUserSearch{
-		Name: classicStrPtr(name),
+		Name: new(name),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -640,7 +641,7 @@ func TestAcceptance_Classic_PolicyCRUD(t *testing.T) {
 	enabled := false
 	created, err := pc.CreatePolicyByID(ctx, "0", &proclassic.PolicyPost{
 		General: &proclassic.PolicyPostGeneral{
-			Name:    classicStrPtr(name),
+			Name:    new(name),
 			Enabled: &enabled,
 		},
 	})
@@ -682,7 +683,7 @@ func TestAcceptance_Classic_OSXConfigurationProfileCRUD(t *testing.T) {
 	name := "sdk-acc-osxcp-" + runSuffix()
 	created, err := pc.CreateOSXConfigurationProfileByID(ctx, "0", &proclassic.OsXConfigurationProfile{
 		General: &proclassic.OsXConfigurationProfileGeneral{
-			Name: classicStrPtr(name),
+			Name: new(name),
 		},
 	})
 	if err != nil {
@@ -714,7 +715,7 @@ func TestAcceptance_Classic_MobileDeviceConfigurationProfileCRUD(t *testing.T) {
 	name := "sdk-acc-mdcp-" + runSuffix()
 	created, err := pc.CreateMobileDeviceConfigurationProfileByID(ctx, "0", &proclassic.MobileDeviceConfigurationProfile{
 		General: &proclassic.MobileDeviceConfigurationProfileGeneral{
-			Name: classicStrPtr(name),
+			Name: new(name),
 		},
 	})
 	if err != nil {
@@ -755,9 +756,9 @@ func TestAcceptance_Classic_MobileDeviceCRUD(t *testing.T) {
 
 	_, err := pc.CreateMobileDeviceByID(ctx, "0", &proclassic.MobileDevicePost{
 		General: &proclassic.MobileDevicePostGeneral{
-			DeviceName:   classicStrPtr(name),
-			SerialNumber: classicStrPtr(serial),
-			UDID:         classicStrPtr(udid),
+			DeviceName:   new(name),
+			SerialNumber: new(serial),
+			UDID:         new(udid),
 		},
 	})
 	if err != nil {
@@ -782,7 +783,7 @@ func TestAcceptance_Classic_MobileDeviceCRUD(t *testing.T) {
 
 	newName := name + "-updated"
 	if err := pc.UpdateMobileDeviceByID(ctx, intToStr(id), &proclassic.MobileDevicePost{
-		General: &proclassic.MobileDevicePostGeneral{DeviceName: classicStrPtr(newName)},
+		General: &proclassic.MobileDevicePostGeneral{DeviceName: new(newName)},
 	}); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateMobileDeviceByID(%d): %v", id, err)
@@ -853,9 +854,9 @@ func TestAcceptance_Classic_PrinterCRUD(t *testing.T) {
 
 	name := "sdk-acc-printer-" + runSuffix()
 	created, err := pc.CreatePrinterByID(ctx, "0", &proclassic.Printer{
-		Name:     classicStrPtr(name),
-		CUPSName: classicStrPtr("PDF"),
-		URI:      classicStrPtr("lpd://printer.local/queue"),
+		Name:     new(name),
+		CUPSName: new("PDF"),
+		URI:      new("lpd://printer.local/queue"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -885,9 +886,9 @@ func TestAcceptance_Classic_DirectoryBindingCRUD(t *testing.T) {
 
 	name := "sdk-acc-dirbind-" + runSuffix()
 	created, err := pc.CreateDirectoryBindingByID(ctx, "0", &proclassic.DirectoryBinding{
-		Name:   classicStrPtr(name),
-		Domain: classicStrPtr("example.test"),
-		Type:   classicStrPtr("Active Directory"),
+		Name:   new(name),
+		Domain: new("example.test"),
+		Type:   new("Active Directory"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -925,26 +926,26 @@ func TestAcceptance_Classic_DirectoryBindingNestedAD(t *testing.T) {
 	bp := func(b bool) *bool { return &b }
 	name := "sdk-acc-dirbind-ad-" + runSuffix()
 	want := &proclassic.DirectoryBinding{
-		Name:       classicStrPtr(name),
+		Name:       new(name),
 		Priority:   func(i int) *int { return &i }(9),
-		Domain:     classicStrPtr("acc.test"),
-		Username:   classicStrPtr("accuser"),
-		Password:   classicStrPtr("placeholder-pw"),
-		ComputerOu: classicStrPtr("OU=acc"),
-		Type:       classicStrPtr("Active Directory"),
+		Domain:     new("acc.test"),
+		Username:   new("accuser"),
+		Password:   new("placeholder-pw"),
+		ComputerOu: new("OU=acc"),
+		Type:       new("Active Directory"),
 		ActiveDirectory: &proclassic.DirectoryBindingActiveDirectory{
 			CacheLastUser:       bp(true),
 			RequireConfirmation: bp(false),
 			LocalHome:           bp(true),
 			UseUncPath:          bp(false),
-			MountStyle:          classicStrPtr("smb"),
-			DefaultShell:        classicStrPtr("/bin/bash"),
-			Uid:                 classicStrPtr("accuid"),
-			UserGid:             classicStrPtr("accugid"),
-			Gid:                 classicStrPtr("accgid"),
+			MountStyle:          new("smb"),
+			DefaultShell:        new("/bin/bash"),
+			Uid:                 new("accuid"),
+			UserGid:             new("accugid"),
+			Gid:                 new("accgid"),
 			MultipleDomains:     bp(false),
-			PreferredDomain:     classicStrPtr("accpref"),
-			AdminGroups:         classicStrPtr("accgrp"),
+			PreferredDomain:     new("accpref"),
+			AdminGroups:         new("accgrp"),
 		},
 	}
 
@@ -1017,8 +1018,8 @@ func TestAcceptance_Classic_ClassicPackageCRUD(t *testing.T) {
 	name := "sdk-acc-classic-pkg-" + runSuffix()
 	filename := name + ".pkg"
 	created, err := pc.CreateClassicPackageByID(ctx, "0", &proclassic.Package{
-		Name:     classicStrPtr(name),
-		Filename: classicStrPtr(filename),
+		Name:     new(name),
+		Filename: new(filename),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1048,9 +1049,9 @@ func TestAcceptance_Classic_NetworkSegmentCRUD(t *testing.T) {
 
 	name := "sdk-acc-ns-" + runSuffix()
 	created, err := pc.CreateNetworkSegmentByID(ctx, "0", &proclassic.NetworkSegmentPost{
-		Name:            classicStrPtr(name),
-		StartingAddress: classicStrPtr("10.200.0.1"),
-		EndingAddress:   classicStrPtr("10.200.0.255"),
+		Name:            new(name),
+		StartingAddress: new("10.200.0.1"),
+		EndingAddress:   new("10.200.0.255"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1081,11 +1082,11 @@ func TestAcceptance_Classic_DistributionPointCRUD(t *testing.T) {
 	name := "sdk-acc-dp-" + runSuffix()
 	noAuth := true
 	created, err := pc.CreateDistributionPointByID(ctx, "0", &proclassic.DistributionPointPost{
-		Name:                     classicStrPtr(name),
-		IPAddress:                classicStrPtr("dp.example.test"),
-		ShareName:                classicStrPtr("CasperShare"),
-		ReadOnlyUsername:         classicStrPtr("ro-user"),
-		ReadWriteUsername:        classicStrPtr("rw-user"),
+		Name:                     new(name),
+		IPAddress:                new("dp.example.test"),
+		ShareName:                new("CasperShare"),
+		ReadOnlyUsername:         new("ro-user"),
+		ReadWriteUsername:        new("rw-user"),
 		NoAuthenticationRequired: &noAuth,
 	})
 	if err != nil {
@@ -1119,8 +1120,8 @@ func TestAcceptance_Classic_LDAPServerCRUD(t *testing.T) {
 	port := 389
 	created, err := pc.CreateLDAPServerByID(ctx, "0", &proclassic.LdapServerPost{
 		Connection: &proclassic.LdapServerPostConnection{
-			Name:               classicStrPtr(name),
-			Hostname:           classicStrPtr(hostname),
+			Name:               new(name),
+			Hostname:           new(hostname),
 			Port:               &port,
 			ServerType:         classicStrPtr(proclassic.LdapServerPostConnectionServerTypeActiveDirectory),
 			AuthenticationType: classicStrPtr(proclassic.LdapServerPostConnectionAuthenticationTypeNone),
@@ -1161,10 +1162,10 @@ func TestAcceptance_Classic_MacApplicationCRUD(t *testing.T) {
 	bundle := "com.example.sdk-" + runSuffix()
 	created, err := pc.CreateMacApplicationByID(ctx, "0", &proclassic.MacApplication{
 		General: &proclassic.MacApplicationGeneral{
-			Name:     classicStrPtr(name),
-			BundleID: classicStrPtr(bundle),
-			Version:  classicStrPtr("1.0.0"),
-			URL:      classicStrPtr("https://apps.apple.com/us/app/id123456"),
+			Name:     new(name),
+			BundleID: new(bundle),
+			Version:  new("1.0.0"),
+			URL:      new("https://apps.apple.com/us/app/id123456"),
 		},
 	})
 	if err != nil {
@@ -1203,9 +1204,9 @@ func TestAcceptance_Classic_MobileDeviceApplicationCRUD(t *testing.T) {
 	version := "1.0.0"
 	created, err := pc.CreateMobileDeviceApplicationByID(ctx, "0", &proclassic.MobileDeviceApplication{
 		General: &proclassic.MobileDeviceApplicationGeneral{
-			Name:     classicStrPtr(name),
-			BundleID: classicStrPtr(bundle),
-			Version:  classicStrPtr(version),
+			Name:     new(name),
+			BundleID: new(bundle),
+			Version:  new(version),
 		},
 	})
 	if err != nil {
@@ -1235,7 +1236,7 @@ func TestAcceptance_Classic_EbookCRUD(t *testing.T) {
 	name := "sdk-acc-ebook-" + runSuffix()
 	created, err := pc.CreateEbookByID(ctx, "0", &proclassic.EbookPost{
 		General: &proclassic.EbookPostGeneral{
-			Name: classicStrPtr(name),
+			Name: new(name),
 		},
 	})
 	if err != nil {
@@ -1256,7 +1257,7 @@ func TestAcceptance_Classic_ClassCRUD(t *testing.T) {
 	ctx := context.Background()
 	pc := proclassic.New(c)
 	name := "sdk-acc-class-" + runSuffix()
-	created, err := pc.CreateClassByID(ctx, "0", &proclassic.ClassPost{Name: classicStrPtr(name)})
+	created, err := pc.CreateClassByID(ctx, "0", &proclassic.ClassPost{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateClassByID: %v", err)
@@ -1283,7 +1284,7 @@ func TestAcceptance_Classic_LicensedSoftwareCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-licsw-" + runSuffix()
 	created, err := pc.CreateLicensedSoftwareByID(ctx, "0", &proclassic.LicensedSoftware{
-		General: &proclassic.LicensedSoftwareGeneral{Name: classicStrPtr(name)},
+		General: &proclassic.LicensedSoftwareGeneral{Name: new(name)},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1311,7 +1312,7 @@ func TestAcceptance_Classic_RestrictedSoftwareCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-restsw-" + runSuffix()
 	created, err := pc.CreateRestrictedSoftwareByID(ctx, "0", &proclassic.RestrictedSoftware{
-		General: &proclassic.RestrictedSoftwareGeneral{Name: classicStrPtr(name), ProcessName: classicStrPtr("evil.app")},
+		General: &proclassic.RestrictedSoftwareGeneral{Name: new(name), ProcessName: new("evil.app")},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1339,7 +1340,7 @@ func TestAcceptance_Classic_DiskEncryptionConfigurationCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-dec-" + runSuffix()
 	created, err := pc.CreateDiskEncryptionConfigurationByID(ctx, "0", &proclassic.DiskEncryptionConfiguration{
-		Name:                  classicStrPtr(name),
+		Name:                  new(name),
 		KeyType:               classicStrPtr(proclassic.DiskEncryptionConfigurationKeyTypeIndividual),
 		FileVaultEnabledUsers: classicStrPtr(proclassic.DiskEncryptionConfigurationFileVaultEnabledUsersManagementAccount),
 	})
@@ -1369,8 +1370,8 @@ func TestAcceptance_Classic_IBeaconCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-ibeacon-" + runSuffix()
 	created, err := pc.CreateIBeaconByID(ctx, "0", &proclassic.Ibeacon{
-		Name: classicStrPtr(name),
-		UUID: classicStrPtr("12345678-1234-1234-1234-123456789012"),
+		Name: new(name),
+		UUID: new("12345678-1234-1234-1234-123456789012"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1398,8 +1399,8 @@ func TestAcceptance_Classic_DockItemCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-dock-" + runSuffix()
 	created, err := pc.CreateDockItemByID(ctx, "0", &proclassic.DockItem{
-		Name: classicStrPtr(name),
-		Path: classicStrPtr("file:///Applications/Safari.app/"),
+		Name: new(name),
+		Path: new("file:///Applications/Safari.app/"),
 		Type: classicStrPtr(proclassic.DockItemTypeApp),
 	})
 	if err != nil {
@@ -1427,7 +1428,7 @@ func TestAcceptance_Classic_RemovableMacAddressCRUD(t *testing.T) {
 	ctx := context.Background()
 	pc := proclassic.New(c)
 	name := "AA:BB:CC:DD:EE:" + runSuffix()[len(runSuffix())-2:]
-	created, err := pc.CreateRemovableMacAddressByID(ctx, "0", &proclassic.RemovableMacAddress{Name: classicStrPtr(name)})
+	created, err := pc.CreateRemovableMacAddressByID(ctx, "0", &proclassic.RemovableMacAddress{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateRemovableMacAddressByID: %v", err)
@@ -1453,7 +1454,7 @@ func TestAcceptance_Classic_AllowedFileExtensionCRUD(t *testing.T) {
 	ctx := context.Background()
 	pc := proclassic.New(c)
 	ext := "sdk" + runSuffix()
-	created, err := pc.CreateAllowedFileExtensionByID(ctx, "0", &proclassic.AllowedFileExtension{Extension: classicStrPtr(ext)})
+	created, err := pc.CreateAllowedFileExtensionByID(ctx, "0", &proclassic.AllowedFileExtension{Extension: new(ext)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateAllowedFileExtensionByID: %v", err)
@@ -1485,8 +1486,8 @@ func TestAcceptance_Classic_JsonWebTokenConfigurationCRUD(t *testing.T) {
 
 	name := "sdk-acc-jwt-" + runSuffix()
 	created, err := pc.CreateJsonWebTokenConfigurationByID(ctx, "0", &proclassic.JsonWebTokenConfiguration{
-		Name:          classicStrPtr(name),
-		EncryptionKey: classicStrPtr("sdk-acc-jwt-key-" + runSuffix()),
+		Name:          new(name),
+		EncryptionKey: new("sdk-acc-jwt-key-" + runSuffix()),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1528,8 +1529,8 @@ func TestAcceptance_Classic_WebhookCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-wh-" + runSuffix()
 	created, err := pc.CreateWebhookByID(ctx, "0", &proclassic.Webhook{
-		Name:        classicStrPtr(name),
-		URL:         classicStrPtr("https://webhook.example.test/receiver"),
+		Name:        new(name),
+		URL:         new("https://webhook.example.test/receiver"),
 		Event:       classicStrPtr(proclassic.WebhookEventComputerAdded),
 		ContentType: classicStrPtr(proclassic.WebhookContentTypeApplicationJson),
 	})
@@ -1564,10 +1565,10 @@ func TestAcceptance_Classic_AccountUserCRUD(t *testing.T) {
 
 	name := "sdk-acc-user-" + runSuffix()
 	created, err := pc.CreateAccountByUserID(ctx, "0", &proclassic.Account{
-		Name:         classicStrPtr(name),
-		FullName:     classicStrPtr("SDK Acceptance User"),
-		Email:        classicStrPtr(name + "@sdk.test"),
-		Password:     classicStrPtr("SDK-acc-pw-" + runSuffix() + "!"),
+		Name:         new(name),
+		FullName:     new("SDK Acceptance User"),
+		Email:        new(name + "@sdk.test"),
+		Password:     new("SDK-acc-pw-" + runSuffix() + "!"),
 		AccessLevel:  classicStrPtr(proclassic.AccountAccessLevelFullAccess),
 		PrivilegeSet: classicStrPtr(proclassic.AccountPrivilegeSetAdministrator),
 	})
@@ -1611,7 +1612,7 @@ func TestAcceptance_Classic_AccountGroupCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-grp-" + runSuffix()
 	created, err := pc.CreateAccountGroupByID(ctx, "0", &proclassic.Group{
-		Name:         classicStrPtr(name),
+		Name:         new(name),
 		AccessLevel:  classicStrPtr(proclassic.GroupAccessLevelFullAccess),
 		PrivilegeSet: classicStrPtr(proclassic.GroupPrivilegeSetAdministrator),
 	})
@@ -1653,9 +1654,9 @@ func TestAcceptance_Classic_ComputerInvitationCRUD(t *testing.T) {
 
 	createAccount := false
 	created, err := pc.CreateComputerInvitationByID(ctx, "0", &proclassic.ComputerInvitation{
-		InvitationType:              classicStrPtr("USER_INITIATED_URL"),
-		SshUsername:                 classicStrPtr("sdk-acc"),
-		SshPassword:                 classicStrPtr("sdk-acc-pw"),
+		InvitationType:              new("USER_INITIATED_URL"),
+		SshUsername:                 new("sdk-acc"),
+		SshPassword:                 new("sdk-acc-pw"),
 		CreateAccountIfDoesNotExist: &createAccount,
 	})
 	if err != nil {
@@ -1704,7 +1705,7 @@ func TestAcceptance_Classic_MobileDeviceInvitationCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	created, err := pc.CreateMobileDeviceInvitationByID(ctx, "0", &proclassic.MobileDeviceInvitationPost{
-		InvitationType: classicStrPtr("USER_INITIATED_URL"),
+		InvitationType: new("USER_INITIATED_URL"),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1747,7 +1748,7 @@ func TestAcceptance_Classic_MobileDeviceEnrollmentProfileCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 	name := "sdk-acc-mdep-" + runSuffix()
 	created, err := pc.CreateMobileDeviceEnrollmentProfileByID(ctx, "0", &proclassic.MobileDeviceEnrollmentProfilePost{
-		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: classicStrPtr(name)},
+		General: &proclassic.MobileDeviceEnrollmentProfilePostGeneral{Name: new(name)},
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1785,8 +1786,8 @@ func TestAcceptance_Classic_PatchExternalSourceCRUD(t *testing.T) {
 	port := 443
 	sslEnabled := true
 	created, err := pc.CreatePatchExternalSourceByID(ctx, "0", &proclassic.PatchExternalSource{
-		Name:       classicStrPtr(name),
-		HostName:   classicStrPtr("patches.example.test"),
+		Name:       new(name),
+		HostName:   new("patches.example.test"),
 		Port:       &port,
 		SslEnabled: &sslEnabled,
 	})
@@ -1932,8 +1933,8 @@ func TestAcceptance_Classic_SoftwareUpdateServerCRUD(t *testing.T) {
 	name := "sdk-acc-sus-" + runSuffix()
 	port := 8088
 	created, err := pc.CreateSoftwareUpdateServerByID(ctx, "0", &proclassic.SoftwareUpdateServer{
-		Name:      classicStrPtr(name),
-		IPAddress: classicStrPtr("sus.example.test"),
+		Name:      new(name),
+		IPAddress: new("sus.example.test"),
 		Port:      &port,
 	})
 	if err != nil {
@@ -2147,7 +2148,7 @@ func TestAcceptance_Classic_SiteCRUD(t *testing.T) {
 	pc := proclassic.New(c)
 
 	name := "sdk-acc-classic-site-" + runSuffix()
-	created, err := pc.CreateSiteByID(ctx, "0", &proclassic.Site{Name: classicStrPtr(name)})
+	created, err := pc.CreateSiteByID(ctx, "0", &proclassic.Site{Name: new(name)})
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("CreateSiteByID: %v", err)

@@ -150,8 +150,7 @@ func TestAcceptance_Pro_JCDS_DeleteFileV1(t *testing.T) {
 		t.Log("DeleteJCDSFileV1: unexpectedly succeeded for nonexistent file")
 		return
 	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 		if apiErr.HasStatus(404) {
 			t.Logf("DeleteJCDSFileV1(bogus): 404 as expected — plumbing OK")
 			return

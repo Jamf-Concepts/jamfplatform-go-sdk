@@ -94,8 +94,7 @@ func TestAcceptance_Pro_ChangeUserPassword(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected server to reject wrong currentPassword, got nil error (did credentials actually rotate?)")
 	}
-	var apiErr *jamfplatform.APIResponseError
-	if errors.As(err, &apiErr) {
+	if apiErr, ok := errors.AsType[*jamfplatform.APIResponseError](err); ok {
 		t.Logf("ChangeUserPasswordV1 rejected as expected: status=%d", apiErr.StatusCode)
 		return
 	}

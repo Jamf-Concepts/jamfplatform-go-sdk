@@ -218,12 +218,12 @@ func TestAcceptance_Pro_Computer_CEACRUD(t *testing.T) {
 
 	created, err := p.CreateComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 		Name:                 name,
-		Description:          ptr("SDK acceptance test fixture"),
-		Enabled:              ptr(true),
+		Description:          new("SDK acceptance test fixture"),
+		Enabled:              new(true),
 		InputType:            pro.ComputerExtensionAttributesInputTypeScript,
 		InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 		DataType:             pro.ComputerExtensionAttributesDataTypeString,
-		ScriptContents:       ptr(script),
+		ScriptContents:       new(script),
 		PopupMenuChoices:     &[]string{},
 	})
 	if err != nil {
@@ -245,7 +245,7 @@ func TestAcceptance_Pro_Computer_CEACRUD(t *testing.T) {
 		t.Errorf("Name = %q, want %q", got.Name, name)
 	}
 
-	got.Description = ptr("updated")
+	got.Description = new("updated")
 	if _, err := p.UpdateComputerExtensionAttributeV1(ctx, created.ID, got); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateComputerExtensionAttributeV1(%s): %v", created.ID, err)
@@ -317,12 +317,12 @@ func TestAcceptance_Pro_Computer_DeleteMultipleCEAV1(t *testing.T) {
 	for _, tag := range []string{"a", "b"} {
 		resp, err := p.CreateComputerExtensionAttributeV1(ctx, &pro.ComputerExtensionAttributes{
 			Name:                 "sdk-acc-cea-bulk-" + suffix + "-" + tag,
-			Description:          ptr("SDK acceptance bulk-delete fixture"),
-			Enabled:              ptr(true),
+			Description:          new("SDK acceptance bulk-delete fixture"),
+			Enabled:              new(true),
 			InputType:            pro.ComputerExtensionAttributesInputTypeScript,
 			InventoryDisplayType: pro.ComputerExtensionAttributesInventoryDisplayTypeGeneral,
 			DataType:             pro.ComputerExtensionAttributesDataTypeString,
-			ScriptContents:       ptr("#!/bin/sh\necho bulk\n"),
+			ScriptContents:       new("#!/bin/sh\necho bulk\n"),
 			PopupMenuChoices:     &[]string{},
 		})
 		if err != nil {

@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand/v2"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -74,12 +75,7 @@ func requireAigovError(t *testing.T, label string, err error, wantStatus int, wa
 }
 
 func slicesContains(hay []string, needle string) bool {
-	for _, s := range hay {
-		if s == needle {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(hay, needle)
 }
 
 // versionLabel renders currentVersionNumber, which is a *int because a policy
