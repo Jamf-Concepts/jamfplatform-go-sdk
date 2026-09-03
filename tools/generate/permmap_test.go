@@ -67,8 +67,8 @@ func TestParsePermissionsMapReadsTheCommittedSnapshot(t *testing.T) {
 			continue
 		}
 		for _, a := range tc.want {
-			if !dc.actions[a] {
-				t.Errorf("%s: want action %q, got {%s}", tc.name, a, strings.Join(sortedSet(dc.actions), ","))
+			if !dc[a] {
+				t.Errorf("%s: want action %q, got {%s}", tc.name, a, strings.Join(sortedKeys(dc), ","))
 			}
 		}
 	}
@@ -91,7 +91,7 @@ func TestParsePermissionsMapUnionsRowsForOneCapability(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got := strings.Join(sortedSet(declared["widgets"].actions), ",")
+	got := strings.Join(sortedKeys(declared["widgets"]), ",")
 	if got != "create,delete,read" {
 		t.Fatalf("widgets actions = %q, want create,delete,read", got)
 	}
@@ -119,6 +119,24 @@ func TestParsePermissionsMapRejectsABrokenSnapshot(t *testing.T) {
 			t.Fatalf("err = %v", err)
 		}
 	})
+	// A missing *closing* heading must fail the same way as a missing opening
+	// one — falling through to end-of-document would silently widen the parse
+	// into the tables that follow, which list resources with no capability at
+	// all. This document never mentions "## Endpoints with no permission", so
+	// unlike parsePermissionsMapForTest's fixtures there is no filler to reach
+	// minDeclaredCapabilities with — and none is needed, since the missing
+	// heading must be reported before that count is ever checked.
+	t.Run("missing end heading", func(t *testing.T) {
+		doc := "# Permissions map\n\n" +
+			"## Find the capability for an endpoint you already call\n\n" +
+			"| Permission | Capability | Endpoints |\n" +
+			"| ---------- | ---------- | --------- |\n" +
+			"| Widgets    | `widgets:{r}` | Platform `/widgets` |\n"
+		_, err := parsePermissionsMap(doc)
+		if err == nil || !strings.Contains(err.Error(), "Endpoints with no permission") {
+			t.Fatalf("err = %v", err)
+		}
+	})
 	t.Run("too few capabilities", func(t *testing.T) {
 		_, err := parsePermissionsMap(syntheticMap("| Widgets | `widgets:{r}` | Platform `/widgets` |"))
 		if err == nil || !strings.Contains(err.Error(), "at least") {
@@ -137,7 +155,7 @@ func TestParsePermissionsMapRejectsABrokenSnapshot(t *testing.T) {
 // parsePermissionsMapForTest pads a synthetic document with filler capabilities
 // so it clears minDeclaredCapabilities, which exists to catch a snapshot that
 // parsed to nothing and would otherwise reject every synthetic fixture.
-func parsePermissionsMapForTest(t *testing.T, doc string) (map[string]declaredCapability, error) {
+func parsePermissionsMapForTest(t *testing.T, doc string) (map[string]map[string]bool, error) {
 	t.Helper()
 	var filler strings.Builder
 	for i := range minDeclaredCapabilities {
@@ -158,14 +176,14 @@ func withExceptions(t *testing.T, exceptions ...permissionsMapException) {
 }
 
 // declare builds a parsed-map stand-in without going through markdown.
-func declare(rows map[string][]string) map[string]declaredCapability {
-	out := map[string]declaredCapability{}
+func declare(rows map[string][]string) map[string]map[string]bool {
+	out := map[string]map[string]bool{}
 	for name, actions := range rows {
 		set := map[string]bool{}
 		for _, a := range actions {
 			set[a] = true
 		}
-		out[name] = declaredCapability{name: name, actions: set}
+		out[name] = set
 	}
 	return out
 }

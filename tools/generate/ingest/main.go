@@ -206,6 +206,11 @@ const (
 	statusUpdated   status = "updated"
 	statusUnchanged status = "unchanged"
 	statusHeld      status = "held"
+	// statusSkipped is an unheld spec that -only simply did not name. It must
+	// never share statusHeld's rendering: a skipped row's heldAt and why are
+	// both empty, and printing "held at  — " invents a hold with a blank build
+	// and a blank reason in the exact report whose job is naming real ones.
+	statusSkipped status = "skipped"
 )
 
 type row struct {
@@ -236,7 +241,7 @@ func main() {
 	flag.Parse()
 
 	if *zipPath == "" {
-		log.Fatal("-zip is required")
+		log.Fatal("-zip is required (make ingest ZIP=path/to/jamf-platform-apis-gitops-vNNNN-*.zip)")
 	}
 	switch *env {
 	case "external", "internal/stage", "internal/dev":
@@ -277,26 +282,38 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Both phases resolve and validate fully, with no file written and no
+	// manifest entry recorded, before either commits. That is what keeps a
+	// refusal on spec 16 of 19 (or on either permission file) from leaving
+	// spec 1-15 on disk with a manifest that never rewrites to describe them —
+	// testing/ would otherwise become a mixture of two builds, and the
+	// unchanged/updated report would be wrong for the already-landed rows on
+	// the next run.
 	mf := loadManifest(destDir)
-	rows, err := ingest(arc, *env, destDir, selected, mf, *dryRun)
+	rows, specWrites, err := ingest(arc, *env, destDir, selected, mf)
 	if err != nil {
 		log.Fatal(err)
 	}
 	printSpecs(rows)
 
-	permRows, err := ingestPermissions(arc, *env, destDir, mf, *dryRun)
+	permRows, permWrites, err := ingestPermissions(arc, *env, destDir, mf)
 	if err != nil {
 		log.Fatal(err)
 	}
 	printPermissions(permRows)
 
-	if !*dryRun {
-		if err := saveManifest(destDir, mf); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Print("\nNext: `make generate`, read the whole diff, then wire-probe every " +
-			"behavioural change before believing it.\n")
+	if *dryRun {
+		fmt.Print("\nDry run — nothing written; re-run without -dry-run to write these files.\n")
+		return
 	}
+	if err := commit(append(specWrites, permWrites...), mf); err != nil {
+		log.Fatal(err)
+	}
+	if err := saveManifest(destDir, mf); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Print("\nNext: `make generate`, read the whole diff, then wire-probe every " +
+		"behavioural change before believing it.\n")
 }
 
 // abs resolves a flag path. A leading ~/ is expanded because the Makefile
@@ -319,11 +336,14 @@ func abs(root, p string) string {
 // that -include-held otherwise provides in bulk.
 func selection(only string, includeHeld bool) (map[string]bool, error) {
 	known := map[string]bool{}
+	var valid []string
 	for _, s := range specs {
 		known[s.dest] = true
+		valid = append(valid, s.dest)
 	}
-	sel := map[string]bool{}
+	sort.Strings(valid)
 	if only == "" {
+		sel := map[string]bool{}
 		for _, s := range specs {
 			if s.heldAt == "" || includeHeld {
 				sel[s.dest] = true
@@ -331,15 +351,23 @@ func selection(only string, includeHeld bool) (map[string]bool, error) {
 		}
 		return sel, nil
 	}
+	sel := map[string]bool{}
 	for name := range strings.SplitSeq(only, ",") {
 		name = strings.TrimSpace(name)
 		if name == "" {
 			continue
 		}
 		if !known[name] {
-			return nil, fmt.Errorf("-only names %q, which is not a destination in the provenance table", name)
+			return nil, fmt.Errorf("-only names %q, which is not a destination in the provenance table.\n"+
+				"Valid destinations: %s", name, strings.Join(valid, ", "))
 		}
 		sel[name] = true
+	}
+	// Every token trimmed to empty (",", " , ", an unset shell variable pasted
+	// into a wrapper script) must not silently fall through to "ingest
+	// nothing, exit 0" — that is indistinguishable from success.
+	if len(sel) == 0 {
+		return nil, fmt.Errorf("-only %q resolved to no destinations", only)
 	}
 	return sel, nil
 }
@@ -455,33 +483,49 @@ func checkUnmapped(a *archive, env string) error {
 		env, len(novel), strings.Join(novel, ", "))
 }
 
-func ingest(a *archive, env, destDir string, selected map[string]bool, mf *manifest, dryRun bool) ([]row, error) {
+// ingest resolves and validates every spec row against the archive and
+// reports what would happen to each, but never touches disk and never mutates
+// mf: the pending writes it computes are returned for the caller to commit
+// once every row here, and both permission files, have resolved cleanly. That
+// two-phase split is deliberate. A refusal on row 16 of 19 must not leave rows
+// 1-15 written with a manifest that never rewrites to describe them — testing/
+// would then be a mixture of two builds, and the next run's
+// unchanged/updated report would be wrong for exactly the rows that already
+// landed.
+func ingest(a *archive, env, destDir string, selected map[string]bool, mf *manifest) ([]row, []pendingWrite, error) {
 	var rows []row
+	var writes []pendingWrite
 	for _, s := range specs {
 		member := a.prefix + env + "/" + s.dir + "/openapi.yaml"
 		raw, err := a.read(member)
 		if err != nil {
 			if selected[s.dest] {
-				return nil, fmt.Errorf("family %q: %w (did the archive layout change?)", s.dir, err)
+				return nil, nil, fmt.Errorf("family %q: %w (did the archive layout change?)", s.dir, err)
 			}
-			// A held row absent from this archive is normal when reconstructing
-			// an older build: a family published to external/ later than the
-			// build being read simply is not there. Only a *selected* row must
-			// resolve.
-			rows = append(rows, row{
-				dest:   s.dest,
-				source: env + "/" + s.dir,
-				status: statusHeld,
-				note:   "absent from this archive; held at " + s.heldAt,
-			})
+			// A row absent from this archive is normal when reconstructing an
+			// older build (a held family published to external/ later than the
+			// build being read simply is not there) or when -only excluded it.
+			// Only a *selected* row must resolve. Which note applies follows
+			// the same split as the selected-but-unheld case below: a held row
+			// names its hold, an unheld-but-unselected one must not print a
+			// hold it does not have.
+			r := row{dest: s.dest, source: env + "/" + s.dir}
+			if s.heldAt != "" {
+				r.status = statusHeld
+				r.note = "absent from this archive; held at " + s.heldAt
+			} else {
+				r.status = statusSkipped
+				r.note = "absent from this archive; not selected by -only"
+			}
+			rows = append(rows, r)
 			continue
 		}
 		title, version, npaths, nops, err := summarize(raw)
 		if err != nil {
-			return nil, fmt.Errorf("family %q: %w", s.dir, err)
+			return nil, nil, fmt.Errorf("family %q: %w", s.dir, err)
 		}
 		if !strings.Contains(strings.ToLower(title), strings.ToLower(s.title)) {
-			return nil, fmt.Errorf(
+			return nil, nil, fmt.Errorf(
 				"family %q: info.title is %q, which does not contain %q.\n"+
 					"Either the archive renamed the directory (find the family by title and fix "+
 					"the provenance table, here and in CLAUDE.md) or this row now points at an "+
@@ -497,8 +541,18 @@ func ingest(a *archive, env, destDir string, selected map[string]bool, mf *manif
 			nprivs:  strings.Count(string(raw), "x-required-privileges"),
 		}
 		if !selected[s.dest] {
-			r.status = statusHeld
-			r.note = "held at " + s.heldAt + " — " + s.why
+			// Two distinct triggers land here and must not share one message:
+			// a genuinely held spec (heldAt set) versus a spec -only simply
+			// did not name. The latter has no heldAt and no why, so reporting
+			// it as "held at  — " invents a hold with a blank build and a
+			// blank reason in the exact report whose job is naming real ones.
+			if s.heldAt != "" {
+				r.status = statusHeld
+				r.note = "held at " + s.heldAt + " — " + s.why
+			} else {
+				r.status = statusSkipped
+				r.note = "not selected by -only"
+			}
 			rows = append(rows, r)
 			continue
 		}
@@ -520,18 +574,15 @@ func ingest(a *archive, env, destDir string, selected map[string]bool, mf *manif
 		if s.heldAt != "" {
 			r.note = strings.TrimSpace(r.note + " [hold overridden — update CLAUDE.md's holds table]")
 		}
-		if !dryRun {
-			if err := os.MkdirAll(destDir, 0o755); err != nil {
-				return nil, fmt.Errorf("creating %s: %w", destDir, err)
-			}
-			if err := os.WriteFile(outPath, raw, 0o644); err != nil {
-				return nil, fmt.Errorf("writing %s: %w", outPath, err)
-			}
-			mf.Entries[s.dest] = manifestEntry{Build: a.build, Source: r.source, SHA256: sum}
-		}
+		writes = append(writes, pendingWrite{
+			path:  outPath,
+			raw:   raw,
+			key:   s.dest,
+			entry: manifestEntry{Build: a.build, Source: r.source, SHA256: sum},
+		})
 		rows = append(rows, r)
 	}
-	return rows, nil
+	return rows, writes, nil
 }
 
 // summarize reads info.title, info.version and the path/operation counts.
@@ -562,18 +613,23 @@ type permRow struct {
 	note   string
 }
 
-// ingestPermissions copies _permissions/{routes,scopes}.yaml and reports a
-// change that is only a reordering as such. routes.yaml has been byte-different
-// and sort-identical in five separate builds; reading that by hand every time is
-// wasted effort, and mistaking it for a real change has cost a wrong conclusion.
-func ingestPermissions(a *archive, env, destDir string, mf *manifest, dryRun bool) ([]permRow, error) {
+// ingestPermissions resolves _permissions/{routes,scopes}.yaml and reports a
+// change that is only a reordering as such — routes.yaml has been
+// byte-different and sort-identical in five separate builds; reading that by
+// hand every time is wasted effort, and mistaking it for a real change has
+// cost a wrong conclusion. It is ingest's counterpart for these two files and
+// shares its two-phase contract: resolve and validate both, write neither,
+// and let the caller commit only once every spec row and both of these have
+// come back clean.
+func ingestPermissions(a *archive, env, destDir string, mf *manifest) ([]permRow, []pendingWrite, error) {
 	var rows []permRow
+	var writes []pendingWrite
 	outDir := filepath.Join(destDir, "_permissions")
 	for _, name := range permissionFiles {
 		member := a.prefix + env + "/_permissions/" + name
 		raw, err := a.read(member)
 		if err != nil {
-			return nil, fmt.Errorf("permissions: %w", err)
+			return nil, nil, fmt.Errorf("permissions: %w", err)
 		}
 		key := "_permissions/" + name
 		outPath := filepath.Join(outDir, name)
@@ -597,18 +653,43 @@ func ingestPermissions(a *archive, env, destDir string, mf *manifest, dryRun boo
 				}
 			}
 		}
-		if !dryRun {
-			if err := os.MkdirAll(outDir, 0o755); err != nil {
-				return nil, fmt.Errorf("creating %s: %w", outDir, err)
-			}
-			if err := os.WriteFile(outPath, raw, 0o644); err != nil {
-				return nil, fmt.Errorf("writing %s: %w", outPath, err)
-			}
-			mf.Entries[key] = manifestEntry{Build: a.build, Source: env + "/_permissions", SHA256: sum}
-		}
+		writes = append(writes, pendingWrite{
+			path:  outPath,
+			raw:   raw,
+			key:   key,
+			entry: manifestEntry{Build: a.build, Source: env + "/_permissions", SHA256: sum},
+		})
 		rows = append(rows, r)
 	}
-	return rows, nil
+	return rows, writes, nil
+}
+
+// pendingWrite is one file ingest or ingestPermissions has resolved and
+// validated but not yet written. key is the manifest entry key (a spec's
+// dest, or "_permissions/<name>").
+type pendingWrite struct {
+	path  string
+	raw   []byte
+	key   string
+	entry manifestEntry
+}
+
+// commit writes every pending write to disk and records it in mf. Callers
+// must not call this until every selected spec row and both permission files
+// have resolved and validated cleanly — that is what makes a refusal partway
+// through land zero files instead of a partial build.
+func commit(writes []pendingWrite, mf *manifest) error {
+	for _, w := range writes {
+		dir := filepath.Dir(w.path)
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return fmt.Errorf("creating %s: %w", dir, err)
+		}
+		if err := os.WriteFile(w.path, w.raw, 0o644); err != nil {
+			return fmt.Errorf("writing %s: %w", w.path, err)
+		}
+		mf.Entries[w.key] = w.entry
+	}
+	return nil
 }
 
 func printSpecs(rows []row) {

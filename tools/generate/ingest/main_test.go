@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -137,7 +138,7 @@ func TestIngestRejectsAMisdirectedRow(t *testing.T) {
 
 	sel := map[string]bool{"securitycloud-device-groups-api.yaml": true}
 	mf := &manifest{Entries: map[string]manifestEntry{}}
-	_, err := ingest(buildArchive(t, members), "external", t.TempDir(), sel, mf, true)
+	_, _, err := ingest(buildArchive(t, members), "external", t.TempDir(), sel, mf)
 	if err == nil {
 		t.Fatal("want an error for the title mismatch")
 	}
@@ -164,7 +165,7 @@ func TestIngestToleratesAnAbsentHeldFamilyButNotAnAbsentSelectedOne(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows, err := ingest(a, "external", t.TempDir(), sel, &manifest{Entries: map[string]manifestEntry{}}, true)
+	rows, _, err := ingest(a, "external", t.TempDir(), sel, &manifest{Entries: map[string]manifestEntry{}})
 	if err != nil {
 		t.Fatalf("unheld-only selection should succeed: %v", err)
 	}
@@ -178,7 +179,7 @@ func TestIngestToleratesAnAbsentHeldFamilyButNotAnAbsentSelectedOne(t *testing.T
 		t.Fatal("no held row reported as absent")
 	}
 
-	_, err = ingest(a, "external", t.TempDir(), map[string]bool{"Classic-openapi.yaml": true}, &manifest{Entries: map[string]manifestEntry{}}, true)
+	_, _, err = ingest(a, "external", t.TempDir(), map[string]bool{"Classic-openapi.yaml": true}, &manifest{Entries: map[string]manifestEntry{}})
 	if err == nil {
 		t.Fatal("a selected family missing from the archive must fail")
 	}
@@ -214,6 +215,462 @@ func TestSelection(t *testing.T) {
 	}
 	if _, err := selection("no-such-spec.yaml", false); err == nil {
 		t.Fatal("-only with an unknown destination must fail")
+	}
+}
+
+// -only selects a strict subset; every unheld spec it does not name must
+// report as skipped, not held. A held row's heldAt and why are always
+// non-empty; an unheld, unselected row has neither, so sharing statusHeld's
+// rendering prints "held at  — " — a hold with a blank build and a blank
+// reason, in the exact report whose job is naming real ones.
+func TestOnlyReportsUnselectedUnheldSpecsAsSkipped(t *testing.T) {
+	members := map[string]string{"MANIFEST.md": "**GitOps Build**: v1\n"}
+	for _, s := range specs {
+		members["external/"+s.dir+"/openapi.yaml"] = specDoc(s.title, "/a")
+	}
+	a := buildArchive(t, members)
+
+	var target string
+	for _, s := range specs {
+		if s.heldAt == "" {
+			target = s.dest
+			break
+		}
+	}
+	sel, err := selection(target, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows, _, err := ingest(a, "external", t.TempDir(), sel, &manifest{Entries: map[string]manifestEntry{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var skipped, held int
+	for _, r := range rows {
+		if strings.Contains(r.note, "held at  ") {
+			t.Errorf("%s: note names an empty hold: %q", r.dest, r.note)
+		}
+		if r.dest == target {
+			continue
+		}
+		switch r.status {
+		case statusSkipped:
+			skipped++
+			if !strings.Contains(r.note, "not selected by -only") {
+				t.Errorf("%s: skipped note = %q", r.dest, r.note)
+			}
+		case statusHeld:
+			held++
+			if r.note == "" {
+				t.Errorf("%s: held row has no note", r.dest)
+			}
+		}
+	}
+	if skipped == 0 {
+		t.Fatal("no unheld, unselected spec reported as skipped")
+	}
+	if held == 0 {
+		t.Fatal("no genuinely held spec reported as held")
+	}
+}
+
+// The same split applies when the unselected row is additionally absent from
+// the archive: an unheld, unselected, absent family must report skipped, not
+// a hold with a blank build and a blank reason.
+func TestOnlySkipsAnAbsentUnheldUnselectedFamily(t *testing.T) {
+	var target, missing string
+	for _, s := range specs {
+		if s.heldAt != "" {
+			continue
+		}
+		if target == "" {
+			target = s.dest
+			continue
+		}
+		if missing == "" {
+			missing = s.dest
+			break
+		}
+	}
+	if target == "" || missing == "" {
+		t.Fatal("need at least two unheld specs to run this test")
+	}
+	members := map[string]string{"MANIFEST.md": "**GitOps Build**: v1\n"}
+	for _, s := range specs {
+		if s.dest == missing {
+			continue // simulate an archive that predates this family
+		}
+		members["external/"+s.dir+"/openapi.yaml"] = specDoc(s.title, "/a")
+	}
+	a := buildArchive(t, members)
+
+	sel, err := selection(target, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows, _, err := ingest(a, "external", t.TempDir(), sel, &manifest{Entries: map[string]manifestEntry{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var found bool
+	for _, r := range rows {
+		if r.dest != missing {
+			continue
+		}
+		found = true
+		if r.status != statusSkipped {
+			t.Errorf("status = %v, want skipped", r.status)
+		}
+		if strings.Contains(r.note, "held at") {
+			t.Errorf("note names a hold that does not exist: %q", r.note)
+		}
+	}
+	if !found {
+		t.Fatal("missing row not present in output")
+	}
+}
+
+// A token that trims to empty — "-only ','" or an unset shell variable pasted
+// into a wrapper script — must be a hard error, not a selection of nothing
+// that exits 0 having ingested nothing.
+func TestSelectionRejectsATrimmedToEmptyOnly(t *testing.T) {
+	for _, only := range []string{",", " , ", ",,", " "} {
+		if _, err := selection(only, false); err == nil {
+			t.Errorf("-only %q must fail, not resolve to an empty selection", only)
+		}
+	}
+}
+
+// An -only typo means opening main.go to find the right name unless the
+// error itself lists the valid destinations.
+func TestOnlyUnknownDestinationListsValidDestinations(t *testing.T) {
+	_, err := selection("no-such-spec.yaml", false)
+	if err == nil {
+		t.Fatal("want an error")
+	}
+	for _, s := range specs {
+		if !strings.Contains(err.Error(), s.dest) {
+			t.Errorf("error does not list %s as a valid destination: %v", s.dest, err)
+		}
+	}
+}
+
+// ingest must never write, even partway, when a later selected row refuses:
+// not the rows that passed before it, and not the manifest. ingest computes
+// pending writes and returns them; committing is the caller's job, done only
+// once every row — spec and permission alike — has resolved cleanly. This
+// pins that split so a refusal on row 16 of 19 cannot leave rows 1-15 on disk
+// with a manifest that never rewrites to describe them.
+func TestIngestRefusalWritesNothing(t *testing.T) {
+	members := map[string]string{"MANIFEST.md": "**GitOps Build**: v1\n"}
+	for _, s := range specs {
+		members["external/"+s.dir+"/openapi.yaml"] = specDoc(s.title, "/a")
+	}
+	// A row well after the first several carries the wrong title.
+	members["external/audit/openapi.yaml"] = specDoc("Wrong Title Entirely", "/a")
+	a := buildArchive(t, members)
+
+	sel, err := selection("", true) // include held so every row is selected
+	if err != nil {
+		t.Fatal(err)
+	}
+	dest := t.TempDir()
+	mf := &manifest{Entries: map[string]manifestEntry{}}
+	if _, _, err := ingest(a, "external", dest, sel, mf); err == nil {
+		t.Fatal("want an error for the title mismatch")
+	}
+	entries, err := os.ReadDir(dest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 0 {
+		t.Fatalf("ingest wrote files despite a later refusal: %v", entries)
+	}
+	if len(mf.Entries) != 0 {
+		t.Fatalf("ingest mutated the manifest despite a later refusal: %+v", mf.Entries)
+	}
+}
+
+// The atomicity crosses both calls, not just one: ingest's pending writes for
+// a clean spec pass must not be committed if ingestPermissions then fails to
+// resolve. This mirrors what main() does — call both, and invoke commit only
+// once both have returned clean.
+func TestIngestPermissionsRefusalLeavesSpecWritesUncommitted(t *testing.T) {
+	members := map[string]string{"MANIFEST.md": "**GitOps Build**: v1\n"}
+	for _, s := range specs {
+		members["external/"+s.dir+"/openapi.yaml"] = specDoc(s.title, "/a")
+	}
+	// scopes.yaml is deliberately omitted, so ingestPermissions fails.
+	members["external/_permissions/routes.yaml"] = "routes: []\n"
+	a := buildArchive(t, members)
+
+	sel, err := selection("", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dest := t.TempDir()
+	mf := &manifest{Entries: map[string]manifestEntry{}}
+	_, specWrites, err := ingest(a, "external", dest, sel, mf)
+	if err != nil {
+		t.Fatalf("spec pass should succeed: %v", err)
+	}
+	if len(specWrites) == 0 {
+		t.Fatal("expected pending spec writes")
+	}
+	if _, _, err := ingestPermissions(a, "external", dest, mf); err == nil {
+		t.Fatal("want an error for the missing scopes.yaml")
+	}
+	// main() bails here without ever calling commit. Confirm the pending
+	// spec writes alone changed nothing on disk.
+	entries, err := os.ReadDir(dest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 0 {
+		t.Fatalf("spec writes must stay uncommitted when permissions fails to resolve: %v", entries)
+	}
+}
+
+// ingestPermissions is the reordering note's only caller-facing home;
+// TestSortedSHA256IsBlindToLineOrderOnly exercises the helper in isolation
+// and cannot reach it. Disabling the sortedSHA256 comparison inside
+// ingestPermissions must fail this test even though the helper itself still
+// works correctly.
+func TestIngestPermissionsReportsAPureReordering(t *testing.T) {
+	routes := "a: 1\nb: 2\nc: 3\n"
+	reordered := "c: 3\na: 1\nb: 2\n"
+	scopes := "x: 1\n"
+	members := map[string]string{
+		"MANIFEST.md":                       "**GitOps Build**: v2\n",
+		"external/_permissions/routes.yaml": reordered,
+		"external/_permissions/scopes.yaml": scopes,
+	}
+	a := buildArchive(t, members)
+
+	dest := t.TempDir()
+	outDir := filepath.Join(dest, "_permissions")
+	if err := os.MkdirAll(outDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(outDir, "routes.yaml"), []byte(routes), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(outDir, "scopes.yaml"), []byte(scopes), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mf := &manifest{Entries: map[string]manifestEntry{
+		"_permissions/routes.yaml": {Build: "v1", Source: "external/_permissions", SHA256: sha256Bytes([]byte(routes))},
+		"_permissions/scopes.yaml": {Build: "v1", Source: "external/_permissions", SHA256: sha256Bytes([]byte(scopes))},
+	}}
+
+	rows, writes, err := ingestPermissions(a, "external", dest, mf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var foundRoutes bool
+	for _, r := range rows {
+		switch r.name {
+		case "_permissions/routes.yaml":
+			foundRoutes = true
+			if r.status != statusUpdated {
+				t.Errorf("routes.yaml status = %v, want updated", r.status)
+			}
+			if !strings.Contains(r.note, "PURE REORDERING") {
+				t.Errorf("routes.yaml note = %q, want it to flag a pure reordering", r.note)
+			}
+		case "_permissions/scopes.yaml":
+			if r.status != statusUnchanged {
+				t.Errorf("scopes.yaml status = %v, want unchanged", r.status)
+			}
+		}
+	}
+	if !foundRoutes {
+		t.Fatal("routes.yaml row not present")
+	}
+
+	// The write itself must actually land, and the manifest must move on.
+	if err := commit(writes, mf); err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(filepath.Join(outDir, "routes.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != reordered {
+		t.Fatalf("routes.yaml on disk = %q, want the archive's (reordered) content", got)
+	}
+	if mf.Entries["_permissions/routes.yaml"].Build != "v2" {
+		t.Fatalf("manifest not updated for routes.yaml: %+v", mf.Entries["_permissions/routes.yaml"])
+	}
+}
+
+// Neither ingest nor ingestPermissions ever touches disk: they only resolve,
+// validate and hand back pending writes. commit is the sole place bytes land,
+// and it is called (from main) only when -dry-run is not set. This exercises
+// both directions over one temp dir: nothing written before commit runs,
+// everything written and the manifest updated after, and a second pass over
+// the same archive and manifest reads back unchanged.
+func TestCommitIsTheOnlyThingThatWrites(t *testing.T) {
+	members := map[string]string{"MANIFEST.md": "**GitOps Build**: v3\n"}
+	for _, s := range specs {
+		members["external/"+s.dir+"/openapi.yaml"] = specDoc(s.title, "/a")
+	}
+	members["external/_permissions/routes.yaml"] = "routes: []\n"
+	members["external/_permissions/scopes.yaml"] = "scopes: []\n"
+	a := buildArchive(t, members)
+
+	sel, err := selection("", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dest := t.TempDir()
+	mf := loadManifest(dest)
+
+	rows, specWrites, err := ingest(a, "external", dest, sel, mf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, permWrites, err := ingestPermissions(a, "external", dest, mf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Before commit: resolved and reported, nothing on disk.
+	if entries, _ := os.ReadDir(dest); len(entries) != 0 {
+		t.Fatalf("resolving alone wrote %v", entries)
+	}
+	for _, r := range rows {
+		if sel[r.dest] && r.status != statusNew {
+			t.Errorf("%s: status = %v before any write, want new", r.dest, r.status)
+		}
+	}
+
+	if err := commit(append(specWrites, permWrites...), mf); err != nil {
+		t.Fatal(err)
+	}
+	if err := saveManifest(dest, mf); err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range specs {
+		if !fileExists(filepath.Join(dest, s.dest)) {
+			t.Errorf("%s not written after commit", s.dest)
+		}
+	}
+	if !fileExists(filepath.Join(dest, "_permissions", "routes.yaml")) {
+		t.Fatal("routes.yaml not written after commit")
+	}
+	if !fileExists(filepath.Join(dest, manifestName)) {
+		t.Fatal("manifest not saved after commit")
+	}
+
+	// A second run reading the manifest just saved must report every
+	// selected spec, and both permission files, unchanged.
+	mf2 := loadManifest(dest)
+	rows2, _, err := ingest(a, "external", dest, sel, mf2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, r := range rows2 {
+		if !sel[r.dest] {
+			continue
+		}
+		if r.status != statusUnchanged {
+			t.Errorf("%s: second run status = %v, want unchanged", r.dest, r.status)
+		}
+		if !strings.HasPrefix(r.note, "since v3") {
+			t.Errorf("%s: second run note = %q, want it prefixed \"since v3\"", r.dest, r.note)
+		}
+	}
+	permRows2, _, err := ingestPermissions(a, "external", dest, mf2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, r := range permRows2 {
+		if r.status != statusUnchanged {
+			t.Errorf("%s: second run status = %v, want unchanged", r.name, r.status)
+		}
+	}
+}
+
+// The manifest is the machine-readable half of the unchanged/updated report;
+// it had no test of its own before this.
+func TestManifestRoundTrip(t *testing.T) {
+	dest := t.TempDir()
+	mf := &manifest{Entries: map[string]manifestEntry{
+		"openapi-jpapi.yaml": {Build: "v42", Source: "external/jpapi", SHA256: "deadbeef"},
+	}}
+	if err := saveManifest(dest, mf); err != nil {
+		t.Fatal(err)
+	}
+	got := loadManifest(dest)
+	if len(got.Entries) != 1 || got.Entries["openapi-jpapi.yaml"].Build != "v42" {
+		t.Fatalf("round trip = %+v, want the entry saved above", got.Entries)
+	}
+}
+
+// A corrupt or unreadable manifest must degrade to "everything is new"
+// rather than fail the whole ingest — the bytes written never depend on it.
+func TestCorruptManifestDegradesToEverythingNew(t *testing.T) {
+	dest := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dest, manifestName), []byte("not json"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mf := loadManifest(dest)
+	if mf.Entries == nil || len(mf.Entries) != 0 {
+		t.Fatalf("corrupt manifest loaded as %+v, want an empty entries map", mf.Entries)
+	}
+}
+
+// CLAUDE.md's provenance table is the prose copy of specs, and the doc
+// comment at the top of this file (and CLAUDE.md itself) both say the two
+// must agree. Nothing enforced that before this test: it parses the
+// "Provenance — the full table" section and checks every dest/dir pair and
+// every held/unheld row against the code.
+func TestCLAUDEMdProvenanceTableMatchesSpecs(t *testing.T) {
+	raw, err := os.ReadFile("../../../CLAUDE.md")
+	if err != nil {
+		t.Skipf("CLAUDE.md unreadable: %v", err)
+	}
+	body := string(raw)
+	tableStart := strings.Index(body, "| `testing/` file | bundle source | at |")
+	if tableStart < 0 {
+		t.Fatal("CLAUDE.md has no provenance table header")
+	}
+	section := body[tableStart:]
+	if end := strings.Index(section, "\n\n"); end > 0 {
+		section = section[:end]
+	}
+
+	rowRe := regexp.MustCompile("(?m)^\\| `([^`]+)` \\| `external/([^`]+)` \\| (.+) \\|$")
+	rowMatches := rowRe.FindAllStringSubmatch(section, -1)
+	if len(rowMatches) == 0 {
+		t.Fatal("no provenance rows parsed out of CLAUDE.md")
+	}
+
+	type docRow struct {
+		dir  string
+		held bool
+	}
+	got := map[string]docRow{}
+	for _, m := range rowMatches {
+		got[m[1]] = docRow{dir: m[2], held: strings.Contains(m[3], "(**held**)")}
+	}
+
+	if len(got) != len(specs) {
+		t.Fatalf("CLAUDE.md carries %d provenance rows, specs carries %d", len(got), len(specs))
+	}
+	for _, s := range specs {
+		d, ok := got[s.dest]
+		if !ok {
+			t.Errorf("CLAUDE.md has no provenance row for %s", s.dest)
+			continue
+		}
+		if d.dir != s.dir {
+			t.Errorf("%s: CLAUDE.md names external/%s, specs names external/%s", s.dest, d.dir, s.dir)
+		}
+		if d.held != (s.heldAt != "") {
+			t.Errorf("%s: CLAUDE.md marks held=%v, specs' heldAt=%q", s.dest, d.held, s.heldAt)
+		}
 	}
 }
 

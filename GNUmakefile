@@ -8,12 +8,15 @@ ingest:
 	cd tools/generate && go run ./ingest -root "$(CURDIR)" -zip "$(ZIP)" $(INGEST_FLAGS)
 
 # Refresh the committed snapshot of the published permissions map, which
-# `make generate` checks every emitted privilege against. Hits the network, so
-# it is an explicit maintainer step and never part of generate or CI.
+# `make test` checks every emitted privilege against (TestScopedPrivilegesUseGAVocabulary).
+# Hits the network, so it is an explicit maintainer step and never part of
+# generate or CI. Fetches to a temp file first so a dropped connection or a
+# failed rename can never truncate or corrupt the tracked snapshot in place.
 permmap:
-	curl -fsS https://developer.jamf.com/platform-api/reference/jamf-pro-permissions-map.md \
-		-o tools/generate/permissions-map.md
-	@echo "refreshed tools/generate/permissions-map.md — now run: make generate"
+	curl -fsS --remove-on-error https://developer.jamf.com/platform-api/reference/jamf-pro-permissions-map.md \
+		-o tools/generate/permissions-map.md.tmp
+	mv tools/generate/permissions-map.md.tmp tools/generate/permissions-map.md
+	@echo "refreshed tools/generate/permissions-map.md — review its diff, then run: make test"
 
 generate:
 	cd tools/generate && go run . -root $(CURDIR)

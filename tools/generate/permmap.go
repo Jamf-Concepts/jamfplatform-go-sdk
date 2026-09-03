@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -113,20 +114,10 @@ type permissionsMapException struct {
 // declaration manufactures a disagreement.
 var permissionsMapExceptions = []permissionsMapException{}
 
-// declaredCapability is one capability as the published map declares it.
-type declaredCapability struct {
-	name    string
-	actions map[string]bool
-	section string
-}
-
-var (
-	capCellRe = regexp.MustCompile("^`([a-z0-9-]+)(?::\\{([a-z,\\s]+)\\})?`$")
-	sectionRe = regexp.MustCompile(`^### +(.*\S)`)
-)
+var capCellRe = regexp.MustCompile("^`([a-z0-9-]+)(?::\\{([a-z,\\s]+)\\})?`$")
 
 // loadPermissionsMap reads and parses the committed snapshot.
-func loadPermissionsMap() (map[string]declaredCapability, error) {
+func loadPermissionsMap() (map[string]map[string]bool, error) {
 	raw, err := os.ReadFile(permissionsMapFile)
 	if err != nil {
 		return nil, fmt.Errorf("reading the published permissions map: %w (refresh it with `make permmap`)", err)
@@ -134,13 +125,18 @@ func loadPermissionsMap() (map[string]declaredCapability, error) {
 	return parsePermissionsMap(string(raw))
 }
 
-// parsePermissionsMap reads the capability tables out of the published map.
+// parsePermissionsMap reads the capability tables out of the published map,
+// returning each declared capability's action set.
 //
 // Only the "Find the capability for an endpoint you already call" section is
 // read. The tables before it are worked examples of the old-to-new conversion
 // and would inject capabilities that section does not declare; the tables after
-// it list resources with *no* capability.
-func parsePermissionsMap(markdown string) (map[string]declaredCapability, error) {
+// it list resources with *no* capability — which is exactly why that closing
+// heading is required, not merely preferred, to be present: an absent one is
+// indistinguishable from "the rest of the document is more of the same
+// section" and would silently fold the no-capability tables in as
+// declarations.
+func parsePermissionsMap(markdown string) (map[string]map[string]bool, error) {
 	const (
 		startAt = "## Find the capability for an endpoint you already call"
 		endAt   = "## Endpoints with no permission"
@@ -149,17 +145,14 @@ func parsePermissionsMap(markdown string) (map[string]declaredCapability, error)
 	if !found {
 		return nil, fmt.Errorf("heading %q not found — has the published map been restructured?", startAt)
 	}
-	if before, _, ok := strings.Cut(body, endAt); ok {
-		body = before
+	before, _, found := strings.Cut(body, endAt)
+	if !found {
+		return nil, fmt.Errorf("heading %q not found — has the published map been restructured?", endAt)
 	}
+	body = before
 
-	out := map[string]declaredCapability{}
-	section := ""
+	out := map[string]map[string]bool{}
 	for line := range strings.SplitSeq(body, "\n") {
-		if m := sectionRe.FindStringSubmatch(line); m != nil {
-			section = m[1]
-			continue
-		}
 		if !strings.HasPrefix(strings.TrimSpace(line), "|") {
 			continue
 		}
@@ -185,16 +178,11 @@ func parsePermissionsMap(markdown string) (map[string]declaredCapability, error)
 			actions[action] = true
 		}
 		// A capability is declared across as many rows as its resources need,
-		// so rows contribute the union of their action sets. The sections are a
-		// reader's index, not a partition.
-		rowSection := section
-		if prev, ok := out[name]; ok {
-			for a := range prev.actions {
-				actions[a] = true
-			}
-			rowSection = prev.section
+		// so rows contribute the union of their action sets.
+		for a := range out[name] {
+			actions[a] = true
 		}
-		out[name] = declaredCapability{name: name, actions: actions, section: rowSection}
+		out[name] = actions
 	}
 	if len(out) < minDeclaredCapabilities {
 		return nil, fmt.Errorf(
@@ -231,7 +219,7 @@ func (r permissionsMapReport) OK() bool {
 
 // checkAgainstPermissionsMap compares generated identifiers with the map. ids
 // maps each distinct `{capability}:{action}` to the packages carrying it.
-func checkAgainstPermissionsMap(declared map[string]declaredCapability, ids map[string][]string) permissionsMapReport {
+func checkAgainstPermissionsMap(declared map[string]map[string]bool, ids map[string][]string) permissionsMapReport {
 	allowed := map[string]bool{}
 	for _, e := range permissionsMapExceptions {
 		allowed[e.Permission] = true
@@ -241,7 +229,7 @@ func checkAgainstPermissionsMap(declared map[string]declaredCapability, ids map[
 	r := permissionsMapReport{Identifiers: len(ids)}
 	used := map[string]map[string]bool{}
 	for id, pkgs := range ids {
-		where := id + " (" + strings.Join(uniqueStrings(sortedCopy(pkgs)), ",") + ")"
+		where := id + " (" + strings.Join(slices.Compact(slices.Sorted(slices.Values(pkgs))), ",") + ")"
 		capability, action, wellFormed := strings.Cut(id, ":")
 		if !wellFormed || capability == "" || action == "" {
 			r.BadForm = append(r.BadForm, where)
@@ -252,7 +240,7 @@ func checkAgainstPermissionsMap(declared map[string]declaredCapability, ids map[
 		}
 		used[capability][action] = true
 
-		dc, isDeclared := declared[capability]
+		actions, isDeclared := declared[capability]
 		switch {
 		case !isDeclared:
 			if allowed[id] {
@@ -260,13 +248,13 @@ func checkAgainstPermissionsMap(declared map[string]declaredCapability, ids map[
 				continue
 			}
 			r.UnknownCapability = append(r.UnknownCapability, where)
-		case !dc.actions[action]:
+		case !actions[action]:
 			if allowed[id] {
 				hit[id] = true
 				continue
 			}
 			r.UnknownAction = append(r.UnknownAction,
-				where+" — the map declares "+capability+" with {"+strings.Join(sortedSet(dc.actions), ",")+"}")
+				where+" — the map declares "+capability+" with {"+strings.Join(sortedKeys(actions), ",")+"}")
 		}
 	}
 	r.Capabilities = len(used)
@@ -276,12 +264,12 @@ func checkAgainstPermissionsMap(declared map[string]declaredCapability, ids map[
 			r.ExpiredExceptions = append(r.ExpiredExceptions, e.Permission)
 		}
 	}
-	for name, dc := range declared {
+	for name, actions := range declared {
 		if used[name] == nil {
 			r.UnreachedCapabilities = append(r.UnreachedCapabilities, name)
 			continue
 		}
-		for action := range dc.actions {
+		for action := range actions {
 			if !used[name][action] {
 				r.UnusedActions = append(r.UnusedActions, name+":"+action)
 			}
@@ -294,30 +282,4 @@ func checkAgainstPermissionsMap(declared map[string]declaredCapability, ids map[
 		sort.Strings(*s)
 	}
 	return r
-}
-
-func sortedSet(m map[string]bool) []string {
-	out := make([]string, 0, len(m))
-	for k := range m {
-		out = append(out, k)
-	}
-	sort.Strings(out)
-	return out
-}
-
-// uniqueStrings collapses a sorted slice to its distinct elements.
-func uniqueStrings(in []string) []string {
-	var out []string
-	for i, s := range in {
-		if i == 0 || in[i-1] != s {
-			out = append(out, s)
-		}
-	}
-	return out
-}
-
-func sortedCopy(in []string) []string {
-	out := append([]string(nil), in...)
-	sort.Strings(out)
-	return out
 }
