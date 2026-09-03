@@ -25,6 +25,7 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/compliancebenchmarks"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devicegroups"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/securitycloud"
 )
 
@@ -526,6 +527,42 @@ func accOrgClient(t *testing.T) *jamfplatform.Client {
 		t.Fatal(credentialRejectedMessage(err))
 	}
 	return c
+}
+
+// requirePackageStore skips unless this instance has a working Jamf Cloud
+// distribution point, which is what packages are stored in.
+//
+// Without one, package CRUD is not merely unsupported, it is BROKEN in a way that
+// looks like an SDK fault. Wire-verified 2026-09-03 across two instances running
+// the identical build 11.31.1-t1787060595569:
+//
+//	                        cdnType      directUploadCapable  /v1/jcds/files
+//	no distribution point   NONE         false                404 "JCDS Settings record not found"
+//	Jamf Cloud              JAMF_CLOUD   true                 200, real files
+//
+// On the instance with cdnType NONE, POST /v1/packages returns 201 with an id and
+// the package reads back — then DELETE answers 500 and half-deletes it, removing
+// the Pro row while stranding an undeletable Classic record. Because DELETE+5xx is
+// retryable (correctly: delete is idempotent), the transport retries and the
+// caller sees only the retry's 404 INVALID_ID. So four package tests failed on a
+// 404 whose real cause was a 500 two hops earlier, and each run leaked a package
+// record that cannot be removed.
+//
+// Gated on cdnType rather than on directUploadCapable because cdnType names the
+// backing store, which is the thing packages need; directUploadCapable is about
+// how bytes get there. Both agree on both instances, so either would do today —
+// cdnType is the one that will still mean the right thing if a non-Jamf-Cloud CDN
+// gains direct upload.
+func requirePackageStore(t *testing.T, c *jamfplatform.Client) {
+	t.Helper()
+	cdp, err := pro.New(c).GetCloudDistributionPointV1(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetCloudDistributionPointV1: cannot determine whether this instance can store packages: %v", err)
+	}
+	if cdp.CdnType != string(pro.CloudDistributionPointCdnTypeJamfCloud) {
+		t.Skipf("packages need a Jamf Cloud distribution point; this instance reports cdnType=%q, so creates succeed but deletes 500 and strand an undeletable record", cdp.CdnType)
+	}
 }
 
 // requireWriteOptIn skips unless the named environment variable is set. Used for

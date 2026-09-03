@@ -357,6 +357,7 @@ func TestAcceptance_ApplyClass(t *testing.T) {
 
 func TestAcceptance_ApplyClassicPackage(t *testing.T) {
 	c := accClient(t)
+	requirePackageStore(t, c)
 	ctx := context.Background()
 	pc := proclassic.New(c)
 

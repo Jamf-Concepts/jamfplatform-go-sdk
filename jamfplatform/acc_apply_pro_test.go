@@ -325,6 +325,7 @@ func TestAcceptance_ApplyMobileDeviceExtensionAttributeV1(t *testing.T) {
 
 func TestAcceptance_ApplyPackageV1(t *testing.T) {
 	c := accClient(t)
+	requirePackageStore(t, c)
 	ctx := context.Background()
 	p := pro.New(c)
 

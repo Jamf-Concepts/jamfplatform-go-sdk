@@ -76,30 +76,63 @@ func TestAcceptance_Pro_DssDeclarationsUnroutedAtGateway(t *testing.T) {
 	}
 }
 
-// TestAcceptance_Pro_JamfProServerURLHistoryNoteUnroutedAtGateway pins
+// TestAcceptance_Pro_JamfProServerURLHistoryNoteRefusedOnHostedInstance pins
 // POST /v1/jamf-pro-server-url/history.
 //
+// Renamed from ...UnroutedAtGateway on 2026-09-03, because the old name and the
+// old assertion were both wrong about WHERE the refusal happens. The gateway
+// routes this path fine; Jamf Pro itself refuses it, with
+// 403 [HOSTED_ENVIRONMENT] Forbidden — which makes sense, since the server URL of
+// a Jamf-hosted instance is not the customer's to change, and the history note is
+// part of that surface.
+//
+// Wire-verified on two instances in different regions, on different tenants, with
+// different credentials and different scope kinds (tenant and environment): both
+// answer HOSTED_ENVIRONMENT, neither has ever answered BAD_PERMISSIONS. The old
+// test asserted the gateway's BAD_PERMISSIONS via gatewayUnrouted, so it failed
+// with "403 but not BAD_PERMISSIONS" the moment it met a real instance.
+//
 // GET on the very same path is routed and answers 200 (see
-// TestAcceptance_Pro_Settings_JamfProServerURLHistoryV1), so this is a
-// method-level gap rather than a path-level one. The privilege is jss-url:update
-// and this credential holds it: PUT /pro/v1/jamf-pro-server-url reaches Jamf Pro
-// and returns 415 for an unsupported media type, which cannot happen if the
-// gateway had refused the request.
-func TestAcceptance_Pro_JamfProServerURLHistoryNoteUnroutedAtGateway(t *testing.T) {
+// TestAcceptance_Pro_Settings_JamfProServerURLHistoryV1), so reads are allowed
+// and only the write is refused. This is therefore a hosting restriction rather
+// than a gateway gap, and it will not lift by adding a privilege: the privilege
+// is jss-url:update and this credential holds it — PUT /pro/v1/jamf-pro-server-url
+// reaches Jamf Pro and returns 415 for an unsupported media type, which could not
+// happen if the request had been refused before Pro saw it.
+func TestAcceptance_Pro_JamfProServerURLHistoryNoteRefusedOnHostedInstance(t *testing.T) {
 	c := accClient(t)
 
 	_, err := pro.New(c).CreateJamfProServerURLHistoryNoteV1(context.Background(), &pro.ObjectHistoryNote{
 		Note: "sdk-acc jamf-pro-server-url history probe",
 	})
 	if err == nil {
-		t.Fatal("CreateJamfProServerURLHistoryNoteV1 now answers — the gateway has started routing " +
-			"POST /pro/v1/jamf-pro-server-url/history. Replace this test with a real round-trip: " +
-			"create the note, then find it via ListJamfProServerURLHistoryV1.")
+		t.Fatal("CreateJamfProServerURLHistoryNoteV1 now answers — this instance permits writing the " +
+			"server-URL history, so it is either self-hosted or the restriction has been lifted. Replace " +
+			"this test with a real round-trip: create the note, then find it via ListJamfProServerURLHistoryV1.")
 	}
 	skipOnServerError(t, err)
-	if !gatewayUnrouted(t, "CreateJamfProServerURLHistoryNoteV1", err) {
-		t.Fatalf("CreateJamfProServerURLHistoryNoteV1 failed for an unexpected reason: %v", err)
+
+	apiErr := jamfplatform.AsAPIError(err)
+	if apiErr == nil {
+		t.Fatalf("CreateJamfProServerURLHistoryNoteV1: non-API error, the request did not reach the gateway: %v", err)
 	}
+	if !apiErr.HasStatus(403) {
+		t.Fatalf("CreateJamfProServerURLHistoryNoteV1: want 403 HOSTED_ENVIRONMENT, got status %d: %v", apiErr.StatusCode, err)
+	}
+	for _, d := range apiErr.Details() {
+		switch d.Code {
+		case "HOSTED_ENVIRONMENT":
+			t.Log("CreateJamfProServerURLHistoryNoteV1: still refused by Jamf Pro on a hosted instance (403 HOSTED_ENVIRONMENT)")
+			return
+		case "BAD_PERMISSIONS":
+			// Worth distinguishing rather than accepting: BAD_PERMISSIONS would
+			// mean the gateway had stopped routing a path it currently routes,
+			// which is a different regression with a different owner.
+			t.Fatalf("CreateJamfProServerURLHistoryNoteV1: the gateway now refuses this path (403 BAD_PERMISSIONS) " +
+				"where it previously routed it to Jamf Pro — that is a routing change, not the hosting restriction this test pins")
+		}
+	}
+	t.Fatalf("CreateJamfProServerURLHistoryNoteV1: 403 but neither HOSTED_ENVIRONMENT nor BAD_PERMISSIONS: %v", err)
 }
 
 // --- cache-settings ----------------------------------------------------

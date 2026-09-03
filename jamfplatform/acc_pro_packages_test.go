@@ -66,6 +66,7 @@ func TestAcceptance_Pro_ListPackages(t *testing.T) {
 // in jamfplatform/testdata/ — the test skips if none is present.
 func TestAcceptance_Pro_PackageCRUD(t *testing.T) {
 	c := accClient(t)
+	requirePackageStore(t, c)
 	ctx := context.Background()
 	p := pro.New(c)
 

@@ -1012,6 +1012,7 @@ func derefStr(p *string) string {
 
 func TestAcceptance_Classic_ClassicPackageCRUD(t *testing.T) {
 	c := accClient(t)
+	requirePackageStore(t, c)
 	ctx := context.Background()
 	pc := proclassic.New(c)
 
