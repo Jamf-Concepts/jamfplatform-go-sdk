@@ -1176,11 +1176,25 @@ work — there is only one test package.
 
 ## Commit hygiene
 
-- **Before every commit**, run `go fmt ./...` and `go fix ./...` on the tree.
-  `go fmt` normalises whitespace; `go fix` rewrites deprecated stdlib usages
-  (e.g. old `rand.Seed` → `math/rand/v2`). Both are idempotent on a clean tree;
-  any diff they produce is hygiene that belongs **with** the functional change,
-  not as a follow-up "lint" commit.
+- **Before every commit**, run `go fmt ./...` and `go fix ./...` on the tree,
+  **and `go fix -tags acceptance ./jamfplatform/...`**. `go fmt` normalises
+  whitespace; `go fix` rewrites deprecated stdlib usages (e.g. old `rand.Seed` →
+  `math/rand/v2`). Both are idempotent on a clean tree; any diff they produce is
+  hygiene that belongs **with** the functional change, not as a follow-up "lint"
+  commit.
+- **The tagged `go fix` is load-bearing for the same reason the tagged `go vet`
+  is.** The acceptance suite is behind `//go:build acceptance`, so an untagged
+  `go fix ./...` — which is what this rule and CI's fmt gate both ran — never
+  reaches 56 of `jamfplatform/`'s files, and the rewrites pile up invisibly.
+  `8a38c91` cleared that backlog: `strings.Split` → `strings.SplitSeq`, a
+  hand-rolled search → `slices.Contains`, and `ptr(v)` → `new(v)` across 26
+  files, none of it behavioural and none of it reachable by the untagged gate.
+- **`go fix` is not idempotent in a single pass, so run it to a fixpoint.** A
+  pass that stamps `//go:fix inline` on a helper only enables the *next* pass to
+  inline that helper's call sites. `8a38c91` ran it once and left three more
+  files to rewrite — including `min(len(x), n)` collapses that appeared only
+  after the preceding pass. CI's drift gate loops for the same reason; a gate
+  that ran once would fail on a tree a correct single local run produced.
 - **Run `go vet -tags acceptance ./jamfplatform/` after any config or generator
   change that alters a type or a return type.** The acceptance file is behind
   `//go:build acceptance`, so `make test` and CI never compile it and a signature

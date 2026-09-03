@@ -1215,8 +1215,12 @@ the API being reachable.
 - Error wrapping: `fmt.Errorf("MethodName(%s): %w", id, err)`.
 - Resolvers and Apply methods are **declared entirely in `config.json`** — never
   hand-coded. Modes and keys: [docs/STYLE.md](docs/STYLE.md#nameid-resolvers).
-- **Before every commit**, run `go fmt ./...` and `go fix ./...`; any diff they
-  produce belongs with the functional change, not a follow-up commit.
+- **Before every commit**, run `go fmt ./...` and `go fix ./...`, **and
+  `go fix -tags acceptance ./jamfplatform/...`**; any diff they produce belongs
+  with the functional change, not a follow-up commit. The tagged run is not
+  optional: an untagged `go fix` cannot see the 56 build-tagged acceptance files,
+  so modernisations silently accumulate there — `8a38c91` cleared a backlog of
+  them across 26 files.
 - **Every new generated method gets an acceptance test**, and **never silently
   tolerate a real error to make one pass** — no `>= 400 && < 500` escape hatches.
   Policy: [docs/STYLE.md](docs/STYLE.md#acceptance-tests).

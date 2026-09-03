@@ -34,6 +34,38 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go vet ./...
+      # The acceptance suite is behind //go:build acceptance, so the run above
+      # never compiles it and a signature change can break it silently and stay
+      # broken. This is the CI half of the `go vet -tags acceptance` rule that
+      # until now existed only as a pre-commit convention.
+      - run: go vet -tags acceptance ./jamfplatform/...
+
+      # Formatting and modernisation drift, including behind the build tag. An
+      # untagged `go fix ./...` cannot see 56 of jamfplatform/'s files, so the
+      # rewrites accumulated there unnoticed until 8a38c91 cleared 26 files'
+      # worth. Checking the tagged path here stops that recurring.
+      - name: Formatting and go fix drift
+        run: |
+          set -euo pipefail
+          unformatted="$(gofmt -l . | grep -v '^testing/' || true)"
+          if [ -n "$unformatted" ]; then
+            echo "gofmt would rewrite:"; echo "$unformatted"; exit 1
+          fi
+          # go fix is NOT idempotent in one pass: a pass that adds `//go:fix
+          # inline` to a helper only enables the NEXT pass to inline its call
+          # sites. Running once left three files still to rewrite, so the gate
+          # iterates to a fixpoint — otherwise it fails on a tree that a correct
+          # single local run produced.
+          for _ in 1 2 3 4 5; do
+            go fix ./... >/dev/null
+            go fix -tags acceptance ./jamfplatform/... >/dev/null
+            git diff --quiet && break
+          done
+          git diff --exit-code || {
+            echo "go fix produced changes — run these to a fixpoint locally and commit the result with your change:"
+            echo "  go fix ./... && go fix -tags acceptance ./jamfplatform/... (repeat until clean)"
+            exit 1
+          }
 
   lint:
     name: Lint

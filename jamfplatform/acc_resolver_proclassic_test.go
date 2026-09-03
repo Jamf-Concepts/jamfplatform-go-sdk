@@ -236,7 +236,7 @@ func TestAcceptance_Classic_ResolveScriptByName(t *testing.T) {
 	created, err := pc.CreateScriptByID(ctx, "0", &proclassic.Script{
 		Name:           new(name),
 		ScriptContents: new("#!/bin/sh\necho hello\n"),
-		Priority:       classicStrPtr(proclassic.ScriptPriorityAfter),
+		Priority:       new(proclassic.ScriptPriorityAfter),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -308,7 +308,7 @@ func TestAcceptance_Classic_ResolveDockItemByName(t *testing.T) {
 	created, err := pc.CreateDockItemByID(ctx, "0", &proclassic.DockItem{
 		Name: new(name),
 		Path: new("file:///Applications/Safari.app/"),
-		Type: classicStrPtr(proclassic.DockItemTypeApp),
+		Type: new(proclassic.DockItemTypeApp),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -698,7 +698,7 @@ func TestAcceptance_Classic_ResolveComputerExtensionAttributeByName(t *testing.T
 	name := "sdk-acc-rsv-cea-" + runSuffix()
 	created, err := pc.CreateComputerExtensionAttributeByID(ctx, "0", &proclassic.ComputerExtensionAttribute{
 		Name:     new(name),
-		DataType: classicStrPtr(proclassic.ComputerExtensionAttributeDataTypeString),
+		DataType: new(proclassic.ComputerExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -735,7 +735,7 @@ func TestAcceptance_Classic_ResolveMobileDeviceExtensionAttributeByName(t *testi
 	// preserved here because generator tracks the spec verbatim.
 	created, err := pc.CreateMobileDeviceExtensionAttributeByID(ctx, "0", &proclassic.MobileDeviceExtensionAttribute{
 		Name:     new(name),
-		DataType: classicStrPtr(proclassic.MobileDeviceExtensionAttributeDataTypeString),
+		DataType: new(proclassic.MobileDeviceExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -770,7 +770,7 @@ func TestAcceptance_Classic_ResolveUserExtensionAttributeByName(t *testing.T) {
 	name := "sdk-acc-rsv-uea-" + runSuffix()
 	created, err := pc.CreateUserExtensionAttributeByID(ctx, "0", &proclassic.UserExtensionAttribute{
 		Name:     new(name),
-		DataType: classicStrPtr(proclassic.UserExtensionAttributeDataTypeString),
+		DataType: new(proclassic.UserExtensionAttributeDataTypeString),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -980,8 +980,8 @@ func TestAcceptance_Classic_ResolveWebhookByName(t *testing.T) {
 	created, err := pc.CreateWebhookByID(ctx, "0", &proclassic.Webhook{
 		Name:        new(name),
 		URL:         new("https://webhook.example.test/receiver"),
-		Event:       classicStrPtr(proclassic.WebhookEventComputerAdded),
-		ContentType: classicStrPtr(proclassic.WebhookContentTypeApplicationJson),
+		Event:       new(proclassic.WebhookEventComputerAdded),
+		ContentType: new(proclassic.WebhookContentTypeApplicationJson),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1094,8 +1094,8 @@ func TestAcceptance_Classic_ResolveDiskEncryptionConfigurationByName(t *testing.
 	name := "sdk-acc-rsv-dec-" + runSuffix()
 	created, err := pc.CreateDiskEncryptionConfigurationByID(ctx, "0", &proclassic.DiskEncryptionConfiguration{
 		Name:                  new(name),
-		KeyType:               classicStrPtr(proclassic.DiskEncryptionConfigurationKeyTypeIndividual),
-		FileVaultEnabledUsers: classicStrPtr(proclassic.DiskEncryptionConfigurationFileVaultEnabledUsersManagementAccount),
+		KeyType:               new(proclassic.DiskEncryptionConfigurationKeyTypeIndividual),
+		FileVaultEnabledUsers: new(proclassic.DiskEncryptionConfigurationFileVaultEnabledUsersManagementAccount),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
@@ -1139,8 +1139,8 @@ func TestAcceptance_Classic_ResolveLDAPServerByName(t *testing.T) {
 			Name:               new(name),
 			Hostname:           new("ldap.example.test"),
 			Port:               &port,
-			ServerType:         classicStrPtr(proclassic.LdapServerPostConnectionServerTypeActiveDirectory),
-			AuthenticationType: classicStrPtr(proclassic.LdapServerPostConnectionAuthenticationTypeNone),
+			ServerType:         new(proclassic.LdapServerPostConnectionServerTypeActiveDirectory),
+			AuthenticationType: new(proclassic.LdapServerPostConnectionAuthenticationTypeNone),
 		},
 	})
 	if err != nil {
@@ -1515,8 +1515,8 @@ func TestAcceptance_Classic_ResolveAccountGroupByName(t *testing.T) {
 	name := "sdk-acc-rsv-grp-" + runSuffix()
 	created, err := pc.CreateAccountGroupByID(ctx, "0", &proclassic.Group{
 		Name:         new(name),
-		AccessLevel:  classicStrPtr(proclassic.GroupAccessLevelFullAccess),
-		PrivilegeSet: classicStrPtr(proclassic.GroupPrivilegeSetAdministrator),
+		AccessLevel:  new(proclassic.GroupAccessLevelFullAccess),
+		PrivilegeSet: new(proclassic.GroupPrivilegeSetAdministrator),
 	})
 	if err != nil {
 		skipOnServerError(t, err)
