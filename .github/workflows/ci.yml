@@ -2,6 +2,14 @@ name: CI
 
 on:
   pull_request:
+  # Manual runs. No inputs: every job here is cheap, hermetic and side-effect
+  # free — no tenant, no credentials, no writes — so there is nothing worth
+  # selecting between, and a job filter would mean an `if:` on all seven.
+  #
+  # Useful because CI is otherwise pull_request-only: a branch with no PR open
+  # gets no coverage at all, which is exactly when the gates matter most (the
+  # first acceptance matrix run went out on a PR-less branch).
+  workflow_dispatch:
 
 permissions:
   contents: read
