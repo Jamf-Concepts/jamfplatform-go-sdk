@@ -55,10 +55,10 @@
     },
     {
       "lane": "platform-env",
-      "match": "^TestAcceptance_(AiGovernance|Audit|EnvironmentScope)",
+      "match": "^TestAcceptance_(AiGovernance|Audit|EnvironmentScope|Blueprint|ListBlueprint|GetBlueprint|ResolveBlueprint|Benchmark|ListBenchmark|ResolveBenchmark|ListBaselines|GetBaselineRules|ResolveBaseline|APIError_(Blueprints|ComplianceBenchmarks))",
       "require": "environment",
       "lock": false,
-      "why": "Environment-scoped platform surfaces. Audit lives here, NOT in account: scopes.yaml files it under organization but the wire refuses X-Organization-Id with 400 INVALID_REQUEST_CONTEXT_TYPE."
+      "why": "Environment-scoped platform surfaces. Audit lives here, NOT in account: scopes.yaml files it under organization but the wire refuses X-Organization-Id with 400 INVALID_REQUEST_CONTEXT_TYPE. Blueprints and compliance-benchmarks joined on 2026-09-03: their specs say tenant, and a legacy pre-GA tenant credential does read them, but a tenant integration created after GA cannot be granted the capabilities they need \u2014 so environment scope is the only one that works going forward, and accClient's silent tenant fallback would turn that into a 403 that reads as a broken endpoint. Device groups deliberately did NOT move: they remain reachable under both scopes, verified 200 on two tenant credentials and one environment credential. The pattern is an explicit alternation rather than a prefix because these tests are named for their operation (ListBaselines, GetBaselineRules) rather than their product; the conformance test is what keeps it honest, since a new test whose name lands in the wrong lane fails on the factory mismatch."
     },
     {
       "lane": "pro-tenant",

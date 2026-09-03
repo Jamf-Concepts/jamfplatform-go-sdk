@@ -17,7 +17,7 @@ import (
 
 func TestAcceptance_ResolveBlueprintIDByName(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 
@@ -36,7 +36,7 @@ func TestAcceptance_ResolveBlueprintIDByName(t *testing.T) {
 
 func TestAcceptance_ResolveBlueprintByName(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 
@@ -60,7 +60,7 @@ func TestAcceptance_ResolveBlueprintByName(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBlueprintIDByName_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 
@@ -86,7 +86,7 @@ func TestAcceptance_ResolveBlueprintIDByName_NotFound(t *testing.T) {
 // with the exact name match.
 func TestAcceptance_ResolveBlueprint_SimilarNames(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 	suffix := runSuffix()
@@ -118,7 +118,7 @@ func TestAcceptance_ResolveBlueprint_SimilarNames(t *testing.T) {
 // — that's server behaviour worth recording, not a resolver defect.
 func TestAcceptance_ResolveBlueprint_Ambiguous(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 
@@ -178,7 +178,7 @@ func TestAcceptance_ResolveBlueprint_Ambiguous(t *testing.T) {
 // Components are platform-managed — no create/delete. Read-only probe.
 
 func TestAcceptance_ResolveBlueprintComponentIDByName_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	bp := blueprints.New(c)
 	_, err := bp.ResolveBlueprintComponentIDByName(context.Background(), "sdk-does-not-exist-bpc-"+runSuffix())
 	if err == nil {
@@ -192,7 +192,7 @@ func TestAcceptance_ResolveBlueprintComponentIDByName_NotFound(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBlueprintComponentIDByName_Existing(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 
@@ -215,7 +215,7 @@ func TestAcceptance_ResolveBlueprintComponentIDByName_Existing(t *testing.T) {
 }
 
 func TestAcceptance_ResolveBlueprintComponentByName_Existing(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 

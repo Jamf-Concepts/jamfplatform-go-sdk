@@ -58,7 +58,7 @@ func makeStep(identifier string, config any) []blueprints.BlueprintStep {
 }
 
 func TestAcceptance_ListBlueprints(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	bps, err := blueprints.New(c).ListBlueprints(context.Background(), nil, "")
 	if err != nil {
@@ -69,7 +69,7 @@ func TestAcceptance_ListBlueprints(t *testing.T) {
 }
 
 func TestAcceptance_ListBlueprintsWithSearch(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	bps, err := blueprints.New(c).ListBlueprints(context.Background(), nil, "sdk-acc")
 	if err != nil {
@@ -80,7 +80,7 @@ func TestAcceptance_ListBlueprintsWithSearch(t *testing.T) {
 }
 
 func TestAcceptance_ListBlueprintComponents(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	comps, err := blueprints.New(c).ListBlueprintComponents(context.Background())
 	if err != nil {
@@ -98,7 +98,7 @@ func TestAcceptance_ListBlueprintComponents(t *testing.T) {
 }
 
 func TestAcceptance_GetBlueprintComponent(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bp := blueprints.New(c)
 
@@ -124,7 +124,7 @@ func TestAcceptance_GetBlueprintComponent(t *testing.T) {
 
 func TestAcceptance_Blueprint_EmptyBlueprint(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	name := "sdk-acc-empty-bp-" + runSuffix()
 	bp := createTestBlueprint(t, c, name, groupID, []blueprints.BlueprintStep{})
@@ -140,7 +140,7 @@ func TestAcceptance_Blueprint_EmptyBlueprint(t *testing.T) {
 
 func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
 	bpClient := blueprints.New(c)
@@ -200,7 +200,7 @@ func TestAcceptance_Blueprint_UpdateAndRead(t *testing.T) {
 
 func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	suffix := runSuffix()
 	bpClient := blueprints.New(c)
@@ -262,7 +262,7 @@ func TestAcceptance_Blueprint_PartialUpdatePreservesSteps(t *testing.T) {
 
 func TestAcceptance_Blueprint_Report(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	bpClient := blueprints.New(c)
 
@@ -326,7 +326,7 @@ func TestAcceptance_Blueprint_Report(t *testing.T) {
 // Components not available on the tenant are skipped automatically.
 func TestAcceptance_Blueprint_TypedComponents(t *testing.T) {
 	groupID := requireSmartGroupFixture(t)
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	// Query available components so we can skip identifiers not present on this tenant.
 	available, err := blueprints.New(c).ListBlueprintComponents(context.Background())

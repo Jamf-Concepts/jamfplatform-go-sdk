@@ -330,7 +330,7 @@ func TestAcceptance_APIError_DeviceActions_NotFound(t *testing.T) {
 // deep required structure (device group scope + steps); this test focuses
 // purely on error-accessor behaviour, not CRUD exercise.
 func TestAcceptance_APIError_Blueprints_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	bp := blueprints.New(c)
 
 	_, err := bp.GetBlueprint(context.Background(), "00000000-0000-0000-0000-000000000000")
@@ -349,7 +349,7 @@ func TestAcceptance_APIError_Blueprints_NotFound(t *testing.T) {
 // with a bogus UUID. Duplicate-title probe skipped due to CreateBenchmark's
 // deep required body (rules, sources, baseline, target).
 func TestAcceptance_APIError_ComplianceBenchmarks_NotFound(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	cb := compliancebenchmarks.New(c)
 
 	_, err := cb.GetBenchmark(context.Background(), "00000000-0000-0000-0000-000000000000")

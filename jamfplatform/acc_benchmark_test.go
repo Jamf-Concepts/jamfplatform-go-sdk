@@ -13,7 +13,7 @@ import (
 )
 
 func TestAcceptance_ListBaselines(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	baselines, err := compliancebenchmarks.New(c).ListBaselines(context.Background())
 	if err != nil {
@@ -31,7 +31,7 @@ func TestAcceptance_ListBaselines(t *testing.T) {
 }
 
 func TestAcceptance_GetBaselineRules(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -64,7 +64,7 @@ func TestAcceptance_GetBaselineRules(t *testing.T) {
 }
 
 func TestAcceptance_ListBenchmarks(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 
 	benchmarks, err := compliancebenchmarks.New(c).ListBenchmarks(context.Background())
 	if err != nil {
@@ -78,7 +78,7 @@ func TestAcceptance_ListBenchmarks(t *testing.T) {
 }
 
 func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
@@ -156,7 +156,7 @@ func TestAcceptance_Benchmark_CreateAndDelete(t *testing.T) {
 }
 
 func TestAcceptance_Benchmark_Reporting(t *testing.T) {
-	c := accClient(t)
+	c := accEnvClient(t)
 	ctx := context.Background()
 	cb := compliancebenchmarks.New(c)
 
