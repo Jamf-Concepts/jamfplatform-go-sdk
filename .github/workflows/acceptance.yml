@@ -234,6 +234,60 @@ jobs:
           # pipeline that wires a secret and then skips prints `ok` having
           # asserted nothing.
           JAMFPLATFORM_ACC_REQUIRE: ${{ matrix.require }}
+          # ---------------------------------------------------------------
+          # Credentials. One set per (product, scope), named
+          # JAMFPLATFORM_ACC_<PRODUCT>_<SCOPE>_<FIELD>. The product token appears
+          # only where the scope is product-bound: tenant is per-product, while
+          # environment and organization span a customer's tenants. ACC_ marks
+          # these as acceptance-only and keeps them clear of
+          # JAMFPLATFORM_CLIENT_ID and friends, which jamfplatform/doc.go
+          # documents as the *consumer* convention.
+          # ---------------------------------------------------------------
+          #
+          # Environment scope is the workhorse: one environment credential is
+          # wire-verified (2026-09-03) to reach pro, devices, blueprints,
+          # compliance-benchmarks, ai/governance AND securitycloud. Prefer it.
+          JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL }}
+          JAMFPLATFORM_ACC_ENVIRONMENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_ID }}
+          JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID }}
+          JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET }}
+          # Organization scope is the ABSENCE of a scope header — the gateway
+          # derives the organization from the token — so there is no ID to wire
+          # and supplying one would be wrong. Jamf Account ships only use1
+          # api-definitions, so BASE_URL must be the US gateway; an EU one fails
+          # in a way that does not look regional. Missing entirely until
+          # 2026-09-03, so all ten account tests skipped on every run.
+          JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL }}
+          JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID }}
+          JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET }}
+          # Tenant scope, kept for COVERAGE rather than data: WithTenantID is a
+          # supported public option the Terraform provider uses, and tenant is
+          # the legacy scope — so if CI only ever sent X-Environment-Id a
+          # regression in the ScopeTenant path would ship unnoticed. One lane
+          # uses it; everything else runs on the environment credential.
+          JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL }}
+          JAMFPLATFORM_ACC_PRO_TENANT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_ID }}
+          JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID }}
+          JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET }}
+          #
+          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_* is deliberately NOT wired.
+          # The environment credential above reaches /api/securitycloud, so a
+          # dedicated Security Cloud credential is redundant here. It remains
+          # supported and PREFERRED when set, because it lands on a different
+          # Security Cloud tenant carrying the suite's long-lived fixtures — set
+          # it locally if a test needs those. accJSCCredSource logs which
+          # credential the run actually used.
+          #
+          # JAMFPLATFORM_ACC_REQUIRE is set per lane from matrix.require above,
+          # not once for the whole run.
+          # Optional Pro fixtures and material — when present the suite exercises
+          # real register/lifecycle flows instead of probe-only paths. Namespaced
+          # by product for the same reason the credentials are.
+          JAMFPLATFORM_ACC_PRO_DEP_TOKEN: ${{ secrets.JAMFPLATFORM_ACC_PRO_DEP_TOKEN }}
+          JAMFPLATFORM_ACC_PRO_VPP_TOKEN: ${{ secrets.JAMFPLATFORM_ACC_PRO_VPP_TOKEN }}
+          JAMFPLATFORM_ACC_PRO_PROTECT_URL: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_URL }}
+          JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID }}
+          JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD }}
 
       # Surface what this lane actually ran, failed or self-skipped, so a
       # suite that never executes — a missing fixture, an unset write gate — is
@@ -298,60 +352,6 @@ jobs:
           COUNT: ${{ matrix.count }}
           LOCK: ${{ matrix.lock }}
           REQUIRE: ${{ matrix.require }}
-          # ---------------------------------------------------------------
-          # Credentials. One set per (product, scope), named
-          # JAMFPLATFORM_ACC_<PRODUCT>_<SCOPE>_<FIELD>. The product token appears
-          # only where the scope is product-bound: tenant is per-product, while
-          # environment and organization span a customer's tenants. ACC_ marks
-          # these as acceptance-only and keeps them clear of
-          # JAMFPLATFORM_CLIENT_ID and friends, which jamfplatform/doc.go
-          # documents as the *consumer* convention.
-          # ---------------------------------------------------------------
-          #
-          # Environment scope is the workhorse: one environment credential is
-          # wire-verified (2026-09-03) to reach pro, devices, blueprints,
-          # compliance-benchmarks, ai/governance AND securitycloud. Prefer it.
-          JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_BASE_URL }}
-          JAMFPLATFORM_ACC_ENVIRONMENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_ID }}
-          JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_ID }}
-          JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_ENVIRONMENT_CLIENT_SECRET }}
-          # Organization scope is the ABSENCE of a scope header — the gateway
-          # derives the organization from the token — so there is no ID to wire
-          # and supplying one would be wrong. Jamf Account ships only use1
-          # api-definitions, so BASE_URL must be the US gateway; an EU one fails
-          # in a way that does not look regional. Missing entirely until
-          # 2026-09-03, so all ten account tests skipped on every run.
-          JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_BASE_URL }}
-          JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_ID }}
-          JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_ORGANIZATION_CLIENT_SECRET }}
-          # Tenant scope, kept for COVERAGE rather than data: WithTenantID is a
-          # supported public option the Terraform provider uses, and tenant is
-          # the legacy scope — so if CI only ever sent X-Environment-Id a
-          # regression in the ScopeTenant path would ship unnoticed. One lane
-          # uses it; everything else runs on the environment credential.
-          JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_BASE_URL }}
-          JAMFPLATFORM_ACC_PRO_TENANT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_ID }}
-          JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_ID }}
-          JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET: ${{ secrets.JAMFPLATFORM_ACC_PRO_TENANT_CLIENT_SECRET }}
-          #
-          # JAMFPLATFORM_ACC_SECURITYCLOUD_TENANT_* is deliberately NOT wired.
-          # The environment credential above reaches /api/securitycloud, so a
-          # dedicated Security Cloud credential is redundant here. It remains
-          # supported and PREFERRED when set, because it lands on a different
-          # Security Cloud tenant carrying the suite's long-lived fixtures — set
-          # it locally if a test needs those. accJSCCredSource logs which
-          # credential the run actually used.
-          #
-          # JAMFPLATFORM_ACC_REQUIRE is set per lane from matrix.require above,
-          # not once for the whole run.
-          # Optional Pro fixtures and material — when present the suite exercises
-          # real register/lifecycle flows instead of probe-only paths. Namespaced
-          # by product for the same reason the credentials are.
-          JAMFPLATFORM_ACC_PRO_DEP_TOKEN: ${{ secrets.JAMFPLATFORM_ACC_PRO_DEP_TOKEN }}
-          JAMFPLATFORM_ACC_PRO_VPP_TOKEN: ${{ secrets.JAMFPLATFORM_ACC_PRO_VPP_TOKEN }}
-          JAMFPLATFORM_ACC_PRO_PROTECT_URL: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_URL }}
-          JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_CLIENT_ID }}
-          JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD: ${{ secrets.JAMFPLATFORM_ACC_PRO_PROTECT_PASSWORD }}
           # Fixture-ID overrides (JAMFPLATFORM_ACC_PROCLASSIC_COMPUTER_ID,
           # ..._PROCLASSIC_MOBILE_DEVICE_ID, ..._PRO_DEVICE_GROUP_ID,
           # ..._PRO_WIFI_PROFILE_ID, ..._PRO_VPP_INVITATION_ID) are

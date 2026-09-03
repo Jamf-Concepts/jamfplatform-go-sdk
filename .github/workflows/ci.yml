@@ -44,6 +44,51 @@ jobs:
       # untagged `go fix ./...` cannot see 56 of jamfplatform/'s files, so the
       # rewrites accumulated there unnoticed until 8a38c91 cleared 26 files'
       # worth. Checking the tagged path here stops that recurring.
+      # The acceptance workflow's credential secrets must sit on the step that
+      # runs `go test`, not on a neighbouring step. Both yamllint and actionlint
+      # accept them anywhere — a workflow with the secrets attached to the wrong
+      # step is structurally valid and semantically dead, and the only symptom is
+      # every lane failing with "credentials not configured", which reads as a
+      # missing secret rather than a misplaced one. That happened on the first
+      # matrix run (33744831062): all 16 landed on the summary step.
+      - name: Acceptance credentials are on the test step
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys, yaml
+          wf = yaml.safe_load(open(".github/workflows/acceptance.yml"))
+          steps = wf["jobs"]["acceptance"]["steps"]
+          by_name = {s.get("name"): (s.get("env") or {}) for s in steps}
+
+          runner = next(s for s in steps if "go test" in (s.get("run") or ""))
+          creds = {k for k in (runner.get("env") or {})
+                   if k.startswith("JAMFPLATFORM_") and k != "JAMFPLATFORM_ACC_REQUIRE"}
+          if not creds:
+              sys.exit("the step running `go test` carries no JAMFPLATFORM_* credentials")
+
+          # Every lane's require token must have a credential set behind it.
+          lanes = yaml.safe_load(open(".github/acceptance-lanes.json"))
+          wanted = {"organization": "JAMFPLATFORM_ACC_ORGANIZATION_",
+                    "environment": "JAMFPLATFORM_ACC_ENVIRONMENT_",
+                    "platform": "JAMFPLATFORM_ACC_ENVIRONMENT_",
+                    "pro-tenant": "JAMFPLATFORM_ACC_PRO_TENANT_"}
+          active = [l for l in lanes["lanes"] if not l.get("planned")] + [lanes["default_lane"]]
+          for lane in active:
+              prefix = wanted.get(lane["require"])
+              if prefix and not any(c.startswith(prefix) for c in creds):
+                  sys.exit(f'lane {lane["lane"]!r} requires {lane["require"]!r} but no {prefix}* is set on the test step')
+
+          # Nothing else may carry them: a stray copy on another step is how the
+          # originals got orphaned in the first place.
+          for name, env in by_name.items():
+              if env is (runner.get("env") or {}):
+                  continue
+              stray = {k for k in env if k.startswith("JAMFPLATFORM_")}
+              if stray:
+                  sys.exit(f"step {name!r} carries credentials that belong on the test step: {sorted(stray)}")
+          print(f"OK: {len(creds)} credential vars on the test step, none stranded elsewhere")
+          PY
+
       - name: Formatting and go fix drift
         run: |
           set -euo pipefail
