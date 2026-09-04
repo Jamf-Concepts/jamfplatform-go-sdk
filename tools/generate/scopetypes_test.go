@@ -149,18 +149,29 @@ func TestEveryConfiguredSpecResolvesAScope(t *testing.T) {
 	}
 
 	for _, spec := range cfg.Specs {
-		raw, err := os.ReadFile("../../" + spec.File)
+		// Resolve the spec the way the generator does rather than reaching
+		// straight for testing/: that directory is gitignored, so in CI the
+		// only copy is the published api/*.json and a hardcoded testing/ path
+		// fails there and nowhere else. resolveSpecPath is the same function
+		// main.go uses, so this test cannot drift from the real fallback.
+		specPath, _, err := resolveSpecPath("../..", cfg, spec)
 		if err != nil {
-			t.Fatalf("%s: %v", spec.File, err)
+			t.Fatalf("%s: resolveSpecPath: %v", spec.File, err)
+		}
+		raw, err := os.ReadFile(specPath)
+		if err != nil {
+			t.Fatalf("%s: %v", specPath, err)
 		}
 		// Only the root extension matters here, so decode the document
 		// directly rather than through loadSpec: this test is about what the
-		// spec declares, not about whether it resolves.
+		// spec declares, not about whether it resolves. YAML is a JSON
+		// superset, so one decoder reads both the verbatim testing/ YAML and
+		// the published api/ JSON.
 		var root struct {
 			ScopeTypes []string `yaml:"x-scope-types"`
 		}
 		if err := yaml.Unmarshal(raw, &root); err != nil {
-			t.Fatalf("%s: %v", spec.File, err)
+			t.Fatalf("%s: %v", specPath, err)
 		}
 
 		scopes, err := resolveScopeTypes(docWithScopeTypes(root.ScopeTypes), spec)
