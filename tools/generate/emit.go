@@ -2918,25 +2918,25 @@ type MethodPrivileges struct {
 	// declared per spec rather than per operation, so every method built from
 	// one spec carries the same set. The field is per-method as a precaution
 	// against two specs in one package disagreeing — securitycloud did, one of
-	// its six specs being held at a build predating the others' environment
-	// declaration, and a config correction closed that gap rather than the
-	// registry reporting it. Keeping the field per-method means the next such
-	// divergence needs no structural change.
+	// its six specs having been held at a build predating the others'
+	// environment declaration, until v2082 was ingested there and closed the
+	// gap. Keeping the field per-method means the next such divergence needs
+	// no structural change.
 	Scopes []ScopeKind
 	// ScopesSource names where Scopes came from:
 	//
 	//   - "spec": the spec root's own x-scope-types extension.
 	//   - "config-override": the SDK's own config.scopeTypes, because the
 	//     published spec either understates what the gateway serves or
-	//     declares no extension at all. Two families are this case. The
-	//     account trio (licensing, partners, sso) carries no x-scope-types in
-	//     any published build and is organization-scoped by gateway
-	//     configuration, the routes resolving the organization from the access
-	//     token. securitycloud-device-groups is held at a build predating its
-	//     environment declaration: it declares tenant alone, while the current
-	//     build declares tenant and environment for the identical operation
-	//     set and an environment credential reaches all seven (wire-verified
-	//     2026-09-04).
+	//     declares no extension at all. One family is this case: the account
+	//     trio (licensing, partners, sso) carries no x-scope-types in any
+	//     published build and is organization-scoped by gateway
+	//     configuration, the routes resolving the organization from the
+	//     access token. securitycloud-device-groups was the second until
+	//     2026-09-04, when the v2 update handler was fixed, its hold lifted
+	//     and the ingested spec began declaring the set the override had been
+	//     asserting — at which point the override self-expired, exactly as
+	//     designed.
 	//
 	// A "config-override" entry is therefore an assertion about the gateway,
 	// evidenced on the wire, rather than a claim about the ingested artifact —

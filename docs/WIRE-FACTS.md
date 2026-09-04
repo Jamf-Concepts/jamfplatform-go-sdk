@@ -1262,6 +1262,74 @@ both an unrouted path and a privilege failure.
 the `jsc-api-gateway` ping, `securitycloud-devices`' `GET /v1/…/devices`, and
 **every `/v2/groups/{id}` method** — see below.
 
+### Device groups `PUT /v2/groups/{id}` is FIXED, and the hold is lifted (2026-09-04)
+
+**The handler defect recorded in the section below was fixed the next day, and
+the fix window is narrow enough to state exactly: between 12:51 and 13:33 BST on
+2026-09-04.** A run of `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` at
+12:51 still got the `404`; a run at 13:33 succeeded. Nothing in the SDK changed
+between them.
+
+**It is a real fix, not a status change.** The failure mode a status check
+cannot see is a handler that accepts a write and discards it, so the rename was
+**read back**. Three cycles, raw curl so the payloads are not mediated by the
+SDK, with an environment credential on `eu`:
+
+```
+control  bogus path                    -> HTTP 403        (unrouted tell, this namespace)
+POST /securitycloud/v1/groups          -> {"id":"b0693661-…","name":"sdk-v2put-verify-1-31843"}
+PUT  /securitycloud/v1/groups/{id}     -> HTTP 200        {"id":"b0693661-…","name":"…-v1ok"}
+PUT  /securitycloud/v2/groups/{id}     -> HTTP 204        (empty body, as declared)
+GET  /securitycloud/v2/groups          -> name is "sdk-v2put-verify-1-31843-v2applied"   ← PERSISTED
+DELETE /securitycloud/v1/groups/{id}   -> HTTP 204
+```
+
+3/3 identical. The `403` control in the same invocation is what rules out the
+`204` being a router artefact, and the read-back through `GET /v2/groups` — a
+different operation from the one written — is what rules out a write the handler
+accepted and dropped.
+
+**Two layers were broken here, and fixing the first made the second visible.**
+The 403 → 404 transition on 2026-09-03 was `authorization-policies#265`
+deploying, and the diagnosis at the time — recorded below — concluded "the
+remaining gap is the rollout". The rollout did land. It then exposed an
+independent defect in the v2 handler behind it, which is why the hold outlived
+the authorization fix by a day. **A 403 clearing is not the same event as the
+capability arriving**; that is the part worth carrying forward.
+
+**What it cost to lift the hold.** `securitycloud-device-groups-api.yaml` is
+ingested at v2082, taking v1942's two withdrawals with it: `GET /v1/groups` and
+`PUT /v1/groups/{groupId}`. Removed from Go — all breaking:
+`ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, `ResolveDeviceGroupV1IDByName`,
+`ResolveDeviceGroupV1ByName`, `ApplyDeviceGroupV1`, and the
+`GroupListResponse = []GroupListItem` alias the withdrawn list was the only user
+of. `ApplyDeviceGroupV2`'s update branch is repointed from
+`UpdateDeviceGroupV1` to `UpdateDeviceGroupV2` — the branch that could not have
+worked at all before this fix. `POST /v1/groups` and `GET`/`DELETE
+/v1/groups/{groupId}` survive the withdrawal, so the package still creates and
+deletes through v1.
+
+**Both withdrawn paths still answer 200 on the wire**, probed in the same
+session with the same 403 bogus-path control:
+
+```
+GET /securitycloud/v1/groups        -> HTTP 200  [{"name":"Default Group"}]
+PUT /securitycloud/v1/groups/{id}   -> HTTP 200  {"id":"ad1cee93-…","name":"sdk-withdrawal-probe-v1"}
+```
+
+So the SDK is deliberately stricter than the gateway here, which is the v1942
+rule applied rather than an accident. Worth noting `GET /v1/groups` returns a
+bare array whose entries carry only `name` — no `id` — which is why the
+withdrawn list's item type was never `Group`.
+
+**The whole spec delta is those two withdrawals plus v2082's scope-parameter
+migration.** Stripping the scope parameters leaves **zero** operations
+differing across the five survivors, and zero schemas added, removed or
+changed. `x-scope-types` goes `[tenant]` → `[tenant, environment]`, which
+self-expired the `scopeTypes` config override: generation failed with *"delete
+the config entry so the spec is the only source"* and the entry went. The
+account trio is now the only user of that key.
+
 ### Device groups `/v2/{id}`: the rule deployed, and the v2 handler 404s (2026-09-04)
 
 **The authorization story is over and the hold now rests on a service defect.**

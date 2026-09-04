@@ -63954,7 +63954,6 @@
           "computer-inventory"
         ],
         "x-deprecation-date": "2026-07-14",
-        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "devices:update"
         ],
@@ -64063,7 +64062,6 @@
           "computer-inventory"
         ],
         "x-deprecation-date": "2026-07-14",
-        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "destructive-device-actions:execute"
         ],
@@ -64300,7 +64298,6 @@
           "computer-inventory"
         ],
         "x-deprecation-date": "2026-07-14",
-        "x-jamf-expected-status": 204,
         "x-required-privileges": [
           "devices:update"
         ],

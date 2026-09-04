@@ -121,7 +121,7 @@ deliberately kept three of them for exactly that reason.
 | `splitByTag` | 18 | **required** — one methods file per OpenAPI tag |
 | `fieldTypeOverrides` | 5 | `"schema.property"` → Go type, to correct a spec bug. `*.property` matches the property on every schema. Applied per spec so an upstream fix isn't silently overwritten |
 | `docNotes` | 3 | Go type name → prose appended to its godoc. For corrections belonging to the type as a whole, which `schemaPatches` cannot reach (it patches properties). **A key matching no emitted type is a build failure** — a silently dropped correction leaves the wrong doc in place |
-| `scopeTypes` | 4 | spec → the scope kinds its operations accept (`tenant`, `environment`, `organization`), overriding a published `x-scope-types` that understates what the gateway serves. Carried to each method's `Scopes` in the Privileges registry, never into `api/`, with `ScopesSource` recording that the value is a config correction rather than the spec's own claim. Self-expiring in both directions: generation fails once the spec declares the same set, and also once the spec declares anything the override omits — an override widens an understated spec, so a spec that has moved past it is about to lose a declared scope, which the equality check alone cannot see. The account trio uses it because no account spec declares the extension at all; `securitycloud-devices` uses it because it is held at a build that predates the environment declaration |
+| `scopeTypes` | 3 | spec → the scope kinds its operations accept (`tenant`, `environment`, `organization`), overriding a published `x-scope-types` that understates what the gateway serves. Carried to each method's `Scopes` in the Privileges registry, never into `api/`, with `ScopesSource` recording that the value is a config correction rather than the spec's own claim. Self-expiring in both directions: generation fails once the spec declares the same set, and also once the spec declares anything the override omits — an override widens an understated spec, so a spec that has moved past it is about to lose a declared scope, which the equality check alone cannot see. The account trio is the only user: no account spec declares the extension at all. `securitycloud-devices` was the second until 2026-09-04, when its hold lifted and the entry self-expired |
 | `schemaPatches` | 3 | schema → dotted property path → raw OpenAPI 3 Schema. Adds or replaces at that path |
 | `requiredPrivileges` | 3 | `"METHOD /path"` → GA capability permissions, for an operation the **published spec declares none for** but an authoritative out-of-band source does. Carried straight to the generated registry with `Source: "gateway-policy"`, never into the spec document, so `api/` stays faithful to upstream. **Fails generation if the operation now declares `x-required-privileges`** — that means upstream published them and the entry must go. All three users are the `account` specs; see [Required privileges](#required-privileges) |
 | `enumAdditions` | 1 | schema name → wire values to append to its `enum`, for a value the server produces or accepts that the spec omits. Applied with the other schema patches, so the value reaches `api/` too. **Panics when the value is already declared**, when the schema declares no enum, or when the schema is missing — a duplicated enum member would emit two identical constants and compile, so nothing else would ever notice. One user: `Region` gaining `RAMP` |
@@ -1112,15 +1112,18 @@ machine-readable.
 **Scope is declared per spec and stored per method.** Every method built from one
 spec carries the same set, so the field looks like it should have been a
 package-level accessor. It should not: two specs in one package can disagree, and
-`securitycloud` does. It is built from six specs, and
-`securitycloud-device-groups-api.yaml` is held at v1897 — a build predating the
-environment declaration the other five now carry — so a package-level answer
-would have had to pick one of the two and lie about the rest of the package.
+`securitycloud` did. It is built from six specs, and
+`securitycloud-device-groups-api.yaml` sat at v1897 — a build predating the
+environment declaration the other five carried — so a package-level answer would
+have had to pick one of the two and lie about the rest of the package. That
+particular divergence closed on 2026-09-04 when the hold lifted, which is the
+argument for keeping the storage per-method rather than against it: the next one
+needs no structural change.
 
 **Provenance is recorded, because the value is not always the spec's.**
 `ScopesSource` is `"spec"` or `"config-override"`, mirroring exactly what `Source`
 does for `Scoped`, and it is never empty for the same reason `Scopes` is never
-empty. Four spec entries carry an override today, in two cases, both through the
+empty. Three spec entries carry an override today, all one case, through the
 [`scopeTypes` spec-level key](#spec-level) — read that row for the mechanism
 rather than repeating it here:
 
@@ -1130,13 +1133,16 @@ rather than repeating it here:
   the extension — the same structural reason they carry no
   `x-required-privileges`. Organization scope is gateway configuration rather
   than a spec claim, so config is where it is stated.
-- **`securitycloud-device-groups`** is held at v1897 while v2082 declares
-  `[tenant, environment]` for the identical operation set, and an environment
-  credential reaches all seven of its operations (wire-verified 2026-09-04). So
-  the override states a wire-established fact, not a guess, and it reverts
-  itself: when the hold lifts and the spec declares what config asserts,
-  generation fails with *"delete the config entry so the spec is the only
-  source"*.
+- **`securitycloud-device-groups`** was the second case, and it is the worked
+  example of the mechanism expiring on its own. It was held at v1897, declaring
+  `[tenant]`, while v2082 declared `[tenant, environment]` for the identical
+  operation set and an environment credential demonstrably reached every one of
+  its operations — so the override stated a wire-established fact rather than a
+  guess. On 2026-09-04 the v2 update handler was fixed, the hold lifted, and the
+  ingested spec began declaring exactly what config asserted; generation failed
+  with *"delete the config entry so the spec is the only source"* and the entry
+  went. Nobody had to remember it was there, which is the whole point of the
+  self-expiry.
 
 **The caveat a consumer must not lose: the registry reports the SPEC's claim, and
 as of v2082 that is stricter than the gateway for the Platform APIs.** Six

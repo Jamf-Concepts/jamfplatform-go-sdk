@@ -1523,39 +1523,46 @@ func TestAcceptance_SecurityCloudDeviceGroupLifecycle(t *testing.T) {
 		t.Errorf("group name = %q, want %q", got.Name, jscName("group"))
 	}
 
-	// ListDeviceGroupsV1 is deprecated (2026-08-12) and v2 is routed as of
-	// 2026-08-20, but v1 stays in the SDK — and stays covered — until Jamf
-	// removes the path, so consumers get a real migration window. Both
-	// versions' resolvers and Apply methods exist side by side for the same
-	// reason (see the pro packages, where V1/V2/V3 coexist).
-	groups, err := sc.ListDeviceGroupsV1(ctx)
+	// The list and update steps moved from v1 to v2 rather than being dropped.
+	// v2082 withdrew GET /v1/groups and PUT /v1/groups/{groupId} from the
+	// published spec, so ListDeviceGroupsV1 and UpdateDeviceGroupV1 no longer
+	// exist — the withdrawal was ingestable only because PUT /v2/groups/{id}
+	// started working on 2026-09-04, which is what the securitycloud-devices
+	// hold had been waiting for. POST /v1/groups and GET/DELETE
+	// /v1/groups/{groupId} survive the withdrawal, which is why the rest of
+	// this lifecycle is still v1.
+	groups, err := sc.ListDeviceGroupsV2(ctx)
 	if err != nil {
-		t.Fatalf("ListDeviceGroupsV1 failed: %v", err)
+		t.Fatalf("ListDeviceGroupsV2 failed: %v", err)
 	}
-	// GroupListResponse is an alias for []GroupListItem, so the method returns
-	// a pointer to a slice — the shape any bare-array response takes. The item
-	// type is deliberately not Group: the implicit "Default Group" entry comes
-	// back with no id, so the list schema cannot require one (build v1865).
+	// The item type is deliberately not Group: the implicit "Default Group"
+	// entry comes back with no id, so the list schema cannot require one
+	// (build v1865).
 	var found bool
-	for _, g := range *groups {
+	for _, g := range groups.Groups {
 		if g.ID == created.ID {
 			found = true
 		}
 	}
 	if !found {
-		t.Errorf("created group %s missing from ListDeviceGroupsV1 (%d groups)", created.ID, len(*groups))
+		t.Errorf("created group %s missing from ListDeviceGroupsV2 (%d groups)", created.ID, len(groups.Groups))
 	}
 
-	// The update answers 200 with the updated group. This was a config-level
-	// expectedStatus/responseType override against a spec that wrongly declared
-	// 204; build v1865 corrected the spec, so the override was deleted and the
-	// signature is now spec-derived. An empty name back means that regressed.
-	updated, err := sc.UpdateDeviceGroupV1(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: jscName("group") + "-renamed"})
-	if err != nil {
-		t.Fatalf("UpdateDeviceGroupV1(%s) failed: %v", created.ID, err)
+	// The v2 update answers 204 with no body, where the withdrawn v1 update
+	// answered 200 with the updated group. So the rename is asserted by reading
+	// it back rather than off the response — which is the stronger assertion
+	// anyway, and the one that caught this endpoint being genuinely fixed
+	// rather than merely answering 2xx.
+	renamed := jscName("group") + "-renamed"
+	if err := sc.UpdateDeviceGroupV2(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: renamed}); err != nil {
+		t.Fatalf("UpdateDeviceGroupV2(%s) failed: %v", created.ID, err)
 	}
-	if updated.Name != jscName("group")+"-renamed" {
-		t.Errorf("UpdateDeviceGroupV1 returned name %q, want %q", updated.Name, jscName("group")+"-renamed")
+	after, err := sc.GetDeviceGroupV1(ctx, created.ID)
+	if err != nil {
+		t.Fatalf("GetDeviceGroupV1(%s) after update failed: %v", created.ID, err)
+	}
+	if after.Name != renamed {
+		t.Errorf("after UpdateDeviceGroupV2 the name is %q, want %q — the update answered 204 without applying", after.Name, renamed)
 	}
 
 	if err := sc.DeleteDeviceGroupV1(ctx, created.ID); err != nil {
@@ -1584,41 +1591,39 @@ func TestAcceptance_SecurityCloudDeviceGroupsV2(t *testing.T) {
 	t.Logf("v2 returned %d device groups", len(groups.Groups))
 }
 
-// TestAcceptance_SecurityCloudUpdateDeviceGroupV2 pins a SERVICE defect. Until
-// 2026-09-03 it pinned a gateway gap, and the difference matters because it
-// changes who fixes it.
+// TestAcceptance_SecurityCloudUpdateDeviceGroupV2 pins the capability that
+// PUT /v2/groups/{groupId} finally has. It has pinned two defects before this,
+// and the history is why the assertion is worded the way it is.
 //
-// UpdateDeviceGroupV1 is deprecated as of 2026-08-25 and the spec names
-// PUT /v2/groups/{groupId} as its successor. That path answered
-// 403 BAD_PERMISSIONS — this namespace's unrouted tell — for five weeks, and this
-// test asserted the 403 so the suite would fail when it changed. It changed at
-// 12:29Z on 2026-09-03, and this is the rewrite that failure asked for.
+// The path answered 403 BAD_PERMISSIONS — this namespace's unrouted tell — for
+// five weeks, and this test asserted that 403 so the suite would fail when it
+// changed. It changed at 12:29Z on 2026-09-03, when authorization-policies#265
+// (07791a1) deployed: the request began clearing authorization and reaching the
+// service, which then answered 404 NOT_FOUND for a group that demonstrably
+// existed. So the test was rewritten to assert the 404 and wait for a 2xx.
 //
-// **authorization-policies#265 (07791a1) has deployed.** The 403 became a
-// service-level 404 NOT_FOUND, and the request now clears authorization and
-// reaches the service. What it does not do is work: the service answers 404 for a
-// group that exists — created by v1 in this very test, updated by v1 as the
-// control below, and listed by GET /v2/groups in the same invocation.
+// **It got the 2xx on 2026-09-04.** The fix landed between 12:51 and 13:33 BST:
+// a probe at 12:51 still got the 404, and one at 13:33 succeeded. Verified 3/3
+// by curl with the payloads quoted in WIRE-FACTS, and the assertion below is
+// the read-back rather than the status, because a 204 that changes nothing
+// would be worse than the 404 it replaced.
 //
-// The classification rests on controls rather than on the status alone, because
-// 404 could plausibly be a router miss. In the same invocation,
-// PUT /securitycloud/v2/bogus-control/{uuid} and GET /securitycloud/v9/groups
-// both still answer 403 BAD_PERMISSIONS, so 403 remains what an unrouted path
-// gives here and a 404 means something downstream answered. Verified across five
-// probes and two credentials on 2026-09-03.
+// That is what lifted the securitycloud-devices hold. The spec had withdrawn
+// GET /v1/groups and PUT /v1/groups/{groupId} at v1942, and the SDK held the
+// spec at v1897 because the v1 update was the only device-group update that
+// worked — withdrawing it would have cost the capability outright. With v2
+// working the withdrawal costs nothing, so the spec is ingested at v2082 and
+// UpdateDeviceGroupV1 is gone. Note the control this test used to run through
+// UpdateDeviceGroupV1 went with it; GET /v2/groups is the control now.
 //
-// So the outcome to wait for is a 2xx, not the 403 clearing — that already
-// happened. GET and DELETE on the v2 item path are still 403 and undeclared;
-// #265 granted PUT alone, which is consistent.
+// Do not weaken any branch to a skip. A blanket tolerance is what hid this
+// class of gap for five weeks, and a regression here has a named owner: a 403
+// is authorization (#265 rolled back), a 404 is the service handler, and a 204
+// that does not persist is the handler accepting writes it discards.
 //
-// Do not weaken any branch to a skip. A blanket tolerance is what hid this class
-// of gap before, and the three states below have three different owners: a 403 is
-// an authorization regression, a 404 is the service, a 2xx is the day the
-// securitycloud-devices hold lifts.
-//
-// One caution retained from the original: an early probe returned 500 on both v1
-// and v2, which reads as "v2 is routed and merely faulting" — the opposite of the
-// truth. Repeat a routing probe before believing a single result.
+// One caution retained from the original: an early probe returned 500 on both
+// v1 and v2, which reads as "v2 is routed and merely faulting" — the opposite
+// of the truth. Repeat a routing probe before believing a single result.
 func TestAcceptance_SecurityCloudUpdateDeviceGroupV2(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 	ctx := context.Background()
@@ -1633,37 +1638,56 @@ func TestAcceptance_SecurityCloudUpdateDeviceGroupV2(t *testing.T) {
 		return sc.DeleteDeviceGroupV1(context.Background(), created.ID)
 	})
 
-	// Control: the deprecated v1 write works on this exact group, so the v2
-	// result below cannot be blamed on the group, the credential or the tenant.
-	// This is also what makes the v2 404 a contradiction rather than a plausible
-	// answer — the group demonstrably exists.
-	if _, err := sc.UpdateDeviceGroupV1(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v1ok"}); err != nil {
-		t.Fatalf("control UpdateDeviceGroupV1(%s) failed, so the v2 result below is not interpretable: %v", created.ID, err)
+	// Control: the group is visible to the same v2 surface being written
+	// through, in the same invocation. This is what made the old 404 a
+	// contradiction rather than a plausible answer, and it still rules out a
+	// failure below being blamed on the group, the credential or the tenant.
+	before, err := sc.ListDeviceGroupsV2(ctx)
+	if err != nil {
+		t.Fatalf("control ListDeviceGroupsV2 failed, so the result below is not interpretable: %v", err)
+	}
+	var listed bool
+	for _, g := range before.Groups {
+		if g.ID == created.ID {
+			listed = true
+		}
+	}
+	if !listed {
+		t.Fatalf("control: GET /v2/groups does not list %s, so a write failure below would be ambiguous", created.ID)
 	}
 
-	err = sc.UpdateDeviceGroupV2(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: name + "-v2"})
-	if err == nil {
-		t.Fatalf("UpdateDeviceGroupV2(%s) SUCCEEDED — the v2 update handler is fixed. That is the outcome this "+
-			"test waits for: flip it to assert success, and lift the securitycloud-devices hold in CLAUDE.md, since "+
-			"v1 is no longer the only device-group update that works.", created.ID)
+	renamed := name + "-v2applied"
+	if err := sc.UpdateDeviceGroupV2(ctx, created.ID, &securitycloud.UpdateGroupRequest{Name: renamed}); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if !errors.As(err, &apiErr) {
+			t.Fatalf("UpdateDeviceGroupV2 failed with a non-API error: %v", err)
+		}
+		switch {
+		case apiErr.HasStatus(403):
+			t.Fatalf("UpdateDeviceGroupV2 is back to 403 — authorization-policies#265 (07791a1) appears to have "+
+				"been withdrawn or rolled back. That is an authorization regression, not a service defect: %v", err)
+		case apiErr.HasStatus(404):
+			t.Fatalf("UpdateDeviceGroupV2 is back to 404 for a group GET /v2/groups listed in this same "+
+				"invocation — the service handler defect fixed on 2026-09-04 has regressed. The v1 update this "+
+				"used to fall back on no longer exists, so device groups now have NO working update: %v", err)
+		default:
+			t.Fatalf("UpdateDeviceGroupV2 returned %v, want 204. Re-probe with controls in the same invocation "+
+				"before adjusting this test.", err)
+		}
 	}
 
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) {
-		t.Fatalf("UpdateDeviceGroupV2 failed with a non-API error, want 404 NOT_FOUND: %v", err)
+	// The assertion that matters. A 204 is not evidence the write applied, and
+	// an accepted-then-discarded write is the failure mode a status check
+	// cannot see.
+	after, err := sc.GetDeviceGroupV1(ctx, created.ID)
+	if err != nil {
+		t.Fatalf("GetDeviceGroupV1(%s) after the v2 update failed: %v", created.ID, err)
 	}
-	switch {
-	case apiErr.HasStatus(404):
-		t.Logf("PUT /v2/groups/{groupId} reaches the service and answers 404 for a group v1 just updated "+
-			"(authorization-policies#265 deployed, handler defective), as expected: %s", apiErr.Summary())
-	case apiErr.HasStatus(403):
-		t.Fatalf("UpdateDeviceGroupV2 is back to 403 — authorization-policies#265 (07791a1) appears to have been "+
-			"withdrawn or rolled back, which is an authorization regression rather than the service defect this "+
-			"test pins: %v", err)
-	default:
-		t.Fatalf("UpdateDeviceGroupV2 returned %v, want 404 NOT_FOUND. Neither the deployed-rule state nor the "+
-			"old unrouted 403 — re-probe with controls in the same invocation before adjusting this test.", err)
+	if after.Name != renamed {
+		t.Fatalf("UpdateDeviceGroupV2 answered 204 but the name is still %q, want %q — the handler is accepting "+
+			"writes and discarding them, which is worse than the 404 this test used to assert", after.Name, renamed)
 	}
+	t.Logf("PUT /v2/groups/%s applied and persisted: name is %q", created.ID, after.Name)
 }
 
 // ---------------------------------------------------------------------------
@@ -2250,13 +2274,11 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 	if _, err := sc.ResolveDnsZoneV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
 		t.Errorf("resolving an absent DNS zone: want 404 APIResponseError, got %v", err)
 	}
-	// Both device-group resolver versions are live and hit different endpoints:
-	// v1 walks the deprecated bare-array list, v2 the {groups: []} envelope.
-	// Cover both — the envelope unwrap is the only resultsField in the package,
-	// so a regression there would otherwise be invisible.
-	if _, err := sc.ResolveDeviceGroupV1IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
-		t.Errorf("resolving an absent device group (v1): want 404 APIResponseError, got %v", err)
-	}
+	// Only the v2 device-group resolver remains: v2082 withdrew GET /v1/groups,
+	// so ResolveDeviceGroupV1IDByName went with it. The v2 resolver unwraps the
+	// {groups: []} envelope and is the only resultsField user in the package, so
+	// a regression there would otherwise be invisible — which is why it keeps a
+	// dedicated absent-name assertion rather than relying on the Apply test.
 	if _, err := sc.ResolveDeviceGroupV2IDByName(ctx, absent); !isSecurityCloudNotFound(err) {
 		t.Errorf("resolving an absent device group (v2): want 404 APIResponseError, got %v", err)
 	}
@@ -2273,12 +2295,12 @@ func TestAcceptance_SecurityCloudResolvers(t *testing.T) {
 // the cheapest resource in the family: create-when-absent, then
 // update-when-present with the same name.
 //
-// Run once per endpoint version. Both Apply methods share the v1 create,
-// update and delete ops — only the resolve step differs, and it differs in the
-// way most likely to break silently: v1 walks a bare JSON array, v2 unwraps a
-// {groups: []} envelope. Covering only one version would leave the other's
-// resolve path untested while it stayed exported and callable, which is the
-// cost of the SDK's additive-versioning rule and the reason to pay it here.
+// Only ApplyDeviceGroupV2 remains. v2082 withdrew GET /v1/groups, which took
+// ResolveDeviceGroupV1IDByName and with it ApplyDeviceGroupV1 — there is no v1
+// list left to resolve a name against. The surviving Apply resolves through the
+// {groups: []} envelope, creates through POST /v1/groups and updates through
+// PUT /v2/groups/{groupId}, so its update branch is the endpoint fixed on
+// 2026-09-04; before that fix this branch could not have worked at all.
 func TestAcceptance_SecurityCloudApplyDeviceGroup(t *testing.T) {
 	sc := accSecurityCloudClient(t)
 
@@ -2286,7 +2308,6 @@ func TestAcceptance_SecurityCloudApplyDeviceGroup(t *testing.T) {
 		version string
 		apply   func(context.Context, *securitycloud.CreateGroupRequest) (string, bool, error)
 	}{
-		{"v1", sc.ApplyDeviceGroupV1},
 		{"v2", sc.ApplyDeviceGroupV2},
 	} {
 		t.Run(tc.version, func(t *testing.T) {

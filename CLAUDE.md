@@ -426,7 +426,7 @@ the executable authority; this is the prose copy, and the two must agree.**
 | `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v2082** |
 | `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2082** |
 | `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v2082** |
-| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | v1897 (**held**) |
+| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | **v2082** |
 | `ai-governance-api.yaml` | `external/ai-governance` | **v2082** |
 | `audit-api.yaml` | `external/audit` | **v2082** |
 | `account-licensing-api.yaml` | `external/account-licensing` | v1865 (**held**) |
@@ -502,7 +502,14 @@ Three things about it that are not guessable:
   specs in one package can disagree — `securitycloud` did, while
   `securitycloud-device-groups-api.yaml` was held at a build predating the
   environment declaration. A package-level accessor would have had to pick one
-  and lie.
+  and lie. That divergence closed on 2026-09-04 when the hold lifted, which
+  argues for keeping the storage per-method rather than against it: the next
+  one costs no structural change.
+- **Provenance is recorded too, in `ScopesSource`.** `"spec"` or
+  `"config-override"`, mirroring what `Source` does for `Scoped`, because the
+  value is not always the spec's: the account trio's whole scope declaration
+  comes from `config.scopeTypes`, and a consumer reading `Scopes` as an
+  upstream claim would be wrong for those 18 methods. It is never empty.
 - **`ScopeOrganization` now exists as a named zero value.** `client.go` used to
   say organization deliberately has no constant, on the grounds that it has no
   header. That holds for client configuration and there is still no
@@ -515,21 +522,24 @@ Three things about it that are not guessable:
   ingest that drops the extension fails a test rather than shipping a registry
   that reads as "no scope required".
 
-**`scopeTypes` corrects a held spec rather than leaving the package
-incoherent.** `securitycloud-device-groups-api.yaml` is pinned at v1897, which
-declares `[tenant]`; v2082 declares `[tenant, environment]` for the identical
-operation set, and an environment credential reaches **all seven** of its
-operations (wire-verified 2026-09-04 — `POST`, `GET`, `PUT`, `DELETE` on
-`/v1/groups*` plus `GET /v2/groups`, and even the broken `PUT /v2/groups/{id}`
-clears authorization before its handler 404s). So the override states a
-wire-established fact, not a guess, and it is the same move
-`requiredPrivileges` makes for the account trio.
+**~~`scopeTypes` corrects a held spec rather than leaving the package
+incoherent.~~ — expired 2026-09-04, and it is worth reading as the worked
+example of the mechanism working.** `securitycloud-device-groups-api.yaml` was
+pinned at v1897 declaring `[tenant]` while v2082 declared
+`[tenant, environment]` for the identical operation set, and an environment
+credential reached every one of its operations (wire-verified 2026-09-04). So
+the override stated a wire-established fact rather than a guess — the same move
+`requiredPrivileges` makes for the account trio, which remains the only user of
+the key.
 
-**It reverts itself.** When the Security Cloud v2 update handler is fixed, the
-hold lifts, `capi`-style, and the next ingest brings the v2082 spec with
-`[tenant, environment]` — at which point `resolveScopeTypes` sees the spec
-declaring exactly what config asserts and **fails generation** with "delete the
-config entry so the spec is the only source". Nobody has to remember.
+**It reverted itself, exactly as written.** The Security Cloud v2 update
+handler was fixed, the hold lifted `capi`-style, the ingest brought the v2082
+spec with `[tenant, environment]` — and `resolveScopeTypes` saw the spec
+declaring exactly what config asserts and **failed generation** with "delete the
+config entry so the spec is the only source". Nobody had to remember, which was
+the point. The guard now also fires the other way: a spec declaring anything an
+override omits fails too, since an override widens an understated spec and a
+spec that has moved past it is about to lose a declared scope.
 
 **What the registry reports is the SPEC's claim, which is currently stricter
 than the gateway for the Platform APIs** — the six declare environment only
@@ -544,10 +554,15 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v2082** (2026-09-04), except `securitycloud-devices`
-(**held at v1897**) and `account-licensing` / `account-sso` (**held at
-v1865**) — see the holds table. **The `capi` hold is gone**: v2082 republished
-the patch-management family it was protecting.
+Ingested through **v2082** (2026-09-04), except `account-licensing` /
+`account-sso` (**held at v1865**) — see the holds table. **Two holds went in
+this change.** `capi`'s is gone because v2082 republished the
+patch-management family it was protecting. `securitycloud-devices`' is gone
+because `PUT /v2/groups/{groupId}` started working on 2026-09-04, between
+12:51 and 13:33 BST, which was the one condition its row named — so the two
+v1 operations v1942 withdrew no longer cost a capability and the spec is
+ingested at v2082. Eighteen of the nineteen specs are now current; only the
+two account specs are held.
 
 **v2082 is the scope-declaration build, and it is two things: a bundle-wide
 scope migration that is inert to generated Go, and two operation
@@ -1093,35 +1108,17 @@ each pinned by a test that fails when it closes:
   including the third URL shape the
   runtime `Link` header names, and the scope-header tells — in
   [WIRE-FACTS.md](docs/WIRE-FACTS.md#device-groups-v2id-the-rule-landed-on-main-2026-09-02).
-  So `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their resolver and both Applies
-  all stay, and `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` keeps its v1
-  *write* control.
-- **`capi` was held at v1897 over this, and v2082 dissolved it.** Classic's
-  `POST /patchsoftwaretitles/id/0` is the **only** way to mint an id the Pro v3
-  patch-configuration endpoints address — and `softwareTitleId` *is* the Classic
-  title id, with that one call creating the v3 configuration in the same act
-  (proved end to end 2026-09-01: Classic POST returns id 146, v3 immediately
-  lists `id=146 softwareTitleId=146`, and a v3 create against 146 answers
-  `400 ALREADY_EXISTS_FOR_SITE`). **The v3 create needs an id that only exists
-  once the object exists, so there is nothing for a create to migrate onto.**
-  This is structurally impossible on the current surface, not merely unshipped:
-  the hold lifts only if Jamf gives the configurations surface an id-minting
-  create, not on the next bundle and not on a policy change. Withdrawing it makes
-  patch software titles unseedable end to end: `/pro/v{1,2}/patch-software-titles` are
-  unrouted (403, probed 2026-09-01), and Classic's `patchavailabletitles` cannot
-  supply one: **916 of its 1552 `name_id` values are non-numeric** (`0F5`, `2DE`,
-  `41D`…) while `softwareTitleId` must be a positive numeric string, and the 636
-  all-digit ones are rejected anyway (`400 SOFTWARE_TITLE_ID_NOT_FOUND` for
-  `376`, `518`, `575`; `Firefox` → `400 INVALID_ID`). `name_id` names *what to
-  subscribe*, `softwareTitleId` names *a subscription* — different identifier
-  spaces — and no `*softwaretitles*` path exists in any spec in any environment
-  other than the Classic ones. Full proof:
-  [WIRE-FACTS.md](docs/WIRE-FACTS.md#what-v1942s-removal-cost-probed-the-same-day). That breaks
-  `seedPatchSoftwareTitleFixture` and the three tests on it, and leaves
-  `terraform-provider-jamfplatform`'s `patch_software_title` resource with no
-  create path at all. Second, `GET` and `PUT /computers/id/{id}` go while `POST`
-  and `DELETE` on the same path stay, which is not a coherent surface. Holding
-  kept all 606 operations and both problems away.
+  **Resolved 2026-09-04**, and the resolution is the one the row allowed for
+  rather than the one it predicted: the diagnosis above stopped at "the
+  remaining gap is the rollout", and the rollout did land — it just exposed a
+  second, independent defect in the v2 handler behind it. That was fixed a day
+  later, so the hold lifted, the spec is at v2082, and
+  `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, their resolver and
+  `ApplyDeviceGroupV1` are gone. `ApplyDeviceGroupV2`'s update branch now runs
+  through `UpdateDeviceGroupV2`, which is the branch that could not have worked
+  at all before the fix. The lesson worth keeping is that a 403 clearing is not
+  the same event as the capability arriving: two layers were broken here, and
+  the first fix made the second visible.
 
   **Resolved 2026-09-04.** v2082 republished the whole patch family, so the
   identifier problem is gone and `capi` is ingested at v2082 with the whitelist
@@ -1340,7 +1337,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 |---|---|
 | `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**, both re-confirmed 2026-09-04 on **two independent organization tenants** — `8a2d0ff2-4336-44ca-bd61-1e7e88258740` (16 licences, 5 domains) and `ffeadc76-1e1c-4827-a764-ab111fef43c6` (24 licences, 7 domains). Each spec's whole v2082 delta is the one field its hold names, plus an inert `servers` region-enum narrowing to `us`. **Licensing:** `License.type` is deleted though the wire populates it **40/40 rows**, and it is neither a rename of `licenseType` (non-null on only 8/16 and 16/24, so both fields coexist) nor derivable — on **17 of the 40** rows `type` matches none of `licenseType`, `addOnType` or `productTopLine` (`Jamf Trust` → `type: JAMF_SECURITY_CLOUD` while `addOnType: JAMF_TRUST`; `Jamf Pro for iOS` → `JAMF_PRO_SUBSCRIPTION`, the very value the deleted property gave as its `example`). So taking it drops a populated product-family classifier on 42% of rows. **SSO:** `DomainAllocationConnection.authZeroRegion` → `authRegion`, but the wire sends the old name on **11/11 connections** and `authRegion` on none. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. ~~SSO could not be re-probed — `/sso/v1/domain-allocations` answers 403 `BAD_PERMISSIONS`, so the capability is ungranted and it needs a credential holding `sso-domains`.~~ **That was wrong, and the mistake is worth keeping: there is no `/sso/v1/domain-allocations` path.** The operation is `GET /sso/v1/domains/allocation/{domain}` and it answers **200** on both credentials; the 403 was the gateway refusing an unmapped path, which in this namespace is indistinguishable from an ungranted capability. **Read the path out of the spec before concluding a capability is missing.** `account-partners` is inert (`servers` only) and moved to v2082 — it 403s on both organization credentials, so its own coverage is still ungranted. |
 | ~~`capi` at v1897~~ | **Lifted 2026-09-04: v2082 republished the whole patch-management family**, including `POST /patchsoftwaretitles/id/{id}` — the one operation the hold existed to keep, because nothing else mints a `softwareTitleId` for the Pro v3 configuration endpoints (`public-apis-oas#438`: "Patch management is where Classic API callers are most concentrated"). `capi` is at v2082 and the whitelist at 589, mirroring the published spec exactly; the 17 `/computers` withdrawals the config had already taken at v1993 came with it, so the alignment cost nothing. Row kept so the next reader sees the outcome rather than the wait. |
-| `securitycloud-devices` at v1897 | v1942 withdraws `GET /v1/groups` and `PUT /v1/groups/{groupId}`. The v1 PUT is the only device-group update that works. **`authorization-policies#265` (`07791a1`, `PUT` only) HAS deployed, and the hold stands for a different reason: the v2 update handler is broken.** Since 2026-09-03 12:29Z the v2 PUT answers a service-level **`404 NOT_FOUND`** rather than 403 — **re-probed 2026-09-04 on a second Security Cloud tenant, with a second credential, against a group created seconds earlier in the same invocation, 3/3**. `GET /v2/groups` returns that group by that exact id in the same invocation, `GET`/`PUT /v1/groups/{id}` are 200, and two bogus-path controls return the namespace's unrouted `403 BAD_PERMISSIONS` — so the request clears authorization and the service cannot find a group its own list endpoint just returned. Creating the group in-invocation is what rules out stale state and anything predating a migration. **That is a v2 update-handler defect, not an authorization one, so it is no longer a `jamf/authorization-service` rollout to wait on** — report it to the Security Cloud devices team. `GET /v2/groups/{id}` is still 403, consistent with `#265` granting `PUT` alone and the other item-level verbs being undeclared. **Lift when the v2 PUT answers 2xx**, not when it stops 403ing — that already happened and cost nothing. The authorization rollout lag, for the record, was between 3h42m and 26h. `authorization-policies#264` (still DRAFT) would deny the v1 update and named the missing v2 rule as its own blocker; it was rebased onto `main` at 2026-09-02 13:22Z (`fa4cb07`) so `07791a1` is an ancestor of its head, which structurally excludes the out-of-order deploy on the merge path. Re-check on any force-push, and note that #264 landing now would remove the only working device-group update. |
+| ~~`securitycloud-devices` at v1897~~ | **Lifted 2026-09-04: `PUT /v2/groups/{groupId}` answers 204 and the write persists.** The row's condition was *"lift when the v2 PUT answers 2xx, not when it stops 403ing"*, and that is exactly what happened — in two steps, five weeks apart. `authorization-policies#265` (`07791a1`, `PUT` only) deployed at 12:29Z on 2026-09-03 and turned the unrouted `403 BAD_PERMISSIONS` into a service-level `404 NOT_FOUND`: the request began clearing authorization and reaching a handler that could not find a group `GET /v2/groups` returned in the same invocation. The handler was then fixed on **2026-09-04, between 12:51 and 13:33 BST** — a probe at 12:51 still got the 404, one at 13:33 succeeded — and the fix is genuine rather than a status change: verified 3/3 by curl with the rename **read back** through `GET /v2/groups`, a `PUT /v1/groups/{id}` at 200 and a bogus-path `403` as controls in the same invocation. So the two operations v1942 withdrew (`GET /v1/groups`, `PUT /v1/groups/{groupId}`) no longer cost a capability, the spec is ingested at v2082, and `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, `ResolveDeviceGroupV1*` and `ApplyDeviceGroupV1` are gone. Both withdrawn paths still answer 200 on the wire, so the SDK is deliberately stricter than the gateway here, per the v1942 rule. Row kept so the next reader sees the outcome rather than the wait. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
 | ~~App Installers~~ | **Ingested 2026-09-03 from v2043, 23 operations.** The gateway opened the same day and v2051 withdrew `POST /titles/{id}/cache-update` 80 minutes later, taken. Row kept so the next reader sees the outcome rather than the wait. |
 | User Inventory API (`users`), Jamf Inventory API | Not in `config.json`. `users` is prod-published with real privileges but every path 404s — `platform-users-directory` is flag-gated to dev. `inventory-api` is stage/dev only. |
@@ -1451,7 +1448,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 | `proclassic` | `proclassic` | tenant **or** environment (both declared as of v2082) | 589 ops, XML end-to-end — the v2082 surface exactly, the patch-management family restored and the hold gone |
 | `devices`, `devicegroups`, `deviceactions` | as named | **environment** per the spec; tenant still served | Platform APIs. v2082 declares them environment-only, the gateway still answers `X-Tenant-Id` on all three — pinned by `TestAcceptance_TenantScopePlatformSpecsStillServed`, which fails when that changes |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | **environment** | v2082 declares all three environment-only. `ddmreport` still answers under tenant scope and is pinned; `blueprints` and `compliancebenchmarks` refuse a tenant credential with `403 BAD_PERMISSIONS`, unclassifiable against one credential but agreeing with the GA env-only decision, so deliberately unpinned |
-| `securitycloud` | `securitycloud` | tenant (own identifier) **or** environment (both declared as of v2082) | 54 ops across six specs |
+| `securitycloud` | `securitycloud` | tenant (own identifier) **or** environment (both declared as of v2082) | 52 ops across six specs — every spec at v2082 as of 2026-09-04, the `securitycloud-devices` hold having lifted and taken `GET /v1/groups` and `PUT /v1/groups/{groupId}` with it |
 | `account` | `licensing`, `partners`, `sso` | **organization** | three specs, one package — one Jamf product behind one api-product. **US only.** The only package whose privileges come from `requiredPrivileges` rather than the spec |
 | `aigovernance` | `ai/governance/policies` | environment | slashes; the spec's hyphens were corrected upstream at v1877 |
 | `audit` | `audit` | environment (**only**, as of v2056) | **reachable as of 2026-09-03** — a credential granted `audit:read` under `X-Environment-Id` reads it; 1014 events walked. `ListAuditEvents` needs `since` **and** one of `actor`/`audit-source`/`audit-type`/`resource-id`, neither expressed in the signature |

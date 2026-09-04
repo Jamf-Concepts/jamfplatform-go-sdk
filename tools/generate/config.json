@@ -10303,24 +10303,6 @@
       "splitByTag": true,
       "operations": [
         {
-          "op": "GET /v1/groups",
-          "name": "ListDeviceGroupsV1",
-          "resolver": {
-            "resourceType": "DeviceGroupV1",
-            "nameField": "name",
-            "idField": "id",
-            "mode": "clientFilter",
-            "typedReturn": "GroupListItem",
-            "apply": {
-              "createOp": "CreateDeviceGroupV1",
-              "updateOp": "UpdateDeviceGroupV1",
-              "deleteOp": "DeleteDeviceGroupV1",
-              "nameGoField": "Name",
-              "updateType": "UpdateGroupRequest"
-            }
-          }
-        },
-        {
           "op": "POST /v1/groups",
           "name": "CreateDeviceGroupV1"
         },
@@ -10336,7 +10318,7 @@
             "typedReturn": "GroupListItem",
             "apply": {
               "createOp": "CreateDeviceGroupV1",
-              "updateOp": "UpdateDeviceGroupV1",
+              "updateOp": "UpdateDeviceGroupV2",
               "deleteOp": "DeleteDeviceGroupV1",
               "nameGoField": "Name",
               "updateType": "UpdateGroupRequest"
@@ -10348,10 +10330,6 @@
           "name": "GetDeviceGroupV1"
         },
         {
-          "op": "PUT /v1/groups/{groupId}",
-          "name": "UpdateDeviceGroupV1"
-        },
-        {
           "op": "PUT /v2/groups/{groupId}",
           "name": "UpdateDeviceGroupV2"
         },
@@ -10359,10 +10337,6 @@
           "op": "DELETE /v1/groups/{groupId}",
           "name": "DeleteDeviceGroupV1"
         }
-      ],
-      "scopeTypes": [
-        "tenant",
-        "environment"
       ]
     },
     {

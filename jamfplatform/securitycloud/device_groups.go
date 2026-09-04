@@ -15,21 +15,6 @@ import (
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
-// ListDeviceGroupsV1 list all device groups for a customer.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-08-12) and may be removed in a future release.
-//
-// Required privileges: device-groups:read.
-func (c *Client) ListDeviceGroupsV1(ctx context.Context) (*GroupListResponse, error) {
-	prefix := c.transport.APIPrefix("securitycloud", "v1")
-	var result GroupListResponse
-	endpoint := prefix + "/groups"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
-		return nil, fmt.Errorf("ListDeviceGroupsV1: %w", err)
-	}
-	return &result, nil
-}
-
 // CreateDeviceGroupV1 create a new device group.
 //
 // Required privileges: device-groups:create.
@@ -72,24 +57,6 @@ func (c *Client) GetDeviceGroupV1(ctx context.Context, groupID string) (*Group, 
 	return &result, nil
 }
 
-// UpdateDeviceGroupV1 update a device group.
-//
-// Deprecated: this endpoint is marked deprecated in the Jamf API spec (deprecation-date: 2026-08-25) and may be removed in a future release.
-//
-// Required privileges: device-groups:update.
-//
-// Parameters:
-//   - groupID: Unique identifier of the group to update.
-func (c *Client) UpdateDeviceGroupV1(ctx context.Context, groupID string, request *UpdateGroupRequest) (*Group, error) {
-	prefix := c.transport.APIPrefix("securitycloud", "v1")
-	var result Group
-	endpoint := fmt.Sprintf("%s/groups/%s", prefix, url.PathEscape(groupID))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPut, endpoint, request, "application/json", http.StatusOK, &result); err != nil {
-		return nil, fmt.Errorf("UpdateDeviceGroupV1(%s): %w", groupID, err)
-	}
-	return &result, nil
-}
-
 // UpdateDeviceGroupV2 update a device group.
 //
 // Required privileges: device-groups:update.
@@ -120,32 +87,6 @@ func (c *Client) DeleteDeviceGroupV1(ctx context.Context, groupID string) error 
 	return nil
 }
 
-// ResolveDeviceGroupV1IDByName looks up a DeviceGroupV1 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
-func (c *Client) ResolveDeviceGroupV1IDByName(ctx context.Context, name string) (string, error) {
-	prefix := c.transport.APIPrefix("securitycloud", "v1")
-	listPath := prefix + "/groups"
-	id, _, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
-	if err != nil {
-		return "", fmt.Errorf("ResolveDeviceGroupV1IDByName(%s): %w", name, err)
-	}
-	return id, nil
-}
-
-// ResolveDeviceGroupV1ByName looks up a DeviceGroupV1 by its name field and returns the decoded resource. Shares the same HTTP call as the ID-only variant; error semantics are identical.
-func (c *Client) ResolveDeviceGroupV1ByName(ctx context.Context, name string) (*GroupListItem, error) {
-	prefix := c.transport.APIPrefix("securitycloud", "v1")
-	listPath := prefix + "/groups"
-	_, raw, err := c.transport.ResolveByNameClient(ctx, listPath, "", "", "name", "id", name)
-	if err != nil {
-		return nil, fmt.Errorf("ResolveDeviceGroupV1ByName(%s): %w", name, err)
-	}
-	var out GroupListItem
-	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, fmt.Errorf("ResolveDeviceGroupV1ByName(%s): decoding matched element: %w", name, err)
-	}
-	return &out, nil
-}
-
 // ResolveDeviceGroupV2IDByName looks up a DeviceGroupV2 by its name field and returns the ID. Returns *APIResponseError with HasStatus(404) when no match exists, or *AmbiguousMatchError when multiple resources share the name.
 func (c *Client) ResolveDeviceGroupV2IDByName(ctx context.Context, name string) (string, error) {
 	prefix := c.transport.APIPrefix("securitycloud", "v2")
@@ -170,39 +111,6 @@ func (c *Client) ResolveDeviceGroupV2ByName(ctx context.Context, name string) (*
 		return nil, fmt.Errorf("ResolveDeviceGroupV2ByName(%s): decoding matched element: %w", name, err)
 	}
 	return &out, nil
-}
-
-// ApplyDeviceGroupV1 creates or updates a DeviceGroupV1 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
-func (c *Client) ApplyDeviceGroupV1(ctx context.Context, request *CreateGroupRequest) (string, bool, error) {
-	name := request.Name
-	if name == "" {
-		return "", false, fmt.Errorf("ApplyDeviceGroupV1: Name must not be empty")
-	}
-	id, err := c.ResolveDeviceGroupV1IDByName(ctx, name)
-	if err != nil {
-		if apiErr := client.AsAPIError(err); apiErr != nil && apiErr.HasStatus(404) {
-			resp, createErr := c.CreateDeviceGroupV1(ctx, request)
-			if createErr != nil {
-				return "", false, fmt.Errorf("ApplyDeviceGroupV1: create: %w", createErr)
-			}
-			return resp.ID, true, nil
-		}
-		return "", false, fmt.Errorf("ApplyDeviceGroupV1: resolve: %w", err)
-	}
-	// Convert create request to update type via JSON round-trip.
-	data, marshalErr := json.Marshal(request)
-	if marshalErr != nil {
-		return "", false, fmt.Errorf("ApplyDeviceGroupV1: marshal for update(%s): %w", id, marshalErr)
-	}
-	var updateReq UpdateGroupRequest
-	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
-		return "", false, fmt.Errorf("ApplyDeviceGroupV1: unmarshal for update(%s): %w", id, unmarshalErr)
-	}
-	_, err = c.UpdateDeviceGroupV1(ctx, id, &updateReq)
-	if err != nil {
-		return "", false, fmt.Errorf("ApplyDeviceGroupV1: update(%s): %w", id, err)
-	}
-	return id, false, nil
 }
 
 // ApplyDeviceGroupV2 creates or updates a DeviceGroupV2 by name. If a resource with the specified name exists, it is updated; if not found, a new resource is created. Returns the resource ID, whether it was created (true) or updated (false), and any error. An *AmbiguousMatchError is returned if multiple resources match the name.
@@ -231,7 +139,7 @@ func (c *Client) ApplyDeviceGroupV2(ctx context.Context, request *CreateGroupReq
 	if unmarshalErr := json.Unmarshal(data, &updateReq); unmarshalErr != nil {
 		return "", false, fmt.Errorf("ApplyDeviceGroupV2: unmarshal for update(%s): %w", id, unmarshalErr)
 	}
-	_, err = c.UpdateDeviceGroupV1(ctx, id, &updateReq)
+	err = c.UpdateDeviceGroupV2(ctx, id, &updateReq)
 	if err != nil {
 		return "", false, fmt.Errorf("ApplyDeviceGroupV2: update(%s): %w", id, err)
 	}

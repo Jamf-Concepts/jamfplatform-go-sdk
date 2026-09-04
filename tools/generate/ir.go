@@ -158,10 +158,11 @@ type GoMethod struct {
 	ReturnsSlice     bool
 	// ResponseIsJSONArray reports that the success body is a JSON array,
 	// which ReturnsSlice does not: a named schema declared `type: array`
-	// (Security Cloud's GroupListResponse = []Group) travels as an array but
-	// appears in the Go signature as its alias, not as a []T. Test stubs
-	// pick the body shape from this; the method templates keep using
-	// ReturnsSlice, which is about the Go type.
+	// travels as an array but appears in the Go signature as its alias, not
+	// as a []T. Test stubs pick the body shape from this; the method
+	// templates keep using ReturnsSlice, which is about the Go type.
+	// Security Cloud's GroupListResponse = []GroupListItem was the worked
+	// example until v2082 withdrew GET /v1/groups and pruned the alias.
 	ResponseIsJSONArray bool
 	SpecPath            string
 	UnwrapResults       string
