@@ -135,6 +135,30 @@ func TestScopeKindValues(t *testing.T) {
 	}
 }
 
+// TestScopeKindString pins the diagnostic name of each kind, and the zero value
+// is the one that matters: it reports "organization" rather than "none" because
+// absence of a scope header IS organization scope — the gateway resolves the
+// organization from the access token. A "none" here would name a fourth state
+// that does not exist and would read as though an organization-scoped client
+// were unconfigured. An out-of-range value reports "unknown" rather than
+// falling back to a real scope name, since that is a programming error and not
+// a scope.
+func TestScopeKindString(t *testing.T) {
+	for _, tc := range []struct {
+		kind ScopeKind
+		want string
+	}{
+		{ScopeOrganization, "organization"},
+		{ScopeTenant, "tenant"},
+		{ScopeEnvironment, "environment"},
+		{ScopeKind(7), "unknown"},
+	} {
+		if got := tc.kind.String(); got != tc.want {
+			t.Errorf("ScopeKind(%d).String() = %q, want %q", int(tc.kind), got, tc.want)
+		}
+	}
+}
+
 // TestScopeHeader pins the header each scope kind travels in. Organization
 // scope is deliberately absent: the gateway resolves it from the access token
 // alone, so there is no header for a client to send.
