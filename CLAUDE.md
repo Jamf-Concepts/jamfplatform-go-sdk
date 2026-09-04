@@ -1084,7 +1084,9 @@ follows it.
 **What the removal cost, beyond the 146 methods.** Three real capability gaps,
 each pinned by a test that fails when it closes:
 
-- **`securitycloud-devices` is held at v1897 for exactly this reason.** Taking
+- **~~`securitycloud-devices` is held at v1897 for exactly this reason.~~ —
+  the hold lifted 2026-09-04; the reasoning is kept because it is the pattern
+  to reuse.** Taking
   v1942 there would have withdrawn `PUT /v1/groups/{groupId}` — the *only*
   device-group update the gateway routes — leaving the unrouted
   `PUT /v2/groups/{groupId}` as the package's sole update method and killing

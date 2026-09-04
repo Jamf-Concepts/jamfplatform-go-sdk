@@ -1373,9 +1373,11 @@ not exclude.
 **So: the v2 update handler cannot find a group its own list endpoint just
 returned.** That is a defect in the Security Cloud devices service, not an
 authorization gap, and the owner is no longer a `jamf/authorization-service`
-rollout. Report upstream. `securitycloud-devices` **stays held at v1897** —
-v1942 would withdraw `PUT /v1/groups/{groupId}`, the only device-group update
-that works, and the declared successor is broken. **Lift the hold when the v2
+rollout. Report upstream. ~~`securitycloud-devices` **stays held at v1897**~~ —
+**superseded 2026-09-04: the handler was fixed and the hold lifted; see the
+section above.** At the time of this probe, v1942 would have withdrawn
+`PUT /v1/groups/{groupId}` — then the only device-group update that worked —
+while its declared successor was broken. **Lift the hold when the v2
 PUT answers 2xx**, not when it stops 403ing: that already happened and cost the
 SDK nothing.
 
@@ -1597,8 +1599,10 @@ One more for the same team: `POST /securitycloud/v1/groups` returns
 `href: "/api/securitycloud/v1/groups/{id}"` — an `/api` prefix the GA gateway
 does not serve, so the href is not directly followable.
 
-**v1942 would have removed the only working device-group update and kept the broken
-one, so `securitycloud-devices` is held at v1897.** The build withdrew
+**~~v1942 would have removed the only working device-group update and kept the
+broken one, so `securitycloud-devices` is held at v1897.~~ — the v2 update was
+fixed on 2026-09-04 and the hold lifted; the withdrawal is now taken.** The
+build withdrew
 `PUT /v1/groups/{groupId}` — the call that answers 200 above — which would have left
 the unrouted v2 PUT as the package's sole update method and repointed
 `ApplyDeviceGroupV2` onto it, killing its update branch. The removal was taken and
@@ -2205,7 +2209,11 @@ the way most likely to rot silently — v2 is the SDK's only `resultsField` user
 the v1 bare-array sibling is what it is contrasted against. Both resolvers and both
 Applies exist side by side, sharing the v1 create/update/delete ops since v2 is
 list-only. **v1942 withdrew `GET /v1/groups` and `PUT /v1/groups/{groupId}`, which
-would have collapsed all of that; the spec is held at v1897 instead.**
+would have collapsed all of that; the spec was held at v1897 instead — until
+2026-09-04, when the v2 update handler was fixed and the withdrawal was taken.
+As of then `ListDeviceGroupsV1`, `ResolveDeviceGroupV1ByName` and
+`ApplyDeviceGroupV1` no longer exist, so the bare-array contrast above is
+history: v2's envelope is the package's only device-group list shape.**
 
 `Default Group` comes back with **no `id`** on both v1 and v2 — the reason
 `GroupListItem` requires only `name`, and the reason `ResolveDeviceGroupV1ByName`
