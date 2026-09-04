@@ -117,15 +117,7 @@ type specRow struct {
 // securitycloud-uem-connect-api.yaml comes from uem-connect.
 var specs = []specRow{
 	{dest: "openapi-jpapi.yaml", dir: "jpapi", title: "Jamf Pro API"},
-	{
-		dest:   "Classic-openapi.yaml",
-		title:  "Classic API",
-		dir:    "capi",
-		heldAt: "v1897",
-		why: "POST /patchsoftwaretitles/id/{id} is the only way to mint a softwareTitleId " +
-			"for the Pro v3 patch-configuration endpoints; the config took the other 31 " +
-			"withdrawals at v1993. Ingest and drop the hold when /patchsoftwaretitles is republished.",
-	},
+	{dest: "Classic-openapi.yaml", dir: "capi", title: "Classic API"},
 	{dest: "blueprints-api.yaml", dir: "blueprints", title: "Blueprints API"},
 	{dest: "device-groups-api.yaml", dir: "device-groups", title: "Device Groups API"},
 	{dest: "device-inventory-api.yaml", dir: "devices", title: "Device Inventory API"},
@@ -138,13 +130,9 @@ var specs = []specRow{
 	{dest: "securitycloud-uem-connect-api.yaml", dir: "uem-connect", title: "UEM Connect API"},
 	{dest: "securitycloud-enrollment-api.yaml", dir: "securitycloud-enrollment", title: "Security Cloud Enrollment API"},
 	{
-		dest:   "securitycloud-device-groups-api.yaml",
-		title:  "Security Cloud Devices API",
-		dir:    "securitycloud-devices",
-		heldAt: "v1897",
-		why: "v1942 withdraws PUT /v1/groups/{groupId}, the only device-group update the " +
-			"gateway serves; the declared v2 successor answers 404 from its own handler. " +
-			"Ingest when the v2 PUT answers 2xx.",
+		dest:  "securitycloud-device-groups-api.yaml",
+		title: "Security Cloud Devices API",
+		dir:   "securitycloud-devices",
 	},
 	{dest: "ai-governance-api.yaml", dir: "ai-governance", title: "AI Governance Policies API"},
 	{dest: "audit-api.yaml", dir: "audit", title: "Audit API"},

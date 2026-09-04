@@ -158,10 +158,11 @@ type GoMethod struct {
 	ReturnsSlice     bool
 	// ResponseIsJSONArray reports that the success body is a JSON array,
 	// which ReturnsSlice does not: a named schema declared `type: array`
-	// (Security Cloud's GroupListResponse = []Group) travels as an array but
-	// appears in the Go signature as its alias, not as a []T. Test stubs
-	// pick the body shape from this; the method templates keep using
-	// ReturnsSlice, which is about the Go type.
+	// travels as an array but appears in the Go signature as its alias, not
+	// as a []T. Test stubs pick the body shape from this; the method
+	// templates keep using ReturnsSlice, which is about the Go type.
+	// Security Cloud's GroupListResponse = []GroupListItem was the worked
+	// example until v2082 withdrew GET /v1/groups and pruned the alias.
 	ResponseIsJSONArray bool
 	SpecPath            string
 	UnwrapResults       string
@@ -189,6 +190,17 @@ type GoMethod struct {
 	PrivilegeSource  string
 	PrivilegesKnown  bool
 	ScopedPrivileges []string // GA capability permissions, {capability}:{action}, e.g. "buildings:create"
+	// Scopes lists the scope kinds the endpoint accepts, as the Go constant
+	// names emitted into the Privileges registry ("ScopeTenant",
+	// "ScopeEnvironment", "ScopeOrganization"). Sourced from the spec root's
+	// x-scope-types, or from config.scopeTypes where a held spec understates
+	// it. Never empty: resolveScopeTypes fails generation instead.
+	Scopes []string
+	// ScopesSource records which of those two supplied Scopes — "spec" or
+	// "config-override" — so the emitted registry can say so rather than
+	// asserting spec provenance for a set this repo corrected. Resolved once
+	// per spec alongside Scopes, and never empty for the same reason.
+	ScopesSource     string
 	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"
 }
 

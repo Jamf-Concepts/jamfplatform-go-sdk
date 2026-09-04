@@ -2243,6 +2243,21 @@ func New(base *jamfplatform.Client) *Client {
 // goStringSliceLiteral renders ss as a Go source expression: "nil" for an
 // empty slice, otherwise a []string composite literal. Used to emit the
 // Scoped/Legacy fields of the per-package privilege registry.
+// goScopeKindSliceLiteral renders scope-kind constant names as a
+// []jamfplatform.ScopeKind literal. Unlike goStringSliceLiteral the values are
+// identifiers, not quoted strings, and an empty slice is unreachable:
+// resolveScopeTypes fails generation before it can produce one.
+func goScopeKindSliceLiteral(names []string) string {
+	if len(names) == 0 {
+		return "nil"
+	}
+	qualified := make([]string, len(names))
+	for i, n := range names {
+		qualified[i] = "jamfplatform." + n
+	}
+	return "[]jamfplatform.ScopeKind{" + strings.Join(qualified, ", ") + "}"
+}
+
 func goStringSliceLiteral(ss []string) string {
 	if len(ss) == 0 {
 		return "nil"
@@ -2301,6 +2316,15 @@ import "%s/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts. It is an alternatives
+// set: a client carries one scope, so a consumer needs a credential matching
+// one of the listed kinds. ScopesSource names where the set came from —
+// "spec" for the spec root's own x-scope-types, "config-override" for one this
+// SDK supplies because the published spec understates what the gateway serves
+// or declares no extension at all. A spec-sourced set is what the spec
+// declares, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
@@ -2308,11 +2332,13 @@ var Privileges = map[string]jamfplatform.MethodPrivileges{
 
 	for _, e := range entries {
 		m := e.method
-		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scoped: %s, Legacy: %s, Source: %s},\n",
+		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scopes: %s, ScopesSource: %s, Scoped: %s, Legacy: %s, Source: %s},\n",
 			strconv.Quote(m.Name),
 			strconv.Quote(m.Name),
 			strconv.Quote(m.HTTPMethod),
 			strconv.Quote(e.path),
+			goScopeKindSliceLiteral(m.Scopes),
+			strconv.Quote(m.ScopesSource),
 			goStringSliceLiteral(m.ScopedPrivileges),
 			goStringSliceLiteral(m.LegacyPrivileges),
 			strconv.Quote(m.PrivilegeSource),
@@ -2865,6 +2891,58 @@ type MethodPrivileges struct {
 	// Path is the endpoint's resource path relative to the tenant prefix,
 	// e.g. "/buildings/{id}".
 	Path string
+	// Scopes lists the scope kinds the endpoint accepts. A client carries
+	// exactly one scope, so a consumer needs a credential whose scope appears
+	// here: ScopeTenant sends X-Tenant-Id, ScopeEnvironment sends
+	// X-Environment-Id, and ScopeOrganization sends no header at all because
+	// the gateway resolves the organization from the access token.
+	//
+	// Where two kinds are present the endpoint is published at both and the
+	// caller picks one — the header must match the credential, and crossing
+	// them over is 403 OWNERSHIP_FORBIDDEN even within one customer. So this
+	// is an alternatives set, the opposite of Scoped, which is a conjunction.
+	//
+	// Where ScopesSource is "spec" this is the spec's own x-scope-types,
+	// carried through unchanged; otherwise it is a correction this SDK
+	// supplies for a spec that understates the gateway or declares no
+	// extension at all. Read ScopesSource to tell the two apart. It is never
+	// empty either way: a spec that declares no scope with no correction fails
+	// generation rather than emitting an empty set a consumer would read as
+	// "no scope required".
+	//
+	// Two caveats a consumer must not lose. A spec-sourced set is what the
+	// spec declares, which is not always what the gateway serves: as of GitOps
+	// v2082 the six Platform specs declare environment only, while devices,
+	// device-groups, declaration-reporting and device-management-action still
+	// answer under X-Tenant-Id (wire-verified 2026-09-04). And scope is
+	// declared per spec rather than per operation, so every method built from
+	// one spec carries the same set. The field is per-method as a precaution
+	// against two specs in one package disagreeing — securitycloud did, one of
+	// its six specs having been held at a build predating the others'
+	// environment declaration, until v2082 was ingested there and closed the
+	// gap. Keeping the field per-method means the next such divergence needs
+	// no structural change.
+	Scopes []ScopeKind
+	// ScopesSource names where Scopes came from:
+	//
+	//   - "spec": the spec root's own x-scope-types extension.
+	//   - "config-override": the SDK's own config.scopeTypes, because the
+	//     published spec either understates what the gateway serves or
+	//     declares no extension at all. One family is this case: the account
+	//     trio (licensing, partners, sso) carries no x-scope-types in any
+	//     published build and is organization-scoped by gateway
+	//     configuration, the routes resolving the organization from the
+	//     access token. securitycloud-device-groups was the second until
+	//     2026-09-04, when the v2 update handler was fixed, its hold lifted
+	//     and the ingested spec began declaring the set the override had been
+	//     asserting — at which point the override self-expired, exactly as
+	//     designed.
+	//
+	// A "config-override" entry is therefore an assertion about the gateway,
+	// evidenced on the wire, rather than a claim about the ingested artifact —
+	// the same distinction Source draws for Scoped. It is never empty: every
+	// spec resolves a scope from one of the two sources or generation fails.
+	ScopesSource string
 	// Scoped lists the GA capability permissions the endpoint requires, in
 	// {capability}:{action} form, e.g. "buildings:create". The capability is
 	// kebab-case and carries no product name — one capability is reached by

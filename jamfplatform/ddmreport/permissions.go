@@ -21,12 +21,21 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts. It is an alternatives
+// set: a client carries one scope, so a consumer needs a credential matching
+// one of the listed kinds. ScopesSource names where the set came from —
+// "spec" for the spec root's own x-scope-types, "config-override" for one this
+// SDK supplies because the published spec understates what the gateway serves
+// or declares no extension at all. A spec-sourced set is what the spec
+// declares, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"GetDeviceChannels":                    {Method: "GetDeviceChannels", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/channels", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
-	"GetDeviceDeclarationReportFiltered":   {Method: "GetDeviceDeclarationReportFiltered", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/declarations", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
-	"ListDeclarationReportClientsFiltered": {Method: "ListDeclarationReportClientsFiltered", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}/devices", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
+	"GetDeviceChannels":                    {Method: "GetDeviceChannels", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/channels", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
+	"GetDeviceDeclarationReportFiltered":   {Method: "GetDeviceDeclarationReportFiltered", HTTPMethod: "GET", Path: "/v1/devices/{deviceId}/declarations", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
+	"ListDeclarationReportClientsFiltered": {Method: "ListDeclarationReportClientsFiltered", HTTPMethod: "GET", Path: "/v1/declarations/{declarationIdentifier}/devices", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"declarations:read"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

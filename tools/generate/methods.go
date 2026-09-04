@@ -6,6 +6,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/http"
 	"path"
 	"regexp"
@@ -22,15 +23,25 @@ import (
 // ---------------------------------------------------------------------------
 
 func extractMethods(doc *openapi3.T, spec SpecDef, enumTypes map[string]bool) ([]GoMethod, error) {
+	// Scope is declared once on the spec root, so resolve it once rather than
+	// per operation: repeating the work would repeat the same error 700 times
+	// for pro.
+	scopes, scopesSource, err := resolveScopeTypes(doc, spec)
+	if err != nil {
+		return nil, err
+	}
+
 	var methods []GoMethod
 	for _, opDef := range spec.Operations {
 		m, err := buildMethod(doc, spec, opDef, enumTypes)
 		if err != nil {
 			return nil, fmt.Errorf("operation %s: %w", opDef.Op, err)
 		}
+		m.Scopes = scopes
+		m.ScopesSource = scopesSource
 		methods = append(methods, m)
 	}
-	methods, err := appendResolverMethods(methods, spec)
+	methods, err = appendResolverMethods(methods, spec)
 	if err != nil {
 		return nil, err
 	}
@@ -1492,4 +1503,139 @@ func detectPaginatedItemType(op *openapi3.Operation, resultsField string) string
 		}
 	}
 	return "any"
+}
+
+// scopeKindConstants maps an x-scope-types value to the Go constant the
+// Privileges registry carries. Organization is the zero ScopeKind and sends no
+// header, but it is named rather than omitted: an empty Scopes slice would be
+// indistinguishable from a spec that declared nothing.
+var scopeKindConstants = map[string]string{
+	"tenant":       "ScopeTenant",
+	"environment":  "ScopeEnvironment",
+	"organization": "ScopeOrganization",
+}
+
+// resolveScopeTypes returns the scope-kind constants for a spec together with
+// the provenance of the set, reading the root x-scope-types extension and
+// applying config.scopeTypes where the published spec understates what the
+// gateway serves. source is "spec" when the extension supplied the value and
+// "config-override" when the config entry did; it is carried to each method's
+// ScopesSource so a consumer reading one registry entry can tell an ingested
+// declaration from a correction this repo made.
+//
+// Three failure modes are deliberate rather than tolerated. A malformed
+// extension is a hard error, because an element the extractor cannot read as a
+// string would otherwise vanish and leave a plausible-looking shorter set. An
+// unknown value is a hard error for the same reason: silently dropping it
+// would understate the scopes an endpoint accepts. And a spec that declares
+// nothing with no override is a hard error too: the account trio is the only
+// family with no x-scope-types, and it is organization-scoped, so it carries
+// an explicit config.scopeTypes entry. A new spec that arrives without the
+// extension therefore fails generation rather than emitting an empty scope set
+// that a consumer would read as "no scope required".
+func resolveScopeTypes(doc *openapi3.T, spec SpecDef) (kinds []string, source string, err error) {
+	declared, err := stringSliceRootExtension(doc, "x-scope-types")
+	if err != nil {
+		return nil, "", fmt.Errorf("scopeTypes for %s: %w", spec.File, err)
+	}
+
+	source = "spec"
+	if len(spec.ScopeTypes) > 0 {
+		if equalStringSets(declared, spec.ScopeTypes) {
+			return nil, "", fmt.Errorf("scopeTypes for %s: the spec now declares exactly %v — delete the config entry so the spec is the only source", spec.File, spec.ScopeTypes)
+		}
+		// The equality check above only expires an override the spec has
+		// caught up with exactly. An override exists to WIDEN a spec that
+		// understates the gateway, so anything the spec declares and the
+		// override omits means the override has gone stale in the one
+		// direction equality cannot see: replacing a superset with a subset
+		// drops a scope upstream now publishes, and the registry would then
+		// tell consumers an endpoint refuses a credential it accepts.
+		if len(declared) > 0 && !isSubset(declared, spec.ScopeTypes) {
+			return nil, "", fmt.Errorf("scopeTypes for %s: the spec now declares %v, which the config override %v does not cover — reconcile before generating", spec.File, declared, spec.ScopeTypes)
+		}
+		declared = spec.ScopeTypes
+		source = "config-override"
+	}
+	if len(declared) == 0 {
+		return nil, "", fmt.Errorf("scopeTypes for %s: the spec declares no x-scope-types and config supplies none — add a scopeTypes entry rather than emitting an empty scope set", spec.File)
+	}
+
+	out := make([]string, 0, len(declared))
+	seen := map[string]bool{}
+	for _, v := range declared {
+		c, ok := scopeKindConstants[v]
+		if !ok {
+			return nil, "", fmt.Errorf("scopeTypes for %s: unknown scope kind %q (want tenant, environment or organization)", spec.File, v)
+		}
+		if seen[c] {
+			continue
+		}
+		seen[c] = true
+		out = append(out, c)
+	}
+	return out, source, nil
+}
+
+// equalStringSets reports whether a and b hold the same values, order and
+// duplicates ignored.
+func equalStringSets(a, b []string) bool {
+	if len(a) == 0 || len(b) == 0 {
+		return false
+	}
+	sa, sb := map[string]bool{}, map[string]bool{}
+	for _, v := range a {
+		sa[v] = true
+	}
+	for _, v := range b {
+		sb[v] = true
+	}
+	return maps.Equal(sa, sb)
+}
+
+// isSubset reports whether every value in a is present in b, order and
+// duplicates ignored. An empty a is trivially a subset.
+func isSubset(a, b []string) bool {
+	in := make(map[string]bool, len(b))
+	for _, v := range b {
+		in[v] = true
+	}
+	for _, v := range a {
+		if !in[v] {
+			return false
+		}
+	}
+	return true
+}
+
+// stringSliceRootExtension reads a []string-valued extension off the document
+// root, the way stringSliceExtension reads one off an operation.
+//
+// An absent extension is a nil slice and a nil error, because the caller has
+// its own refusal for a spec that declares nothing and the config-override
+// path depends on reaching it. A malformed one is an error rather than a
+// shorter slice: an element that is not a string would otherwise be dropped,
+// and for x-scope-types the result is a registry entry that looks like a
+// deliberate single-scope declaration.
+func stringSliceRootExtension(doc *openapi3.T, key string) ([]string, error) {
+	if doc == nil || doc.Extensions == nil {
+		return nil, nil
+	}
+	raw, ok := doc.Extensions[key]
+	if !ok {
+		return nil, nil
+	}
+	items, ok := raw.([]any)
+	if !ok {
+		return nil, fmt.Errorf("%s is %v, want an array of strings", key, raw)
+	}
+	out := make([]string, 0, len(items))
+	for _, it := range items {
+		str, ok := it.(string)
+		if !ok {
+			return nil, fmt.Errorf("%s contains %v, which is not a string", key, it)
+		}
+		out = append(out, str)
+	}
+	return out, nil
 }

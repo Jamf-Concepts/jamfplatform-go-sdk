@@ -38,6 +38,202 @@ func TestAcceptance_Pro_Inventory_GetInformationV1(t *testing.T) {
 }
 
 // --- computer-inventory V3 (read chain) --------------------------------
+//
+// v1942 withdrew V1, V2 and V3 from the published spec; v2082 brought V3 back
+// (public-apis-oas#438) on the grounds that its 2026-07-14 deprecation left
+// callers no reasonable window to reach V4. V1 and V2 stay withdrawn, so the
+// two destructive V1 stubs that used to sit in this section are gone with
+// them. Wire-confirmed 2026-09-04: GET /pro/v3/computers-inventory answers 200
+// with a body byte-identical to V4's for the same tenant.
+
+func TestAcceptance_Pro_Inventory_ListComputersV3(t *testing.T) {
+	c := accClient(t)
+
+	items, err := pro.New(c).ListComputersInventoryV3(context.Background(), nil, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputersInventoryV3: %v", err)
+	}
+	t.Logf("Found %d computers", len(items))
+}
+
+func TestAcceptance_Pro_Inventory_ListComputerFileVaultsV3(t *testing.T) {
+	c := accClient(t)
+
+	items, err := pro.New(c).ListComputerInventoryFileVaultsV3(context.Background())
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputerInventoryFileVaultsV3: %v", err)
+	}
+	t.Logf("Found %d computer FileVault records", len(items))
+}
+
+// TestAcceptance_Pro_Inventory_ComputerReadChainV3 exercises per-computer
+// read endpoints (get, get-detail, filevault, view-device-lock-pin,
+// view-recovery-lock-password) against the first computer the tenant has,
+// if any. Sensitive reads (PIN / recovery password) fire but the values
+// are not logged.
+func TestAcceptance_Pro_Inventory_ComputerReadChainV3(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	computers, err := p.ListComputersInventoryV3(ctx, nil, nil, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListComputersInventoryV3: %v", err)
+	}
+	if len(computers) == 0 {
+		t.Skip("tenant has no computers — no read probes possible")
+	}
+	id := computers[0].ID
+
+	if _, err := p.GetComputerInventoryV3(ctx, id, nil); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("GetComputerInventoryV3(%s): %v", id, err)
+	}
+	if _, err := p.GetComputerInventoryDetailV3(ctx, id); err != nil {
+		skipOnServerError(t, err)
+		t.Errorf("GetComputerInventoryDetailV3(%s): %v", id, err)
+	}
+
+	// Per-device FileVault — 404 if the machine isn't encrypted, plumbing ok.
+	if _, err := p.GetComputerInventoryFileVaultV3(ctx, id); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
+			t.Logf("GetComputerInventoryFileVaultV3(%s): 404 — no FileVault record, plumbing OK", id)
+		} else {
+			skipOnServerError(t, err)
+			t.Errorf("GetComputerInventoryFileVaultV3(%s): %v", id, err)
+		}
+	}
+
+	// Device lock PIN and recovery lock password — sensitive. Plumbing only;
+	// do not log values. 4xx on no-PIN-set is acceptable.
+	if _, err := p.GetComputerDeviceLockPinV3(ctx, id); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+			t.Logf("GetComputerDeviceLockPinV3(%s): %d — no PIN set or not eligible, plumbing OK", id, apiErr.StatusCode)
+		} else {
+			skipOnServerError(t, err)
+			t.Errorf("GetComputerDeviceLockPinV3(%s): %v", id, err)
+		}
+	} else {
+		t.Logf("GetComputerDeviceLockPinV3(%s): ok (value not logged)", id)
+	}
+
+	if _, err := p.GetComputerRecoveryLockPasswordV3(ctx, id); err != nil {
+		var apiErr *jamfplatform.APIResponseError
+		if errors.As(err, &apiErr) && apiErr.StatusCode >= 400 && apiErr.StatusCode < 500 {
+			t.Logf("GetComputerRecoveryLockPasswordV3(%s): %d — no password set or not eligible, plumbing OK", id, apiErr.StatusCode)
+		} else {
+			skipOnServerError(t, err)
+			t.Errorf("GetComputerRecoveryLockPasswordV3(%s): %v", id, err)
+		}
+	} else {
+		t.Logf("GetComputerRecoveryLockPasswordV3(%s): ok (value not logged)", id)
+	}
+}
+
+// TestAcceptance_Pro_Inventory_ComputerCRUDV3 exercises full CRUD against a
+// synthetic computer inventory record seeded with a sdk-acc-* UDID. Server
+// accepts a minimal create body; no real managed computer is touched.
+// Covers create, get, detail update (PATCH), attachment upload, attachment
+// download, attachment delete, and record delete.
+func TestAcceptance_Pro_Inventory_ComputerCRUDV3(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	udid := "sdk-acc-udid-" + runSuffix()
+	name := "sdk-acc-mac-" + runSuffix()
+
+	created, err := p.CreateComputerInventoryV3(ctx, &pro.ComputerInventoryCreateRequestV2{
+		UDID: &udid,
+		General: &pro.ComputerGeneralCreate{
+			Name: name,
+		},
+		Hardware: &pro.ComputerHardwareCreate{
+			Make:            ptr("Apple"),
+			Model:           ptr("SDK Acceptance Virtual"),
+			ModelIdentifier: ptr("SDKAcc1,1"),
+		},
+		OperatingSystem: &pro.ComputerOperatingSystemCreate{
+			Name:    ptr("macOS"),
+			Version: ptr("14.0"),
+			Build:   ptr("23A344"),
+		},
+	})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("CreateComputerInventoryV3: %v", err)
+	}
+	if created.ID == "" {
+		t.Fatalf("CreateComputerInventoryV3 returned no ID (href=%q)", created.Href)
+	}
+	cleanupDelete(t, "DeleteComputerInventoryV3", func() error { return p.DeleteComputerInventoryV3(ctx, created.ID) })
+	t.Logf("Created computer inventory record %s (udid=%s)", created.ID, udid)
+
+	// Round-trip verify.
+	got, err := p.GetComputerInventoryV3(ctx, created.ID, []string{"GENERAL", "HARDWARE"})
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetComputerInventoryV3(%s): %v", created.ID, err)
+	}
+	if got.UDID != udid {
+		t.Errorf("UDID = %q, want %q", got.UDID, udid)
+	}
+
+	// PATCH detail — returns 204.
+	assetTag := "sdk-acc-tag-" + runSuffix()
+	if err := p.UpdateComputerInventoryDetailV3(ctx, created.ID, &pro.ComputerInventoryUpdateRequest{
+		General: &pro.ComputerGeneralUpdate{AssetTag: &assetTag},
+	}); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UpdateComputerInventoryDetailV3(%s): %v", created.ID, err)
+	}
+
+	// Upload attachment (inline bytes).
+	body := "sdk-acc attachment probe payload " + runSuffix()
+	att, err := p.UploadComputerInventoryAttachmentV3(ctx, created.ID, "probe.txt", strings.NewReader(body))
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("UploadComputerInventoryAttachmentV3(%s): %v", created.ID, err)
+	}
+	t.Logf("Uploaded attachment %s", att.ID)
+
+	// Download the attachment — returns text/plain bytes.
+	downloaded, err := p.DownloadComputerInventoryAttachmentV3(ctx, created.ID, att.ID)
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DownloadComputerInventoryAttachmentV3(%s, %s): %v", created.ID, att.ID, err)
+	}
+	if !strings.Contains(string(downloaded), "sdk-acc attachment probe") {
+		t.Errorf("Download body %q does not contain expected probe string", downloaded)
+	}
+
+	// Delete attachment.
+	if err := p.DeleteComputerInventoryAttachmentV3(ctx, created.ID, att.ID); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteComputerInventoryAttachmentV3(%s, %s): %v", created.ID, att.ID, err)
+	}
+
+	// Delete record.
+	if err := p.DeleteComputerInventoryV3(ctx, created.ID); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("DeleteComputerInventoryV3(%s): %v", created.ID, err)
+	}
+
+	// Verify gone.
+	_, err = p.GetComputerInventoryV3(ctx, created.ID, nil)
+	if err == nil {
+		t.Fatalf("GetComputerInventoryV3(%s) after delete should 404", created.ID)
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
+		t.Fatalf("GetComputerInventoryV3(%s) after delete: want 404, got %v", created.ID, err)
+	}
+}
 
 // --- computer-inventory V4 (read chain) --------------------------------
 //

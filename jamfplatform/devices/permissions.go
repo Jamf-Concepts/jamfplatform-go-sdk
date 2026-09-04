@@ -21,15 +21,24 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts. It is an alternatives
+// set: a client carries one scope, so a consumer needs a credential matching
+// one of the listed kinds. ScopesSource names where the set came from —
+// "spec" for the spec root's own x-scope-types, "config-override" for one this
+// SDK supplies because the published spec understates what the gateway serves
+// or declares no extension at all. A spec-sourced set is what the spec
+// declares, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"DeleteDevice":           {Method: "DeleteDevice", HTTPMethod: "DELETE", Path: "/v1/devices/{id}", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil, Source: "spec"},
-	"GetDevice":              {Method: "GetDevice", HTTPMethod: "GET", Path: "/v1/devices/{id}", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
-	"ListDeviceApplications": {Method: "ListDeviceApplications", HTTPMethod: "GET", Path: "/v1/devices/{id}/applications", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
-	"ListDevices":            {Method: "ListDevices", HTTPMethod: "GET", Path: "/v1/devices", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
-	"ListDevicesForUser":     {Method: "ListDevicesForUser", HTTPMethod: "GET", Path: "/v1/users/{id}/devices", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
-	"UpdateDevice":           {Method: "UpdateDevice", HTTPMethod: "PATCH", Path: "/v1/devices/{id}", Scoped: []string{"devices:update"}, Legacy: nil, Source: "spec"},
+	"DeleteDevice":           {Method: "DeleteDevice", HTTPMethod: "DELETE", Path: "/v1/devices/{id}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"destructive-device-actions:execute"}, Legacy: nil, Source: "spec"},
+	"GetDevice":              {Method: "GetDevice", HTTPMethod: "GET", Path: "/v1/devices/{id}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"ListDeviceApplications": {Method: "ListDeviceApplications", HTTPMethod: "GET", Path: "/v1/devices/{id}/applications", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"ListDevices":            {Method: "ListDevices", HTTPMethod: "GET", Path: "/v1/devices", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"ListDevicesForUser":     {Method: "ListDevicesForUser", HTTPMethod: "GET", Path: "/v1/users/{id}/devices", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"devices:read"}, Legacy: nil, Source: "spec"},
+	"UpdateDevice":           {Method: "UpdateDevice", HTTPMethod: "PATCH", Path: "/v1/devices/{id}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"devices:update"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

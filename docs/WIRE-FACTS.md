@@ -641,15 +641,34 @@ sub-resources Classic never had; only `source_id` lacks an equivalent (v3 has
 Also re-confirmed on 11.31.1: `GET /pro/v4/patch-software-title-configurations`
 → **403**, unchanged from the 11.30.2 observation.
 
-**`GET /patches/name/{name}` answers 500, not 404.** `500` for an
-obviously-absent name 3/3, and `500` again for a plausible one (`Firefox`), on a
-tenant whose `/patchsoftwaretitles` list is empty. A server defect found while
-the patch family was briefly withdrawn; worth reporting regardless of the hold.
-Not currently pinned by a test. `GET /patches/name/{name}` survives v1993 and
-`TestAcceptance_Classic_PatchByName` still covers it, but the enumeration it used
-to source a name from — `ListPatches` — is withdrawn, so the test now takes a
-name from `ListPatchSoftwareTitles` and skips on a tenant with no *configured*
-titles rather than reaching the defect.
+**`GET /patches/name/{name}` answers 500 unconditionally.** First recorded
+2026-09-01 as "500, not 404" — `500` for an obviously-absent name 3/3 and again
+for a plausible one (`Firefox`), on a tenant whose `/patchsoftwaretitles` list
+was empty — which framed it as a wrong status for a missing title.
+
+**~~for a name the tenant does not have~~ — re-probed 2026-09-04, it is not
+state-dependent at all**, on a tenant that *does* have a title and with
+controls in the same invocation:
+
+```
+GET /proclassic/patches                          → 200  <patch_management_software_titles><size>1</size>
+                                                          …<id>1</id><name>Microsoft Defender</name>…
+GET /proclassic/patches/id/1                     → 200  (control)
+GET /proclassic/patches/name/Microsoft%20Defender → 500  Jamf Pro's own HTML
+GET /proclassic/patches/name/010%20Editor         → 500  (a freshly seeded title)
+GET /proclassic/patches/name/NoSuchTitleXyz       → 500
+```
+
+So the endpoint is broken for every name, present or absent, while the by-id
+form on the same path works. Report upstream.
+
+**Now pinned.** `TestAcceptance_Classic_PatchByName` used to reach
+`skipOnServerError` and skip, which is the right convention for a *transient*
+5xx and exactly wrong for a permanent one — the test could never report the
+fix. It now asserts the 500 and fails if the call ever succeeds. The name it
+probes with comes from Pro v3's configuration list; `ListPatches` is back at
+v2082 and could source it too, but the v3 list is the surface a caller would
+use.
 
 **Classic computers: the withdrawal is incoherent, and it was taken anyway.**
 v1942 removes `GET` and `PUT /computers/id/{id}` while keeping `POST` and
@@ -876,6 +895,174 @@ Still unexercised, and needing a deployment that targets real machines:
 Also still unverified: whether a post-GA **tenant** credential reaches any of
 this — only an environment credential has been live since the gateway opened.
 
+### The restored Classic patch family (2026-09-04)
+
+v2082 republished every Classic patch-management operation v1942 withdrew
+(`public-apis-oas#438`). Probing them before writing coverage found three
+defects, two of which had been shipping silently in the SDK since the day
+those methods first appeared, and none of which a status-only test could see.
+
+All probes on Jamf Pro 11.31.1 through an **environment** credential, with
+`GET /proclassic/patchsoftwaretitles` at 200 in the same invocation as the
+control and a fixture minted through `POST /patchsoftwaretitles/id/0`.
+
+**1. `GET /patchpolicies/softwaretitleconfig/id/{id}` answers a collection,
+not the singular object the spec declares.**
+
+```
+GET /proclassic/patchpolicies/softwaretitleconfig/id/1  → 200
+<?xml version="1.0" encoding="UTF-8"?><patch_policies><size>0</size></patch_policies>
+```
+
+The spec declares `#/components/schemas/patch_policy` for both
+`application/xml` and `application/json`. The wire root element is
+`patch_policies`. `responseType` is now `patch_policies`, so
+`ListPatchPoliciesBySoftwareTitleConfigID` returns `*PatchPolicies` — which
+its name always promised.
+
+**2. `GET /patches/id/{id}/version/{version}` answers `<software_title>`, and
+the pre-v1942 config said `computers`.**
+
+```
+GET /proclassic/patches/id/1/version/101.26062.0012  → 200
+<?xml version="1.0" encoding="UTF-8"?><software_title><id>1</id><name>Microsoft Defender</name>
+  <name_id>256</name_id><source_id>1</source_id>…<versions><version><software_version>…
+```
+
+It is the title filtered to one version. The spec declares **no schema at
+all** for this operation, so `"responseType": "computers"` was the SDK's own
+guess rather than a spec transcription, and it was wrong. Now `software_title`,
+and the method is renamed `GetPatchComputersByIDVersion` →
+**`GetPatchByIDVersion`**: a name promising computers over a `SoftwareTitle`
+return is worse than a rename, and no consumer can have depended on the old
+one because it never returned data.
+
+**Why neither failed loudly, and the general lesson.** Generated Classic types
+carry `XMLName xml.Name` with no struct tag. Go's `encoding/xml` does not
+validate an untagged root, and none of `<patch_policies>`'s or
+`<software_title>`'s children map onto the wrongly-chosen struct's fields — so
+both calls decoded a **zero-valued struct and returned `nil` error**. A
+consumer saw an empty result, not a failure. So: **a restored operation needs
+its response *shape* probed, not just its status**, and a `responseType`
+override the spec does not corroborate is a guess until the wire agrees with
+it.
+
+**3. `POST` and `PUT /patches/id/{id}` are refused whatever the body.** Jamf
+Pro's own HTML `400`, not a gateway JSON error, so this is routed and refused
+by Jamf Pro itself:
+
+```
+PUT /proclassic/patches/id/79
+  <software_title><name>010 Editor</name><notifications>
+    <email_notification>false</email_notification></notifications></software_title>
+  → 400  "Error in XML file"
+
+PUT, same path, root <SoftwareTitle> (what the Go type marshals)   → 400  "Error in XML file"
+PUT, same path, <software_title><name>010 Editor</name></software_title> → 400  "Error in XML file"
+
+POST /proclassic/patches/id/0
+  <software_title><name>010 Editor</name><name_id>518</name_id><source_id>1</source_id></software_title>
+  → 400  "Error in XML file.  Possible mismatch between resource specified in
+          the URL and XML file"
+
+DELETE /proclassic/patches/id/999999  → 404  (Jamf Pro's own HTML — routed)
+GET    /proclassic/patches/id/79      → 200  (control, same invocation)
+```
+
+Three body shapes, including the spec's own root element and a minimal
+one-field body, all rejected identically. So this is not a marshalling problem
+the SDK can fix and not a body-shape guess: **`/patches` is a read-and-delete
+surface whose spec declares four verbs.** Report upstream.
+`TestAcceptance_Classic_PatchByIDWrites` asserts both refusals as 400 and
+fails if either starts working, at which point it becomes a real round-trip.
+
+**What does work, all 200 with real data**: `GET /patches`,
+`GET /patches/id/{id}` (with the version catalogue —
+`total_versions: 113` on the sampled title, which
+`GET /patchsoftwaretitles/id/{id}` does not carry),
+`GET /patchsoftwaretitles`, `GET /patchsoftwaretitles/id/{id}`,
+`PUT`/`DELETE /patchsoftwaretitles/id/{id}`, both `/patchreports` forms, and
+`GET /patchpolicies`. The version-scoped report narrows `total_versions`
+114 → 1, which is the assertion that proves the path segment is honoured
+rather than ignored.
+
+### v2082's scope migration: the specs moved, the gateway mostly did not (2026-09-04)
+
+v2082 set a scope level on every spec that had one wrong
+(`public-apis-oas#436`, `#437`, `#439`). Six Platform specs went tenant →
+**environment only** — `x-scope-types: [environment]`, `X-Environment-Id`
+`required: true`, and `X-Tenant-Id` deleted from `components.parameters`
+outright. `jpapi`, `capi` and all six Security Cloud specs went tenant →
+**tenant and environment**, both headers `required: false`.
+
+The gateway has not followed on the withdrawal half. Probed with a tenant
+credential, `GET /pro/v1/jamf-pro-version` → 200 as the control in the same
+invocation, and `GET /blueprints/v1/bogus-control-xyz` → `403 BAD_PERMISSIONS`
+as the unrouted control:
+
+| namespace | spec at v2082 | tenant credential | reading |
+|---|---|---|---|
+| `devices` | environment only | **200**, 13 devices | tenant still served |
+| `device-groups` | environment only | **200**, 53 groups | tenant still served |
+| `ddm/report` | environment only | **400** `filter` required (`Unable to parse RSQL filter`) | past the gateway |
+| `device-actions` | environment only | **404** `NOT_FOUND` on `id` | past the gateway |
+| `blueprints` | environment only | `403 BAD_PERMISSIONS` | unclassified — see below |
+| `compliance-benchmarks` | environment only | `403 BAD_PERMISSIONS` | unclassified — see below |
+
+The two 403s cannot be attributed. **Classifying a 403 takes two credentials,
+not two paths**, and only one tenant credential was available; a 403 that
+varies by credential is a capability grant, one constant across credentials is
+a missing authorization rule, and neither can be distinguished from a scope
+withdrawal on a single credential. Both agree with the GA decision that
+blueprints and benchmarks are environment-only, so they are recorded as
+consistent-but-unproven and deliberately left out of the acceptance
+assertions. `compliance-benchmarks` also answered
+`500 {"error": "Upstream host lookup failed"}` **2/2** to the *environment*
+credential, which is an infra fault on that environment and not a scope
+answer — repeated, per the rule that a single 500 reads as "routed and merely
+faulting".
+
+The dual-scope half is correct. Under `X-Environment-Id`:
+`GET /pro/v3/computers-inventory` → 200 (5 computers),
+`GET /proclassic/patchsoftwaretitles` → 200,
+`GET /securitycloud/v1/categories` → 200 (36),
+`GET /securitycloud/v2/groups` → 200,
+`GET /securitycloud/uem-connect/v1/connectors` → 200 (1).
+
+**`_permissions/routes.yaml` mistypes the tenant half of every dual-scope API
+as `environment`.** 6357 → 12367 lines and 18 → 26 domain blocks, with **zero**
+`tenant`-typed blocks where v2056 had 16. A dual-scope spec emits two blocks
+whose `routes` are byte-identical and both typed `environment`: `pro` twice at
+506 routes, `proclassic` twice at 273, `securitycloud` twelve times for six
+specs. The file therefore no longer distinguishes the two scopes it was
+extended to describe, and a consumer asking what a tenant-scoped integration
+may be granted now finds nothing at all — the same question that was already
+unanswerable at v1865 for the opposite reason (`routes.yaml` typed 11 domains
+`tenant` while `scopes.yaml` had no `tenant` key). Report upstream.
+`scopes.yaml` is byte-identical to v2056 and still has `environment` as its
+only top-level key.
+
+**`/v3/computers-inventory` is live and matches `/v4`.**
+`GET /pro/v3/computers-inventory?page-size=1&section=GENERAL` and the same
+call on `/v4` returned byte-identical bodies for the same tenant
+(`totalCount: 6`, first record `id=6`). The V3 endpoints still send
+`Deprecation: date="Tue, 14 Jul 2026 00:00:00 GMT"`, which the transport logs
+on every call — expected, and the reason `#438` restored them: the deprecation
+predates the removal manifest by weeks.
+
+**A UEM connector exists on the JSC surface again**, which unblocks a probe
+recorded as impossible at v1958. `GET /securitycloud/uem-connect/v1/connectors`
+→ `totalCount: 1`, id `6a17f51d35de56a42a87c520`, `JAMF_PRO`,
+`connected: true`, `refreshRateMinutes: 1440` (in v1958's new enum),
+`deviceUnmanagedThreshold: 0`, `uemVersion: 11.31.1`. The v1958 constraint
+claims — `refreshRateMinutes` restricted to
+`60, 120, 240, 480, 720, 1440` and `deviceUnmanagedThreshold` to
+`0, 1, 3, 5, 7, 14`, with `0` redefined from "grace period off" to "platform
+default (3 days)" — are now probeable through the sync-settings PUT, which
+resolves the resource before validating fields. Not done here: it is a write
+against a live connected connector, and the connector has a concurrent human
+operator.
+
 ### The gateway-bypass technique
 
 When a gateway 403 blocks verification, separate "Jamf Pro can't do this" from
@@ -1074,6 +1261,133 @@ both an unrouted path and a privilege failure.
 **Not routed** (403 with credentials that reach every other Security Cloud path):
 the `jsc-api-gateway` ping, `securitycloud-devices`' `GET /v1/…/devices`, and
 **every `/v2/groups/{id}` method** — see below.
+
+### Device groups `PUT /v2/groups/{id}` is FIXED, and the hold is lifted (2026-09-04)
+
+**The handler defect recorded in the section below was fixed the next day, and
+the fix window is narrow enough to state exactly: between 12:51 and 13:33 BST on
+2026-09-04.** A run of `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` at
+12:51 still got the `404`; a run at 13:33 succeeded. Nothing in the SDK changed
+between them.
+
+**It is a real fix, not a status change.** The failure mode a status check
+cannot see is a handler that accepts a write and discards it, so the rename was
+**read back**. Three cycles, raw curl so the payloads are not mediated by the
+SDK, with an environment credential on `eu`:
+
+```
+control  bogus path                    -> HTTP 403        (unrouted tell, this namespace)
+POST /securitycloud/v1/groups          -> {"id":"b0693661-…","name":"sdk-v2put-verify-1-31843"}
+PUT  /securitycloud/v1/groups/{id}     -> HTTP 200        {"id":"b0693661-…","name":"…-v1ok"}
+PUT  /securitycloud/v2/groups/{id}     -> HTTP 204        (empty body, as declared)
+GET  /securitycloud/v2/groups          -> name is "sdk-v2put-verify-1-31843-v2applied"   ← PERSISTED
+DELETE /securitycloud/v1/groups/{id}   -> HTTP 204
+```
+
+3/3 identical. The `403` control in the same invocation is what rules out the
+`204` being a router artefact, and the read-back through `GET /v2/groups` — a
+different operation from the one written — is what rules out a write the handler
+accepted and dropped.
+
+**Two layers were broken here, and fixing the first made the second visible.**
+The 403 → 404 transition on 2026-09-03 was `authorization-policies#265`
+deploying, and the diagnosis at the time — recorded below — concluded "the
+remaining gap is the rollout". The rollout did land. It then exposed an
+independent defect in the v2 handler behind it, which is why the hold outlived
+the authorization fix by a day. **A 403 clearing is not the same event as the
+capability arriving**; that is the part worth carrying forward.
+
+**What it cost to lift the hold.** `securitycloud-device-groups-api.yaml` is
+ingested at v2082, taking v1942's two withdrawals with it: `GET /v1/groups` and
+`PUT /v1/groups/{groupId}`. Removed from Go — all breaking:
+`ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, `ResolveDeviceGroupV1IDByName`,
+`ResolveDeviceGroupV1ByName`, `ApplyDeviceGroupV1`, and the
+`GroupListResponse = []GroupListItem` alias the withdrawn list was the only user
+of. `ApplyDeviceGroupV2`'s update branch is repointed from
+`UpdateDeviceGroupV1` to `UpdateDeviceGroupV2` — the branch that could not have
+worked at all before this fix. `POST /v1/groups` and `GET`/`DELETE
+/v1/groups/{groupId}` survive the withdrawal, so the package still creates and
+deletes through v1.
+
+**Both withdrawn paths still answer 200 on the wire**, probed in the same
+session with the same 403 bogus-path control:
+
+```
+GET /securitycloud/v1/groups        -> HTTP 200  [{"name":"Default Group"}]
+PUT /securitycloud/v1/groups/{id}   -> HTTP 200  {"id":"ad1cee93-…","name":"sdk-withdrawal-probe-v1"}
+```
+
+So the SDK is deliberately stricter than the gateway here, which is the v1942
+rule applied rather than an accident. Worth noting `GET /v1/groups` returns a
+bare array whose entries carry only `name` — no `id` — which is why the
+withdrawn list's item type was never `Group`.
+
+**The whole spec delta is those two withdrawals plus v2082's scope-parameter
+migration.** Stripping the scope parameters leaves **zero** operations
+differing across the five survivors, and zero schemas added, removed or
+changed. `x-scope-types` goes `[tenant]` → `[tenant, environment]`, which
+self-expired the `scopeTypes` config override: generation failed with *"delete
+the config entry so the spec is the only source"* and the entry went. The
+account trio is now the only user of that key.
+
+### Device groups `/v2/{id}`: the rule deployed, and the v2 handler 404s (2026-09-04)
+
+**The authorization story is over and the hold now rests on a service defect.**
+`authorization-policies#265` (`07791a1`) has deployed: `PUT /v2/groups/{groupId}`
+stopped answering `403 BAD_PERMISSIONS` and started answering a service-level
+**`404 NOT_FOUND`**. First seen 2026-09-03 12:29Z on the JSC sandbox tenant;
+**re-probed 2026-09-04 on a second Security Cloud tenant with a second
+credential, against a group created seconds earlier, and it is the same.** That
+run is the strongest form of the evidence so far, because it removes every
+remaining explanation except the handler.
+
+Environment credential on the `mockingbirduat` environment
+(`aee3ec71-d162-4a30-9d90-536ea3dc4f79`, eu) — a **different** Security Cloud
+tenant from the `928260f5…` JSC sandbox every earlier probe used. One
+invocation, throwaway group created and deleted inside it:
+
+| request | result |
+|---|---|
+| `POST /securitycloud/v1/groups` | **201** `{"href":"/api/securitycloud/v1/groups/73f7499d…","id":"73f7499d-2040-4a2a-9354-cca24d89e79c","name":"sdk-probe-1788514469"}` |
+| `PUT /securitycloud/v2/groups/73f7499d…` | **404** `NOT_FOUND` / `"Not Found"`, `field: null` — **3/3**, traceIds `7605c52f…`, `6d0c1595…`, `6c505e9c…` |
+| `GET /securitycloud/v1/groups/73f7499d…` (control) | **200** `{"id":"73f7499d…","name":"sdk-probe-1788514469"}` |
+| `PUT /securitycloud/v1/groups/73f7499d…` (sibling-rule control) | **200**, renamed, and the rename read back |
+| `GET /securitycloud/v2/groups` | **200** — lists `{"id":"73f7499d…","name":"sdk-probe-renamed-v1"}` |
+| `GET /securitycloud/v2/groups/{id}` | **403** `BAD_PERMISSIONS` — undeclared verb, proves nothing |
+| `PUT /securitycloud/v2/bogus-control/{id}` (unrouted control) | **403** `BAD_PERMISSIONS` |
+| `GET /securitycloud/v9/groups` (unrouted control) | **403** `BAD_PERMISSIONS` |
+| `DELETE /securitycloud/v1/groups/73f7499d…` (cleanup) | **204**, and `GET /v1/groups` back to `[{"name":"Default Group"}]` |
+
+**What each control rules out.** The two bogus-path 403s establish that
+`403 BAD_PERMISSIONS` is still this namespace's unrouted signature, so a 404 on
+the v2 PUT means the request cleared OPA and reached the service. The v1 `PUT`
+at 200 is the same-permission sibling rule — identical `tenantPermissions`
+condition in the same rego file — so the credential satisfies the v2 rule by
+construction. `GET /v2/groups` returning the group **by that exact id in the
+same invocation** rules out the id being wrong or unknown to v2's own read path.
+And the group was **created seconds earlier in the same invocation**, which
+rules out stale state, replication lag, and anything about the group predating a
+migration — the explanations a probe against a long-lived sandbox group could
+not exclude.
+
+**So: the v2 update handler cannot find a group its own list endpoint just
+returned.** That is a defect in the Security Cloud devices service, not an
+authorization gap, and the owner is no longer a `jamf/authorization-service`
+rollout. Report upstream. ~~`securitycloud-devices` **stays held at v1897**~~ —
+**superseded 2026-09-04: the handler was fixed and the hold lifted; see the
+section above.** At the time of this probe, v1942 would have withdrawn
+`PUT /v1/groups/{groupId}` — then the only device-group update that worked —
+while its declared successor was broken. **Lift the hold when the v2
+PUT answers 2xx**, not when it stops 403ing: that already happened and cost the
+SDK nothing.
+
+Two details worth keeping. `GET /v2/groups/{id}` and `DELETE /v2/groups/{id}`
+are still 403 and still prove nothing — `#265` granted `PUT` alone and the spec
+declares neither verb. And the create's `href` is `/api/securitycloud/v1/…`,
+carrying an `/api` prefix the GA gateway root does not take, so it is not
+callable as returned — the same shape as the App Installers `href` finding. Use
+`id`. (`href` was populated here because curl sent no `Accept-Encoding`; through
+the SDK it is nulled by response compression, recorded separately.)
 
 ### Device groups `/v2/{id}`: the rule landed on `main` 2026-09-02
 
@@ -1285,8 +1599,10 @@ One more for the same team: `POST /securitycloud/v1/groups` returns
 `href: "/api/securitycloud/v1/groups/{id}"` — an `/api` prefix the GA gateway
 does not serve, so the href is not directly followable.
 
-**v1942 would have removed the only working device-group update and kept the broken
-one, so `securitycloud-devices` is held at v1897.** The build withdrew
+**~~v1942 would have removed the only working device-group update and kept the
+broken one, so `securitycloud-devices` is held at v1897.~~ — the v2 update was
+fixed on 2026-09-04 and the hold lifted; the withdrawal is now taken.** The
+build withdrew
 `PUT /v1/groups/{groupId}` — the call that answers 200 above — which would have left
 the unrouted v2 PUT as the package's sole update method and repointed
 `ApplyDeviceGroupV2` onto it, killing its update branch. The removal was taken and
@@ -1893,7 +2209,11 @@ the way most likely to rot silently — v2 is the SDK's only `resultsField` user
 the v1 bare-array sibling is what it is contrasted against. Both resolvers and both
 Applies exist side by side, sharing the v1 create/update/delete ops since v2 is
 list-only. **v1942 withdrew `GET /v1/groups` and `PUT /v1/groups/{groupId}`, which
-would have collapsed all of that; the spec is held at v1897 instead.**
+would have collapsed all of that; the spec was held at v1897 instead — until
+2026-09-04, when the v2 update handler was fixed and the withdrawal was taken.
+As of then `ListDeviceGroupsV1`, `ResolveDeviceGroupV1ByName` and
+`ApplyDeviceGroupV1` no longer exist, so the bare-array contrast above is
+history: v2's envelope is the package's only device-group list shape.**
 
 `Default Group` comes back with **no `id`** on both v1 and v2 — the reason
 `GroupListItem` requires only `name`, and the reason `ResolveDeviceGroupV1ByName`
@@ -2044,6 +2364,96 @@ covered as calls, not as outcomes.
 ---
 
 ## Jamf Account (`account`) — organization scope
+
+### Both holds re-confirmed on two organization tenants (2026-09-04)
+
+The `account-licensing` and `account-sso` holds have stood since v1865. v2082
+changed each spec by exactly the one field its hold names — plus a `servers`
+region-enum narrowing `[us, eu, apac]` → `[us]`, which the SDK never reads —
+so the whole question is whether the wire has caught up. It has not, on either.
+
+Two **independent organization tenants**, both on `https://us.api.jamfcloud.com`,
+organization scope so no scope header, each with
+`GET /licensing/v9/bogus` → `404 page not found` as the unrouted control:
+
+| | tenant A `8a2d0ff2-4336-44ca-bd61-1e7e88258740` | tenant B `ffeadc76-1e1c-4827-a764-ab111fef43c6` |
+|---|---|---|
+| licences | 16 | 24 |
+| SSO domains | 5 | 7 |
+| SSO connections | 5 | 6 |
+
+**Licensing: `License.type` is populated 40/40 and is not redundant.**
+v2082 deletes the property (it was `deprecated: true`, `type: string`,
+`example: JAMF_PRO_SUBSCRIPTION`). On the wire it is present and non-null on
+every row of both tenants.
+
+It is **not** a rename of `licenseType`: both fields coexist, and `licenseType`
+is non-null on only 8/16 and 16/24. It is **not derivable** either — on **17 of
+the 40** rows `type` equals none of `licenseType`, `addOnType` or
+`productTopLine`:
+
+```
+productName                     type                      licenseType     addOnType
+Jamf Trust                      JAMF_SECURITY_CLOUD       null            JAMF_TRUST     <- disagrees with addOnType
+Jamf Data Policy                JAMF_SECURITY_CLOUD       NFR             null
+Jamf Threat Defense             JAMF_PROTECT              NFR             null
+Jamf Private Access             JAMF_PRIVATE_ACCESS       NFR             null
+Jamf Pro for iOS                JAMF_PRO_SUBSCRIPTION     SUBSCRIPTION    null
+Jamf Pro for macOS              JAMF_CLOUD_SANDBOX        SANDBOX_DEV     null
+Jamf Connect                    JAMF_CONNECT              NFR             null
+```
+
+`type` is a product-family classifier; `licenseType` is a commercial class
+(`NFR`, `BETA`, `SUBSCRIPTION`, `SANDBOX_DEV`) and `addOnType` only ever covers
+add-ons. Two rows both read `JAMF_SECURITY_CLOUD` under different
+`productName`/`addOnType` combinations, which no other field expresses. So the
+removal is a **silent loss of information on 42% of rows**, not a tidy-up of a
+duplicate — a stronger claim than the "populated 16/16" this hold was first
+recorded with, and the one to put upstream.
+
+**SSO: the wire sends `authZeroRegion` on 11/11 connections and `authRegion` on
+none.** v2082 renames the property (and drops "Auth0" from two descriptions).
+Every connection on both tenants carries exactly
+`["assignedConnection", "assignedConnectionOrgId", "authZeroRegion"]`:
+
+```
+GET https://us.api.jamfcloud.com/sso/v1/domains/allocation/reddawgramp.com  → 200
+{"domain":"reddawgramp.com","connections":[{"assignedConnection":"con_...",
+ "assignedConnectionOrgId":"org_...","authZeroRegion":"RAMP"}],"jamfIdEnabled":true}
+```
+
+Tenant B exercises all five region values across its seven domains — `US`, `EU`,
+`AU`, `JP` and `RAMP` — which independently confirms the `RAMP` `enumAdditions`
+entry is still load-bearing: v2082 still declares `Region` as
+`[US, EU, AU, JP]`.
+
+**A recorded diagnosis was wrong, and the error is the reusable part.** This
+hold was previously marked un-re-probeable: "`/sso/v1/domain-allocations`
+answers `403 BAD_PERMISSIONS` for that credential while `/sso/v1/connections`
+answers 200 in the same session, so the capability is ungranted rather than the
+endpoint being absent; it needs a credential holding `sso-domains`."
+
+**There is no `/sso/v1/domain-allocations` path.** The operation is
+`GET /v1/domains/allocation/{domain}`, and it answers **200** on both
+credentials with no special grant. The 403 came from probing a path the spec
+never declared, and in this namespace the gateway's refusal of an unmapped path
+is byte-identical to its refusal of an ungranted one — same `403`, same
+`BAD_PERMISSIONS`, same body. So a wrong URL manufactured a capability gap and
+parked a re-probe for a month.
+
+**Read the path out of the spec before concluding a capability is missing**, and
+prefer a *declared* sibling in the same namespace as the control: here
+`GET /sso/v1/domains` → 200 would have shown the credential reaches SSO domains
+perfectly well. (`datajar.co.uk` on tenant B returns `connections: []` with
+`jamfIdEnabled: true`, so the read is also safe on a domain with no
+allocations — no fixture needed to exercise it.)
+
+**`account-partners` is still ungranted.** `GET /partners/v1/partners` → `403
+BAD_PERMISSIONS` on **both** organization credentials. Constant across two
+credentials, which by the usual rule points at a missing authorization rule
+rather than a per-credential grant — but partners is a Jamf-internal surface, so
+an unentitled-by-design 403 is equally consistent. Its acceptance coverage
+remains unexercised either way.
 
 ### Probed 2026-09-02: `RAMP` is accepted on write, and the connection body has a testable tell
 

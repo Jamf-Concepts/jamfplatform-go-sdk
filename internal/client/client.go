@@ -325,19 +325,41 @@ func (c *Transport) BaseURL() string {
 // request header.
 type ScopeKind int
 
+// Every value is written out rather than run off iota, and that is not a style
+// preference. iota counts the ConstSpec's position in the block, not the
+// constants declared before it, so naming the zero value first and then opening
+// an `iota + 1` run underneath it numbered ScopeTenant 2 and ScopeEnvironment 3
+// and left 1 unreachable — the three printed `0 2 3`. Nothing observable broke,
+// because every comparison in the SDK is symbolic and a ScopeKind is never
+// serialised or persisted, but the block read as though ScopeTenant were 1,
+// these constants are exported, and the next named zero value someone inserts
+// at the top would have renumbered them again just as silently.
+// TestScopeKindValues pins all three.
 const (
+	// ScopeOrganization scopes requests to a Jamf Account organization. It is
+	// the zero value, and it sends no header at all: the gateway resolves the
+	// organization from the access token
+	// (request-context-allowed-sources is `token` for the account
+	// api-products, in every environment).
+	//
+	// The constant exists so the generated Privileges registry can *name* this
+	// scope rather than leaving an empty slice, which would be
+	// indistinguishable from "the spec declared nothing". Client code has no
+	// use for it: an unset scope already means organization, so there is no
+	// WithOrganizationID option and never will be.
+	ScopeOrganization ScopeKind = 0
 	// ScopeTenant scopes requests to a single product tenant, sent as
 	// X-Tenant-Id. This is the legacy scope: every spec still declares this
 	// header, but Jamf intends new integrations to be environment-scoped.
-	ScopeTenant ScopeKind = iota + 1
+	ScopeTenant ScopeKind = 1
 	// ScopeEnvironment scopes requests to a platform environment — a grouping
 	// of tenants — sent as X-Environment-Id, set by WithEnvironmentID. This is
-	// the scope to prefer: no spec *declares* this header yet (they all declare
-	// X-Tenant-Id), but the gateway accepts it wherever an api-product lists
-	// request-context-types [tenant, environment], and it is what Jamf intends
-	// new integrations to use. Wire-verified against blueprints,
-	// compliance-benchmarks, pro, proclassic, devices and securitycloud.
-	ScopeEnvironment
+	// the scope to prefer, and as of GitOps v2082 the specs declare it: the
+	// six Platform APIs declare it as their only scope, and jpapi, capi and
+	// the Security Cloud specs declare it alongside tenant. Wire-verified
+	// against blueprints, compliance-benchmarks, pro, proclassic, devices and
+	// securitycloud.
+	ScopeEnvironment ScopeKind = 2
 )
 
 // ScopeHeader returns the request header that carries this scope kind, or ""
@@ -357,17 +379,35 @@ func (k ScopeKind) ScopeHeader() string {
 	}
 }
 
-// String names the scope kind, for logs and diagnostics. An unset kind reports
-// "none" rather than an empty string, so a log line cannot read as though the
-// field were missing.
+// String names the scope kind, for logs and diagnostics.
+//
+// The zero value reports "organization", not "none". There is no unset scope in
+// this model: absence of a scope header *is* organization scope, because the
+// gateway resolves the organization from the access token, so a client that
+// sends no header is organization-scoped whether or not its author meant it to
+// be. Reporting "none" would name a fourth state that does not exist, and a
+// caller reading it could not tell that the client was in fact addressing an
+// organization-scoped API correctly.
+//
+// The consequence worth stating: a client whose scope options never took effect
+// also logs "organization", so this string cannot diagnose a missing
+// WithEnvironmentID or WithTenantID. What diagnoses that is the gateway, which
+// answers 400 REQUEST_CONTEXT_NOT_PROVIDED when a scoped API is called with no
+// scope header. Read the refusal, not the log line.
+//
+// A value outside the three kinds reports "unknown" rather than falling back to
+// a real scope name — that is a programming error, not a scope, and naming it
+// as one would be the same conflation this method exists to avoid.
 func (k ScopeKind) String() string {
 	switch k {
+	case ScopeOrganization:
+		return "organization"
 	case ScopeTenant:
 		return "tenant"
 	case ScopeEnvironment:
 		return "environment"
 	default:
-		return "none"
+		return "unknown"
 	}
 }
 
@@ -397,14 +437,17 @@ func (c *Transport) TenantID() string {
 
 // Scope reports which kind of scope this client carries and the ID it sends.
 //
-// A zero ScopeKind with an empty ID means no scope header is sent at all, which
-// is how organization-scoped credentials work: the gateway resolves the context
-// from the access token, so there is nothing for the client to state. Callers
-// switching on the kind should handle that case rather than assuming a scope is
-// always present.
+// ScopeOrganization with an empty ID means no scope header is sent at all,
+// which is how organization-scoped credentials work: the gateway resolves the
+// context from the access token, so there is nothing for the client to state.
+// It is the zero value, so it is also what a client whose scope options never
+// took effect reports — the two are the same state on the wire and this method
+// cannot separate them. Callers switching on the kind must handle
+// ScopeOrganization rather than assuming a header-bearing scope is always
+// present.
 func (c *Transport) Scope() (ScopeKind, string) {
 	if c.scopeKind.ScopeHeader() == "" || c.scopeID == "" {
-		return 0, ""
+		return ScopeOrganization, ""
 	}
 	return c.scopeKind, c.scopeID
 }

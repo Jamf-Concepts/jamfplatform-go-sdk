@@ -553,12 +553,17 @@ func TestAcceptance_Classic_VPPInvitationByIDSubset(t *testing.T) {
 	t.Logf("VPP invitation %s (General subset) retrieved", id)
 }
 
-// TestAcceptance_Classic_PatchPolicyByIDSubset covers the surviving Classic
-// subset read. Its id comes from Pro's ListPatchPoliciesV2 because v1993
-// withdrew both Classic enumerations — GET /patchpolicies and
-// GET /patchpolicies/softwaretitleconfig/id/{id} — leaving the Classic
-// surface with no way to discover a patch policy id. Pro v2 addresses the
-// same objects.
+// TestAcceptance_Classic_PatchPolicyByIDSubset covers the Classic subset read.
+// Its id comes from Pro's ListPatchPoliciesV2 by choice, not for want of a
+// Classic enumeration: v2082 restored both — GET /patchpolicies and
+// GET /patchpolicies/softwaretitleconfig/id/{id} — and either could supply the
+// id. Pro v2 is used because it is where upstream points callers. The restored
+// ListPatchPolicies carries its own transition note ("Please transition use to
+// Jamf Pro API endpoint /v2/patch-policies") and a Deprecated marker, so
+// sourcing the fixture from Pro v2 follows that guidance while this test keeps
+// the Classic subset read itself covered. Both surfaces address the same
+// objects, and the Classic enumerations are covered in
+// acc_proclassic_patch_test.go.
 func TestAcceptance_Classic_PatchPolicyByIDSubset(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -819,38 +824,58 @@ func TestAcceptance_Classic_PatchByName(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	// GET /patches/name/{name} is the only Classic patch read left: v1993
-	// withdrew GET /patches and the whole /patches/id family, and the SDK now
-	// keeps only POST on /patchsoftwaretitles, so Classic cannot enumerate
-	// software titles at all. The name therefore comes from Pro v3, whose
-	// SoftwareTitleName is the same software-title name this endpoint keys on.
-	configs, err := pro.New(c).ListPatchSoftwareTitleConfigurationsV3(ctx)
-	skipIfNoFixture(t, "patch-software-title-configurations (pro v3)", err)
-	if len(configs) == 0 {
-		t.Skip("no patch software titles configured on tenant")
+	// The name comes from Classic's own enumeration. This used to be sourced
+	// from Pro v3 on the grounds that v1993 had withdrawn GET /patches and
+	// the whole /patches/id family, leaving POST /patchsoftwaretitles as the
+	// only Classic verb and Classic unable to enumerate software titles at
+	// all. v2082 restored the family — ListPatches, GetPatchByID,
+	// ListPatchSoftwareTitles and GetPatchSoftwareTitleByID are all back — so
+	// that reasoning is void, and taking the name from ListPatches keeps this
+	// test inside the package it is testing: no cross-package dependency on
+	// pro, and the name is the one the /patches surface itself publishes for
+	// the title, rather than Pro v3's SoftwareTitleName which merely happens
+	// to agree. A tenant with no patch software titles configured at all is
+	// the one case that still cannot supply a fixture.
+	titles, err := p.ListPatches(ctx)
+	skipIfNoFixture(t, "patches (classic)", err)
+	var name string
+	for _, ti := range titles.PatchManagementSoftwareTitles {
+		if ti.Name != nil && *ti.Name != "" {
+			name = *ti.Name
+			break
+		}
 	}
-	name := configs[0].SoftwareTitleName
 	if name == "" {
-		name = configs[0].DisplayName
-	}
-	if name == "" {
-		t.Skip("first patch software title configuration carries no name")
+		t.Skipf("no named patch software titles on tenant (%d entries) — nothing to key a by-name read on", len(titles.PatchManagementSoftwareTitles))
 	}
 
+	// GET /patches/name/{name} is broken outright, and this asserts that
+	// rather than skipping past it.
+	//
+	// The earlier record here was that it answers 500 instead of 404 for a
+	// name the tenant does not have. Re-probed 2026-09-04 with a control in
+	// the same invocation, it is worse: the endpoint answers Jamf Pro's own
+	// HTML 500 for **every** name, including a title GET /patches lists in
+	// that same invocation ("Microsoft Defender", id 1) and a freshly seeded
+	// one, while GET /patches/id/1 answers 200. So it is unconditional, not
+	// state-dependent, and skipOnServerError would hide a permanent defect
+	// behind the convention for transient ones — this test would never report
+	// the fix.
 	got, err := p.GetPatchByName(ctx, name)
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
-			t.Logf("GetPatchByName(%s): 404 — patch not resolvable by name on this tenant", name)
-			return
+	if err == nil {
+		if got == nil {
+			t.Fatal("nil response with nil error")
 		}
-		t.Fatalf("GetPatchByName(%s): %v", name, err)
+		t.Fatalf("GetPatchByName(%q) succeeded. The endpoint has been fixed — replace this assertion with a real by-name read and drop the limitation note above", name)
 	}
-	if got == nil {
-		t.Fatal("nil response")
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("GetPatchByName(%q): non-API error: %v", name, err)
 	}
-	t.Logf("Patch %q retrieved by name", name)
+	if !apiErr.HasStatus(500) {
+		t.Fatalf("GetPatchByName(%q): want the recorded unconditional 500, got %d: %s", name, apiErr.StatusCode, apiErr.Summary())
+	}
+	t.Logf("GetPatchByName(%q): 500 as recorded — the endpoint is broken for every name (%s)", name, apiErr.Summary())
 }
 
 // --- patch computers by ID+version -----------------------------------

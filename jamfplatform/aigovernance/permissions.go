@@ -21,21 +21,30 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts. It is an alternatives
+// set: a client carries one scope, so a consumer needs a credential matching
+// one of the listed kinds. ScopesSource names where the set came from —
+// "spec" for the spec root's own x-scope-types, "config-override" for one this
+// SDK supplies because the published spec understates what the gateway serves
+// or declares no extension at all. A spec-sourced set is what the spec
+// declares, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"ArchivePolicy":       {Method: "ArchivePolicy", HTTPMethod: "DELETE", Path: "/v1/policies/{policyId}", Scoped: []string{"ai-policies:delete"}, Legacy: nil, Source: "spec"},
-	"CreatePolicy":        {Method: "CreatePolicy", HTTPMethod: "POST", Path: "/v1/policies", Scoped: []string{"ai-policies:create"}, Legacy: nil, Source: "spec"},
-	"GetPolicy":           {Method: "GetPolicy", HTTPMethod: "GET", Path: "/v1/policies/{policyId}", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"GetPolicyDeployment": {Method: "GetPolicyDeployment", HTTPMethod: "GET", Path: "/v1/policies/{policyId}/deployment", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"GetPolicyVersion":    {Method: "GetPolicyVersion", HTTPMethod: "GET", Path: "/v1/policies/{policyId}/versions/{versionNumber}", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"GetTool":             {Method: "GetTool", HTTPMethod: "GET", Path: "/v1/tools/{toolId}", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"GetToolSchema":       {Method: "GetToolSchema", HTTPMethod: "GET", Path: "/v1/tools/{toolId}/schemas/{schemaVersion}", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"ListPolicies":        {Method: "ListPolicies", HTTPMethod: "GET", Path: "/v1/policies", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"ListPolicyVersions":  {Method: "ListPolicyVersions", HTTPMethod: "GET", Path: "/v1/policies/{policyId}/versions", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"ListTools":           {Method: "ListTools", HTTPMethod: "GET", Path: "/v1/tools", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
-	"PublishPolicy":       {Method: "PublishPolicy", HTTPMethod: "POST", Path: "/v1/policies/{policyId}/publish", Scoped: []string{"ai-policies:update"}, Legacy: nil, Source: "spec"},
-	"UpdatePolicy":        {Method: "UpdatePolicy", HTTPMethod: "PATCH", Path: "/v1/policies/{policyId}", Scoped: []string{"ai-policies:update"}, Legacy: nil, Source: "spec"},
+	"ArchivePolicy":       {Method: "ArchivePolicy", HTTPMethod: "DELETE", Path: "/v1/policies/{policyId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:delete"}, Legacy: nil, Source: "spec"},
+	"CreatePolicy":        {Method: "CreatePolicy", HTTPMethod: "POST", Path: "/v1/policies", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:create"}, Legacy: nil, Source: "spec"},
+	"GetPolicy":           {Method: "GetPolicy", HTTPMethod: "GET", Path: "/v1/policies/{policyId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"GetPolicyDeployment": {Method: "GetPolicyDeployment", HTTPMethod: "GET", Path: "/v1/policies/{policyId}/deployment", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"GetPolicyVersion":    {Method: "GetPolicyVersion", HTTPMethod: "GET", Path: "/v1/policies/{policyId}/versions/{versionNumber}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"GetTool":             {Method: "GetTool", HTTPMethod: "GET", Path: "/v1/tools/{toolId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"GetToolSchema":       {Method: "GetToolSchema", HTTPMethod: "GET", Path: "/v1/tools/{toolId}/schemas/{schemaVersion}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"ListPolicies":        {Method: "ListPolicies", HTTPMethod: "GET", Path: "/v1/policies", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"ListPolicyVersions":  {Method: "ListPolicyVersions", HTTPMethod: "GET", Path: "/v1/policies/{policyId}/versions", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"ListTools":           {Method: "ListTools", HTTPMethod: "GET", Path: "/v1/tools", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:read"}, Legacy: nil, Source: "spec"},
+	"PublishPolicy":       {Method: "PublishPolicy", HTTPMethod: "POST", Path: "/v1/policies/{policyId}/publish", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:update"}, Legacy: nil, Source: "spec"},
+	"UpdatePolicy":        {Method: "UpdatePolicy", HTTPMethod: "PATCH", Path: "/v1/policies/{policyId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"ai-policies:update"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

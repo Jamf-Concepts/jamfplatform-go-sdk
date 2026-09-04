@@ -112,6 +112,53 @@ func TestTransportAPIPrefix(t *testing.T) {
 	}
 }
 
+// TestScopeKindValues pins the numeric value of every ScopeKind. The constants
+// are exported and the block used to run off iota, which counts a ConstSpec's
+// position rather than the constants before it: adding ScopeOrganization as a
+// named zero value ahead of an `iota + 1` run renumbered ScopeTenant to 2 and
+// ScopeEnvironment to 3 with nothing to notice it, because every comparison in
+// the SDK is symbolic. The block now writes each value out, and this fails if
+// another constant is ever inserted at the top.
+func TestScopeKindValues(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		kind ScopeKind
+		want int
+	}{
+		{"ScopeOrganization", ScopeOrganization, 0},
+		{"ScopeTenant", ScopeTenant, 1},
+		{"ScopeEnvironment", ScopeEnvironment, 2},
+	} {
+		if int(tc.kind) != tc.want {
+			t.Errorf("%s = %d, want %d — the constants renumbered; write the values out rather than reaching for iota", tc.name, int(tc.kind), tc.want)
+		}
+	}
+}
+
+// TestScopeKindString pins the diagnostic name of each kind, and the zero value
+// is the one that matters: it reports "organization" rather than "none" because
+// absence of a scope header IS organization scope — the gateway resolves the
+// organization from the access token. A "none" here would name a fourth state
+// that does not exist and would read as though an organization-scoped client
+// were unconfigured. An out-of-range value reports "unknown" rather than
+// falling back to a real scope name, since that is a programming error and not
+// a scope.
+func TestScopeKindString(t *testing.T) {
+	for _, tc := range []struct {
+		kind ScopeKind
+		want string
+	}{
+		{ScopeOrganization, "organization"},
+		{ScopeTenant, "tenant"},
+		{ScopeEnvironment, "environment"},
+		{ScopeKind(7), "unknown"},
+	} {
+		if got := tc.kind.String(); got != tc.want {
+			t.Errorf("ScopeKind(%d).String() = %q, want %q", int(tc.kind), got, tc.want)
+		}
+	}
+}
+
 // TestScopeHeader pins the header each scope kind travels in. Organization
 // scope is deliberately absent: the gateway resolves it from the access token
 // alone, so there is no header for a client to send.

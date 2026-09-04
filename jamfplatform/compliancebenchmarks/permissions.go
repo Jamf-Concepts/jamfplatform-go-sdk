@@ -21,18 +21,27 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts. It is an alternatives
+// set: a client carries one scope, so a consumer needs a credential matching
+// one of the listed kinds. ScopesSource names where the set came from —
+// "spec" for the spec root's own x-scope-types, "config-override" for one this
+// SDK supplies because the published spec understates what the gateway serves
+// or declares no extension at all. A spec-sourced set is what the spec
+// declares, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CreateBenchmark":                  {Method: "CreateBenchmark", HTTPMethod: "POST", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:create"}, Legacy: nil, Source: "spec"},
-	"DeleteBenchmark":                  {Method: "DeleteBenchmark", HTTPMethod: "DELETE", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:delete"}, Legacy: nil, Source: "spec"},
-	"GetBaselineRules":                 {Method: "GetBaselineRules", HTTPMethod: "GET", Path: "/v1/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
-	"GetBenchmark":                     {Method: "GetBenchmark", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
-	"GetBenchmarkCompliancePercentage": {Method: "GetBenchmarkCompliancePercentage", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/compliance-percentage", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
-	"ListBaselines":                    {Method: "ListBaselines", HTTPMethod: "GET", Path: "/v1/baselines", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
-	"ListBenchmarkRuleDevices":         {Method: "ListBenchmarkRuleDevices", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/devices", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
-	"ListBenchmarkRulesStats":          {Method: "ListBenchmarkRulesStats", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/rules", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
-	"ListBenchmarks":                   {Method: "ListBenchmarks", HTTPMethod: "GET", Path: "/v1/benchmarks", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"CreateBenchmark":                  {Method: "CreateBenchmark", HTTPMethod: "POST", Path: "/v1/benchmarks", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:create"}, Legacy: nil, Source: "spec"},
+	"DeleteBenchmark":                  {Method: "DeleteBenchmark", HTTPMethod: "DELETE", Path: "/v1/benchmarks/{id}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:delete"}, Legacy: nil, Source: "spec"},
+	"GetBaselineRules":                 {Method: "GetBaselineRules", HTTPMethod: "GET", Path: "/v1/rules", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"GetBenchmark":                     {Method: "GetBenchmark", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"GetBenchmarkCompliancePercentage": {Method: "GetBenchmarkCompliancePercentage", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/compliance-percentage", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBaselines":                    {Method: "ListBaselines", HTTPMethod: "GET", Path: "/v1/baselines", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBenchmarkRuleDevices":         {Method: "ListBenchmarkRuleDevices", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/devices", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBenchmarkRulesStats":          {Method: "ListBenchmarkRulesStats", HTTPMethod: "GET", Path: "/v1/benchmarks/{id}/rules", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
+	"ListBenchmarks":                   {Method: "ListBenchmarks", HTTPMethod: "GET", Path: "/v1/benchmarks", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, ScopesSource: "spec", Scoped: []string{"compliance-benchmarks:read"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

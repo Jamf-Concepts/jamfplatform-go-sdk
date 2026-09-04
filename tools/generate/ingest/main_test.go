@@ -179,9 +179,22 @@ func TestIngestToleratesAnAbsentHeldFamilyButNotAnAbsentSelectedOne(t *testing.T
 		t.Fatal("no held row reported as absent")
 	}
 
-	_, _, err = ingest(a, "external", t.TempDir(), map[string]bool{"Classic-openapi.yaml": true}, &manifest{Entries: map[string]manifestEntry{}})
+	// Name a held row explicitly rather than hardcoding one: which specs are
+	// held changes every time a hold lifts, and a hardcoded dest silently
+	// stops testing anything the build after it is unheld.
+	var held string
+	for _, s := range specs {
+		if s.heldAt != "" {
+			held = s.dest
+			break
+		}
+	}
+	if held == "" {
+		t.Skip("no held spec to select")
+	}
+	_, _, err = ingest(a, "external", t.TempDir(), map[string]bool{held: true}, &manifest{Entries: map[string]manifestEntry{}})
 	if err == nil {
-		t.Fatal("a selected family missing from the archive must fail")
+		t.Fatalf("a selected family missing from the archive must fail (%s)", held)
 	}
 }
 
