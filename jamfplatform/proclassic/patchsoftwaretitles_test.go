@@ -11,6 +11,36 @@ import (
 	"testing"
 )
 
+func TestGetPatchSoftwareTitleByID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/proclassic/patchsoftwaretitles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<patch_software_title></patch_software_title>")
+	})
+
+	result, err := c.GetPatchSoftwareTitleByID(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetPatchSoftwareTitleByID_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/proclassic/patchsoftwaretitles/id/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.GetPatchSoftwareTitleByID(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestCreatePatchSoftwareTitleByID(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/proclassic/patchsoftwaretitles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -26,5 +56,65 @@ func TestCreatePatchSoftwareTitleByID(t *testing.T) {
 	}
 	if result == nil {
 		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUpdatePatchSoftwareTitleByID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/proclassic/patchsoftwaretitles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("method = %s, want PUT", r.Method)
+		}
+		w.WriteHeader(http.StatusCreated)
+	})
+
+	err := c.UpdatePatchSoftwareTitleByID(context.Background(), "test-id", &PatchSoftwareTitle{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeletePatchSoftwareTitleByID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/proclassic/patchsoftwaretitles/id/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	err := c.DeletePatchSoftwareTitleByID(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestListPatchSoftwareTitles(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/proclassic/patchsoftwaretitles", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeXML(t, w, http.StatusOK, "<patch_software_titles></patch_software_titles>")
+	})
+
+	result, err := c.ListPatchSoftwareTitles(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestListPatchSoftwareTitles_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/proclassic/patchsoftwaretitles", func(w http.ResponseWriter, _ *http.Request) {
+		writeXML(t, w, http.StatusNotFound, "<error>not found</error>")
+	})
+
+	_, err := c.ListPatchSoftwareTitles(context.Background())
+	if err == nil {
+		t.Fatal("expected error")
 	}
 }

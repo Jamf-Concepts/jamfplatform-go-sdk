@@ -144,6 +144,11 @@ func TestProcessSpecRejectsUntypedFieldOnRootPath(t *testing.T) {
 		File:      "root-legacy-api.json",
 		Namespace: "pro",
 		// Package deliberately empty: emits to the root package (legacy).
+		// ScopeTypes is set because the fixture spec declares no
+		// x-scope-types and resolveScopeTypes refuses that — without it this
+		// test fails on the scope guard before reaching the untyped-any
+		// assertion it exists to make.
+		ScopeTypes: []string{"tenant"},
 		Operations: []OperationDef{
 			{Op: "GET /v1/things/{id}", Name: "GetThing"},
 		},

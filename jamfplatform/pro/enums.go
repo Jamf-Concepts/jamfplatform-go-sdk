@@ -96,6 +96,69 @@ func ComputerPartitionFileVault2StateValues() []ComputerPartitionFileVault2State
 	}
 }
 
+// ComputerSectionV3 represents a computer section v3 value.
+type ComputerSectionV3 = string
+
+// ComputerSectionV3 values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerSectionV3General               ComputerSectionV3 = "GENERAL"
+	ComputerSectionV3DiskEncryption        ComputerSectionV3 = "DISK_ENCRYPTION"
+	ComputerSectionV3Purchasing            ComputerSectionV3 = "PURCHASING"
+	ComputerSectionV3Applications          ComputerSectionV3 = "APPLICATIONS"
+	ComputerSectionV3Storage               ComputerSectionV3 = "STORAGE"
+	ComputerSectionV3UserAndLocation       ComputerSectionV3 = "USER_AND_LOCATION"
+	ComputerSectionV3ConfigurationProfiles ComputerSectionV3 = "CONFIGURATION_PROFILES"
+	ComputerSectionV3Printers              ComputerSectionV3 = "PRINTERS"
+	ComputerSectionV3Services              ComputerSectionV3 = "SERVICES"
+	ComputerSectionV3Hardware              ComputerSectionV3 = "HARDWARE"
+	ComputerSectionV3LocalUserAccounts     ComputerSectionV3 = "LOCAL_USER_ACCOUNTS"
+	ComputerSectionV3Certificates          ComputerSectionV3 = "CERTIFICATES"
+	ComputerSectionV3Attachments           ComputerSectionV3 = "ATTACHMENTS"
+	ComputerSectionV3PackageReceipts       ComputerSectionV3 = "PACKAGE_RECEIPTS"
+	ComputerSectionV3Security              ComputerSectionV3 = "SECURITY"
+	ComputerSectionV3OperatingSystem       ComputerSectionV3 = "OPERATING_SYSTEM"
+	ComputerSectionV3LicensedSoftware      ComputerSectionV3 = "LICENSED_SOFTWARE"
+	ComputerSectionV3Ibeacons              ComputerSectionV3 = "IBEACONS"
+	ComputerSectionV3SoftwareUpdates       ComputerSectionV3 = "SOFTWARE_UPDATES"
+	ComputerSectionV3ExtensionAttributes   ComputerSectionV3 = "EXTENSION_ATTRIBUTES"
+	ComputerSectionV3ContentCaching        ComputerSectionV3 = "CONTENT_CACHING"
+	ComputerSectionV3GroupMemberships      ComputerSectionV3 = "GROUP_MEMBERSHIPS"
+)
+
+// ComputerSectionV3Values returns every value the Jamf API accepts for ComputerSectionV3,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerSectionV3Values() []ComputerSectionV3 {
+	return []ComputerSectionV3{
+		ComputerSectionV3General,
+		ComputerSectionV3DiskEncryption,
+		ComputerSectionV3Purchasing,
+		ComputerSectionV3Applications,
+		ComputerSectionV3Storage,
+		ComputerSectionV3UserAndLocation,
+		ComputerSectionV3ConfigurationProfiles,
+		ComputerSectionV3Printers,
+		ComputerSectionV3Services,
+		ComputerSectionV3Hardware,
+		ComputerSectionV3LocalUserAccounts,
+		ComputerSectionV3Certificates,
+		ComputerSectionV3Attachments,
+		ComputerSectionV3PackageReceipts,
+		ComputerSectionV3Security,
+		ComputerSectionV3OperatingSystem,
+		ComputerSectionV3LicensedSoftware,
+		ComputerSectionV3Ibeacons,
+		ComputerSectionV3SoftwareUpdates,
+		ComputerSectionV3ExtensionAttributes,
+		ComputerSectionV3ContentCaching,
+		ComputerSectionV3GroupMemberships,
+	}
+}
+
 // ComputerSectionV4 represents a computer section v4 value.
 type ComputerSectionV4 = string
 
@@ -1685,6 +1748,31 @@ func ComputerExtensionAttributesManageExistingDataValues() []ComputerExtensionAt
 	return []ComputerExtensionAttributesManageExistingData{
 		ComputerExtensionAttributesManageExistingDataRetain,
 		ComputerExtensionAttributesManageExistingDataDelete,
+	}
+}
+
+// ComputerGeneralCreatePlatform is the set of values accepted by ComputerGeneralCreate.Platform.
+type ComputerGeneralCreatePlatform = string
+
+// ComputerGeneralCreatePlatform values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ComputerGeneralCreatePlatformWindows ComputerGeneralCreatePlatform = "WINDOWS"
+	ComputerGeneralCreatePlatformMac     ComputerGeneralCreatePlatform = "MAC"
+	ComputerGeneralCreatePlatformNone    ComputerGeneralCreatePlatform = "NONE"
+)
+
+// ComputerGeneralCreatePlatformValues returns every value the Jamf API accepts for ComputerGeneralCreatePlatform,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ComputerGeneralCreatePlatformValues() []ComputerGeneralCreatePlatform {
+	return []ComputerGeneralCreatePlatform{
+		ComputerGeneralCreatePlatformWindows,
+		ComputerGeneralCreatePlatformMac,
+		ComputerGeneralCreatePlatformNone,
 	}
 }
 

@@ -2243,6 +2243,21 @@ func New(base *jamfplatform.Client) *Client {
 // goStringSliceLiteral renders ss as a Go source expression: "nil" for an
 // empty slice, otherwise a []string composite literal. Used to emit the
 // Scoped/Legacy fields of the per-package privilege registry.
+// goScopeKindSliceLiteral renders scope-kind constant names as a
+// []jamfplatform.ScopeKind literal. Unlike goStringSliceLiteral the values are
+// identifiers, not quoted strings, and an empty slice is unreachable:
+// resolveScopeTypes fails generation before it can produce one.
+func goScopeKindSliceLiteral(names []string) string {
+	if len(names) == 0 {
+		return "nil"
+	}
+	qualified := make([]string, len(names))
+	for i, n := range names {
+		qualified[i] = "jamfplatform." + n
+	}
+	return "[]jamfplatform.ScopeKind{" + strings.Join(qualified, ", ") + "}"
+}
+
 func goStringSliceLiteral(ss []string) string {
 	if len(ss) == 0 {
 		return "nil"
@@ -2301,6 +2316,12 @@ import "%s/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts, from the spec's
+// x-scope-types. It is an alternatives set: a client carries one scope, so a
+// consumer needs a credential matching one of the listed kinds. It reflects
+// the spec, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
@@ -2308,11 +2329,12 @@ var Privileges = map[string]jamfplatform.MethodPrivileges{
 
 	for _, e := range entries {
 		m := e.method
-		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scoped: %s, Legacy: %s, Source: %s},\n",
+		fmt.Fprintf(&b, "\t%s: {Method: %s, HTTPMethod: %s, Path: %s, Scopes: %s, Scoped: %s, Legacy: %s, Source: %s},\n",
 			strconv.Quote(m.Name),
 			strconv.Quote(m.Name),
 			strconv.Quote(m.HTTPMethod),
 			strconv.Quote(e.path),
+			goScopeKindSliceLiteral(m.Scopes),
 			goStringSliceLiteral(m.ScopedPrivileges),
 			goStringSliceLiteral(m.LegacyPrivileges),
 			strconv.Quote(m.PrivilegeSource),
@@ -2865,6 +2887,31 @@ type MethodPrivileges struct {
 	// Path is the endpoint's resource path relative to the tenant prefix,
 	// e.g. "/buildings/{id}".
 	Path string
+	// Scopes lists the scope kinds the endpoint accepts. A client carries
+	// exactly one scope, so a consumer needs a credential whose scope appears
+	// here: ScopeTenant sends X-Tenant-Id, ScopeEnvironment sends
+	// X-Environment-Id, and ScopeOrganization sends no header at all because
+	// the gateway resolves the organization from the access token.
+	//
+	// Where two kinds are present the endpoint is published at both and the
+	// caller picks one — the header must match the credential, and crossing
+	// them over is 403 OWNERSHIP_FORBIDDEN even within one customer. So this
+	// is an alternatives set, the opposite of Scoped, which is a conjunction.
+	//
+	// Sourced from each spec's x-scope-types. It is never empty: a spec that
+	// declares no scope fails generation rather than emitting an empty set a
+	// consumer would read as "no scope required".
+	//
+	// Two caveats a consumer must not lose. This is what the SPEC declares,
+	// which is not always what the gateway serves: as of GitOps v2082 the six
+	// Platform specs declare environment only, while devices, device-groups,
+	// declaration-reporting and device-management-action still answer under
+	// X-Tenant-Id (wire-verified 2026-09-04). And scope is declared per spec
+	// rather than per operation, so every method built from one spec carries
+	// the same set; the field is per-method because two specs in one package
+	// can disagree, which securitycloud does while one of its six specs is
+	// held at an older build.
+	Scopes []ScopeKind
 	// Scoped lists the GA capability permissions the endpoint requires, in
 	// {capability}:{action} form, e.g. "buildings:create". The capability is
 	// kebab-case and carries no product name — one capability is reached by

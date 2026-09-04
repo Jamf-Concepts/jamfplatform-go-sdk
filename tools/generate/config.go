@@ -143,6 +143,28 @@ type SpecDef struct {
 	// entry should be deleted.
 	RequiredPrivileges map[string][]string `json:"requiredPrivileges,omitempty"`
 
+	// ScopeTypes overrides the scope kinds this spec's operations accept,
+	// for a spec whose published `x-scope-types` understates what the gateway
+	// serves. Values are "tenant", "environment" and "organization".
+	//
+	// The generator reads `x-scope-types` off the spec root and carries it to
+	// each method's Scopes in the generated Privileges registry. A held spec
+	// is the case this exists for: securitycloud-device-groups-api.yaml is
+	// pinned at v1897, which declares `[tenant]`, while v2082 declares
+	// `[tenant, environment]` for the same operations and an environment
+	// credential reaches all seven of them (wire-verified 2026-09-04). Without
+	// an override the registry would tell consumers that Security Cloud device
+	// groups are tenant-only, which is false, and it would report a scope set
+	// that disagrees with the other five specs in the same package.
+	//
+	// Self-expiring: generation fails when the ingested spec declares exactly
+	// this set, because the override has then become redundant and the spec
+	// should be the only source. Delete the entry when that fires.
+	//
+	// Unlike a schema patch this never enters the spec document, so the
+	// published api/*.json stays faithful to upstream.
+	ScopeTypes []string `json:"scopeTypes,omitempty"`
+
 	// DocNotes appends a note to the godoc of an emitted Go type. Key: the Go
 	// type name as generated (a struct, or the alias a string enum emits).
 	// Value: prose, wrapped and appended to whatever comment the spec's own

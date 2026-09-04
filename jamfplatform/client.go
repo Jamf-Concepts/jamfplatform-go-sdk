@@ -103,10 +103,18 @@ type ScopeKind = client.ScopeKind
 
 // Scope kinds. A zero value means no scope, which is how organization-scoped
 // credentials work: the gateway resolves the context from the access token, so
-// the client sends no scope header. Organization deliberately has no constant —
-// there is no header for it, confirmed absent across every published spec and
-// the gateway configuration.
+// the client sends no scope header. That zero value is named
+// ScopeOrganization for the benefit of the generated Privileges registry; it
+// carries no header, confirmed absent across every published spec and the
+// gateway configuration.
 const (
+	// ScopeOrganization is the zero value and sends no header: the gateway
+	// resolves the organization from the access token. It exists so the
+	// generated Privileges registry can name this scope instead of leaving an
+	// empty slice, which would be indistinguishable from "the spec declared
+	// nothing". There is no WithOrganizationID — an unset scope already means
+	// organization.
+	ScopeOrganization = client.ScopeOrganization
 	// ScopeTenant scopes requests to a single product tenant, sent as
 	// X-Tenant-Id. The legacy scope; prefer ScopeEnvironment.
 	ScopeTenant = client.ScopeTenant

@@ -189,6 +189,12 @@ type GoMethod struct {
 	PrivilegeSource  string
 	PrivilegesKnown  bool
 	ScopedPrivileges []string // GA capability permissions, {capability}:{action}, e.g. "buildings:create"
+	// Scopes lists the scope kinds the endpoint accepts, as the Go constant
+	// names emitted into the Privileges registry ("ScopeTenant",
+	// "ScopeEnvironment", "ScopeOrganization"). Sourced from the spec root's
+	// x-scope-types, or from config.scopeTypes where a held spec understates
+	// it. Never empty: resolveScopeTypes fails generation instead.
+	Scopes           []string
 	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"
 }
 

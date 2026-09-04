@@ -1,11 +1,21 @@
 {
   "components": {
     "parameters": {
+      "X-Environment-Id": {
+        "description": "The environment UUID identifier. Send it to address environment scope. This API is also published at tenant scope — send that scope's header instead. Send exactly one scope header per request.",
+        "in": "header",
+        "name": "X-Environment-Id",
+        "schema": {
+          "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "type": "string"
+        }
+      },
       "X-Tenant-Id": {
-        "description": "The tenant UUID identifier.",
+        "description": "The tenant UUID identifier. Send it to address tenant scope. This API is also published at environment scope — send that scope's header instead. Send exactly one scope header per request.",
         "in": "header",
         "name": "X-Tenant-Id",
-        "required": true,
         "schema": {
           "example": "e77c1408-10c8-4007-b177-abc9157fbcaa",
           "format": "uuid",
@@ -11933,6 +11943,50 @@
         },
         "type": "array"
       },
+      "patch_management_software_titles": {
+        "items": {
+          "properties": {
+            "patch_management_software_title": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "example": "Google Chrome",
+                  "type": "string"
+                },
+                "name_id": {
+                  "example": "GoogleChrome",
+                  "type": "string"
+                },
+                "source_id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
+      "patch_policies": {
+        "items": {
+          "properties": {
+            "patch_policy": {
+              "$ref": "#/components/schemas/id_name"
+            },
+            "size": {
+              "$ref": "#/components/schemas/size"
+            }
+          }
+        },
+        "type": "array"
+      },
       "patch_policy": {
         "properties": {
           "general": {
@@ -12280,6 +12334,67 @@
         },
         "type": "object"
       },
+      "patch_report": {
+        "properties": {
+          "name": {
+            "example": "Google Chrome",
+            "type": "string"
+          },
+          "patch_software_title_id": {
+            "example": 1,
+            "type": "string"
+          },
+          "total_computers": {
+            "example": 1,
+            "type": "integer"
+          },
+          "total_versions": {
+            "example": 1,
+            "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "properties": {
+                "version": {
+                  "properties": {
+                    "computers": {
+                      "items": {
+                        "properties": {
+                          "computer": {
+                            "properties": {
+                              "id": {
+                                "example": 1,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "example": "Admins MacBook Pro",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "size": {
+                            "example": 1,
+                            "type": "integer"
+                          }
+                        }
+                      },
+                      "type": "array"
+                    },
+                    "software_version": {
+                      "example": "65.0.3325.181",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "patch_software_title": {
         "properties": {
           "category": {
@@ -12348,6 +12463,37 @@
           }
         },
         "type": "object"
+      },
+      "patch_software_titles": {
+        "items": {
+          "properties": {
+            "patch_software_title": {
+              "properties": {
+                "id": {
+                  "example": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "name_id": {
+                  "example": "GoogleChromne",
+                  "type": "string"
+                },
+                "source_id": {
+                  "example": 1,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "size": {
+              "example": 1,
+              "type": "integer"
+            }
+          }
+        },
+        "type": "array"
       },
       "policies": {
         "items": {
@@ -16639,6 +16785,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -16684,6 +16833,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -16720,6 +16872,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -16772,6 +16927,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -16810,6 +16968,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -16853,6 +17014,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -16889,6 +17053,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -16941,6 +17108,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -16979,6 +17149,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -17022,6 +17195,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -17058,6 +17234,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -17110,6 +17289,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -17148,6 +17330,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -17191,6 +17376,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -17227,6 +17415,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -17279,6 +17470,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -17317,6 +17511,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -17358,6 +17555,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -17399,6 +17599,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -17441,6 +17644,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -17488,6 +17694,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -17523,6 +17732,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -17574,6 +17786,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID to filter by",
             "in": "path",
             "name": "id",
@@ -17612,6 +17827,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -17655,6 +17873,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -17690,6 +17911,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -17741,6 +17965,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID to filter by",
             "in": "path",
             "name": "name",
@@ -17779,6 +18006,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -17820,6 +18050,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -17864,6 +18097,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -17899,6 +18135,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -17950,6 +18189,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -17988,6 +18230,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -18031,6 +18276,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -18066,6 +18314,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -18117,6 +18368,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -18155,6 +18409,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Nameto filter by",
@@ -18196,6 +18453,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -18240,6 +18500,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -18275,6 +18538,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -18326,6 +18592,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -18364,6 +18633,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -18407,6 +18679,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -18442,6 +18717,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -18493,6 +18771,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -18531,6 +18812,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -18572,6 +18856,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -18614,6 +18901,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "String value of extension",
@@ -18667,6 +18957,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Database ID of the extension",
             "in": "path",
             "name": "id",
@@ -18702,6 +18995,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Database ID of the extension",
@@ -18753,6 +19049,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Database ID of the extension",
             "in": "path",
             "name": "id",
@@ -18793,6 +19092,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -18837,6 +19139,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -18872,6 +19177,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -18923,6 +19231,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -18961,6 +19272,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -19004,6 +19318,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -19039,6 +19356,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -19090,6 +19410,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -19128,6 +19451,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -19169,6 +19495,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -19213,6 +19542,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -19248,6 +19580,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -19299,6 +19634,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -19337,6 +19675,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -19380,6 +19721,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -19415,6 +19759,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -19466,6 +19813,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -19504,6 +19854,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -19545,6 +19898,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -19589,6 +19945,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -19624,6 +19983,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -19675,6 +20037,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -19713,6 +20078,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -19756,6 +20124,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -19791,6 +20162,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -19842,6 +20216,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -19880,6 +20257,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -19921,6 +20301,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -19962,6 +20345,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Type of device to be flushed",
@@ -20033,6 +20419,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Application name to filter by",
             "in": "path",
             "name": "application",
@@ -20082,6 +20471,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Application name to filter by",
@@ -20144,6 +20536,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Application name to filter by",
             "in": "path",
             "name": "application",
@@ -20202,6 +20597,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Application name to filter by",
@@ -20271,6 +20669,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -20344,6 +20745,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "MAC address to filter by",
             "in": "path",
             "name": "macaddress",
@@ -20411,6 +20815,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -20482,6 +20889,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Serial number to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -20551,6 +20961,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "UDID to filter by",
             "in": "path",
             "name": "udid",
@@ -20618,6 +21031,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -20658,6 +21074,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -20700,6 +21119,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -20742,6 +21164,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -20793,6 +21218,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "in": "path",
             "name": "command",
             "required": true,
@@ -20835,6 +21263,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Command to send (EnableRemoteDesktop and DisableRemoteDesktop require macOS 10.14.4)",
@@ -20891,6 +21322,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -20940,6 +21374,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "UUID to filter by",
@@ -20993,6 +21430,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "UUID to filter by",
             "in": "path",
             "name": "uuid",
@@ -21042,6 +21482,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -21086,6 +21529,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -21121,6 +21567,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -21172,6 +21621,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -21210,6 +21662,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -21253,6 +21708,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -21288,6 +21746,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -21339,6 +21800,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -21377,6 +21841,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -21418,6 +21885,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -21462,6 +21932,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -21497,6 +21970,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -21548,6 +22024,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -21586,6 +22065,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -21629,6 +22111,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -21664,6 +22149,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -21715,6 +22203,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -21753,6 +22244,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -21794,6 +22288,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -21865,6 +22362,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer ID to filter by",
@@ -21953,6 +22453,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "MAC address to filter by",
             "in": "path",
             "name": "macaddress",
@@ -22022,6 +22525,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -22095,6 +22601,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Serial number to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -22164,6 +22673,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "UDID to filter by",
@@ -22237,6 +22749,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer ID value to filter by",
             "in": "path",
             "name": "id",
@@ -22286,6 +22801,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer ID to filter by",
@@ -22360,6 +22878,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer Mac Address to filter by",
             "in": "path",
             "name": "macaddress",
@@ -22409,6 +22930,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer Name to filter by",
@@ -22462,6 +22986,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer Serial Number to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -22513,6 +23040,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer UDID to filter by",
             "in": "path",
             "name": "udid",
@@ -22562,6 +23092,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -22602,6 +23135,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -22644,6 +23180,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -22688,6 +23227,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -22723,6 +23265,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -22774,6 +23319,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -22822,6 +23370,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Invitation value to filter by",
             "in": "path",
             "name": "invitation",
@@ -22857,6 +23408,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Invitation value to filter by",
@@ -22908,6 +23462,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Invitation value to filter by",
             "in": "path",
             "name": "invitation",
@@ -22956,6 +23513,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Invitation value to filter by",
             "in": "path",
             "name": "name",
@@ -22991,6 +23551,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Invitation value to filter by",
@@ -23042,6 +23605,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Invitation value to filter by",
             "in": "path",
             "name": "name",
@@ -23088,6 +23654,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer ID value to filter by",
@@ -23139,6 +23708,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer ID to filter by",
@@ -23199,6 +23771,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer ID value to filter by",
@@ -23272,6 +23847,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer ID to filter by",
             "in": "path",
             "name": "id",
@@ -23330,6 +23908,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer ID to filter by",
@@ -23412,6 +23993,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer Mac Address to filter by",
             "in": "path",
             "name": "macaddress",
@@ -23461,6 +24045,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer Name to filter by",
@@ -23514,6 +24101,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer Serial Number to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -23565,6 +24155,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer UDID to filter by",
             "in": "path",
             "name": "udid",
@@ -23614,6 +24207,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -23656,6 +24252,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Computer Report ID to filter by",
@@ -23709,6 +24308,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Computer Report name to filter by",
             "in": "path",
             "name": "name",
@@ -23760,6 +24362,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -23795,6 +24400,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -23839,6 +24447,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -23886,6 +24497,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "matchname",
@@ -23927,6 +24541,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name, mac address, etc. to filter by.  Match uses the same format as the general search in Jamf Pro.  For instance, admin* can be used to match computer names that begin with admin",
             "in": "path",
             "name": "match",
@@ -23965,6 +24582,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -24011,6 +24631,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -24055,6 +24678,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "udid",
@@ -24097,6 +24723,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -24141,6 +24770,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -24176,6 +24808,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -24227,6 +24862,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -24265,6 +24903,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -24308,6 +24949,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -24345,6 +24989,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -24380,6 +25027,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -24422,6 +25072,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -24461,6 +25114,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -24505,6 +25161,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -24540,6 +25199,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -24591,6 +25253,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -24629,6 +25294,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -24672,6 +25340,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -24707,6 +25378,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -24758,6 +25432,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -24796,6 +25473,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -24837,6 +25517,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -24881,6 +25564,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -24916,6 +25602,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -24967,6 +25656,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -25005,6 +25697,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -25048,6 +25743,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -25083,6 +25781,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -25134,6 +25835,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -25172,6 +25876,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -25213,6 +25920,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -25257,6 +25967,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -25292,6 +26005,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -25343,6 +26059,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -25381,6 +26100,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -25424,6 +26146,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -25459,6 +26184,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -25510,6 +26238,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -25548,6 +26279,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -25589,6 +26323,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -25633,6 +26370,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -25668,6 +26408,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -25719,6 +26462,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -25757,6 +26503,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -25800,6 +26549,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -25835,6 +26587,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -25886,6 +26641,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -25924,6 +26682,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -25965,6 +26726,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -26009,6 +26773,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -26044,6 +26811,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -26095,6 +26865,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -26133,6 +26906,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -26174,6 +26950,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -26229,6 +27008,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -26264,6 +27046,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -26315,6 +27100,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -26353,6 +27141,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -26394,6 +27185,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Resource to attach the file to",
@@ -26475,6 +27269,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -26515,6 +27312,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -26557,6 +27357,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -26599,6 +27402,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -26650,6 +27456,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -26689,6 +27498,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -26731,6 +27543,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -26782,6 +27597,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -26820,6 +27638,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -26861,6 +27682,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -26905,6 +27729,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -26940,6 +27767,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -26991,6 +27821,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27029,6 +27862,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -27072,6 +27908,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -27107,6 +27946,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -27158,6 +28000,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -27196,6 +28041,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -27237,6 +28085,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -27281,6 +28132,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27318,6 +28172,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -27369,6 +28226,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27408,6 +28268,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -27452,6 +28315,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27487,6 +28353,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -27538,6 +28407,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27585,6 +28457,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27625,6 +28500,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -27667,6 +28545,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -27711,6 +28592,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27746,6 +28630,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -27797,6 +28684,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -27835,6 +28725,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -27876,6 +28769,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Server ID to filter by",
@@ -27924,6 +28820,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Server ID to filter by",
@@ -27983,6 +28882,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Server ID to filter by",
             "in": "path",
             "name": "id",
@@ -28031,6 +28933,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -28068,6 +28973,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -28103,6 +29011,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -28145,6 +29056,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -28184,6 +29098,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -28228,6 +29145,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -28263,6 +29183,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -28314,6 +29237,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -28352,6 +29278,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -28395,6 +29324,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -28430,6 +29362,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -28481,6 +29416,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -28519,6 +29457,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -28560,6 +29501,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -28601,6 +29545,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID of policy whose log will be flushed",
@@ -28664,6 +29611,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Supported values are a combination of [Zero, One, Two, Three, Six] and [Days, Weeks, Months, Years]. For example, JSSResource/logflush/policies/interval/Three+Months",
             "in": "path",
             "name": "interval",
@@ -28714,6 +29664,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -28758,6 +29711,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -28793,6 +29749,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -28844,6 +29803,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -28882,6 +29844,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -28923,6 +29888,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -28980,6 +29948,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -29015,6 +29986,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -29066,6 +30040,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -29104,6 +30081,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -29145,6 +30125,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -29212,6 +30195,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -29256,6 +30242,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Bundle ID value to filter by",
             "in": "path",
             "name": "bundleid",
@@ -29291,6 +30280,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Bundle ID to filter by",
@@ -29342,6 +30334,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Bundle ID value to filter by",
             "in": "path",
             "name": "bundleid",
@@ -29381,6 +30376,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Bundle ID value to filter by",
@@ -29427,6 +30425,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Bundle ID to filter by",
@@ -29487,6 +30488,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Bundle ID value to filter by",
             "in": "path",
             "name": "bundleid",
@@ -29537,6 +30541,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -29572,6 +30579,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -29623,6 +30633,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -29661,6 +30674,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -29702,6 +30718,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -29760,6 +30779,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -29795,6 +30817,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -29846,6 +30871,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -29884,6 +30912,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -29925,6 +30956,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -29993,6 +31027,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -30035,6 +31072,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -30080,6 +31120,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -30131,6 +31174,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Command to send device",
             "in": "path",
             "name": "command",
@@ -30178,6 +31224,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15)",
@@ -30236,6 +31285,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15)",
@@ -30303,6 +31355,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Mobile device ID values, multiple IDs may be separated by commas (e.g. /id/13,14,15)",
@@ -30381,6 +31436,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -30428,6 +31486,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Path parameter name",
@@ -30482,6 +31543,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "UUID value to filter by",
             "in": "path",
             "name": "uuid",
@@ -30531,6 +31595,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -30575,6 +31642,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -30610,6 +31680,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -30661,6 +31734,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -30699,6 +31775,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -30740,6 +31819,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -30795,6 +31877,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -30830,6 +31915,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -30881,6 +31969,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -30919,6 +32010,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -30960,6 +32054,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -31025,6 +32122,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -31069,6 +32169,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -31104,6 +32207,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -31155,6 +32261,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -31193,6 +32302,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -31234,6 +32346,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -31290,6 +32405,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Invitation value to filter by",
             "in": "path",
             "name": "invitation",
@@ -31325,6 +32443,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Invitation value to filter by",
@@ -31376,6 +32497,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "invitation",
@@ -31414,6 +32538,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Invitation value to filter by",
@@ -31455,6 +32582,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -31511,6 +32641,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -31546,6 +32679,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -31597,6 +32733,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -31635,6 +32774,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -31676,6 +32818,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -31742,6 +32887,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -31786,6 +32934,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -31821,6 +32972,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -31872,6 +33026,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -31910,6 +33067,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -31953,6 +33113,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -31988,6 +33151,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -32039,6 +33205,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -32077,6 +33246,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -32118,6 +33290,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -32162,6 +33337,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -32197,6 +33375,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -32248,6 +33429,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -32286,6 +33470,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -32329,6 +33516,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -32364,6 +33554,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -32415,6 +33608,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -32453,6 +33649,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -32494,6 +33693,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -32545,6 +33747,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -32603,6 +33808,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Mac address to filter by",
             "in": "path",
             "name": "macaddress",
@@ -32652,6 +33860,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -32705,6 +33916,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Serial number to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -32756,6 +33970,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "UDID to filter by",
             "in": "path",
             "name": "udid",
@@ -32805,6 +34022,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -32849,6 +34069,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -32884,6 +34107,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -32935,6 +34161,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -32983,6 +34212,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Invitation value to filter by",
             "in": "path",
             "name": "invitation",
@@ -33018,6 +34250,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Invitation value to filter by",
@@ -33069,6 +34304,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Invitation value to filter by",
             "in": "path",
             "name": "invitation",
@@ -33113,6 +34351,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -33161,6 +34402,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -33205,6 +34449,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Id value to filter by",
             "in": "path",
             "name": "id",
@@ -33240,6 +34487,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Id value to filter by",
@@ -33291,6 +34541,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Id value to filter by",
             "in": "path",
             "name": "id",
@@ -33328,6 +34581,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Id value to filter by",
@@ -33381,6 +34637,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Id value to filter by",
@@ -33443,6 +34702,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -33478,6 +34740,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -33529,6 +34794,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -33566,6 +34834,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -33621,6 +34892,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Uuid value to filter by",
             "in": "path",
             "name": "uuid",
@@ -33656,6 +34930,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Uuid value to filter by",
@@ -33707,6 +34984,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Uuid value to filter by",
             "in": "path",
             "name": "uuid",
@@ -33744,6 +35024,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Uuid value to filter by",
@@ -33797,6 +35080,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -33841,6 +35127,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -33876,6 +35165,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -33927,6 +35219,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -33967,6 +35262,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -34010,6 +35308,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -34073,6 +35374,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Mac address value to filter by",
             "in": "path",
             "name": "macaddress",
@@ -34108,6 +35412,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Mac address to filter by",
@@ -34159,6 +35466,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "macaddress",
@@ -34199,6 +35509,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Mac address value to filter by",
@@ -34242,6 +35555,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name, mac address, etc. to filter by. Match uses the same format as the general search in Jamf Pro.",
@@ -34295,6 +35611,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -34330,6 +35649,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -34381,6 +35703,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -34421,6 +35746,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -34466,6 +35794,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Serial number value to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -34501,6 +35832,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Serial number to filter by",
@@ -34552,6 +35886,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "serialnumber",
@@ -34592,6 +35929,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Serial number value to filter by",
@@ -34637,6 +35977,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "UDID value to filter by",
             "in": "path",
             "name": "udid",
@@ -34672,6 +36015,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "UDID to filter by",
@@ -34723,6 +36069,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "udid",
@@ -34763,6 +36112,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "UDID value to filter by",
@@ -34806,6 +36158,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -34850,6 +36205,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -34885,6 +36243,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -34936,6 +36297,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -34974,6 +36338,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -35017,6 +36384,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -35052,6 +36422,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -35103,6 +36476,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -35141,6 +36517,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -35182,6 +36561,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -35226,6 +36608,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -35261,6 +36646,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -35312,6 +36700,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -35350,6 +36741,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -35391,6 +36785,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -35446,6 +36843,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -35481,6 +36881,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -35532,6 +36935,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -35570,6 +36976,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -35611,6 +37020,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -35676,6 +37088,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -35720,6 +37135,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -35755,6 +37173,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -35806,6 +37227,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -35844,6 +37268,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -35887,6 +37314,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -35922,6 +37352,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -35973,6 +37406,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -36011,6 +37447,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -36052,6 +37491,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID of the internal or external patch source to filter by",
@@ -36096,6 +37538,285 @@
         ]
       }
     },
+    "/patches": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "findPatches",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_management_software_titles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_management_software_titles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patches (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
+    "/patches/id/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:delete`",
+        "operationId": "deleteSoftwareTitlesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:delete"
+            ]
+          }
+        ],
+        "summary": "Deletes a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:delete"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "findPatchesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_title"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/software_title"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds patches by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      },
+      "post": {
+        "deprecated": true,
+        "description": "The patch title must exist within a specific site or Full Jamf Pro. Use this endpoint to create additional instances of the patch software title for specific sites. The name_id element can be obtained from the /patches and/or /patches/id/{id} resources.\n\n**Required Permissions:** `patch-management-software-titles:create`",
+        "operationId": "createPatchSoftwareTitlesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:create"
+            ]
+          }
+        ],
+        "summary": "Creates a patch software title (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "patch-management-software-titles:create"
+        ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Using an empty \u003cpackage/\u003e tag will disassociate any previous packages associated with a specific software title version.\n\n**Required Permissions:** `patch-management-software-titles:update`",
+        "operationId": "updateSoftwareTitlesById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:update"
+            ]
+          }
+        ],
+        "summary": "Updates a Patch Software Title by ID (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "patch-management-software-titles:update"
+        ]
+      }
+    },
+    "/patches/id/{id}/version/{version}": {
+      "get": {
+        "deprecated": true,
+        "description": "Displays information specified with the {version} parameter for a patch specified with the {id} parameter. A version number of 'Latest' and 'Unknown' will also work.\n\n**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "findComputersByIDAndTitleVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Version number to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Display computers on a specific version (Deprecated - Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}/definitions\".)",
+        "tags": [
+          "patches"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
     "/patches/name/{name}": {
       "get": {
         "deprecated": true,
@@ -36104,6 +37825,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -36155,6 +37879,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -36199,6 +37926,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -36234,6 +37964,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -36285,6 +38018,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -36323,6 +38059,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -36366,6 +38105,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -36401,6 +38143,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -36452,6 +38197,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -36489,6 +38237,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -36530,6 +38281,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -36572,6 +38326,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -36625,6 +38382,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -36667,6 +38427,52 @@
         ]
       }
     },
+    "/patchpolicies": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-policies:read`",
+        "operationId": "findPatchPolicies",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policies"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policies"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-policies:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patch policies. (Deprecated). Please transition use to Jamf Pro API endpoint \"/v2/patch-policies\".",
+        "tags": [
+          "patchpolicies"
+        ],
+        "x-required-privileges": [
+          "patch-policies:read"
+        ]
+      }
+    },
     "/patchpolicies/id/{id}": {
       "delete": {
         "description": "**Required Permissions:** `patch-policies:delete`",
@@ -36674,6 +38480,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -36711,6 +38520,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -36762,6 +38574,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -36801,6 +38616,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -36860,12 +38678,68 @@
       }
     },
     "/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}": {
+      "get": {
+        "deprecated": true,
+        "description": "softwaretitleconfigid refers to the ID of the patch software title the policy is associated to\n\n**Required Permissions:** `patch-policies:read`",
+        "operationId": "findPatchPoliciesBySoftwareTitleConfigId",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "Patch software title config ID value to filter by",
+            "in": "path",
+            "name": "softwaretitleconfigid",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_policy"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-policies:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patch policies by patch software title configuration ID (Deprecated). Please transition use to Jamf Pro API endpoint \"/v2/patch-policies\".",
+        "tags": [
+          "patchpolicies"
+        ],
+        "x-required-privileges": [
+          "patch-policies:read"
+        ]
+      },
       "post": {
         "description": "softwaretitleconfig refers to the ID of the patch software title the policy is to be associated to\n\n**Required Permissions:** `patch-policies:create`",
         "operationId": "createPatchPolicyBySoftwareTitleConfigId",
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Patch software title config ID value to filter by",
@@ -36900,7 +38774,261 @@
         ]
       }
     },
+    "/patchreports/patchsoftwaretitleid/{id}": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchreportsPatchsoftwaretitleidByIdGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "Patch software title id to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds patch reports by patch software title ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}/patch-report\".",
+        "tags": [
+          "patchreports"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
+    "/patchreports/patchsoftwaretitleid/{id}/version/{version}": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchreportsPatchsoftwaretitleidVersionByIdAndVersionGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "Patch software title ID to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Version number to filter by",
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_report"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Display computers for a specific version of a patch report. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}/patch-report\".",
+        "tags": [
+          "patchreports"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
+    "/patchsoftwaretitles": {
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchsoftwaretitlesGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_titles"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_titles"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds all patch software titles. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      }
+    },
     "/patchsoftwaretitles/id/{id}": {
+      "delete": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:delete`",
+        "operationId": "PatchsoftwaretitlesIdByIdDelete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:delete"
+            ]
+          }
+        ],
+        "summary": "Deletes a patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:delete"
+        ]
+      },
+      "get": {
+        "deprecated": true,
+        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "operationId": "PatchsoftwaretitlesIdByIdGet",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "ID value to filter by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/patch_software_title"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:read"
+            ]
+          }
+        ],
+        "summary": "Finds a patch software titles by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-required-privileges": [
+          "patch-management-software-titles:read"
+        ]
+      },
       "post": {
         "deprecated": true,
         "description": "**Required Permissions:** `patch-management-software-titles:create`",
@@ -36908,6 +39036,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -36940,6 +39071,49 @@
         "x-required-privileges": [
           "patch-management-software-titles:create"
         ]
+      },
+      "put": {
+        "deprecated": true,
+        "description": "Including an empty package element \u003cpackage/\u003e within the version element will disassociate any previously associated packages with that version of the software title.\n\n**Required Permissions:** `patch-management-software-titles:update`",
+        "operationId": "PatchsoftwaretitlesIdByIdPut",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "ID value to update by",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "patch-management-software-titles:update"
+            ]
+          }
+        ],
+        "summary": "Updates a patch software title by ID. (Deprecated) Please transition use to Jamf Pro API endpoint \"/v2/patch-software-title-configurations/{id}\".",
+        "tags": [
+          "patchsoftwaretitles"
+        ],
+        "x-explorer-enabled": false,
+        "x-jamf-expected-status": 201,
+        "x-required-privileges": [
+          "patch-management-software-titles:update"
+        ]
       }
     },
     "/policies": {
@@ -36949,6 +39123,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -36993,6 +39170,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Category to filter by",
             "in": "path",
             "name": "category",
@@ -37030,6 +39210,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Type to filter by",
@@ -37075,6 +39258,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -37110,6 +39296,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -37161,6 +39350,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -37199,6 +39391,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -37240,6 +39435,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -37305,6 +39503,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -37340,6 +39541,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -37391,6 +39595,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -37429,6 +39636,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -37470,6 +39680,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -37514,6 +39727,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -37549,6 +39765,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -37600,6 +39819,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -37638,6 +39860,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -37681,6 +39906,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -37716,6 +39944,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -37767,6 +39998,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -37805,6 +40039,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -37846,6 +40083,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -37890,6 +40130,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -37925,6 +40168,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -37976,6 +40222,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -38014,6 +40263,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -38057,6 +40309,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -38092,6 +40347,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -38143,6 +40401,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -38181,6 +40442,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -38222,6 +40486,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -38266,6 +40533,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -38301,6 +40571,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -38352,6 +40625,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -38390,6 +40666,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -38433,6 +40712,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -38468,6 +40750,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -38519,6 +40804,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -38557,6 +40845,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -38599,6 +40890,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -38644,6 +40938,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -38684,6 +40981,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name to filter by",
             "in": "path",
             "name": "name",
@@ -38721,6 +41021,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -38765,6 +41068,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -38800,6 +41106,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -38851,6 +41160,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -38889,6 +41201,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -38932,6 +41247,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -38967,6 +41285,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -39018,6 +41339,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -39056,6 +41380,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -39097,6 +41424,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -39141,6 +41471,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -39176,6 +41509,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -39227,6 +41563,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -39265,6 +41604,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -39308,6 +41650,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -39343,6 +41688,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -39394,6 +41742,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -39432,6 +41783,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -39473,6 +41827,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -39513,6 +41870,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "requestBody": {
@@ -39555,6 +41915,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -39599,6 +41962,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -39634,6 +42000,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -39685,6 +42054,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -39723,6 +42095,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -39766,6 +42141,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -39801,6 +42179,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -39852,6 +42233,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -39890,6 +42274,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -39931,6 +42318,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -39975,6 +42365,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -40010,6 +42403,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -40061,6 +42457,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -40099,6 +42498,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -40142,6 +42544,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -40177,6 +42582,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -40228,6 +42636,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -40266,6 +42677,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -40307,6 +42721,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -40351,6 +42768,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -40386,6 +42806,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -40437,6 +42860,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -40475,6 +42901,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -40518,6 +42947,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -40553,6 +42985,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -40604,6 +43039,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -40642,6 +43080,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -40683,6 +43124,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -40725,6 +43169,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Email address to filter by",
@@ -40778,6 +43225,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -40813,6 +43263,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -40864,6 +43317,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -40902,6 +43358,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -40945,6 +43404,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -40980,6 +43442,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -41031,6 +43496,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -41069,6 +43537,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -41110,6 +43581,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -41154,6 +43628,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41189,6 +43666,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -41240,6 +43720,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41278,6 +43761,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -41319,6 +43805,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -41363,6 +43852,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41398,6 +43890,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -41449,6 +43944,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41487,6 +43985,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -41528,6 +44029,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -41572,6 +44076,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41607,6 +44114,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -41658,6 +44168,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41696,6 +44209,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -41737,6 +44253,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID to filter by",
@@ -41790,6 +44309,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           }
         ],
         "responses": {
@@ -41834,6 +44356,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41869,6 +44394,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -41920,6 +44448,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "id",
@@ -41958,6 +44489,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "ID value to filter by",
@@ -42001,6 +44535,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "Name value to filter by",
             "in": "path",
             "name": "name",
@@ -42036,6 +44573,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name to filter by",
@@ -42087,6 +44627,9 @@
             "$ref": "#/components/parameters/X-Tenant-Id"
           },
           {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
             "description": "ID value to filter by",
             "in": "path",
             "name": "name",
@@ -42125,6 +44668,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
           },
           {
             "description": "Name value to filter by",
@@ -42192,6 +44738,7 @@
     ]
   },
   "x-scope-types": [
-    "tenant"
+    "tenant",
+    "environment"
   ]
 }

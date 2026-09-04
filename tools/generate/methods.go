@@ -6,6 +6,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/http"
 	"path"
 	"regexp"
@@ -22,15 +23,24 @@ import (
 // ---------------------------------------------------------------------------
 
 func extractMethods(doc *openapi3.T, spec SpecDef, enumTypes map[string]bool) ([]GoMethod, error) {
+	// Scope is declared once on the spec root, so resolve it once rather than
+	// per operation: repeating the work would repeat the same error 700 times
+	// for pro.
+	scopes, err := resolveScopeTypes(doc, spec)
+	if err != nil {
+		return nil, err
+	}
+
 	var methods []GoMethod
 	for _, opDef := range spec.Operations {
 		m, err := buildMethod(doc, spec, opDef, enumTypes)
 		if err != nil {
 			return nil, fmt.Errorf("operation %s: %w", opDef.Op, err)
 		}
+		m.Scopes = scopes
 		methods = append(methods, m)
 	}
-	methods, err := appendResolverMethods(methods, spec)
+	methods, err = appendResolverMethods(methods, spec)
 	if err != nil {
 		return nil, err
 	}
@@ -1492,4 +1502,94 @@ func detectPaginatedItemType(op *openapi3.Operation, resultsField string) string
 		}
 	}
 	return "any"
+}
+
+// scopeKindConstants maps an x-scope-types value to the Go constant the
+// Privileges registry carries. Organization is the zero ScopeKind and sends no
+// header, but it is named rather than omitted: an empty Scopes slice would be
+// indistinguishable from a spec that declared nothing.
+var scopeKindConstants = map[string]string{
+	"tenant":       "ScopeTenant",
+	"environment":  "ScopeEnvironment",
+	"organization": "ScopeOrganization",
+}
+
+// resolveScopeTypes returns the scope-kind constants for a spec, reading the
+// root x-scope-types extension and applying config.scopeTypes where the
+// published spec understates what the gateway serves.
+//
+// Two failure modes are deliberate rather than tolerated. An unknown value is
+// a hard error, because silently dropping it would understate the scopes an
+// endpoint accepts. And a spec that declares nothing with no override is a
+// hard error too: the account trio is the only family with no x-scope-types,
+// and it is organization-scoped, so it carries an explicit config.scopeTypes
+// entry. A new spec that arrives without the extension therefore fails
+// generation rather than emitting an empty scope set that a consumer would
+// read as "no scope required".
+func resolveScopeTypes(doc *openapi3.T, spec SpecDef) ([]string, error) {
+	declared := stringSliceRootExtension(doc, "x-scope-types")
+
+	if len(spec.ScopeTypes) > 0 {
+		if equalStringSets(declared, spec.ScopeTypes) {
+			return nil, fmt.Errorf("scopeTypes for %s: the spec now declares exactly %v — delete the config entry so the spec is the only source", spec.File, spec.ScopeTypes)
+		}
+		declared = spec.ScopeTypes
+	}
+	if len(declared) == 0 {
+		return nil, fmt.Errorf("scopeTypes for %s: the spec declares no x-scope-types and config supplies none — add a scopeTypes entry rather than emitting an empty scope set", spec.File)
+	}
+
+	out := make([]string, 0, len(declared))
+	seen := map[string]bool{}
+	for _, v := range declared {
+		c, ok := scopeKindConstants[v]
+		if !ok {
+			return nil, fmt.Errorf("scopeTypes for %s: unknown scope kind %q (want tenant, environment or organization)", spec.File, v)
+		}
+		if seen[c] {
+			continue
+		}
+		seen[c] = true
+		out = append(out, c)
+	}
+	return out, nil
+}
+
+// equalStringSets reports whether a and b hold the same values, order and
+// duplicates ignored.
+func equalStringSets(a, b []string) bool {
+	if len(a) == 0 || len(b) == 0 {
+		return false
+	}
+	sa, sb := map[string]bool{}, map[string]bool{}
+	for _, v := range a {
+		sa[v] = true
+	}
+	for _, v := range b {
+		sb[v] = true
+	}
+	return maps.Equal(sa, sb)
+}
+
+// stringSliceRootExtension reads a []string-valued extension off the document
+// root, the way stringSliceExtension reads one off an operation.
+func stringSliceRootExtension(doc *openapi3.T, key string) []string {
+	if doc == nil || doc.Extensions == nil {
+		return nil
+	}
+	raw, ok := doc.Extensions[key]
+	if !ok {
+		return nil
+	}
+	items, ok := raw.([]any)
+	if !ok {
+		return nil
+	}
+	out := make([]string, 0, len(items))
+	for _, it := range items {
+		if str, ok := it.(string); ok {
+			out = append(out, str)
+		}
+	}
+	return out
 }

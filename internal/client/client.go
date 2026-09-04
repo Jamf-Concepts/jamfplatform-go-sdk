@@ -326,17 +326,29 @@ func (c *Transport) BaseURL() string {
 type ScopeKind int
 
 const (
+	// ScopeOrganization scopes requests to a Jamf Account organization. It is
+	// the zero value, and it sends no header at all: the gateway resolves the
+	// organization from the access token
+	// (request-context-allowed-sources is `token` for the account
+	// api-products, in every environment).
+	//
+	// The constant exists so the generated Privileges registry can *name* this
+	// scope rather than leaving an empty slice, which would be
+	// indistinguishable from "the spec declared nothing". Client code has no
+	// use for it: an unset scope already means organization, so there is no
+	// WithOrganizationID option and never will be.
+	ScopeOrganization ScopeKind = 0
 	// ScopeTenant scopes requests to a single product tenant, sent as
 	// X-Tenant-Id. This is the legacy scope: every spec still declares this
 	// header, but Jamf intends new integrations to be environment-scoped.
 	ScopeTenant ScopeKind = iota + 1
 	// ScopeEnvironment scopes requests to a platform environment — a grouping
 	// of tenants — sent as X-Environment-Id, set by WithEnvironmentID. This is
-	// the scope to prefer: no spec *declares* this header yet (they all declare
-	// X-Tenant-Id), but the gateway accepts it wherever an api-product lists
-	// request-context-types [tenant, environment], and it is what Jamf intends
-	// new integrations to use. Wire-verified against blueprints,
-	// compliance-benchmarks, pro, proclassic, devices and securitycloud.
+	// the scope to prefer, and as of GitOps v2082 the specs declare it: the
+	// six Platform APIs declare it as their only scope, and jpapi, capi and
+	// the Security Cloud specs declare it alongside tenant. Wire-verified
+	// against blueprints, compliance-benchmarks, pro, proclassic, devices and
+	// securitycloud.
 	ScopeEnvironment
 )
 

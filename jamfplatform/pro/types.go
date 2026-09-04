@@ -1698,6 +1698,72 @@ type ComputerExtensionAttributes struct {
 	ScriptContents *string `json:"scriptContents,omitempty"`
 }
 
+// ComputerGeneral represents a computer general.
+type ComputerGeneral struct {
+	AssetTag                                 string                       `json:"assetTag"`
+	Barcode1                                 string                       `json:"barcode1"`
+	Barcode2                                 string                       `json:"barcode2"`
+	DeclarativeDeviceManagementEnabled       bool                         `json:"declarativeDeviceManagementEnabled"`
+	DistributionPoint                        string                       `json:"distributionPoint"`
+	EnrolledViaAutomatedDeviceEnrollment     bool                         `json:"enrolledViaAutomatedDeviceEnrollment"`
+	EnrollmentMethod                         *EnrollmentMethod            `json:"enrollmentMethod,omitempty"`
+	ExtensionAttributes                      []ComputerExtensionAttribute `json:"extensionAttributes"`
+	InitialEntryDate                         string                       `json:"initialEntryDate"`
+	ItunesStoreAccountActive                 bool                         `json:"itunesStoreAccountActive"`
+	JamfBinaryVersion                        string                       `json:"jamfBinaryVersion"`
+	LastCloudBackupDate                      *time.Time                   `json:"lastCloudBackupDate,omitempty"`
+	LastContactTime                          *time.Time                   `json:"lastContactTime,omitempty"`
+	LastEnrolledDate                         *time.Time                   `json:"lastEnrolledDate,omitempty"`
+	LastIPAddress                            string                       `json:"lastIpAddress"`
+	LastLoggedInUsernameBinary               *string                      `json:"lastLoggedInUsernameBinary,omitempty"`
+	LastLoggedInUsernameBinaryTimestamp      *time.Time                   `json:"lastLoggedInUsernameBinaryTimestamp,omitempty"`
+	LastLoggedInUsernameMDM                  *string                      `json:"lastLoggedInUsernameMdm,omitempty"`
+	LastLoggedInUsernameMDMTimestamp         *time.Time                   `json:"lastLoggedInUsernameMdmTimestamp,omitempty"`
+	LastLoggedInUsernameSelfService          *string                      `json:"lastLoggedInUsernameSelfService,omitempty"`
+	LastLoggedInUsernameSelfServiceTimestamp *time.Time                   `json:"lastLoggedInUsernameSelfServiceTimestamp,omitempty"`
+	// Last reported IPv4 address (Deprecated. Use lastReportedIpV4 instead.).
+	LastReportedIp string `json:"lastReportedIp"`
+	// Last reported IPv4 address.
+	LastReportedIPV4     string                    `json:"lastReportedIpV4"`
+	LastReportedIPV6     string                    `json:"lastReportedIpV6"`
+	ManagementID         string                    `json:"managementId"`
+	MDMCapable           *ComputerMDMCapability    `json:"mdmCapable,omitempty"`
+	MDMProfileExpiration *time.Time                `json:"mdmProfileExpiration,omitempty"`
+	Name                 string                    `json:"name"`
+	Platform             string                    `json:"platform"`
+	RemoteManagement     *ComputerRemoteManagement `json:"remoteManagement,omitempty"`
+	ReportDate           *time.Time                `json:"reportDate,omitempty"`
+	Site                 *ComputerSite             `json:"site,omitempty"`
+	Supervised           bool                      `json:"supervised"`
+	UserApprovedMDM      bool                      `json:"userApprovedMdm"`
+}
+
+// ComputerGeneralCreate represents a computer general create.
+type ComputerGeneralCreate struct {
+	AssetTag                             *string    `json:"assetTag,omitempty"`
+	Barcode1                             *string    `json:"barcode1,omitempty"`
+	Barcode2                             *string    `json:"barcode2,omitempty"`
+	DeclarativeDeviceManagementEnabled   *bool      `json:"declarativeDeviceManagementEnabled,omitempty"`
+	DistributionPointID                  *string    `json:"distributionPointId,omitempty"`
+	EnrolledViaAutomatedDeviceEnrollment *bool      `json:"enrolledViaAutomatedDeviceEnrollment,omitempty"`
+	ItunesStoreAccountActive             *bool      `json:"itunesStoreAccountActive,omitempty"`
+	JamfBinaryVersion                    *string    `json:"jamfBinaryVersion,omitempty"`
+	LastCloudBackupDate                  *time.Time `json:"lastCloudBackupDate,omitempty"`
+	LastContactTime                      *time.Time `json:"lastContactTime,omitempty"`
+	LastEnrolledDate                     *time.Time `json:"lastEnrolledDate,omitempty"`
+	LastIPAddress                        *string    `json:"lastIpAddress,omitempty"`
+	LastReportedIp                       *string    `json:"lastReportedIp,omitempty"`
+	MDMCapable                           *bool      `json:"mdmCapable,omitempty"`
+	Name                                 string     `json:"name"`
+	// Allowed values: see the ComputerGeneralCreatePlatform constants.
+	Platform         *string                         `json:"platform,omitempty"`
+	RemoteManagement *ComputerRemoteManagementCreate `json:"remoteManagement,omitempty"`
+	ReportDate       *time.Time                      `json:"reportDate,omitempty"`
+	SiteID           *string                         `json:"siteId,omitempty"`
+	Supervised       *bool                           `json:"supervised,omitempty"`
+	UserApprovedMDM  *bool                           `json:"userApprovedMdm,omitempty"`
+}
+
 // ComputerGeneralCreateV4 represents a computer general create v4.
 type ComputerGeneralCreateV4 struct {
 	AssetTag                             *string    `json:"assetTag,omitempty"`
@@ -1906,6 +1972,27 @@ type ComputerInventoryCollectionSettingsV2 struct {
 	ComputerInventoryCollectionPreferences *ComputerInventoryCollectionPreferencesV2 `json:"computerInventoryCollectionPreferences,omitempty"`
 }
 
+// ComputerInventoryCreateRequestV2 represents a computer inventory create request v2.
+type ComputerInventoryCreateRequestV2 struct {
+	Applications          *[]ComputerApplicationCreate          `json:"applications,omitempty"`
+	Certificates          *[]ComputerCertificateCreate          `json:"certificates,omitempty"`
+	ConfigurationProfiles *[]ComputerConfigurationProfileCreate `json:"configurationProfiles,omitempty"`
+	General               *ComputerGeneralCreate                `json:"general,omitempty"`
+	Hardware              *ComputerHardwareCreate               `json:"hardware,omitempty"`
+	LocalUserAccounts     *[]ComputerLocalUserAccountCreate     `json:"localUserAccounts,omitempty"`
+	OperatingSystem       *ComputerOperatingSystemCreate        `json:"operatingSystem,omitempty"`
+	// All package receipts are listed by their package name.
+	PackageReceipts *ComputerPackageReceiptsCreate  `json:"packageReceipts,omitempty"`
+	Printers        *[]ComputerPrinterCreate        `json:"printers,omitempty"`
+	Purchasing      *ComputerPurchaseCreate         `json:"purchasing,omitempty"`
+	Security        *ComputerSecurityCreate         `json:"security,omitempty"`
+	Services        *[]ComputerServiceCreate        `json:"services,omitempty"`
+	SoftwareUpdates *[]ComputerSoftwareUpdateCreate `json:"softwareUpdates,omitempty"`
+	Storage         *ComputerStorageCreate          `json:"storage,omitempty"`
+	UDID            *string                         `json:"udid,omitempty"`
+	UserAndLocation *ComputerUserAndLocationCreate  `json:"userAndLocation,omitempty"`
+}
+
 // ComputerInventoryCreateRequestV4 represents a computer inventory create request v4.
 type ComputerInventoryCreateRequestV4 struct {
 	Applications          *[]ComputerApplicationCreate          `json:"applications,omitempty"`
@@ -1957,6 +2044,12 @@ type ComputerInventoryRecoveryLockPasswordResponse struct {
 	RecoveryLockPassword string `json:"recoveryLockPassword"`
 }
 
+// ComputerInventorySearchResultsV3 represents a computer inventory search results v3.
+type ComputerInventorySearchResultsV3 struct {
+	Results    []ComputerInventoryV3 `json:"results"`
+	TotalCount int                   `json:"totalCount"`
+}
+
 // ComputerInventorySearchResultsV4 represents a computer inventory search results v4.
 type ComputerInventorySearchResultsV4 struct {
 	Results    []ComputerInventoryV4 `json:"results"`
@@ -1972,6 +2065,35 @@ type ComputerInventoryUpdateRequest struct {
 	Purchasing          *ComputerPurchase              `json:"purchasing,omitempty"`
 	UDID                *string                        `json:"udid,omitempty"`
 	UserAndLocation     *ComputerUserAndLocation       `json:"userAndLocation,omitempty"`
+}
+
+// ComputerInventoryV3 represents a computer inventory v3.
+type ComputerInventoryV3 struct {
+	Applications          []ComputerApplicationV3        `json:"applications"`
+	Attachments           []ComputerAttachment           `json:"attachments"`
+	Certificates          []ComputerCertificate          `json:"certificates"`
+	ConfigurationProfiles []ComputerConfigurationProfile `json:"configurationProfiles"`
+	ContentCaching        *ComputerContentCaching        `json:"contentCaching,omitempty"`
+	DiskEncryption        *ComputerDiskEncryption        `json:"diskEncryption,omitempty"`
+	ExtensionAttributes   []ComputerExtensionAttribute   `json:"extensionAttributes"`
+	General               *ComputerGeneral               `json:"general,omitempty"`
+	GroupMemberships      []GroupMembership              `json:"groupMemberships"`
+	Hardware              *ComputerHardware              `json:"hardware,omitempty"`
+	Ibeacons              []ComputerIbeacon              `json:"ibeacons"`
+	ID                    string                         `json:"id"`
+	LicensedSoftware      []ComputerLicensedSoftware     `json:"licensedSoftware"`
+	LocalUserAccounts     []ComputerLocalUserAccount     `json:"localUserAccounts"`
+	OperatingSystem       *ComputerOperatingSystem       `json:"operatingSystem,omitempty"`
+	// All package receipts are listed by their package name.
+	PackageReceipts *ComputerPackageReceipts `json:"packageReceipts,omitempty"`
+	Printers        []ComputerPrinter        `json:"printers"`
+	Purchasing      *ComputerPurchase        `json:"purchasing,omitempty"`
+	Security        *ComputerSecurity        `json:"security,omitempty"`
+	Services        []ComputerService        `json:"services"`
+	SoftwareUpdates []ComputerSoftwareUpdate `json:"softwareUpdates"`
+	Storage         *ComputerStorage         `json:"storage,omitempty"`
+	UDID            string                   `json:"udid"`
+	UserAndLocation *ComputerUserAndLocation `json:"userAndLocation,omitempty"`
 }
 
 // ComputerInventoryV4 represents a computer inventory v4.

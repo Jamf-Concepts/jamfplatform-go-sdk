@@ -21,13 +21,19 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts, from the spec's
+// x-scope-types. It is an alternatives set: a client carries one scope, so a
+// consumer needs a credential matching one of the listed kinds. It reflects
+// the spec, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"GetResourceLineage":     {Method: "GetResourceLineage", HTTPMethod: "GET", Path: "/v1/audit/resources/{resourceId}/lineage", Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
-	"GetTransactionTimeline": {Method: "GetTransactionTimeline", HTTPMethod: "GET", Path: "/v1/audit/transactions/{txId}", Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
-	"ListAuditEvents":        {Method: "ListAuditEvents", HTTPMethod: "GET", Path: "/v1/audit", Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
-	"ListAuditSources":       {Method: "ListAuditSources", HTTPMethod: "GET", Path: "/v1/audit/sources", Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
+	"GetResourceLineage":     {Method: "GetResourceLineage", HTTPMethod: "GET", Path: "/v1/audit/resources/{resourceId}/lineage", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
+	"GetTransactionTimeline": {Method: "GetTransactionTimeline", HTTPMethod: "GET", Path: "/v1/audit/transactions/{txId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
+	"ListAuditEvents":        {Method: "ListAuditEvents", HTTPMethod: "GET", Path: "/v1/audit", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
+	"ListAuditSources":       {Method: "ListAuditSources", HTTPMethod: "GET", Path: "/v1/audit/sources", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"audit:read"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

@@ -117,15 +117,7 @@ type specRow struct {
 // securitycloud-uem-connect-api.yaml comes from uem-connect.
 var specs = []specRow{
 	{dest: "openapi-jpapi.yaml", dir: "jpapi", title: "Jamf Pro API"},
-	{
-		dest:   "Classic-openapi.yaml",
-		title:  "Classic API",
-		dir:    "capi",
-		heldAt: "v1897",
-		why: "POST /patchsoftwaretitles/id/{id} is the only way to mint a softwareTitleId " +
-			"for the Pro v3 patch-configuration endpoints; the config took the other 31 " +
-			"withdrawals at v1993. Ingest and drop the hold when /patchsoftwaretitles is republished.",
-	},
+	{dest: "Classic-openapi.yaml", dir: "capi", title: "Classic API"},
 	{dest: "blueprints-api.yaml", dir: "blueprints", title: "Blueprints API"},
 	{dest: "device-groups-api.yaml", dir: "device-groups", title: "Device Groups API"},
 	{dest: "device-inventory-api.yaml", dir: "devices", title: "Device Inventory API"},

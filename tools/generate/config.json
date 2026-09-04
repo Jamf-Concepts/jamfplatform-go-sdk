@@ -1587,12 +1587,58 @@
           ]
         },
         {
+          "op": "GET /v3/computers-inventory",
+          "name": "ListComputersInventoryV3",
+          "pagination": "totalCount",
+          "params": [
+            "section:[]string",
+            "sort:[]string",
+            "filter"
+          ],
+          "resolver": {
+            "resourceType": "ComputerInventoryV3",
+            "nameField": "general.name",
+            "idField": "id",
+            "mode": "filtered",
+            "extraParams": "section=GENERAL",
+            "typedReturn": "ComputerInventoryV3"
+          },
+          "resolvers": [
+            {
+              "resourceType": "ComputerInventoryV3",
+              "nameField": "hardware.serialNumber",
+              "idField": "id",
+              "mode": "filtered",
+              "extraParams": "section=HARDWARE",
+              "typedReturn": "ComputerInventoryV3",
+              "byField": "BySerialNumber"
+            },
+            {
+              "resourceType": "ComputerInventoryV3",
+              "nameField": "udid",
+              "idField": "id",
+              "mode": "filtered",
+              "typedReturn": "ComputerInventoryV3",
+              "byField": "ByUDID"
+            }
+          ]
+        },
+        {
           "op": "POST /v4/computers-inventory",
           "name": "CreateComputerInventoryV4"
         },
         {
+          "op": "POST /v3/computers-inventory",
+          "name": "CreateComputerInventoryV3"
+        },
+        {
           "op": "GET /v4/computers-inventory/filevault",
           "name": "ListComputerInventoryFileVaultsV4",
+          "pagination": "totalCount"
+        },
+        {
+          "op": "GET /v3/computers-inventory/filevault",
+          "name": "ListComputerInventoryFileVaultsV3",
           "pagination": "totalCount"
         },
         {
@@ -1603,40 +1649,86 @@
           ]
         },
         {
+          "op": "GET /v3/computers-inventory/{id}",
+          "name": "GetComputerInventoryV3",
+          "params": [
+            "section:[]string"
+          ]
+        },
+        {
           "op": "DELETE /v4/computers-inventory/{id}",
           "name": "DeleteComputerInventoryV4"
+        },
+        {
+          "op": "DELETE /v3/computers-inventory/{id}",
+          "name": "DeleteComputerInventoryV3",
+          "expectedStatus": 204
         },
         {
           "op": "GET /v4/computers-inventory-detail/{id}",
           "name": "GetComputerInventoryDetailV4"
         },
         {
+          "op": "GET /v3/computers-inventory-detail/{id}",
+          "name": "GetComputerInventoryDetailV3"
+        },
+        {
           "op": "PATCH /v4/computers-inventory-detail/{id}",
           "name": "UpdateComputerInventoryDetailV4"
+        },
+        {
+          "op": "PATCH /v3/computers-inventory-detail/{id}",
+          "name": "UpdateComputerInventoryDetailV3",
+          "expectedStatus": 204
         },
         {
           "op": "POST /v4/computers-inventory/{id}/attachments",
           "name": "UploadComputerInventoryAttachmentV4"
         },
         {
+          "op": "POST /v3/computers-inventory/{id}/attachments",
+          "name": "UploadComputerInventoryAttachmentV3"
+        },
+        {
           "op": "GET /v4/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DownloadComputerInventoryAttachmentV4"
+        },
+        {
+          "op": "GET /v3/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DownloadComputerInventoryAttachmentV3"
         },
         {
           "op": "DELETE /v4/computers-inventory/{id}/attachments/{attachmentId}",
           "name": "DeleteComputerInventoryAttachmentV4"
         },
         {
+          "op": "DELETE /v3/computers-inventory/{id}/attachments/{attachmentId}",
+          "name": "DeleteComputerInventoryAttachmentV3",
+          "expectedStatus": 204
+        },
+        {
           "op": "GET /v4/computers-inventory/{id}/filevault",
           "name": "GetComputerInventoryFileVaultV4"
+        },
+        {
+          "op": "GET /v3/computers-inventory/{id}/filevault",
+          "name": "GetComputerInventoryFileVaultV3"
         },
         {
           "op": "GET /v4/computers-inventory/{id}/view-device-lock-pin",
           "name": "GetComputerDeviceLockPinV4"
         },
         {
+          "op": "GET /v3/computers-inventory/{id}/view-device-lock-pin",
+          "name": "GetComputerDeviceLockPinV3"
+        },
+        {
           "op": "GET /v4/computers-inventory/{id}/view-recovery-lock-password",
           "name": "GetComputerRecoveryLockPasswordV4"
+        },
+        {
+          "op": "GET /v3/computers-inventory/{id}/view-recovery-lock-password",
+          "name": "GetComputerRecoveryLockPasswordV3"
         },
         {
           "op": "GET /v2/computer-inventory-collection-settings",
@@ -7199,6 +7291,40 @@
           }
         },
         {
+          "op": "GET /patches/id/{id}",
+          "name": "GetPatchByID",
+          "responseType": "software_title",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
+          "op": "POST /patches/id/{id}",
+          "name": "CreatePatchByID",
+          "requestType": "software_title",
+          "responseType": "software_title",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "PUT /patches/id/{id}",
+          "name": "UpdatePatchByID",
+          "requestType": "software_title",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "DELETE /patches/id/{id}",
+          "name": "DeletePatchByID",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
           "op": "GET /patchexternalsources/id/{id}",
           "name": "GetPatchExternalSourceByID",
           "responseType": "patch_external_source",
@@ -7275,6 +7401,22 @@
           }
         },
         {
+          "op": "GET /patchreports/patchsoftwaretitleid/{id}",
+          "name": "GetPatchReportByPatchSoftwareTitleID",
+          "responseType": "patch_report",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
+          "op": "GET /patchsoftwaretitles/id/{id}",
+          "name": "GetPatchSoftwareTitleByID",
+          "responseType": "patch_software_title",
+          "pathNames": {
+            "id": "id"
+          }
+        },
+        {
           "op": "POST /patchsoftwaretitles/id/{id}",
           "name": "CreatePatchSoftwareTitleByID",
           "requestType": "patch_software_title",
@@ -7283,6 +7425,22 @@
             "id": "id"
           },
           "expectedStatus": 201
+        },
+        {
+          "op": "PUT /patchsoftwaretitles/id/{id}",
+          "name": "UpdatePatchSoftwareTitleByID",
+          "requestType": "patch_software_title",
+          "pathNames": {
+            "id": "id"
+          },
+          "expectedStatus": 201
+        },
+        {
+          "op": "DELETE /patchsoftwaretitles/id/{id}",
+          "name": "DeletePatchSoftwareTitleByID",
+          "pathNames": {
+            "id": "id"
+          }
         },
         {
           "op": "GET /activationcode",
@@ -8700,6 +8858,14 @@
           }
         },
         {
+          "op": "GET /patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}",
+          "name": "ListPatchPoliciesBySoftwareTitleConfigID",
+          "responseType": "patch_policies",
+          "pathNames": {
+            "softwaretitleconfigid": "softwareTitleConfigID"
+          }
+        },
+        {
           "op": "GET /computercommands/name/{name}",
           "name": "GetComputerCommandByName",
           "responseType": "computer_command"
@@ -8938,6 +9104,21 @@
           "op": "GET /patchinternalsources",
           "name": "ListPatchInternalSources",
           "responseType": "patch_internal_sources"
+        },
+        {
+          "op": "GET /patches",
+          "name": "ListPatches",
+          "responseType": "patch_management_software_titles"
+        },
+        {
+          "op": "GET /patchpolicies",
+          "name": "ListPatchPolicies",
+          "responseType": "patch_policies"
+        },
+        {
+          "op": "GET /patchsoftwaretitles",
+          "name": "ListPatchSoftwareTitles",
+          "responseType": "patch_software_titles"
         },
         {
           "op": "GET /printers",
@@ -9793,8 +9974,21 @@
           "responseType": "software_title"
         },
         {
+          "op": "GET /patches/id/{id}/version/{version}",
+          "name": "GetPatchByIDVersion",
+          "responseType": "software_title"
+        },
+        {
           "op": "DELETE /patchexternalsources/name/{name}",
           "name": "DeletePatchExternalSourceByName"
+        },
+        {
+          "op": "GET /patchreports/patchsoftwaretitleid/{id}/version/{version}",
+          "name": "GetPatchReportByTitleIDVersion",
+          "responseType": "patch_report",
+          "pathNames": {
+            "id": "id"
+          }
         },
         {
           "op": "POST /policies/name/{name}",
@@ -10168,6 +10362,10 @@
           "op": "DELETE /v1/groups/{groupId}",
           "name": "DeleteDeviceGroupV1"
         }
+      ],
+      "scopeTypes": [
+        "tenant",
+        "environment"
       ]
     },
     {
@@ -10368,6 +10566,9 @@
           "name": "ListLicenses",
           "unwrapResults": "[]License"
         }
+      ],
+      "scopeTypes": [
+        "organization"
       ]
     },
     {
@@ -10429,6 +10630,9 @@
           "op": "POST /v1/distributor/validate-purchase-order",
           "name": "ValidateDistributorPurchaseOrder"
         }
+      ],
+      "scopeTypes": [
+        "organization"
       ]
     },
     {
@@ -10521,6 +10725,9 @@
           "op": "POST /v1/domains/{domainId}/actions/verify",
           "name": "VerifyDomain"
         }
+      ],
+      "scopeTypes": [
+        "organization"
       ]
     },
     {

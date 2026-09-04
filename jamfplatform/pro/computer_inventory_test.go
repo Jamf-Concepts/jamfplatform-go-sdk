@@ -87,6 +87,28 @@ func TestListComputersInventoryV4(t *testing.T) {
 	}
 }
 
+func TestListComputersInventoryV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListComputersInventoryV3(context.Background(), nil, nil, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
 func TestCreateComputerInventoryV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v4/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
@@ -97,6 +119,24 @@ func TestCreateComputerInventoryV4(t *testing.T) {
 	})
 
 	result, err := c.CreateComputerInventoryV4(context.Background(), &ComputerInventoryCreateRequestV4{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestCreateComputerInventoryV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+
+	result, err := c.CreateComputerInventoryV3(context.Background(), &ComputerInventoryCreateRequestV2{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,6 +159,28 @@ func TestListComputerInventoryFileVaultsV4(t *testing.T) {
 	})
 
 	results, err := c.ListComputerInventoryFileVaultsV4(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len = %d, want 1", len(results))
+	}
+}
+
+func TestListComputerInventoryFileVaultsV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/filevault", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results":    []map[string]any{{}},
+			"totalCount": 1,
+			"hasNext":    false,
+		})
+	})
+
+	results, err := c.ListComputerInventoryFileVaultsV3(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,6 +223,40 @@ func TestGetComputerInventoryV4_NotFound(t *testing.T) {
 	}
 }
 
+func TestGetComputerInventoryV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetComputerInventoryV3(context.Background(), "test-id", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerInventoryV3_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetComputerInventoryV3(context.Background(), "test-id", nil)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestDeleteComputerInventoryV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v4/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -171,6 +267,21 @@ func TestDeleteComputerInventoryV4(t *testing.T) {
 	})
 
 	err := c.DeleteComputerInventoryV4(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteComputerInventoryV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteComputerInventoryV3(context.Background(), "test-id")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -210,6 +321,40 @@ func TestGetComputerInventoryDetailV4_NotFound(t *testing.T) {
 	}
 }
 
+func TestGetComputerInventoryDetailV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetComputerInventoryDetailV3(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerInventoryDetailV3_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory-detail/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetComputerInventoryDetailV3(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestUpdateComputerInventoryDetailV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v4/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -220,6 +365,21 @@ func TestUpdateComputerInventoryDetailV4(t *testing.T) {
 	})
 
 	err := c.UpdateComputerInventoryDetailV4(context.Background(), "test-id", &ComputerInventoryUpdateRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateComputerInventoryDetailV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory-detail/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPatch {
+			t.Errorf("method = %s, want PATCH", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.UpdateComputerInventoryDetailV3(context.Background(), "test-id", &ComputerInventoryUpdateRequest{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -237,6 +397,26 @@ func TestUploadComputerInventoryAttachmentV4(t *testing.T) {
 		writeJSON(t, w, http.StatusCreated, map[string]any{})
 	})
 	result, err := c.UploadComputerInventoryAttachmentV4(context.Background(), "test-id", "test.bin", bytes.NewBufferString("stub"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestUploadComputerInventoryAttachmentV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/attachments", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
+			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
+		}
+		writeJSON(t, w, http.StatusCreated, map[string]any{})
+	})
+	result, err := c.UploadComputerInventoryAttachmentV3(context.Background(), "test-id", "test.bin", bytes.NewBufferString("stub"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -279,6 +459,40 @@ func TestDownloadComputerInventoryAttachmentV4_NotFound(t *testing.T) {
 	}
 }
 
+func TestDownloadComputerInventoryAttachmentV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
+	})
+
+	result, err := c.DownloadComputerInventoryAttachmentV3(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestDownloadComputerInventoryAttachmentV3_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.DownloadComputerInventoryAttachmentV3(context.Background(), "test-id", "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestDeleteComputerInventoryAttachmentV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v4/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
@@ -289,6 +503,21 @@ func TestDeleteComputerInventoryAttachmentV4(t *testing.T) {
 	})
 
 	err := c.DeleteComputerInventoryAttachmentV4(context.Background(), "test-id", "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteComputerInventoryAttachmentV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/attachments/test-id", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	err := c.DeleteComputerInventoryAttachmentV3(context.Background(), "test-id", "test-id")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -328,6 +557,40 @@ func TestGetComputerInventoryFileVaultV4_NotFound(t *testing.T) {
 	}
 }
 
+func TestGetComputerInventoryFileVaultV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/filevault", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetComputerInventoryFileVaultV3(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerInventoryFileVaultV3_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/filevault", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetComputerInventoryFileVaultV3(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestGetComputerDeviceLockPinV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v4/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
@@ -362,6 +625,40 @@ func TestGetComputerDeviceLockPinV4_NotFound(t *testing.T) {
 	}
 }
 
+func TestGetComputerDeviceLockPinV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetComputerDeviceLockPinV3(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerDeviceLockPinV3_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/view-device-lock-pin", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetComputerDeviceLockPinV3(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
 func TestGetComputerRecoveryLockPasswordV4(t *testing.T) {
 	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
 	mux.HandleFunc("/pro/v4/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
@@ -391,6 +688,40 @@ func TestGetComputerRecoveryLockPasswordV4_NotFound(t *testing.T) {
 	})
 
 	_, err := c.GetComputerRecoveryLockPasswordV4(context.Background(), "test-id")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestGetComputerRecoveryLockPasswordV3(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{})
+	})
+
+	result, err := c.GetComputerRecoveryLockPasswordV3(context.Background(), "test-id")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestGetComputerRecoveryLockPasswordV3_NotFound(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory/test-id/view-recovery-lock-password", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(t, w, http.StatusNotFound, map[string]any{
+			"httpStatus": 404,
+			"traceId":    "trace-nf",
+			"errors":     []map[string]string{{"code": "NOT_FOUND", "field": "id", "description": "not found"}},
+		})
+	})
+
+	_, err := c.GetComputerRecoveryLockPasswordV3(context.Background(), "test-id")
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -526,6 +857,144 @@ func TestResolveComputerInventoryV4ByUDID(t *testing.T) {
 	})
 
 	result, err := c.ResolveComputerInventoryV4ByUDID(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestResolveComputerInventoryV3IDByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "general": map[string]any{"name": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveComputerInventoryV3IDByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveComputerInventoryV3ByName(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "general": map[string]any{"name": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveComputerInventoryV3ByName(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestResolveComputerInventoryV3IDBySerialNumber(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "hardware": map[string]any{"serialNumber": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveComputerInventoryV3IDBySerialNumber(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveComputerInventoryV3BySerialNumber(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "hardware": map[string]any{"serialNumber": "target"}},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveComputerInventoryV3BySerialNumber(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
+		t.Fatal("expected non-nil result")
+	}
+}
+
+func TestResolveComputerInventoryV3IDByUDID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "udid": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	id, err := c.ResolveComputerInventoryV3IDByUDID(context.Background(), "target")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != "resolved-id" {
+		t.Errorf("id = %q, want resolved-id", id)
+	}
+}
+
+func TestResolveComputerInventoryV3ByUDID(t *testing.T) {
+	c, mux := testServerWithOpts(t, WithTenantID("t-test"))
+	mux.HandleFunc("/pro/v3/computers-inventory", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		writeJSON(t, w, http.StatusOK, map[string]any{
+			"results": []map[string]any{
+				{"id": "resolved-id", "udid": "target"},
+			},
+			"totalCount": 1,
+		})
+	})
+
+	result, err := c.ResolveComputerInventoryV3ByUDID(context.Background(), "target")
 	if err != nil {
 		t.Fatal(err)
 	}

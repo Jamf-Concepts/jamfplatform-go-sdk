@@ -31,6 +31,9 @@ import (
 	"testing"
 
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/ddmreport"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/deviceactions"
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devicegroups"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/devices"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/pro"
 	"github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform/proclassic"
@@ -98,4 +101,120 @@ func TestAcceptance_TenantScope(t *testing.T) {
 			t.Logf("devices: %d", len(d))
 		}
 	})
+}
+
+// TestAcceptance_TenantScopePlatformSpecsStillServed pins a spec/wire disagreement
+// that v2082 opened, and it is written to fail the day the wire catches up.
+//
+// v2082 moved six Platform specs from tenant to environment scope — blueprints,
+// device-groups, devices, device-management-action, declaration-reporting and
+// compliance-benchmarks (public-apis-oas#436 and #437, on the grounds that
+// "Platform endpoints are environment-scoped only"). Each now declares
+// x-scope-types: [environment] with X-Environment-Id required and no
+// X-Tenant-Id parameter at all.
+//
+// The gateway has not followed. Probed 2026-09-04 with a tenant credential,
+// with GET /pro/v1/jamf-pro-version at 200 as the control in the same
+// invocation and a bogus path in the same namespace returning the unrouted
+// 403 BAD_PERMISSIONS: devices, device-groups, declaration-reporting and
+// device-management-action all answer under X-Tenant-Id. So a caller migrating
+// off tenant scope because the spec told them to is acting on a claim the
+// server does not yet make, and a caller who does not migrate is not yet
+// broken.
+//
+// The four below are asserted, not logged. A 403 here means the withdrawal has
+// landed, which is a breaking change for every tenant-scoped consumer of these
+// packages and must not pass silently — when it fires, flip this test to assert
+// the refusal and say so in CLAUDE.md's package table.
+//
+// blueprints and compliance-benchmarks are deliberately absent. Both refused
+// the tenant credential with 403 BAD_PERMISSIONS on the same run, and with one
+// tenant credential that cannot be told apart from an ungranted capability —
+// classifying a 403 needs two credentials, not two paths. It agrees with the
+// separately recorded GA decision that those two are environment-only, so they
+// are left unpinned rather than pinned on a guess.
+func TestAcceptance_TenantScopePlatformSpecsStillServed(t *testing.T) {
+	c := accTenantClient(t)
+	ctx := context.Background()
+
+	// The control. Without it a blanket 403 across the subtests reads as a
+	// scope withdrawal when it is really a dead or unentitled credential.
+	if _, err := pro.New(c).GetJamfProVersionV1(ctx); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("control GET /pro/v1/jamf-pro-version under tenant scope: %v", err)
+	}
+
+	t.Run("devices", func(t *testing.T) {
+		d, err := devices.New(c).ListDevices(ctx, nil, "")
+		assertTenantStillServed(t, "ListDevices", err)
+		t.Logf("devices under tenant scope: %d", len(d))
+	})
+
+	t.Run("device-groups", func(t *testing.T) {
+		g, err := devicegroups.New(c).ListDeviceGroups(ctx, nil, "")
+		assertTenantStillServed(t, "ListDeviceGroups", err)
+		t.Logf("device groups under tenant scope: %d", len(g))
+	})
+
+	// A device id that cannot exist: this proves the namespace is routed and
+	// the credential accepted without needing a device, since a refusal at the
+	// gateway is a 403 and a refusal at the service is a 404.
+	t.Run("declaration-reporting", func(t *testing.T) {
+		_, err := ddmreport.New(c).GetDeviceDeclarationReportFiltered(ctx, noSuchDeviceID, "", nil)
+		assertTenantStillServedPastGateway(t, "GetDeviceDeclarationReportFiltered", err)
+	})
+
+	// Likewise, and it mutates nothing: check-in against a nonexistent device
+	// is a no-op the service answers 404 for.
+	t.Run("device-management-action", func(t *testing.T) {
+		err := deviceactions.New(c).CheckInDevice(ctx, noSuchDeviceID)
+		assertTenantStillServedPastGateway(t, "CheckInDevice", err)
+	})
+}
+
+// noSuchDeviceID is a well-formed UUID no tenant can hold, so an operation
+// taking it reaches the service and returns without touching anything.
+const noSuchDeviceID = "00000000-0000-0000-0000-000000000000"
+
+// assertTenantStillServed fails when a Platform read is refused under tenant
+// scope. 403 gets its own message because it is the one that means the spec's
+// withdrawal has reached the gateway.
+func assertTenantStillServed(t *testing.T, op string, err error) {
+	t.Helper()
+	if err == nil {
+		return
+	}
+	skipOnServerError(t, err)
+	if apiErr := jamfplatform.AsAPIError(err); apiErr != nil && apiErr.HasStatus(403) {
+		t.Fatalf("%s: 403 under tenant scope — v2082's environment-only declaration has reached the gateway. "+
+			"This is a breaking change for tenant-scoped consumers: flip this test to assert the refusal, "+
+			"and update the scope column in CLAUDE.md's package table. (%s)", op, apiErr.Summary())
+	}
+	t.Fatalf("%s under tenant scope: %v", op, err)
+}
+
+// assertTenantStillServedPastGateway is assertTenantStillServed for an
+// operation probed with an impossible id, where the service's own 404 is the
+// success condition and 403 still means unrouted or refused.
+func assertTenantStillServedPastGateway(t *testing.T, op string, err error) {
+	t.Helper()
+	if err == nil {
+		t.Fatalf("%s: an impossible device id succeeded — the probe proves nothing", op)
+	}
+	skipOnServerError(t, err)
+	apiErr := jamfplatform.AsAPIError(err)
+	switch {
+	case apiErr == nil:
+		t.Fatalf("%s: non-API error under tenant scope: %v", op, err)
+	case apiErr.HasStatus(404), apiErr.HasStatus(400):
+		// Reached the service. 400 is the shape this endpoint takes when it
+		// wants a filter it was not given, which is equally past the gateway.
+		t.Logf("%s: %d under tenant scope — routed and accepted (%s)", op, apiErr.StatusCode, apiErr.Summary())
+	case apiErr.HasStatus(403):
+		t.Fatalf("%s: 403 under tenant scope — v2082's environment-only declaration has reached the gateway. "+
+			"This is a breaking change for tenant-scoped consumers: flip this test to assert the refusal, "+
+			"and update the scope column in CLAUDE.md's package table. (%s)", op, apiErr.Summary())
+	default:
+		t.Fatalf("%s: unexpected %d under tenant scope: %s", op, apiErr.StatusCode, apiErr.Summary())
+	}
 }

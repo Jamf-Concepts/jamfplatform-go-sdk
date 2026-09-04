@@ -21,19 +21,25 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/jamfplatform"
 // required — see jamfplatform.MethodPrivileges. Do not render it as "no
 // permission needed".
 //
+// Scopes lists the scope kinds each endpoint accepts, from the spec's
+// x-scope-types. It is an alternatives set: a client carries one scope, so a
+// consumer needs a credential matching one of the listed kinds. It reflects
+// the spec, which for the Platform APIs is currently stricter than the
+// gateway — see jamfplatform.MethodPrivileges.
+//
 // Synthetic Resolve<X>ByName / Apply<X> methods are not present; document the
 // privileges of the operations they call instead.
 var Privileges = map[string]jamfplatform.MethodPrivileges{
-	"CreateBlueprint":         {Method: "CreateBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints", Scoped: []string{"blueprints:create"}, Legacy: nil, Source: "spec"},
-	"DeleteBlueprint":         {Method: "DeleteBlueprint", HTTPMethod: "DELETE", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"blueprints:delete"}, Legacy: nil, Source: "spec"},
-	"DeployBlueprint":         {Method: "DeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/deploy", Scoped: []string{"blueprints:deploy"}, Legacy: nil, Source: "spec"},
-	"GetBlueprint":            {Method: "GetBlueprint", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
-	"GetBlueprintComponent":   {Method: "GetBlueprintComponent", HTTPMethod: "GET", Path: "/v1/blueprint-components/{identifier}", Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
-	"GetBlueprintReport":      {Method: "GetBlueprintReport", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}/report", Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
-	"ListBlueprintComponents": {Method: "ListBlueprintComponents", HTTPMethod: "GET", Path: "/v1/blueprint-components", Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
-	"ListBlueprints":          {Method: "ListBlueprints", HTTPMethod: "GET", Path: "/v1/blueprints", Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
-	"UndeployBlueprint":       {Method: "UndeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/undeploy", Scoped: []string{"blueprints:deploy"}, Legacy: nil, Source: "spec"},
-	"UpdateBlueprint":         {Method: "UpdateBlueprint", HTTPMethod: "PATCH", Path: "/v1/blueprints/{blueprintId}", Scoped: []string{"blueprints:update"}, Legacy: nil, Source: "spec"},
+	"CreateBlueprint":         {Method: "CreateBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:create"}, Legacy: nil, Source: "spec"},
+	"DeleteBlueprint":         {Method: "DeleteBlueprint", HTTPMethod: "DELETE", Path: "/v1/blueprints/{blueprintId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:delete"}, Legacy: nil, Source: "spec"},
+	"DeployBlueprint":         {Method: "DeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/deploy", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:deploy"}, Legacy: nil, Source: "spec"},
+	"GetBlueprint":            {Method: "GetBlueprint", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
+	"GetBlueprintComponent":   {Method: "GetBlueprintComponent", HTTPMethod: "GET", Path: "/v1/blueprint-components/{identifier}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
+	"GetBlueprintReport":      {Method: "GetBlueprintReport", HTTPMethod: "GET", Path: "/v1/blueprints/{blueprintId}/report", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
+	"ListBlueprintComponents": {Method: "ListBlueprintComponents", HTTPMethod: "GET", Path: "/v1/blueprint-components", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
+	"ListBlueprints":          {Method: "ListBlueprints", HTTPMethod: "GET", Path: "/v1/blueprints", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:read"}, Legacy: nil, Source: "spec"},
+	"UndeployBlueprint":       {Method: "UndeployBlueprint", HTTPMethod: "POST", Path: "/v1/blueprints/{blueprintId}/undeploy", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:deploy"}, Legacy: nil, Source: "spec"},
+	"UpdateBlueprint":         {Method: "UpdateBlueprint", HTTPMethod: "PATCH", Path: "/v1/blueprints/{blueprintId}", Scopes: []jamfplatform.ScopeKind{jamfplatform.ScopeEnvironment}, Scoped: []string{"blueprints:update"}, Legacy: nil, Source: "spec"},
 }
 
 // PrivilegesFor returns the privilege metadata for the named SDK method and

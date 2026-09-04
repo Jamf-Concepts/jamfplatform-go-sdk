@@ -837,20 +837,33 @@ func TestAcceptance_Classic_PatchByName(t *testing.T) {
 		t.Skip("first patch software title configuration carries no name")
 	}
 
+	// GET /patches/name/{name} is broken outright, and this asserts that
+	// rather than skipping past it.
+	//
+	// The earlier record here was that it answers 500 instead of 404 for a
+	// name the tenant does not have. Re-probed 2026-09-04 with a control in
+	// the same invocation, it is worse: the endpoint answers Jamf Pro's own
+	// HTML 500 for **every** name, including a title GET /patches lists in
+	// that same invocation ("Microsoft Defender", id 1) and a freshly seeded
+	// one, while GET /patches/id/1 answers 200. So it is unconditional, not
+	// state-dependent, and skipOnServerError would hide a permanent defect
+	// behind the convention for transient ones — this test would never report
+	// the fix.
 	got, err := p.GetPatchByName(ctx, name)
-	if err != nil {
-		skipOnServerError(t, err)
-		var apiErr *jamfplatform.APIResponseError
-		if errors.As(err, &apiErr) && apiErr.HasStatus(404) {
-			t.Logf("GetPatchByName(%s): 404 — patch not resolvable by name on this tenant", name)
-			return
+	if err == nil {
+		if got == nil {
+			t.Fatal("nil response with nil error")
 		}
-		t.Fatalf("GetPatchByName(%s): %v", name, err)
+		t.Fatalf("GetPatchByName(%q) succeeded. The endpoint has been fixed — replace this assertion with a real by-name read and drop the limitation note above", name)
 	}
-	if got == nil {
-		t.Fatal("nil response")
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("GetPatchByName(%q): non-API error: %v", name, err)
 	}
-	t.Logf("Patch %q retrieved by name", name)
+	if !apiErr.HasStatus(500) {
+		t.Fatalf("GetPatchByName(%q): want the recorded unconditional 500, got %d: %s", name, apiErr.StatusCode, apiErr.Summary())
+	}
+	t.Logf("GetPatchByName(%q): 500 as recorded — the endpoint is broken for every name (%s)", name, apiErr.Summary())
 }
 
 // --- patch computers by ID+version -----------------------------------
