@@ -121,7 +121,7 @@ deliberately kept three of them for exactly that reason.
 | `splitByTag` | 18 | **required** — one methods file per OpenAPI tag |
 | `fieldTypeOverrides` | 5 | `"schema.property"` → Go type, to correct a spec bug. `*.property` matches the property on every schema. Applied per spec so an upstream fix isn't silently overwritten |
 | `docNotes` | 3 | Go type name → prose appended to its godoc. For corrections belonging to the type as a whole, which `schemaPatches` cannot reach (it patches properties). **A key matching no emitted type is a build failure** — a silently dropped correction leaves the wrong doc in place |
-| `scopeTypes` | 4 | spec → the scope kinds its operations accept (`tenant`, `environment`, `organization`), overriding a published `x-scope-types` that understates what the gateway serves. Carried to each method's `Scopes` in the Privileges registry, never into `api/`. Self-expiring: generation fails once the spec declares the same set. The account trio uses it because no account spec declares the extension at all; `securitycloud-devices` uses it because it is held at a build that predates the environment declaration |
+| `scopeTypes` | 4 | spec → the scope kinds its operations accept (`tenant`, `environment`, `organization`), overriding a published `x-scope-types` that understates what the gateway serves. Carried to each method's `Scopes` in the Privileges registry, never into `api/`, with `ScopesSource` recording that the value is a config correction rather than the spec's own claim. Self-expiring in both directions: generation fails once the spec declares the same set, and also once the spec declares anything the override omits — an override widens an understated spec, so a spec that has moved past it is about to lose a declared scope, which the equality check alone cannot see. The account trio uses it because no account spec declares the extension at all; `securitycloud-devices` uses it because it is held at a build that predates the environment declaration |
 | `schemaPatches` | 3 | schema → dotted property path → raw OpenAPI 3 Schema. Adds or replaces at that path |
 | `requiredPrivileges` | 3 | `"METHOD /path"` → GA capability permissions, for an operation the **published spec declares none for** but an authoritative out-of-band source does. Carried straight to the generated registry with `Source: "gateway-policy"`, never into the spec document, so `api/` stays faithful to upstream. **Fails generation if the operation now declares `x-required-privileges`** — that means upstream published them and the entry must go. All three users are the `account` specs; see [Required privileges](#required-privileges) |
 | `enumAdditions` | 1 | schema name → wire values to append to its `enum`, for a value the server produces or accepts that the spec omits. Applied with the other schema patches, so the value reaches `api/` too. **Panics when the value is already declared**, when the schema declares no enum, or when the schema is missing — a duplicated enum member would emit two identical constants and compile, so nothing else would ever notice. One user: `Region` gaining `RAMP` |
@@ -1058,6 +1058,97 @@ that honest:
 "Unofficial:" godoc line — it marks a spec whose operations are in no spec Jamf
 publishes. It currently has zero users, and the bar for a new one is a published
 spec.
+
+### Endpoint scope
+
+`MethodPrivileges` carries `Scopes []ScopeKind` beside `Scoped`, so one registry
+lookup answers both *"what privileges does this method need"* and *"what kind of
+credential must I hold to call it"*. The two fields sit next to each other in one
+struct and **mean opposite things**:
+
+- **`Scoped` is a conjunction.** More than one entry means every identifier is
+  required. Render it as *"grant all of these"*.
+- **`Scopes` is an alternatives set.** A client carries exactly one scope, so
+  more than one entry means the endpoint is published under each of them and the
+  caller picks one. Render it as *"use a credential of one of these kinds"*.
+  Sending a header that disagrees with the credential is
+  `403 OWNERSHIP_FORBIDDEN` even within one customer, so "one of" is the whole
+  point rather than a nicety.
+
+That difference is the same shape as the mistake the section above exists for. A
+consumer reading either field by analogy with the other produces a table that is
+confidently wrong and type-checks perfectly: zipping `Scoped` with `Legacy`
+shipped two swapped privilege labels for `RedeployJamfManagementFrameworkV1`, and
+reading `Scopes` as a conjunction would tell an operator to hold two credentials
+for an endpoint that refuses the second header. Nothing in the types can stop
+either, which is why both are written down here.
+
+**The three kinds and the header each travels in** — all a consumer needs in
+order to act on a `Scopes` entry:
+
+| kind | header | note |
+|---|---|---|
+| `ScopeTenant` | `X-Tenant-Id` | the legacy scope; still declared almost everywhere, but not the one to build on |
+| `ScopeEnvironment` | `X-Environment-Id` | the scope to prefer — an environment groups a customer's tenants, and Jamf intends new integrations to be environment-scoped |
+| `ScopeOrganization` | *none at all* | the gateway resolves the organization from the access token, so there is no header to send |
+
+`ScopeOrganization` exists so that the registry can *name* that scope. Client
+code has no use for it: an unset scope already means organization, so there is no
+`WithOrganizationID` option and never will be.
+
+**The set is never empty, and that is enforced rather than hoped for.**
+`resolveScopeTypes` fails generation on a spec that declares no `x-scope-types`
+with no `scopeTypes` override, on an unknown kind, on a non-string element, on an
+override the spec has caught up with exactly, and on an override the spec has
+outgrown in the widening direction. `TestEveryConfiguredSpecResolvesAScope` walks
+all 19 configured specs, so an ingest that drops the extension fails a test
+rather than shipping a registry whose empty slice reads as *"no scope
+required"* — the same misreading that got the empty account privilege sets
+published as *"any authenticated integration may call these"*. A consumer
+therefore never has to interpret an empty `Scopes`, which is the opposite of
+`Scoped`, where empty is meaningful and `Source` is what makes the distinction
+machine-readable.
+
+**Scope is declared per spec and stored per method.** Every method built from one
+spec carries the same set, so the field looks like it should have been a
+package-level accessor. It should not: two specs in one package can disagree, and
+`securitycloud` does. It is built from six specs, and
+`securitycloud-device-groups-api.yaml` is held at v1897 — a build predating the
+environment declaration the other five now carry — so a package-level answer
+would have had to pick one of the two and lie about the rest of the package.
+
+**Provenance is recorded, because the value is not always the spec's.**
+`ScopesSource` is `"spec"` or `"config-override"`, mirroring exactly what `Source`
+does for `Scoped`, and it is never empty for the same reason `Scopes` is never
+empty. Four spec entries carry an override today, in two cases, both through the
+[`scopeTypes` spec-level key](#spec-level) — read that row for the mechanism
+rather than repeating it here:
+
+- **The account trio** declares no `x-scope-types` at all, and will not while the
+  routing model does not change: these routes resolve the organization from the
+  access token, which exempts them from the publishing transform that attaches
+  the extension — the same structural reason they carry no
+  `x-required-privileges`. Organization scope is gateway configuration rather
+  than a spec claim, so config is where it is stated.
+- **`securitycloud-device-groups`** is held at v1897 while v2082 declares
+  `[tenant, environment]` for the identical operation set, and an environment
+  credential reaches all seven of its operations (wire-verified 2026-09-04). So
+  the override states a wire-established fact, not a guess, and it reverts
+  itself: when the hold lifts and the spec declares what config asserts,
+  generation fails with *"delete the config entry so the spec is the only
+  source"*.
+
+**The caveat a consumer must not lose: the registry reports the SPEC's claim, and
+as of v2082 that is stricter than the gateway for the Platform APIs.** Six
+Platform specs went tenant → environment-only in that build and four of the six
+still answer under `X-Tenant-Id`, wire-probed 2026-09-04 with a control in the
+same invocation. A consumer that reads `Scopes` as a statement about what the
+server *refuses* will therefore tell callers to migrate ahead of the gateway. The
+`MethodPrivileges` godoc carries the caveat inline so it reaches someone who
+reads only the type; the evidence, and which four, are in
+[WIRE-FACTS.md](WIRE-FACTS.md#v2082s-scope-migration-the-specs-moved-the-gateway-mostly-did-not-2026-09-04).
+`TestAcceptance_TenantScopePlatformSpecsStillServed` pins all four and fails the
+day the withdrawal lands, which is the notification to rewrite this paragraph.
 
 ---
 

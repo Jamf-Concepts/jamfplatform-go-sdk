@@ -194,7 +194,12 @@ type GoMethod struct {
 	// "ScopeEnvironment", "ScopeOrganization"). Sourced from the spec root's
 	// x-scope-types, or from config.scopeTypes where a held spec understates
 	// it. Never empty: resolveScopeTypes fails generation instead.
-	Scopes           []string
+	Scopes []string
+	// ScopesSource records which of those two supplied Scopes — "spec" or
+	// "config-override" — so the emitted registry can say so rather than
+	// asserting spec provenance for a set this repo corrected. Resolved once
+	// per spec alongside Scopes, and never empty for the same reason.
+	ScopesSource     string
 	LegacyPrivileges []string // human-readable Jamf Pro privilege names, e.g. "Create Buildings"
 }
 

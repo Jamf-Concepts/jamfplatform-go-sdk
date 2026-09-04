@@ -553,12 +553,17 @@ func TestAcceptance_Classic_VPPInvitationByIDSubset(t *testing.T) {
 	t.Logf("VPP invitation %s (General subset) retrieved", id)
 }
 
-// TestAcceptance_Classic_PatchPolicyByIDSubset covers the surviving Classic
-// subset read. Its id comes from Pro's ListPatchPoliciesV2 because v1993
-// withdrew both Classic enumerations — GET /patchpolicies and
-// GET /patchpolicies/softwaretitleconfig/id/{id} — leaving the Classic
-// surface with no way to discover a patch policy id. Pro v2 addresses the
-// same objects.
+// TestAcceptance_Classic_PatchPolicyByIDSubset covers the Classic subset read.
+// Its id comes from Pro's ListPatchPoliciesV2 by choice, not for want of a
+// Classic enumeration: v2082 restored both — GET /patchpolicies and
+// GET /patchpolicies/softwaretitleconfig/id/{id} — and either could supply the
+// id. Pro v2 is used because it is where upstream points callers. The restored
+// ListPatchPolicies carries its own transition note ("Please transition use to
+// Jamf Pro API endpoint /v2/patch-policies") and a Deprecated marker, so
+// sourcing the fixture from Pro v2 follows that guidance while this test keeps
+// the Classic subset read itself covered. Both surfaces address the same
+// objects, and the Classic enumerations are covered in
+// acc_proclassic_patch_test.go.
 func TestAcceptance_Classic_PatchPolicyByIDSubset(t *testing.T) {
 	c := accClient(t)
 	ctx := context.Background()
@@ -819,22 +824,29 @@ func TestAcceptance_Classic_PatchByName(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	// GET /patches/name/{name} is the only Classic patch read left: v1993
-	// withdrew GET /patches and the whole /patches/id family, and the SDK now
-	// keeps only POST on /patchsoftwaretitles, so Classic cannot enumerate
-	// software titles at all. The name therefore comes from Pro v3, whose
-	// SoftwareTitleName is the same software-title name this endpoint keys on.
-	configs, err := pro.New(c).ListPatchSoftwareTitleConfigurationsV3(ctx)
-	skipIfNoFixture(t, "patch-software-title-configurations (pro v3)", err)
-	if len(configs) == 0 {
-		t.Skip("no patch software titles configured on tenant")
+	// The name comes from Classic's own enumeration. This used to be sourced
+	// from Pro v3 on the grounds that v1993 had withdrawn GET /patches and
+	// the whole /patches/id family, leaving POST /patchsoftwaretitles as the
+	// only Classic verb and Classic unable to enumerate software titles at
+	// all. v2082 restored the family — ListPatches, GetPatchByID,
+	// ListPatchSoftwareTitles and GetPatchSoftwareTitleByID are all back — so
+	// that reasoning is void, and taking the name from ListPatches keeps this
+	// test inside the package it is testing: no cross-package dependency on
+	// pro, and the name is the one the /patches surface itself publishes for
+	// the title, rather than Pro v3's SoftwareTitleName which merely happens
+	// to agree. A tenant with no patch software titles configured at all is
+	// the one case that still cannot supply a fixture.
+	titles, err := p.ListPatches(ctx)
+	skipIfNoFixture(t, "patches (classic)", err)
+	var name string
+	for _, ti := range titles.PatchManagementSoftwareTitles {
+		if ti.Name != nil && *ti.Name != "" {
+			name = *ti.Name
+			break
+		}
 	}
-	name := configs[0].SoftwareTitleName
 	if name == "" {
-		name = configs[0].DisplayName
-	}
-	if name == "" {
-		t.Skip("first patch software title configuration carries no name")
+		t.Skipf("no named patch software titles on tenant (%d entries) — nothing to key a by-name read on", len(titles.PatchManagementSoftwareTitles))
 	}
 
 	// GET /patches/name/{name} is broken outright, and this asserts that

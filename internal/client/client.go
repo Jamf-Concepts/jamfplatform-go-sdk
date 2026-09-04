@@ -325,6 +325,16 @@ func (c *Transport) BaseURL() string {
 // request header.
 type ScopeKind int
 
+// Every value is written out rather than run off iota, and that is not a style
+// preference. iota counts the ConstSpec's position in the block, not the
+// constants declared before it, so naming the zero value first and then opening
+// an `iota + 1` run underneath it numbered ScopeTenant 2 and ScopeEnvironment 3
+// and left 1 unreachable — the three printed `0 2 3`. Nothing observable broke,
+// because every comparison in the SDK is symbolic and a ScopeKind is never
+// serialised or persisted, but the block read as though ScopeTenant were 1,
+// these constants are exported, and the next named zero value someone inserts
+// at the top would have renumbered them again just as silently.
+// TestScopeKindValues pins all three.
 const (
 	// ScopeOrganization scopes requests to a Jamf Account organization. It is
 	// the zero value, and it sends no header at all: the gateway resolves the
@@ -341,7 +351,7 @@ const (
 	// ScopeTenant scopes requests to a single product tenant, sent as
 	// X-Tenant-Id. This is the legacy scope: every spec still declares this
 	// header, but Jamf intends new integrations to be environment-scoped.
-	ScopeTenant ScopeKind = iota + 1
+	ScopeTenant ScopeKind = 1
 	// ScopeEnvironment scopes requests to a platform environment — a grouping
 	// of tenants — sent as X-Environment-Id, set by WithEnvironmentID. This is
 	// the scope to prefer, and as of GitOps v2082 the specs declare it: the
@@ -349,7 +359,7 @@ const (
 	// the Security Cloud specs declare it alongside tenant. Wire-verified
 	// against blueprints, compliance-benchmarks, pro, proclassic, devices and
 	// securitycloud.
-	ScopeEnvironment
+	ScopeEnvironment ScopeKind = 2
 )
 
 // ScopeHeader returns the request header that carries this scope kind, or ""

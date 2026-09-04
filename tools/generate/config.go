@@ -157,9 +157,17 @@ type SpecDef struct {
 	// groups are tenant-only, which is false, and it would report a scope set
 	// that disagrees with the other five specs in the same package.
 	//
-	// Self-expiring: generation fails when the ingested spec declares exactly
-	// this set, because the override has then become redundant and the spec
-	// should be the only source. Delete the entry when that fires.
+	// Self-expiring in both directions. Generation fails when the ingested
+	// spec declares exactly this set, because the override has then become
+	// redundant and the spec should be the only source — delete the entry when
+	// that fires. It also fails when the spec declares anything this set omits:
+	// an override exists to widen an understated spec, so a spec that has moved
+	// past it is a stale override about to drop a scope upstream now publishes,
+	// which equality alone cannot see.
+	//
+	// The registry says which of the two supplied a method's scopes, so a
+	// consumer is never told a corrected set came from the spec. See
+	// MethodPrivileges.ScopesSource.
 	//
 	// Unlike a schema patch this never enters the spec document, so the
 	// published api/*.json stays faithful to upstream.

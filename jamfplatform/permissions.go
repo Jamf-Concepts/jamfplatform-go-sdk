@@ -39,20 +39,47 @@ type MethodPrivileges struct {
 	// them over is 403 OWNERSHIP_FORBIDDEN even within one customer. So this
 	// is an alternatives set, the opposite of Scoped, which is a conjunction.
 	//
-	// Sourced from each spec's x-scope-types. It is never empty: a spec that
-	// declares no scope fails generation rather than emitting an empty set a
-	// consumer would read as "no scope required".
+	// Where ScopesSource is "spec" this is the spec's own x-scope-types,
+	// carried through unchanged; otherwise it is a correction this SDK
+	// supplies for a spec that understates the gateway or declares no
+	// extension at all. Read ScopesSource to tell the two apart. It is never
+	// empty either way: a spec that declares no scope with no correction fails
+	// generation rather than emitting an empty set a consumer would read as
+	// "no scope required".
 	//
-	// Two caveats a consumer must not lose. This is what the SPEC declares,
-	// which is not always what the gateway serves: as of GitOps v2082 the six
-	// Platform specs declare environment only, while devices, device-groups,
-	// declaration-reporting and device-management-action still answer under
-	// X-Tenant-Id (wire-verified 2026-09-04). And scope is declared per spec
-	// rather than per operation, so every method built from one spec carries
-	// the same set; the field is per-method because two specs in one package
-	// can disagree, which securitycloud does while one of its six specs is
-	// held at an older build.
+	// Two caveats a consumer must not lose. A spec-sourced set is what the
+	// spec declares, which is not always what the gateway serves: as of GitOps
+	// v2082 the six Platform specs declare environment only, while devices,
+	// device-groups, declaration-reporting and device-management-action still
+	// answer under X-Tenant-Id (wire-verified 2026-09-04). And scope is
+	// declared per spec rather than per operation, so every method built from
+	// one spec carries the same set. The field is per-method as a precaution
+	// against two specs in one package disagreeing — securitycloud did, one of
+	// its six specs being held at a build predating the others' environment
+	// declaration, and a config correction closed that gap rather than the
+	// registry reporting it. Keeping the field per-method means the next such
+	// divergence needs no structural change.
 	Scopes []ScopeKind
+	// ScopesSource names where Scopes came from:
+	//
+	//   - "spec": the spec root's own x-scope-types extension.
+	//   - "config-override": the SDK's own config.scopeTypes, because the
+	//     published spec either understates what the gateway serves or
+	//     declares no extension at all. Two families are this case. The
+	//     account trio (licensing, partners, sso) carries no x-scope-types in
+	//     any published build and is organization-scoped by gateway
+	//     configuration, the routes resolving the organization from the access
+	//     token. securitycloud-device-groups is held at a build predating its
+	//     environment declaration: it declares tenant alone, while the current
+	//     build declares tenant and environment for the identical operation
+	//     set and an environment credential reaches all seven (wire-verified
+	//     2026-09-04).
+	//
+	// A "config-override" entry is therefore an assertion about the gateway,
+	// evidenced on the wire, rather than a claim about the ingested artifact —
+	// the same distinction Source draws for Scoped. It is never empty: every
+	// spec resolves a scope from one of the two sources or generation fails.
+	ScopesSource string
 	// Scoped lists the GA capability permissions the endpoint requires, in
 	// {capability}:{action} form, e.g. "buildings:create". The capability is
 	// kebab-case and carries no product name — one capability is reached by

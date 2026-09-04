@@ -161,8 +161,18 @@ func TestAcceptance_Classic_ListPatches(t *testing.T) {
 }
 
 // TestAcceptance_Classic_ListPatchPolicies covers the collection enumeration.
-// It asserts only that the call decodes, because a patch policy needs a
-// package and a scope this suite has no business creating on a shared tenant.
+// It cannot assert on the policies themselves, because a patch policy needs a
+// package and a scope this suite has no business creating on a shared tenant,
+// so the tenant may legitimately have none.
+//
+// What it can assert is that the collection root decoded, and it must: the
+// generated Classic types leave XMLName untagged, so a response whose root is
+// not <patch_policies> decodes into a zero-valued PatchPolicies and the call
+// reports success — which reads here as "0 policies", indistinguishable from a
+// tenant with no patch policies. <size> is the tell, the same one
+// TestAcceptance_Classic_ListPatchPoliciesBySoftwareTitleConfigID uses to pin
+// its corrected response type. A failure means the response root changed (or
+// the responseType override did), not that the tenant is empty.
 func TestAcceptance_Classic_ListPatchPolicies(t *testing.T) {
 	c := accClient(t)
 
@@ -171,7 +181,10 @@ func TestAcceptance_Classic_ListPatchPolicies(t *testing.T) {
 		skipOnServerError(t, err)
 		t.Fatalf("ListPatchPolicies: %v", err)
 	}
-	t.Logf("ListPatchPolicies: %d policies", len(policies.PatchPolicies))
+	if policies.Size == nil {
+		t.Fatal("ListPatchPolicies: no <size> decoded — response root is not patch_policies")
+	}
+	t.Logf("ListPatchPolicies: %d policies, size=%s", len(policies.PatchPolicies), sizePtrStr(policies.Size))
 }
 
 // TestAcceptance_Classic_ListPatchPoliciesBySoftwareTitleConfigID pins the
@@ -404,7 +417,22 @@ func TestAcceptance_Classic_PatchByIDWrites(t *testing.T) {
 	assertPatchesWriteRefused(t, "UpdatePatchByID", err)
 
 	// POST, against the id-0 create form the rest of the Classic surface uses.
-	_, err = p.CreatePatchByID(ctx, "0", &proclassic.SoftwareTitle{Name: before.Name})
+	//
+	// The response is captured rather than discarded so the create can be
+	// cleaned up on the day it starts working. Today it cannot: the POST is
+	// refused, nothing is created, and this cleanup is dormant — the guard
+	// makes it a no-op. But the assertion below fails by design the moment
+	// the endpoint is fixed, and a failing test that leaves an unowned patch
+	// software title behind on a shared tenant is worse than a failing test.
+	// /patches and /patchsoftwaretitles describe the same objects with
+	// matching ids, so DeletePatchByID removes what this POST would create.
+	created, err := p.CreatePatchByID(ctx, "0", &proclassic.SoftwareTitle{Name: before.Name})
+	if created != nil && created.ID != nil {
+		createdID := strconv.Itoa(*created.ID)
+		cleanupDelete(t, "DeletePatchByID "+createdID+" (CreatePatchByID)", func() error {
+			return p.DeletePatchByID(ctx, createdID)
+		})
+	}
 	assertPatchesWriteRefused(t, "CreatePatchByID", err)
 
 	// DELETE does work, and it removes the same object /patchsoftwaretitles
@@ -424,20 +452,31 @@ func TestAcceptance_Classic_PatchByIDWrites(t *testing.T) {
 // assertPatchesWriteRefused requires a /patches write to be refused with the
 // 400 recorded above. A success means the server was fixed: say so loudly,
 // because the fix turns this test from a limitation into coverage that has to
-// be written. Any other status is an unexpected change and equally worth
-// failing on.
+// be written. Any other status — 5xx included — is an unexpected change and
+// equally worth failing on.
 func assertPatchesWriteRefused(t *testing.T, op string, err error) {
 	t.Helper()
 	if err == nil {
 		t.Fatalf("%s: succeeded. The /patches write surface has been fixed — replace this assertion with a real round-trip and drop the limitation note in this file's header", op)
 	}
-	skipOnServerError(t, err)
+	// Deliberately no skipOnServerError here, unlike almost every other call
+	// in this file. That helper skips unconditionally on any status >= 500,
+	// which is the right convention for a transient fault and precisely wrong
+	// for a permanent refusal: the 400 asserted below is wire-established as
+	// unconditional (2026-09-04, three body shapes tried, GET on the same
+	// path at 200 in the same invocation), so a 5xx here is not
+	// infrastructure having a bad afternoon — it is the refusal changing
+	// shape, which is exactly what this helper exists to report. Skipping on
+	// it would leave the test unable ever to report the change, the same trap
+	// TestAcceptance_Classic_PatchByName was corrected for, and a 5xx is
+	// plausible on this family: GET /patches/name/{name} answers 500 for
+	// every name today.
 	apiErr := jamfplatform.AsAPIError(err)
 	if apiErr == nil {
 		t.Fatalf("%s: non-API error: %v", op, err)
 	}
 	if !apiErr.HasStatus(400) {
-		t.Fatalf("%s: want the recorded 400 refusal, got %d: %s", op, apiErr.StatusCode, apiErr.Summary())
+		t.Fatalf("%s: want the recorded 400 refusal, got %d — the refusal has changed shape, which is a change in the endpoint rather than a transient fault: %s", op, apiErr.StatusCode, apiErr.Summary())
 	}
 	t.Logf("%s: 400 as recorded — /patches writes are refused whatever the body (%s)", op, apiErr.Summary())
 }
