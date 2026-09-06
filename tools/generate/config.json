@@ -4630,6 +4630,7 @@
         },
         "os_x_configuration_profile": {
           "scope.jss_users.users": "user",
+          "scope.jss_user_groups.jss_user_group": "user_group",
           "scope.exclusions.jss_users.jss_user": "user",
           "scope.exclusions.jss_user_groups.jss_user_group": "user_group"
         },

@@ -13631,8 +13631,8 @@ func (t OsXConfigurationProfileScopeExclusionsUsersUserItem) MarshalXML(e *xml.E
 
 // OsXConfigurationProfileScopeJssUserGroups represents a os x configuration profile scope jss user groups.
 type OsXConfigurationProfileScopeJssUserGroups struct {
-	XMLName      xml.Name
-	JssUserGroup *[]IDName `xml:"jss_user_group,omitempty"`
+	XMLName   xml.Name
+	UserGroup *[]IDName `xml:"user_group,omitempty"`
 }
 
 // MarshalXML forces the OsXConfigurationProfileScopeJssUserGroups root element name to the wire value
