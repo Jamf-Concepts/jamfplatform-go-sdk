@@ -178,6 +178,7 @@ func TestOsXConfigurationProfileSelfService_RoundTrip(t *testing.T) {
 // TestOsXConfigurationProfileScope_DecodeWireFixture locks in the scope
 // wire-shape corrections audited against profile id=11 on a live tenant:
 //   - <jss_users><user> (not <users>) at top level
+//   - <jss_user_groups><user_group> (not <jss_user_group>) at top level
 //   - <exclusions><jss_users><user> (not <jss_user>)
 //   - <exclusions><jss_user_groups><user_group> (not <jss_user_group>)
 //   - <limitations><network_segments><network_segment> carries <uid>
@@ -190,6 +191,9 @@ func TestOsXConfigurationProfileScope_DecodeWireFixture(t *testing.T) {
     <jss_users>
       <user><id>10</id><name>username</name></user>
     </jss_users>
+    <jss_user_groups>
+      <user_group><id>451</id><name>zz-probe-ug</name></user_group>
+    </jss_user_groups>
     <limitations>
       <network_segments>
         <network_segment>
@@ -227,6 +231,13 @@ func TestOsXConfigurationProfileScope_DecodeWireFixture(t *testing.T) {
 		t.Errorf("scope.JssUsers.User[0].ID mismatch")
 	}
 
+	if sc.JssUserGroups == nil || sc.JssUserGroups.UserGroup == nil || len(*sc.JssUserGroups.UserGroup) != 1 {
+		t.Fatalf("scope.JssUserGroups.UserGroup lost: %+v", sc.JssUserGroups)
+	}
+	if (*sc.JssUserGroups.UserGroup)[0].ID == nil || *(*sc.JssUserGroups.UserGroup)[0].ID != 451 {
+		t.Errorf("scope.JssUserGroups.UserGroup[0].ID mismatch")
+	}
+
 	if sc.Limitations == nil || sc.Limitations.NetworkSegments == nil || sc.Limitations.NetworkSegments.NetworkSegment == nil {
 		t.Fatalf("limitations.NetworkSegments lost: %+v", sc.Limitations)
 	}
@@ -258,6 +269,9 @@ func TestOsXConfigurationProfileScope_MarshalEmits(t *testing.T) {
 			JssUsers: &proclassic.OsXConfigurationProfileScopeJssUsers{
 				User: &[]proclassic.IDName{{ID: new(10), Name: new("u")}},
 			},
+			JssUserGroups: &proclassic.OsXConfigurationProfileScopeJssUserGroups{
+				UserGroup: &[]proclassic.IDName{{ID: new(451), Name: new("g")}},
+			},
 			Limitations: &proclassic.OsXConfigurationProfileScopeLimitations{
 				NetworkSegments: &proclassic.OsXConfigurationProfileScopeLimitationsNetworkSegments{
 					NetworkSegment: &[]proclassic.OsXConfigurationProfileScopeLimitationsNetworkSegmentsNetworkSegmentItem{
@@ -284,6 +298,7 @@ func TestOsXConfigurationProfileScope_MarshalEmits(t *testing.T) {
 
 	expects := []string{
 		"<jss_users><user>",
+		"<jss_user_groups><user_group><id>451</id>",
 		"<exclusions>",
 		"<jss_user_groups><user_group>",
 		"<network_segment>",
