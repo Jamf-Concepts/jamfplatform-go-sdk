@@ -986,6 +986,67 @@ fails if either starts working, at which point it becomes a real round-trip.
 114 → 1, which is the assertion that proves the path segment is honoured
 rather than ignored.
 
+### Self Service categories: `display_in` is what stores them, and only the mobile profile hides it (2026-09-07)
+
+All six Classic resources carrying a `self_service.self_service_categories`
+block were probed on Jamf Pro 11.31.1 with an EU tenant, raw XML, each write
+carrying `feature_on_main_page` as an in-request control so a write that did
+not land could not be misread as the server discarding the category.
+
+**The law is identical on all six.** A `<category>` inside
+`<self_service_categories>` persists only when it carries
+`<display_in>true</display_in>`:
+
+| sent | stored |
+|---|---|
+| `<id>` alone | discarded |
+| `<id>` + `<name>` | discarded |
+| `<id>` + `<feature_in>true` | discarded |
+| `<id>` + `<display_in>true` | **persisted** |
+| `<id>` + `<display_in>true` + `<feature_in>true` | **persisted** |
+| `<id>` + `<display_in>false` | discarded |
+
+So `display_in=false` is a deletion gesture rather than a stored value, and
+`feature_in` on its own does nothing — it is only meaningful alongside
+`display_in`.
+
+**The read is where they differ, and the difference is the finding.**
+
+| resource | `display_in` echoed on read | `feature_in` stored |
+|---|---|---|
+| `mobile_device_configuration_profile` | **NO** | no |
+| `mobile_device_application` | yes | no |
+| `os_x_configuration_profile` | yes | yes (default `false`) |
+| `policy` | yes | yes (default `false`) |
+| `ebook` | yes | yes (default `false`) |
+| `mac_application` | yes | yes (default `false`) |
+
+`mobile_device_configuration_profile` is the only one of the six that hides
+`display_in` from the read, so it is the only one no client can drift-detect.
+**Report upstream**: the resource whose spec omitted the property — it `$ref`ed
+the shared `category` schema (`{id, name, priority}`), which is what left the
+generated element type unable to express the write at all — is also the one
+whose read surface conceals it. The two halves compound: a caller could neither
+send the field nor observe that it was missing.
+
+`feature_in` is a **per-resource capability, not a field the server ignores
+everywhere**: both mobile resources store none, the four macOS/ebook ones store
+and echo it. That is why the mobile profile's generated item type carries
+`id`, `name` and `display_in` only, and `mobile_device_application`'s spec
+independently agrees by declaring no `feature_in` at that position.
+
+**Fixture trap.** `mobile_device_application` with `internal_app=true` is
+creatable *without* `general.os_type`, and then **every** subsequent PUT —
+including one touching nothing but `self_service` — answers `409 "Os type is
+required for in-house app. Possible values: iOS, tvOS."` The first probe pass
+read as "this resource refuses category writes"; it was the fixture. Setting
+`os_type` once clears it, and a create carrying the categories in the POST body
+works regardless.
+
+**Incidental, no SDK action.** The mobile profile's POST/PUT root element is
+`<configuration_profile>`, not `<mobile_device_configuration_profile>`; the
+generated `MarshalXML` already emits it.
+
 ### v2082's scope migration: the specs moved, the gateway mostly did not (2026-09-04)
 
 v2082 set a scope level on every spec that had one wrong
