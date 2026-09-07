@@ -11543,7 +11543,7 @@
               "jss_user_groups": {
                 "items": {
                   "properties": {
-                    "jss_user_group": {
+                    "user_group": {
                       "$ref": "#/components/schemas/id_name"
                     }
                   },
