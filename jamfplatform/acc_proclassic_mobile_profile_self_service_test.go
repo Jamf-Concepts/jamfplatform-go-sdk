@@ -18,7 +18,29 @@
 //
 // So <display_in>true</display_in> is what makes the server store the
 // category at all, and display_in=false is a deletion gesture rather than a
-// stored value. The published spec $refed the shared `category` schema
+// stored value.
+//
+// All five sibling Classic resources carrying a self_service_categories block
+// were probed in the same session, and the law above is identical on every one
+// of them — so it is a property of the Self Service category relation, not a
+// quirk of this resource. What IS a quirk of this resource is the read:
+//
+//	resource                             display_in echoed?  feature_in stored?
+//	mobile_device_configuration_profile  NO                  no
+//	mobile_device_application            yes                 no
+//	os_x_configuration_profile           yes                 yes (default false)
+//	policy                               yes                 yes (default false)
+//	ebook                                yes                 yes (default false)
+//	mac_application                      yes                 yes (default false)
+//
+// This is the only one of the six that hides display_in from the read, which is
+// why the write-only note lives on this type's godoc and is explicitly scoped
+// there — a consumer generalising from os_x_configuration_profile would be
+// wrong. It is also why feature_in is absent from this type and present on the
+// four macOS/ebook ones: both mobile resources store no feature_in at all, and
+// mobile_device_application's spec declares none either.
+//
+// The published spec $refed the shared `category` schema
 // ({id, name, priority}) at this position, so the generated element type could
 // not express display_in and every write from this SDK was a silent no-op —
 // which is what left terraform-provider-jamfplatform's

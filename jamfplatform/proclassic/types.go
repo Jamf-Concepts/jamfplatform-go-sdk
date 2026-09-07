@@ -11202,15 +11202,22 @@ func (t MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories) Marsha
 // write at all. `feature_in` is deliberately absent — the mobile profile's Self Service tab has no
 // per-category "feature in" control, only the single `FeatureOnMainPage` checkbox, and the wire
 // discards a `<category>` carrying `<feature_in>` without `<display_in>` exactly as it discards a bare
-// `<id>`. The sibling `mobile_device_application` spec agrees, declaring `display_in` and no
-// `feature_in` at the same position. Wire-verified on Jamf Pro 11.31.1, 2026-09-07, with
-// `FeatureOnMainPage` toggled in the same request as the control.
+// `<id>`. The sibling `mobile_device_application` agrees on both the spec and the wire: it declares
+// `display_in` and no `feature_in` at the same position, and it stores and echoes `display_in` while
+// storing no `feature_in` at all. The four macOS/ebook siblings do store `feature_in` and echo it
+// defaulted to false, so this is a per-resource capability rather than a field the server ignores
+// everywhere. All six were wire-probed on Jamf Pro 11.31.1, 2026-09-07, with `FeatureOnMainPage`
+// toggled in the same request as the control; the display_in-or-discarded law is identical across all
+// six, and only this resource hides `display_in` from the read.
 type MobileDeviceConfigurationProfileSelfServiceSelfServiceCategoriesCategoryItem struct {
 	XMLName xml.Name
 	// Required for the category to be stored at all. A <category> carrying only <id>, or <id> plus <name>,
-	// is silently discarded, and display_in=false is a deletion gesture rather than a stored value.
-	// Write-only: the GET echoes only <id> and <name>, so no client can read it back or drift-detect it.
-	// Wire-verified on Jamf Pro 11.31.1, 2026-09-07.
+	// or <feature_in> without <display_in>, is silently discarded, and display_in=false is a deletion
+	// gesture rather than a stored value. Write-only ON THIS RESOURCE: the GET echoes only <id> and
+	// <name>, so no client can read it back or drift-detect it. Do not generalise that —
+	// os_x_configuration_profile, policy, ebook, mac_application and mobile_device_application all echo
+	// display_in on read, and this is the only one that hides it. Wire-verified on Jamf Pro 11.31.1,
+	// 2026-09-07.
 	DisplayIn *bool   `xml:"display_in,omitempty"`
 	ID        *int    `xml:"id,omitempty"`
 	Name      *string `xml:"name,omitempty"`
