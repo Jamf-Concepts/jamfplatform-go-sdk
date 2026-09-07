@@ -11180,7 +11180,7 @@ func (t MobileDeviceConfigurationProfileSelfServiceSecurity) MarshalXML(e *xml.E
 // MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories represents a mobile device configuration profile self service self service categories.
 type MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories struct {
 	XMLName  xml.Name
-	Category *[]Category `xml:"category,omitempty"`
+	Category *[]MobileDeviceConfigurationProfileSelfServiceSelfServiceCategoriesCategoryItem `xml:"category,omitempty"`
 }
 
 // MarshalXML forces the MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories root element name to the wire value
@@ -11193,6 +11193,39 @@ type MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories struct {
 func (t MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "self_service_categories"}
 	type shadow MobileDeviceConfigurationProfileSelfServiceSelfServiceCategories
+	return e.EncodeElement(shadow(t), start)
+}
+
+// MobileDeviceConfigurationProfileSelfServiceSelfServiceCategoriesCategoryItem represents a mobile device configuration profile self service self service categories category item.
+// `display_in` is the only property that makes the server store the category, and the spec omitted it:
+// it `$ref`ed the shared `category` schema ({id, name, priority}), so this type could not express the
+// write at all. `feature_in` is deliberately absent — the mobile profile's Self Service tab has no
+// per-category "feature in" control, only the single `FeatureOnMainPage` checkbox, and the wire
+// discards a `<category>` carrying `<feature_in>` without `<display_in>` exactly as it discards a bare
+// `<id>`. The sibling `mobile_device_application` spec agrees, declaring `display_in` and no
+// `feature_in` at the same position. Wire-verified on Jamf Pro 11.31.1, 2026-09-07, with
+// `FeatureOnMainPage` toggled in the same request as the control.
+type MobileDeviceConfigurationProfileSelfServiceSelfServiceCategoriesCategoryItem struct {
+	XMLName xml.Name
+	// Required for the category to be stored at all. A <category> carrying only <id>, or <id> plus <name>,
+	// is silently discarded, and display_in=false is a deletion gesture rather than a stored value.
+	// Write-only: the GET echoes only <id> and <name>, so no client can read it back or drift-detect it.
+	// Wire-verified on Jamf Pro 11.31.1, 2026-09-07.
+	DisplayIn *bool   `xml:"display_in,omitempty"`
+	ID        *int    `xml:"id,omitempty"`
+	Name      *string `xml:"name,omitempty"`
+}
+
+// MarshalXML forces the MobileDeviceConfigurationProfileSelfServiceSelfServiceCategoriesCategoryItem root element name to the wire value
+// declared by the spec (<category>) regardless of what XMLName.Local
+// holds. Classic resources are frequently decoded from polymorphic wire
+// roots (<static_user_group>, <smart_user_group>, <user_group>, etc.) —
+// stashing the incoming root name in XMLName is useful context but must
+// not leak back into writes. The shadow type suppresses re-entry into
+// this method during encoding.
+func (t MobileDeviceConfigurationProfileSelfServiceSelfServiceCategoriesCategoryItem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name = xml.Name{Local: "category"}
+	type shadow MobileDeviceConfigurationProfileSelfServiceSelfServiceCategoriesCategoryItem
 	return e.EncodeElement(shadow(t), start)
 }
 
