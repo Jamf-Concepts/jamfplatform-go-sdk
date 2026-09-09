@@ -156,7 +156,7 @@ var funcMap = template.FuncMap{
 	// saying Set("accept", …) invites a reader to think the case is
 	// load-bearing.
 	"headerName": http.CanonicalHeaderKey,
-	// testHeaderArgs supplies each header param	// testHeaderArgs supplies each header param a non-zero sentinel in the
+	// testHeaderArgs supplies each header param a non-zero sentinel in the
 	// stub call, and headerAsserts asserts the request carried it.
 	//
 	// The pair is what makes the mechanism testable at all. Stubs call every
@@ -177,8 +177,13 @@ var funcMap = template.FuncMap{
 	"headerAsserts": func(m GoMethod) string {
 		var b strings.Builder
 		for _, hp := range m.HeaderParams {
+			// Canonical, for the same reason the method's Set is: Get
+			// canonicalises either way, so a stub asserting Get("accept")
+			// would reintroduce exactly the spelling headerName exists to
+			// keep out of generated code.
+			name := http.CanonicalHeaderKey(hp.Spec)
 			fmt.Fprintf(&b, "\n\t\tif got := r.Header.Get(%q); got != %q {\n\t\t\tt.Errorf(\"header %s = %%q, want %%q\", got, %q)\n\t\t}",
-				hp.Spec, testHeaderValue(hp.Spec), hp.Spec, testHeaderValue(hp.Spec))
+				name, testHeaderValue(hp.Spec), name, testHeaderValue(hp.Spec))
 		}
 		return b.String()
 	},

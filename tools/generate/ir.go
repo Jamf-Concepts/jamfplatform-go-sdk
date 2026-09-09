@@ -148,10 +148,16 @@ type GoMethod struct {
 	ProducesMediaTypes []string
 	// HeaderParams are request parameters the spec declares `in: header`,
 	// emitted as string arguments that the method stamps on the request
-	// through DoExpectWithHeaders. Distinct from QueryParams because the two
-	// share a namespace in the spec but nothing else — see parseHeaderParams.
-	HeaderParams     []ExtraParam
-	RequestType      string
+	// through DoWithOptions — the only transport entry point that can carry
+	// headers. Distinct from QueryParams because the two share a namespace in
+	// the spec but nothing else — see parseHeaderParams.
+	HeaderParams []ExtraParam
+	// WireRequiredParams is the set of parameter wire names the server
+	// refuses the request without, although the spec marks them optional.
+	// Only godoc reads it — see parameterComment and config's
+	// WireRequiredParams for why it must not affect emission.
+	WireRequiredParams map[string]bool
+	RequestType        string
 	ResponseType     string
 	ResponseWireName string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
 	ExpectedStatus   int

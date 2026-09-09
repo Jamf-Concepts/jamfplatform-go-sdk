@@ -5,7 +5,12 @@ package main
 
 import (
 	"bytes"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"net/http"
+	"sort"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -152,6 +157,12 @@ func TestResolveHeaderParamsRefusals(t *testing.T) {
 		{"unknown name", []ExtraParam{headerParam("If-Modified-Since", "ifModifiedSince")}, "not found in spec"},
 		{"declared in: query", []ExtraParam{headerParam("filter", "filter")}, `move it to "params"`},
 		{"scope header", []ExtraParam{headerParam("X-Tenant-Id", "tenantID")}, "stamped by the transport"},
+		// Authorization is refused for a different reason than the scope
+		// headers — oauth2 writes it and WithAuthorizationHeaderName may
+		// relocate it — so it gets its own case rather than resting on the
+		// map-membership check, which would pass while the refusal itself
+		// was broken.
+		{"authorization header", []ExtraParam{headerParam("Authorization", "auth")}, "stamped by the transport"},
 		{"non-string type", []ExtraParam{{Spec: "If-Match", Go: "ifMatch", Type: "[]string"}}, "only string is supported"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -214,14 +225,28 @@ func TestValidateHeaderParamSupportRefusesUnsupportedCategories(t *testing.T) {
 	}
 }
 
-// The generator's copy of the transport's reserved-header list has to stay in
-// step with it. tools/generate is its own module, so the list is duplicated
-// rather than imported — this pins the duplication to the scope headers the
-// transport actually stamps.
-func TestGeneratorReservedHeadersCoverTheScopeHeaders(t *testing.T) {
-	for _, h := range []string{"X-Tenant-Id", "X-Environment-Id", "Authorization"} {
+// The generator's copy of the transport's scope headers has to stay in step
+// with it, and tools/generate cannot import internal/client to check — its own
+// generator importing the SDK would make the build circular.
+//
+// So this parses ScopeKind.ScopeHeader() out of internal/client/client.go and
+// requires every header that switch can return to be present here. Pinning
+// against ScopeHeader rather than against internal/client's own
+// reservedHeaders is deliberate: that map is itself derived from ScopeHeader,
+// so ScopeHeader is the source of truth and a pin against the derived copy
+// would miss a scope kind that gained a header without the map being updated.
+//
+// A hardcoded list here would be no pin at all — it would assert the
+// generator's literal against another literal in the same package and pass
+// however far internal/client had drifted.
+func TestGeneratorReservedHeadersPinScopeHeaders(t *testing.T) {
+	headers := scopeHeadersFromTransportSource(t)
+	if len(headers) < 2 {
+		t.Fatalf("parsed %d scope headers out of ScopeHeader(), want at least the two known ones — the parse has broken and this test is no longer pinning anything", len(headers))
+	}
+	for _, h := range headers {
 		if !generatorReservedHeaders[http.CanonicalHeaderKey(h)] {
-			t.Errorf("%s is stamped by the transport but the generator would emit it as an argument", h)
+			t.Errorf("ScopeKind.ScopeHeader() can return %q, but generatorReservedHeaders does not list it — the generator would emit it as a method argument, and doRequestFull applies extra headers after setScopeHeader, so the argument would overwrite the scope and produce 403 OWNERSHIP_FORBIDDEN", h)
 		}
 	}
 	for name := range generatorReservedHeaders {
@@ -229,4 +254,146 @@ func TestGeneratorReservedHeadersCoverTheScopeHeaders(t *testing.T) {
 			t.Errorf("reserved header %q is not in canonical form, so the lookup misses it", name)
 		}
 	}
+}
+
+// scopeHeadersFromTransportSource returns every string literal
+// ScopeKind.ScopeHeader() can return, read from the transport's source rather
+// than from a copy of it. Empty returns (the organization case, which has no
+// header) are skipped.
+func scopeHeadersFromTransportSource(t *testing.T) []string {
+	t.Helper()
+	const src = "../../internal/client/client.go"
+	file, err := parser.ParseFile(token.NewFileSet(), src, nil, 0)
+	if err != nil {
+		t.Fatalf("parsing %s: %v — this test pins the generator against the transport, so it must fail rather than skip", src, err)
+	}
+
+	var fn *ast.FuncDecl
+	for _, decl := range file.Decls {
+		d, ok := decl.(*ast.FuncDecl)
+		if ok && d.Name.Name == "ScopeHeader" && d.Recv != nil {
+			fn = d
+			break
+		}
+	}
+	if fn == nil {
+		t.Fatalf("no ScopeHeader method found in %s — it was renamed or moved, and this pin has to follow it", src)
+	}
+
+	var out []string
+	ast.Inspect(fn, func(n ast.Node) bool {
+		ret, ok := n.(*ast.ReturnStmt)
+		if !ok || len(ret.Results) != 1 {
+			return true
+		}
+		lit, ok := ret.Results[0].(*ast.BasicLit)
+		if !ok || lit.Kind != token.STRING {
+			return true
+		}
+		v, err := strconv.Unquote(lit.Value)
+		if err != nil || v == "" {
+			return true
+		}
+		out = append(out, v)
+		return true
+	})
+	sort.Strings(out)
+	return out
+}
+
+// A resolver or apply built over a header-bearing operation is refused. The
+// synthetic methods never copy HeaderParams and their templates have no
+// headers form, so without this the header is dropped with nothing failing —
+// and validateHeaderParamSupport cannot catch it, because these methods are
+// assembled field by field rather than through buildMethod.
+func TestRefuseHeaderParamsOnSynthetic(t *testing.T) {
+	withHeader := &GoMethod{
+		Name:         "UpdateThing",
+		HeaderParams: []ExtraParam{headerParam("If-Match", "ifMatch")},
+	}
+	for _, kind := range []string{"resolver", "apply"} {
+		err := refuseHeaderParamsOnSynthetic(kind, "Thing", "UpdateThing", withHeader)
+		if err == nil {
+			t.Fatalf("%s over a header-bearing op was accepted", kind)
+		}
+		for _, want := range []string{"If-Match", "silently dropped"} {
+			if !strings.Contains(err.Error(), want) {
+				t.Errorf("%s: error = %v, want it to mention %q", kind, err, want)
+			}
+		}
+	}
+
+	// The common case must stay silent, or every existing resolver fails.
+	if err := refuseHeaderParamsOnSynthetic("resolver", "Thing", "ListThings", &GoMethod{Name: "ListThings"}); err != nil {
+		t.Errorf("a header-free source operation was refused: %v", err)
+	}
+	if err := refuseHeaderParamsOnSynthetic("apply", "Thing", "Missing", nil); err != nil {
+		t.Errorf("a nil source operation was refused rather than left to the caller's own lookup check: %v", err)
+	}
+}
+
+// wireRequiredParams is documentation for a parameter the signature cannot
+// describe, so both of its refusals are what keep the note from outliving its
+// own truth.
+func TestResolveWireRequiredParams(t *testing.T) {
+	optional := &openapi3.Parameter{Name: "accept", In: openapi3.ParameterInHeader}
+	required := &openapi3.Parameter{Name: "accept", In: openapi3.ParameterInHeader, Required: true}
+
+	t.Run("records an optional parameter", func(t *testing.T) {
+		m := GoMethod{HTTPMethod: "GET", SpecPath: "/things"}
+		if err := resolveWireRequiredParams(&m, []string{"accept"}, map[string]*openapi3.Parameter{"accept": optional}); err != nil {
+			t.Fatalf("an optional parameter was refused: %v", err)
+		}
+		if !m.WireRequiredParams["accept"] {
+			t.Error("accept was not recorded")
+		}
+		if lines := wireRequiredDocLines("accept", m); len(lines) == 0 || !strings.Contains(strings.Join(lines, " "), "400") {
+			t.Errorf("doc lines = %v, want them to name the status the server answers", lines)
+		}
+	})
+
+	// The self-expiry. Once the spec marks the parameter required its own
+	// declaration says so, and the note would be restating it.
+	t.Run("expires when the spec marks it required", func(t *testing.T) {
+		m := GoMethod{HTTPMethod: "GET", SpecPath: "/things"}
+		err := resolveWireRequiredParams(&m, []string{"accept"}, map[string]*openapi3.Parameter{"accept": required})
+		if err == nil {
+			t.Fatal("a now-required parameter was accepted, so the note will outlive the defect it records")
+		}
+		if !strings.Contains(err.Error(), "delete the entry") {
+			t.Errorf("error = %v, want it to say to delete the entry", err)
+		}
+	})
+
+	t.Run("refuses a name the spec does not declare", func(t *testing.T) {
+		m := GoMethod{HTTPMethod: "GET", SpecPath: "/things"}
+		err := resolveWireRequiredParams(&m, []string{"acccept"}, map[string]*openapi3.Parameter{"accept": optional})
+		if err == nil {
+			t.Fatal("a misspelled name was accepted, so the note would document nothing")
+		}
+		if !strings.Contains(err.Error(), "does not declare") {
+			t.Errorf("error = %v, want it to report the name as undeclared", err)
+		}
+	})
+
+	// It must not change what is emitted: sending the parameter empty is not
+	// better than omitting it, so the guard stays.
+	t.Run("does not flip AlwaysSend", func(t *testing.T) {
+		m := GoMethod{
+			Name: "ProbeOp", Category: "get", HTTPMethod: "GET",
+			Namespace: "probe", Version: "v1", ResourcePath: "/things",
+			ResponseType: "ThingResponse",
+			HeaderParams: []ExtraParam{headerParam("accept", "accept")},
+		}
+		if err := resolveWireRequiredParams(&m, []string{"accept"}, map[string]*openapi3.Parameter{"accept": optional}); err != nil {
+			t.Fatal(err)
+		}
+		var buf bytes.Buffer
+		if err := sourceTmpl.ExecuteTemplate(&buf, "get", m); err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(buf.String(), `if accept != "" {`) {
+			t.Errorf("wireRequiredParams removed the zero-value guard, so a caller passing \"\" now sends an empty header:\n%s", buf.String())
+		}
+	})
 }

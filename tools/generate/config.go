@@ -318,6 +318,25 @@ type OperationDef struct {
 	PathNames      map[string]string `json:"pathNames,omitempty"`    // spec param -> Go param name
 	Params         []string          `json:"params,omitempty"`       // "name", "name:type", "spec:type:goName"
 	HeaderParams   []string          `json:"headerParams,omitempty"` // same notation as Params, for `in: header` request parameters — see parseHeaderParams
+	// WireRequiredParams names parameters (query or header, by wire name) the
+	// server refuses the request without, although the spec marks them
+	// optional. It adds a line to the parameter's godoc and nothing else.
+	//
+	// It exists because a signature cannot express it. `accept` on
+	// export-report is the case: the spec says `required: false`, the endpoint
+	// answers 400 without it, and a consumer reading `accept string` in the
+	// signature has no reason to pass anything — which is exactly how
+	// ExportPatchSoftwareTitleReportV3 shipped broken for its whole life.
+	//
+	// Deliberately documentation-only: it must not flip AlwaysSend, because
+	// sending the parameter empty is not better than omitting it (empty
+	// `columns-to-export` is a 500 where omitting is a 400, and an empty
+	// Accept is refused the same as an absent one). The caller has to pass a
+	// real value, so the fix is to tell the caller.
+	//
+	// Self-expiring: resolveWireRequiredParams fails generation once the spec
+	// marks the parameter required, and on a name the spec does not declare.
+	WireRequiredParams []string `json:"wireRequiredParams,omitempty"`
 	UnwrapResults  string            `json:"unwrapResults,omitempty"`
 	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)

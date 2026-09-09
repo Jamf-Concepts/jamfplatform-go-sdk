@@ -206,6 +206,8 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV3(ctx context.Context, id str
 //   - columnsToExport: List of column names to export.
 //   - accept: File.
 //     Allowed values, from the operation's declared response content types: text/csv, text/tab.
+//     Required in practice: the server answers 400 when this is omitted, although the spec marks the
+//     parameter optional. Passing the zero value omits it.
 func (c *Client) ExportPatchSoftwareTitleReportV3(ctx context.Context, id string, filter string, columnsToExport []string, accept string) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []byte

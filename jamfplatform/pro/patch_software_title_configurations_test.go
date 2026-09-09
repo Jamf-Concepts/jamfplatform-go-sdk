@@ -256,8 +256,8 @@ func TestExportPatchSoftwareTitleReportV3(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
-		if got := r.Header.Get("accept"); got != "hdr-accept" {
-			t.Errorf("header accept = %q, want %q", got, "hdr-accept")
+		if got := r.Header.Get("Accept"); got != "hdr-accept" {
+			t.Errorf("header Accept = %q, want %q", got, "hdr-accept")
 		}
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})

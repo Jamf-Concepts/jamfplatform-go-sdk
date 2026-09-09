@@ -109,6 +109,9 @@ func appendResolverMethods(methods []GoMethod, spec SpecDef) ([]GoMethod, error)
 			if !ok {
 				return nil, fmt.Errorf("resolver on %s: source operation not found in extracted methods", opDef.Name)
 			}
+			if err := refuseHeaderParamsOnSynthetic("resolver", r.ResourceType, opDef.Name, src); err != nil {
+				return nil, err
+			}
 			typedReturn := r.TypedReturn
 			if typedReturn == "" {
 				typedReturn = r.ResourceType
@@ -237,6 +240,12 @@ func appendApplyMethods(doc *openapi3.T, methods []GoMethod, spec SpecDef) ([]Go
 			updateM, ok := byName[ac.UpdateOp]
 			if !ok {
 				return nil, fmt.Errorf("apply on %s: updateOp %q not found", r.ResourceType, ac.UpdateOp)
+			}
+			if err := refuseHeaderParamsOnSynthetic("apply", r.ResourceType, ac.CreateOp, createM); err != nil {
+				return nil, err
+			}
+			if err := refuseHeaderParamsOnSynthetic("apply", r.ResourceType, ac.UpdateOp, updateM); err != nil {
+				return nil, err
 			}
 			// Determine request type from the Create method.
 			requestType := createM.RequestType
@@ -848,11 +857,21 @@ func resolveQueryParams(m *GoMethod, specParams map[string]*openapi3.Parameter) 
 // generatorReservedHeaders are request headers the transport owns, which a
 // generated method must never take as an argument.
 //
-// It mirrors internal/client's reservedHeaders, and the duplication is
-// deliberate: tools/generate is its own module and importing the SDK into its
-// own generator would make the build circular. TestReservedHeadersMatchTransport
-// pins the two lists together, so a scope kind gaining a header fails a test
-// here rather than emitting a method that can overwrite the scope.
+// The duplication of internal/client's scope headers is deliberate:
+// tools/generate is its own module and importing the SDK into its own
+// generator would make the build circular.
+//
+// TestGeneratorReservedHeadersPinScopeHeaders pins it anyway, by parsing
+// ScopeKind.ScopeHeader() out of internal/client/client.go and requiring every
+// header it can return to appear here. That is a pin against the source of
+// truth rather than against internal/client's own reservedHeaders, which is
+// itself derived from ScopeHeader — so a new scope kind fails a test here
+// rather than emitting a method that can overwrite the scope.
+//
+// Authorization is the one entry with no counterpart in that switch: the
+// transport owns it through oauth2 and WithAuthorizationHeaderName, not
+// through a scope. So this map is a superset of the scope headers, never a
+// mirror of internal/client's map.
 //
 // The scope headers are the load-bearing entries. setScopeHeader stamps them
 // from the client's scope and doRequestFull applies extraHeaders *after* it, so
@@ -879,9 +898,14 @@ var generatorReservedHeaders = map[string]bool{
 //     []string here would be inventing a serialisation the spec never stated.
 //     Failing is recoverable; guessing ships a request the server misreads.
 //
-// AlwaysSend is derived from the spec exactly as it is for query params: a
-// required header travels unguarded, so a caller passing "" gets the server's
-// own complaint rather than a request that silently omits it.
+// AlwaysSend is derived from the spec exactly as it is for query params,
+// including the hasSpecDefault subtraction: a required header travels
+// unguarded, so a caller passing "" gets the server's own complaint rather
+// than a request that silently omits it — unless the spec gives the parameter
+// a default, which gives its absence a defined meaning and so keeps the
+// guard. No header declares a default today, so the subtraction is inert; it
+// is here because the divergence would be silent when one does, and the rule
+// it mirrors is documented on hasSpecDefault itself.
 func resolveHeaderParams(m *GoMethod, specParams map[string]*openapi3.Parameter) error {
 	var unmatched []string
 	for i := range m.HeaderParams {
@@ -905,7 +929,7 @@ func resolveHeaderParams(m *GoMethod, specParams map[string]*openapi3.Parameter)
 			return fmt.Errorf("%s %s: config declares %q under \"headerParams\" but the spec says in: %s — move it to \"params\"",
 				m.HTTPMethod, m.SpecPath, h.Spec, sp.In)
 		}
-		h.AlwaysSend = sp.Required
+		h.AlwaysSend = sp.Required && !hasSpecDefault(sp.Schema)
 	}
 	if len(unmatched) > 0 {
 		known := make([]string, 0, len(specParams))
@@ -1005,6 +1029,11 @@ func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enu
 		if extra := acceptHeaderDocLines(sp, m.ProducesMediaTypes); len(extra) > 0 {
 			body = append(body, extra...)
 		}
+		// Last, so it is the line the reader ends on: it is the one thing
+		// here that changes whether the call works at all.
+		if extra := wireRequiredDocLines(p.specName, m); len(extra) > 0 {
+			body = append(body, extra...)
+		}
 		if len(body) == 0 {
 			continue
 		}
@@ -1019,6 +1048,55 @@ func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enu
 	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n")
 }
 
+// resolveWireRequiredParams validates config's WireRequiredParams against the
+// spec and records them on the method for godoc.
+//
+// Two refusals, and both are what make the key self-expiring rather than a
+// note that outlives its own truth:
+//
+//   - a name the spec does not declare. The same typo guard resolveQueryParams
+//     and resolveHeaderParams carry, for the same reason: a note keyed to a
+//     renamed parameter silently documents nothing.
+//   - a parameter the spec now marks required. The key's whole content is
+//     "the spec says optional and the server disagrees", so once the spec
+//     agrees the note is restating it, and the emitted line would tell a
+//     reader something the parameter's own declaration already says.
+func resolveWireRequiredParams(m *GoMethod, names []string, specParams map[string]*openapi3.Parameter) error {
+	if len(names) == 0 {
+		return nil
+	}
+	m.WireRequiredParams = make(map[string]bool, len(names))
+	for _, name := range names {
+		sp, ok := specParams[name]
+		if !ok {
+			known := make([]string, 0, len(specParams))
+			for n := range specParams {
+				known = append(known, n)
+			}
+			sort.Strings(known)
+			return fmt.Errorf("%s %s: \"wireRequiredParams\" names %q, which the spec does not declare (spec declares: %v) — fix the name or drop the entry",
+				m.HTTPMethod, m.SpecPath, name, known)
+		}
+		if sp.Required {
+			return fmt.Errorf("%s %s: \"wireRequiredParams\" names %q but the spec now marks it required — delete the entry, the parameter's own declaration says it",
+				m.HTTPMethod, m.SpecPath, name)
+		}
+		m.WireRequiredParams[name] = true
+	}
+	return nil
+}
+
+// wireRequiredDocLines renders the note for a parameter the server refuses the
+// request without. Deliberately says "required" plainly and names the status,
+// because the signature says optional and the spec says optional, so anything
+// softer loses to both.
+func wireRequiredDocLines(specName string, m GoMethod) []string {
+	if !m.WireRequiredParams[specName] {
+		return nil
+	}
+	return wrapCommentText("Required in practice: the server answers 400 when this is omitted, although the spec marks the parameter optional. Passing the zero value omits it.", parameterDocWidth)
+}
+
 // acceptHeaderDocLines documents an Accept header param's allowed values from
 // the operation's own success-response content types.
 //
@@ -1027,9 +1105,11 @@ func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enu
 // types on the response, so `responses.200.content` *is* the enum and the
 // parameter beside it is a bare string. Jamf Pro's
 // GET /v3/patch-software-title-configurations/{id}/export-report is the live
-// case — it produces text/csv or text/tab, answers 415 for anything else, and
-// describes its `accept` parameter as "File." A caller reading only the
-// signature had no way to learn that text/tab exists.
+// case — it produces text/csv or text/tab, answers 400 for anything else
+// (not 415: wire-verified 2026-09-09 on application/pdf and text/plain, with
+// the error body's own serialisation following Accept), and describes its
+// `accept` parameter as "File." A caller reading only the signature had no way
+// to learn that text/tab exists.
 //
 // It defers to a real enum: if a bundle ever gives the parameter one,
 // parameterDocLines has already listed those values and this adds nothing. It
@@ -1266,6 +1346,10 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 
 	m.ProducesMediaTypes = successMediaTypes(op)
 
+	if err := resolveWireRequiredParams(&m, opDef.WireRequiredParams, specParams); err != nil {
+		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
+	}
+
 	// Parameter docs come last so the block sits below the summary and the
 	// privilege/deprecation lines, matching how godoc reads: prose, then
 	// metadata, then the per-argument list.
@@ -1421,6 +1505,37 @@ var headerParamCategories = map[string]bool{
 	"update":             true,
 	"action":             true,
 	"actionWithResponse": true,
+}
+
+// refuseHeaderParamsOnSynthetic refuses to build a resolver or apply method
+// over a source operation that declares header params.
+//
+// It is the counterpart to validateHeaderParamSupport, which cannot reach
+// these: a synthetic method is assembled field by field from the source rather
+// than through buildMethod, and it deliberately does not copy HeaderParams —
+// its signature is fixed (a resolver takes only a name; an apply takes a
+// request). So the header would not appear in the signature at all, and the
+// resolver/apply templates build their calls through ResolveByNameClient /
+// ResolveByNameFiltered or the create/update methods' own paths with no
+// http.Header anywhere.
+//
+// That makes the omission invisible rather than merely wrong: for an If-Match
+// the caller has no way to supply the precondition and the write silently
+// becomes unconditional. Refusing is the same choice made for the multipart,
+// raw, unwrap and pagination templates — fail generation rather than ship a
+// surface that cannot carry what the operation requires. Lifting it is a
+// template change (thread the header through the synthetic signature), not a
+// config change.
+func refuseHeaderParamsOnSynthetic(kind, resourceType, opName string, src *GoMethod) error {
+	if src == nil || len(src.HeaderParams) == 0 {
+		return nil
+	}
+	names := make([]string, 0, len(src.HeaderParams))
+	for _, h := range src.HeaderParams {
+		names = append(names, h.Spec)
+	}
+	return fmt.Errorf("%s on %s: source operation %s declares header param(s) %v, which a synthetic %s method has no signature or template to carry — the header would be silently dropped; extend the %s template or drop the resolver/apply",
+		kind, resourceType, opName, names, kind, kind)
 }
 
 // validateHeaderParamSupport refuses a header param the emitted method could
