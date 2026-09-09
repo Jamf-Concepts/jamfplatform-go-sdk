@@ -339,6 +339,114 @@ func TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV2(t *testing.T) {
 	t.Logf("Recent MDM commands (status==Pending): %d", len(cmds))
 }
 
+// TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV1 covers the operation v2121
+// restored (public-apis-oas restored GET /v1/mdm/commands; it had been
+// withdrawn at v1942 with /v2 named as successor). The v1 surface is a
+// two-parameter point lookup rather than a paginated list, so it is not
+// reachable through the v2 method and needs its own coverage.
+//
+// Three wire laws pinned here, all probed 2026-09-09 with a known-good
+// control in the same invocation and each repeated:
+//
+//   - neither parameter is 400 with an empty errors array (no attribution),
+//     although the spec marks both optional;
+//   - both parameters together is 500, deterministic 2/2, although the spec
+//     says "choose one of two parameters, but not both" — which should be a
+//     400. That is a server defect, reported upstream, and asserted rather
+//     than skipped so this test fails the day it is fixed;
+//   - more than 40 uuids is 414 INVALID_SIZE, as the spec declares.
+//
+// The happy path takes a real uuid and managementId from the v2 list, so it
+// provisions nothing.
+func TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV1(t *testing.T) {
+	c := accClient(t)
+	ctx := context.Background()
+	p := pro.New(c)
+
+	// v2 requires a filter; status==Pending may legitimately be empty, so fall
+	// back to active==true before giving up on a fixture.
+	var seed *pro.MDMCommand
+	for _, filter := range []string{"status==Pending", "active==true"} {
+		cmds, err := p.ListMdmCommandsV2(ctx, nil, filter)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListMdmCommandsV2(%s): %v", filter, err)
+		}
+		if len(cmds) > 0 {
+			seed = &cmds[0]
+			break
+		}
+	}
+	if seed == nil {
+		t.Skip("tenant has no MDM commands to look up — the v1 surface is a point lookup with no list form")
+	}
+
+	uuid := seed.UUID
+	if uuid == "" {
+		t.Fatalf("ListMdmCommandsV2 returned a command with no uuid: %+v", seed)
+	}
+
+	got, err := p.ListMdmCommandsV1(ctx, []string{uuid}, "")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("ListMdmCommandsV1(uuids=%s): %v", uuid, err)
+	}
+	if len(got) != 1 || got[0].UUID != uuid {
+		t.Fatalf("ListMdmCommandsV1(uuids=%s) = %d commands, want exactly the one requested", uuid, len(got))
+	}
+
+	if seed.Client != nil && seed.Client.ManagementID != "" {
+		mgmtID := seed.Client.ManagementID
+		byClient, err := p.ListMdmCommandsV1(ctx, nil, mgmtID)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Fatalf("ListMdmCommandsV1(client-management-id=%s): %v", mgmtID, err)
+		}
+		if len(byClient) == 0 {
+			t.Fatalf("ListMdmCommandsV1(client-management-id=%s) returned nothing, but the command it came from names that client", mgmtID)
+		}
+		t.Logf("ListMdmCommandsV1(client-management-id=%s): %d commands", mgmtID, len(byClient))
+	}
+
+	// Neither parameter: 400, no attribution.
+	_, err = p.ListMdmCommandsV1(ctx, nil, "")
+	assertMdmCommandsV1Status(t, err, 400, "neither parameter")
+
+	// Both parameters: 500 rather than the 400 the spec's own wording implies.
+	// A limitation, not a fact about the SDK — flip this assertion when it is
+	// fixed upstream.
+	if seed.Client != nil && seed.Client.ManagementID != "" {
+		_, err = p.ListMdmCommandsV1(ctx, []string{uuid}, seed.Client.ManagementID)
+		assertMdmCommandsV1Status(t, err, 500, "both parameters (spec says choose one; server 500s instead of 400)")
+	}
+
+	// More than 40 uuids: 414 INVALID_SIZE.
+	tooMany := make([]string, 41)
+	for i := range tooMany {
+		tooMany[i] = fmt.Sprintf("00000000-0000-0000-0000-%012d", i)
+	}
+	_, err = p.ListMdmCommandsV1(ctx, tooMany, "")
+	assertMdmCommandsV1Status(t, err, 414, "41 uuids")
+}
+
+// assertMdmCommandsV1Status fails unless err is an APIResponseError carrying
+// want. A nil error is a failure too: every case this guards is one the server
+// refuses today, so success means the wire law changed.
+func assertMdmCommandsV1Status(t *testing.T, err error, want int, label string) {
+	t.Helper()
+	if err == nil {
+		t.Fatalf("ListMdmCommandsV1 (%s): want HTTP %d, got success — the wire law changed, update this assertion", label, want)
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("ListMdmCommandsV1 (%s): want HTTP %d, got non-API error: %v", label, want, err)
+	}
+	if !apiErr.HasStatus(want) {
+		t.Fatalf("ListMdmCommandsV1 (%s): want HTTP %d, got %v", label, want, err)
+	}
+	t.Logf("ListMdmCommandsV1 (%s): HTTP %d as expected", label, want)
+}
+
 // POST /api/pro/v2/mdm/commands is no longer covered. Jamf withdrew it from
 // the published spec in the GA cleanup (public-apis-oas#395; the GET is
 // retained), so the SDK no longer generates SendMdmCommandV2 and the request

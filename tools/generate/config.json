@@ -2520,6 +2520,14 @@
           "name": "SendMdmBlankPushV2"
         },
         {
+          "op": "GET /v1/mdm/commands",
+          "name": "ListMdmCommandsV1",
+          "params": [
+            "uuids:[]string",
+            "client-management-id:string:clientManagementID"
+          ]
+        },
+        {
           "op": "GET /v2/mdm/commands",
           "name": "ListMdmCommandsV2",
           "pagination": "totalCount",

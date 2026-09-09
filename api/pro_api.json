@@ -42360,6 +42360,97 @@
         ]
       }
     },
+    "/v1/mdm/commands": {
+      "get": {
+        "deprecated": true,
+        "description": "Get information about mdm commands made by Jamf Pro.\n\n**Required Permissions:** `device-actions:read`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/X-Tenant-Id"
+          },
+          {
+            "$ref": "#/components/parameters/X-Environment-Id"
+          },
+          {
+            "description": "A list of the UUIDs of the commands being searched for.  Limited to 40 UUIDs in length. Choose one of two parameters, but not both.",
+            "explode": true,
+            "in": "query",
+            "name": "uuids",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
+          },
+          {
+            "description": "The client management id used to search for a list of commands. Choose one of two parameters, but not both.",
+            "explode": true,
+            "in": "query",
+            "name": "client-management-id",
+            "schema": {
+              "example": "fd68c371-5921-436e-b16b-8a3c1bf90ee5",
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MdmCommand"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "414": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Too many UUIDs were provided in the path. The limit is set at a strict 40 UUIDs."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Failure, unable to complete lookup."
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "device-actions:read"
+            ]
+          }
+        ],
+        "summary": "Get information about mdm commands made by Jamf Pro.",
+        "tags": [
+          "mdm"
+        ],
+        "x-deprecation-date": "2023-10-16",
+        "x-required-privileges": [
+          "device-actions:read"
+        ],
+        "x-required-privileges-legacy": [
+          "View MDM command information in Jamf Pro API"
+        ]
+      }
+    },
     "/v1/mdm/renew-profile": {
       "post": {
         "description": "Renews the device's MDM Profile, including the device identity certificate within the MDM Profile.\n\n\n**Required Permissions:** `device-actions:execute`",
