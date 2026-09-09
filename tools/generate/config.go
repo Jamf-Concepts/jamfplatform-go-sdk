@@ -312,12 +312,12 @@ type OperationDef struct {
 	CursorField string `json:"cursorField,omitempty"`
 	// CursorParam is the query parameter the cursor is sent back in, for
 	// Pagination == "cursor". Empty defaults to "cursor".
-	CursorParam    string            `json:"cursorParam,omitempty"`
-	MaxPageSize    int               `json:"maxPageSize,omitempty"`  // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
-	Version        string            `json:"version,omitempty"`      // override version for tenantPrefix
-	PathNames      map[string]string `json:"pathNames,omitempty"`    // spec param -> Go param name
-	Params         []string          `json:"params,omitempty"`       // "name", "name:type", "spec:type:goName"
-	HeaderParams   []string          `json:"headerParams,omitempty"` // same notation as Params, for `in: header` request parameters — see parseHeaderParams
+	CursorParam  string            `json:"cursorParam,omitempty"`
+	MaxPageSize  int               `json:"maxPageSize,omitempty"`  // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
+	Version      string            `json:"version,omitempty"`      // override version for tenantPrefix
+	PathNames    map[string]string `json:"pathNames,omitempty"`    // spec param -> Go param name
+	Params       []string          `json:"params,omitempty"`       // "name", "name:type", "spec:type:goName"
+	HeaderParams []string          `json:"headerParams,omitempty"` // same notation as Params, for `in: header` request parameters — see parseHeaderParams
 	// WireRequiredParams names parameters (query or header, by wire name) the
 	// server refuses the request without, although the spec marks them
 	// optional. It adds a line to the parameter's godoc and nothing else.
@@ -336,13 +336,13 @@ type OperationDef struct {
 	//
 	// Self-expiring: resolveWireRequiredParams fails generation once the spec
 	// marks the parameter required, and on a name the spec does not declare.
-	WireRequiredParams []string `json:"wireRequiredParams,omitempty"`
-	UnwrapResults  string            `json:"unwrapResults,omitempty"`
-	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
-	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
-	ExpectedStatus int               `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
-	Resolver       *ResolverConfig   `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
-	Resolvers      []ResolverConfig  `json:"resolvers,omitempty"`      // attach multiple resolvers to one operation (e.g. resolve device by name AND by serialNumber)
+	WireRequiredParams []string         `json:"wireRequiredParams,omitempty"`
+	UnwrapResults      string           `json:"unwrapResults,omitempty"`
+	RequestType        string           `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
+	ResponseType       string           `json:"responseType,omitempty"`   // explicit response schema name (same)
+	ExpectedStatus     int              `json:"expectedStatus,omitempty"` // explicit success status code (default 200)
+	Resolver           *ResolverConfig  `json:"resolver,omitempty"`       // attach name->ID resolver emission to this operation (typically a List op)
+	Resolvers          []ResolverConfig `json:"resolvers,omitempty"`      // attach multiple resolvers to one operation (e.g. resolve device by name AND by serialNumber)
 
 	// NoRetry opts this operation out of the transport's automatic 5xx retry
 	// (internal/client/retry.go's isRetryableWriteStatus), even though its

@@ -158,19 +158,19 @@ type GoMethod struct {
 	// WireRequiredParams for why it must not affect emission.
 	WireRequiredParams map[string]bool
 	RequestType        string
-	ResponseType     string
-	ResponseWireName string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
-	ExpectedStatus   int
-	ContentType      string
-	NoRetry          bool // from OperationDef.NoRetry — see its doc; drives DoWithContentTypeNoRetry vs DoWithContentType in template.go
-	PaginationStyle  string
-	PageSizeParam    string
-	MaxPageSize      int
-	ItemType         string
-	ResultsField     string
-	CursorField      string
-	CursorParam      string
-	ReturnsSlice     bool
+	ResponseType       string
+	ResponseWireName   string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
+	ExpectedStatus     int
+	ContentType        string
+	NoRetry            bool // from OperationDef.NoRetry — see its doc; drives DoWithContentTypeNoRetry vs DoWithContentType in template.go
+	PaginationStyle    string
+	PageSizeParam      string
+	MaxPageSize        int
+	ItemType           string
+	ResultsField       string
+	CursorField        string
+	CursorParam        string
+	ReturnsSlice       bool
 	// ResponseIsJSONArray reports that the success body is a JSON array,
 	// which ReturnsSlice does not: a named schema declared `type: array`
 	// travels as an array but appears in the Go signature as its alias, not
