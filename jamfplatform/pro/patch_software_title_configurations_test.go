@@ -256,10 +256,13 @@ func TestExportPatchSoftwareTitleReportV3(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if got := r.Header.Get("accept"); got != "hdr-accept" {
+			t.Errorf("header accept = %q, want %q", got, "hdr-accept")
+		}
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 	})
 
-	result, err := c.ExportPatchSoftwareTitleReportV3(context.Background(), "test-id", "", nil)
+	result, err := c.ExportPatchSoftwareTitleReportV3(context.Background(), "test-id", "", nil, "hdr-accept")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -278,7 +281,7 @@ func TestExportPatchSoftwareTitleReportV3_NotFound(t *testing.T) {
 		})
 	})
 
-	_, err := c.ExportPatchSoftwareTitleReportV3(context.Background(), "test-id", "", nil)
+	_, err := c.ExportPatchSoftwareTitleReportV3(context.Background(), "test-id", "", nil, "hdr-accept")
 	if err == nil {
 		t.Fatal("expected error")
 	}

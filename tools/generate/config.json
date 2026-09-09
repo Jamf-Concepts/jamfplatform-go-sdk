@@ -1505,6 +1505,9 @@
           "params": [
             "filter",
             "columns-to-export:[]string:columnsToExport"
+          ],
+          "headerParams": [
+            "accept:string:accept"
           ]
         },
         {
@@ -4182,12 +4185,18 @@
         },
         {
           "op": "GET /v3/account-preferences",
-          "name": "GetAccountPreferencesV3"
+          "name": "GetAccountPreferencesV3",
+          "headerParams": [
+            "Accept-Language:string:acceptLanguage"
+          ]
         },
         {
           "op": "PATCH /v3/account-preferences",
           "name": "UpdateAccountPreferencesV3",
-          "expectedStatus": 204
+          "expectedStatus": 204,
+          "headerParams": [
+            "Accept-Language:string:acceptLanguage"
+          ]
         },
         {
           "op": "GET /v1/health-check",
@@ -10801,7 +10810,10 @@
         },
         {
           "op": "PATCH /v1/policies/{policyId}",
-          "name": "UpdatePolicy"
+          "name": "UpdatePolicy",
+          "headerParams": [
+            "If-Match:string:ifMatch"
+          ]
         },
         {
           "op": "DELETE /v1/policies/{policyId}",

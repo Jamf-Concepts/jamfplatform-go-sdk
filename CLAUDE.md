@@ -153,7 +153,15 @@ stale and gets deleted on the next run.
 Transport entry points: `Do(ctx, method, path, body, result)` expects 200;
 `DoExpect(..., expectedStatus, result)` expects a specific status;
 `DoWithContentType(..., contentType, expectedStatus, result)` overrides
-Content-Type.
+Content-Type; `DoWithOptions(..., client.RequestOptions{…}, result)` is the
+general form and the **only one that can carry request headers**.
+
+`RequestOptions` exists because the per-request dimensions are independent —
+expected status, Content-Type, extra headers, retry opt-out — so a wrapper per
+combination doubles the surface each time one is added. The named methods above
+are shorthands, and a generated method keeps whichever it already used; only
+the four operations with `headerParams` route through `DoWithOptions`, which is
+what holds a regenerated diff to the operations that actually gained a header.
 
 ---
 
@@ -413,7 +421,7 @@ the executable authority; this is the prose copy, and the two must agree.**
 
 | `testing/` file | bundle source | at |
 |---|---|---|
-| `openapi-jpapi.yaml` | `external/jpapi` | **v2082** |
+| `openapi-jpapi.yaml` | `external/jpapi` | **v2121** |
 | `Classic-openapi.yaml` | `external/capi` | **v2082** |
 | `blueprints-api.yaml` | `external/blueprints` | **v2082** |
 | `device-groups-api.yaml` | `external/device-groups` | **v2082** |
@@ -427,7 +435,7 @@ the executable authority; this is the prose copy, and the two must agree.**
 | `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2082** |
 | `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v2082** |
 | `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | **v2082** |
-| `ai-governance-api.yaml` | `external/ai-governance` | **v2082** |
+| `ai-governance-api.yaml` | `external/ai-governance` | **v2121** |
 | `audit-api.yaml` | `external/audit` | **v2082** |
 | `account-licensing-api.yaml` | `external/account-licensing` | v1865 (**held**) |
 | `account-partners-api.yaml` | `external/account-partners` | **v2082** |
@@ -554,15 +562,126 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-Ingested through **v2082** (2026-09-04), except `account-licensing` /
-`account-sso` (**held at v1865**) — see the holds table. **Two holds went in
-this change.** `capi`'s is gone because v2082 republished the
+**Ingested through v2121 (2026-09-09) for seventeen of the nineteen specs**;
+`account-licensing` and `account-sso` stay **held at v1865**. Two specs moved
+and everything else in `external/` is byte-identical to v2082, so the only
+other diffs in the archive were the manifest, the two unified rollups, and
+`_permissions/routes.yaml` — which is byte-different and **`sort`-identical**
+again, the sixth build in which that has happened. `scopes.yaml` is unchanged.
+`internal/stage` matches `external/` op-for-op, so neither change is an
+environment rollout; `internal/dev` carries 811 `jpapi` operations against
+`external/`'s 701, so the v1942 publishing filter is still in place and still
+prod-only.
+
+**`jpapi` restored `GET /v1/mdm/commands` — the second un-withdrawal of a
+v1942 removal**, after v2082's 13 `/v3/computers-inventory` operations. 700 →
+701 operations, **zero schemas added or changed** (`MdmCommand` never left the
+spec), and the recovered `config.json` entry is the pre-v1942 one verbatim, so
+this is a revert rather than a re-derivation. Wire-confirmed 2026-09-09: it
+answers 200 with a bare array of real commands under both parameters, and it
+is a **two-parameter point lookup, not a paginated list**, so it is not
+reachable through `ListMdmCommandsV2` and needed its own method. It still
+sends `Deprecation: 2023-10-16`, which the transport logs.
+
+**Two of its wire laws are not in the spec, and one of them is a defect.**
+Neither parameter is `400` with an **empty `errors` array**, although the spec
+marks both optional; **both parameters together is `500`**, deterministic 2/2,
+although the spec's own wording ("choose one of two parameters, but not both")
+describes a 400. 41 uuids is `414 INVALID_SIZE` as declared.
+`TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV1` **asserts** the 500 rather
+than skipping on it, so it fails the day the fix lands — `skipOnServerError` is
+right for a transient 5xx and precisely wrong for a permanent one. Report both
+upstream. Evidence:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#v2121-restored-get-v1mdmcommands-and-it-has-two-wire-laws-the-spec-does-not-state-2026-09-09).
+
+**`ai-governance` gained an optimistic-concurrency mechanism, and it is fully
+enforced on the wire.** `PolicyDetail.version` (nullable `int64` → `*int64`),
+an `ETag` response header on the detail `GET`, an `If-Match` request header on
+`PATCH`, a `409` on that `PATCH`, and a `Jamf-Preview: true` response header
+declared on every 2xx of all 12 operations. `ApiError.httpStatus` also became
+declared-and-required, which the wire has always sent.
+
+**Nothing is needed for the read half: the ETag's value *is* `version`.**
+Verified `"0"`↔`0` and `"1"`↔`1`, so a caller formats the field rather than
+reading a response header, and the transport needs no header plumbing. The
+`409` already surfaced through `APIResponseError.Details()` as
+`POLICY_VERSION_CONFLICT`, so the error surface needed nothing either.
+
+Wire-verified 2026-09-09 with a control in the same invocation: a policy
+created during the probe answered `ETag: "0"` with `"version": 0`; `If-Match:
+"999"` and `W/"999"` both got **409 `POLICY_VERSION_CONFLICT`**, the current
+value got 204, and `*` or an absent header updated unconditionally. **Every
+`PATCH` increments `version` whether or not it changes anything**; publishing
+does not, so `version` and `currentVersionNumber` are independent counters.
+`If-Match: garbage` is `400 VALIDATION_FAILED`, so the header is parsed rather
+than ignored. Both **pre-existing** policies answer `"version": null` and send
+no `ETag` at all — which is the spec's documented "legacy document that
+predates versioning", so a caller cannot conditionally update one.
+
+**Sending `If-Match` needed the generator to learn header parameters, and it
+now has**, via a `headerParams` config key. `UpdatePolicy` takes an `ifMatch`
+string and routes through the new `Transport.DoWithOptions`. Wire-confirmed
+that the server compares the *number* and accepts the bare, strong and weak
+validator forms alike, so a caller needs no ETag quoting —
+`strconv.FormatInt(*policy.Version, 10)` is a valid precondition, and a
+comma-separated list is the only form refused.
+
+**It must be a separate key from `params`, not a flag on it.**
+`collectSpecParams` keys every parameter by wire name regardless of where it
+travels, so `"params": ["If-Match"]` matches the spec, passes the name-match
+check and emits `?If-Match=…` — a query key the server ignores, turning a
+conditional update into an unconditional one with nothing failing at any layer.
+Both directions are now refused, along with the scope headers, a non-`string`
+type, and a template with no headers form. Mechanism and the four refusals:
+[docs/STYLE.md](docs/STYLE.md#header-parameters); wire evidence:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#v2121s-optimistic-concurrency-mechanism-is-live-and-the-sdk-cannot-reach-half-of-it-2026-09-09).
+
+**Three other header parameters were latent in `jpapi` and came with it, and
+one was a shipped break.** `ExportPatchSoftwareTitleReportV3` declares an
+`accept` header selecting `text/csv` or `text/tab` — and **without it the
+endpoint answers 400**, so that method had failed every call it ever made.
+Worse, the acceptance suite tolerated the 400 under a wrong diagnosis recorded
+since 11.30.2 ("a property of an empty patch report"); the probe behind it
+never set the header. With `Accept` set, a zero-row report exports fine, and
+the two media types genuinely differ — same 21 bytes, comma versus tab, so TSV
+was unreachable. `Accept-Language` on both `/v3/account-preferences`
+operations is now reachable and inert on the wire. Both, plus the corrected
+`columns-to-export` reasoning:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#export-report-was-never-callable-and-accept-is-why-2026-09-09).
+
+**An `Accept` header's allowed values are documented from the response, not the
+parameter.** OpenAPI models acceptable media types structurally on the
+response, so `responses.200.content` *is* the enum while the parameter beside
+it is a bare string described as "File." — `acceptHeaderDocLines` reads the
+vocabulary off the response and defers to a real enum if a bundle adds one. No
+header parameter in any of the 19 specs declares an enum of its own.
+
+**Both account holds stand at v2121, unchanged from the 2026-09-09 re-probe.**
+`License.type` is still absent from the published spec and
+`DomainAllocationConnection.authZeroRegion` still renamed to `authRegion`, so
+neither spec's delta has moved and there is nothing new to weigh.
+
+**v2100 (2026-09-08) is a pure pipeline re-run and was not ingested — the
+third recorded no-op build.** Every per-family spec in `external/` is
+byte-identical to v2082, held rows included, and so is
+`_permissions/{routes,scopes}.yaml`. The only diffs in the whole archive are
+the manifest's build number, commit (`ba9fb3d` → `4affef9`) and timestamp,
+`info.version: auto-v3.2082` → `auto-v3.2100` plus a `Generated` line in the
+two unified rollups, and the `x-generated` block in each of `internal/dev`'s
+22 specs — stripping that block leaves all 22 semantically identical to
+v2082. `internal/stage` took the same nil delta. Nothing to ingest, no
+generated diff, no probing warranted. Note the five-day gap: build recency is
+not evidence of spec movement, which is why step 1 of the ingest is to hash
+and dry-run before reading.
+
+**v2082 (2026-09-04) is where the current hold position was set**, and two
+holds went in that change. `capi`'s is gone because v2082 republished the
 patch-management family it was protecting. `securitycloud-devices`' is gone
 because `PUT /v2/groups/{groupId}` started working on 2026-09-04, between
 12:51 and 13:33 BST, which was the one condition its row named — so the two
 v1 operations v1942 withdrew no longer cost a capability and the spec is
-ingested at v2082. Eighteen of the nineteen specs are now current; only the
-two account specs are held.
+ingested at v2082. Seventeen of the nineteen specs are now at v2121 and the
+other two at v2082; only the two account specs are held.
 
 **v2082 is the scope-declaration build, and it is two things: a bundle-wide
 scope migration that is inert to generated Go, and two operation
@@ -1249,14 +1368,15 @@ newline) confirmed `testing/openapi-jpapi.json` was semantically identical to
 v1882's `openapi.yaml` before the copy, so the generated diff is exactly the
 delta: 298 deletions, zero insertions, nothing outside `pro`.
 
-**The `pro` whitelist remains complete — 700 operations as of v2082** — it
+**The `pro` whitelist remains complete — 701 operations as of v2121** — it
 reached all 790 on 2026-08-31, v1897 took two away, v1942 took 122 more,
-v2043 added App Installers' 23, v2051 took one back, and v2082 restored the 13
-`/v3/computers-inventory` operations. 21 of the 38 added on 2026-08-31 were
+v2043 added App Installers' 23, v2051 took one back, v2082 restored the 13
+`/v3/computers-inventory` operations and v2121 restored
+`GET /v1/mdm/commands`. 21 of the 38 added on 2026-08-31 were
 deprecated, which was no bar at the time: the whitelist carried 111 deprecated
 operations, and until v1942 the additive-versions rule kept them until Jamf
-removed the path. v1942 removed the paths — and v2082 put some back, which is
-the case the rule's own wording anticipated. Every surviving operation has an
+removed the path. v1942 removed the paths — and v2082 and v2121 have each put
+some back, which is the case the rule's own wording anticipated. Every surviving operation has an
 acceptance test.
 
 Five spec/wire disagreements came out of it, all corrected in `config.json` and
@@ -1337,7 +1457,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 
 | held | why |
 |---|---|
-| `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**, both re-confirmed 2026-09-04 on **two independent organization tenants** — `8a2d0ff2-4336-44ca-bd61-1e7e88258740` (16 licences, 5 domains) and `ffeadc76-1e1c-4827-a764-ab111fef43c6` (24 licences, 7 domains). Each spec's whole v2082 delta is the one field its hold names, plus an inert `servers` region-enum narrowing to `us`. **Licensing:** `License.type` is deleted though the wire populates it **40/40 rows**, and it is neither a rename of `licenseType` (non-null on only 8/16 and 16/24, so both fields coexist) nor derivable — on **17 of the 40** rows `type` matches none of `licenseType`, `addOnType` or `productTopLine` (`Jamf Trust` → `type: JAMF_SECURITY_CLOUD` while `addOnType: JAMF_TRUST`; `Jamf Pro for iOS` → `JAMF_PRO_SUBSCRIPTION`, the very value the deleted property gave as its `example`). So taking it drops a populated product-family classifier on 42% of rows. **SSO:** `DomainAllocationConnection.authZeroRegion` → `authRegion`, but the wire sends the old name on **11/11 connections** and `authRegion` on none. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. ~~SSO could not be re-probed — `/sso/v1/domain-allocations` answers 403 `BAD_PERMISSIONS`, so the capability is ungranted and it needs a credential holding `sso-domains`.~~ **That was wrong, and the mistake is worth keeping: there is no `/sso/v1/domain-allocations` path.** The operation is `GET /sso/v1/domains/allocation/{domain}` and it answers **200** on both credentials; the 403 was the gateway refusing an unmapped path, which in this namespace is indistinguishable from an ungranted capability. **Read the path out of the spec before concluding a capability is missing.** `account-partners` is inert (`servers` only) and moved to v2082 — it 403s on both organization credentials, so its own coverage is still ungranted. |
+| `account-licensing`, `account-sso` at v1865 | Two breaking changes are **ahead of the server**, both re-confirmed 2026-09-04 on **two independent organization tenants** — `8a2d0ff2-4336-44ca-bd61-1e7e88258740` (16 licences, 5 domains) and `ffeadc76-1e1c-4827-a764-ab111fef43c6` (24 licences, 7 domains). Each spec's whole v2082 delta is the one field its hold names, plus an inert `servers` region-enum narrowing to `us`. **Licensing:** `License.type` is deleted though the wire populates it **40/40 rows**, and it is neither a rename of `licenseType` (non-null on only 8/16 and 16/24, so both fields coexist) nor derivable — on **17 of the 40** rows `type` matches none of `licenseType`, `addOnType` or `productTopLine` (`Jamf Trust` → `type: JAMF_SECURITY_CLOUD` while `addOnType: JAMF_TRUST`; `Jamf Pro for iOS` → `JAMF_PRO_SUBSCRIPTION`, the very value the deleted property gave as its `example`). So taking it drops a populated product-family classifier on 42% of rows. **SSO:** `DomainAllocationConnection.authZeroRegion` → `authRegion`, but the wire sends the old name on **11/11 connections** and `authRegion` on none. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. ~~SSO could not be re-probed — `/sso/v1/domain-allocations` answers 403 `BAD_PERMISSIONS`, so the capability is ungranted and it needs a credential holding `sso-domains`.~~ **That was wrong, and the mistake is worth keeping: there is no `/sso/v1/domain-allocations` path.** The operation is `GET /sso/v1/domains/allocation/{domain}` and it answers **200** on both credentials; the 403 was the gateway refusing an unmapped path, which in this namespace is indistinguishable from an ungranted capability. **Read the path out of the spec before concluding a capability is missing.** **Re-probed 2026-09-09 at v2100 on `8a2d0ff2-…`: both holds stand unchanged** — `type` populated **16/16** with `licenseType` non-null on only 8, and `authZeroRegion` on **5/5** allocations (`US`×3, `JP`, `RAMP`) with `authRegion` on none — and v2100 changed neither spec, so there is nothing new to weigh. `account-partners` is inert (`servers` only) and moved to v2082. ~~It 403s on both organization credentials, so its own coverage is still ungranted.~~ **Wrong as of 2026-09-09: partners is granted and the whole account lane is green.** `GET /partners/v1/deal-registrations` answers **200** (`{"totalCount":0,"results":[]}`) with a bogus path in the same namespace returning `403 BAD_PERMISSIONS` as the control, so the earlier 403 was the *distributor* surface, not the capability. All five distributor operations are routed and authorized and answer `400 UPSTREAM_ERROR` "… via Skyway distributor service" — the standing EAI-4327 fault the suite already pins, not a grant problem. Every one of the eleven `TestAcceptance_Account*` tests now passes or skips on a write opt-in; none skips for want of a credential. |
 | ~~`capi` at v1897~~ | **Lifted 2026-09-04: v2082 republished the whole patch-management family**, including `POST /patchsoftwaretitles/id/{id}` — the one operation the hold existed to keep, because nothing else mints a `softwareTitleId` for the Pro v3 configuration endpoints (`public-apis-oas#438`: "Patch management is where Classic API callers are most concentrated"). `capi` is at v2082 and the whitelist at 589, mirroring the published spec exactly; the 17 `/computers` withdrawals the config had already taken at v1993 came with it, so the alignment cost nothing. Row kept so the next reader sees the outcome rather than the wait. |
 | ~~`securitycloud-devices` at v1897~~ | **Lifted 2026-09-04: `PUT /v2/groups/{groupId}` answers 204 and the write persists.** The row's condition was *"lift when the v2 PUT answers 2xx, not when it stops 403ing"*, and that is exactly what happened — in two steps, five weeks apart. `authorization-policies#265` (`07791a1`, `PUT` only) deployed at 12:29Z on 2026-09-03 and turned the unrouted `403 BAD_PERMISSIONS` into a service-level `404 NOT_FOUND`: the request began clearing authorization and reaching a handler that could not find a group `GET /v2/groups` returned in the same invocation. The handler was then fixed on **2026-09-04, between 12:51 and 13:33 BST** — a probe at 12:51 still got the 404, one at 13:33 succeeded — and the fix is genuine rather than a status change: verified 3/3 by curl with the rename **read back** through `GET /v2/groups`, a `PUT /v1/groups/{id}` at 200 and a bogus-path `403` as controls in the same invocation. So the two operations v1942 withdrew (`GET /v1/groups`, `PUT /v1/groups/{groupId}`) no longer cost a capability, the spec is ingested at v2082, and `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, `ResolveDeviceGroupV1*` and `ApplyDeviceGroupV1` are gone. Both withdrawn paths still answer 200 on the wire, so the SDK is deliberately stricter than the gateway here, per the v1942 rule. Row kept so the next reader sees the outcome rather than the wait. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
@@ -1446,7 +1566,7 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 
 | package | namespace(s) | scope | notes |
 |---|---|---|---|
-| `pro` | `pro` | tenant **or** environment (both declared as of v2082) | 700 ops — the whole spec, v1942's 122 withdrawals minus v2082's 13 `/v3/computers-inventory` restorations |
+| `pro` | `pro` | tenant **or** environment (both declared as of v2082) | 701 ops — the whole spec, v1942's 122 withdrawals minus v2082's 13 `/v3/computers-inventory` restorations and v2121's `GET /v1/mdm/commands` |
 | `proclassic` | `proclassic` | tenant **or** environment (both declared as of v2082) | 589 ops, XML end-to-end — the v2082 surface exactly, the patch-management family restored and the hold gone |
 | `devices`, `devicegroups`, `deviceactions` | as named | **environment** per the spec; tenant still served | Platform APIs. v2082 declares them environment-only, the gateway still answers `X-Tenant-Id` on all three — pinned by `TestAcceptance_TenantScopePlatformSpecsStillServed`, which fails when that changes |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | **environment** | v2082 declares all three environment-only. `ddmreport` still answers under tenant scope and is pinned; `blueprints` and `compliancebenchmarks` refuse a tenant credential with `403 BAD_PERMISSIONS`, unclassifiable against one credential but agreeing with the GA env-only decision, so deliberately unpinned |

@@ -204,7 +204,9 @@ func (c *Client) GetPatchSoftwareTitleDependenciesV3(ctx context.Context, id str
 //     query: version. Comparators allowed in the query: ==, != This param can be combined with paging and
 //     sorting.
 //   - columnsToExport: List of column names to export.
-func (c *Client) ExportPatchSoftwareTitleReportV3(ctx context.Context, id string, filter string, columnsToExport []string) ([]byte, error) {
+//   - accept: File.
+//     Allowed values, from the operation's declared response content types: text/csv, text/tab.
+func (c *Client) ExportPatchSoftwareTitleReportV3(ctx context.Context, id string, filter string, columnsToExport []string, accept string) ([]byte, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result []byte
 	endpoint := fmt.Sprintf("%s/patch-software-title-configurations/%s/export-report", prefix, url.PathEscape(id))
@@ -218,7 +220,11 @@ func (c *Client) ExportPatchSoftwareTitleReportV3(ctx context.Context, id string
 	if encoded := params.Encode(); encoded != "" {
 		endpoint += "?" + encoded
 	}
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	headers := http.Header{}
+	if accept != "" {
+		headers.Set("Accept", accept)
+	}
+	if err := c.transport.DoWithOptions(ctx, http.MethodGet, endpoint, nil, client.RequestOptions{Headers: headers}, &result); err != nil {
 		return nil, fmt.Errorf("ExportPatchSoftwareTitleReportV3(%s): %w", id, err)
 	}
 	return result, nil

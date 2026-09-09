@@ -280,15 +280,40 @@ func TestAcceptance_Pro_AccountPreferencesV3(t *testing.T) {
 	ctx := context.Background()
 	p := pro.New(c)
 
-	current, err := p.GetAccountPreferencesV3(ctx)
+	current, err := p.GetAccountPreferencesV3(ctx, "")
 	if err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("GetAccountPreferencesV3: %v", err)
 	}
 	t.Logf("Account preferences v3 retrieved")
 
-	if err := p.UpdateAccountPreferencesV3(ctx, current); err != nil {
+	if err := p.UpdateAccountPreferencesV3(ctx, current, ""); err != nil {
 		skipOnServerError(t, err)
 		t.Fatalf("UpdateAccountPreferencesV3 round-trip: %v", err)
+	}
+
+	// Accept-Language became reachable when the generator learned header
+	// parameters. It is accepted and, on this surface, inert: wire-probed
+	// 2026-09-09 across fr-FR, de-DE, ja-JP and a bogus xx-ZZ, every response
+	// byte-identical to the header-free one with `language` unchanged, and a
+	// rejected PATCH body returning the same untranslated Jackson message
+	// either way. So the parameter exists, the spec documents it as "Locale to
+	// be used", and nothing observable depends on it.
+	//
+	// This pins the *reachability*, not the inertness: an assertion that the
+	// bodies match would fail the day Jamf starts honouring it, which is the
+	// wrong way round. A bogus locale must not be an error, though — that
+	// would mean the header had started being validated.
+	localized, err := p.GetAccountPreferencesV3(ctx, "fr-FR")
+	if err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAccountPreferencesV3(Accept-Language: fr-FR): %v", err)
+	}
+	if localized.Language != current.Language {
+		t.Logf("Accept-Language now changes the response: language %q -> %q — the header has started being honoured", current.Language, localized.Language)
+	}
+	if _, err := p.GetAccountPreferencesV3(ctx, "xx-ZZ"); err != nil {
+		skipOnServerError(t, err)
+		t.Fatalf("GetAccountPreferencesV3(Accept-Language: xx-ZZ): a bogus locale is accepted on the wire, so this is a new rejection: %v", err)
 	}
 }

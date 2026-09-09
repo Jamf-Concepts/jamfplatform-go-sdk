@@ -89,10 +89,18 @@ func (c *Client) GetPolicy(ctx context.Context, policyID string) (*PolicyDetail,
 //
 // Parameters:
 //   - policyID: Policy ID.
-func (c *Client) UpdatePolicy(ctx context.Context, policyID string, request *UpdatePolicyRequest) error {
+//   - ifMatch: Optimistic-lock precondition. Supply the ETag from a prior GET (e.g. `"7"`) to make the update
+//     conditional on the policy still being at that version; a mismatch yields 409
+//     (POLICY_VERSION_CONFLICT). A weak validator (`W/"7"`) is also accepted. Omit the header or send `*`
+//     for an unconditional update.
+func (c *Client) UpdatePolicy(ctx context.Context, policyID string, request *UpdatePolicyRequest, ifMatch string) error {
 	prefix := c.transport.APIPrefix("ai/governance/policies", "v1")
 	endpoint := fmt.Sprintf("%s/policies/%s", prefix, url.PathEscape(policyID))
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
+	headers := http.Header{}
+	if ifMatch != "" {
+		headers.Set("If-Match", ifMatch)
+	}
+	if err := c.transport.DoWithOptions(ctx, http.MethodPatch, endpoint, request, client.RequestOptions{ExpectedStatus: http.StatusNoContent, ContentType: "application/json", Headers: headers}, nil); err != nil {
 		return fmt.Errorf("UpdatePolicy(%s): %w", policyID, err)
 	}
 	return nil

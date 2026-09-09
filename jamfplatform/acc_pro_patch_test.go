@@ -419,10 +419,10 @@ func TestAcceptance_Pro_Patch_SoftwareTitleConfigV3Lifecycle(t *testing.T) {
 		t.Logf("Config %s patch summary has %d versions", id, len(versions))
 	}
 
-	// Export report — see assertPatchExportReport for why an empty report is
-	// a 400 here rather than an empty CSV.
-	assertPatchExportReport(t, "ExportPatchSoftwareTitleReportV3", id, len(report), func() ([]byte, error) {
-		return p.ExportPatchSoftwareTitleReportV3(ctx, id, "", nil)
+	// Export report — Accept selects the delimiter and is mandatory; see
+	// assertPatchExportReport.
+	assertPatchExportReport(t, "ExportPatchSoftwareTitleReportV3", id, func(accept string, columns []string) ([]byte, error) {
+		return p.ExportPatchSoftwareTitleReportV3(ctx, id, "", columns, accept)
 	})
 
 	// PATCH the display name, then resolve by the new name.
@@ -459,41 +459,85 @@ func TestAcceptance_Pro_Patch_SoftwareTitleConfigV3Lifecycle(t *testing.T) {
 	}
 }
 
-// assertPatchExportReport checks an export-report call given how many rows the
-// corresponding patch report holds.
+// assertPatchExportReport covers export-report across both media types it
+// declares, and pins the two ways it refuses a request.
 //
-// Both V2 and V3 export-report answer 400 with an empty `errors` array when
-// the configuration's patch report has no rows — verified on 11.30.2 across
-// every column set (nil, the V2 spec default, the V3 spec default, and a
-// single column), on freshly seeded titles for software the tenant's computers
-// actually have installed. The rejection is therefore a property of an empty
-// report, not of the version or of the request, and V3 is not a regression on
-// V2. The 400 carries no detail, so there is nothing more precise to assert;
-// a report with rows must still export a body.
-func assertPatchExportReport(t *testing.T, label, id string, reportRows int, export func() ([]byte, error)) {
+// ~~Both V2 and V3 export-report answer 400 when the configuration's patch
+// report has no rows.~~ **That was wrong, and it had been recorded as a wire
+// fact since 11.30.2.** Re-probed 2026-09-09: the 400 was the *absent Accept
+// header*, not the empty report. With `Accept: text/csv` a zero-row report
+// exports fine — a 21-byte header-only body — so the earlier conclusion came
+// from a probe that never set the header, which is also the reason
+// ExportPatchSoftwareTitleReportV3 had never once succeeded: the SDK sends no
+// Accept of its own, so every call it ever made got that 400.
+//
+// The operation declares `text/csv` and `text/tab` and the two genuinely
+// differ — the same two columns come back comma-separated and tab-separated —
+// so the header is a format selector, not a formality, and TSV was
+// unreachable until the `accept` parameter existed.
+//
+// Both refusals are asserted rather than tolerated, so each fails the day it
+// changes:
+//
+//   - no Accept at all is 400. Not a limitation to skip past: it is the
+//     defect that made this method dead, and it must keep failing so nobody
+//     drops the argument.
+//   - columns-to-export omitted is 400 even though the spec marks the
+//     parameter required *with* a nine-column default, so the server applies
+//     no default. This is the evidence hasSpecDefault's guard rests on; note
+//     that sending it empty is a 500, which is why omitting beats sending "".
+func assertPatchExportReport(t *testing.T, label, id string, export func(accept string, columns []string) ([]byte, error)) {
 	t.Helper()
-	body, err := export()
-	if err != nil {
-		if reportRows == 0 {
-			var apiErr *jamfplatform.APIResponseError
-			if errors.As(err, &apiErr) && apiErr.HasStatus(400) {
-				t.Logf("%s(%s): 400 — expected, patch report has 0 rows (same on V2); plumbing OK", label, id)
-				return
-			}
+	columns := []string{"computerName", "version"}
+
+	bodies := make(map[string]string, 2)
+	for _, accept := range []string{"text/csv", "text/tab"} {
+		body, err := export(accept, columns)
+		if err != nil {
+			skipOnServerError(t, err)
+			t.Errorf("%s(%s, Accept: %s): %v", label, id, accept, err)
+			continue
 		}
-		skipOnServerError(t, err)
-		t.Errorf("%s(%s): patch report has %d rows, export should have succeeded: %v", label, id, reportRows, err)
-		return
+		if len(body) == 0 {
+			t.Errorf("%s(%s, Accept: %s) returned an empty body", label, id, accept)
+			continue
+		}
+		firstLine := string(body)
+		if nl := strings.IndexByte(firstLine, '\n'); nl >= 0 {
+			firstLine = firstLine[:nl]
+		}
+		bodies[accept] = firstLine
+		t.Logf("%s(%s, Accept: %s): %d bytes; header: %q", label, id, accept, len(body), firstLine)
 	}
-	if len(body) == 0 {
-		t.Errorf("%s(%s) returned empty body", label, id)
-		return
+	if csv, tab := bodies["text/csv"], bodies["text/tab"]; csv != "" && tab != "" {
+		if !strings.Contains(csv, ",") || strings.Contains(csv, "\t") {
+			t.Errorf("%s: text/csv header %q is not comma-separated", label, csv)
+		}
+		if !strings.Contains(tab, "\t") {
+			t.Errorf("%s: text/tab header %q is not tab-separated — Accept has stopped selecting the delimiter", label, tab)
+		}
 	}
-	firstLine := string(body)
-	if nl := strings.IndexByte(firstLine, '\n'); nl >= 0 {
-		firstLine = firstLine[:nl]
+
+	assertPatchExportRefusal(t, label+" (no Accept)", id, func() ([]byte, error) {
+		return export("", columns)
+	})
+	assertPatchExportRefusal(t, label+" (no columns-to-export)", id, func() ([]byte, error) {
+		return export("text/csv", nil)
+	})
+}
+
+// assertPatchExportRefusal requires a 400. A success means the wire law
+// changed, which the caller has to see rather than pass silently.
+func assertPatchExportRefusal(t *testing.T, label, id string, export func() ([]byte, error)) {
+	t.Helper()
+	if _, err := export(); err == nil {
+		t.Errorf("%s(%s): want 400, got success — the wire law changed, update this assertion", label, id)
+	} else {
+		var apiErr *jamfplatform.APIResponseError
+		if !errors.As(err, &apiErr) || !apiErr.HasStatus(400) {
+			t.Errorf("%s(%s): want 400, got %v", label, id, err)
+		}
 	}
-	t.Logf("%s(%s): %d bytes; header: %s", label, id, len(body), firstLine)
 }
 
 // TestAcceptance_Pro_Patch_CreateConfigV3 probes create with an empty body,

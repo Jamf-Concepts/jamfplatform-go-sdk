@@ -9,16 +9,25 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 )
 
 // GetAccountPreferencesV3 get Jamf Pro account preferences.
 //
 // Required privileges: the spec declares none.
-func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferencesV6, error) {
+//
+// Parameters:
+//   - acceptLanguage: Locale to be used.
+func (c *Client) GetAccountPreferencesV3(ctx context.Context, acceptLanguage string) (*AccountPreferencesV6, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result AccountPreferencesV6
 	endpoint := prefix + "/account-preferences"
-	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+	headers := http.Header{}
+	if acceptLanguage != "" {
+		headers.Set("Accept-Language", acceptLanguage)
+	}
+	if err := c.transport.DoWithOptions(ctx, http.MethodGet, endpoint, nil, client.RequestOptions{Headers: headers}, &result); err != nil {
 		return nil, fmt.Errorf("GetAccountPreferencesV3: %w", err)
 	}
 	return &result, nil
@@ -27,10 +36,17 @@ func (c *Client) GetAccountPreferencesV3(ctx context.Context) (*AccountPreferenc
 // UpdateAccountPreferencesV3 update Jamf Pro account preferences.
 //
 // Required privileges: the spec declares none.
-func (c *Client) UpdateAccountPreferencesV3(ctx context.Context, request *AccountPreferencesV6) error {
+//
+// Parameters:
+//   - acceptLanguage: Locale to be used, when user has not defined preferred language.
+func (c *Client) UpdateAccountPreferencesV3(ctx context.Context, request *AccountPreferencesV6, acceptLanguage string) error {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	endpoint := prefix + "/account-preferences"
-	if err := c.transport.DoWithContentType(ctx, http.MethodPatch, endpoint, request, "application/json", http.StatusNoContent, nil); err != nil {
+	headers := http.Header{}
+	if acceptLanguage != "" {
+		headers.Set("Accept-Language", acceptLanguage)
+	}
+	if err := c.transport.DoWithOptions(ctx, http.MethodPatch, endpoint, request, client.RequestOptions{ExpectedStatus: http.StatusNoContent, ContentType: "application/json", Headers: headers}, nil); err != nil {
 		return fmt.Errorf("UpdateAccountPreferencesV3: %w", err)
 	}
 	return nil
