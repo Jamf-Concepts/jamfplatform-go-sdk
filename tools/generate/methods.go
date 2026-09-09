@@ -827,6 +827,10 @@ func resolveQueryParams(m *GoMethod, specParams map[string]*openapi3.Parameter) 
 			}
 			continue
 		}
+		if sp.In != "" && sp.In != openapi3.ParameterInQuery {
+			return fmt.Errorf("%s %s: config declares %q under \"params\" but the spec says in: %s — a header parameter emitted as a query key is silently ignored by the server; move it to \"headerParams\"",
+				m.HTTPMethod, m.SpecPath, q.Spec, sp.In)
+		}
 		q.AlwaysSend = sp.Required && !hasSpecDefault(sp.Schema)
 	}
 	if len(unmatched) > 0 {
@@ -836,6 +840,82 @@ func resolveQueryParams(m *GoMethod, specParams map[string]*openapi3.Parameter) 
 		}
 		sort.Strings(known)
 		return fmt.Errorf("%s %s: config declares query param(s) %v not found in spec (spec declares: %v) — the spec may have renamed or removed it, fix config.json; if this is a wire-verified param the spec genuinely omits, mark the entry \":undocumented\"",
+			m.HTTPMethod, m.SpecPath, unmatched, known)
+	}
+	return nil
+}
+
+// generatorReservedHeaders are request headers the transport owns, which a
+// generated method must never take as an argument.
+//
+// It mirrors internal/client's reservedHeaders, and the duplication is
+// deliberate: tools/generate is its own module and importing the SDK into its
+// own generator would make the build circular. TestReservedHeadersMatchTransport
+// pins the two lists together, so a scope kind gaining a header fails a test
+// here rather than emitting a method that can overwrite the scope.
+//
+// The scope headers are the load-bearing entries. setScopeHeader stamps them
+// from the client's scope and doRequestFull applies extraHeaders *after* it, so
+// a generated argument would win — and a wrong scope value is
+// 403 OWNERSHIP_FORBIDDEN, which is close to undiagnosable.
+var generatorReservedHeaders = map[string]bool{
+	"X-Tenant-Id":      true,
+	"X-Environment-Id": true,
+	"Authorization":    true,
+}
+
+// resolveHeaderParams cross-checks every config-declared header param against
+// the spec, the way resolveQueryParams does for query params, and refuses four
+// things rather than emitting something that cannot work:
+//
+//   - a name the spec does not declare, unless the entry opts out with
+//     ":undocumented";
+//   - a name the spec declares somewhere other than `in: header` — the mirror
+//     of the guard resolveQueryParams now carries, so neither key can borrow
+//     the other's parameters;
+//   - a header the transport owns (see generatorReservedHeaders);
+//   - any Go type but string. No spec declares a non-string header, and the
+//     wire encoding of a repeated or numeric one is a guess: comma-joining a
+//     []string here would be inventing a serialisation the spec never stated.
+//     Failing is recoverable; guessing ships a request the server misreads.
+//
+// AlwaysSend is derived from the spec exactly as it is for query params: a
+// required header travels unguarded, so a caller passing "" gets the server's
+// own complaint rather than a request that silently omits it.
+func resolveHeaderParams(m *GoMethod, specParams map[string]*openapi3.Parameter) error {
+	var unmatched []string
+	for i := range m.HeaderParams {
+		h := &m.HeaderParams[i]
+		if h.Type != "string" {
+			return fmt.Errorf("%s %s: header param %q is declared as %q — only string is supported, because the wire encoding of any other type is unstated by the spec",
+				m.HTTPMethod, m.SpecPath, h.Spec, h.Type)
+		}
+		if generatorReservedHeaders[http.CanonicalHeaderKey(h.Spec)] {
+			return fmt.Errorf("%s %s: header param %q is stamped by the transport and must not be a method argument — remove it from \"headerParams\"",
+				m.HTTPMethod, m.SpecPath, h.Spec)
+		}
+		sp, ok := specParams[h.Spec]
+		if !ok {
+			if !h.Undocumented {
+				unmatched = append(unmatched, h.Spec)
+			}
+			continue
+		}
+		if sp.In != openapi3.ParameterInHeader {
+			return fmt.Errorf("%s %s: config declares %q under \"headerParams\" but the spec says in: %s — move it to \"params\"",
+				m.HTTPMethod, m.SpecPath, h.Spec, sp.In)
+		}
+		h.AlwaysSend = sp.Required
+	}
+	if len(unmatched) > 0 {
+		known := make([]string, 0, len(specParams))
+		for name, sp := range specParams {
+			if sp.In == openapi3.ParameterInHeader {
+				known = append(known, name)
+			}
+		}
+		sort.Strings(known)
+		return fmt.Errorf("%s %s: config declares header param(s) %v not found in spec (spec declares header params: %v) — fix config.json, or mark the entry \":undocumented\" if it is wire-verified and the spec omits it",
 			m.HTTPMethod, m.SpecPath, unmatched, known)
 	}
 	return nil
@@ -885,8 +965,8 @@ func hasSpecDefault(ref *openapi3.SchemaRef) bool {
 // parameterComment renders a godoc block documenting the parameters a method
 // takes, sourced from the spec's parameter objects (see collectSpecParams).
 // Ordering follows the Go signature — path params first, then the
-// config-declared query params — so the block reads against the call the
-// consumer is writing. Without it the only place a caller can learn which
+// config-declared query params, then the header params — so the block reads
+// against the call the consumer is writing. Without it the only place a caller can learn which
 // fields a `filter` or `sort` argument accepts is the raw spec: those RSQL
 // field lists live in the parameter description and nowhere else in the SDK.
 //
@@ -904,12 +984,15 @@ func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enu
 	}
 
 	type docParam struct{ goName, specName string }
-	ordered := make([]docParam, 0, len(m.PathParams)+len(m.QueryParams))
+	ordered := make([]docParam, 0, len(m.PathParams)+len(m.QueryParams)+len(m.HeaderParams))
 	for _, p := range m.PathParams {
 		ordered = append(ordered, docParam{goName: p.GoName, specName: p.SpecName})
 	}
 	for _, q := range m.QueryParams {
 		ordered = append(ordered, docParam{goName: q.Go, specName: q.Spec})
+	}
+	for _, h := range m.HeaderParams {
+		ordered = append(ordered, docParam{goName: h.Go, specName: h.Spec})
 	}
 
 	var lines []string
@@ -919,6 +1002,9 @@ func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enu
 			continue
 		}
 		body := parameterDocLines(sp, enumTypes)
+		if extra := acceptHeaderDocLines(sp, m.ProducesMediaTypes); len(extra) > 0 {
+			body = append(body, extra...)
+		}
 		if len(body) == 0 {
 			continue
 		}
@@ -931,6 +1017,32 @@ func parameterComment(m GoMethod, specParams map[string]*openapi3.Parameter, enu
 		return ""
 	}
 	return "\n//\n// Parameters:\n" + strings.Join(lines, "\n")
+}
+
+// acceptHeaderDocLines documents an Accept header param's allowed values from
+// the operation's own success-response content types.
+//
+// This is the one header whose vocabulary a spec can state completely while
+// its parameter declaration says nothing: OpenAPI models acceptable media
+// types on the response, so `responses.200.content` *is* the enum and the
+// parameter beside it is a bare string. Jamf Pro's
+// GET /v3/patch-software-title-configurations/{id}/export-report is the live
+// case — it produces text/csv or text/tab, answers 415 for anything else, and
+// describes its `accept` parameter as "File." A caller reading only the
+// signature had no way to learn that text/tab exists.
+//
+// It defers to a real enum: if a bundle ever gives the parameter one,
+// parameterDocLines has already listed those values and this adds nothing. It
+// also stays silent when the response declares a single content type, where
+// the header cannot change anything worth documenting.
+func acceptHeaderDocLines(sp *openapi3.Parameter, produces []string) []string {
+	if sp == nil || sp.In != openapi3.ParameterInHeader || http.CanonicalHeaderKey(sp.Name) != "Accept" {
+		return nil
+	}
+	if len(parameterEnumValues(sp.Schema)) > 0 || len(produces) < 2 {
+		return nil
+	}
+	return wrapCommentText("Allowed values, from the operation's declared response content types: "+strings.Join(produces, ", ")+".", parameterDocWidth)
 }
 
 // isPlaceholderParamDoc reports whether a parameter's description says nothing
@@ -1043,6 +1155,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		Version:         version,
 		ResourcePath:    stripTenantPathSegment(stripVersionPrefix(specPath)),
 		QueryParams:     opDef.parseParams(),
+		HeaderParams:    opDef.parseHeaderParams(),
 		ContentType:     opDef.ContentType,
 		PaginationStyle: opDef.Pagination,
 		PageSizeParam:   coalesce(opDef.PageSizeParam, "page-size"),
@@ -1147,6 +1260,11 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 	if err := resolveQueryParams(&m, specParams); err != nil {
 		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
 	}
+	if err := resolveHeaderParams(&m, specParams); err != nil {
+		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
+	}
+
+	m.ProducesMediaTypes = successMediaTypes(op)
 
 	// Parameter docs come last so the block sits below the summary and the
 	// privilege/deprecation lines, matching how godoc reads: prose, then
@@ -1278,7 +1396,49 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		}
 	}
 
+	if err := validateHeaderParamSupport(m); err != nil {
+		return GoMethod{}, fmt.Errorf("%s: %w", opDef.Name, err)
+	}
+
 	return m, nil
+}
+
+// headerParamCategories are the method shapes whose templates stamp header
+// params. The rest — multipart, raw, unwrap, both pagination walkers and the
+// synthetic resolver/apply methods — build their requests without an
+// http.Header, so a header declared on one of those would be accepted by
+// config, appear in the method signature and its godoc, and then never be
+// sent.
+//
+// Failing generation is the point. The alternative shipped shape is a method
+// whose signature promises a header the request does not carry, and for a
+// precondition header that means an update the caller believes is conditional
+// silently becoming unconditional. Extending the set is a template change, not
+// a config change.
+var headerParamCategories = map[string]bool{
+	"get":                true,
+	"create":             true,
+	"update":             true,
+	"action":             true,
+	"actionWithResponse": true,
+}
+
+// validateHeaderParamSupport refuses a header param the emitted method could
+// not send. Content-Type and the retry opt-out need no check of their own:
+// DoWithOptions carries all three dimensions, so the only thing that can make
+// a header undeliverable is a template that never stamps one.
+func validateHeaderParamSupport(m GoMethod) error {
+	if len(m.HeaderParams) == 0 {
+		return nil
+	}
+	if headerParamCategories[m.Category] {
+		return nil
+	}
+	names := make([]string, 0, len(m.HeaderParams))
+	for _, h := range m.HeaderParams {
+		names = append(names, h.Spec)
+	}
+	return fmt.Errorf("declares header param(s) %v but its %q template has no headers form — extend the template, or drop the parameter", names, m.Category)
 }
 
 func categorize(m GoMethod) string {
@@ -1380,6 +1540,28 @@ func namedResponseIsArray(doc *openapi3.T, goType string) bool {
 		return ref.Value.Type.Is("array")
 	}
 	return false
+}
+
+// successMediaTypes returns the content types the operation's success
+// response declares, sorted. It is the only declaration of what an Accept
+// header may be set to: OpenAPI models a request's acceptable media types
+// structurally, on the response, and not as a parameter enum — so a spec can
+// be complete about the vocabulary while the `Accept` parameter it declares
+// alongside is a bare string. See parameterComment for the use.
+func successMediaTypes(op *openapi3.Operation) []string {
+	if op == nil || op.Responses == nil {
+		return nil
+	}
+	for _, code := range []int{200, 201, 202} {
+		resp := op.Responses.Status(code)
+		if resp == nil || resp.Value == nil || len(resp.Value.Content) == 0 {
+			continue
+		}
+		out := slices.Collect(maps.Keys(resp.Value.Content))
+		sort.Strings(out)
+		return out
+	}
+	return nil
 }
 
 func detectResponse(op *openapi3.Operation) (int, string) {

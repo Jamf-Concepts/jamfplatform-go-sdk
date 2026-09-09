@@ -313,10 +313,11 @@ type OperationDef struct {
 	// CursorParam is the query parameter the cursor is sent back in, for
 	// Pagination == "cursor". Empty defaults to "cursor".
 	CursorParam    string            `json:"cursorParam,omitempty"`
-	MaxPageSize    int               `json:"maxPageSize,omitempty"` // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
-	Version        string            `json:"version,omitempty"`     // override version for tenantPrefix
-	PathNames      map[string]string `json:"pathNames,omitempty"`   // spec param -> Go param name
-	Params         []string          `json:"params,omitempty"`      // "name", "name:type", "spec:type:goName"
+	MaxPageSize    int               `json:"maxPageSize,omitempty"`  // page-size requested per page; defaults to 100. Only raise this once the endpoint's true server-side cap is wire-verified — see CLAUDE.md "Wire-verified pagination limits".
+	Version        string            `json:"version,omitempty"`      // override version for tenantPrefix
+	PathNames      map[string]string `json:"pathNames,omitempty"`    // spec param -> Go param name
+	Params         []string          `json:"params,omitempty"`       // "name", "name:type", "spec:type:goName"
+	HeaderParams   []string          `json:"headerParams,omitempty"` // same notation as Params, for `in: header` request parameters — see parseHeaderParams
 	UnwrapResults  string            `json:"unwrapResults,omitempty"`
 	RequestType    string            `json:"requestType,omitempty"`    // explicit request schema name (used when spec body is untyped, e.g. Classic)
 	ResponseType   string            `json:"responseType,omitempty"`   // explicit response schema name (same)
@@ -413,8 +414,31 @@ func (o OperationDef) parseOp() (method, path string) {
 // wire-verified to work but that the spec doesn't declare under any name
 // (as opposed to a typo or a spec rename, which the check exists to catch).
 func (o OperationDef) parseParams() []ExtraParam {
-	params := make([]ExtraParam, 0, len(o.Params))
-	for _, p := range o.Params {
+	return parseParamList(o.Params)
+}
+
+// parseHeaderParams expands the same compact notation as parseParams, for
+// parameters the spec declares `in: header`.
+//
+// It is a separate config key rather than a flag on Params, and the reason is
+// that the two are indistinguishable at the point of the name-match check:
+// collectSpecParams keys every parameter by wire name regardless of where it
+// travels, so `"params": ["If-Match"]` matches the spec, passes every guard
+// and emits `?If-Match=…` — a query key the server ignores, with the
+// conditional update silently becoming unconditional. Splitting the key makes
+// the intent explicit and lets resolveQueryParams and resolveHeaderParams each
+// assert the `in` they expect.
+//
+// The scope headers are never declared here: the transport stamps them from
+// the client's scope (see setScopeHeader), and resolveHeaderParams refuses
+// them.
+func (o OperationDef) parseHeaderParams() []ExtraParam {
+	return parseParamList(o.HeaderParams)
+}
+
+func parseParamList(in []string) []ExtraParam {
+	params := make([]ExtraParam, 0, len(in))
+	for _, p := range in {
 		parts := strings.Split(p, ":")
 		ep := ExtraParam{Spec: parts[0], Go: toLowerCamelCase(parts[0]), Type: "string"}
 		if len(parts) >= 2 {

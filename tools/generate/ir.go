@@ -131,17 +131,26 @@ type GoField struct {
 }
 
 type GoMethod struct {
-	Name             string
-	Comment          string
-	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped, resolverIDDirect, resolverTypedDirect, apply
-	HTTPMethod       string
-	Namespace        string
-	Version          string
-	Tag              string // first OpenAPI tag of the operation, used when SplitByTag is enabled
-	ResourcePath     string // path after version prefix, e.g. "/devices/{id}"
-	MultipartFields  []GoMultipartField
-	PathParams       []GoPathParam
-	QueryParams      []ExtraParam
+	Name            string
+	Comment         string
+	Category        string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped, resolverIDDirect, resolverTypedDirect, apply
+	HTTPMethod      string
+	Namespace       string
+	Version         string
+	Tag             string // first OpenAPI tag of the operation, used when SplitByTag is enabled
+	ResourcePath    string // path after version prefix, e.g. "/devices/{id}"
+	MultipartFields []GoMultipartField
+	PathParams      []GoPathParam
+	QueryParams     []ExtraParam
+	// ProducesMediaTypes are the content types the success response declares,
+	// sorted. Only godoc reads them, and only to document an Accept header
+	// param — see parameterComment.
+	ProducesMediaTypes []string
+	// HeaderParams are request parameters the spec declares `in: header`,
+	// emitted as string arguments that the method stamps on the request
+	// through DoExpectWithHeaders. Distinct from QueryParams because the two
+	// share a namespace in the spec but nothing else — see parseHeaderParams.
+	HeaderParams     []ExtraParam
 	RequestType      string
 	ResponseType     string
 	ResponseWireName string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies

@@ -4,6 +4,7 @@
 package main
 
 import (
+	"net/http"
 	"regexp"
 	"sort"
 	"strings"
@@ -399,4 +400,11 @@ func toSet(ss []string) map[string]bool {
 		m[s] = true
 	}
 	return m
+}
+
+// testHeaderValue is the sentinel a generated stub sends for one header param
+// and asserts came back. Derived from the wire name so a method taking two
+// headers cannot pass by stamping one value twice.
+func testHeaderValue(specName string) string {
+	return "hdr-" + strings.ToLower(http.CanonicalHeaderKey(specName))
 }
