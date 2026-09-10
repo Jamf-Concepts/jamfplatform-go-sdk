@@ -131,31 +131,46 @@ type GoField struct {
 }
 
 type GoMethod struct {
-	Name             string
-	Comment          string
-	Category         string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped, resolverIDDirect, resolverTypedDirect, apply
-	HTTPMethod       string
-	Namespace        string
-	Version          string
-	Tag              string // first OpenAPI tag of the operation, used when SplitByTag is enabled
-	ResourcePath     string // path after version prefix, e.g. "/devices/{id}"
-	MultipartFields  []GoMultipartField
-	PathParams       []GoPathParam
-	QueryParams      []ExtraParam
-	RequestType      string
-	ResponseType     string
-	ResponseWireName string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
-	ExpectedStatus   int
-	ContentType      string
-	NoRetry          bool // from OperationDef.NoRetry — see its doc; drives DoWithContentTypeNoRetry vs DoWithContentType in template.go
-	PaginationStyle  string
-	PageSizeParam    string
-	MaxPageSize      int
-	ItemType         string
-	ResultsField     string
-	CursorField      string
-	CursorParam      string
-	ReturnsSlice     bool
+	Name            string
+	Comment         string
+	Category        string // get, create, update, action, actionWithResponse, paginated, unwrap, multipart, resolverID, resolverTyped, resolverIDDirect, resolverTypedDirect, apply
+	HTTPMethod      string
+	Namespace       string
+	Version         string
+	Tag             string // first OpenAPI tag of the operation, used when SplitByTag is enabled
+	ResourcePath    string // path after version prefix, e.g. "/devices/{id}"
+	MultipartFields []GoMultipartField
+	PathParams      []GoPathParam
+	QueryParams     []ExtraParam
+	// ProducesMediaTypes are the content types the success response declares,
+	// sorted. Only godoc reads them, and only to document an Accept header
+	// param — see parameterComment.
+	ProducesMediaTypes []string
+	// HeaderParams are request parameters the spec declares `in: header`,
+	// emitted as string arguments that the method stamps on the request
+	// through DoWithOptions — the only transport entry point that can carry
+	// headers. Distinct from QueryParams because the two share a namespace in
+	// the spec but nothing else — see parseHeaderParams.
+	HeaderParams []ExtraParam
+	// WireRequiredParams is the set of parameter wire names the server
+	// refuses the request without, although the spec marks them optional.
+	// Only godoc reads it — see parameterComment and config's
+	// WireRequiredParams for why it must not affect emission.
+	WireRequiredParams map[string]bool
+	RequestType        string
+	ResponseType       string
+	ResponseWireName   string // XML element name of the response root (format=xml only); used by test stubs to emit valid wire bodies
+	ExpectedStatus     int
+	ContentType        string
+	NoRetry            bool // from OperationDef.NoRetry — see its doc; drives DoWithContentTypeNoRetry vs DoWithContentType in template.go
+	PaginationStyle    string
+	PageSizeParam      string
+	MaxPageSize        int
+	ItemType           string
+	ResultsField       string
+	CursorField        string
+	CursorParam        string
+	ReturnsSlice       bool
 	// ResponseIsJSONArray reports that the success body is a JSON array,
 	// which ReturnsSlice does not: a named schema declared `type: array`
 	// travels as an array but appears in the Go signature as its alias, not

@@ -17,10 +17,13 @@ func TestGetAccountPreferencesV3(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("method = %s, want GET", r.Method)
 		}
+		if got := r.Header.Get("Accept-Language"); got != "hdr-accept-language" {
+			t.Errorf("header Accept-Language = %q, want %q", got, "hdr-accept-language")
+		}
 		writeJSON(t, w, http.StatusOK, map[string]any{})
 	})
 
-	result, err := c.GetAccountPreferencesV3(context.Background())
+	result, err := c.GetAccountPreferencesV3(context.Background(), "hdr-accept-language")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +42,7 @@ func TestGetAccountPreferencesV3_NotFound(t *testing.T) {
 		})
 	})
 
-	_, err := c.GetAccountPreferencesV3(context.Background())
+	_, err := c.GetAccountPreferencesV3(context.Background(), "hdr-accept-language")
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -51,10 +54,13 @@ func TestUpdateAccountPreferencesV3(t *testing.T) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
+		if got := r.Header.Get("Accept-Language"); got != "hdr-accept-language" {
+			t.Errorf("header Accept-Language = %q, want %q", got, "hdr-accept-language")
+		}
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	err := c.UpdateAccountPreferencesV3(context.Background(), &AccountPreferencesV6{})
+	err := c.UpdateAccountPreferencesV3(context.Background(), &AccountPreferencesV6{}, "hdr-accept-language")
 	if err != nil {
 		t.Fatal(err)
 	}

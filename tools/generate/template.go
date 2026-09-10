@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"text/template"
@@ -15,24 +16,8 @@ import (
 // ---------------------------------------------------------------------------
 
 var funcMap = template.FuncMap{
-	"httpConst": func(method string) string {
-		m := map[string]string{
-			"GET": "http.MethodGet", "POST": "http.MethodPost",
-			"PATCH": "http.MethodPatch", "PUT": "http.MethodPut",
-			"DELETE": "http.MethodDelete",
-		}
-		if v, ok := m[method]; ok {
-			return v
-		}
-		return fmt.Sprintf("%q", method)
-	},
-	"statusConst": func(code int) string {
-		m := map[int]string{200: "http.StatusOK", 201: "http.StatusCreated", 202: "http.StatusAccepted", 204: "http.StatusNoContent"}
-		if v, ok := m[code]; ok {
-			return v
-		}
-		return strconv.Itoa(code)
-	},
+	"httpConst":   httpConstName,
+	"statusConst": statusConstName,
 	"fmtPath": func(m GoMethod) string {
 		if len(m.PathParams) == 0 {
 			return fmt.Sprintf(`prefix + "%s"`, m.ResourcePath)
@@ -146,6 +131,59 @@ var funcMap = template.FuncMap{
 				continue
 			}
 			fmt.Fprintf(&b, "\n\t\tif !r.URL.Query().Has(%q) {\n\t\t\tt.Errorf(\"required query param %s not sent: %%q\", r.URL.RawQuery)\n\t\t}", qp.Spec, qp.Spec)
+		}
+		return b.String()
+	},
+	// transportCall renders the whole c.transport.X(...) invocation for the
+	// five method shapes that reach the transport directly.
+	//
+	// It is one Go function rather than a conditional in each of those five
+	// templates because the entry point is chosen from three independent
+	// dimensions — Content-Type, retry opt-out, header params — and a
+	// per-template conditional had already been written out twice before
+	// headers were a third. The body and result expressions are derived from
+	// Category and RequestType rather than passed in, so a template cannot
+	// pair a create's `request` with a get's `nil` result.
+	//
+	// Header-carrying methods route through DoWithOptions because it is the
+	// only entry point that can carry headers; everything else keeps the
+	// named shorthand it already used, which is what holds the regenerated
+	// diff to the operations that actually gained a header.
+	"transportCall": transportCall,
+	// headerName renders a header's wire name in the canonical form Go's
+	// http.Header uses. Set and Get canonicalise either way, so this is for
+	// the reader: the spec spells one of these "accept", and generated code
+	// saying Set("accept", …) invites a reader to think the case is
+	// load-bearing.
+	"headerName": http.CanonicalHeaderKey,
+	// testHeaderArgs supplies each header param a non-zero sentinel in the
+	// stub call, and headerAsserts asserts the request carried it.
+	//
+	// The pair is what makes the mechanism testable at all. Stubs call every
+	// method with zero-value arguments, and an optional header is emitted
+	// behind a `!= ""` guard — so with "" the header is legitimately absent
+	// and a template that forgot to wire it up passes identically to one that
+	// did. Sending a sentinel turns that into a failure.
+	"testHeaderArgs": func(m GoMethod) string {
+		if len(m.HeaderParams) == 0 {
+			return ""
+		}
+		args := make([]string, len(m.HeaderParams))
+		for i, hp := range m.HeaderParams {
+			args[i] = fmt.Sprintf("%q", testHeaderValue(hp.Spec))
+		}
+		return ", " + strings.Join(args, ", ")
+	},
+	"headerAsserts": func(m GoMethod) string {
+		var b strings.Builder
+		for _, hp := range m.HeaderParams {
+			// Canonical, for the same reason the method's Set is: Get
+			// canonicalises either way, so a stub asserting Get("accept")
+			// would reintroduce exactly the spelling headerName exists to
+			// keep out of generated code.
+			name := http.CanonicalHeaderKey(hp.Spec)
+			fmt.Fprintf(&b, "\n\t\tif got := r.Header.Get(%q); got != %q {\n\t\t\tt.Errorf(\"header %s = %%q, want %%q\", got, %q)\n\t\t}",
+				name, testHeaderValue(hp.Spec), name, testHeaderValue(hp.Spec))
 		}
 		return b.String()
 	},
@@ -563,18 +601,43 @@ func {{ .Name }}Values() []{{ $enumType }} {
 {{- end }}
 {{- end }}
 
+{{- /*
+buildHeaderParams stamps the operation's header params onto an http.Header the
+transport applies to the request. Optional ones keep a zero-value guard — an
+absent header and an empty one are different requests, and for If-Match the
+difference is "update unconditionally" versus a malformed precondition. A
+spec-required header travels unguarded, for the same reason a required query
+param does: the caller gets the server's own complaint rather than a request
+that silently omitted it.
+*/ -}}
+{{- define "buildHeaderParams" -}}
+{{- if .HeaderParams }}
+	headers := http.Header{}
+{{- range .HeaderParams }}
+{{- if .AlwaysSend }}
+	headers.Set("{{ headerName .Spec }}", {{ .Go }})
+{{- else }}
+	if {{ .Go }} != "" {
+		headers.Set("{{ headerName .Spec }}", {{ .Go }})
+	}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "get" }}
 // {{ .Comment }}
 {{- if .ReturnsSlice }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
 {{- else }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
-	if err := c.transport.Do(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, &result); err != nil {
+{{- template "buildHeaderParams" . }}
+	if err := {{ transportCall . }}; err != nil {
 		return nil, fmt.Errorf({{ errWrap . }})
 	}
 {{- if .ReturnsSlice }}
@@ -588,19 +651,16 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "create" }}
 // {{ .Comment }}
 {{- if .ReturnsSlice }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
 {{- else }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
-{{- if .ContentType }}
-	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, &result); err != nil {
-{{- else }}
-	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, {{ statusConst .ExpectedStatus }}, &result); err != nil {
-{{- end }}
+{{- template "buildHeaderParams" . }}
+	if err := {{ transportCall . }}; err != nil {
 		return nil, fmt.Errorf({{ errWrap . }})
 	}
 {{- if .ReturnsSlice }}
@@ -614,15 +674,16 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 {{- define "actionWithResponse" }}
 // {{ .Comment }}
 {{- if .ReturnsSlice }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) ({{ .ResponseType }}, error) {
 {{- else }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) (*{{ .ResponseType }}, error) {
 {{- end }}
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	var result {{ .ResponseType }}
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
-	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, &result); err != nil {
+{{- template "buildHeaderParams" . }}
+	if err := {{ transportCall . }}; err != nil {
 		return nil, fmt.Errorf({{ errWrap . }})
 	}
 {{- if .ReturnsSlice }}
@@ -635,15 +696,12 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 
 {{- define "update" }}
 // {{ .Comment }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }},{{- if eq .RequestType "[]byte" }} body []byte{{- else }} request *{{ .RequestType }}{{- end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
-{{- if .ContentType }}
-	if err := c.transport.{{ if .NoRetry }}DoWithContentTypeNoRetry{{ else }}DoWithContentType{{ end }}(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, "{{ .ContentType }}", {{ statusConst .ExpectedStatus }}, nil); err != nil {
-{{- else }}
-	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, {{ if eq .RequestType "[]byte" }}body{{ else }}request{{ end }}, {{ statusConst .ExpectedStatus }}, nil); err != nil {
-{{- end }}
+{{- template "buildHeaderParams" . }}
+	if err := {{ transportCall . }}; err != nil {
 		return fmt.Errorf({{ errWrap . }})
 	}
 	return nil
@@ -652,11 +710,12 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 
 {{- define "action" }}
 // {{ .Comment }}
-func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
+func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .QueryParams }}, {{ .Go }} {{ .Type }}{{ end }}{{ range .HeaderParams }}, {{ .Go }} {{ .Type }}{{ end }}) error {
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
 	endpoint := {{ fmtPath . }}
 {{- template "buildQueryParams" . }}
-	if err := c.transport.DoExpect(ctx, {{ httpConst .HTTPMethod }}, endpoint, nil, {{ statusConst .ExpectedStatus }}, nil); err != nil {
+{{- template "buildHeaderParams" . }}
+	if err := {{ transportCall . }}; err != nil {
 		return fmt.Errorf({{ errWrap . }})
 	}
 	return nil
@@ -1161,7 +1220,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 		<%- if eq .Format "xml" %>
 		writeXML(t, w, http.StatusOK, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
 		<%- else if .ResponseIsJSONArray %>
@@ -1171,7 +1230,7 @@ func Test<% .Name %>(t *testing.T) {
 		<%- end %>
 	})
 
-	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1194,7 +1253,7 @@ func Test<% .Name %>_NotFound(t *testing.T) {
 		<%- end %>
 	})
 
-	_, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	_, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -1207,7 +1266,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 <%- if eq .Format "xml" %>
 		writeXML(t, w, <% statusConst .ExpectedStatus %>, "<<% .ResponseWireName %>></<% .ResponseWireName %>>")
 <%- else if .ResponseIsJSONArray %>
@@ -1217,7 +1276,7 @@ func Test<% .Name %>(t *testing.T) {
 <%- end %>
 	})
 
-	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>, <% requestArg .RequestType %><% testExtraArgs . %>)
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %>, <% requestArg .RequestType %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1233,11 +1292,11 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
-	err := c.<% .Name %>(context.Background()<% testCallArgs . %>, <% requestArg .RequestType %><% testExtraArgs . %>)
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %>, <% requestArg .RequestType %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1250,11 +1309,11 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 	})
 
-	err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1267,7 +1326,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 		if ct := r.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") {
 			t.Errorf("Content-Type = %q, want multipart/form-data", ct)
 		}
@@ -1302,7 +1361,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 		<%- if .ResponseType %>
 		w.WriteHeader(<% statusConst .ExpectedStatus %>)
 		_, _ = w.Write([]byte("<ok/>"))
@@ -1356,11 +1415,11 @@ func Test<% .Name %>(t *testing.T) {
 			mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 				if r.Method != <% httpConst .HTTPMethod %> {
 					t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-				}<% requiredQueryAsserts . %>
+				}<% requiredQueryAsserts . %><% headerAsserts . %>
 				writeJSON(t, w, http.StatusOK, tc.body)
 			})
 
-			results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+			results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1381,7 +1440,7 @@ func Test<% .Name %>_NotFound(t *testing.T) {
 		})
 	})
 
-	_, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	_, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -1394,7 +1453,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 <%- if .ResponseIsJSONArray %>
 		writeJSON(t, w, <% statusConst .ExpectedStatus %>, []map[string]any{{}})
 <%- else %>
@@ -1402,7 +1461,7 @@ func Test<% .Name %>(t *testing.T) {
 <%- end %>
 	})
 
-	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	result, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1418,7 +1477,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 <%- if eq .PaginationStyle "rawArray" %>
 		writeJSON(t, w, http.StatusOK, []map[string]any{{}})
 <%- else %>
@@ -1430,7 +1489,7 @@ func Test<% .Name %>(t *testing.T) {
 <%- end %>
 	})
 
-	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1449,7 +1508,7 @@ func Test<% .Name %>(t *testing.T) {
 	mux.HandleFunc("<% testPath . %>", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != <% httpConst .HTTPMethod %> {
 			t.Errorf("method = %s, want <% .HTTPMethod %>", r.Method)
-		}<% requiredQueryAsserts . %>
+		}<% requiredQueryAsserts . %><% headerAsserts . %>
 		switch r.URL.Query().Get("<% .CursorParam %>") {
 		case "":
 			writeJSON(t, w, http.StatusOK, map[string]any{
@@ -1465,7 +1524,7 @@ func Test<% .Name %>(t *testing.T) {
 		}
 	})
 
-	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %>)
+	results, err := c.<% .Name %>(context.Background()<% testCallArgs . %><% testExtraArgs . %><% testHeaderArgs . %>)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1855,4 +1914,79 @@ func testAPIBase(namespace, version string) string {
 		return fmt.Sprintf("/%s", namespace)
 	}
 	return fmt.Sprintf("/%s/%s", namespace, version)
+}
+
+// transportCall renders one generated method's transport invocation. See the
+// funcMap entry of the same name for why it lives in Go.
+func transportCall(m GoMethod) string {
+	bodyArg := "nil"
+	if m.Category == "create" || m.Category == "update" {
+		bodyArg = "request"
+		if m.RequestType == "[]byte" {
+			bodyArg = "body"
+		}
+	}
+	resultArg := "nil"
+	switch m.Category {
+	case "get", "create", "actionWithResponse":
+		resultArg = "&result"
+	}
+	method := httpConstName(m.HTTPMethod)
+
+	if len(m.HeaderParams) > 0 {
+		var opts []string
+		// The "get" shape has always gone through Do, which hardcodes 200 and
+		// ignores ExpectedStatus. Leaving the field unset preserves that
+		// exactly rather than promoting a value the old call never read.
+		if m.Category != "get" {
+			opts = append(opts, "ExpectedStatus: "+statusConstName(m.ExpectedStatus))
+		}
+		if m.ContentType != "" {
+			opts = append(opts, fmt.Sprintf("ContentType: %q", m.ContentType))
+		}
+		if m.NoRetry {
+			opts = append(opts, "NoRetry: true")
+		}
+		opts = append(opts, "Headers: headers")
+		return fmt.Sprintf("c.transport.DoWithOptions(ctx, %s, endpoint, %s, client.RequestOptions{%s}, %s)",
+			method, bodyArg, strings.Join(opts, ", "), resultArg)
+	}
+
+	if m.ContentType != "" {
+		name := "DoWithContentType"
+		if m.NoRetry {
+			name = "DoWithContentTypeNoRetry"
+		}
+		return fmt.Sprintf("c.transport.%s(ctx, %s, endpoint, %s, %q, %s, %s)",
+			name, method, bodyArg, m.ContentType, statusConstName(m.ExpectedStatus), resultArg)
+	}
+	if m.Category == "get" {
+		return fmt.Sprintf("c.transport.Do(ctx, %s, endpoint, %s, %s)", method, bodyArg, resultArg)
+	}
+	return fmt.Sprintf("c.transport.DoExpect(ctx, %s, endpoint, %s, %s, %s)",
+		method, bodyArg, statusConstName(m.ExpectedStatus), resultArg)
+}
+
+// httpConstName and statusConstName render an HTTP method and status as the
+// net/http constant a generated file refers to, falling back to a literal for
+// anything net/http does not name. Shared by the templates (as httpConst /
+// statusConst) and by transportCall.
+func httpConstName(method string) string {
+	m := map[string]string{
+		"GET": "http.MethodGet", "POST": "http.MethodPost",
+		"PATCH": "http.MethodPatch", "PUT": "http.MethodPut",
+		"DELETE": "http.MethodDelete",
+	}
+	if v, ok := m[method]; ok {
+		return v
+	}
+	return fmt.Sprintf("%q", method)
+}
+
+func statusConstName(code int) string {
+	m := map[int]string{200: "http.StatusOK", 201: "http.StatusCreated", 202: "http.StatusAccepted", 204: "http.StatusNoContent"}
+	if v, ok := m[code]; ok {
+		return v
+	}
+	return strconv.Itoa(code)
 }

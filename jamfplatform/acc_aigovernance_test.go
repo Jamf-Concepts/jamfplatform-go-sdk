@@ -347,12 +347,14 @@ func TestAcceptance_AiGovernanceReadRejections(t *testing.T) {
 		if err != nil || len(tools.Results) == 0 {
 			t.Skipf("Skipping: no tool to probe (%v)", err)
 		}
-		// The policy lookup happens before body validation, so this reaches 404
-		// rather than 422 even with a legal schemaVersion.
+		// Body validation runs first (an illegal body against this same
+		// missing id answers 400 VALIDATION_FAILED, wire-verified
+		// 2026-09-09), so a legal body is what lets the request reach
+		// resolution and 404 rather than stopping at 400.
 		err = g.UpdatePolicy(ctx, missing, &aigovernance.UpdatePolicyRequest{
 			SchemaVersion: tools.Results[0].SchemaVersion,
 			Settings:      json.RawMessage(`{}`),
-		})
+		}, "")
 		requireAigovError(t, "UpdatePolicy(unknown policy)", err, 404, "POLICY_NOT_FOUND")
 	})
 
@@ -466,6 +468,17 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 	if detail.CurrentVersionNumber != nil {
 		t.Errorf("a never-published policy has currentVersionNumber = %d, want null", *detail.CurrentVersionNumber)
 	}
+	// version (v2121) is the optimistic-lock counter, not the published
+	// version: a freshly created policy is at 0 while currentVersionNumber is
+	// still null. Wire-verified 2026-09-09 — the create's own GET answered
+	// `ETag: "0"` with `"version": 0`. The spec says null means a legacy
+	// document that predates versioning, so a policy this suite just created
+	// must never be null.
+	if detail.Version == nil {
+		t.Error("a policy created just now has version = null, which the spec reserves for documents predating versioning")
+	} else if *detail.Version != 0 {
+		t.Errorf("a never-updated policy has version = %d, want 0", *detail.Version)
+	}
 	if versions, err := g.ListPolicyVersions(ctx, created.ID); err != nil {
 		t.Errorf("ListPolicyVersions on a never-published policy: %v", err)
 	} else if len(versions) != 0 {
@@ -527,7 +540,7 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 		if err := g.UpdatePolicy(ctx, created.ID, &aigovernance.UpdatePolicyRequest{
 			SchemaVersion: schemaVersion,
 			Settings:      json.RawMessage(`{"sdkAccProbeKey":"present"}`),
-		}); err != nil {
+		}, ""); err != nil {
 			t.Fatalf("UpdatePolicy(settings with a probe key): %v", err)
 		}
 		withKey, err := g.GetPolicy(ctx, created.ID)
@@ -537,16 +550,28 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 		if !strings.Contains(string(withKey.Settings), "sdkAccProbeKey") {
 			t.Fatalf("settings round-trip lost the probe key: %s", withKey.Settings)
 		}
+		// Every PATCH increments version, whether or not it changes anything
+		// (wire-verified 2026-09-09: an unconditional PATCH with the body
+		// already stored still went 1 -> 2 -> 3). Publishing does not.
+		firstVersion := withKey.Version
+		if firstVersion == nil {
+			t.Fatal("version is null after a PATCH — the optimistic-lock counter stopped being maintained")
+		}
 
 		if err := g.UpdatePolicy(ctx, created.ID, &aigovernance.UpdatePolicyRequest{
 			SchemaVersion: schemaVersion,
 			Settings:      json.RawMessage(`{}`),
-		}); err != nil {
+		}, ""); err != nil {
 			t.Fatalf("UpdatePolicy(empty settings): %v", err)
 		}
 		emptied, err := g.GetPolicy(ctx, created.ID)
 		if err != nil {
 			t.Fatalf("GetPolicy: %v", err)
+		}
+		if emptied.Version == nil {
+			t.Error("version is null after a second PATCH")
+		} else if *emptied.Version <= *firstVersion {
+			t.Errorf("version did not advance across a PATCH: %d then %d", *firstVersion, *emptied.Version)
 		}
 		if strings.Contains(string(emptied.Settings), "sdkAccProbeKey") {
 			t.Errorf("settings still carry the probe key after a PATCH that omitted it (%s) — PATCH has become a merge, and every consumer that assumed replace is now sending stale members",
@@ -569,7 +594,7 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 		if err := g.UpdatePolicy(ctx, created.ID, &aigovernance.UpdatePolicyRequest{
 			SchemaVersion: schemaVersion,
 			Settings:      json.RawMessage(`{"sdkAccProbeKey":"again"}`),
-		}); err != nil {
+		}, ""); err != nil {
 			t.Fatalf("UpdatePolicy(divergent settings): %v", err)
 		}
 		divergent, err := g.GetPolicy(ctx, created.ID)
@@ -578,6 +603,94 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 		}
 		if !divergent.HasDraft {
 			t.Error("hasDraft is false while the draft settings differ from the published version — publish-if-hasDraft would skip a real change")
+		}
+	})
+
+	t.Run("If-Match makes the update conditional", func(t *testing.T) {
+		// The optimistic-lock protocol v2121 declared, exercised through the
+		// SDK. Wire-established 2026-09-09; three halves are load-bearing and
+		// none of them is guessable from the spec:
+		//
+		//   - version is the ETag's value, so a caller needs no header
+		//     plumbing to take part: strconv.FormatInt(*d.Version, 10) is a
+		//     valid precondition. This is the assertion that keeps that true.
+		//   - the server matches on the number, accepting the bare form, the
+		//     quoted strong validator and the quoted weak one alike. A caller
+		//     that quotes and one that does not both work, which is why the
+		//     generated argument is a plain string rather than something that
+		//     formats an int64 for you.
+		//   - a stale value is 409 POLICY_VERSION_CONFLICT, and an omitted
+		//     header is an unconditional update. Both are asserted, because
+		//     the failure mode of getting this wrong is silent: an update the
+		//     caller believes is conditional simply overwrites.
+		before, err := g.GetPolicy(ctx, created.ID)
+		if err != nil {
+			t.Fatalf("GetPolicy: %v", err)
+		}
+		if before.Version == nil {
+			t.Skip("policy has no version — conditional update is unavailable for documents predating versioning")
+		}
+		body := func() *aigovernance.UpdatePolicyRequest {
+			return &aigovernance.UpdatePolicyRequest{SchemaVersion: schemaVersion, Settings: json.RawMessage(`{}`)}
+		}
+
+		// A version that cannot be current. Both quoted and bare, since the
+		// two travel differently on the wire and only one was ever probed
+		// before.
+		for _, stale := range []string{
+			strconv.FormatInt(*before.Version+1000, 10),
+			`"` + strconv.FormatInt(*before.Version+1000, 10) + `"`,
+		} {
+			err := g.UpdatePolicy(ctx, created.ID, body(), stale)
+			requireAigovError(t, "UpdatePolicy(If-Match: "+stale+")", err, 409, "POLICY_VERSION_CONFLICT")
+		}
+		if unchanged, err := g.GetPolicy(ctx, created.ID); err != nil {
+			t.Fatalf("GetPolicy after the refused updates: %v", err)
+		} else if unchanged.Version == nil || *unchanged.Version != *before.Version {
+			t.Errorf("a refused conditional update still moved version: %v then %v", before.Version, unchanged.Version)
+		}
+
+		// Each accepted form advances the counter by one, so the next
+		// iteration has to re-read it — which is the read-modify-write loop a
+		// consumer writes.
+		for _, form := range []struct{ label, format string }{
+			{"bare", "%s"},
+			{"quoted", `"%s"`},
+			{"weak", `W/"%s"`},
+		} {
+			live, err := g.GetPolicy(ctx, created.ID)
+			if err != nil {
+				t.Fatalf("GetPolicy before the %s precondition: %v", form.label, err)
+			}
+			if live.Version == nil {
+				t.Fatalf("version went null mid-test")
+			}
+			value := fmt.Sprintf(form.format, strconv.FormatInt(*live.Version, 10))
+			if err := g.UpdatePolicy(ctx, created.ID, body(), value); err != nil {
+				t.Fatalf("UpdatePolicy(If-Match: %s, %s form): %v", value, form.label, err)
+			}
+			after, err := g.GetPolicy(ctx, created.ID)
+			if err != nil {
+				t.Fatalf("GetPolicy after the %s precondition: %v", form.label, err)
+			}
+			if after.Version == nil || *after.Version != *live.Version+1 {
+				t.Errorf("%s precondition: version went %v -> %v, want +1", form.label, live.Version, after.Version)
+			}
+		}
+
+		// An omitted header is unconditional, which is what every other
+		// UpdatePolicy call in this file relies on.
+		live, err := g.GetPolicy(ctx, created.ID)
+		if err != nil {
+			t.Fatalf("GetPolicy: %v", err)
+		}
+		if err := g.UpdatePolicy(ctx, created.ID, body(), ""); err != nil {
+			t.Fatalf("UpdatePolicy with no precondition: %v", err)
+		}
+		if after, err := g.GetPolicy(ctx, created.ID); err != nil {
+			t.Fatalf("GetPolicy: %v", err)
+		} else if after.Version == nil || *after.Version != *live.Version+1 {
+			t.Errorf("unconditional update: version went %v -> %v, want +1", live.Version, after.Version)
 		}
 	})
 
@@ -590,7 +703,7 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 			Name:          &renamed,
 			SchemaVersion: schemaVersion,
 			Settings:      json.RawMessage(`{}`),
-		}); err != nil {
+		}, ""); err != nil {
 			t.Fatalf("UpdatePolicy(rename): %v", err)
 		}
 		after, err := g.GetPolicy(ctx, created.ID)
@@ -607,7 +720,7 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 		if err := g.UpdatePolicy(ctx, created.ID, &aigovernance.UpdatePolicyRequest{
 			SchemaVersion: schemaVersion,
 			Settings:      json.RawMessage(`{}`),
-		}); err != nil {
+		}, ""); err != nil {
 			t.Fatalf("UpdatePolicy(no name): %v", err)
 		}
 		still, err := g.GetPolicy(ctx, created.ID)

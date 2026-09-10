@@ -13,6 +13,8 @@ import (
 // ApiError Standard error response envelope returned for all non-2xx status codes.
 type ApiError struct {
 	Errors []ApiErrorItem `json:"errors"`
+	// HTTP status of the response.
+	HttpStatus int `json:"httpStatus"`
 	// Trace ID for request correlation.
 	TraceID string `json:"traceId"`
 }
@@ -104,6 +106,9 @@ type PolicyDetail struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 	// Actor ID.
 	UpdatedBy string `json:"updatedBy"`
+	// Optimistic-lock counter, incremented on each PATCH. Surfaced as the strong ETag response header and
+	// used as the If-Match precondition. Null for legacy documents that predate versioning.
+	Version *int64 `json:"version,omitempty"`
 }
 
 // PolicyListResponse Paginated list of policy summaries.

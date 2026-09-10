@@ -153,6 +153,8 @@ deliberately kept three of them for exactly that reason.
 | `pathNames` | 313 | spec path param → Go param name |
 | `requestType` | 229 | explicit request schema name |
 | `params` | 161 | query params, compact: `"name"`, `"name:type"`, `"spec:type:goName"`, plus a trailing `:undocumented` to opt out of the spec name-match check. **Required-ness is not declarable here** — it is derived from the spec, see [query parameter emission](#query-parameter-emission-a-required-param-carries-no-guard) |
+| `headerParams` | 4 | request headers the spec declares `in: header`, same compact notation as `params`. Refuses the scope headers, a non-`string` type, and a parameter the spec declares anywhere but `in: header` — see [header parameters](#header-parameters) |
+| `wireRequiredParams` | 1 | parameter wire names the server refuses the request without although the spec marks them optional. **Godoc only** — it must never flip `AlwaysSend`, because sending the parameter empty is not better than omitting it. Self-expiring: fails generation once the spec marks the parameter required — see [header parameters](#header-parameters) |
 | `pagination` | 127 | one of the five styles below |
 | `resolver` | 108 | one name→ID resolver, optionally with `apply` |
 | `contentType` | 8 | request Content-Type override. Every current user is `application/merge-patch+json` |
@@ -203,6 +205,144 @@ An emitted method's error path is unchanged in one respect worth knowing: an
 envelope that omits the results key, `{}`, and `null` all decode to an empty
 slice with no error, exactly as the struct decode this replaced did. The only
 behaviour that changed from error to empty is a bare `[]`, which means zero rows.
+
+### Header parameters
+
+`headerParams` emits a spec's `in: header` request parameters as string
+arguments the method stamps on the request. Four operations use it:
+
+| operation | header | what it does |
+|---|---|---|
+| `UpdatePolicy` (aigovernance) | `If-Match` | optimistic-lock precondition; a stale value is 409 `POLICY_VERSION_CONFLICT` |
+| `ExportPatchSoftwareTitleReportV3` | `Accept` | selects `text/csv` or `text/tab`. **Mandatory** — see below |
+| `GetAccountPreferencesV3`, `UpdateAccountPreferencesV3` | `Accept-Language` | accepted, and inert on the wire today |
+
+**It is a separate key from `params`, and that is the whole point.**
+`collectSpecParams` keys every parameter by wire name regardless of where it
+travels, so `"params": ["If-Match"]` matches the spec, passes the name-match
+check, and emits `?If-Match=…` — a query key the server ignores, turning a
+conditional update into an unconditional one with nothing failing anywhere.
+Splitting the key lets each resolver assert the `in` it expects, and both
+directions are refused: `resolveQueryParams` rejects a parameter the spec
+declares `in: header`, `resolveHeaderParams` rejects one declared `in: query`.
+
+Three more refusals, each because the alternative ships something that cannot
+work:
+
+- **The scope headers.** `generatorReservedHeaders` refuses `X-Tenant-Id`,
+  `X-Environment-Id` and `Authorization`. `doRequestFull` applies extra headers
+  *after* `setScopeHeader`, so a generated argument would win, and a wrong scope
+  value is `403 OWNERSHIP_FORBIDDEN` — close to undiagnosable. The list is
+  duplicated from `internal/client`'s `reservedHeaders` because
+  `tools/generate` is its own module; `TestGeneratorReservedHeadersCoverTheScopeHeaders`
+  pins the duplication.
+- **Any type but `string`.** No spec declares a non-string header, and the wire
+  encoding of a repeated or numeric one is unstated — comma-joining a
+  `[]string` here would be inventing a serialisation.
+- **A template with no headers form.** `headerParamCategories` is `get`,
+  `create`, `update`, `action` and `actionWithResponse`. The rest — multipart,
+  raw, unwrap and both pagination walkers — build their requests without an
+  `http.Header`, so a header declared on one would appear in the signature and
+  its godoc and then never be sent.
+- **A resolver or apply over a header-bearing operation.**
+  `refuseHeaderParamsOnSynthetic` covers what `validateHeaderParamSupport`
+  structurally cannot: a synthetic method is assembled field by field from its
+  source rather than through `buildMethod`, and it deliberately does not copy
+  `HeaderParams` — a resolver's signature is `(ctx, name)` and an apply's is
+  fixed too. So the header would not reach the signature at all, and the
+  caller would have no way to supply the precondition. Both the `resolver`
+  source and an `apply`'s `createOp`/`updateOp` are checked.
+
+**Emission mirrors query params: optional headers keep a zero-value guard,
+spec-required ones travel unguarded.** For `If-Match` the distinction is load
+bearing rather than stylistic — an absent header means "update
+unconditionally", while an empty one is a malformed precondition.
+
+**The generated stub sends a sentinel and asserts it came back.** Stubs call
+every method with zero-value arguments, and with `""` an optional header is
+legitimately absent — so a template that forgot to wire one up would pass
+identically to one that did. `testHeaderArgs` sends `hdr-<header-name>` and
+`headerAsserts` requires the request carried it.
+
+#### One transport entry point instead of a wrapper per combination
+
+A header-carrying method routes through `Transport.DoWithOptions` and a
+`client.RequestOptions` literal; every other method keeps the named shorthand
+it already used. That confinement is deliberate — it holds the regenerated diff
+to the operations that actually gained a header, and
+`TestNoHeaderParamsKeepsTheNamedTransportCall` pins it.
+
+`RequestOptions` exists because the per-request dimensions are independent:
+expected status, Content-Type, extra headers, retry opt-out. Naming a wrapper
+per combination had already produced `DoWithContentType` and
+`DoWithContentTypeNoRetry`, and headers would have doubled it again. The choice
+of entry point now lives in `transportCall` — one Go function rather than a
+conditional repeated in five templates, which is also what stops a template
+pairing a create's `request` with a get's `nil` result.
+
+A `get` deliberately sets **no** `ExpectedStatus`. The shape it replaces called
+`Do`, which hardcodes 200 and never read the field, so promoting the spec's
+value would change behaviour for any read declaring something else.
+
+#### An `Accept` header's allowed values come from the response, not the parameter
+
+`acceptHeaderDocLines` documents an `Accept` parameter's vocabulary from the
+operation's own success-response content types. This is the one header whose
+allowed values a spec can state completely while its parameter declaration says
+nothing, because OpenAPI models acceptable media types structurally on the
+response: `responses.200.content` *is* the enum.
+
+`GET /v3/patch-software-title-configurations/{id}/export-report` is the live
+case. It produces `text/csv` or `text/tab`, answers **400** for anything else,
+and describes its `accept` parameter as "File." — so a caller reading the
+signature had no way to learn `text/tab` exists. It defers to a real enum if a
+bundle ever adds one, and stays silent when the response declares a single
+content type.
+
+**The refusal is a 400, not the 415 an unsatisfiable `Accept` usually gets.**
+Wire-verified 2026-09-09 with `GET /pro/v1/jamf-pro-version` at 200 as the
+control in the same invocation: `application/pdf` (2/2) and `text/plain` both
+answer 400, and the *error serialisation itself follows `Accept`* — absent or
+`application/json` gives Jamf's JSON envelope, while `text/csv`, `text/tab`,
+`application/pdf` and `text/plain` give Tomcat's HTML. That is the tell that the
+header was always being read, and it is why a probe watching only the status
+code would have missed the whole mechanism.
+
+#### `wireRequiredParams` says what the signature cannot
+
+A generated argument carries no required-ness. `accept` is declared
+`required: false`, so `resolveHeaderParams` gives it a zero-value guard and the
+signature reads `accept string` like any optional parameter — while the endpoint
+answers 400 without it. That gap is how `ExportPatchSoftwareTitleReportV3`
+shipped broken for its whole life, and a consumer migrating past the new
+compile error would have reproduced it by passing `""`.
+
+`wireRequiredParams` adds the missing line to the parameter's godoc:
+
+```
+//   - accept: File.
+//     Allowed values, from the operation's declared response content types: text/csv, text/tab.
+//     Required in practice: the server answers 400 when this is omitted, although the spec marks the
+//     parameter optional. Passing the zero value omits it.
+```
+
+**It is documentation only, and must stay that way.** Flipping `AlwaysSend`
+would send `Accept: ` empty, which the server refuses exactly as it refuses an
+absent one — and on `columns-to-export` the empty form is a *500* where omitting
+is a 400. The caller has to pass a real value, so the only useful fix is telling
+the caller.
+
+Both refusals are what stop the note outliving the defect: `resolveWireRequiredParams`
+fails generation on a name the spec does not declare, and on a parameter the
+spec has started marking `required` — at which point the parameter's own
+declaration says it and the note would be restating it.
+
+**That operation had never once succeeded.** The SDK sends no `Accept` of its
+own on Pro paths, and without one the export answers 400 with an empty `errors`
+array. The recorded diagnosis — that the 400 was a property of an empty patch
+report — was wrong and had stood since 11.30.2, because the probe behind it
+never set the header. Evidence and the corrected picture:
+[WIRE-FACTS.md](WIRE-FACTS.md#export-report-was-never-callable-and-accept-is-why-2026-09-09).
 
 ### Pagination styles
 

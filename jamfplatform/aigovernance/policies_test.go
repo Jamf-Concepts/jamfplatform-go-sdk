@@ -91,10 +91,13 @@ func TestUpdatePolicy(t *testing.T) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("method = %s, want PATCH", r.Method)
 		}
+		if got := r.Header.Get("If-Match"); got != "hdr-if-match" {
+			t.Errorf("header If-Match = %q, want %q", got, "hdr-if-match")
+		}
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	err := c.UpdatePolicy(context.Background(), "test-id", &UpdatePolicyRequest{})
+	err := c.UpdatePolicy(context.Background(), "test-id", &UpdatePolicyRequest{}, "hdr-if-match")
 	if err != nil {
 		t.Fatal(err)
 	}

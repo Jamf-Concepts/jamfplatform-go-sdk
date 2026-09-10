@@ -591,15 +591,46 @@ func (c *Transport) DoWithContentTypeNoRetry(ctx context.Context, method, path s
 	return c.execute(ctx, method, path, body, contentType, nil, expectedStatus, result, c.uploadClient)
 }
 
-// DoWithHeaders performs an authenticated API request with extra headers and decodes the response.
-// It expects HTTP 200 OK as the success status.
-func (c *Transport) DoWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, result any) error {
-	return c.DoExpectWithHeaders(ctx, method, path, body, headers, http.StatusOK, result)
+// RequestOptions carries the per-request dimensions of a call. It exists
+// because those dimensions are independent — expected status, Content-Type,
+// extra headers, and whether the write may be retried — so naming a wrapper
+// per combination doubles the surface every time one is added. The Do* methods
+// above are the shorthands for the combinations the generated code reaches
+// most; DoWithOptions is the general form and the only one that can carry
+// headers.
+//
+// Headers are stamped after the scope header, so a caller could in principle
+// overwrite X-Tenant-Id / X-Environment-Id with a wrong value and get an
+// undiagnosable 403 OWNERSHIP_FORBIDDEN. That is why tools/generate refuses to
+// emit a scope header as a method argument (generatorReservedHeaders) — the
+// restriction lives at the generator rather than here so a legitimate
+// reverse-proxy caller reaching Client.Transport() is not blocked.
+type RequestOptions struct {
+	// ExpectedStatus is the success status; zero means 200, which keeps a
+	// plain read's options literal empty rather than restating the default.
+	ExpectedStatus int
+	// ContentType overrides the Content-Type the codec would pick. Only
+	// consulted when the request carries a body.
+	ContentType string
+	// Headers are set on the request, replacing rather than appending.
+	Headers http.Header
+	// NoRetry opts out of the automatic 5xx retry — see
+	// DoWithContentTypeNoRetry for the case it exists for.
+	NoRetry bool
 }
 
-// DoExpectWithHeaders performs an authenticated API request with extra headers expecting the given HTTP status.
-func (c *Transport) DoExpectWithHeaders(ctx context.Context, method, path string, body any, headers http.Header, expectedStatus int, result any) error {
-	return c.execute(ctx, method, path, body, "", headers, expectedStatus, result, c.httpClient)
+// DoWithOptions performs an authenticated API request with any combination of
+// the per-request options. It is the general form of the Do* family.
+func (c *Transport) DoWithOptions(ctx context.Context, method, path string, body any, opts RequestOptions, result any) error {
+	expected := opts.ExpectedStatus
+	if expected == 0 {
+		expected = http.StatusOK
+	}
+	httpClient := c.httpClient
+	if opts.NoRetry {
+		httpClient = c.uploadClient
+	}
+	return c.execute(ctx, method, path, body, opts.ContentType, opts.Headers, expected, result, httpClient)
 }
 
 // execute funnels every Do* variant through one place so Deprecation-header

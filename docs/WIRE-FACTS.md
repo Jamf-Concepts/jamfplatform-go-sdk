@@ -986,6 +986,120 @@ fails if either starts working, at which point it becomes a real round-trip.
 114 → 1, which is the assertion that proves the path segment is honoured
 rather than ignored.
 
+### Export-report was never callable, and `Accept` is why (2026-09-09)
+
+`GET /v3/patch-software-title-configurations/{id}/export-report` declares an
+`in: header` `accept` parameter the SDK had no way to send, and **without one
+the endpoint answers 400**. So `ExportPatchSoftwareTitleReportV3` had failed
+every call it ever made. Go sends no `Accept` unasked and the transport sets
+none on Pro paths, so there was no accidental default to rescue it.
+
+**The recorded diagnosis was wrong, and it had stood since 11.30.2.**
+`assertPatchExportReport` said "both V2 and V3 answer 400 when the
+configuration's patch report has no rows … the rejection is a property of an
+empty report", tolerating the 400 whenever `reportRows == 0`. The probe behind
+that never set `Accept`. Re-probed on config `1` (patch report `totalCount: 0`)
+with `GET /pro/v1/jamf-pro-version` at 200 as the control:
+
+| `Accept` | `columns-to-export` | status | body |
+|---|---|---|---|
+| absent | two columns | **400** ×2 | `{"httpStatus":400,"errors":[]}` |
+| `text/csv` | two columns | **200** | `computerName,version` — 21 bytes, `Content-Type: text/csv` |
+| `text/tab` | two columns | **200** | `computerName\tversion` — 21 bytes, `Content-Type: text/tab` |
+| `text/csv` | omitted | **400** | Tomcat's HTML 400 |
+| `text/csv` | `columns-to-export=` | **500** | `java.lang.IllegalArgumentException: There has to be at least one column to export` |
+| `text/csv` | `nonsuchColumn` | **200** | `nonsuchColumn` — column names are not validated |
+
+So a zero-row report exports fine, as a header-only body, and the two media
+types genuinely differ — same 21 bytes, comma versus tab. **TSV was
+unreachable** until the `accept` parameter existed.
+
+**Error serialisation follows `Accept` too**, which is the tell that the header
+was always being read: absent or `application/json` gives Jamf's JSON error
+envelope, while `text/csv`, `text/tab` and `application/pdf` all give Tomcat's
+HTML 400. A probe that only ever looked at status would miss it.
+
+**`columns-to-export`'s recorded reasoning changes but its conclusion holds.**
+`hasSpecDefault` keeps the zero-value guard on that parameter — omitting it
+rather than sending `""` — on the grounds that omitting and sending a valid list
+both answered 400 while `columns-to-export=` answered 500. The first half of
+that was the missing `Accept`, not the parameter. With `Accept` set, omitting is
+a **400** because the server applies no default despite the spec declaring a
+nine-column one, and sending empty is still a **500**. Omitting still beats
+sending empty, so the mechanism is unchanged; only the evidence is.
+
+`assertPatchExportReport` now exports under both media types, asserts the
+delimiter differs, and **asserts** both refusals rather than tolerating them —
+the no-`Accept` 400 especially, so nobody drops the argument again. Verified
+against a freshly seeded config (id 487) with a zero-row report: both exports
+returned 21 bytes.
+
+Report upstream: the spec should declare `enum: [text/csv, text/tab]` on the
+parameter and mark it required, and `columns-to-export`'s declared default is
+not applied.
+
+### `Accept-Language` is accepted and inert (2026-09-09)
+
+`GET` and `PATCH /pro/v3/account-preferences` each declare an `in: header`
+`Accept-Language` — "Locale to be used" — that the SDK could not send until the
+generator learned header parameters. It is now reachable and changes nothing
+observable.
+
+Probed with `fr-FR`, `de-DE`, `ja-JP` and a bogus `xx-ZZ`: every response is
+byte-identical to the header-free one, `"language": "en"` throughout. A PATCH
+with a deliberately invalid `resultsPerPage` returns the same untranslated
+Jackson message with and without the header:
+
+```
+"description" : "Cannot deserialize value of type `java.lang.Integer` from String \"not-a-number\": not a valid `java.lang.Integer` value"
+```
+
+The response carries no prose to localise, so there may be nothing for the
+header to do here. The acceptance test pins **reachability**, not inertness — an
+assertion that the bodies match would fail the day Jamf starts honouring it,
+which is the wrong way round — but it does require a bogus locale to stay
+accepted, since a rejection would mean the header had started being validated.
+
+### v2121 restored `GET /v1/mdm/commands`, and it has two wire laws the spec does not state (2026-09-09)
+
+v2121 is the second restoration of a v1942 withdrawal (`GET /v3/computers-inventory`
+was the first, at v2082). `jpapi` goes 700 → 701 operations, zero schemas added
+or changed — `MdmCommand` never left the spec — and the recovered `config.json`
+entry is the pre-v1942 one verbatim, so this is a revert rather than a
+re-derivation.
+
+It is a two-parameter point lookup, not a paginated list, so it is not reachable
+through `ListMdmCommandsV2` and needed its own method and its own coverage.
+Probed on the EU environment `aee3ec71-…` with `GET /pro/v1/jamf-pro-version` at
+200 and a bogus `/pro/v1/…` path returning the unrouted `403 BAD_PERMISSIONS` as
+controls in the same invocation:
+
+| request | status | body |
+|---|---|---|
+| `?uuids=<real>` | **200** | the one command, as `[{…}]` — a bare array, matching the spec |
+| `?client-management-id=<real>` | **200** | every command for that client (136 on this tenant) |
+| `?uuids=<bogus>` / `?client-management-id=<bogus>` | **200** | `[ ]` |
+| neither parameter | **400** | `{"httpStatus":400,"errors":[]}` — deterministic 2/2 |
+| **both** parameters | **500** | `{"httpStatus":500,"errors":[]}` — deterministic 2/2 |
+| 41 `uuids` | **414** | `INVALID_SIZE` / "This lookup is limited to 40 or fewer UUIDs." |
+
+**Two things to report upstream.** The spec marks both parameters optional while
+the server refuses a request with neither, and both bodies carry an **empty
+`errors` array** so there is no attribution to work from. And the spec's own
+wording — "Choose one of two parameters, but not both" — describes a constraint
+the server implements as a **500**, not the 400 it should be.
+`TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV1` asserts the 500 rather than
+skipping on it, so the test fails the day it is fixed;
+`skipOnServerError` would have made the fix invisible, which is the same mistake
+`GET /patches/name/{name}` taught.
+
+**The generator's comma-joined `[]string` is correct here even though the spec
+says `explode: true`.** `uuids=a,b` and `uuids=a&uuids=b` return the identical
+two rows, so the generated `strings.Join(uuids, ",")` needs no override.
+
+The endpoint still sends `Deprecation: date="Mon, 16 Oct 2023 00:00:00 GMT"`,
+which the transport logs.
+
 ### Self Service categories: `display_in` is what stores them, and only the mobile profile hides it (2026-09-07)
 
 All six Classic resources carrying a `self_service.self_service_categories`
@@ -1081,7 +1195,24 @@ assertions. `compliance-benchmarks` also answered
 `500 {"error": "Upstream host lookup failed"}` **2/2** to the *environment*
 credential, which is an infra fault on that environment and not a scope
 answer — repeated, per the rule that a single 500 reads as "routed and merely
-faulting".
+faulting". **Confirmed environment-specific 2026-09-09**: a *different*
+environment credential (`aee3ec71-…`, EU gateway) answers **200** on
+`GET /compliance-benchmarks/v1/benchmarks`, with `GET /pro/v1/jamf-pro-version`
+→ `11.31.1` as the control in the same invocation, and the whole benchmark
+lane — `TestAcceptance_Benchmark_CreateAndDelete`,
+`…_Reporting`, `TestAcceptance_ResolveBenchmark*`,
+`TestAcceptance_ResolveBaseline*` — passes against it. So the 500 was an infra
+fault on the one environment, not a property of the API.
+
+Two further readings from that credential, worth keeping because they are what
+a *partial* environment grant looks like: `GET /device-groups/v1/groups`
+answers `403 BAD_PERMISSIONS` while `devices`, `blueprints`,
+`compliance-benchmarks`, `audit` and `securitycloud` all answer 200 on the
+same token — a per-capability grant gap on the credential, not a namespace
+being unrouted. And `GET /declaration-reporting/v1/declarations` answers
+`404 page not found`, the unrouted-*path* tell rather than the namespace's own
+`403`: the declared path is not that one. Read the path out of the spec before
+concluding anything from a 404.
 
 The dual-scope half is correct. Under `X-Environment-Id`:
 `GET /pro/v3/computers-inventory` → 200 (5 computers),
@@ -2426,6 +2557,53 @@ covered as calls, not as outcomes.
 
 ## Jamf Account (`account`) — organization scope
 
+### Re-probed at v2100: both holds stand, and `partners` turns out to be granted (2026-09-09)
+
+v2100 changed neither held spec, so the hold question is unchanged; the probe
+was run anyway because the holds are the only reason the SDK is behind on any
+spec. Tenant A (`8a2d0ff2-…`, US gateway, organization scope so no scope
+header), with `GET /licensing/v1/licenses` → 200 as the control in the same
+invocation and `GET /licensing/v1/nope-not-a-path` →
+`403 BAD_PERMISSIONS` as the unrouted control:
+
+- **Licensing.** `type` non-null on **16/16** rows, `licenseType` on **8**.
+  Both fields present in the key union, so `authRegion`-style rename is still
+  ruled out and taking v2082 would still drop a populated classifier.
+- **SSO.** All five domains resolved through
+  `GET /sso/v1/domains/allocation/{domain}` → 200, and every connection
+  carries `authZeroRegion` and no `authRegion`:
+  `{"assignedConnection":"con_RMBLC9S3qpC6Bzv0","assignedConnectionOrgId":"org_k7LP9cP4h3RijIaR","authZeroRegion":"US"}`
+  — **5/5**, values `US`×3, `JP`, `RAMP`. (`RAMP` is the undeclared region the
+  SDK carries via `enumAdditions`; it is still on the wire.)
+
+**The recorded claim that `account-partners` "403s on both organization
+credentials" is wrong, and the mistake is the same shape as the
+`/sso/v1/domain-allocations` one: a namespace judged from one path.**
+`GET /partners/v1/deal-registrations` answers **200**
+(`{"totalCount":0,"results":[]}`). What 403s is nothing — all five distributor
+operations are routed *and* authorized, and every one answers the standing
+EAI-4327 upstream fault:
+
+| operation | status | body |
+|---|---|---|
+| `GET /partners/v1/deal-registrations` | 200 | `{"totalCount":0,"results":[]}` |
+| `GET /partners/v1/distributor/configuration` | 400 | `[UPSTREAM_ERROR] Failed to get configuration via Skyway distributor service` |
+| `GET /partners/v1/distributor/quotes/NOPE123` | 400 | `… Failed to get quote NOPE123 via Skyway distributor service` |
+| `GET /partners/v1/distributor/purchase-orders/NOPE123` | 400 | `… Failed to get purchase order NOPE123 via Skyway distributor service` |
+| `POST /partners/v1/distributor/validate-purchase-order` `{}` | 400 | `… Failed to validate purchase order via Skyway distributor service` |
+| `GET /partners/v1/nope-bogus` | 403 | `BAD_PERMISSIONS` (unrouted control) |
+
+Note the last write: `{}` does not reach body validation — the upstream call
+fails first — so **field validation on this operation is upstream-side**, and
+the doomed-request trick cannot probe it while EAI-4327 stands.
+
+The whole account lane is consequently green for the first time: all eleven
+`TestAcceptance_Account*` tests pass or skip on a write opt-in
+(`JAMFPLATFORM_ACC_ORGANIZATION_WRITE_OK`, plus the SSO-create skip that names
+the 500 `UPSTREAM_ERROR`), and **none skips for want of a credential**. The two
+`isSkywayScopeFault` pins fired as designed, asserting the block rather than
+tolerating it.
+
 ### Both holds re-confirmed on two organization tenants (2026-09-04)
 
 The `account-licensing` and `account-sso` holds have stood since v1865. v2082
@@ -2821,6 +2999,94 @@ probe at the top of this section.
 ---
 
 ## AI Governance (`aigovernance`) — environment scope
+
+### v2121's optimistic-concurrency mechanism is live, and the SDK cannot reach half of it (2026-09-09)
+
+v2121 adds an ETag/If-Match concurrency protocol to the policies API:
+`PolicyDetail.version` (nullable `int64`), an `ETag` response header on the
+detail `GET`, an `If-Match` request header on `PATCH`, and a `409` on that
+`PATCH`. Every part of it is enforced on the wire — probed on the EU
+environment `aee3ec71-…` with `GET /v1/policies` at 200 as the control in the
+same invocation.
+
+**The read half only works for documents created after the rollout, exactly as
+the spec says.** Both pre-existing policies on that environment answer
+`"version": null` and send **no** `ETag` header at all. A policy created during
+the probe answered:
+
+```
+$ curl -D - .../ai/governance/policies/v1/policies/b53d619a-…
+HTTP/2 200
+etag: "0"
+jamf-preview: true
+…  "version": 0
+```
+
+So `version: null` is not "the field is unpopulated" — it is a legacy document
+with no ETag to supply, and a caller cannot make a conditional update to one.
+
+**The write half, on that same new policy.** Re-probed with a second policy to
+settle the validator forms, which the first pass had left ambiguous:
+
+| `If-Match` | status | body |
+|---|---|---|
+| `3` (bare, current) | **204** | version → 4 |
+| `"3"` (strong, current) | **204** | version increments |
+| `W/"3"` (weak, current) | **204** | version increments |
+| `"1", "2"` (list) | **400** | `VALIDATION_FAILED` / "Invalid request" |
+
+**The server compares the number and tolerates all three validator forms**, so a
+caller needs no ETag quoting: `strconv.FormatInt(*policy.Version, 10)` is a
+valid precondition. That is what makes a plain `string` argument safe, and
+`TestAcceptance_AiGovernancePolicyLifecycle/If-Match_makes_the_update_conditional`
+asserts all three so the SDK notices if the tolerance narrows. Only a
+comma-separated list — legal HTTP — is refused.
+
+**And the stale cases:**
+
+| `If-Match` | status | body |
+|---|---|---|
+| `"999"` | **409** | `POLICY_VERSION_CONFLICT` — "Policy was modified by another request; reload and retry with the current version" |
+| `W/"999"` | **409** | same. Ambiguous on its own — a rejected form and a stale one look alike here, which is why the table above re-probed `W/"3"` against the *current* version |
+| `"0"` (current) | **204** | version → 1, `ETag: "1"` on the next `GET` |
+| `*` | **204** | unconditional; version → 2 |
+| absent | **204** | unconditional; version → 3 |
+| `garbage` | **400** | `VALIDATION_FAILED` / "Invalid request" — the header is parsed, not ignored |
+
+**Every `PATCH` increments `version`, whether or not it changes anything** —
+1 → 2 → 3 above were all the same stored body. Publishing does not touch it, so
+`version` and `currentVersionNumber` are independent counters on the same
+document.
+
+**Validation ordering on `PATCH` is body → If-Match syntax → resource
+resolution → precondition.** A bogus `policyId` with an invalid body answers 400
+`VALIDATION_FAILED` naming `schemaVersion`/`settings`; the same bogus id with a
+*valid* body answers 404 `POLICY_NOT_FOUND` for every syntactically valid
+`If-Match`, and 400 for `garbage`. So the field constraints are probeable
+without a policy, and only the 409 needs a real one.
+
+**~~The SDK cannot send `If-Match`.~~ — implemented 2026-09-09.**
+`tools/generate` had no concept of `in: header` parameters: it never inspected
+a parameter's `In`, so a `params` entry for `If-Match` would have matched the
+spec, passed every guard and been emitted as a **query** key the server
+ignores — turning a conditional update into an unconditional one with nothing
+failing anywhere. `WithHeaders` was no help either, being per-client while the
+value changes per request.
+
+It now has a `headerParams` config key, `UpdatePolicy` takes an `ifMatch`
+string, and the request routes through `Transport.DoWithOptions`. Mechanism,
+the four refusals, and why the key is separate from `params`:
+[STYLE.md](STYLE.md#header-parameters). Three other latent header parameters
+came with it — `Accept` on export-report and `Accept-Language` on both
+account-preferences operations, recorded above.
+
+`Jamf-Preview: true` is now declared on every 2xx of all 12 operations and is
+present on the wire. `ApiError.httpStatus` is declared required at v2121 and the
+wire has always sent it — every error body quoted in this section carries it.
+
+The probe policy was deleted (`DELETE` 204, `GET` 404 after) and the list
+re-read at the original two rows.
+
 
 **The published path was wrong in every variant and the gateway was the
 authority — ~~fixed upstream at v1877~~.** The spec declared
