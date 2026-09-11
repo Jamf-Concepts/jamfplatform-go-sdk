@@ -93,6 +93,25 @@ credential (`8a2d0ff2-…`, `us.api.jamfcloud.com`) reads `/licensing/v1/license
 unmounted-namespace answer, not a grant answer, and matches `account` being US
 only.
 
+**Two of those rows have already moved, and the wording has not.** Re-probed
+later the same day on the same environment credential, with the same 200 control:
+`/audit/v1/audit/sources` now answers **200** (real sources) and
+`/securitycloud/v1/categories` **200** (36 categories), so the *ungranted*
+api-product half of the table is no longer reproducible with this credential —
+the grant changed under it, which is a reminder that a 401 classified by varying
+the credential is dated evidence, not a standing property. What did not move is
+the body: a garbage bearer, a bare `Bearer` carrying no token and a `Basic`
+scheme all still answer the byte-identical 22-byte `Authentication failed`, and a
+*missing* `Authorization` header answers JSON instead —
+`{"httpStatus":401,"message":"unauthorized access"}`, `message` rather than
+`errors[]`. A bogus path inside a granted namespace answers a structured
+`403 BAD_PERMISSIONS`, not a plain-text 401.
+
+So four distinct credential-shaped faults produce one wording, and nothing yet
+observed produces a second one. That is the evidence `nonJSONAuthGuidance` keys on
+the status alone rather than matching the body — see its godoc for why the two
+failure modes are not symmetric.
+
 **Correction to the table above: `x-cache: Error from cloudfront` is not an
 edge-block tell.** It appears on the gateway's own plain-text 401 and 404 as
 well — CloudFront emits it for any non-2xx it passes through. The reliable edge

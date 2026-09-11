@@ -2835,6 +2835,14 @@ type APIResponseError = client.APIResponseError
 // The page itself is condensed to its headings and any edge request id, so
 // Error() stays one line; the full body remains on APIResponseError.Body.
 //
+// Read the status before choosing a remedy. This sentinel says only that a page
+// answered instead of an API, and two different faults do that: a WAF, proxy or
+// allowlist refusing this host, which arrives as a 403 or as a 200 carrying a
+// login shell and is a standing block; and Jamf's own gateway failing, which
+// arrives as a 502/503/504 the transport has already retried and is usually
+// transient. AsAPIError(err).StatusCode separates them, so report an egress IP
+// for the first rather than for both.
+//
 // The only sentinel the SDK exposes, and the only error worth matching with
 // errors.Is; everything else is *APIResponseError. It exists because the
 // condition is inferred from the shape of the body rather than reported by Jamf,

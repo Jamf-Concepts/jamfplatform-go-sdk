@@ -202,6 +202,33 @@ const apiProductGuidance = "the gateway returns this same plain-text 401 both fo
 // Confined to 401: a plain-text body on any other status ("404 page not found"
 // from the gateway for an unknown namespace, say) has an unambiguous cause and
 // needs no annotation.
+//
+// The status is the whole test, deliberately: the body is NOT matched against
+// "Authentication failed". Three reasons, in order of weight.
+//
+// The failure modes are not symmetric. A body this does not recognise loses the
+// annotation permanently and silently — the same silence that had thirteen CI
+// failures reading as bad credentials — whereas a body it recognises too eagerly
+// gets appended prose that is sound advice for any unexplained 401 anyway
+// ("check whether another path in the same namespace answers for this client
+// before rotating the secret"). Unlike the sentinel, which sends a consumer
+// after an egress IP, being wrong here costs a sentence and no wrong action,
+// which is why this deliberately carries no sentinel.
+//
+// It is also the rule annotateTokenError already follows, for the reason stated
+// there: an upstream message is prose the SDK does not own, and enrichment must
+// never be conditional on it, because this only ever adds to an error that is
+// already being returned.
+//
+// And the gateway gives the exact match nothing to discriminate. Probed
+// 2026-09-11 against eu.api.jamfcloud.com with a 200 control in the same
+// invocation: a garbage bearer, a bare "Bearer" carrying no token and a "Basic"
+// scheme all answer the byte-identical 22-byte body, as the ungranted
+// api-product does in WIRE-FACTS, while a *missing* Authorization header answers
+// JSON ({"httpStatus":401,"message":"unauthorized access"}) and is excluded by
+// looksLikeJSON. Four distinct faults, one wording, and no second plain-text 401
+// wording observed on this gateway — so narrowing to the string would change
+// nothing today and lose the annotation the day the wording moves.
 func nonJSONAuthGuidance(status int, header http.Header, body []byte) string {
 	if status != http.StatusUnauthorized {
 		return ""
