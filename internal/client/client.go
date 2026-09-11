@@ -783,24 +783,43 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, cla
 
 		var apiErr ApiError
 		_ = json.Unmarshal(body, &apiErr) // best-effort; non-JSON bodies leave apiErr zero
+		edge := false
 		switch {
 		case len(apiErr.Errors) > 0:
 			if apiErr.HTTPStatus > 0 {
 				respErr.StatusCode = apiErr.HTTPStatus
 			}
 			respErr.Errors = apiErr.Errors
-		default:
-			// Classic API errors are an HTML "Status page", not JSON. Lift the
-			// message into a synthetic structured detail so it renders through
-			// the same path as Pro errors (Error/Summary/Details/FieldErrors,
-			// and traceId). Non-classic, non-JSON bodies leave Errors empty and
-			// fall back to the raw body.
+		// Classic API errors are an HTML "Status page", not JSON. Lift the
+		// message into a synthetic structured detail so it renders through
+		// the same path as Pro errors (Error/Summary/Details/FieldErrors,
+		// and traceId).
+		case isClassicStatusPage(resp.Header, body):
 			if msg, ok := parseClassicErrorMessage(resp.Header, body); ok {
+				respErr.Errors = []Error{{Description: msg}}
+			}
+		// Any other HTML body is an edge or gateway error page carrying no Jamf
+		// message. Condense it the same way, and mark the error so a consumer
+		// can branch — the page means the request did not reach Jamf, which
+		// calls for reporting the host's egress IP rather than reading a
+		// message. Marked here and not only on the token exchange because the
+		// same page arrives on either path; see nonjson_errors.go.
+		case isHTMLErrorBody(resp.Header, body):
+			edge = true
+			if msg := summarizeNonJSONError(resp.Header, body); msg != "" {
 				respErr.Errors = []Error{{Description: msg}}
 			}
 		}
 		respErr.TraceID = pickTraceID(apiErr.TraceID, resp.Header)
 
+		// Both wrappers keep respErr in the chain, so errors.As, AsAPIError and
+		// every accessor go on working; only Error() gains the annotation.
+		if edge {
+			return fmt.Errorf("%w: %w", ErrUnexpectedResponse, respErr)
+		}
+		if guidance := nonJSONAuthGuidance(resp.StatusCode, resp.Header, body); guidance != "" {
+			return fmt.Errorf("%w\n%s", respErr, guidance)
+		}
 		return respErr
 	}
 

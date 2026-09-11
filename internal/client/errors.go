@@ -100,19 +100,25 @@ func (e *APIResponseError) Error() string {
 		statusDetail = strconv.Itoa(e.StatusCode) + " " + statusText
 	}
 
+	// The traceId segment is omitted when there is none to quote. An edge block
+	// carries no Jamf traceId at all — nothing in Jamf's logs to correlate —
+	// and it now reaches this branch with a condensed detail, where an
+	// unconditional segment would render "traceId  (method=…".
+	trace := ""
+	if e.TraceID != "" {
+		trace = ", traceId " + e.TraceID
+	}
+
 	if len(e.Errors) > 0 {
 		details := make([]string, len(e.Errors))
 		for i, err := range e.Errors {
 			details[i] = formatDetail(err)
 		}
-		return fmt.Sprintf("API request failed with status %d, traceId %s (%s): %s",
-			e.StatusCode, e.TraceID, requestInfo, strings.Join(details, "; "))
+		return fmt.Sprintf("API request failed with status %s%s (%s): %s",
+			statusDetail, trace, requestInfo, strings.Join(details, "; "))
 	}
 
-	if e.TraceID != "" {
-		return fmt.Sprintf("API request failed with status %s, traceId %s (%s): %s", statusDetail, e.TraceID, requestInfo, e.Body)
-	}
-	return fmt.Sprintf("API request failed with status %s (%s): %s", statusDetail, requestInfo, e.Body)
+	return fmt.Sprintf("API request failed with status %s%s (%s): %s", statusDetail, trace, requestInfo, e.Body)
 }
 
 // formatDetail renders a single structured error detail, omitting the Code or
