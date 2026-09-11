@@ -655,7 +655,12 @@ func ingestPermissions(a *archive, env, destDir string, mf *manifest, write bool
 				entry: manifestEntry{Build: a.build, Source: env + "/_permissions", SHA256: sum},
 			})
 		} else {
-			r.note = strings.TrimSpace(r.note + " — reported only; -only narrows the run and these are not spec-scoped")
+			const skipped = "reported only; -only narrows the run and these are not spec-scoped — refresh with a full run"
+			if r.note == "" {
+				r.note = skipped
+			} else {
+				r.note += " — " + skipped
+			}
 		}
 		rows = append(rows, r)
 	}

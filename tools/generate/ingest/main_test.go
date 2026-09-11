@@ -523,42 +523,6 @@ func TestIngestPermissionsReportsAPureReordering(t *testing.T) {
 // both directions over one temp dir: nothing written before commit runs,
 // everything written and the manifest updated after, and a second pass over
 // the same archive and manifest reads back unchanged.
-// A -only run must not rewrite _permissions. Those two files are not
-// spec-scoped, so selecting one spec from an older bundle — the exact shape of
-// restoring a held spec — would otherwise reset the whole privilege oracle to
-// that bundle's build. It happened in the v2154 ingest: a `-only
-// Classic-openapi.yaml` restore from the v2121 archive silently took
-// routes.yaml back to v2121 with it. The row must still be reported, so the
-// narrowing is visible rather than hidden.
-func TestOnlyRunReportsPermissionsWithoutWritingThem(t *testing.T) {
-	routes := "a: 1\n"
-	scopes := "x: 1\n"
-	members := map[string]string{
-		"MANIFEST.md":                       "**GitOps Build**: v1\n",
-		"external/_permissions/routes.yaml": routes,
-		"external/_permissions/scopes.yaml": scopes,
-	}
-	a := buildArchive(t, members)
-
-	dest := t.TempDir()
-	mf := &manifest{Entries: map[string]manifestEntry{}}
-	rows, writes, err := ingestPermissions(a, "external", dest, mf, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(writes) != 0 {
-		t.Fatalf("a narrowed run must queue no permission writes, got %d", len(writes))
-	}
-	if len(rows) != len(permissionFiles) {
-		t.Fatalf("rows = %d, want one per permission file (%d)", len(rows), len(permissionFiles))
-	}
-	for _, r := range rows {
-		if !strings.Contains(r.note, "reported only") {
-			t.Errorf("%s note = %q, want it to say the row is reported only", r.name, r.note)
-		}
-	}
-}
-
 func TestCommitIsTheOnlyThingThatWrites(t *testing.T) {
 	members := map[string]string{"MANIFEST.md": "**GitOps Build**: v3\n"}
 	for _, s := range specs {
@@ -637,6 +601,42 @@ func TestCommitIsTheOnlyThingThatWrites(t *testing.T) {
 	for _, r := range permRows2 {
 		if r.status != statusUnchanged {
 			t.Errorf("%s: second run status = %v, want unchanged", r.name, r.status)
+		}
+	}
+}
+
+// A -only run must not rewrite _permissions. Those two files are not
+// spec-scoped, so selecting one spec from an older bundle — the exact shape of
+// restoring a held spec — would otherwise reset the whole privilege oracle to
+// that bundle's build. It happened in the v2154 ingest: a `-only
+// Classic-openapi.yaml` restore from the v2121 archive silently took
+// routes.yaml back to v2121 with it. The row must still be reported, so the
+// narrowing is visible rather than hidden.
+func TestOnlyRunReportsPermissionsWithoutWritingThem(t *testing.T) {
+	routes := "a: 1\n"
+	scopes := "x: 1\n"
+	members := map[string]string{
+		"MANIFEST.md":                       "**GitOps Build**: v1\n",
+		"external/_permissions/routes.yaml": routes,
+		"external/_permissions/scopes.yaml": scopes,
+	}
+	a := buildArchive(t, members)
+
+	dest := t.TempDir()
+	mf := &manifest{Entries: map[string]manifestEntry{}}
+	rows, writes, err := ingestPermissions(a, "external", dest, mf, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(writes) != 0 {
+		t.Fatalf("a narrowed run must queue no permission writes, got %d", len(writes))
+	}
+	if len(rows) != len(permissionFiles) {
+		t.Fatalf("rows = %d, want one per permission file (%d)", len(rows), len(permissionFiles))
+	}
+	for _, r := range rows {
+		if !strings.Contains(r.note, "reported only") {
+			t.Errorf("%s note = %q, want it to say the row is reported only", r.name, r.note)
 		}
 	}
 }

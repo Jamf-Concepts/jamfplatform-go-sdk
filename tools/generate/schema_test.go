@@ -550,3 +550,34 @@ func TestApplyPropertyRemovalsAlsoDropsTheRequiredEntry(t *testing.T) {
 		t.Error("removal took an unrelated property with it")
 	}
 }
+
+// A rename must carry the property's `required` entry with it, for the reason
+// applyPropertyRemovals prunes one: a required name with no property is an
+// invalid spec a consumer reads. Latent in every committed propertyRenames
+// entry today — none targets a required property — which is how the removal
+// side stayed latent until v2154 removed its first required one.
+func TestApplyPropertyRenamesCarriesTheRequiredEntry(t *testing.T) {
+	schema := openapi3.NewObjectSchema()
+	schema.Properties = map[string]*openapi3.SchemaRef{
+		"keep": {Value: openapi3.NewStringSchema()},
+		"old":  {Value: openapi3.NewStringSchema()},
+	}
+	schema.Required = []string{"keep", "old"}
+
+	doc := &openapi3.T{Components: &openapi3.Components{Schemas: map[string]*openapi3.SchemaRef{
+		"Prefs": {Value: schema},
+	}}}
+
+	applyPropertyRenames(doc, map[string]map[string]string{"Prefs": {"old": "new"}})
+
+	got := doc.Components.Schemas["Prefs"].Value
+	if _, still := got.Properties["old"]; still {
+		t.Error("the old property survived the rename")
+	}
+	if _, ok := got.Properties["new"]; !ok {
+		t.Fatal("the renamed property is missing")
+	}
+	if want := []string{"keep", "new"}; !slices.Equal(got.Required, want) {
+		t.Errorf("required = %v, want %v — the entry must follow the rename, in place", got.Required, want)
+	}
+}

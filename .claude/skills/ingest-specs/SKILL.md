@@ -59,6 +59,11 @@ Held specs are skipped and their reason printed on every run, so a hold cannot
 rot unnoticed. Take one with `-only <dest>` (or `-include-held` in bulk) and
 update `CLAUDE.md`'s holds table in the same change.
 
+A `-only` run **reports `_permissions/{routes,scopes}.yaml` but writes
+neither** — they are not spec-scoped, so a narrowed run must never rewind the
+privilege oracle to that archive's build. Both rows still print, annotated
+`reported only`. Refresh them with a full run.
+
 **Never ingest from `internal/dev`.** It carries a per-spec `x-generated` block
 (`commitHash`, `runId`, `timestamp`), so every file reports as changed and a
 no-op build reads as a bundle-wide rewrite. Comparing operation *sets* across

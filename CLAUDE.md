@@ -400,6 +400,14 @@ silent version of the failure has happened here:
 cannot rot unnoticed; `-only <dest>` or `-include-held` takes one, and the
 holds table below must move in the same change.
 
+**A `-only` run reports `_permissions/{routes,scopes}.yaml` but writes
+neither.** Those two files are not spec-scoped, so a narrowed run would
+otherwise reset the whole privilege oracle to that invocation's build — which
+is how a `-only Classic-openapi.yaml` restore from the v2121 archive silently
+reverted `routes.yaml` while every spec stayed at v2154. The rows are still
+resolved and printed, annotated `reported only`, so the narrowing is visible
+rather than hidden; **a full run is what refreshes the oracle.**
+
 **Never ingest from `internal/dev`.** It carries a per-spec `x-generated` block
 (`commitHash`, `runId`, `timestamp`), so *every* spec reports as changed and a
 no-op build looks like a bundle-wide rewrite. Comparing operation *sets* across
