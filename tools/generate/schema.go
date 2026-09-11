@@ -9,6 +9,7 @@ import (
 	"log"
 	"maps"
 	"math"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -297,6 +298,17 @@ func applyPropertyRenames(doc *openapi3.T, renames map[string]map[string]string)
 			}
 			delete(parent.Properties, leaf)
 			parent.Properties[newKey] = cur
+			// A rename must carry the property's `required` entry with it,
+			// for the reason applyPropertyRemovals prunes one: a required
+			// name with no property is an invalid spec a consumer reads.
+			// Latent today — no renamed property is currently required —
+			// which is exactly how the removal side stayed latent until
+			// v2154 removed its first required one.
+			for i, r := range parent.Required {
+				if r == leaf {
+					parent.Required[i] = newKey
+				}
+			}
 		}
 	}
 }
@@ -328,6 +340,14 @@ func applyPropertyRemovals(doc *openapi3.T, removals map[string][]string) {
 				panic(fmt.Sprintf("propertyRemovals[%q]: property %q missing at path %q", schemaName, leaf, path))
 			}
 			delete(parent.Properties, leaf)
+			// A removal must take the property's `required` entry with it.
+			// Leaving it behind publishes an api/*.json declaring a required
+			// property the schema does not have — an invalid spec a consumer
+			// reads — and leaves the same dangling name in front of every
+			// later pass that keys off required. Hit for real when v2154 added
+			// AccountPreferencesV6.showDirectoryGroupUuidColumn as required
+			// and the server rejected it.
+			parent.Required = slices.DeleteFunc(parent.Required, func(r string) bool { return r == leaf })
 		}
 	}
 }

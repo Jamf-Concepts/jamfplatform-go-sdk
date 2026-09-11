@@ -284,7 +284,7 @@ func main() {
 	}
 	printSpecs(rows)
 
-	permRows, permWrites, err := ingestPermissions(arc, *env, destDir, mf)
+	permRows, permWrites, err := ingestPermissions(arc, *env, destDir, mf, *only == "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -609,7 +609,13 @@ type permRow struct {
 // shares its two-phase contract: resolve and validate both, write neither,
 // and let the caller commit only once every spec row and both of these have
 // come back clean.
-func ingestPermissions(a *archive, env, destDir string, mf *manifest) ([]permRow, []pendingWrite, error) {
+//
+// write is false whenever -only narrows the run. These two files are not
+// spec-scoped, so a run selecting one spec would otherwise reset the whole
+// privilege oracle to that invocation's build — which is how a `-only capi`
+// restore from an older bundle silently reverted routes.yaml here. They are
+// still resolved and reported, so the row is not hidden.
+func ingestPermissions(a *archive, env, destDir string, mf *manifest, write bool) ([]permRow, []pendingWrite, error) {
 	var rows []permRow
 	var writes []pendingWrite
 	outDir := filepath.Join(destDir, "_permissions")
@@ -641,12 +647,21 @@ func ingestPermissions(a *archive, env, destDir string, mf *manifest) ([]permRow
 				}
 			}
 		}
-		writes = append(writes, pendingWrite{
-			path:  outPath,
-			raw:   raw,
-			key:   key,
-			entry: manifestEntry{Build: a.build, Source: env + "/_permissions", SHA256: sum},
-		})
+		if write {
+			writes = append(writes, pendingWrite{
+				path:  outPath,
+				raw:   raw,
+				key:   key,
+				entry: manifestEntry{Build: a.build, Source: env + "/_permissions", SHA256: sum},
+			})
+		} else {
+			const skipped = "reported only; -only narrows the run and these are not spec-scoped — refresh with a full run"
+			if r.note == "" {
+				r.note = skipped
+			} else {
+				r.note += " — " + skipped
+			}
+		}
 		rows = append(rows, r)
 	}
 	return rows, writes, nil
