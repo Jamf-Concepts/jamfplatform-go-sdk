@@ -60,6 +60,69 @@ Two rounds of scope probing were reported wrongly — once from a cached expired
 token, once from a broken shell helper — before a known-good positive control in
 the *same* invocation showed the harness, not the API, was at fault.
 
+### A plain-text 401 does not distinguish a bad token from an ungranted api-product (2026-09-11)
+
+Recorded because the SDK now annotates it, and because the annotation is the only
+thing separating two causes that need opposite remedies — rotate the secret versus
+get the api-product granted.
+
+Probed against `eu.api.jamfcloud.com` with one environment credential
+(`aee3ec71-…`), all in one invocation, with 200 controls:
+
+| request | status | content-type | body | `x-tyk-trace-id` |
+|---|---|---|---|---|
+| `GET /pro/v1/jamf-pro-version`, valid token | 200 | `application/json` | `{"version":"11.31.1-…"}` | yes |
+| `GET /pro/v1/pki/certificate-authority/active`, valid token | 200 | `application/json` | real CA subject | yes |
+| `GET /pro/v1/jamf-pro-version`, **bogus** token | 401 | `text/plain; charset=utf-8` | `Authentication failed` (22 B) | yes |
+| `GET /audit/v1/audit/sources`, **valid** token | 401 | `text/plain; charset=utf-8` | `Authentication failed` (22 B) | yes |
+| `GET /securitycloud/v1/categories`, **valid** token | 401 | `text/plain; charset=utf-8` | `Authentication failed` (22 B) | yes |
+| `GET /not-a-namespace/v1/thing`, valid token | 404 | `text/plain; charset=utf-8` | `404 page not found` (19 B) | **no** |
+| `GET /licensing/v1/licenses`, valid token | 404 | `text/plain; charset=utf-8` | `404 page not found` (19 B) | **no** |
+
+**The ungranted-api-product 401 and the rejected-token 401 are byte-identical**,
+both 22 bytes of `text/plain`, both carrying a trace id — so neither the body, the
+content type nor the headers separate them. The rows above settle it the way a 403
+has to be settled, by varying the credential rather than the path: the *same*
+token that answered 200 on two `pro` paths answered 401 on `audit` and
+`securitycloud`. Second credential for the other direction: the organization
+credential (`8a2d0ff2-…`, `us.api.jamfcloud.com`) reads `/licensing/v1/licenses` at
+200 — 16 licences — and gets a structured `400 REQUEST_CONTEXT_NOT_PROVIDED` on
+`/pro/v1/jamf-pro-version`, which is a scope-header fault and a different layer.
+
+`/licensing/v1/licenses` 404s on the EU gateway with no trace id, which is the
+unmounted-namespace answer, not a grant answer, and matches `account` being US
+only.
+
+**Two of those rows have already moved, and the wording has not.** Re-probed
+later the same day on the same environment credential, with the same 200 control:
+`/audit/v1/audit/sources` now answers **200** (real sources) and
+`/securitycloud/v1/categories` **200** (36 categories), so the *ungranted*
+api-product half of the table is no longer reproducible with this credential —
+the grant changed under it, which is a reminder that a 401 classified by varying
+the credential is dated evidence, not a standing property. What did not move is
+the body: a garbage bearer, a bare `Bearer` carrying no token and a `Basic`
+scheme all still answer the byte-identical 22-byte `Authentication failed`, and a
+*missing* `Authorization` header answers JSON instead —
+`{"httpStatus":401,"message":"unauthorized access"}`, `message` rather than
+`errors[]`. A bogus path inside a granted namespace answers a structured
+`403 BAD_PERMISSIONS`, not a plain-text 401.
+
+So four distinct credential-shaped faults produce one wording, and nothing yet
+observed produces a second one. That is the evidence `nonJSONAuthGuidance` keys on
+the status alone rather than matching the body — see its godoc for why the two
+failure modes are not symmetric.
+
+**Correction to the table above: `x-cache: Error from cloudfront` is not an
+edge-block tell.** It appears on the gateway's own plain-text 401 and 404 as
+well — CloudFront emits it for any non-2xx it passes through. The reliable edge
+tells stay the ones already listed: an HTML body and **no Jamf `traceId`**.
+
+**`x-amz-cf-id` is on every response, 200s included** (`dzzx90b-D0H…` on the
+version control above). So it identifies a CloudFront request, not a CloudFront
+error, and must only be read as an edge handle once the body has already been
+established as an HTML page — which is what `edgeRequestID` does, being reachable
+only from `summarizeNonJSONError`.
+
 **A caller cannot check its own grants.** The token endpoint returns an opaque
 token (one segment, not a JWT) and the token response's `scope` comes back empty.
 With `GET /v1/api-role-privileges` withdrawn at GA there is no introspection path

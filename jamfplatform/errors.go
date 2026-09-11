@@ -15,10 +15,28 @@ import "github.com/Jamf-Concepts/jamfplatform-go-sdk/internal/client"
 // format them with err.Error(), except for ErrUnexpectedResponse below.
 type APIResponseError = client.APIResponseError
 
-// ErrUnexpectedResponse reports that an endpoint answered with a non-JSON body
-// where JSON was expected — typically an HTML error page served by an edge proxy
-// or WAF, or by an IP allowlist rejecting the caller. Currently raised on the
-// OAuth token exchange, which is where such a block surfaces first.
+// ErrUnexpectedResponse reports that an endpoint answered with an HTML page
+// where JSON was expected — an edge proxy, WAF or IP allowlist rejecting the
+// caller, or a gateway error page — which means the request did not reach Jamf.
+// Raised on the OAuth token exchange, where such a block surfaces first, and on
+// any API response whose error body is an HTML page.
+//
+// Jamf Pro's own HTML error template is excluded: it is a real application
+// message and is lifted into Details() instead. A plain-text refusal is excluded
+// too — notably the gateway's "Authentication failed", which is a credential or
+// api-product problem and not a block, so it carries guidance rather than this
+// sentinel.
+//
+// The page itself is condensed to its headings and any edge request id, so
+// Error() stays one line; the full body remains on APIResponseError.Body.
+//
+// Read the status before choosing a remedy. This sentinel says only that a page
+// answered instead of an API, and two different faults do that: a WAF, proxy or
+// allowlist refusing this host, which arrives as a 403 or as a 200 carrying a
+// login shell and is a standing block; and Jamf's own gateway failing, which
+// arrives as a 502/503/504 the transport has already retried and is usually
+// transient. AsAPIError(err).StatusCode separates them, so report an egress IP
+// for the first rather than for both.
 //
 // The only sentinel the SDK exposes, and the only error worth matching with
 // errors.Is; everything else is *APIResponseError. It exists because the

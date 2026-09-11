@@ -1316,15 +1316,87 @@ context cancellation, IO failures) surface as plain wrapped errors.
   support block on this condition. A branch needs a matchable error, not a message
   to grep.
 
-It is raised today on the OAuth token exchange, where such a block surfaces first.
 A rejected credential answers with JSON (`401 invalid_client`) and never carries
 the sentinel, keeping "wrong secret" and "blocked network" distinguishable — they
 need opposite remedies. The name matches `jamfprotect-go-sdk` deliberately: the
 Protect provider's resources fold into `terraform-provider-jamfplatform` once
 Protect has Platform API support, and a shared error surface is one less thing to
-rewrite. **Prefer widening this sentinel's reach** (e.g. to response bodies, which
-needs a format guard — Classic is XML and its error pages are Tomcat HTML) **over
-adding a second one.**
+rewrite. **Prefer widening this sentinel's reach over adding a second one** —
+which is what happened next.
+
+### Widened to API response bodies
+
+It was raised on the OAuth token exchange only, and that was an inconsistency
+rather than a scope: the *same* CloudFront page arrives on either path, and got a
+matchable error on one and an unmatchable one on the other. `handleResponse` now
+raises it too, and the format guard this section asked for is three-way rather
+than two, because "not JSON" turned out to be three different conditions with
+three different remedies:
+
+| error body | treatment | sentinel |
+|---|---|---|
+| Pro/gateway JSON | `Errors` from the body | no |
+| Jamf Pro's own HTML "Status page" | message lifted to `Details()` | no |
+| any other HTML page | condensed to headings + edge request id | **yes** |
+| plain text, 401 | api-product guidance appended | no |
+| plain text, anything else | raw body, untouched | no |
+
+Three things about it that are not guessable:
+
+- **The Classic gate is a separate predicate from the Classic scrape.**
+  `isClassicStatusPage` classifies; `parseClassicErrorMessage` extracts. They are
+  not the same question, and collapsing them would attach the sentinel to a
+  Status page the scrape happened to get nothing out of — reporting a response
+  that *did* reach Jamf as a network block, and sending the caller to their
+  network team. (Note also that this template is Jamf Pro's own, not stock
+  Tomcat, as `classic_errors.go` records.)
+- **The HTML test is not "not JSON", and not "starts with `<`".** Classic is XML
+  end-to-end, and some Classic endpoints return an XML entity echo under a 4xx,
+  so the sniff requires a doctype or an `<html>` root specifically. `<?xml` must
+  never match.
+- **A plain-text 401 deliberately gets guidance and no sentinel.** The sentinel
+  means "something in front of Jamf answered", and a consumer branching on it
+  reports the host's egress IP — the wrong remedy for a missing grant, and worse
+  than no branch at all. The gateway answers a rejected token and an ungranted
+  api-product with the byte-identical 22-byte `Authentication failed`, so the
+  response cannot distinguish them; the guidance names that rather than guessing.
+  Wire evidence, including the two-credential probe that establishes it:
+  [WIRE-FACTS.md](WIRE-FACTS.md#a-plain-text-401-does-not-distinguish-a-bad-token-from-an-ungranted-api-product-2026-09-11).
+
+**An HTML body is condensed, not echoed.** The page's headings are the only part
+that varies with the failure; the gateway's own 503 page is 149 lines of CSS and
+ASCII art around "503 Error" and "Service currently unavailable", and CloudFront's
+is 39 lines around three headings. Both had been rendering verbatim into Terraform
+diagnostics and CI logs. `summarizeNonJSONError` keeps at most three distinct
+headings plus any edge request id; the full page stays on `APIResponseError.Body`.
+
+**A page the summary cannot read is named, not echoed.** An unrecognised template
+yields no headings and no request id, and falling back to the raw body there put
+the whole page into `Error()` on precisely the input nobody has seen before —
+reintroducing the wall of text one layer down. `describeNonJSONError` is the
+guaranteed-non-empty form the transport calls, and `collectTagText` flushes a
+pending element at EOF and when another wanted tag opens, because the tokenizer
+never invents a missing end tag: an unclosed heading otherwise swallowed every
+later one and the element never flushed at all, so a page with unclosed headings
+summarized to nothing and took that fallback.
+
+**`x-amz-cf-id` is read only once the body is known to be a page.** CloudFront
+sets it on *every* response including 200s, so it identifies a CloudFront request
+and not a CloudFront error — reading it unconditionally would stamp an "edge
+request id" onto ordinary Jamf errors.
+
+**What this does not do: attribute the refusal to a layer.** The JSON formatting
+tells (Jamf Pro pretty-prints, the gateway emits compact) stay out of the
+transport, per
+[WIRE-FACTS.md](WIRE-FACTS.md#diagnosing-a-refusal). "This is a web page, not an
+API response" is a weaker claim than layer attribution, and one the SDK already
+made on the token exchange.
+
+`Error()` gained two fixes in the same change, both exposed by an HTML body
+reaching the detail-carrying branch for the first time: the `traceId` segment is
+omitted when empty (an edge block carries no Jamf traceId at all, so it rendered
+`traceId  (method=…`), and that branch now prints the HTTP status *text* like the
+other one, having formatted the bare code with `%d`.
 
 Accessors: `HasStatus(code)`, `Details()`, `FieldErrors()`, `Summary()`, and
 `AsAPIError(err)` for a top-level unwrap that saves callers managing `errors.As`

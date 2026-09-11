@@ -8,8 +8,6 @@ import (
 	"mime"
 	"net/http"
 	"strings"
-
-	"golang.org/x/net/html"
 )
 
 // classicStatusPageMarker is the <title> unique to the Jamf Classic API's
@@ -39,10 +37,7 @@ const classicStatusPageMarker = "<title>Status page</title>"
 // 4xx by quirk endpoints (e.g. the classic /ebooks DELETE, which echoes
 // <ebook><id>N</id></ebook> on an accepted async delete) are left untouched.
 func parseClassicErrorMessage(header http.Header, body []byte) (string, bool) {
-	if !isHTMLContentType(header.Get("Content-Type")) {
-		return "", false
-	}
-	if !bytes.Contains(body, []byte(classicStatusPageMarker)) {
+	if !isClassicStatusPage(header, body) {
 		return "", false
 	}
 
@@ -67,6 +62,19 @@ func parseClassicErrorMessage(header http.Header, body []byte) (string, bool) {
 	return msg, true
 }
 
+// isClassicStatusPage reports whether a body is Jamf Pro's own HTML error
+// template, as opposed to any other HTML page.
+//
+// Separate from parseClassicErrorMessage so the classification survives a page
+// the scrape cannot get a message out of. The two answers are not the same
+// question: an unparseable Status page is still Jamf Pro's, and must not be
+// treated as an edge block — that would attach ErrUnexpectedResponse to a
+// response that did reach Jamf and send the caller to their network team.
+func isClassicStatusPage(header http.Header, body []byte) bool {
+	return isHTMLContentType(header.Get("Content-Type")) &&
+		bytes.Contains(body, []byte(classicStatusPageMarker))
+}
+
 // isHTMLContentType reports whether a Content-Type header value names an HTML
 // body, tolerating parameters such as "; charset=utf-8".
 func isHTMLContentType(contentType string) bool {
@@ -82,43 +90,15 @@ func isHTMLContentType(contentType string) bool {
 
 // extractParagraphs returns the trimmed, entity-decoded text of each <p>
 // element in body, in document order, dropping the template's trailing "You
-// can get technical details …" boilerplate and any empty paragraph. It uses
-// the x/net/html tokenizer rather than a regex so attribute ordering, nested
-// inline tags (<a>, <br>), and HTML entities are handled correctly.
+// can get technical details …" boilerplate and any empty paragraph. The walk
+// itself is collectTagText, shared with the edge-page heading summary.
 func extractParagraphs(body []byte) []string {
-	z := html.NewTokenizer(bytes.NewReader(body))
-	var (
-		out   []string
-		depth int // >0 while inside a <p> element
-		buf   strings.Builder
-	)
-	flush := func() {
-		text := strings.Join(strings.Fields(buf.String()), " ")
-		buf.Reset()
-		if text == "" || strings.HasPrefix(text, "You can get technical details") {
-			return
+	var out []string
+	for _, t := range collectTagText(body, "p") {
+		if strings.HasPrefix(t.text, "You can get technical details") {
+			continue
 		}
-		out = append(out, text)
+		out = append(out, t.text)
 	}
-	for {
-		switch z.Next() {
-		case html.ErrorToken:
-			return out
-		case html.StartTagToken:
-			if name, _ := z.TagName(); string(name) == "p" {
-				depth++
-			}
-		case html.EndTagToken:
-			if name, _ := z.TagName(); string(name) == "p" && depth > 0 {
-				depth--
-				if depth == 0 {
-					flush()
-				}
-			}
-		case html.TextToken:
-			if depth > 0 {
-				buf.Write(z.Text()) // z.Text() returns entity-decoded text
-			}
-		}
-	}
+	return out
 }
