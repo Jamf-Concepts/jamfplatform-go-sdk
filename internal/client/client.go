@@ -806,9 +806,7 @@ func (c *Transport) handleResponse(ctx context.Context, resp *http.Response, cla
 		// same page arrives on either path; see nonjson_errors.go.
 		case isHTMLErrorBody(resp.Header, body):
 			edge = true
-			if msg := summarizeNonJSONError(resp.Header, body); msg != "" {
-				respErr.Errors = []Error{{Description: msg}}
-			}
+			respErr.Errors = []Error{{Description: describeNonJSONError(resp.Header, body)}}
 		}
 		respErr.TraceID = pickTraceID(apiErr.TraceID, resp.Header)
 

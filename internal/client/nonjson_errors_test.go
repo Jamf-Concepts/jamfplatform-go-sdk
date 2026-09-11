@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -67,6 +68,15 @@ const gatewayPage = `<html>
 const classicStatusPage = `<html><head><title>Status page</title></head><body>
 <p>Conflict</p><p>Error: name - This software title already exists</p>
 <p>You can get technical details here.</p></body></html>`
+
+// headinglessPage is an error page with nothing the summary can key on: no
+// title, no heading, no edge request id. Shaped like a styled template whose
+// wording lives in CSS-positioned markup the scrape does not read.
+const headinglessPage = `<!DOCTYPE html>
+<html><head><style>
+  body { background: #f3f3f3 }
+  .msg::after { content: "request blocked" }
+</style></head><body><div class="msg"></div></body></html>`
 
 func TestSummarizeNonJSONError(t *testing.T) {
 	htmlHeader := http.Header{"Content-Type": []string{"text/html"}}
@@ -275,6 +285,29 @@ func TestHandleResponse_NonJSONBodies(t *testing.T) {
 			wantInError:  "404 page not found",
 		},
 		{
+			// The reason isClassicStatusPage is a separate predicate from the
+			// Classic scrape: a Status page the scrape gets nothing out of still
+			// reached Jamf, so it must not be reported as a block.
+			name:         "an unparseable Status page still gains no sentinel",
+			status:       500,
+			contentType:  "text/html",
+			body:         `<html><head><title>Status page</title></head><body></body></html>`,
+			wantSentinel: false,
+			wantInError:  "<title>Status page</title>",
+		},
+		{
+			// An unknown template yields no headings and no id. The detail must
+			// still be bounded, because the alternative is Error() printing the
+			// page.
+			name:         "an unrecognised HTML page is named rather than echoed",
+			status:       503,
+			contentType:  "text/html",
+			body:         headinglessPage,
+			wantSentinel: true,
+			wantDetail:   "unrecognised HTML error page, " + strconv.Itoa(len(headinglessPage)) + " bytes (see APIResponseError.Body)",
+			wantInError:  "unrecognised HTML error page",
+		},
+		{
 			name:         "structured JSON error is untouched",
 			status:       400,
 			contentType:  "application/json",
@@ -397,5 +430,85 @@ func TestAPIResponseError_OmitsEmptyTraceID(t *testing.T) {
 	e.TraceID = "abc123"
 	if !strings.Contains(e.Error(), ", traceId abc123 (") {
 		t.Errorf("Error() dropped a traceId it does have: %q", e.Error())
+	}
+}
+
+// TestCollectTagTextSurvivesUnclosedTags pins the two ways a pending element used
+// to be lost outright. Both matter because the input is an arbitrary error page
+// from something the SDK does not control, and an empty summary is the one
+// result that puts the whole page back into the message.
+func TestCollectTagTextSurvivesUnclosedTags(t *testing.T) {
+	tests := []struct {
+		name string
+		body string
+		want []string
+	}{
+		{
+			// The tokenizer never invents the missing </h2>, so the second
+			// heading used to swallow the first and neither ever flushed.
+			name: "a repeated unclosed tag yields both texts, not none",
+			body: `<html><body><h2>One<h2>Two</h2></body></html>`,
+			want: []string{"One", "Two"},
+		},
+		{
+			name: "a different wanted tag opening does not merge the two texts",
+			body: `<html><body><h2>One<h3>Two</h3></body></html>`,
+			want: []string{"One", "Two"},
+		},
+		{
+			// What a proxy timeout produces: the body stops mid-element, and
+			// that element is often the only one carrying the failure.
+			name: "a page truncated mid-element keeps that element",
+			body: `<html><head><title>503 Server Unavailable</title></head><body><h2>503 Error`,
+			want: []string{"503 Server Unavailable", "503 Error"},
+		},
+		{
+			name: "genuine nesting still yields one text per innermost element",
+			body: `<html><body><p><p>only</p></p></body></html>`,
+			want: []string{"only"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := collectTagText([]byte(tc.body), "title", "h1", "h2", "h3", "p")
+			if len(got) != len(tc.want) {
+				t.Fatalf("collectTagText() = %+v, want %d texts %q", got, len(tc.want), tc.want)
+			}
+			for i, w := range tc.want {
+				if got[i].text != w {
+					t.Errorf("text %d = %q, want %q", i, got[i].text, w)
+				}
+			}
+		})
+	}
+}
+
+// TestHandleResponse_UnrecognisedPageStaysOneLine is finding (1): the fallback
+// for a page the summary cannot read must not be the page.
+func TestHandleResponse_UnrecognisedPageStaysOneLine(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	c.throttle.setInterval(0)
+	shrinkRetryWaits(c, time.Millisecond, 2*time.Millisecond)
+	c.retry.RetryMax = 0
+	mux.HandleFunc("/api/unknown", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = w.Write([]byte(headinglessPage))
+	})
+
+	err := c.DoExpect(context.Background(), http.MethodGet, "/api/unknown", nil, http.StatusOK, nil)
+	if err == nil {
+		t.Fatal("expected an error")
+	}
+	msg := err.Error()
+	if lines := strings.Count(msg, "\n") + 1; lines > 1 {
+		t.Errorf("Error() spans %d lines, want 1:\n%s", lines, msg)
+	}
+	if strings.Contains(msg, "background: #f3f3f3") {
+		t.Errorf("Error() carries the page it could not summarize:\n%s", msg)
+	}
+	if apiErr := AsAPIError(err); apiErr == nil || !strings.Contains(apiErr.Body, "background: #f3f3f3") {
+		t.Error("the full page should remain available on APIResponseError.Body")
 	}
 }

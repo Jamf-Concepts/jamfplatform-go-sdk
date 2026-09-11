@@ -5,6 +5,7 @@ package client
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -83,8 +84,9 @@ func isHTMLErrorBody(header http.Header, body []byte) bool {
 // tells it nothing the summary does not. The full page stays on
 // APIResponseError.Body for anyone who wants it.
 //
-// Returns "" when the page yields nothing, leaving the caller to fall back to
-// the raw body rather than inventing a message.
+// Returns "" when the page yields nothing, rather than inventing a message;
+// describeNonJSONError is what the transport calls, and it names the page in
+// that case instead of falling back to the body.
 func summarizeNonJSONError(header http.Header, body []byte) string {
 	var kept []string
 	for _, t := range collectTagText(body, "title", "h1", "h2", "h3") {
@@ -120,6 +122,22 @@ func summarizeNonJSONError(header http.Header, body []byte) string {
 		msg += " (edge request id: " + id + ")"
 	}
 	return msg
+}
+
+// describeNonJSONError is summarizeNonJSONError with a guaranteed non-empty
+// answer, for the caller that has already decided the body is a page.
+//
+// An unrecognised template yields no headings and no request id, and falling
+// back to the raw body there puts the whole page into Error() — 42 lines for a
+// heading-less page, which is the wall of text this classification exists to
+// remove, reintroduced on precisely the input nobody has seen before. Naming the
+// page and its size is less than the summary and more than nothing; the body
+// itself stays on APIResponseError.Body.
+func describeNonJSONError(header http.Header, body []byte) string {
+	if msg := summarizeNonJSONError(header, body); msg != "" {
+		return msg
+	}
+	return fmt.Sprintf("unrecognised HTML error page, %d bytes (see APIResponseError.Body)", len(body))
 }
 
 // normalizeHeading reduces a heading to lowercase alphanumerics and single
@@ -209,10 +227,15 @@ type tagText struct {
 // Uses the x/net/html tokenizer rather than a regex so attribute ordering,
 // nested inline tags and HTML entities are handled correctly, and so a truncated
 // or malformed page yields what it has rather than failing. Shared by the
-// Classic "Status page" paragraph scrape and the edge-page heading summary; only
-// one wanted element is tracked at a time, which is sufficient for both (neither
-// template nests wanted tags) and keeps a stray unclosed tag from swallowing the
-// rest of the document.
+// Classic "Status page" paragraph scrape and the edge-page heading summary.
+//
+// Only one wanted element is tracked at a time, which is sufficient for both
+// (neither template nests wanted tags), and a stray unclosed tag is flushed
+// rather than allowed to swallow the rest of the document: the tokenizer never
+// emits the missing end tag, so without that an unclosed heading consumes every
+// later one and the element never flushes at all. A page whose headings are all
+// unclosed would then summarize to nothing, and an empty summary is the one
+// input that puts the whole page back into the error message.
 func collectTagText(body []byte, want ...string) []tagText {
 	wanted := make(map[string]bool, len(want))
 	for _, w := range want {
@@ -223,7 +246,6 @@ func collectTagText(body []byte, want ...string) []tagText {
 	var (
 		out    []tagText
 		active string
-		depth  int
 		buf    strings.Builder
 	)
 	flush := func() {
@@ -237,24 +259,33 @@ func collectTagText(body []byte, want ...string) []tagText {
 	for {
 		switch z.Next() {
 		case html.ErrorToken:
+			// EOF, or a page cut off mid-element. Flush the pending text rather
+			// than discarding it: a truncated body is exactly what a proxy
+			// timeout produces, and its last element is often the only one.
+			if active != "" {
+				flush()
+			}
 			return out
 		case html.StartTagToken:
 			name, _ := z.TagName()
 			switch n := string(name); {
 			case !wanted[n]:
-			case active == n:
-				depth++
 			case active == "":
-				active, depth = n, 1
+				active = n
+			default:
+				// A wanted element opened while one is still active — the same
+				// name included, since neither template nests them. Flush what
+				// is buffered and track the new one, so the two texts neither
+				// merge nor wait on an end tag that is never coming.
+				flush()
+				active = n
 			}
 		case html.EndTagToken:
 			name, _ := z.TagName()
 			if active == "" || string(name) != active {
 				continue
 			}
-			if depth--; depth == 0 {
-				flush()
-			}
+			flush()
 		case html.TextToken:
 			if active != "" {
 				buf.Write(z.Text()) // z.Text() returns entity-decoded text

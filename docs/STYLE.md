@@ -1370,6 +1370,16 @@ is 39 lines around three headings. Both had been rendering verbatim into Terrafo
 diagnostics and CI logs. `summarizeNonJSONError` keeps at most three distinct
 headings plus any edge request id; the full page stays on `APIResponseError.Body`.
 
+**A page the summary cannot read is named, not echoed.** An unrecognised template
+yields no headings and no request id, and falling back to the raw body there put
+the whole page into `Error()` on precisely the input nobody has seen before —
+reintroducing the wall of text one layer down. `describeNonJSONError` is the
+guaranteed-non-empty form the transport calls, and `collectTagText` flushes a
+pending element at EOF and when another wanted tag opens, because the tokenizer
+never invents a missing end tag: an unclosed heading otherwise swallowed every
+later one and the element never flushed at all, so a page with unclosed headings
+summarized to nothing and took that fallback.
+
 **`x-amz-cf-id` is read only once the body is known to be a page.** CloudFront
 sets it on *every* response including 200s, so it identifies a CloudFront request
 and not a CloudFront error — reading it unconditionally would stamp an "edge
