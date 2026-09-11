@@ -9,6 +9,7 @@ import (
 	"log"
 	"maps"
 	"math"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -328,6 +329,14 @@ func applyPropertyRemovals(doc *openapi3.T, removals map[string][]string) {
 				panic(fmt.Sprintf("propertyRemovals[%q]: property %q missing at path %q", schemaName, leaf, path))
 			}
 			delete(parent.Properties, leaf)
+			// A removal must take the property's `required` entry with it.
+			// Leaving it behind publishes an api/*.json declaring a required
+			// property the schema does not have — an invalid spec a consumer
+			// reads — and leaves the same dangling name in front of every
+			// later pass that keys off required. Hit for real when v2154 added
+			// AccountPreferencesV6.showDirectoryGroupUuidColumn as required
+			// and the server rejected it.
+			parent.Required = slices.DeleteFunc(parent.Required, func(r string) bool { return r == leaf })
 		}
 	}
 }

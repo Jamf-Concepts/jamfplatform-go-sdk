@@ -513,3 +513,40 @@ func TestMergeOneOfVariants(t *testing.T) {
 		})
 	}
 }
+
+// A removal must take the property's `required` entry with it. Leaving the name
+// behind publishes an api/*.json declaring a required property the schema does
+// not have, which is an invalid spec a consumer reads. The live case is
+// AccountPreferencesV6.showDirectoryGroupUuidColumn, which v2154 added as
+// required against a server (11.31.1) that rejects the field outright —
+// removing the property while leaving it required would have shipped that
+// contradiction to consumers.
+func TestApplyPropertyRemovalsAlsoDropsTheRequiredEntry(t *testing.T) {
+	schema := openapi3.NewObjectSchema()
+	schema.Properties = map[string]*openapi3.SchemaRef{
+		"keep":      {Value: openapi3.NewStringSchema()},
+		"phantom":   {Value: openapi3.NewBoolSchema()},
+		"keepInReq": {Value: openapi3.NewStringSchema()},
+	}
+	schema.Required = []string{"keep", "phantom", "keepInReq"}
+
+	doc := &openapi3.T{Components: &openapi3.Components{Schemas: map[string]*openapi3.SchemaRef{
+		"Prefs": {Value: schema},
+	}}}
+
+	applyPropertyRemovals(doc, map[string][]string{"Prefs": {"phantom"}})
+
+	got := doc.Components.Schemas["Prefs"].Value
+	if _, still := got.Properties["phantom"]; still {
+		t.Error("phantom property survived the removal")
+	}
+	if slices.Contains(got.Required, "phantom") {
+		t.Errorf("required still names the removed property: %v", got.Required)
+	}
+	if want := []string{"keep", "keepInReq"}; !slices.Equal(got.Required, want) {
+		t.Errorf("required = %v, want %v — the other entries must survive in order", got.Required, want)
+	}
+	if _, ok := got.Properties["keep"]; !ok {
+		t.Error("removal took an unrelated property with it")
+	}
+}
