@@ -320,9 +320,13 @@ The SDK logs nothing until you install one, and it redacts nothing. Request
 bodies carry whatever secrets a write sends: `ClientSecret`, `AdminPassword`,
 `KeystorePassword`, the plist inside a configuration profile's `Payloads`. So
 redact inside your `Logger`, or log only the method, URL and status, before you
-attach the output to a ticket or leave it in CI. Your logger never sees the
-bearer token or the client credential. The SDK passes `LogRequest` no headers,
-and the OAuth2 token exchange runs outside the logged path.
+attach the output to a ticket or leave it in CI.
+
+`LogRequest` never sees the bearer token or the client credential: the SDK
+passes it no headers, and the OAuth2 token exchange runs outside the logged
+path. `LogResponse` is different — it receives the response headers unfiltered,
+so filter there rather than printing them wholesale. The SDK's own acceptance
+tracer prints response headers from a fixed allowlist for that reason.
 
 ## License
 

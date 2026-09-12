@@ -714,7 +714,7 @@ func assertRecoveryDelayRejected(t *testing.T, err error) {
 // provisions real network egress — a datacenter allocation, an IPSec tunnel
 // endpoint — and deleting one severs traffic for every access policy routed
 // through it, so this must never run against a tenant anyone depends on. The
-// full lifecycle was wire-verified on the wisconsam sandbox on 2026-08-20
+// full lifecycle was wire-verified on the JSC sandbox on 2026-08-20
 // (create with ipsec, GET, four PATCHes, delete, 404 after) and the tenant was
 // left exactly as found, which is what makes an opt-in test worth having here
 // rather than a permanent skip.
@@ -1575,7 +1575,7 @@ func TestAcceptance_SecurityCloudDeviceGroupLifecycle(t *testing.T) {
 
 // TestAcceptance_SecurityCloudDeviceGroupsV2 no longer tolerates a 403: the
 // gateway routes /v2/.../groups as of 2026-08-20 (wire-verified on eu, tenant
-// wisconsam, where it returns the {groups: []} envelope). It was 403
+// the JSC sandbox, where it returns the {groups: []} envelope). It was 403
 // BAD_PERMISSIONS when the surface was first generated, so a 403 resurfacing
 // here means routing regressed or the region in use lags eu — either way that
 // is worth a failure rather than a skip.
