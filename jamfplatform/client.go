@@ -235,6 +235,20 @@ func WithAuthorizationHeaderName(name string) Option {
 }
 
 // WithLogger sets a logger for HTTP request/response logging.
+//
+// The SDK logs nothing unless a Logger is installed, and it does not redact
+// what it hands over: LogRequest receives the raw request body, LogResponse
+// the raw response body and headers. Request bodies carry every secret a
+// write sends — ClientSecret, AdminPassword, KeystorePassword, the escaped
+// plist in a configuration profile's Payloads — so a Logger that renders a
+// body verbatim puts those in plaintext wherever it writes, which is commonly
+// a support ticket or CI output. Redact inside the Logger, or log only the
+// method, URL and status.
+//
+// Two things a Logger never sees. LogRequest is passed no headers at all, so
+// the bearer token does not reach it; and the OAuth2 token exchange runs on
+// its own http.Client outside the logged path, so the client credential does
+// not either.
 func WithLogger(logger Logger) Option {
 	return func(cfg *clientConfig) {
 		cfg.logger = logger
