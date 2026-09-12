@@ -990,8 +990,8 @@ func (n NotificationValue) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 // entity-escaped text form once. The two directions are deliberately
 // asymmetric because the server itself is asymmetric.
 //
-// The Classic API does not treat <payloads> content per XML 1.0
-// (PI-827). Wire-verified model (2026-07-30, two Jamf Pro 11.x tenants;
+// The Classic API does not treat <payloads> content per XML 1.0.
+// Wire-verified model (2026-07-30, two Jamf Pro 11.x tenants;
 // full matrix in acc_proclassic_profile_payloads_test.go):
 //
 //   - Validation: the server entity-decodes the submitted content once
@@ -1165,7 +1165,7 @@ func crRefLen(s string) int {
 // opens a carriage-return reference, which is emitted bare so the decode
 // yields an actual CR.
 //
-// Escaping those too stores the reference as literal text (the PI-827 extra
+// Escaping those too stores the reference as literal text (the extra
 // entity layer), so a device would display `+"`&#13;`"+` instead of breaking
 // the line. Leaving the reference bare is safe against the server's
 // bare-`+"`&`"+`/`+"`<`"+` rejection because it decodes to CR, not to `+"`&`"+`
@@ -1327,7 +1327,7 @@ func marshalPayloads(t *testing.T, plist string) string {
 }
 
 // serverIngest simulates the Classic API's single entity-decode of
-// MCX-family payload fragments (PI-827; wire-verified 2026-07-30) — the
+// MCX-family payload fragments (wire-verified 2026-07-30) — the
 // storage path this wire form targets byte-exact. Other payload types
 // store the wire content verbatim (see the PayloadsXMLText type comment).
 // Every %s in marshalled output is part of an %s sequence, so one
@@ -2994,9 +2994,9 @@ type MethodPrivileges struct {
 	//     exempts them from the transform the publishing pipeline attaches
 	//     x-required-privileges during, so the artifact ships without them by
 	//     construction. The values come from
-	//     public-apis-oas/redocly-implementation/teams/account-*/config.yaml
+	//     the spec source repository's own per-team config.yaml
 	//     and the hand-written OPA rules in
-	//     authorization-policies/policies/tyk_external/account/account_api.rego,
+	//     the gateway's authorization policy for the account namespace,
 	//     which agree on all 18.
 	//   - "": Scoped is empty.
 	//

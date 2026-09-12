@@ -46,7 +46,7 @@ two credentials, not two paths. Probed 2026-08-29:
 | `GET /pro/v2/environment-type` | 403 | 403 | 403 |
 
 `environment-type` was the only structurally-refused row, and it has no rule in
-`jamf/authorization-policies` on any branch — which is what made its 403
+the gateway's authorization policy on any branch — which is what made its 403
 permanent and assertable. **A retraction worth not repeating:** an earlier pass
 dated the deployed policy bundle by arguing that two newly-added rules were
 "still refused". They were refused because those *tenant* credentials lacked the
@@ -130,27 +130,30 @@ at all: whether a credential holds a capability is visible only in Jamf Account.
 
 ### Where the per-path allowlist lives
 
-Not in `tyk-gateway-management`. pro, proclassic and securitycloud are all
-**catch-all proxies** (`listen_path: /api/pro/` etc., `strip_listen_path: true`,
-no `white_list`, product-level scopes), and grepping the whole repo for any
-withdrawn path name returns nothing. The `audit.rules` globs in the securitycloud
-definition are *audit* rules, not routing.
+Not in the gateway's API definitions. pro, proclassic and securitycloud are all
+**catch-all proxies** — one listen path per product, path prefix stripped, no
+per-path allowlist, product-level scopes — and no withdrawn path name appears in
+them anywhere. The audit globs in the securitycloud definition are *audit* rules,
+not routing.
 
-The decision is made by an external authorization service, called from
-`plugins/authz-plugin/plugin/handler.go`; its policies are readable in
-**`jamf/authorization-policies`** — OPA/Rego under `policies/tyk_external/<domain>/`,
-each domain's `_default.rego` carrying `default allow := false`, so **a path with
-no `allow` rule is a 403 by construction**. Two things about reading it:
+The decision is made by a separate authorization service, and its policies are
+**hand-written OPA rego, one policy per namespace, each defaulting to
+`allow := false`** — so **a path with no `allow` rule is a 403 by construction**.
+Two things about reading it:
 
-- **Path arrays begin with `"api"`** (`["api","securitycloud","v2","groups"]`)
-  even though the GA edge 404s anything under `/api`. The edge re-prefixes before
-  tyk, so these are internal paths and must not be used to reason about caller URLs.
-- **`main` is not what is deployed.** The bundle is tagged `git rev-parse --short HEAD`
-  and rolled out from `jamf/authorization-service`; `tyk-gateway-management` names
-  the bundle but never a version. Nothing local can read the deployed digest — the
-  wire is the only oracle. As of 2026-08-29 the deployed bundle sat between 18 and
-  28 August in both regions, dated from *deletions* (credential-independent), not
-  additions.
+- **Policy path arrays begin with `"api"`** even though the GA edge 404s anything
+  under `/api`. The edge re-prefixes before the gateway, so those are internal
+  paths and must not be used to reason about caller URLs.
+- **A merged rule is not a deployed rule.** The policy bundle is tagged from its
+  own commit and rolled out separately, and the gateway's API definitions name the
+  bundle but never a version. Nothing readable offline gives the deployed digest —
+  the wire is the only oracle. As of 2026-08-29 the deployed bundle sat between 18
+  and 28 August in both regions, dated from *deletions* (credential-independent),
+  not additions.
+
+Where to read the policy itself, and the internal changes cited throughout this
+document, is recorded in `docs/local/internal-provenance.local.md`, which is not
+tracked.
 
 It is also genuinely independent evidence, unlike `_permissions/routes.yaml`,
 which is **generated from the specs' own `x-required-privileges`** and therefore
@@ -158,21 +161,21 @@ cannot corroborate them. Proven, not assumed: twelve pro GETs absent from
 `routes.yaml` (`/startup-status`, `/v1/dashboard`, `/v1/health-check`, …) all
 answer 200, so a missing route entry is not the mechanism behind any 403.
 
-A stale local checkout of either repo shows old config and looks authoritative.
-Use `git show origin/master:<path>` after a fetch, not the working tree.
+A stale local checkout of either shows old config and looks authoritative. Read
+the fetched remote ref, not the working tree.
 
 ### The whole registry cross-checked against the allowlist (2026-08-31)
 
-Every generated `Privileges` entry was matched against every `allow` rule in
-`jamf/authorization-policies` — 1483 SDK operations against 1861 rules in 275
-non-test `.rego` files, keyed on HTTP method plus path template with the
-package's namespace prefixed under `"api"`. **1475 matched a policy route and
+Every generated `Privileges` entry was matched against every `allow` rule in the
+gateway's authorization policy — 1483 SDK operations against 1861 rules in 275
+non-test policy files, keyed on HTTP method plus path template with the package's
+namespace prefixed under `"api"`. **1475 matched a policy route and
 1454 of those agree with it exactly**, so the specs' `x-required-privileges` are
 corroborated by an oracle that is not derived from them. The 29 that do not
 agree, and the 8 with no matching rule, are each one of five things:
 
 - **18 `account` operations: the spec declares nothing and the policy requires a
-  capability.** `account_api.rego` gates them on `licensing:read`,
+  capability.** The gateway's account policy gates them on `licensing:read`,
   `deal-registration:read`, `distributor-actions:{create,read,update}`,
   `sso-connections:{c,r,u,d}` and `sso-domains:{c,r,u,d}` — exactly the five
   capabilities the permissions-map article lists under organization scope. The
@@ -184,23 +187,23 @@ agree, and the 8 with no matching rule, are each one of five things:
   required"; the godoc says so.
 
   **The cause is a bundle-pipeline coupling, not missing authorship** (traced
-  2026-08-31, `public-apis-oas` at `959591e`, the commit v1877 was built from).
-  All 18 privileges *are* declared upstream, twice: inline in
-  `teams/account-{licensing,partners,sso}/openapi.yaml` (1 + 7 + 10) and again in
-  each `config.yaml` under `requiredPrivileges.operations`. The build injects
+  2026-08-31 against the spec source commit v1877 was built from). All 18
+  privileges *are* declared upstream, twice: inline in each account spec's own
+  source `openapi.yaml` (1 + 7 + 10) and again in each spec's source `config.yaml`
+  under `requiredPrivileges.operations`. The build injects
   them into the published artifact only when `betaApiConfig.enabled: true`, and
   the correlation is exact — those three specs are the only ones without that
   block and the only three whose privileges are stripped; all 19 others have it
-  and publish theirs intact. `teams/account-sso/config.yaml` documents the
+  and publish theirs intact. The account-sso source config documents the
   consequence in its own comment. The account APIs opt out of `betaApiConfig`
   correctly: it drives the beta `/{scopeType}/{scopeId}` path transform, which
   cannot apply to an organization-scoped API that resolves the org from the
   token. Privilege injection and path-prefix transformation simply share one
   switch.
 
-  So the values are corroborated three ways — source spec, source config, and
-  `account_api.rego`, which the config cites by name — and the published artifact
-  is the only dissenter. **The upstream ask is to decouple `requiredPrivileges`
+  So the values are corroborated three ways — source spec, source config, and the
+  gateway's account policy, which the config cites by name — and the published
+  artifact is the only dissenter. **The upstream ask is to decouple `requiredPrivileges`
   injection from `betaApiConfig`**, not to add the privileges: any future API
   that opts out of the beta transform loses its privilege metadata the same way,
   silently. Re-check this when the account holds are lifted; if the coupling is
@@ -213,12 +216,11 @@ agree, and the 8 with no matching rule, are each one of five things:
   `flush-policy-logs:execute`, no registry entry is an alternatives set. That is
   what licenses the godoc's "all of them are required".
 - **4 `audit` operations, 1 `proclassic` file upload: matched by hand, agree.**
-  Not parser gaps in the policy. `audit_service_api.rego` gates on a path
-  *predicate* (`path[0..3] == api/audit/v1/audit`) rather than a literal array,
-  requiring `audit:read` on `environmentPermissions` — consistent with the
-  package's known blocker and with environment scope.
-  `jamf_proclassic_file_uploads.rego` enumerates the resource segment as
-  literals (`computers`, `mobiledevices`, `policies`, …), so the SDK's one
+  Not parser gaps in the policy. The audit policy gates on a path *predicate*
+  rather than a literal array, requiring `audit:read` on `environmentPermissions`
+  — consistent with the package's known blocker and with environment scope. The
+  Classic file-uploads policy enumerates the resource segment as literals
+  (`computers`, `mobiledevices`, `policies`, …), so the SDK's one
   templated `POST //fileuploads/{resource}/{idType}/{id}` maps to several rules,
   all `file-uploads:create`.
 - **1 `securitycloud` `PUT /v2/groups/{groupId}`: no rule.** Already recorded
@@ -264,16 +266,15 @@ on 2026-08-29**, each probed individually with bogus IDs and invalid bodies so
 routing was exercised without mutating anything; `GET /v2/environment-type` was
 the sole exception and had never been routed.
 
-The withdrawal is deliberate and coordinated across three repos: the same
-JSC-73265 / API-364 tickets that removed the operations from the specs
-(`public-apis-oas#395`, `#397`) deleted the matching hand-written OPA rules in
-`jamf/authorization-policies` (`d5facb3`, `4a3adf6`, `944085e`, `ebb2253`).
-`ebb2253`'s body names the mechanism outright: each removed operation "is marked
-deprecated in the jss source spec and has a non-deprecated successor whose policy
-rule already exists here." Credential management moved to Jamf Account.
-`4a3adf6` groups peripherals under *"deprecated or not exposed because of
-security"*, so that half is Wiki-driven cleanup rather than a rider on the
-credential change.
+The withdrawal is deliberate and coordinated across the spec source, the gateway
+policy and the product tickets behind both: the same tickets that removed the
+operations from the specs deleted the matching hand-written policy rules, in four
+commits. One of them names the mechanism outright: each removed operation "is
+marked deprecated in the source spec and has a non-deprecated successor whose
+policy rule already exists here." Credential management moved to Jamf Account.
+Another groups peripherals under *"deprecated or not exposed because of
+security"*, so that half is documentation-driven cleanup rather than a rider on
+the credential change.
 
 **Malformed XML is the right probe for a Classic write** — rejected at parse time,
 before anything can be created, so a POST's routing is provable without mutating
@@ -282,12 +283,12 @@ success, a Tomcat HTML status page for an error, neither confusable with the
 gateway's compact JSON.
 
 **Both landed 2026-08-31, and the SDK dropped them:** `POST /v1/system/initialize`
-and `POST /v1/system/platform-initialize` (`public-apis-oas#400`,
-`authorization-policies#260`, API-364) — they bootstrap an on-prem server from an
-activation code and neither applies to cloud. v1897 removed both paths and their
-`InitializeV1` / `PlatformInitializeV1` schemas from `external/jpapi`; `cdd734b`
-deleted both allow blocks from `jamf_pro_m2m_only.rego`, returning them to the
-package default `allow := false`. `InitializeSystemV1` and
+and `POST /v1/system/platform-initialize`, withdrawn upstream in the spec and in
+the gateway policy together — they bootstrap an on-prem server from an activation
+code and neither applies to cloud. v1897 removed both paths and their
+`InitializeV1` / `PlatformInitializeV1` schemas from `external/jpapi`; the policy
+change deleted both allow blocks from the Pro M2M-only policy, returning them to
+the package default `allow := false`. `InitializeSystemV1` and
 `PlatformInitializeSystemV1` are gone from the SDK — a breaking change with no
 downstream consumer in either provider.
 
@@ -297,16 +298,16 @@ reason to re-add them.** Re-probed 2026-08-31 with `GET /pro/v1/jamf-pro-version
 answers `400 INVALID_FIELD` on `jssUrl` and `password`, and to
 `/pro/v1/system/platform-initialize` `400 INVALID_FIELD` on `eulaAccepted` and
 `email` — Jamf Pro's own field validation, so both were still routed and unrefused
-hours after the policy merged. `main` is not `deployed`; the deny arrives with the
-next bundle, and until then a probe only dates the rollout.
+hours after the policy merged. A merged rule is not a deployed one; the deny
+arrives with the next bundle, and until then a probe only dates the rollout.
 
-`cdd734b` also names why they were reachable at all: every rule in
-`jamf_pro_m2m_only.rego` ends in `lib.has_access(...)`, which `lib.rego` defines
-as `permissions != null` — **no permission check whatsoever**. It cites the same
+That change also names why they were reachable at all: every rule in the Pro
+M2M-only policy ends in the policy library's access helper, which is defined as
+`permissions != null` — **no permission check whatsoever**. It cites the same
 decision that dropped `/v1/system/initialize-database-connection` and
-`/v2/environment-type` in `public-apis-oas#395`; neither was ever whitelisted here.
+`/v2/environment-type` upstream; neither was ever whitelisted here.
 
-**`ebb2253` (`#259`) removed the policies for four further deprecated jpapi
+**A further policy change removed the rules for four more deprecated jpapi
 operations, and the SDK was already clear of all four**:
 `GET /v1/macos-managed-software-updates/available-updates`,
 `GET`+`PATCH /v2/account-preferences` and `POST /v1/oidc/dispatch`. `config.json`
@@ -521,8 +522,8 @@ Two further checks, each independent of the specs:
   on the dev side of the filter. Diffing `internal/dev` *file contents* is still
   useless (its `x-generated` block churns every build) but comparing **operation
   sets** across environments is exactly what it is good for.
-- **`authorization-policies`** `origin/main` is still `cdd734b` — v1897's
-  `/v1/system/initialize` deny — with no successor commit. The hand-written OPA
+- **The gateway's authorization policy** is unmoved — its tip is still v1897's
+  `/v1/system/initialize` deny, with no successor commit. The hand-written OPA
   allow blocks for `v1`, `v2` and `v3` `computers-inventory` (including the
   capability and wrong-token-guard variants) are all present.
 - **The bundle's own `_permissions/routes.yaml`** is byte-different from v1897 and
@@ -601,9 +602,9 @@ Three further signals, none of them the wire:
   `devices:create`/`users:create`, `devices:read`, `devices:update`/`users:update`
   and `destructive-device-actions:execute` respectively. `_permissions/scopes.yaml`
   is byte-identical.
-- **`authorization-policies` has nothing.** `origin/main` is still `cdd734b`, and
-  `policies/tyk_external/jamf_pro_external/jamf_proclassic_computers.rego` retains
-  every allow block for all four verbs on all four paths.
+- **The gateway's authorization policy has nothing.** Its tip is unmoved, and the
+  Classic computers policy retains every allow block for all four verbs on all
+  four paths.
 
 **Unlike v1942's removals, none of these declares a successor.** Each carries
 `deprecated: true` and `x-deprecation-date: 2025-02-11T00:00:00.000Z`, and no
@@ -961,7 +962,7 @@ this — only an environment credential has been live since the gateway opened.
 ### The restored Classic patch family (2026-09-04)
 
 v2082 republished every Classic patch-management operation v1942 withdrew
-(`public-apis-oas#438`). Probing them before writing coverage found three
+(upstream's restoration change). Probing them before writing coverage found three
 defects, two of which had been shipping silently in the SDK since the day
 those methods first appeared, and none of which a status-only test could see.
 
@@ -1227,7 +1228,7 @@ generated `MarshalXML` already emits it.
 ### v2082's scope migration: the specs moved, the gateway mostly did not (2026-09-04)
 
 v2082 set a scope level on every spec that had one wrong
-(`public-apis-oas#436`, `#437`, `#439`). Six Platform specs went tenant →
+(three upstream spec changes). Six Platform specs went tenant →
 **environment only** — `x-scope-types: [environment]`, `X-Environment-Id`
 `required: true`, and `X-Tenant-Id` deleted from `components.parameters`
 outright. `jpapi`, `capi` and all six Security Cloud specs went tenant →
@@ -1545,7 +1546,7 @@ different operation from the one written — is what rules out a write the handl
 accepted and dropped.
 
 **Two layers were broken here, and fixing the first made the second visible.**
-The 403 → 404 transition on 2026-09-03 was `authorization-policies#265`
+The 403 → 404 transition on 2026-09-03 was the v2 `PUT` policy change
 deploying, and the diagnosis at the time — recorded below — concluded "the
 remaining gap is the rollout". The rollout did land. It then exposed an
 independent defect in the v2 handler behind it, which is why the hold outlived
@@ -1588,7 +1589,7 @@ account trio is now the only user of that key.
 ### Device groups `/v2/{id}`: the rule deployed, and the v2 handler 404s (2026-09-04)
 
 **The authorization story is over and the hold now rests on a service defect.**
-`authorization-policies#265` (`07791a1`) has deployed: `PUT /v2/groups/{groupId}`
+The v2 `PUT` policy change has deployed: `PUT /v2/groups/{groupId}`
 stopped answering `403 BAD_PERMISSIONS` and started answering a service-level
 **`404 NOT_FOUND`**. First seen 2026-09-03 12:29Z on the JSC sandbox tenant;
 **re-probed 2026-09-04 on a second Security Cloud tenant with a second
@@ -1627,8 +1628,7 @@ not exclude.
 
 **So: the v2 update handler cannot find a group its own list endpoint just
 returned.** That is a defect in the Security Cloud devices service, not an
-authorization gap, and the owner is no longer a `jamf/authorization-service`
-rollout. Report upstream. ~~`securitycloud-devices` **stays held at v1897**~~ —
+authorization gap, and the owner is no longer a policy-bundle rollout. Report upstream. ~~`securitycloud-devices` **stays held at v1897**~~ —
 **superseded 2026-09-04: the handler was fixed and the hold lifted; see the
 section above.** At the time of this probe, v1942 would have withdrawn
 `PUT /v1/groups/{groupId}` — then the only device-group update that worked —
@@ -1646,21 +1646,12 @@ the SDK it is nulled by response compression, recorded separately.)
 
 ### Device groups `/v2/{id}`: the rule landed on `main` 2026-09-02
 
-**Update 2026-09-02: the rule now exists.** `authorization-policies` PR **#265**
-merged at 10:13:41Z as `07791a1` ("JSC-72715: add PUT
-`/api/securitycloud/v2/groups/{groupId}` policy") and is the tip of `main`. It
-adds exactly one allow block to `securitycloud_api_devices.rego`, taking it from
-six rules to seven:
-
-```rego
-allow if {
-	some groupId
-	input.request.method == "PUT"
-	input.request.path = ["api", "securitycloud", "v2", "groups", groupId]
-	lib.is_external_m2m_token(input.subject)
-	lib.has_any_of_permissions(input.context.permissions.tenantPermissions, ["update:jsc:all", "device-groups:update"])
-}
-```
+**Update 2026-09-02: the rule now exists.** A policy change merged at 10:13:41Z
+adding `PUT /api/securitycloud/v2/groups/{groupId}` is the tip of the policy's
+`main`. It adds exactly one allow block to the Security Cloud devices policy,
+taking it from six rules to seven: a `PUT` on that path, for an external M2M
+token, requiring either `update:jsc:all` or `device-groups:update` on the
+credential's tenant permissions.
 
 Three things to hold onto. **It is `PUT` only** — `GET` and `DELETE` on the v2
 item path still have no rule of any method, which is consistent with the spec
@@ -1668,16 +1659,14 @@ declaring neither, so their 403s continue to prove nothing. **The permission is
 read from `tenantPermissions`**, matching the v1 rules, and is satisfied by
 either `update:jsc:all` (legacy) or `device-groups:update` (capability-first) —
 so a credential holding neither will still 403 after rollout, and that 403 will
-be a capability gap rather than a missing rule. **`main` is not deployed, and
-tyk cannot tell you when it is.** Nothing in `tyk-gateway-management` needs to
-change — `prod/api-products/securitycloud/` already listens on
-`/api/securitycloud/` with `config_data.api-bundle: securitycloud` in all three
-regions, which routes the v2 item path into this package — and the
-`custom_middleware_bundle` hash there (`audit-with-external-68316e2.zip`) is a
-`jamf/tyk-custom-plugins` commit, **not** an OPA policy version. The OPA bundle
-is published by authorization-policies' own CI to ECR tagged with the short SHA
-and rolled out by `bump_policy.sh` in `jamf/authorization-service`, which is not
-cloned here. So the wire is the only oracle for whether it is live.
+be a capability gap rather than a missing rule. **A merged rule is not a deployed
+one, and the gateway config cannot tell you when it is.** Nothing in the
+gateway's API definitions needs to change — the prod Security Cloud product
+already listens on `/api/securitycloud/` in all three regions, which routes the
+v2 item path into this package — and the middleware-bundle hash recorded there is
+a gateway-plugin version, **not** an OPA policy version. The policy bundle is
+published by its own CI and rolled out by a separate service. So the wire is the
+only oracle for whether it is live.
 
 **Probed, and it is not live yet: still 403, 3/3, 2026-09-02 ~11:00Z**, JSC
 sandbox tenant `928260f5…` on eu, `PUT /securitycloud/v1/groups/{id}` → **200**
@@ -1693,7 +1682,7 @@ file — `is_external_m2m_token` plus `tenantPermissions` holding
 `update:jsc:all` or `device-groups:update`. A credential that satisfies one
 satisfies the other by construction, and this one demonstrably satisfies the v1
 rule. So the v2 403 cannot be a capability gap: it is the deployed bundle
-predating `07791a1`. **Prefer a same-permission sibling rule over two
+predating the v2 rule. **Prefer a same-permission sibling rule over two
 credentials whenever the rego offers one** — it needs one token, one
 invocation, and it cannot be confounded by a grant difference.
 
@@ -1723,22 +1712,24 @@ sandbox tenant `928260f5…` on eu, same idempotent body read back from
 | `PUT /securitycloud/v2/groups/{bogus-uuid}` | **403** `BAD_PERMISSIONS`, `8bf721480e8b3ff98d1e371abb813653` |
 | `PUT /securitycloud/v1/groups/{real-id}` (sibling-rule control) | **200**, `{"id":"d56a8e26…","name":"API Demo Group"}` |
 
-That is **3h42m after `07791a1` merged** and the deployed bundle still predates
+That is **3h42m after the v2 rule merged** and the deployed bundle still predates
 it, which sets a floor on the rollout lag rather than a defect: nothing in
 either repo publishes a signal this one can read, so the wire stays the only
 oracle. Note the bogus-uuid 403 is identical to the real-id 403 — OPA refuses
 before the service resolves the id, which is why a real group is not needed to
 detect the rollout and the acceptance test can keep asserting on either.
 
-**`authorization-policies#264` moved, and the move removes the ordering risk.**
-It is still DRAFT, but it was **rebased onto the current `main` at 2026-09-02
-13:22:43Z** (`fa4cb07`), so `07791a1` is now an ancestor of its head and its own
-copy of `securitycloud_api_devices.rego` **retains the v2 `PUT` allow** while
-deleting the v1 `GET`/`PUT` ones. So #264 can no longer deny the v1 update
+**The deprecated-endpoint deny draft moved, and the move removes the ordering
+risk.** It is still a draft, but it was **rebased onto the current policy tip at
+2026-09-02 13:22:43Z**, so the v2 `PUT` rule is now an ancestor of its head and
+its own copy of the Security Cloud devices policy **retains the v2 `PUT` allow**
+while deleting the v1 `GET`/`PUT` ones. So the draft can no longer deny the v1
+update
 without carrying the v2 successor in the same bundle — the sequence CLAUDE.md
 warned about (v1 denied with no v2 successor) is now structurally excluded on
 the merge path, not merely unlikely. Verify it stays that way on any later
-force-push: `git merge-base --is-ancestor 07791a1 <pr head>` plus a grep for
+force-push: an `is-ancestor` check of the v2 rule's commit against the draft's
+head, plus a grep for
 `"v2", "groups", groupId` in that file is the whole check.
 
 This also clears the blocker #264 named in its own body: it removes the allow
@@ -1747,7 +1738,7 @@ blocks for `GET /v1/groups` and `PUT /v1/groups/{groupId}` among 155 rules acros
 
 Everything below predates that and is the record of the two-month absence.
 
-`securitycloud_api_devices.rego` carries exactly six rules — `POST`/`GET /v1/groups`,
+The Security Cloud devices policy carries exactly six rules — `POST`/`GET /v1/groups`,
 `GET /v2/groups`, and `GET`/`PUT`/`DELETE /v1/groups/{groupId}`. There is **no
 `/v2/groups/{groupId}` rule of any method**, and grepping all 60+ remote branches
 and all open PRs finds none pending. So this is not awaiting a rollout; it has not
@@ -1772,7 +1763,7 @@ are **not declared in any build**, so their 403s are expected and prove nothing
 about routing — earlier revisions of this section cited them as if they widened
 the finding. They do not. The missing OPA rule is exactly one,
 `PUT /v2/groups/{groupId}`, which is precisely the gap in
-`securitycloud_api_devices.rego`'s six.
+the Security Cloud devices policy's six.
 
 `TestAcceptance_SecurityCloudUpdateDeviceGroupV2` asserts the 403 and **fails when
 routing lands** — invert it then, and do not weaken it to a skip.
@@ -1802,7 +1793,7 @@ tokens proven live (`GET /securitycloud/v2/groups` → 200 on the JSC credential
 The v1 `PUT` **varies** by credential; the v2 `PUT` is **constant** across both. A
 403 that varies is a capability grant, one constant across credentials is a
 missing authorization rule — so `PUT /v2/groups/{groupId}` has no rule authored,
-established from the wire without reading `securitycloud_api_devices.rego`. The
+established from the wire without reading the policy at all. The
 two sources now agree independently. The last two rows are the undeclared verbs,
 included only to show they behave no differently; they are not part of the
 argument.
@@ -1825,7 +1816,7 @@ Two things this pins down. The 403 is **not** id-shaped or permission-shaped —
 bogus uuid gets the same answer as a real one, and the same credential drives the
 v1 write to 200 in the same invocation, so it is the unrouted-path tell, not a
 capability gap. And **no `/v2/groups/{groupId}` verb is routed**: the `GET` fails
-the same way the `PUT` does, matching `securitycloud_api_devices.rego` having no
+the same way the `PUT` does, matching the policy having no
 rule for that path at all.
 
 **The v1 PUT's own `Link` header names a third URL shape, and it is unrouted
@@ -1880,24 +1871,23 @@ group minted for the probe (`POST /securitycloud/v1/groups` → 201
 | `DELETE /securitycloud/v1/groups/{real-id}` | **204**, then `GET` → `404 GROUP_NOT_FOUND` `field: groupId` |
 
 Tenant left clean — the group list is the same 8 entries before and after.
-`securitycloud_api_devices.rego` on `origin/main` still carries exactly the same
-six rules and `origin/main` is still `cdd734b`, so nothing has been authored.
+The Security Cloud devices policy on its `main` still carries exactly the same
+six rules, and that `main` is unmoved, so nothing has been authored.
 
-**Two open PRs now look like they bear on this, and only one of them does.**
+**Two open policy changes now look like they bear on this, and only one of them
+does.**
 
-- **`authorization-policies#263` "PFE-1210 Add policies for DELETE
-  device-enrollments/{id} and GET v2/groups/{id}" (OPEN, 2026-09-01) is not
-  Security Cloud.** Its `v2/groups/{groupId}` rule is for
-  `/ui/jamfpro/v2/groups/{groupId}` in
-  `policies/tyk_external/jamf_pro/jamf_pro_groups_ui.rego` — the Jamf Pro UI
-  namespace. The PR touches four files, none under
-  `policies/tyk_external/securitycloud/`. A title search for `v2/groups` finds it
-  and means nothing here; check the file path, not the title.
-- **`authorization-policies#264` "API-364 Deny manifest-listed deprecated
-  endpoints at the external gateway" (DRAFT, 2026-09-01) would remove the working
-  update outright.** It deletes the `GET /api/securitycloud/v1/groups` and
-  `PUT /api/securitycloud/v1/groups/{groupId}` allow blocks from
-  `securitycloud_api_devices.rego`, leaving four rules — `POST /v1/groups`,
+- **A change adding policies for `DELETE device-enrollments/{id}` and
+  `GET v2/groups/{id}` (open, 2026-09-01) is not Security Cloud.** Its
+  `v2/groups/{groupId}` rule is for `/ui/jamfpro/v2/groups/{groupId}`, in the
+  Jamf Pro **UI** namespace's policy. It touches four files, none of them the
+  Security Cloud policy. A title search for `v2/groups` finds it and means
+  nothing here; check the file path, not the title.
+- **A change denying manifest-listed deprecated endpoints at the external
+  gateway (draft, 2026-09-01) would remove the working update outright.** It
+  deletes the `GET /api/securitycloud/v1/groups` and
+  `PUT /api/securitycloud/v1/groups/{groupId}` allow blocks from the Security
+  Cloud devices policy, leaving four rules — `POST /v1/groups`,
   `GET /v2/groups`, `GET /v1/groups/{groupId}`, `DELETE /v1/groups/{groupId}` —
   and **adds no `PUT /v2/groups/{groupId}` rule**. So if it merges and deploys as
   drafted, device groups become create/read/delete-only: the v1 update is denied
@@ -1908,13 +1898,13 @@ six rules and `origin/main` is still `cdd734b`, so nothing has been authored.
   SDK would keep a method the gateway refuses, which is the honest state but not a
   working update.
 
-`#264` is also the deny half of v1942's `capi` withdrawals — it strips
+That draft is also the deny half of v1942's `capi` withdrawals — it strips
 `GET /api/proclassic/computers`, `/computers/subset/basic`, and `GET`/`PUT`
-`/computers/id/{computerid}` from `jamf_proclassic_computers.rego`. It does **not**
+`/computers/id/{computerid}` from the Classic computers policy. It does **not**
 touch the twelve alternate-identifier rules v1988 deleted from the spec; all twelve
-remain in the branch's version of that file. The PR was opened at 14:09 and the
-v1988 bundle generated at 14:15, so the policy side has not caught up with the
-newer removal yet. Re-check both when `#264` moves out of draft.
+remain in the branch's version of that file. It was opened at 14:09 and the v1988
+bundle generated at 14:15, so the policy side has not caught up with the newer
+removal yet. Re-check both when it moves out of draft.
 
 Two methodological warnings from this probe. The first attempt returned **500 on
 both v1 and v2**, which reads as "v2 is routed and merely faulting" — the opposite
@@ -1934,10 +1924,10 @@ is surprising either way. **The SDK reports what the spec says; do not "correct"
 locally.**
 
 Note these are not gateway scopes: neither the old `*:jsc:all` names nor the new
-ones appear anywhere in `tyk-gateway-management`, which carries only a
+ones appear anywhere in the gateway's API definitions, which carry only a
 product-level `securitycloud-product` scope. Per-privilege checks live in the
-authorization service and the Jamf Account permissions model, so the tyk repo
-cannot answer "is this live" for a privilege rename. The wire can.
+authorization service and the Jamf Account permissions model, so the gateway
+config cannot answer "is this live" for a privilege rename. The wire can.
 
 ### `href` is nulled by response compression
 
@@ -2351,7 +2341,7 @@ itself, verified with both `--compressed` and `identity`.
   the third credential** — which is why the tenant looked like it had none. Any
   future uem-connect probe needs that one. Both tokens are opaque, so the rego's
   permission sets in
-  `policies/tyk_external/securitycloud/uem_connect_api.rego` are the only way to
+  the gateway's uem-connect policy are the only way to
   read a grant back.
 
 - **v2018 is `uem-connect` only, and it takes `406` back off seven of the twelve
@@ -2645,7 +2635,7 @@ credentials" is wrong, and the mistake is the same shape as the
 `GET /partners/v1/deal-registrations` answers **200**
 (`{"totalCount":0,"results":[]}`). What 403s is nothing — all five distributor
 operations are routed *and* authorized, and every one answers the standing
-EAI-4327 upstream fault:
+the standing distributor-service fault:
 
 | operation | status | body |
 |---|---|---|
@@ -2658,7 +2648,7 @@ EAI-4327 upstream fault:
 
 Note the last write: `{}` does not reach body validation — the upstream call
 fails first — so **field validation on this operation is upstream-side**, and
-the doomed-request trick cannot probe it while EAI-4327 stands.
+the doomed-request trick cannot probe it while that fault stands.
 
 The whole account lane is consequently green for the first time: all eleven
 `TestAcceptance_Account*` tests pass or skip on a write opt-in
@@ -2813,9 +2803,9 @@ that now fails generation on the class.
 
 **All 18 account privileges are corroborated three ways**, which is what
 justified supplying them locally after the earlier decision not to:
-`public-apis-oas/redocly-implementation/teams/account-*/config.yaml`
+the account specs' own source `config.yaml`
 `requiredPrivileges`; the hand-written OPA rules in
-`authorization-policies/policies/tyk_external/account/account_api.rego`; and
+the gateway's authorization policy for the `account` namespace; and
 `TestScopedPrivilegesUseGAVocabulary`, which validated every identifier against
 the published capability reference with no addition to `gaCapabilityActions`.
 The `config.yaml` for each spec states the cause in its own closing comment:
@@ -2999,11 +2989,11 @@ migration.** `GET /api/partners/v1/distributor/configuration` answers `400` with
 an OAuth body on an API path: `{"error":"invalid_scope","error_description":
 "Invalid scopes: skyway-use2-product"}`. The partners backend calls Skyway and in
 **prod** asks for a scope that exists only in **dev**; prod declares
-`skyway-use1-product` and, since `tyk-gateway-management` `e2f54c1c`, a
+`skyway-use1-product` and, since a gateway API-definition change, a
 region-independent `skyway-product` added for exactly this purpose. Nothing to fix
 in the SDK — the URL is confirmed correct, every non-distributor endpoint on the
-same credential returns 200, and `account_api.rego` carries the full distributor
-surface, so authorization passes. **Note the tell: an `invalid_scope` OAuth error
+same credential returns 200, and the gateway's account policy carries the full
+distributor surface, so authorization passes. **Note the tell: an `invalid_scope` OAuth error
 arriving on a resource path means a *backend* service failed its own token
 exchange, not that the caller's credential is wrong.** `isSkywayScopeFault`
 matches on the scope name rather than the status code, because a 400 from these
@@ -3262,7 +3252,7 @@ header win and the request fail `403 OWNERSHIP_FORBIDDEN`.
 Generated, compiled and typed correctly; **every call is refused**, and the SDK is
 not at fault.
 
-Prod `tyk-gateway-management` `3e99c347` (2026-08-28, *"TRIVIAL Audit Service is
+A prod gateway API-definition change (2026-08-28, *"TRIVIAL Audit Service is
 Environment scoped only"*, all three prod regions plus dev and stage) changed
 `platform-audit-service`:
 
@@ -3271,12 +3261,12 @@ Environment scoped only"*, all three prod regions plus dev and stage) changed
 | `request-context-allowed-sources` | `[token, path]` | **`[token, path, header]`** |
 | `request-context-types` | `[environment, organization]` | **`[environment]`** |
 
-That fixed both halves of the original diagnosis. The original 400 came from
-`plugins/authz-plugin/requestcontext/token.go`: an external-M2M token carries no
-tenant, environment or organization claim, so `TokenProvider.Resolve` falls
-through to a server-side organization lookup — but only when
-`len(RequestContextTypes) == 1 && [0] == "organization"`. licensing/partners/sso
-declare exactly `[organization]` and work; audit declared two entries, so the
+That fixed both halves of the original diagnosis. The original 400 came from the
+gateway's request-context resolution: an external-M2M token carries no tenant,
+environment or organization claim, so the resolver falls through to a server-side
+organization lookup — but only when the route declares exactly one request-context
+type and that type is `organization`. licensing/partners/sso declare exactly
+`[organization]` and work; audit declared two entries, so the
 fallback never fired.
 
 Re-probed 2026-08-29 on **two separate** environment credentials, control
@@ -3291,7 +3281,7 @@ Re-probed 2026-08-29 on **two separate** environment credentials, control
 
 **The gateway now says what it wants, in as many words:** *"Request context type
 'organization' is invalid. Expected any of 'environment'."* So the context half is
-fixed and the remaining 403 is pure authorization. `audit_service_api.rego` (20
+fixed and the remaining 403 is pure authorization. The audit policy (20
 lines after `ee84e61`, *"TRIVIAL Remove organization scoping from Audit"*, same
 day as the tyk change) confirms it independently: environment-only,
 `environmentId != ""`, gated on `read:env:audit` or `audit:read`. It also confirms
@@ -3323,18 +3313,17 @@ identically to a path that does not exist**, so status alone cannot tell a real
 audit path from a typo.
 
 So it is now three credentials across two organizations and two regions, each
-using an environment it owns, all 403. Since `audit_service_api.rego` *is*
+using an environment it owns, all 403. Since the audit policy *is*
 authored (gated on `read:env:audit` / `audit:read`), the missing piece remains the
 capability grant on the credential, not the rule.
 
 **Re-checked 2026-09-02 across both repos: nothing has moved, and one plausible
-hypothesis is foreclosed.** Only two commits have touched
-`prod/api-products/platform-audit-service/` since 2026-08-28 —
-tyk `3e99c347` (2026-08-28, "Audit Service is Environment scoped only", which
-added `header` to `request-context-allowed-sources` and **removed
-`organization`** from `request-context-types`) and `a9c1d4fa` (2026-09-01, the
+hypothesis is foreclosed.** Only two changes have touched the prod audit-service
+definition since 2026-08-28 — one on 2026-08-28 ("Audit Service is Environment
+scoped only", which added `header` to `request-context-allowed-sources` and
+**removed `organization`** from `request-context-types`) and one on 2026-09-01 (the
 plugin-bundle bump that hit every prod product) — and neither changes
-grantability. On the OPA side `audit_service_api.rego` is unchanged since
+grantability. On the OPA side the audit policy is unchanged since
 `ee84e61` (2026-08-28), which deleted the organization `allow` block two minutes
 before the matching tyk change; the surviving block accepts an `em2m` subject
 with a non-empty `environmentId` and `environmentPermissions` holding
@@ -3456,12 +3445,10 @@ x-ratelimit-reset: 0
 Tyk reports the limit as `0` when rate limiting is disabled for the key. **No
 response carried a `Retry-After` header.**
 
-Corroborated in `jamf/tyk-gateway-management` @ `92c06467`: both prod plans
-(`prod/plans/default.yaml`, `default-external.yaml`) carry `rate: -1`,
-`per: -1`, `quota_max: -1`. The only `global_rate_limit` anywhere in `prod/` is
-on the m2m Auth0 client-registration path (`rate: 2, per: 3`), which the SDK
-never calls. `Retry-After` appears nowhere in the gateway config or in
-`jamf/tyk-custom-plugins`.
+Corroborated in the gateway's API definitions: both prod plans carry `rate: -1`,
+`per: -1`, `quota_max: -1`. The only global rate limit anywhere in prod is on the
+m2m Auth0 client-registration path (`rate: 2, per: 3`), which the SDK never
+calls. `Retry-After` appears nowhere in the gateway config or in its plugins.
 
 Two consequences for the transport:
 
@@ -3588,7 +3575,7 @@ one.
 
 ### v2056 withdrew organization scope from the spec, and the wire agrees (2026-09-03)
 
-The spec has caught up with tyk `3e99c347`. `x-scope-types` goes
+The spec has caught up with the gateway. `x-scope-types` goes
 `[environment, organization]` → `[environment]`, `X-Environment-Id` flips
 `required: false` → `true` and loses the sentence offering the header-less
 organization form, and `_permissions` agrees on both halves: `routes.yaml` drops
