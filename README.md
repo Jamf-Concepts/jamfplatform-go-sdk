@@ -280,50 +280,49 @@ CI enforces that generated output is current on every pull request.
 ## Getting help
 
 Open an issue: <https://github.com/Jamf-Concepts/jamfplatform-go-sdk/issues>.
-Bug reports and feature requests both have templates. This SDK is published by
-Jamf Concepts and is not covered by Jamf Support, so an issue here is the route
-for anything about the library itself; a defect in the API behind it belongs in
-a Jamf Support case.
+There are templates for bug reports and feature requests. Jamf Concepts
+publishes this SDK and Jamf Support does not cover it, so raise anything about
+the library here. Take a defect in the API behind it to a Jamf Support case.
 
-To report a security vulnerability, follow [SECURITY.md](SECURITY.md) rather
-than opening an issue.
+Report a security vulnerability through [SECURITY.md](SECURITY.md). Do not open
+an issue for one.
 
 ## Troubleshooting
 
-**`401 Authentication failed`, as plain text.** The gateway returns the same
-body for a credential it cannot authenticate and for one that authenticates but
-has no policy for the API product you are calling, so the status alone does not
-tell the two apart. Check the credential first, then whether it is granted the
-capability the endpoint needs — `Privileges` in each sub-package reports what
-that is, and `MethodPrivileges.Scopes` reports which scope the credential must
-carry.
+**`401 Authentication failed`, as plain text.** The gateway sends this body both
+for a credential it cannot authenticate and for one it authenticates but which
+holds no policy for the API product you called, so the status will not tell you
+which you hit. Check the credential, then check whether it holds the capability
+the endpoint needs. `Privileges` in each sub-package lists those capabilities,
+and `MethodPrivileges.Scopes` gives the scope the credential must carry.
 
-**A token exchange that 404s.** The token endpoint is always
+**The token exchange answers 404.** The SDK builds the token endpoint as
 `{baseURL}/auth/token`, so a base URL carrying a path prefix sends the exchange
-somewhere the gateway does not serve. The base URL must be the gateway root —
-`https://{region}.api.jamfcloud.com`, no `/api` segment. The SDK detects this
-case and names the base URL in the error.
+somewhere the gateway does not serve. Pass the gateway root,
+`https://{region}.api.jamfcloud.com`, with no `/api` segment. The SDK catches
+this case and names your base URL in the error.
 
-**`403 OWNERSHIP_FORBIDDEN`.** The scope header does not match the credential.
-A client carries exactly one scope; `WithTenantID` and `WithEnvironmentID` are
-alternatives, not aliases, and crossing them over is refused even within one
-customer. Read back what the client is actually using with `Client.Scope()`.
+**`403 OWNERSHIP_FORBIDDEN`.** Your scope header does not match your credential.
+`WithTenantID` and `WithEnvironmentID` stamp different headers, and a client
+carries one scope, so the gateway refuses a tenant header on an
+environment-scoped credential even within one customer. Call `Client.Scope()` to
+see which one the client holds.
 
-**`403 BAD_PERMISSIONS`, repeatedly, on a path that should exist.** Usually the
-gateway has no route for that path rather than the credential lacking the
-capability. The two are hard to tell apart from one credential: a 403 that
-varies between credentials is a grant problem, one that is constant across them
-is a routing problem.
+**`403 BAD_PERMISSIONS` on a path that should exist, every time you call it.**
+In most cases the gateway has no route for that path. It sends the same 403 when
+your credential lacks the capability, and one credential cannot separate the
+two: vary the credential, and a 403 that changes points at the grant while a 403
+that holds points at the route.
 
-**Inspecting requests on the wire.** `WithLogger` installs a logger that
-receives each request's method, URL and body, and each response's status,
-headers and body. Nothing is logged without it — and nothing is redacted for
-you. Request bodies carry whatever secrets a write sends (`ClientSecret`,
-`AdminPassword`, `KeystorePassword`, the plist inside a configuration profile's
-`Payloads`), so redact in your `Logger` implementation, or log only the method,
-URL and status, before putting the output in a ticket or CI log. The bearer
-token and the client credential never reach a `Logger`: `LogRequest` is passed
-no headers, and the token exchange runs outside the logged path.
+**Inspecting requests on the wire.** `WithLogger` hands your logger each
+request's method, URL and body, and each response's status, headers and body.
+The SDK logs nothing until you install one, and it redacts nothing. Request
+bodies carry whatever secrets a write sends: `ClientSecret`, `AdminPassword`,
+`KeystorePassword`, the plist inside a configuration profile's `Payloads`. So
+redact inside your `Logger`, or log only the method, URL and status, before you
+attach the output to a ticket or leave it in CI. Your logger never sees the
+bearer token or the client credential. The SDK passes `LogRequest` no headers,
+and the OAuth2 token exchange runs outside the logged path.
 
 ## License
 
