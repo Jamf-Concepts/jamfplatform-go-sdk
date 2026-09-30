@@ -1291,6 +1291,68 @@ is generated and its refusal pinned.
 `TestAcceptance_Pro_SsoOidcBrokerConfigUnroutedAtGateway` each fail the day the
 rule lands, and each names the real coverage to write in its place.
 
+**Resolved 2026-09-19 in the other direction for two of the three: v2267
+WITHDREW both `oidc-broker-config` operations rather than routing them.** The
+policy change never merged — `git grep oidc-broker origin/main` in the
+authorization-policies repo returns nothing as of 2026-09-19 — and the spec
+moved instead. The withdrawal is a genuine source removal, not the v1942
+publishing filter: the pair is absent from `external/`, `internal/stage` **and**
+`internal/dev` (whose `jpapi` goes 814 → 812 operations, and which has carried
+every filtered operation in every previous build), and from the same bundle's
+`_permissions/routes.yaml`, whose entire delta is those two paths — each
+appearing twice, which is the dual-scope duplication defect already reported.
+
+Re-confirmed unrouted at v2267 before the withdrawal was taken, on an
+**11.32.0** tenant (`eu.api.jamfcloud.com`, environment scope, 2026-09-19):
+
+| request | result |
+|---|---|
+| `GET /pro/v1/jamf-pro-version` | **200** `{"version":"11.32.0-t1787580540993"}` (control) |
+| `GET /pro/v3/sso/dependencies` | **200**, one real dependency — same `sso-settings:read` (control) |
+| `GET /pro/v3/sso/oidc-broker-config` | **403 `BAD_PERMISSIONS`**, 2/2 |
+| `GET /pro/v3/sso/zzz-bogus-control` | **403 `BAD_PERMISSIONS`** (unrouted control) |
+
+So removing them cost no reachable capability — nothing could call them on any
+credential, and no downstream consumer referenced either method or the
+`OidcBrokerConfig*` types (checked across `terraform-provider-jamfplatform`,
+`terraform-provider-jamfplatform-internal` and `jamf-cli-internal`).
+`GetSsoOidcBrokerConfigV3`, `UpdateSsoOidcBrokerConfigV3`, their two
+`methodNotes` and the two tests that pinned them are all gone; the
+`methodNotes` entries **failed generation** with "methodNotes names no emitted
+method" the moment the whitelist entries went, which is the self-expiring
+repair working as designed.
+
+**`DELETE /v1/notifications` survives the spec and is still unrouted.** The
+policy's only `/v1/notifications` rules on `origin/main` remain `GET` on the
+collection (`jamf_pro_m2m_only.rego`) and `DELETE` on `{type}/{id}`
+(`jamf_pro_dismiss_notifications.rego`). It was deliberately **not** re-probed:
+the call dismisses every dismissible notification on the shared tenant
+irreversibly and a pin has to issue the request before it can read the refusal,
+so the policy repo is the safe oracle here and
+`TestAcceptance_Pro_DismissAllNotificationsUnroutedAtGateway` stays behind
+`JAMFPLATFORM_ACC_PRO_NOTIFICATIONS_WRITE_OK`.
+
+### `GET /patches/name/{name}` still 500s for a freshly seeded title (2026-09-19)
+
+The unconditional 500 first recorded at v2082 holds at v2267, and the reason
+this is being re-recorded is that **the pin asserting it had not been running.**
+`TestAcceptance_Classic_PatchByName` took its name from `ListPatches` and
+skipped when the list was empty, so on an environment-scoped tenant with no
+patch software titles configured it skipped every run — and a skipping test can
+never report a fix. The fixture is mintable, so the test now mints it:
+
+```
+seeded patch software title "010 Editor" (nameId=518) as configuration id=25
+GET /proclassic/patches/name/010%20Editor → 500
+  "The server encountered an unexpected condition which prevented it from
+   fulfilling the request"
+```
+
+`GET /proclassic/patchsoftwaretitles` listed the seeded title in the same run
+and read back empty after cleanup, so the title genuinely existed when the
+by-name read 500ed. That closes the last reading of this defect as
+state-dependent: it is unconditional, and it is the endpoint.
+
 One caution recorded in the test rather than left to a reader: the `PUT` is a
 **full replacement**, so the day it starts routing, a replacement test must read
 the current configuration first. The unrouted probe sends the spec's six
@@ -1939,6 +2001,36 @@ it: `Content-Type: application/json` answers
 `415 UNSUPPORTED_MEDIA_TYPE — "Supported types: [application/merge-patch+json]"`.
 `UpdateBlueprint` already routes through `DoWithContentType` with that value, so
 this is pinned by construction rather than by a test.
+
+### `com.jamf.ddm-strict` is live, and accepts declaration types its spec does not list (2026-09-30)
+
+v2362 published the first schema for the "All Declarations" component. EU
+environment credential, `GET /devices/v1/devices?page-size=1` at 200 as the
+control in the same invocation:
+
+- `GET /blueprints/v1/blueprint-components/com.jamf.ddm-strict` → **200**
+  `{"identifier":"com.jamf.ddm-strict","name":"All Declarations","description":"All Declarations","meta":{"supportedOs":{}}}`,
+  twice; `com.jamf.ddm-bogus` → `404 NOT_FOUND` as the control. The component
+  list carries 17 identifiers including it.
+- A create carrying a `com.apple.configuration.package` and a
+  `com.apple.configuration.screensharing.host.settings` declaration answered
+  **201**, and the read-back returned both verbatim (key order aside).
+- **A create carrying `"type": "com.apple.configuration.bogus"` also answered
+  201** and read back unchanged. The spec's `declarations` items are a closed
+  `oneOf` over eleven types with a full discriminator mapping; the service does
+  not enforce it. So a declaration the SDK has no variant for can arrive on a
+  read, and the generated union decodes it with `Type` set and every variant
+  pointer nil — which also means re-marshalling that item through the union
+  emits only `{"type": …}`. SDK methods never re-marshal a configuration
+  (it is `json.RawMessage` on `Component`), so the loss is a consumer's only
+  if they round-trip through the typed union.
+- Scope needs a real group: `scope.deviceGroups: []` is
+  `400 NotEmpty` on `scope.deviceGroups`, checked before the component body.
+
+Both probe blueprints were deleted (204, re-read 404), and no `sdk-` blueprint
+or group remained after the acceptance lane.
+`TestAcceptance_Blueprint_DeclarationsComponentRoundTrip` pins the round trip
+and the unlisted-type acceptance.
 
 ## Jamf Security Cloud (`securitycloud`)
 
@@ -3065,6 +3157,23 @@ covered as calls, not as outcomes.
 
 ---
 
+### v2362's `deviceUnmanagedThreshold: 30` is ahead of the server (2026-09-30)
+
+JSC environment credential, `GET /securitycloud/uem-connect/v1/connectors` at
+200 and a bogus uem-connect path at `403 BAD_PERMISSIONS` as controls in the
+same invocation. `PUT …/connectors/00000000-0000-0000-0000-000000000000/sync-settings`
+with `{"vendor":"INTUNE","autoDeviceDeletion":"DISABLED","deviceFieldMappings":{},"deviceUnmanagedThreshold":N}`:
+
+| N | answer |
+|---|---|
+| 14 | `404 NOT_FOUND` "Config with ID '…' doesn't exist" — validation passed |
+| 30 | `422 VALIDATION_FAILED` "Invalid deviceUnmanagedThreshold: 30. Allowed values: 0, 1, 3, 5, 7, 14" (×2) |
+| 31 | the same 422 naming 31 (×2) |
+
+So the spec's new value is not accepted yet, and the server's own message still
+lists the v1958 set. `deviceFieldMappings` must be an object: `[]` is
+`422 "The request body could not be read"`, which masks every field check.
+
 ## Jamf Account (`account`) — organization scope
 
 ### Both holds lifted: the server dropped `License.type` and renamed `authZeroRegion` to `region` (2026-09-14)
@@ -3161,6 +3270,78 @@ more. Generalising from that to "the property is gone" needs a second tenant,
 and the cheapest second tenant is the one an earlier pass already used — it
 turns a single reading into a before-and-after.
 
+### v2204's two new deal-registration operations are routed, authorized and broken (2026-09-18)
+
+GitOps v2204 took `account-partners` from `info.version` 1.0.0 to 1.1.0 and
+added exactly two operations —
+`POST /v1/deal-registrations` and
+`GET /v1/deal-registrations/{partnerRegistrationId}` — with the two schemas
+behind them and no change to anything already there. Both are whitelisted per
+the house rule, bringing the `account` package to 20 methods. Both answer a
+deterministic 500.
+
+`<org-a>`, US gateway, organization scope so no scope header, with three
+controls in the same invocation:
+
+| operation | status | body |
+|---|---|---|
+| `GET /partners/v1/deal-registrations` | 200 | `{"totalCount":0,"results":[]}` (control) |
+| `GET /licensing/v1/licenses` | 200 | 19 licences (credential control) |
+| `GET /partners/v1/no-such-surface` | 403 | `BAD_PERMISSIONS` (unrouted control) |
+| `GET /partners/v1/deal-registrations/00000000-0000-4000-8000-000000000000` | **500** | `{"httpStatus":500,"traceId":"7ef60bb975d7c2195209eb38c5e72645","errors":[{"code":"UPSTREAM_ERROR","field":null,"description":"The request could not be completed"}]}` |
+| `GET /partners/v1/deal-registrations/not-a-uuid` | **500** | identical body |
+| `POST /partners/v1/deal-registrations` `{}` | **500** | identical body |
+| `POST /partners/v1/deal-registrations` (full plausible body) | **500** | identical body |
+
+**Routed and authorized, not unrouted.** The unrouted tell in this namespace is
+the repeated `403 BAD_PERMISSIONS` the bogus-path control returns, and neither
+new operation gives it. The platform error envelope with a `traceId` puts the
+fault behind the gateway.
+
+**Deterministic, 3/3 each.** Re-run at 2026-09-18 by curl and again through the
+SDK's own generated methods, which agreed — worth stating, since SDK-mediated
+observation has disagreed with curl before (Go's unasked `Accept-Encoding:
+gzip` nulling `href` on the Security Cloud creates).
+
+**The create never reaches field validation, so nothing was created.** An empty
+body and a fully-populated one produce the identical 500, which rules out a
+validation verdict. That also means the doomed-request trick cannot probe any
+`DealRegistrationCreate` constraint while the fault stands — the same position
+the distributor writes are in, for a different reason.
+
+**It is a different upstream from the distributor fault, and the distinction is
+load-bearing.** The five distributor operations answer `400` with the fault
+*attributed* in the description ("… via Skyway distributor service"); these two
+answer `500` with the generic "The request could not be completed" and no
+attribution. So `isUnattributedUpstreamFault` in the acceptance suite is a
+separate matcher from `isSkywayScopeFault`, both keyed on code and status
+together rather than status alone — otherwise a fix to either upstream would
+read as a fix to both, and a genuine 500 from a third cause would be swallowed.
+
+**The claim one credential cannot settle.** Whether this is a service fault or
+the answer to an organization that is not a registered reseller partner.
+`<org-a>` is a UAT sandbox organization; its deal-registration collection is
+empty, which is equally consistent with "no registrations" and "not a partner".
+Settling it needs a credential for a real partner organization. **Report
+upstream either way**: a 500 is the wrong answer to "you are not a partner", and
+the spec declares 401/403/404/500 with no unregistered-partner case.
+
+**Two spec observations from the same pass.** `DealRegistrationCreate` declares
+**no `required` set at all**, so all 20 of its fields generate as pointers and
+neither the SDK nor (while it 500s) the server will tell a caller what a valid
+submission needs. And the create's declared `href` example is
+`https://account.jamf.com/api-external/v1/partners/deal-registrations/{id}` —
+not the gateway, so not callable by this SDK, the same shape already recorded
+for the App Installers create. `DealRegistrationCreated.ID` is the field to use.
+
+Pinned by `TestAcceptance_AccountDealRegistrationItemAndCreate`, which
+**asserts** both 500s rather than calling `skipOnServerError`: that helper is
+right for a transient 5xx and precisely wrong for a permanent one, since a
+skipping test can never report the fix. Each branch names its replacement
+coverage, and the test fails loudly if the create ever *succeeds* — a deal
+registration has no delete on any published surface, so a run that submits one
+has left a permanent record with Jamf.
+
 ### Re-probed at v2100: both holds stand, and `partners` turns out to be granted (2026-09-09)
 
 v2100 changed neither held spec, so the hold question is unchanged; the probe
@@ -3185,8 +3366,7 @@ credentials" is wrong, and the mistake is the same shape as the
 `/sso/v1/domain-allocations` one: a namespace judged from one path.**
 `GET /partners/v1/deal-registrations` answers **200**
 (`{"totalCount":0,"results":[]}`). What 403s is nothing — all five distributor
-operations are routed *and* authorized, and every one answers the standing
-the standing distributor-service fault:
+operations are routed *and* authorized, and every one answers the standing distributor-service fault:
 
 | operation | status | body |
 |---|---|---|
@@ -3201,12 +3381,15 @@ Note the last write: `{}` does not reach body validation — the upstream call
 fails first — so **field validation on this operation is upstream-side**, and
 the doomed-request trick cannot probe it while that fault stands.
 
-The whole account lane is consequently green for the first time: all eleven
-`TestAcceptance_Account*` tests pass or skip on a write opt-in
+The whole account lane is consequently green for the first time: every
+`TestAcceptance_Account*` test passes or skips on a write opt-in
 (`JAMFPLATFORM_ACC_ORGANIZATION_WRITE_OK`, plus the SSO-create skip that names
 the 500 `UPSTREAM_ERROR`), and **none skips for want of a credential**. The two
 `isSkywayScopeFault` pins fired as designed, asserting the block rather than
-tolerating it.
+tolerating it. Read that green carefully, though: as of v2204 **three** of the
+lane's tests pin an upstream fault rather than exercising a working surface —
+the two distributor pins and the deal-registration one added above — so green
+means "the recorded faults are still the recorded faults", not coverage.
 
 ### Both holds re-confirmed on two organization tenants (2026-09-04)
 
@@ -3601,6 +3784,43 @@ locally" verdict this note used to end on is superseded; see the 2026-09-02
 probe at the top of this section.
 
 ---
+
+
+### `/organization` is published and not mounted (2026-09-30)
+
+v2362 published `external/account-organization` (Jamf Account Organization
+API: environments and tenants). US gateway, organization credential, all
+reads, repeated:
+
+| request | answer |
+|---|---|
+| `GET /licensing/v1/licenses` (control) | 200, 19 rows |
+| `GET /licensing/v1/bogus` | `403 BAD_PERMISSIONS` — mounted namespace |
+| `GET /zzzbogusns/v1/environments` | `404 page not found` (plain text) |
+| `GET /organization/v1/environments` | `404 page not found` (plain text), ×3 |
+| `GET /organization/v1/tenants` | `404 page not found` (plain text), ×3 |
+| `GET /organizations/…`, `GET /account/…` | `404 page not found` |
+
+So the namespace is unrouted at the gateway — the answer a nonsense namespace
+gets — not refused by a service. The EU gateway answers the same for
+`/organization` and for `/licensing` alike, consistent with `account` being
+US-only. No write was attempted: creating or deleting an environment is an
+organization-level change. The spec declares no `x-required-privileges`,
+`_permissions/routes.yaml` has no entry for it, and the published permissions
+map (refreshed the same day) has no environment or tenant capability.
+
+**Re-probed the same day after the credential was granted the new environment
+CRUD permission, and nothing moved** — fresh token, `/licensing/v1/licenses` at
+200 and `/licensing/v1/bogus` at `403 BAD_PERMISSIONS` as controls, both
+`/organization` reads still `404 page not found` ×2, identical to
+`/zzzbogusns/…`. Seven alternative mounts (`/account/organization`,
+`/accounts`, `/org`, `/environments`, `/tenants`, `/organization/v2`, an
+unversioned `/organization/environments`) answer the same, and all three
+environments' `servers` agree on `/organization`. That is the expected result:
+the plain-text 404 is the gateway's router, which runs before authorization,
+so a grant cannot change it — the missing piece is an api-product listening on
+`/organization`. The token is opaque, so the grant itself is not observable
+from the client.
 
 ## AI Governance (`aigovernance`) — environment scope
 
@@ -4070,6 +4290,25 @@ Two consequences for the transport:
   asking the gateway team to emit `Retry-After` on 429 and to populate the
   `x-ratelimit-*` headers that currently return `0`; that removes the guessing
   entirely.
+
+**First spec declaration of a 429, at GitOps v2209 (2026-09-17), and it is not
+a gateway rate limit.** `GET /v1/blueprints/{blueprintId}/report` gained a
+declared `429` bodied with `ApiError` and described as *"The reporting is
+overloaded, retry the request later"* — a service-level backpressure signal
+from the blueprints reporting component, not Tyk. That is the whole of v2209's
+delta. It does not disturb the snapshot above: the gateway plans still carry
+`rate: -1` and no probe has seen an `x-ratelimit-*` value other than `0`.
+
+**Deliberately not probed, and the reason is the standing one.** Inducing it
+means hammering an endpoint whose own description says it is overloaded, and
+~150 probe requests during one WAF investigation already cost this project a
+second, broader outage. The claim left open is the one the bullet above already
+names: **whether this 429 carries a `Retry-After`.** If it does, the transport
+honours it and nothing changes. If it does not, this is the first real
+occasion for jittering the exponential band — around it, never by returning to
+`RateLimitLinearJitterBackoff`, whose 1s/60s sampling averaged ~30s on the
+first retry. Ask the blueprints team which it sends rather than finding out by
+triggering it.
 
 ### Tyk enforced timeouts on smart-group writes
 
