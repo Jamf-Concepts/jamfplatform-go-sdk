@@ -181,10 +181,45 @@ func TestIngestRejectsAMisdirectedRow(t *testing.T) {
 	if err == nil {
 		t.Fatal("want an error for the title mismatch")
 	}
-	for _, want := range []string{"Device Groups API", "Security Cloud Devices API", "securitycloud-device-groups-api.yaml"} {
+	for _, want := range []string{"Device Groups API", "Security Cloud Devices", "securitycloud-device-groups-api.yaml"} {
 		if !strings.Contains(err.Error(), want) {
 			t.Fatalf("error omits %q: %v", want, err)
 		}
+	}
+}
+
+// Fragments nest once upstream drops a suffix: v2362 retitled jpapi "Jamf
+// Pro" and capi "Jamf Pro Classic", so a capi spec under the jpapi directory
+// contains the jpapi row's fragment. Longest-fragment-wins must still refuse
+// it, and must still accept each row's own title in every environment.
+func TestIngestRejectsANestedTitleUnderTheShorterRow(t *testing.T) {
+	members := map[string]string{"MANIFEST.md": "**GitOps Build**: v1\n"}
+	for _, s := range specs {
+		members["external/"+s.dir+"/openapi.yaml"] = specDoc(s.title, "/a")
+	}
+	members["external/jpapi/openapi.yaml"] = specDoc("Jamf Pro Classic", "/a")
+
+	sel := map[string]bool{"openapi-jpapi.yaml": true}
+	mf := &manifest{Entries: map[string]manifestEntry{}}
+	_, _, err := ingest(buildArchive(t, members), "external", t.TempDir(), sel, mf)
+	if err == nil {
+		t.Fatal("want an error: a capi title under the jpapi directory")
+	}
+	if !strings.Contains(err.Error(), "openapi-jpapi.yaml") {
+		t.Fatalf("error does not name the replaced spec: %v", err)
+	}
+}
+
+func TestEveryRowOwnsItsOwnTitle(t *testing.T) {
+	for _, s := range specs {
+		for _, suffix := range []string{"", " (STAGE)", " (DEV)", " API"} {
+			if got := titleOwner(s.title + suffix); got != s.dest {
+				t.Errorf("titleOwner(%q) = %q, want %q", s.title+suffix, got, s.dest)
+			}
+		}
+	}
+	if got := titleOwner("AI Governance - Preview"); got != "ai-governance-api.yaml" {
+		t.Errorf("v2362 ai-governance title resolves to %q", got)
 	}
 }
 
