@@ -10,8 +10,10 @@ every one is copied verbatim by `tools/generate/ingest`. So an ingest is no
 longer a per-family hand copy; it is one command, and the work is deciding
 whether to *believe* the build.
 
-`CLAUDE.md` is the authority for the current position, the holds and the
-package table. `docs/WIRE-FACTS.md` is where probe evidence goes.
+`CLAUDE.md` is the authority for the current position, the holds, the
+standing spec/wire disagreements and the package table.
+`docs/INGEST-HISTORY.md` is the build-by-build record. `docs/WIRE-FACTS.md` is
+where probe evidence goes.
 `docs/STYLE.md` carries every config mechanism. Read the relevant one rather
 than re-deriving it.
 
@@ -298,7 +300,12 @@ shrinks.
 
 ## 7. Record what was learned
 
-Update `CLAUDE.md`'s current position, provenance table and holds; put probe
+Put the build's write-up at the top of `docs/INGEST-HISTORY.md`: what changed,
+what the wire said, what the generated diff was, what is open upstream. Then
+update `CLAUDE.md` only where a *standing* fact moved — the position line, the
+provenance table, the not-carried table, the disagreements table (add a row
+per new pin, delete one when its test fires), a hold, or a rule. **Do not write
+build narrative into `CLAUDE.md`**; that is how it reached 2,400 lines. Put probe
 evidence in `docs/WIRE-FACTS.md` with its date and a quoted payload; strike
 through anything the probe disproved. Record the reasoning, not just the
 conclusion — the value is in why a thing is the way it is.
