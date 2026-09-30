@@ -187,11 +187,22 @@ patch the transport to follow them.** As of v1877 the disagreement has largely
 closed: every `external/` spec now declares the gateway root with no `/api`
 segment, and v1877 fixed the last one — AI Governance's namespace, from
 `/ai-governance/policies` to `/ai/governance/policies`, which the SDK had been
-generating with slashes since the ingest. The `internal/stage` specs still declare
-a non-production host carrying an `/api` segment, which is correct for
-stage and wrong for a prod caller — and that is the variant the five Security
-Cloud specs and the two held account specs are sourced from, so a stage-sourced
-`servers` block still must not be followed.
+generating with slashes since the ingest.
+
+**As of v2219 the non-production trees agree on the shape too, and the standing
+note that stage carries an `/api` segment is obsolete.** v2219 moved
+`internal/stage` and `internal/dev` onto a new host, inserting an `integrate.`
+label and dropping the `/api` segment — for stage,
+`{region}.api.stage.platform.jamflabs.com/api/{namespace}` becomes
+`{region}.integrate.api.stage.platform.jamflabs.com/{namespace}` — and narrowed
+the region enum `us1` → `us`. Both now match prod's GA shape. That is the whole
+of v2219 (see the current-position section). It changes nothing for the SDK,
+which never reads `servers`, and nothing for a prod caller, whose host is
+untouched; what it removes is the trap that a stage-sourced `servers` block
+looked structurally different from prod's. **A stage-sourced block still must
+not be followed** — the host is still non-production, and the `(STAGE)` title
+would still leak into `api/*.json` — but no spec the SDK carries is
+stage-sourced any more.
 
 ### The tenant is a request header, not a path segment
 
@@ -385,7 +396,7 @@ silent version of the failure has happened here:
 - **An `external/` family that neither the provenance table nor
   `knownUnmapped` accounts for.** A newly published API appears in no diff of
   the specs already carried, which makes it the easiest thing in a build to
-  miss. `users` is the one deliberate exclusion.
+  miss. `users` and `account-organization` are the deliberate exclusions.
 - **An `info.title` that does not match the row's assertion**, which is the
   "map by title, not by directory name" rule made executable. Directory names
   are not stable — v1401 renamed `securitycloud-dns` → `jsc-dns`, and v1865
@@ -429,25 +440,25 @@ the executable authority; this is the prose copy, and the two must agree.**
 
 | `testing/` file | bundle source | at |
 |---|---|---|
-| `openapi-jpapi.yaml` | `external/jpapi` | **v2154** |
-| `Classic-openapi.yaml` | `external/capi` | **v2154** |
-| `blueprints-api.yaml` | `external/blueprints` | **v2082** |
-| `device-groups-api.yaml` | `external/device-groups` | **v2082** |
-| `device-inventory-api.yaml` | `external/devices` | **v2082** |
-| `device-management-actions-api.yaml` | `external/device-management-action` | **v2082** |
-| `Declaration-reporting-openapi.yaml` | `external/declaration-reporting` | **v2082** |
-| `jamf-compliance-benchmark-engine-api.yaml` | `external/compliance-benchmarks` | **v2082** |
-| `securitycloud-dns-api.yaml` | `external/jsc-dns` | **v2082** |
-| `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v2082** |
-| `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v2082** |
-| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2082** |
-| `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v2082** |
-| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | **v2082** |
-| `ai-governance-api.yaml` | `external/ai-governance` | **v2192** |
-| `audit-api.yaml` | `external/audit` | **v2082** |
-| `account-licensing-api.yaml` | `external/account-licensing` | **v2176** |
-| `account-partners-api.yaml` | `external/account-partners` | **v2082** |
-| `account-sso-api.yaml` | `external/account-sso` | **v2176** |
+| `openapi-jpapi.yaml` | `external/jpapi` | **v2362** |
+| `Classic-openapi.yaml` | `external/capi` | **v2362** |
+| `blueprints-api.yaml` | `external/blueprints` | **v2362** |
+| `device-groups-api.yaml` | `external/device-groups` | **v2362** |
+| `device-inventory-api.yaml` | `external/devices` | **v2362** |
+| `device-management-actions-api.yaml` | `external/device-management-action` | **v2362** |
+| `Declaration-reporting-openapi.yaml` | `external/declaration-reporting` | **v2362** |
+| `jamf-compliance-benchmark-engine-api.yaml` | `external/compliance-benchmarks` | **v2362** |
+| `securitycloud-dns-api.yaml` | `external/jsc-dns` | **v2362** |
+| `securitycloud-ztna-api.yaml` | `external/jsc-ztna` | **v2362** |
+| `securitycloud-categories-api.yaml` | `external/jsc-categories` | **v2362** |
+| `securitycloud-uem-connect-api.yaml` | `external/uem-connect` | **v2362** |
+| `securitycloud-enrollment-api.yaml` | `external/securitycloud-enrollment` | **v2362** |
+| `securitycloud-device-groups-api.yaml` | `external/securitycloud-devices` | **v2362** |
+| `ai-governance-api.yaml` | `external/ai-governance` | **v2362** |
+| `audit-api.yaml` | `external/audit` | **v2362** |
+| `account-licensing-api.yaml` | `external/account-licensing` | **v2362** |
+| `account-partners-api.yaml` | `external/account-partners` | **v2362** |
+| `account-sso-api.yaml` | `external/account-sso` | **v2362** |
 
 Every row was verified semantically identical to its named bundle's YAML before
 the filenames moved to `.yaml`, so the whole tree is reconstructible from
@@ -457,7 +468,9 @@ bundles and every future diff is exact.
 Inventory API is prod-published with real privileges but every path 404s, since
 `platform-users-directory` is flag-gated to dev. It is recorded in the
 command's `knownUnmapped` with that reason, which is what stops the
-unmapped-family check firing on it every build.
+unmapped-family check firing on it every build. **`account-organization`
+(v2362) is the second**: published, but `/organization` is not mounted on the
+prod gateway — see the v2362 section.
 
 The `securitycloud-device-groups-api.yaml` row is named for its *tag*
 (`device-groups`) but the spec is the **Security Cloud Devices API**.
@@ -570,20 +583,315 @@ tenant routes reference is present under `environment`.
 
 ### Current position and holds
 
-**Ingested through v2192 (2026-09-14), and nothing is held.**
-`account-licensing` and `account-sso` came off their v1865 hold at v2176 — see
-the holds table, and the section below for the wire evidence that took both
-premises away at once. `ai-governance` is at **v2192**, alone: it moved at v2176
-and again at v2192, and it is the only spec that has moved in either build. The
-two account specs are at v2176 and the other sixteen at v2154. `account-partners`
-is at v2082 and inert. Two specs moved at v2154 —
-`jpapi` and `capi`, both to `info.version: 11.32.0` — and everything else in
-`external/` is byte-identical to v2121, so the only other diffs were the
-manifest, the two unified rollups and `_permissions/routes.yaml`.
-`internal/stage` matches `external/` op-for-op on both moved specs, so neither
-change is an environment rollout; `internal/dev` carries 814 `jpapi` operations
-against `external/`'s 704 and 606 `capi` against 589, so the v1942 publishing
-filter is still in place and still prod-only.
+**Ingested through v2362 (2026-09-29), and nothing is held.** All nineteen
+specs are at v2362; both `_permissions` files are byte-identical to v2267 and
+stay recorded there. **v2219 was evaluated and not ingested** — its entire
+delta is outside `external/`; see below.
+
+**v2362 (2026-09-29) touched every spec, and three of the nineteen changed
+anything.** The bundle-wide edit is `info.title` losing its ` API` suffix on
+every family (`Jamf Pro API` → `Jamf Pro`, `Classic API` → `Jamf Pro Classic`,
+`AI Governance Policies API` → `AI Governance - Preview`, …), which is inert to
+Go and moves one line of every `api/*.json`. Stripping titles and prose leaves
+**zero operation changes in any spec**, and only three schema-level deltas:
+
+- **`blueprints` gained `com.jamf.ddm-strict` ("All Declarations")** — a
+  `DeclarationsComponent` added to `Component`'s `oneOf` and mapping, plus 43
+  schemas behind it covering eleven Apple declaration types. It is the first
+  schema for one of the live components recorded as having none, and it is
+  **live**: `GET /v1/blueprint-components/com.jamf.ddm-strict` answers 200 and
+  a create carrying two declarations reads back verbatim (2026-09-30,
+  EU environment credential). The service is **looser than the spec**: a
+  declaration `type` the closed `oneOf` does not list answers 201 and is
+  stored.
+- **`uem-connect` added `30` to `deviceUnmanagedThreshold`** on `SyncSettings`
+  and `ConnectorConfig` — one new constant each — **and the server refuses
+  it.** Probed through the validation ordering against a bogus `configId`
+  (JSC environment credential, 2026-09-30): `30` answers
+  `422 "Invalid deviceUnmanagedThreshold: 30. Allowed values: 0, 1, 3, 5, 7, 14"`
+  2/2, while `14` passes validation and reaches the `404` in the same
+  invocation. Taken anyway, per the rule that the spec wins and a hold is not
+  worth one constant: `SyncSettingsDeviceUnmanagedThreshold30` exists and a
+  caller sending it gets that 422. Pinned by
+  `TestAcceptance_SecurityCloudUemConnectThreshold30AheadOfServer`, which fails
+  the day `30` reaches the 404.
+- **`jsc-ztna` rewrote the gateway-create rules in prose** — exactly one of
+  `dedicatedIps.enabled: true` or `ipsec`, `ipsec` requiring at least one
+  `availabilityZones` address, the `field` attribution that tells the three
+  400s apart, and `EMPTY_AVAILABILITY_ZONES_NOT_SUPPORTED` on `PATCH`. No
+  structural change; godoc only. Not probed — a ZTNA gateway create
+  provisions real infrastructure.
+
+**The ` API` rename broke all nineteen title assertions in the ingest tool,
+and exposed that contains-matching was about to go blind.** The obvious
+repair — drop the suffix from each fragment — leaves jpapi's `Jamf Pro` a
+substring of capi's `Jamf Pro Classic`, so a capi spec under the jpapi
+directory would pass. `titleOwner` now resolves a title to the row whose
+fragment is the **longest** it contains, the same rule the permissions map
+uses for overlapping roots, pinned by
+`TestIngestRejectsANestedTitleUnderTheShorterRow` and
+`TestEveryRowOwnsItsOwnTitle`.
+
+**v2362 also published a twentieth family, `account-organization`, and it is
+not carried.** The Jamf Account Organization API — six operations over
+environments and tenants (`GET`/`POST /v1/environments`, `PUT`/`DELETE
+/v1/environments/{id}`, `PUT /v1/environments/{id}/tenants`,
+`GET /v1/tenants`) under `/organization`. The prod gateway **does not mount
+the namespace**: every path answers the plain-text `404 page not found` a
+nonsense namespace gets, on an organization credential that reads
+`/licensing/v1/licenses` at 200 in the same invocation and gets
+`403 BAD_PERMISSIONS` on a bogus path under the mounted `/licensing` — so the
+404 is the routing layer, not the service. Repeated, and the same from an EU
+environment credential. It also declares no `x-required-privileges`, has no
+`routes.yaml` entry and no capability in the published permissions map
+(refreshed 2026-09-30), so there would be nothing to source privileges from
+either. Recorded in `knownUnmapped` beside `users`; ingest it when
+`/organization` starts answering, taking privileges from wherever the account
+trio's come from then.
+
+**Generating `ddm-strict` found two generator gaps, both of which would have
+shipped types that cannot express the payload.**
+
+- **`declarations` generated as `[]any`**, with all eleven declaration types
+  emitted and referenced by no field. The array's items are an inline `oneOf`
+  with a declared discriminator, and inline items were never hoisted.
+  `isInlineItemUnion` now hoists them, giving
+  `DeclarationsComponentConfigurationDeclarationsItem` — and its mapping keys
+  are reverse-DNS, which `unionSchema` refused. **The refusal now applies only
+  to an envelope** (a schema with properties of its own): that is what keeps
+  `Component` a struct with `Configuration json.RawMessage`, the shape
+  `terraform-provider-jamfplatform` is built on, while a pure union — whose
+  fallthrough would be a field-less struct — becomes a discriminated union with
+  variant fields named after their schemas.
+- **A pure `additionalProperties` schema generated as `= string`.** It reached
+  `schemaToGoType`, produced a struct with no fields, and the template renders
+  any field-less, enum-less type through its enum-alias branch.
+  `AppSettingsPermissionDefaultsMap` and `ManagedAppExtensionConfigs` both
+  came out as strings that cannot decode the object the wire carries; they are
+  now `map[string]AppSettingsPermissionDefaults` and
+  `map[string]ManagedAppConfig`. No other package had the shape — the
+  regenerated tree moved nothing outside `blueprints`.
+
+Both are pinned in `itemunion_test.go`, each mutation-checked, and
+`TestAcceptance_Blueprint_DeclarationsComponentRoundTrip` writes through the
+typed union and the map and decodes the read-back. **Neither was reachable
+through an SDK method** — `Component.Configuration` is raw JSON the consumer
+decodes — which is why no generated test could see either.
+
+**Generated impact:** `blueprints` (the new types, a discriminator enum, their
+lenient decoders and a round-trip test) and 2 enum constants plus ZTNA godoc in
+`securitycloud`; every `api/*.json` moves its title line, `blueprints_api.json`
+by the new schemas. CI parity re-checked through the `api/` fallback: identical.
+
+**Report upstream:** `/organization` published and unmounted; uem-connect's
+`30` declared ahead of the server; the
+`ddm-strict` declarations `oneOf` is closed in the spec and open on the wire;
+and `DeclarationsComponentConfiguration`'s example is embedded in the schema
+`description`, so it renders into the type's godoc as a single line.
+
+**v2267 (2026-09-18) is two things, and the smaller one is the one that reached
+Go.** Seventeen of the nineteen specs are byte-identical to v2209 and
+`_permissions/scopes.yaml` with them, so the archive's whole delta is `jpapi`,
+`capi` and `routes.yaml`.
+
+**The substantive half: `jpapi` withdrew `GET` and `PUT
+/v3/sso/oidc-broker-config`** — two of the three operations v2154 added and the
+gateway never routed. 704 → 702 operations, **zero schemas added, removed or
+changed, and zero other operations changed semantically.** The SDK followed, and
+the removal is safe in a way v1942's was not: **this is a genuine source
+withdrawal rather than the publishing filter.** The pair is gone from
+`external/`, `internal/stage` **and** `internal/dev` — dev's `jpapi` goes
+814 → 812, and dev has carried every filtered operation in every previous
+build — and from the same bundle's `_permissions/routes.yaml`, whose entire
+delta is those two paths, each appearing twice (the dual-scope duplication
+defect already reported). `scopes.yaml` is byte-identical, `sso-settings` being
+an already-declared capability, so no `make permmap` was needed.
+
+**The v2154 note said to watch for a policy change routing the three. It never
+merged, and the spec moved instead** — `git grep oidc-broker origin/main` in the
+authorization-policies repo returns nothing as of 2026-09-19. Re-probed
+unrouted at v2267 before the withdrawal was taken (11.32.0 tenant, environment
+scope: **403 `BAD_PERMISSIONS` 2/2**, with `GET /pro/v3/sso/dependencies` — the
+same `sso-settings:read` — at 200, `GET /pro/v1/jamf-pro-version` at 200 and a
+bogus path in the same namespace at 403 as controls in the same invocation). So
+nothing could call them on any credential, and **no downstream consumer
+referenced either method or the `OidcBrokerConfig*` types** (checked across
+`terraform-provider-jamfplatform`, `terraform-provider-jamfplatform-internal`
+and `jamf-cli-internal`). Generated impact: a **pure deletion** of 284 lines of
+`pro` Go — the two methods, `OidcBrokerConfig`/`OidcBrokerConfigUpdate`, three
+enum families and two registry entries — and 398 lines of `api/pro_api.json`.
+The two `methodNotes` **failed generation** with `methodNotes names no emitted
+method` the moment the whitelist entries went, which is the self-expiring
+repair working as designed; the two acceptance pins went with the methods.
+`DELETE /v1/notifications` survives the spec and is still unrouted — the
+policy's only `/v1/notifications` rules remain `GET` on the collection and
+`DELETE` on `{type}/{id}` — so its pin stays, and it is deliberately not
+re-probed because the call is an irreversible bulk dismiss on a shared tenant.
+
+**The larger half is prose, and it is the v2192 trap again: upstream prepended
+`Deprecated - ` to every deprecated operation's summary, and the summary IS the
+generated method comment.** 22 operations in `jpapi` and 4 in `capi` (the two
+`/activationcode` verbs and both `/computers/match/*` reads), plus a
+`**Deprecated:** _As of …_` paragraph prepended to 22 and 24 `description`s
+respectively. Structurally nil — zero paths, zero schemas, zero operations
+changed either side of it. Left alone it would have rendered
+`// GetActivationCode deprecated - finds the Jamf Pro activation code.` on all
+26, because `lowerFirst` lowercases the first word of whatever the summary is.
+
+**Fixed at the generator, symmetrically to the preview strip, and the state was
+already being emitted separately.** `stripDeprecatedPrefix` reads
+`deprecated: true` — the structured OpenAPI field, not the text — and the
+existing `Deprecated:` godoc paragraph carries the warning as before, so the
+prefix is inert to Go: **zero diff in `jamfplatform/proclassic/` and zero
+comment change in `pro`.** Three details worth keeping:
+
+- **The gate is `op.Deprecated`, not the prose**, so a summary that
+  legitimately opens with the word — "Deprecated fields are omitted from this
+  report" — survives on an operation the spec never marked deprecated, and the
+  strip can never rewrite prose on the strength of one word.
+- **It deliberately leaves the 20 older inline forms alone.** Those `capi`
+  summaries carry the state mid-sentence — `Finds all patches (Deprecated -
+  Please transition use to …)` — predate the prefix convention and render as
+  valid godoc. Only a *leading* prefix breaks the sentence.
+- **The prefix is not stripped from `api/`.** The published spec carries
+  upstream's `summary` and `description` verbatim, the same call the preview
+  strip and `inferDiscriminator` make. `api/classic_api_resource_documentation.json`
+  moves 56 lines and `api/pro_api.json` 106 summary/description lines for that
+  reason alone.
+
+`deprecated_test.go` pins the separator variants (hyphen, colon, en and em
+dash, no space), the two gates, the inline forms, composition with the preview
+strip, and — the assertion that would have caught this build unaided — that
+**no generated method comment in any package contains a lowercased state prefix
+inside its verb phrase.** That last test is the general guard: the next state
+prefix upstream invents fails it rather than shipping.
+
+**v2219 (2026-09-17) is a non-production host migration and was not ingested —
+and it is the first build whose delta is entirely *outside* `external/`.** Every
+one of the nineteen per-family specs in `external/` is byte-identical to v2209,
+`_permissions/{routes,scopes}.yaml` included, so the dry run reported all
+twenty-one rows `unchanged (since v2209)` and there was nothing to write. Note
+the shape: **the fifth build with nothing in it for the SDK** — after v1725,
+v2024, v2100 and v2137 — **but the first of them that is not a pipeline
+re-run.** Real work shipped; none of it reached the published tree.
+
+What moved is `servers` and `tokenUrl` in **all 22** `internal/stage` specs and
+all 22 `internal/dev` ones:
+`https://{region}.api.stage.platform.jamflabs.com/api/{namespace}` →
+`https://{region}.integrate.api.stage.platform.jamflabs.com/{namespace}`, and
+the same substitution for dev, with the region enum narrowing `us1` → `us`.
+`MANIFEST.md` states it outright
+("**Staging**: `integrate.api.stage.platform.jamflabs.com`").
+A parsed comparison with `servers`, `tokenUrl` and dev's `x-generated` stripped
+leaves **all 44 specs semantically identical** to v2209, so that is the whole
+change and there is no content hiding behind it. The stage and dev hosts now
+carry prod's GA shape — no `/api` segment, `us` not `us1` — which retires a
+standing note in the URL section above.
+
+Nothing was probed for it and nothing needed to be: the SDK never reads
+`servers`, prod's host did not move, and the blueprints lane was re-run green
+against the live gateway anyway on the v1439 principle that a quiet diff is not
+a quiet build.
+
+**v2209 (2026-09-17) is `blueprints` and nothing else, and the whole delta is
+one declared response.** Every other file in `external/` is byte-identical to
+v2204 — `jpapi`, `capi`, both account specs and
+`_permissions/{routes,scopes}.yaml` included — so the only other diffs in the
+archive are the manifest and the two unified rollups. `internal/stage` and
+`internal/dev` carry the identical delta (each differs from `external/` only in
+`info.title`, the host, the `tokenUrl`, the region enum and dev's `x-generated`
+block), so this is not an environment rollout.
+
+The change is **a `429` added to `GET /v1/blueprints/{blueprintId}/report`**,
+`"The reporting is overloaded, retry the request later"`, bodied with the
+existing `ApiError`. Zero paths, zero schemas, zero operations, zero
+parameters, and no other response on any operation touched. Generated impact:
+**10 added lines of `api/blueprints_api.json` and zero Go** — the generator
+reads the success response for the return type and does not emit declared error
+statuses.
+
+**Nothing was needed for it, and that is worth stating rather than assuming.**
+`internal/client/retry.go` already treats 429 as retryable on every method
+(`isRetryableStatus`), and `jamfBackoff` already honours a `Retry-After` in
+both seconds and date form, clamped to `maxWait` so a hostile header cannot
+stall past what callers were promised. Both are pinned in `retry_test.go`. So
+this is upstream declaring, on one path, the first rate limit the SDK has ever
+had a spec for — and the transport was written for it in advance.
+
+**The 429 is deliberately not wire-probed.** Inducing it means hammering a
+report endpoint whose own description says it is overloaded, and ~150 probe
+requests against an edge block have already cost this project a second, broader
+outage. `GetBlueprintReport` has acceptance coverage on the 200 path
+(`acc_blueprint_test.go`), which is the half that can be exercised without
+manufacturing the fault. The claim left open is whether the service sends a
+`Retry-After` when it does 429: if it does not, `jamfBackoff`'s standing note
+— that the deterministic backoff is tolerable only while no Jamf path
+rate-limits — is the thing to revisit, by jittering around the exponential
+band rather than returning to the linear variant.
+
+**v2204 (2026-09-15) is `account-partners` and nothing else, and it is two
+genuinely new operations.** This section previously said v2204 had no write-up
+because its archive was not to hand when v2209 was ingested; the archive was
+located on 2026-09-18 and the build is characterised here. `info.version` goes
+**1.0.0 → 1.1.0**, and against v2192 the spec gains
+**`POST /v1/deal-registrations`** and
+**`GET /v1/deal-registrations/{partnerRegistrationId}`** plus the two schemas
+behind them (`DealRegistrationCreate`, `DealRegistrationCreated`) — 7 → 9
+operations, 18 → 20 schemas, **zero** existing operations or schemas changed.
+Everything else in `external/` is byte-identical to v2192, `jpapi`, `capi`,
+both other account specs and `_permissions/{routes,scopes}.yaml` included.
+
+Both are whitelisted, per the house rule that a published operation is
+generated and its refusal pinned rather than left out. They bring the `account`
+package to **20 methods**, which is why
+`TestAccountRegistryPrivilegesComeFromGatewayPolicy` now parses 20 registry
+entries rather than 18. Privileges come from `config.json`'s
+`requiredPrivileges` like the rest of the package —
+`deal-registration:{read,create}` — and needed no `make permmap`: the committed
+permissions map already publishes both actions, so
+`TestScopedPrivilegesUseGAVocabulary` passed untouched.
+
+**Wire-classified 2026-09-18, and both new operations answer a deterministic
+`500 UPSTREAM_ERROR` "The request could not be completed".** Controls in the
+same invocation: `GET /partners/v1/deal-registrations` answers 200
+`{"totalCount":0,"results":[]}`, `GET /licensing/v1/licenses` answers 200, and
+a bogus path in the same namespace answers `403 BAD_PERMISSIONS`. So they are
+**routed and authorized** — the 403 is the unrouted tell and this is not it —
+and the fault is behind the gateway. 3/3 on the item read, 3/3 on the create,
+the create with an empty body and a plausible fully-populated one alike, which
+is what rules out field validation: **the create never reaches it**, so nothing
+was created and there is nothing to clean up.
+
+**It is a different upstream from the distributor one, and the two must not
+share a matcher.** The five distributor operations answer `400` with the fault
+*attributed* — "… via Skyway distributor service" — while these two answer
+`500` with no attribution at all. `isUnattributedUpstreamFault` is therefore
+separate from `isSkywayScopeFault`, so a fix to either cannot read as a fix to
+both.
+
+**The one claim a single credential cannot settle**, and the test says so
+rather than guessing: whether the 500 is a service fault or the answer to an
+organization that is **not a registered reseller partner**. An empty-but-200
+collection is consistent with either, and settling it needs a real partner
+organization's credential. Report upstream either way — a 500 is the wrong
+answer to "you are not a partner", and the spec declares 401/403/404/500 with
+no unregistered-partner case.
+
+**Two spec observations worth reporting with it.** `DealRegistrationCreate`
+declares **no `required` set at all**, so every one of its 20 fields generates
+as a pointer and the SDK cannot tell a caller what a valid submission needs —
+and neither can the server while it 500s before validating. And the create's
+declared `href` example names `account.jamf.com/api-external/…`, not the
+gateway, which is the same not-callable-by-this-SDK shape already recorded for
+the App Installers create; `DealRegistrationCreated.ID` is the field to use.
+
+`TestAcceptance_AccountDealRegistrationItemAndCreate` **asserts** both 500s
+rather than calling `skipOnServerError` — that helper is right for a transient
+5xx and precisely wrong for a permanent one, since a skipping test can never
+report the fix — and each branch names what to write in its place. It also
+fails loudly if the create ever *succeeds*, because a deal registration has no
+delete on any published surface and a run that submits one to Jamf has left a
+permanent record.
 
 **v2192 (2026-09-14) is `ai-governance` and nothing else, and it is the second
 consecutive build that is only that spec.** Every other file in `external/` and
@@ -1669,11 +1977,12 @@ newline) confirmed `testing/openapi-jpapi.json` was semantically identical to
 v1882's `openapi.yaml` before the copy, so the generated diff is exactly the
 delta: 298 deletions, zero insertions, nothing outside `pro`.
 
-**The `pro` whitelist remains complete — 704 operations as of v2154** — it
+**The `pro` whitelist remains complete — 702 operations as of v2267** — it
 reached all 790 on 2026-08-31, v1897 took two away, v1942 took 122 more,
 v2043 added App Installers' 23, v2051 took one back, v2082 restored the 13
 `/v3/computers-inventory` operations, v2121 restored
-`GET /v1/mdm/commands` and v2154 added three genuinely new ones. 21 of the 38 added on 2026-08-31 were
+`GET /v1/mdm/commands`, v2154 added three genuinely new ones and v2267
+withdrew two of those three. 21 of the 38 added on 2026-08-31 were
 deprecated, which was no bar at the time: the whitelist carried 111 deprecated
 operations, and until v1942 the additive-versions rule kept them until Jamf
 removed the path. v1942 removed the paths — and v2082 and v2121 have each put
@@ -1758,7 +2067,7 @@ regenerated the tree with zero diff, so the v1882 diff is exactly the delta.
 
 | held | why |
 |---|---|
-| ~~`account-licensing`, `account-sso` at v1865~~ | **Lifted 2026-09-14, and both premises went at once — the wire stopped sending either field, on the very tenant the hold was last confirmed against.** **Licensing:** `License.type` is gone — **0/19 rows**, the key entirely absent, deterministic 2/2, with `GET /licensing/v1/licenses` at 200 and a bogus path in the same namespace at 403 as controls in the same invocation. The decisive control is that this service *does* serialize nulls — `addOnType`, `bundleProductCode` and `contactId` all appear as explicit `null` in the same row — so an absent `type` means the property is off the DTO rather than merely unpopulated, which is a schema-level tell and not data variance. `GET /v1/licenses` is the licensing spec's only operation, so that one body is the whole surface. **SSO:** the wire sends neither name the hold was about — `region` on **5/5** domain allocations, `authZeroRegion` on none and `authRegion` on none. So holding left `AuthZeroRegion` permanently empty and ingesting leaves `AuthRegion` permanently empty: identical badness, and the hold protected nothing. `authRegion` is an upstream authoring slip and the same spec proves it — `Connection`, `ConnectionSummary` and `BaseConnectionSettings` all name the identical `Region` type `region`, and the wire agrees with those three — so `propertyRenames` corrects it to `region` and panics the day the spec declares it. Reported upstream. **Corroborated on `<org-b>` the same day — 24 rows, the `type` key absent on all 24, deterministic 2/2, with a bogus path in the same namespace at 403 as the control.** That is the second tenant of the 2026-09-04 pass, identifiable by its 24 licences with `licenseType` non-null on 16, so it is a before-and-after on a tenant that *had* the field rather than a fresh opinion, and both tenants that populated it have now stopped. The `<org-a>` reading is also **`<org-a>` itself, not a second opinion**, which is what makes it a server change rather than tenant variance: the five domains, the connection identifiers and the region *values* are the same ones the 2026-09-09 probe recorded five days earlier (`<con-1>` / `<org-a>`, `US`×3 / `JP` / `RAMP`) and only the key changed, while the licence list went 16 rows with `type` on all of them to 19 rows with `type` on none. Identify the tenant before reaching for tenant variance as the explanation. Row kept so the next reader sees the outcome rather than the wait, and because the superseded evidence below is what the hold rested on for five weeks. Two breaking changes were **ahead of the server**, both re-confirmed 2026-09-04 on **two independent organization tenants** — `<org-a>` (16 licences, 5 domains) and `<org-b>` (24 licences, 7 domains). Each spec's whole v2082 delta is the one field its hold names, plus an inert `servers` region-enum narrowing to `us`. **Licensing:** `License.type` is deleted though the wire populates it **40/40 rows**, and it is neither a rename of `licenseType` (non-null on only 8/16 and 16/24, so both fields coexist) nor derivable — on **17 of the 40** rows `type` matches none of `licenseType`, `addOnType` or `productTopLine` (`Jamf Trust` → `type: JAMF_SECURITY_CLOUD` while `addOnType: JAMF_TRUST`; `Jamf Pro for iOS` → `JAMF_PRO_SUBSCRIPTION`, the very value the deleted property gave as its `example`). So taking it drops a populated product-family classifier on 42% of rows. **SSO:** `DomainAllocationConnection.authZeroRegion` → `authRegion`, but the wire sends the old name on **11/11 connections** and `authRegion` on none. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. ~~SSO could not be re-probed — `/sso/v1/domain-allocations` answers 403 `BAD_PERMISSIONS`, so the capability is ungranted and it needs a credential holding `sso-domains`.~~ **That was wrong, and the mistake is worth keeping: there is no `/sso/v1/domain-allocations` path.** The operation is `GET /sso/v1/domains/allocation/{domain}` and it answers **200** on both credentials; the 403 was the gateway refusing an unmapped path, which in this namespace is indistinguishable from an ungranted capability. **Read the path out of the spec before concluding a capability is missing.** **Re-probed 2026-09-09 at v2100 on `<org-a>`: both holds stand unchanged** — `type` populated **16/16** with `licenseType` non-null on only 8, and `authZeroRegion` on **5/5** allocations (`US`×3, `JP`, `RAMP`) with `authRegion` on none — and v2100 changed neither spec, so there is nothing new to weigh. `account-partners` is inert (`servers` only) and moved to v2082. ~~It 403s on both organization credentials, so its own coverage is still ungranted.~~ **Wrong as of 2026-09-09: partners is granted and the whole account lane is green.** `GET /partners/v1/deal-registrations` answers **200** (`{"totalCount":0,"results":[]}`) with a bogus path in the same namespace returning `403 BAD_PERMISSIONS` as the control, so the earlier 403 was the *distributor* surface, not the capability. All five distributor operations are routed and authorized and answer `400 UPSTREAM_ERROR` "… via Skyway distributor service" — the standing distributor-service fault the suite already pins, not a grant problem. Every one of the eleven `TestAcceptance_Account*` tests now passes or skips on a write opt-in; none skips for want of a credential. |
+| ~~`account-licensing`, `account-sso` at v1865~~ | **Lifted 2026-09-14, and both premises went at once — the wire stopped sending either field, on the very tenant the hold was last confirmed against.** **Licensing:** `License.type` is gone — **0/19 rows**, the key entirely absent, deterministic 2/2, with `GET /licensing/v1/licenses` at 200 and a bogus path in the same namespace at 403 as controls in the same invocation. The decisive control is that this service *does* serialize nulls — `addOnType`, `bundleProductCode` and `contactId` all appear as explicit `null` in the same row — so an absent `type` means the property is off the DTO rather than merely unpopulated, which is a schema-level tell and not data variance. `GET /v1/licenses` is the licensing spec's only operation, so that one body is the whole surface. **SSO:** the wire sends neither name the hold was about — `region` on **5/5** domain allocations, `authZeroRegion` on none and `authRegion` on none. So holding left `AuthZeroRegion` permanently empty and ingesting leaves `AuthRegion` permanently empty: identical badness, and the hold protected nothing. `authRegion` is an upstream authoring slip and the same spec proves it — `Connection`, `ConnectionSummary` and `BaseConnectionSettings` all name the identical `Region` type `region`, and the wire agrees with those three — so `propertyRenames` corrects it to `region` and panics the day the spec declares it. Reported upstream. **Corroborated on `<org-b>` the same day — 24 rows, the `type` key absent on all 24, deterministic 2/2, with a bogus path in the same namespace at 403 as the control.** That is the second tenant of the 2026-09-04 pass, identifiable by its 24 licences with `licenseType` non-null on 16, so it is a before-and-after on a tenant that *had* the field rather than a fresh opinion, and both tenants that populated it have now stopped. The `<org-a>` reading is also **`<org-a>` itself, not a second opinion**, which is what makes it a server change rather than tenant variance: the five domains, the connection identifiers and the region *values* are the same ones the 2026-09-09 probe recorded five days earlier (`<con-1>` / `<org-a>`, `US`×3 / `JP` / `RAMP`) and only the key changed, while the licence list went 16 rows with `type` on all of them to 19 rows with `type` on none. Identify the tenant before reaching for tenant variance as the explanation. Row kept so the next reader sees the outcome rather than the wait, and because the superseded evidence below is what the hold rested on for five weeks. Two breaking changes were **ahead of the server**, both re-confirmed 2026-09-04 on **two independent organization tenants** — `<org-a>` (16 licences, 5 domains) and `<org-b>` (24 licences, 7 domains). Each spec's whole v2082 delta is the one field its hold names, plus an inert `servers` region-enum narrowing to `us`. **Licensing:** `License.type` is deleted though the wire populates it **40/40 rows**, and it is neither a rename of `licenseType` (non-null on only 8/16 and 16/24, so both fields coexist) nor derivable — on **17 of the 40** rows `type` matches none of `licenseType`, `addOnType` or `productTopLine` (`Jamf Trust` → `type: JAMF_SECURITY_CLOUD` while `addOnType: JAMF_TRUST`; `Jamf Pro for iOS` → `JAMF_PRO_SUBSCRIPTION`, the very value the deleted property gave as its `example`). So taking it drops a populated product-family classifier on 42% of rows. **SSO:** `DomainAllocationConnection.authZeroRegion` → `authRegion`, but the wire sends the old name on **11/11 connections** and `authRegion` on none. Both would be **silent** regressions — nothing sets `DisallowUnknownFields`. ~~SSO could not be re-probed — `/sso/v1/domain-allocations` answers 403 `BAD_PERMISSIONS`, so the capability is ungranted and it needs a credential holding `sso-domains`.~~ **That was wrong, and the mistake is worth keeping: there is no `/sso/v1/domain-allocations` path.** The operation is `GET /sso/v1/domains/allocation/{domain}` and it answers **200** on both credentials; the 403 was the gateway refusing an unmapped path, which in this namespace is indistinguishable from an ungranted capability. **Read the path out of the spec before concluding a capability is missing.** **Re-probed 2026-09-09 at v2100 on `<org-a>`: both holds stand unchanged** — `type` populated **16/16** with `licenseType` non-null on only 8, and `authZeroRegion` on **5/5** allocations (`US`×3, `JP`, `RAMP`) with `authRegion` on none — and v2100 changed neither spec, so there is nothing new to weigh. `account-partners` is inert (`servers` only) and moved to v2082. ~~It 403s on both organization credentials, so its own coverage is still ungranted.~~ **Wrong as of 2026-09-09: partners is granted and the whole account lane is green.** `GET /partners/v1/deal-registrations` answers **200** (`{"totalCount":0,"results":[]}`) with a bogus path in the same namespace returning `403 BAD_PERMISSIONS` as the control, so the earlier 403 was the *distributor* surface, not the capability. All five distributor operations are routed and authorized and answer `400 UPSTREAM_ERROR` "… via Skyway distributor service" — the standing distributor-service fault the suite already pins, not a grant problem. Every one of the `TestAcceptance_Account*` tests passes or skips on a write opt-in; none skips for want of a credential. **Two of them now pin an upstream fault rather than exercising a working surface** — the distributor `400` and, as of v2204, the deal-registration `500` — so read the lane's green as "the recorded faults are still the recorded faults", not as coverage. |
 | ~~`capi` at v1897~~ | **Lifted 2026-09-04: v2082 republished the whole patch-management family**, including `POST /patchsoftwaretitles/id/{id}` — the one operation the hold existed to keep, because nothing else mints a `softwareTitleId` for the Pro v3 configuration endpoints (upstream's stated grounds: "Patch management is where Classic API callers are most concentrated"). `capi` is at v2082 and the whitelist at 589, mirroring the published spec exactly; the 17 `/computers` withdrawals the config had already taken at v1993 came with it, so the alignment cost nothing. Row kept so the next reader sees the outcome rather than the wait. |
 | ~~`securitycloud-devices` at v1897~~ | **Lifted 2026-09-04: `PUT /v2/groups/{groupId}` answers 204 and the write persists.** The row's condition was *"lift when the v2 PUT answers 2xx, not when it stops 403ing"*, and that is exactly what happened — in two steps, five weeks apart. A policy change scoped to `PUT` only deployed at 12:29Z on 2026-09-03 and turned the unrouted `403 BAD_PERMISSIONS` into a service-level `404 NOT_FOUND`: the request began clearing authorization and reaching a handler that could not find a group `GET /v2/groups` returned in the same invocation. The handler was then fixed on **2026-09-04, between 12:51 and 13:33 BST** — a probe at 12:51 still got the 404, one at 13:33 succeeded — and the fix is genuine rather than a status change: verified 3/3 by curl with the rename **read back** through `GET /v2/groups`, a `PUT /v1/groups/{id}` at 200 and a bogus-path `403` as controls in the same invocation. So the two operations v1942 withdrew (`GET /v1/groups`, `PUT /v1/groups/{groupId}`) no longer cost a capability, the spec is ingested at v2082, and `ListDeviceGroupsV1`, `UpdateDeviceGroupV1`, `ResolveDeviceGroupV1*` and `ApplyDeviceGroupV1` are gone. Both withdrawn paths still answer 200 on the wire, so the SDK is deliberately stricter than the gateway here, per the v1942 rule. Row kept so the next reader sees the outcome rather than the wait. |
 | `ai/governance/visibility` | No published spec in any environment. Not ingestable. `securitycloud-enrollment` was in this row until v1993 published it. |
@@ -1905,8 +2214,8 @@ Layer-by-layer diagnosis of a refusal, per-package findings and the full evidenc
 
 | package | namespace(s) | scope | notes |
 |---|---|---|---|
-| `pro` | `pro` | tenant **or** environment (both declared as of v2082) | 704 ops — the whole spec, v1942's 122 withdrawals minus v2082's 13 `/v3/computers-inventory` restorations, v2121's `GET /v1/mdm/commands` and v2154's three new ones, all three of which are unrouted at the gateway |
-| `proclassic` | `proclassic` | tenant **or** environment (both declared as of v2082) | 589 ops, XML end-to-end — the v2154 surface exactly. Both `/activationcode` verbs now carry a `// Deprecated:` marker and the GET has no successor anywhere; see the v2154 section |
+| `pro` | `pro` | tenant **or** environment (both declared as of v2082) | 702 ops — the whole spec, v1942's 122 withdrawals minus v2082's 13 `/v3/computers-inventory` restorations and v2121's `GET /v1/mdm/commands`, plus v2154's three new ones less the two v2267 withdrew. The one v2154 operation left, `DELETE /v1/notifications`, is still unrouted at the gateway |
+| `proclassic` | `proclassic` | tenant **or** environment (both declared as of v2082) | 589 ops, XML end-to-end — the v2362 surface exactly, neither v2267 nor v2362 having changed an operation. Both `/activationcode` verbs carry a `// Deprecated:` marker and the GET has no successor anywhere; see the v2154 section |
 | `devices`, `devicegroups`, `deviceactions` | as named | **environment** per the spec; tenant still served | Platform APIs. v2082 declares them environment-only, the gateway still answers `X-Tenant-Id` on all three — pinned by `TestAcceptance_TenantScopePlatformSpecsStillServed`, which fails when that changes |
 | `blueprints`, `compliancebenchmarks`, `ddmreport` | as named | **environment** | v2082 declares all three environment-only. `ddmreport` still answers under tenant scope and is pinned; `blueprints` and `compliancebenchmarks` refuse a tenant credential with `403 BAD_PERMISSIONS`, unclassifiable against one credential but agreeing with the GA env-only decision, so deliberately unpinned |
 | `securitycloud` | `securitycloud` | tenant (own identifier) **or** environment (both declared as of v2082) | 52 ops across six specs — every spec at v2082 as of 2026-09-04, the `securitycloud-devices` hold having lifted and taken `GET /v1/groups` and `PUT /v1/groups/{groupId}` with it |

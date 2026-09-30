@@ -16787,7 +16787,7 @@
       "url": "https://developer.jamf.com/developer-guide/docs/api-license-agreement"
     },
     "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
-    "title": "Classic API",
+    "title": "Jamf Pro Classic",
     "version": "11.32.0"
   },
   "openapi": "3.0.1",
@@ -17565,7 +17565,7 @@
     "/activationcode": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `activation-code:read`",
+        "description": "**Deprecated:** _As of 2026-07-14, this endpoint has been deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `activation-code:read`",
         "operationId": "findactivationcode",
         "parameters": [
           {
@@ -17599,7 +17599,7 @@
             ]
           }
         ],
-        "summary": "Finds the Jamf Pro activation code",
+        "summary": "Deprecated - Finds the Jamf Pro activation code",
         "tags": [
           "activationcode"
         ],
@@ -17611,7 +17611,7 @@
       },
       "put": {
         "deprecated": true,
-        "description": "**Required Permissions:** `activation-code:update`",
+        "description": "**Deprecated:** _As of 2026-07-14, this endpoint has been deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `activation-code:update`",
         "operationId": "updateActivationCode",
         "parameters": [
           {
@@ -17643,7 +17643,7 @@
             ]
           }
         ],
-        "summary": "Updates the Jamf Pro activation code",
+        "summary": "Deprecated - Updates the Jamf Pro activation code",
         "tags": [
           "activationcode"
         ],
@@ -24508,7 +24508,7 @@
     "/computers/match/name/{matchname}": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `devices:read`",
+        "description": "**Deprecated:** _As of 2025-02-11, this endpoint has been deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `devices:read`",
         "operationId": "matchComputersNames",
         "parameters": [
           {
@@ -24539,7 +24539,7 @@
             ]
           }
         ],
-        "summary": "Searches for computers that match the provided name parameter",
+        "summary": "Deprecated - Searches for computers that match the provided name parameter",
         "tags": [
           "computers"
         ],
@@ -24552,7 +24552,7 @@
     "/computers/match/{match}": {
       "get": {
         "deprecated": true,
-        "description": "Match performs the same function as a simple search in the GUI.\n\n**Required Permissions:** `devices:read`",
+        "description": "**Deprecated:** _As of 2025-02-11, this endpoint has been deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\nMatch performs the same function as a simple search in the GUI.\n\n**Required Permissions:** `devices:read`",
         "operationId": "matchComputers",
         "parameters": [
           {
@@ -24583,7 +24583,7 @@
             ]
           }
         ],
-        "summary": "Searches for computers that match the provided parameter",
+        "summary": "Deprecated - Searches for computers that match the provided parameter",
         "tags": [
           "computers"
         ],
@@ -28513,7 +28513,7 @@
     "/jssuser": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `accounts:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `accounts:read`",
         "operationId": "JssuserGet",
         "parameters": [
           {
@@ -37559,7 +37559,7 @@
     "/patches": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "findPatches",
         "parameters": [
           {
@@ -37605,7 +37605,7 @@
     "/patches/id/{id}": {
       "delete": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:delete`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:delete`",
         "operationId": "deleteSoftwareTitlesById",
         "parameters": [
           {
@@ -37646,7 +37646,7 @@
       },
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "findPatchesById",
         "parameters": [
           {
@@ -37699,7 +37699,7 @@
       },
       "post": {
         "deprecated": true,
-        "description": "The patch title must exist within a specific site or Full Jamf Pro. Use this endpoint to create additional instances of the patch software title for specific sites. The name_id element can be obtained from the /patches and/or /patches/id/{id} resources.\n\n**Required Permissions:** `patch-management-software-titles:create`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\nThe patch title must exist within a specific site or Full Jamf Pro. Use this endpoint to create additional instances of the patch software title for specific sites. The name_id element can be obtained from the /patches and/or /patches/id/{id} resources.\n\n**Required Permissions:** `patch-management-software-titles:create`",
         "operationId": "createPatchSoftwareTitlesById",
         "parameters": [
           {
@@ -37741,7 +37741,7 @@
       },
       "put": {
         "deprecated": true,
-        "description": "Using an empty \u003cpackage/\u003e tag will disassociate any previous packages associated with a specific software title version.\n\n**Required Permissions:** `patch-management-software-titles:update`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\nUsing an empty \u003cpackage/\u003e tag will disassociate any previous packages associated with a specific software title version.\n\n**Required Permissions:** `patch-management-software-titles:update`",
         "operationId": "updateSoftwareTitlesById",
         "parameters": [
           {
@@ -37786,7 +37786,7 @@
     "/patches/id/{id}/version/{version}": {
       "get": {
         "deprecated": true,
-        "description": "Displays information specified with the {version} parameter for a patch specified with the {id} parameter. A version number of 'Latest' and 'Unknown' will also work.\n\n**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\nDisplays information specified with the {version} parameter for a patch specified with the {id} parameter. A version number of 'Latest' and 'Unknown' will also work.\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "findComputersByIDAndTitleVersion",
         "parameters": [
           {
@@ -37838,7 +37838,7 @@
     "/patches/name/{name}": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "findPatchesByName",
         "parameters": [
           {
@@ -38448,7 +38448,7 @@
     "/patchpolicies": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-policies:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-policies:read`",
         "operationId": "findPatchPolicies",
         "parameters": [
           {
@@ -38698,7 +38698,7 @@
     "/patchpolicies/softwaretitleconfig/id/{softwaretitleconfigid}": {
       "get": {
         "deprecated": true,
-        "description": "softwaretitleconfigid refers to the ID of the patch software title the policy is associated to\n\n**Required Permissions:** `patch-policies:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\nsoftwaretitleconfigid refers to the ID of the patch software title the policy is associated to\n\n**Required Permissions:** `patch-policies:read`",
         "operationId": "findPatchPoliciesBySoftwareTitleConfigId",
         "parameters": [
           {
@@ -38795,7 +38795,7 @@
     "/patchreports/patchsoftwaretitleid/{id}": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "PatchreportsPatchsoftwaretitleidByIdGet",
         "parameters": [
           {
@@ -38850,7 +38850,7 @@
     "/patchreports/patchsoftwaretitleid/{id}/version/{version}": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "PatchreportsPatchsoftwaretitleidVersionByIdAndVersionGet",
         "parameters": [
           {
@@ -38914,7 +38914,7 @@
     "/patchsoftwaretitles": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "PatchsoftwaretitlesGet",
         "parameters": [
           {
@@ -38960,7 +38960,7 @@
     "/patchsoftwaretitles/id/{id}": {
       "delete": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:delete`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:delete`",
         "operationId": "PatchsoftwaretitlesIdByIdDelete",
         "parameters": [
           {
@@ -39001,7 +39001,7 @@
       },
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:read`",
         "operationId": "PatchsoftwaretitlesIdByIdGet",
         "parameters": [
           {
@@ -39049,7 +39049,7 @@
       },
       "post": {
         "deprecated": true,
-        "description": "**Required Permissions:** `patch-management-software-titles:create`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `patch-management-software-titles:create`",
         "operationId": "PatchsoftwaretitlesIdByIdPost",
         "parameters": [
           {
@@ -39092,7 +39092,7 @@
       },
       "put": {
         "deprecated": true,
-        "description": "Including an empty package element \u003cpackage/\u003e within the version element will disassociate any previously associated packages with that version of the software title.\n\n**Required Permissions:** `patch-management-software-titles:update`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\nIncluding an empty package element \u003cpackage/\u003e within the version element will disassociate any previously associated packages with that version of the software title.\n\n**Required Permissions:** `patch-management-software-titles:update`",
         "operationId": "PatchsoftwaretitlesIdByIdPut",
         "parameters": [
           {
@@ -40903,7 +40903,7 @@
     "/savedsearches": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `advanced-device-searches:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `advanced-device-searches:read`",
         "operationId": "SavedsearchesGet",
         "parameters": [
           {
@@ -40949,7 +40949,7 @@
     "/savedsearches/id/{id}": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `advanced-device-searches:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `advanced-device-searches:read`",
         "operationId": "SavedsearchesIdByIdGet",
         "parameters": [
           {
@@ -40992,7 +40992,7 @@
     "/savedsearches/name/{name}": {
       "get": {
         "deprecated": true,
-        "description": "**Required Permissions:** `advanced-device-searches:read`",
+        "description": "**Deprecated:** _This endpoint is deprecated and will be removed in a future release. See [changelog](https://developer.jamf.com/jamf-pro/changelog) for details._\n\n**Required Permissions:** `advanced-device-searches:read`",
         "operationId": "SavedsearchesNameByNameGet",
         "parameters": [
           {

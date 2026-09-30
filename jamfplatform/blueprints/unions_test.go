@@ -81,6 +81,319 @@ func TestBookmarkItem_Marshal(t *testing.T) {
 	})
 }
 
+// TestDeclarationsComponentConfigurationDeclarationsItem_Marshal asserts that each "type" value marshals to exactly the bytes
+// its variant alone produces, that a payload carrying the value decodes into
+// that variant, and that an unrecognised value leaves every variant nil while
+// preserving the discriminator rather than guessing.
+func TestDeclarationsComponentConfigurationDeclarationsItem_Marshal(t *testing.T) {
+	t.Run("com.apple.configuration.app.managed", func(t *testing.T) {
+		variant := &ManagedAppDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.app.managed", ManagedAppDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.app.managed"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.app.managed" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.app.managed")
+		}
+		if back.ManagedAppDeclaration == nil {
+			t.Fatal("com.apple.configuration.app.managed decoded with ManagedAppDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.app.settings", func(t *testing.T) {
+		variant := &AppSettingsDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.app.settings", AppSettingsDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.app.settings"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.app.settings" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.app.settings")
+		}
+		if back.AppSettingsDeclaration == nil {
+			t.Fatal("com.apple.configuration.app.settings decoded with AppSettingsDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.content-cache.settings", func(t *testing.T) {
+		variant := &ContentCachingDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.content-cache.settings", ContentCachingDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.content-cache.settings"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.content-cache.settings" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.content-cache.settings")
+		}
+		if back.ContentCachingDeclaration == nil {
+			t.Fatal("com.apple.configuration.content-cache.settings decoded with ContentCachingDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.external-intelligence.settings", func(t *testing.T) {
+		variant := &ExternalIntelligenceSettingsDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.external-intelligence.settings", ExternalIntelligenceSettingsDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.external-intelligence.settings"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.external-intelligence.settings" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.external-intelligence.settings")
+		}
+		if back.ExternalIntelligenceSettingsDeclaration == nil {
+			t.Fatal("com.apple.configuration.external-intelligence.settings decoded with ExternalIntelligenceSettingsDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.intelligence.settings", func(t *testing.T) {
+		variant := &IntelligenceSettingsDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.intelligence.settings", IntelligenceSettingsDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.intelligence.settings"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.intelligence.settings" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.intelligence.settings")
+		}
+		if back.IntelligenceSettingsDeclaration == nil {
+			t.Fatal("com.apple.configuration.intelligence.settings decoded with IntelligenceSettingsDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.keyboard.settings", func(t *testing.T) {
+		variant := &KeyboardSettingsDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.keyboard.settings", KeyboardSettingsDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.keyboard.settings"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.keyboard.settings" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.keyboard.settings")
+		}
+		if back.KeyboardSettingsDeclaration == nil {
+			t.Fatal("com.apple.configuration.keyboard.settings decoded with KeyboardSettingsDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.package", func(t *testing.T) {
+		variant := &PackageDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.package", PackageDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.package"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.package" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.package")
+		}
+		if back.PackageDeclaration == nil {
+			t.Fatal("com.apple.configuration.package decoded with PackageDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.screensharing.connection", func(t *testing.T) {
+		variant := &ScreenSharingConnectionDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.screensharing.connection", ScreenSharingConnectionDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.screensharing.connection"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.screensharing.connection" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.screensharing.connection")
+		}
+		if back.ScreenSharingConnectionDeclaration == nil {
+			t.Fatal("com.apple.configuration.screensharing.connection decoded with ScreenSharingConnectionDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.screensharing.connection.group", func(t *testing.T) {
+		variant := &ScreenSharingConnectionGroupDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.screensharing.connection.group", ScreenSharingConnectionGroupDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.screensharing.connection.group"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.screensharing.connection.group" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.screensharing.connection.group")
+		}
+		if back.ScreenSharingConnectionGroupDeclaration == nil {
+			t.Fatal("com.apple.configuration.screensharing.connection.group decoded with ScreenSharingConnectionGroupDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.screensharing.host.settings", func(t *testing.T) {
+		variant := &ScreenSharingHostSettingsDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.screensharing.host.settings", ScreenSharingHostSettingsDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.screensharing.host.settings"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.screensharing.host.settings" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.screensharing.host.settings")
+		}
+		if back.ScreenSharingHostSettingsDeclaration == nil {
+			t.Fatal("com.apple.configuration.screensharing.host.settings decoded with ScreenSharingHostSettingsDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("com.apple.configuration.siri.settings", func(t *testing.T) {
+		variant := &SiriSettingsDeclaration{}
+		got, err := json.Marshal(DeclarationsComponentConfigurationDeclarationsItem{Type: "com.apple.configuration.siri.settings", SiriSettingsDeclaration: variant})
+		if err != nil {
+			t.Fatalf("marshal union: %v", err)
+		}
+		want, err := json.Marshal(variant)
+		if err != nil {
+			t.Fatalf("marshal variant: %v", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("union marshalled to %s, want the bare variant %s", got, want)
+		}
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"com.apple.configuration.siri.settings"}`), &back); err != nil {
+			t.Fatalf("unmarshal union: %v", err)
+		}
+		if back.Type != "com.apple.configuration.siri.settings" {
+			t.Fatalf("Type = %q after decode, want %q", back.Type, "com.apple.configuration.siri.settings")
+		}
+		if back.SiriSettingsDeclaration == nil {
+			t.Fatal("com.apple.configuration.siri.settings decoded with SiriSettingsDeclaration nil — the value is mapped to no variant")
+		}
+	})
+	t.Run("unrecognised discriminator", func(t *testing.T) {
+		var back DeclarationsComponentConfigurationDeclarationsItem
+		if err := json.Unmarshal([]byte(`{"type":"NOT_A_Type_VALUE"}`), &back); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		if back.Type != "NOT_A_Type_VALUE" {
+			t.Fatalf("Type = %q, want the unrecognised value preserved", back.Type)
+		}
+		if back.ManagedAppDeclaration != nil {
+			t.Error("ManagedAppDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.AppSettingsDeclaration != nil {
+			t.Error("AppSettingsDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.ContentCachingDeclaration != nil {
+			t.Error("ContentCachingDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.ExternalIntelligenceSettingsDeclaration != nil {
+			t.Error("ExternalIntelligenceSettingsDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.IntelligenceSettingsDeclaration != nil {
+			t.Error("IntelligenceSettingsDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.KeyboardSettingsDeclaration != nil {
+			t.Error("KeyboardSettingsDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.PackageDeclaration != nil {
+			t.Error("PackageDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.ScreenSharingConnectionDeclaration != nil {
+			t.Error("ScreenSharingConnectionDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.ScreenSharingConnectionGroupDeclaration != nil {
+			t.Error("ScreenSharingConnectionGroupDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.ScreenSharingHostSettingsDeclaration != nil {
+			t.Error("ScreenSharingHostSettingsDeclaration was populated for an unrecognised discriminator")
+		}
+		if back.SiriSettingsDeclaration != nil {
+			t.Error("SiriSettingsDeclaration was populated for an unrecognised discriminator")
+		}
+	})
+}
+
 // TestSwUpdateAutomaticConfiguration_Marshal asserts that each "strategy" value marshals to exactly the bytes
 // its variant alone produces, that a payload carrying the value decodes into
 // that variant, and that an unrecognised value leaves every variant nil while

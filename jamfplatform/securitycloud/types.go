@@ -441,7 +441,7 @@ type Gateway struct {
 	// Operational contact for this gateway.
 	Contact *GatewayContact `json:"contact,omitempty"`
 	// Datacenter this gateway is deployed to (e.g. `eu-west-1`). Can be changed on PATCH — triggers
-	// re-provisioning; `availabilityZones` must match the new datacenter prefix (returns `400` on
+	// re-provisioning; `availabilityZones` must be valid IPs for the new datacenter (returns `400` on
 	// mismatch).
 	// Allowed values: see the GatewayDatacenter constants.
 	Datacenter string `json:"datacenter"`
@@ -473,7 +473,8 @@ type GatewayContact struct {
 // GatewayCreateRequest Flat request body for creating a dedicated Gateway.
 type GatewayCreateRequest struct {
 	// Public IPv4 addresses of the availability zone nodes to deploy into (e.g. `18.202.42.169`). Must
-	// belong to the gateway's datacenter region. Must be empty when `dedicatedIps.enabled: true`. Note:
+	// belong to the gateway's datacenter region. Must be empty when `dedicatedIps.enabled: true`. Required
+	// (at least one address) when `ipsec` is set — an `ipsec` gateway with no zones is rejected. Note:
 	// despite the field name, values are IPv4 addresses — not zone identifier strings.
 	// For **IPsec gateways**, these are the source addresses the peer firewall must allow. Valid IPs per
 	// datacenter:
@@ -569,10 +570,11 @@ type GatewayListResponse struct {
 	TotalCount int `json:"totalCount"`
 }
 
-// GatewayPatchRequest Flat merge-patch body (`application/merge-patch+json`). All fields optional. When `datacenter` is omitted, the existing value is preserved. When `datacenter` changes, `availabilityZones` must match the new datacenter prefix (e.g. `eu-central-1a` for `eu-central-1`) — returns `400` on mismatch.
+// GatewayPatchRequest Flat merge-patch body (`application/merge-patch+json`). All fields optional. When `datacenter` is omitted, the existing value is preserved. When `datacenter` changes, `availabilityZones` must be valid IPs for the new datacenter (e.g. `3.66.107.208` for `eu-central-1`) — returns `400` on mismatch.
 type GatewayPatchRequest struct {
 	// Replaces the availability zone node list. Accepts public IPv4 addresses (e.g. `18.202.42.169`).
-	// Zones must belong to the (new or existing) datacenter.
+	// Zones must belong to the (new or existing) datacenter. Cannot be emptied once set — sending `[]`
+	// or `null` returns `400 EMPTY_AVAILABILITY_ZONES_NOT_SUPPORTED`. The list can still be replaced.
 	// For **IPsec gateways**, these are the source addresses the peer firewall must allow. Valid IPs per
 	// datacenter:
 	// | Datacenter | Name | IP 1 | IP 2 |
@@ -593,8 +595,8 @@ type GatewayPatchRequest struct {
 	AvailabilityZones *[]string `json:"availabilityZones,omitempty"`
 	// Operational contact for this gateway.
 	Contact *GatewayContact `json:"contact,omitempty"`
-	// New datacenter for this deployment (e.g. `eu-central-1`). When changed, `availabilityZones` must
-	// match the new datacenter prefix — returns `400` on mismatch. **Destructive:** triggers
+	// New datacenter for this deployment (e.g. `eu-central-1`). When changed, `availabilityZones` must be
+	// valid IPs for the new datacenter — returns `400` on mismatch. **Destructive:** triggers
 	// re-provisioning, connectivity outage, and immediate `status.state` reset to `PENDING`.
 	// `dedicatedIps.ips` remain stale until VSC completes provisioning in the new datacenter.
 	// Allowed values: see the GatewayPatchRequestDatacenter constants.

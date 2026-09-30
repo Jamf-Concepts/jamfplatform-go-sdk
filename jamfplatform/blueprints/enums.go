@@ -78,6 +78,267 @@ func AcceptCookiesValueValues() []AcceptCookiesValue {
 	}
 }
 
+// AppSettingsBinaryIdentifierSigningState is the set of values accepted by AppSettingsBinaryIdentifier.SigningState.
+type AppSettingsBinaryIdentifierSigningState = string
+
+// AppSettingsBinaryIdentifierSigningState values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsBinaryIdentifierSigningStateAll         AppSettingsBinaryIdentifierSigningState = "All"
+	AppSettingsBinaryIdentifierSigningStateTestFlight  AppSettingsBinaryIdentifierSigningState = "TestFlight"
+	AppSettingsBinaryIdentifierSigningStateDeveloperID AppSettingsBinaryIdentifierSigningState = "DeveloperID"
+	AppSettingsBinaryIdentifierSigningStateEnterprise  AppSettingsBinaryIdentifierSigningState = "Enterprise"
+	AppSettingsBinaryIdentifierSigningStateAppStore    AppSettingsBinaryIdentifierSigningState = "AppStore"
+	AppSettingsBinaryIdentifierSigningStateApple       AppSettingsBinaryIdentifierSigningState = "Apple"
+)
+
+// AppSettingsBinaryIdentifierSigningStateValues returns every value the Jamf API accepts for AppSettingsBinaryIdentifierSigningState,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsBinaryIdentifierSigningStateValues() []AppSettingsBinaryIdentifierSigningState {
+	return []AppSettingsBinaryIdentifierSigningState{
+		AppSettingsBinaryIdentifierSigningStateAll,
+		AppSettingsBinaryIdentifierSigningStateTestFlight,
+		AppSettingsBinaryIdentifierSigningStateDeveloperID,
+		AppSettingsBinaryIdentifierSigningStateEnterprise,
+		AppSettingsBinaryIdentifierSigningStateAppStore,
+		AppSettingsBinaryIdentifierSigningStateApple,
+	}
+}
+
+// AppSettingsDeclarationKind is the set of values accepted by AppSettingsDeclaration.Kind.
+type AppSettingsDeclarationKind = string
+
+// AppSettingsDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsDeclarationKindConfiguration AppSettingsDeclarationKind = "CONFIGURATION"
+)
+
+// AppSettingsDeclarationKindValues returns every value the Jamf API accepts for AppSettingsDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsDeclarationKindValues() []AppSettingsDeclarationKind {
+	return []AppSettingsDeclarationKind{
+		AppSettingsDeclarationKindConfiguration,
+	}
+}
+
+// AppSettingsDeclarationType is the set of values accepted by AppSettingsDeclaration.Type.
+type AppSettingsDeclarationType = string
+
+// AppSettingsDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsDeclarationTypeComAppleConfigurationAppSettings AppSettingsDeclarationType = "com.apple.configuration.app.settings"
+)
+
+// AppSettingsDeclarationTypeValues returns every value the Jamf API accepts for AppSettingsDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsDeclarationTypeValues() []AppSettingsDeclarationType {
+	return []AppSettingsDeclarationType{
+		AppSettingsDeclarationTypeComAppleConfigurationAppSettings,
+	}
+}
+
+// AppSettingsPermissionDefaultsAccessibility is the set of values accepted by AppSettingsPermissionDefaults.Accessibility.
+type AppSettingsPermissionDefaultsAccessibility = string
+
+// AppSettingsPermissionDefaultsAccessibility values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsAccessibilityNone  AppSettingsPermissionDefaultsAccessibility = "None"
+	AppSettingsPermissionDefaultsAccessibilityAllow AppSettingsPermissionDefaultsAccessibility = "Allow"
+)
+
+// AppSettingsPermissionDefaultsAccessibilityValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsAccessibility,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsAccessibilityValues() []AppSettingsPermissionDefaultsAccessibility {
+	return []AppSettingsPermissionDefaultsAccessibility{
+		AppSettingsPermissionDefaultsAccessibilityNone,
+		AppSettingsPermissionDefaultsAccessibilityAllow,
+	}
+}
+
+// AppSettingsPermissionDefaultsBluetooth is the set of values accepted by AppSettingsPermissionDefaults.Bluetooth.
+type AppSettingsPermissionDefaultsBluetooth = string
+
+// AppSettingsPermissionDefaultsBluetooth values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsBluetoothNone  AppSettingsPermissionDefaultsBluetooth = "None"
+	AppSettingsPermissionDefaultsBluetoothAllow AppSettingsPermissionDefaultsBluetooth = "Allow"
+)
+
+// AppSettingsPermissionDefaultsBluetoothValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsBluetooth,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsBluetoothValues() []AppSettingsPermissionDefaultsBluetooth {
+	return []AppSettingsPermissionDefaultsBluetooth{
+		AppSettingsPermissionDefaultsBluetoothNone,
+		AppSettingsPermissionDefaultsBluetoothAllow,
+	}
+}
+
+// AppSettingsPermissionDefaultsCamera is the set of values accepted by AppSettingsPermissionDefaults.Camera.
+type AppSettingsPermissionDefaultsCamera = string
+
+// AppSettingsPermissionDefaultsCamera values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsCameraNone  AppSettingsPermissionDefaultsCamera = "None"
+	AppSettingsPermissionDefaultsCameraAllow AppSettingsPermissionDefaultsCamera = "Allow"
+)
+
+// AppSettingsPermissionDefaultsCameraValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsCamera,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsCameraValues() []AppSettingsPermissionDefaultsCamera {
+	return []AppSettingsPermissionDefaultsCamera{
+		AppSettingsPermissionDefaultsCameraNone,
+		AppSettingsPermissionDefaultsCameraAllow,
+	}
+}
+
+// AppSettingsPermissionDefaultsDictation is the set of values accepted by AppSettingsPermissionDefaults.Dictation.
+type AppSettingsPermissionDefaultsDictation = string
+
+// AppSettingsPermissionDefaultsDictation values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsDictationNone  AppSettingsPermissionDefaultsDictation = "None"
+	AppSettingsPermissionDefaultsDictationAllow AppSettingsPermissionDefaultsDictation = "Allow"
+)
+
+// AppSettingsPermissionDefaultsDictationValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsDictation,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsDictationValues() []AppSettingsPermissionDefaultsDictation {
+	return []AppSettingsPermissionDefaultsDictation{
+		AppSettingsPermissionDefaultsDictationNone,
+		AppSettingsPermissionDefaultsDictationAllow,
+	}
+}
+
+// AppSettingsPermissionDefaultsLocalNetwork is the set of values accepted by AppSettingsPermissionDefaults.LocalNetwork.
+type AppSettingsPermissionDefaultsLocalNetwork = string
+
+// AppSettingsPermissionDefaultsLocalNetwork values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsLocalNetworkNone  AppSettingsPermissionDefaultsLocalNetwork = "None"
+	AppSettingsPermissionDefaultsLocalNetworkAllow AppSettingsPermissionDefaultsLocalNetwork = "Allow"
+)
+
+// AppSettingsPermissionDefaultsLocalNetworkValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsLocalNetwork,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsLocalNetworkValues() []AppSettingsPermissionDefaultsLocalNetwork {
+	return []AppSettingsPermissionDefaultsLocalNetwork{
+		AppSettingsPermissionDefaultsLocalNetworkNone,
+		AppSettingsPermissionDefaultsLocalNetworkAllow,
+	}
+}
+
+// AppSettingsPermissionDefaultsLocation is the set of values accepted by AppSettingsPermissionDefaults.Location.
+type AppSettingsPermissionDefaultsLocation = string
+
+// AppSettingsPermissionDefaultsLocation values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsLocationNone       AppSettingsPermissionDefaultsLocation = "None"
+	AppSettingsPermissionDefaultsLocationWhileUsing AppSettingsPermissionDefaultsLocation = "WhileUsing"
+	AppSettingsPermissionDefaultsLocationAlways     AppSettingsPermissionDefaultsLocation = "Always"
+)
+
+// AppSettingsPermissionDefaultsLocationValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsLocation,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsLocationValues() []AppSettingsPermissionDefaultsLocation {
+	return []AppSettingsPermissionDefaultsLocation{
+		AppSettingsPermissionDefaultsLocationNone,
+		AppSettingsPermissionDefaultsLocationWhileUsing,
+		AppSettingsPermissionDefaultsLocationAlways,
+	}
+}
+
+// AppSettingsPermissionDefaultsLocationAccuracy is the set of values accepted by AppSettingsPermissionDefaults.LocationAccuracy.
+type AppSettingsPermissionDefaultsLocationAccuracy = string
+
+// AppSettingsPermissionDefaultsLocationAccuracy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsLocationAccuracyNone        AppSettingsPermissionDefaultsLocationAccuracy = "None"
+	AppSettingsPermissionDefaultsLocationAccuracyApproximate AppSettingsPermissionDefaultsLocationAccuracy = "Approximate"
+	AppSettingsPermissionDefaultsLocationAccuracyPrecise     AppSettingsPermissionDefaultsLocationAccuracy = "Precise"
+)
+
+// AppSettingsPermissionDefaultsLocationAccuracyValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsLocationAccuracy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsLocationAccuracyValues() []AppSettingsPermissionDefaultsLocationAccuracy {
+	return []AppSettingsPermissionDefaultsLocationAccuracy{
+		AppSettingsPermissionDefaultsLocationAccuracyNone,
+		AppSettingsPermissionDefaultsLocationAccuracyApproximate,
+		AppSettingsPermissionDefaultsLocationAccuracyPrecise,
+	}
+}
+
+// AppSettingsPermissionDefaultsMicrophone is the set of values accepted by AppSettingsPermissionDefaults.Microphone.
+type AppSettingsPermissionDefaultsMicrophone = string
+
+// AppSettingsPermissionDefaultsMicrophone values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	AppSettingsPermissionDefaultsMicrophoneNone  AppSettingsPermissionDefaultsMicrophone = "None"
+	AppSettingsPermissionDefaultsMicrophoneAllow AppSettingsPermissionDefaultsMicrophone = "Allow"
+)
+
+// AppSettingsPermissionDefaultsMicrophoneValues returns every value the Jamf API accepts for AppSettingsPermissionDefaultsMicrophone,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func AppSettingsPermissionDefaultsMicrophoneValues() []AppSettingsPermissionDefaultsMicrophone {
+	return []AppSettingsPermissionDefaultsMicrophone{
+		AppSettingsPermissionDefaultsMicrophoneNone,
+		AppSettingsPermissionDefaultsMicrophoneAllow,
+	}
+}
+
 // AudioAccessorySettingsComponentIdentifier is the set of values accepted by AudioAccessorySettingsComponent.Identifier.
 type AudioAccessorySettingsComponentIdentifier = string
 
@@ -193,6 +454,125 @@ func ConfigurationProfileIdentifierValues() []ConfigurationProfileIdentifier {
 	}
 }
 
+// ContentCachingDeclarationKind is the set of values accepted by ContentCachingDeclaration.Kind.
+type ContentCachingDeclarationKind = string
+
+// ContentCachingDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ContentCachingDeclarationKindConfiguration ContentCachingDeclarationKind = "CONFIGURATION"
+)
+
+// ContentCachingDeclarationKindValues returns every value the Jamf API accepts for ContentCachingDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ContentCachingDeclarationKindValues() []ContentCachingDeclarationKind {
+	return []ContentCachingDeclarationKind{
+		ContentCachingDeclarationKindConfiguration,
+	}
+}
+
+// ContentCachingDeclarationPayloadManagementSecurityConfig is the set of values accepted by ContentCachingDeclarationPayload.ManagementSecurityConfig.
+type ContentCachingDeclarationPayloadManagementSecurityConfig = string
+
+// ContentCachingDeclarationPayloadManagementSecurityConfig values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ContentCachingDeclarationPayloadManagementSecurityConfigNoCert             ContentCachingDeclarationPayloadManagementSecurityConfig = "no-cert"
+	ContentCachingDeclarationPayloadManagementSecurityConfigSignedByCACert     ContentCachingDeclarationPayloadManagementSecurityConfig = "signedByCACert"
+	ContentCachingDeclarationPayloadManagementSecurityConfigSpecificServerCert ContentCachingDeclarationPayloadManagementSecurityConfig = "specificServerCert"
+)
+
+// ContentCachingDeclarationPayloadManagementSecurityConfigValues returns every value the Jamf API accepts for ContentCachingDeclarationPayloadManagementSecurityConfig,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ContentCachingDeclarationPayloadManagementSecurityConfigValues() []ContentCachingDeclarationPayloadManagementSecurityConfig {
+	return []ContentCachingDeclarationPayloadManagementSecurityConfig{
+		ContentCachingDeclarationPayloadManagementSecurityConfigNoCert,
+		ContentCachingDeclarationPayloadManagementSecurityConfigSignedByCACert,
+		ContentCachingDeclarationPayloadManagementSecurityConfigSpecificServerCert,
+	}
+}
+
+// ContentCachingDeclarationPayloadParentSelectionPolicy is the set of values accepted by ContentCachingDeclarationPayload.ParentSelectionPolicy.
+type ContentCachingDeclarationPayloadParentSelectionPolicy = string
+
+// ContentCachingDeclarationPayloadParentSelectionPolicy values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ContentCachingDeclarationPayloadParentSelectionPolicyFirstAvailable  ContentCachingDeclarationPayloadParentSelectionPolicy = "first-available"
+	ContentCachingDeclarationPayloadParentSelectionPolicyURLPathHash     ContentCachingDeclarationPayloadParentSelectionPolicy = "url-path-hash"
+	ContentCachingDeclarationPayloadParentSelectionPolicyRandom          ContentCachingDeclarationPayloadParentSelectionPolicy = "random"
+	ContentCachingDeclarationPayloadParentSelectionPolicyRoundRobin      ContentCachingDeclarationPayloadParentSelectionPolicy = "round-robin"
+	ContentCachingDeclarationPayloadParentSelectionPolicyStickyAvailable ContentCachingDeclarationPayloadParentSelectionPolicy = "sticky-available"
+)
+
+// ContentCachingDeclarationPayloadParentSelectionPolicyValues returns every value the Jamf API accepts for ContentCachingDeclarationPayloadParentSelectionPolicy,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ContentCachingDeclarationPayloadParentSelectionPolicyValues() []ContentCachingDeclarationPayloadParentSelectionPolicy {
+	return []ContentCachingDeclarationPayloadParentSelectionPolicy{
+		ContentCachingDeclarationPayloadParentSelectionPolicyFirstAvailable,
+		ContentCachingDeclarationPayloadParentSelectionPolicyURLPathHash,
+		ContentCachingDeclarationPayloadParentSelectionPolicyRandom,
+		ContentCachingDeclarationPayloadParentSelectionPolicyRoundRobin,
+		ContentCachingDeclarationPayloadParentSelectionPolicyStickyAvailable,
+	}
+}
+
+// ContentCachingDeclarationType is the set of values accepted by ContentCachingDeclaration.Type.
+type ContentCachingDeclarationType = string
+
+// ContentCachingDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ContentCachingDeclarationTypeComAppleConfigurationContentCacheSettings ContentCachingDeclarationType = "com.apple.configuration.content-cache.settings"
+)
+
+// ContentCachingDeclarationTypeValues returns every value the Jamf API accepts for ContentCachingDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ContentCachingDeclarationTypeValues() []ContentCachingDeclarationType {
+	return []ContentCachingDeclarationType{
+		ContentCachingDeclarationTypeComAppleConfigurationContentCacheSettings,
+	}
+}
+
+// ContentCachingIpRangeType is the set of values accepted by ContentCachingIpRange.Type.
+type ContentCachingIpRangeType = string
+
+// ContentCachingIpRangeType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ContentCachingIpRangeTypeIPv4 ContentCachingIpRangeType = "IPv4"
+	ContentCachingIpRangeTypeIPv6 ContentCachingIpRangeType = "IPv6"
+)
+
+// ContentCachingIpRangeTypeValues returns every value the Jamf API accepts for ContentCachingIpRangeType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ContentCachingIpRangeTypeValues() []ContentCachingIpRangeType {
+	return []ContentCachingIpRangeType{
+		ContentCachingIpRangeTypeIPv4,
+		ContentCachingIpRangeTypeIPv6,
+	}
+}
+
 // CustomDeclarationsComponentIdentifier is the set of values accepted by CustomDeclarationsComponent.Identifier.
 type CustomDeclarationsComponentIdentifier = string
 
@@ -211,6 +591,68 @@ const (
 func CustomDeclarationsComponentIdentifierValues() []CustomDeclarationsComponentIdentifier {
 	return []CustomDeclarationsComponentIdentifier{
 		CustomDeclarationsComponentIdentifierComJamfDdmCustomDeclarations,
+	}
+}
+
+// DeclarationsComponentConfigurationDeclarationsItemType is the set of values accepted by DeclarationsComponentConfigurationDeclarationsItem.Type.
+type DeclarationsComponentConfigurationDeclarationsItemType = string
+
+// DeclarationsComponentConfigurationDeclarationsItemType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationAppManaged                   DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.app.managed"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationAppSettings                  DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.app.settings"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationContentCacheSettings         DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.content-cache.settings"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationExternalIntelligenceSettings DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.external-intelligence.settings"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationIntelligenceSettings         DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.intelligence.settings"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationKeyboardSettings             DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.keyboard.settings"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationPackage                      DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.package"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationScreensharingConnection      DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.screensharing.connection"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationScreensharingConnectionGroup DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.screensharing.connection.group"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationScreensharingHostSettings    DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.screensharing.host.settings"
+	DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationSiriSettings                 DeclarationsComponentConfigurationDeclarationsItemType = "com.apple.configuration.siri.settings"
+)
+
+// DeclarationsComponentConfigurationDeclarationsItemTypeValues returns every value the Jamf API accepts for DeclarationsComponentConfigurationDeclarationsItemType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeclarationsComponentConfigurationDeclarationsItemTypeValues() []DeclarationsComponentConfigurationDeclarationsItemType {
+	return []DeclarationsComponentConfigurationDeclarationsItemType{
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationAppManaged,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationAppSettings,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationContentCacheSettings,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationExternalIntelligenceSettings,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationIntelligenceSettings,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationKeyboardSettings,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationPackage,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationScreensharingConnection,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationScreensharingConnectionGroup,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationScreensharingHostSettings,
+		DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationSiriSettings,
+	}
+}
+
+// DeclarationsComponentIdentifier is the set of values accepted by DeclarationsComponent.Identifier.
+type DeclarationsComponentIdentifier = string
+
+// DeclarationsComponentIdentifier values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	DeclarationsComponentIdentifierComJamfDdmStrict DeclarationsComponentIdentifier = "com.jamf.ddm-strict"
+)
+
+// DeclarationsComponentIdentifierValues returns every value the Jamf API accepts for DeclarationsComponentIdentifier,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func DeclarationsComponentIdentifierValues() []DeclarationsComponentIdentifier {
+	return []DeclarationsComponentIdentifier{
+		DeclarationsComponentIdentifierComJamfDdmStrict,
 	}
 }
 
@@ -281,6 +723,48 @@ func DiskManagementSettingsConfigurationVersionValues() []DiskManagementSettings
 	}
 }
 
+// ExternalIntelligenceSettingsDeclarationKind is the set of values accepted by ExternalIntelligenceSettingsDeclaration.Kind.
+type ExternalIntelligenceSettingsDeclarationKind = string
+
+// ExternalIntelligenceSettingsDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ExternalIntelligenceSettingsDeclarationKindConfiguration ExternalIntelligenceSettingsDeclarationKind = "CONFIGURATION"
+)
+
+// ExternalIntelligenceSettingsDeclarationKindValues returns every value the Jamf API accepts for ExternalIntelligenceSettingsDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ExternalIntelligenceSettingsDeclarationKindValues() []ExternalIntelligenceSettingsDeclarationKind {
+	return []ExternalIntelligenceSettingsDeclarationKind{
+		ExternalIntelligenceSettingsDeclarationKindConfiguration,
+	}
+}
+
+// ExternalIntelligenceSettingsDeclarationType is the set of values accepted by ExternalIntelligenceSettingsDeclaration.Type.
+type ExternalIntelligenceSettingsDeclarationType = string
+
+// ExternalIntelligenceSettingsDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ExternalIntelligenceSettingsDeclarationTypeComAppleConfigurationExternalIntelligenceSettings ExternalIntelligenceSettingsDeclarationType = "com.apple.configuration.external-intelligence.settings"
+)
+
+// ExternalIntelligenceSettingsDeclarationTypeValues returns every value the Jamf API accepts for ExternalIntelligenceSettingsDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ExternalIntelligenceSettingsDeclarationTypeValues() []ExternalIntelligenceSettingsDeclarationType {
+	return []ExternalIntelligenceSettingsDeclarationType{
+		ExternalIntelligenceSettingsDeclarationTypeComAppleConfigurationExternalIntelligenceSettings,
+	}
+}
+
 // FolderBookmarkItemType is the set of values accepted by FolderBookmarkItem.Type.
 type FolderBookmarkItemType = string
 
@@ -302,6 +786,90 @@ func FolderBookmarkItemTypeValues() []FolderBookmarkItemType {
 	}
 }
 
+// IntelligenceSettingsDeclarationKind is the set of values accepted by IntelligenceSettingsDeclaration.Kind.
+type IntelligenceSettingsDeclarationKind = string
+
+// IntelligenceSettingsDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	IntelligenceSettingsDeclarationKindConfiguration IntelligenceSettingsDeclarationKind = "CONFIGURATION"
+)
+
+// IntelligenceSettingsDeclarationKindValues returns every value the Jamf API accepts for IntelligenceSettingsDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func IntelligenceSettingsDeclarationKindValues() []IntelligenceSettingsDeclarationKind {
+	return []IntelligenceSettingsDeclarationKind{
+		IntelligenceSettingsDeclarationKindConfiguration,
+	}
+}
+
+// IntelligenceSettingsDeclarationType is the set of values accepted by IntelligenceSettingsDeclaration.Type.
+type IntelligenceSettingsDeclarationType = string
+
+// IntelligenceSettingsDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	IntelligenceSettingsDeclarationTypeComAppleConfigurationIntelligenceSettings IntelligenceSettingsDeclarationType = "com.apple.configuration.intelligence.settings"
+)
+
+// IntelligenceSettingsDeclarationTypeValues returns every value the Jamf API accepts for IntelligenceSettingsDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func IntelligenceSettingsDeclarationTypeValues() []IntelligenceSettingsDeclarationType {
+	return []IntelligenceSettingsDeclarationType{
+		IntelligenceSettingsDeclarationTypeComAppleConfigurationIntelligenceSettings,
+	}
+}
+
+// KeyboardSettingsDeclarationKind is the set of values accepted by KeyboardSettingsDeclaration.Kind.
+type KeyboardSettingsDeclarationKind = string
+
+// KeyboardSettingsDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	KeyboardSettingsDeclarationKindConfiguration KeyboardSettingsDeclarationKind = "CONFIGURATION"
+)
+
+// KeyboardSettingsDeclarationKindValues returns every value the Jamf API accepts for KeyboardSettingsDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func KeyboardSettingsDeclarationKindValues() []KeyboardSettingsDeclarationKind {
+	return []KeyboardSettingsDeclarationKind{
+		KeyboardSettingsDeclarationKindConfiguration,
+	}
+}
+
+// KeyboardSettingsDeclarationType is the set of values accepted by KeyboardSettingsDeclaration.Type.
+type KeyboardSettingsDeclarationType = string
+
+// KeyboardSettingsDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	KeyboardSettingsDeclarationTypeComAppleConfigurationKeyboardSettings KeyboardSettingsDeclarationType = "com.apple.configuration.keyboard.settings"
+)
+
+// KeyboardSettingsDeclarationTypeValues returns every value the Jamf API accepts for KeyboardSettingsDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func KeyboardSettingsDeclarationTypeValues() []KeyboardSettingsDeclarationType {
+	return []KeyboardSettingsDeclarationType{
+		KeyboardSettingsDeclarationTypeComAppleConfigurationKeyboardSettings,
+	}
+}
+
 // ManagedAppComponentIdentifier is the set of values accepted by ManagedAppComponent.Identifier.
 type ManagedAppComponentIdentifier = string
 
@@ -320,6 +888,48 @@ const (
 func ManagedAppComponentIdentifierValues() []ManagedAppComponentIdentifier {
 	return []ManagedAppComponentIdentifier{
 		ManagedAppComponentIdentifierComJamfDdmAppManaged,
+	}
+}
+
+// ManagedAppDeclarationKind is the set of values accepted by ManagedAppDeclaration.Kind.
+type ManagedAppDeclarationKind = string
+
+// ManagedAppDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppDeclarationKindConfiguration ManagedAppDeclarationKind = "CONFIGURATION"
+)
+
+// ManagedAppDeclarationKindValues returns every value the Jamf API accepts for ManagedAppDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppDeclarationKindValues() []ManagedAppDeclarationKind {
+	return []ManagedAppDeclarationKind{
+		ManagedAppDeclarationKindConfiguration,
+	}
+}
+
+// ManagedAppDeclarationType is the set of values accepted by ManagedAppDeclaration.Type.
+type ManagedAppDeclarationType = string
+
+// ManagedAppDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppDeclarationTypeComAppleConfigurationAppManaged ManagedAppDeclarationType = "com.apple.configuration.app.managed"
+)
+
+// ManagedAppDeclarationTypeValues returns every value the Jamf API accepts for ManagedAppDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppDeclarationTypeValues() []ManagedAppDeclarationType {
+	return []ManagedAppDeclarationType{
+		ManagedAppDeclarationTypeComAppleConfigurationAppManaged,
 	}
 }
 
@@ -393,6 +1003,77 @@ func ManagedAppEntryInstallValues() []ManagedAppEntryInstall {
 	return []ManagedAppEntryInstall{
 		ManagedAppEntryInstallRequired,
 		ManagedAppEntryInstallOptional,
+	}
+}
+
+// ManagedAppInstallBehaviorInstall is the set of values accepted by ManagedAppInstallBehavior.Install.
+type ManagedAppInstallBehaviorInstall = string
+
+// ManagedAppInstallBehaviorInstall values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppInstallBehaviorInstallOptional ManagedAppInstallBehaviorInstall = "Optional"
+	ManagedAppInstallBehaviorInstallRequired ManagedAppInstallBehaviorInstall = "Required"
+)
+
+// ManagedAppInstallBehaviorInstallValues returns every value the Jamf API accepts for ManagedAppInstallBehaviorInstall,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppInstallBehaviorInstallValues() []ManagedAppInstallBehaviorInstall {
+	return []ManagedAppInstallBehaviorInstall{
+		ManagedAppInstallBehaviorInstallOptional,
+		ManagedAppInstallBehaviorInstallRequired,
+	}
+}
+
+// ManagedAppLicenseAssignment is the set of values accepted by ManagedAppLicense.Assignment.
+type ManagedAppLicenseAssignment = string
+
+// ManagedAppLicenseAssignment values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppLicenseAssignmentDevice ManagedAppLicenseAssignment = "Device"
+	ManagedAppLicenseAssignmentUser   ManagedAppLicenseAssignment = "User"
+)
+
+// ManagedAppLicenseAssignmentValues returns every value the Jamf API accepts for ManagedAppLicenseAssignment,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppLicenseAssignmentValues() []ManagedAppLicenseAssignment {
+	return []ManagedAppLicenseAssignment{
+		ManagedAppLicenseAssignmentDevice,
+		ManagedAppLicenseAssignmentUser,
+	}
+}
+
+// ManagedAppUpdateBehaviorAutomaticAppUpdates is the set of values accepted by ManagedAppUpdateBehavior.AutomaticAppUpdates.
+type ManagedAppUpdateBehaviorAutomaticAppUpdates = string
+
+// ManagedAppUpdateBehaviorAutomaticAppUpdates values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ManagedAppUpdateBehaviorAutomaticAppUpdatesAlwaysOn      ManagedAppUpdateBehaviorAutomaticAppUpdates = "AlwaysOn"
+	ManagedAppUpdateBehaviorAutomaticAppUpdatesAlwaysOff     ManagedAppUpdateBehaviorAutomaticAppUpdates = "AlwaysOff"
+	ManagedAppUpdateBehaviorAutomaticAppUpdatesStoreSettings ManagedAppUpdateBehaviorAutomaticAppUpdates = "StoreSettings"
+)
+
+// ManagedAppUpdateBehaviorAutomaticAppUpdatesValues returns every value the Jamf API accepts for ManagedAppUpdateBehaviorAutomaticAppUpdates,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ManagedAppUpdateBehaviorAutomaticAppUpdatesValues() []ManagedAppUpdateBehaviorAutomaticAppUpdates {
+	return []ManagedAppUpdateBehaviorAutomaticAppUpdates{
+		ManagedAppUpdateBehaviorAutomaticAppUpdatesAlwaysOn,
+		ManagedAppUpdateBehaviorAutomaticAppUpdatesAlwaysOff,
+		ManagedAppUpdateBehaviorAutomaticAppUpdatesStoreSettings,
 	}
 }
 
@@ -489,6 +1170,71 @@ func NewTabStartPagePageTypeValues() []NewTabStartPagePageType {
 		NewTabStartPagePageTypeStart,
 		NewTabStartPagePageTypeHome,
 		NewTabStartPagePageTypeExtension,
+	}
+}
+
+// PackageDeclarationKind is the set of values accepted by PackageDeclaration.Kind.
+type PackageDeclarationKind = string
+
+// PackageDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PackageDeclarationKindConfiguration PackageDeclarationKind = "CONFIGURATION"
+)
+
+// PackageDeclarationKindValues returns every value the Jamf API accepts for PackageDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func PackageDeclarationKindValues() []PackageDeclarationKind {
+	return []PackageDeclarationKind{
+		PackageDeclarationKindConfiguration,
+	}
+}
+
+// PackageDeclarationType is the set of values accepted by PackageDeclaration.Type.
+type PackageDeclarationType = string
+
+// PackageDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PackageDeclarationTypeComAppleConfigurationPackage PackageDeclarationType = "com.apple.configuration.package"
+)
+
+// PackageDeclarationTypeValues returns every value the Jamf API accepts for PackageDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func PackageDeclarationTypeValues() []PackageDeclarationType {
+	return []PackageDeclarationType{
+		PackageDeclarationTypeComAppleConfigurationPackage,
+	}
+}
+
+// PackageInstallBehaviorInstall is the set of values accepted by PackageInstallBehavior.Install.
+type PackageInstallBehaviorInstall = string
+
+// PackageInstallBehaviorInstall values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	PackageInstallBehaviorInstallOptional PackageInstallBehaviorInstall = "Optional"
+	PackageInstallBehaviorInstallRequired PackageInstallBehaviorInstall = "Required"
+)
+
+// PackageInstallBehaviorInstallValues returns every value the Jamf API accepts for PackageInstallBehaviorInstall,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func PackageInstallBehaviorInstallValues() []PackageInstallBehaviorInstall {
+	return []PackageInstallBehaviorInstall{
+		PackageInstallBehaviorInstallOptional,
+		PackageInstallBehaviorInstallRequired,
 	}
 }
 
@@ -619,6 +1365,197 @@ const (
 func SafariSettingsComponentIdentifierValues() []SafariSettingsComponentIdentifier {
 	return []SafariSettingsComponentIdentifier{
 		SafariSettingsComponentIdentifierComJamfDdmSafariSettings,
+	}
+}
+
+// ScreenSharingConnectionDeclarationKind is the set of values accepted by ScreenSharingConnectionDeclaration.Kind.
+type ScreenSharingConnectionDeclarationKind = string
+
+// ScreenSharingConnectionDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScreenSharingConnectionDeclarationKindConfiguration ScreenSharingConnectionDeclarationKind = "CONFIGURATION"
+)
+
+// ScreenSharingConnectionDeclarationKindValues returns every value the Jamf API accepts for ScreenSharingConnectionDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ScreenSharingConnectionDeclarationKindValues() []ScreenSharingConnectionDeclarationKind {
+	return []ScreenSharingConnectionDeclarationKind{
+		ScreenSharingConnectionDeclarationKindConfiguration,
+	}
+}
+
+// ScreenSharingConnectionDeclarationType is the set of values accepted by ScreenSharingConnectionDeclaration.Type.
+type ScreenSharingConnectionDeclarationType = string
+
+// ScreenSharingConnectionDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScreenSharingConnectionDeclarationTypeComAppleConfigurationScreensharingConnection ScreenSharingConnectionDeclarationType = "com.apple.configuration.screensharing.connection"
+)
+
+// ScreenSharingConnectionDeclarationTypeValues returns every value the Jamf API accepts for ScreenSharingConnectionDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ScreenSharingConnectionDeclarationTypeValues() []ScreenSharingConnectionDeclarationType {
+	return []ScreenSharingConnectionDeclarationType{
+		ScreenSharingConnectionDeclarationTypeComAppleConfigurationScreensharingConnection,
+	}
+}
+
+// ScreenSharingConnectionGroupDeclarationKind is the set of values accepted by ScreenSharingConnectionGroupDeclaration.Kind.
+type ScreenSharingConnectionGroupDeclarationKind = string
+
+// ScreenSharingConnectionGroupDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScreenSharingConnectionGroupDeclarationKindConfiguration ScreenSharingConnectionGroupDeclarationKind = "CONFIGURATION"
+)
+
+// ScreenSharingConnectionGroupDeclarationKindValues returns every value the Jamf API accepts for ScreenSharingConnectionGroupDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ScreenSharingConnectionGroupDeclarationKindValues() []ScreenSharingConnectionGroupDeclarationKind {
+	return []ScreenSharingConnectionGroupDeclarationKind{
+		ScreenSharingConnectionGroupDeclarationKindConfiguration,
+	}
+}
+
+// ScreenSharingConnectionGroupDeclarationType is the set of values accepted by ScreenSharingConnectionGroupDeclaration.Type.
+type ScreenSharingConnectionGroupDeclarationType = string
+
+// ScreenSharingConnectionGroupDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScreenSharingConnectionGroupDeclarationTypeComAppleConfigurationScreensharingConnectionGroup ScreenSharingConnectionGroupDeclarationType = "com.apple.configuration.screensharing.connection.group"
+)
+
+// ScreenSharingConnectionGroupDeclarationTypeValues returns every value the Jamf API accepts for ScreenSharingConnectionGroupDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ScreenSharingConnectionGroupDeclarationTypeValues() []ScreenSharingConnectionGroupDeclarationType {
+	return []ScreenSharingConnectionGroupDeclarationType{
+		ScreenSharingConnectionGroupDeclarationTypeComAppleConfigurationScreensharingConnectionGroup,
+	}
+}
+
+// ScreenSharingDisplayConfigurationDisplayType is the set of values accepted by ScreenSharingDisplayConfiguration.DisplayType.
+type ScreenSharingDisplayConfigurationDisplayType = string
+
+// ScreenSharingDisplayConfigurationDisplayType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScreenSharingDisplayConfigurationDisplayTypeVirtual1 ScreenSharingDisplayConfigurationDisplayType = "Virtual1"
+	ScreenSharingDisplayConfigurationDisplayTypeVirtual2 ScreenSharingDisplayConfigurationDisplayType = "Virtual2"
+)
+
+// ScreenSharingDisplayConfigurationDisplayTypeValues returns every value the Jamf API accepts for ScreenSharingDisplayConfigurationDisplayType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ScreenSharingDisplayConfigurationDisplayTypeValues() []ScreenSharingDisplayConfigurationDisplayType {
+	return []ScreenSharingDisplayConfigurationDisplayType{
+		ScreenSharingDisplayConfigurationDisplayTypeVirtual1,
+		ScreenSharingDisplayConfigurationDisplayTypeVirtual2,
+	}
+}
+
+// ScreenSharingHostSettingsDeclarationKind is the set of values accepted by ScreenSharingHostSettingsDeclaration.Kind.
+type ScreenSharingHostSettingsDeclarationKind = string
+
+// ScreenSharingHostSettingsDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScreenSharingHostSettingsDeclarationKindConfiguration ScreenSharingHostSettingsDeclarationKind = "CONFIGURATION"
+)
+
+// ScreenSharingHostSettingsDeclarationKindValues returns every value the Jamf API accepts for ScreenSharingHostSettingsDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ScreenSharingHostSettingsDeclarationKindValues() []ScreenSharingHostSettingsDeclarationKind {
+	return []ScreenSharingHostSettingsDeclarationKind{
+		ScreenSharingHostSettingsDeclarationKindConfiguration,
+	}
+}
+
+// ScreenSharingHostSettingsDeclarationType is the set of values accepted by ScreenSharingHostSettingsDeclaration.Type.
+type ScreenSharingHostSettingsDeclarationType = string
+
+// ScreenSharingHostSettingsDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	ScreenSharingHostSettingsDeclarationTypeComAppleConfigurationScreensharingHostSettings ScreenSharingHostSettingsDeclarationType = "com.apple.configuration.screensharing.host.settings"
+)
+
+// ScreenSharingHostSettingsDeclarationTypeValues returns every value the Jamf API accepts for ScreenSharingHostSettingsDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func ScreenSharingHostSettingsDeclarationTypeValues() []ScreenSharingHostSettingsDeclarationType {
+	return []ScreenSharingHostSettingsDeclarationType{
+		ScreenSharingHostSettingsDeclarationTypeComAppleConfigurationScreensharingHostSettings,
+	}
+}
+
+// SiriSettingsDeclarationKind is the set of values accepted by SiriSettingsDeclaration.Kind.
+type SiriSettingsDeclarationKind = string
+
+// SiriSettingsDeclarationKind values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SiriSettingsDeclarationKindConfiguration SiriSettingsDeclarationKind = "CONFIGURATION"
+)
+
+// SiriSettingsDeclarationKindValues returns every value the Jamf API accepts for SiriSettingsDeclarationKind,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SiriSettingsDeclarationKindValues() []SiriSettingsDeclarationKind {
+	return []SiriSettingsDeclarationKind{
+		SiriSettingsDeclarationKindConfiguration,
+	}
+}
+
+// SiriSettingsDeclarationType is the set of values accepted by SiriSettingsDeclaration.Type.
+type SiriSettingsDeclarationType = string
+
+// SiriSettingsDeclarationType values accepted by the Jamf API. The alias above is a string, so
+// these constants pass to any parameter or field declared as a plain string.
+const (
+	SiriSettingsDeclarationTypeComAppleConfigurationSiriSettings SiriSettingsDeclarationType = "com.apple.configuration.siri.settings"
+)
+
+// SiriSettingsDeclarationTypeValues returns every value the Jamf API accepts for SiriSettingsDeclarationType,
+// in the order the spec declares them. Returns a fresh slice per call, so no
+// caller can corrupt the set for the rest of the process — which a package
+// level var would allow. Suits attribute validation (Terraform's
+// stringvalidator.OneOf, say) and anything that needs to enumerate the set
+// rather than name one member.
+func SiriSettingsDeclarationTypeValues() []SiriSettingsDeclarationType {
+	return []SiriSettingsDeclarationType{
+		SiriSettingsDeclarationTypeComAppleConfigurationSiriSettings,
 	}
 }
 

@@ -921,7 +921,7 @@
     },
     "description": "Jamf Compliance Benchmarks API allows you to manage, enforce, and validate compliance on Apple devices",
     "termsOfService": "https://www.jamf.com/developer-resources/api-license-agreement/",
-    "title": "Jamf Compliance Benchmarks API - Beta",
+    "title": "Jamf Compliance Benchmarks - Beta",
     "version": "latest"
   },
   "openapi": "3.0.0",

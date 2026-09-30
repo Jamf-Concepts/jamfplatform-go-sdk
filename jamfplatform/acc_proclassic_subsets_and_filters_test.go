@@ -824,18 +824,25 @@ func TestAcceptance_Classic_PatchByName(t *testing.T) {
 	ctx := context.Background()
 	p := proclassic.New(c)
 
-	// The name comes from Classic's own enumeration. This used to be sourced
-	// from Pro v3 on the grounds that v1993 had withdrawn GET /patches and
-	// the whole /patches/id family, leaving POST /patchsoftwaretitles as the
-	// only Classic verb and Classic unable to enumerate software titles at
-	// all. v2082 restored the family — ListPatches, GetPatchByID,
-	// ListPatchSoftwareTitles and GetPatchSoftwareTitleByID are all back — so
-	// that reasoning is void, and taking the name from ListPatches keeps this
-	// test inside the package it is testing: no cross-package dependency on
-	// pro, and the name is the one the /patches surface itself publishes for
-	// the title, rather than Pro v3's SoftwareTitleName which merely happens
-	// to agree. A tenant with no patch software titles configured at all is
-	// the one case that still cannot supply a fixture.
+	// The test provisions its own title rather than borrowing one. It used to
+	// take the first name ListPatches returned and skip when the list was
+	// empty — which is how the 500 assertion below silently stopped running:
+	// on an environment-scoped tenant with no patch software titles configured
+	// the skip fires, and a skipping test can never report the fix. The
+	// fixture is mintable (seedPatchSoftwareTitleFixture mints a real
+	// configuration from patch source 1's catalogue and the caller registers
+	// its cleanup), so it is minted here.
+	//
+	// The name still comes from Classic's own enumeration rather than from Pro
+	// v3, which keeps this test inside the package it is testing: the name is
+	// the one the /patches surface itself publishes for the title, rather than
+	// Pro v3's SoftwareTitleName which merely happens to agree. ListPatches is
+	// read AFTER the seed, so it is the seeded title that supplies the name.
+	seededID := seedPatchSoftwareTitleFixture(t)
+	cleanupDelete(t, "DeletePatchSoftwareTitleByID "+seededID, func() error {
+		return p.DeletePatchSoftwareTitleByID(context.Background(), seededID)
+	})
+
 	titles, err := p.ListPatches(ctx)
 	skipIfNoFixture(t, "patches (classic)", err)
 	var name string
@@ -846,7 +853,8 @@ func TestAcceptance_Classic_PatchByName(t *testing.T) {
 		}
 	}
 	if name == "" {
-		t.Skipf("no named patch software titles on tenant (%d entries) — nothing to key a by-name read on", len(titles.PatchManagementSoftwareTitles))
+		t.Fatalf("ListPatches returned %d entries and none carries a name, although a title was just seeded as id=%s — /patches is no longer enumerating configured titles",
+			len(titles.PatchManagementSoftwareTitles), seededID)
 	}
 
 	// GET /patches/name/{name} is broken outright, and this asserts that

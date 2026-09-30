@@ -695,3 +695,121 @@ func TestAcceptance_AccountListBodyShapes(t *testing.T) {
 		})
 	}
 }
+
+// isUnattributedUpstreamFault reports whether err is the deterministic 500 that
+// both v2204 deal-registration operations answer.
+//
+// It is deliberately NOT isSkywayScopeFault: the distributor surface answers 400
+// with the fault attributed in the description ("… via Skyway distributor
+// service"), while these two answer 500 with the generic "The request could not
+// be completed" and no attribution at all. Two different upstreams behind one
+// namespace, so one matcher must not cover both or a fix to either would read as
+// a fix to both.
+//
+// Matched on the code and the status together rather than the status alone: a
+// genuine 500 from some other cause must not be swallowed.
+func isUnattributedUpstreamFault(err error) bool {
+	if err == nil {
+		return false
+	}
+	var apiErr *jamfplatform.APIResponseError
+	if !errors.As(err, &apiErr) || !apiErr.HasStatus(500) {
+		return false
+	}
+	for _, d := range apiErr.Details() {
+		if d.Code == "UPSTREAM_ERROR" {
+			return true
+		}
+	}
+	return false
+}
+
+// TestAcceptance_AccountDealRegistrationItemAndCreate covers the two operations
+// GitOps v2204 added to account-partners — GET /v1/deal-registrations/{id} and
+// POST /v1/deal-registrations — and both currently answer a deterministic
+// 500 UPSTREAM_ERROR "The request could not be completed".
+//
+// Wire-classified 2026-09-18 with controls in the same invocation:
+// GET /partners/v1/deal-registrations answers 200 {"totalCount":0,"results":[]},
+// GET /licensing/v1/licenses answers 200, and a bogus path in the same namespace
+// answers 403 BAD_PERMISSIONS. So these two are routed and authorized — the
+// unrouted tell is the 403, and this is not it — and the fault is behind the
+// gateway. Reproduced 3/3 on the item read and 3/3 on the create, the latter with
+// an empty body and with a plausible fully-populated one alike, which is what
+// rules out field validation: the create never reaches it.
+//
+// The claim this test cannot settle, and says so rather than guessing: whether
+// the 500 is a service fault or the response to an organization that is not a
+// registered reseller partner. One organization credential cannot tell those
+// apart, and the empty-but-200 list is consistent with either. Settling it needs
+// a credential for a real partner organization. Report both to Jamf: a 500 is the
+// wrong answer to "you are not a partner" whichever it is, and the spec declares
+// 401/403/404/500 with no unregistered-partner case.
+//
+// It ASSERTS the 500 rather than calling skipOnServerError, because that helper
+// is right for a transient 5xx and precisely wrong for a permanent one — a
+// skipping test can never report the fix. When either operation starts answering,
+// this fails and names what to write in its place.
+//
+// Note on duration: 500 is retryable, so each call here spends the client's full
+// retry budget before returning. That is the cost of pinning a permanent 5xx
+// through a generated method, which cannot opt out of retries.
+func TestAcceptance_AccountDealRegistrationItemAndCreate(t *testing.T) {
+	ac := account.New(accOrgClient(t))
+	ctx := context.Background()
+
+	// Control in the same invocation: the collection read on the same namespace
+	// and credential. If this fails the two assertions below say nothing.
+	if _, err := ac.ListDealRegistrations(ctx); err != nil {
+		t.Fatalf("ListDealRegistrations (control): %v", err)
+	}
+
+	// An identifier that cannot exist. On a working service this would be the
+	// 404 DealRegistrationNotFound the spec declares.
+	const noSuchRegistration = "00000000-0000-4000-8000-000000000000"
+	switch _, err := ac.GetDealRegistration(ctx, noSuchRegistration); {
+	case err == nil:
+		t.Errorf("GetDealRegistration returned a registration for %s, which cannot exist", noSuchRegistration)
+	case isUnattributedUpstreamFault(err):
+		t.Logf("GetDealRegistration: KNOWN FAULT, asserted not tolerated — deterministic 500 UPSTREAM_ERROR: %v", err)
+	default:
+		t.Errorf("GetDealRegistration no longer answers 500 UPSTREAM_ERROR (err=%v). "+
+			"If it now 404s for a nonexistent identifier the operation is fixed: replace this branch with "+
+			"a 404 assertion, add a real round-trip against an identifier from ListDealRegistrations, and "+
+			"update the account-partners section of docs/WIRE-FACTS.md", err)
+	}
+
+	// The create is probed with the minimum body the spec's own required set
+	// implies. It creates nothing while the fault stands, and there is no DELETE
+	// on this resource in any published spec — so when the fault lifts, whoever
+	// writes the replacement coverage must gate a real create behind an opt-in
+	// rather than letting the suite submit a deal registration to Jamf on every
+	// run.
+	//
+	// Every field on DealRegistrationCreate is a pointer, because the spec
+	// declares no `required` set on the create body at all — so the SDK cannot
+	// tell a caller what a valid submission needs, and neither can the server
+	// while it 500s before validating. Worth reporting upstream on its own.
+	req := &account.DealRegistrationCreate{
+		FirstName:          ptr("SDK"),
+		LastName:           ptr("Acceptance"),
+		Email:              ptr("sdk-acceptance@example.invalid"),
+		OrganizationName:   ptr("SDK Acceptance Probe"),
+		NewCustomer:        ptr(true),
+		EmployeeStudentCnt: ptr(10),
+	}
+	switch created, err := ac.CreateDealRegistration(ctx, req); {
+	case err == nil:
+		t.Errorf("CreateDealRegistration SUCCEEDED (id=%q) where it has answered 500 since v2204 published it. "+
+			"A deal registration has no delete on any published surface, so this run has left a permanent "+
+			"record: tell Jamf, then rewrite this test to gate the create behind an explicit opt-in and "+
+			"assert the Location header and the DealRegistrationCreated {id, href} shape", created.ID)
+	case isUnattributedUpstreamFault(err):
+		t.Logf("CreateDealRegistration: KNOWN FAULT, asserted not tolerated — deterministic 500 UPSTREAM_ERROR: %v", err)
+	default:
+		t.Errorf("CreateDealRegistration no longer answers 500 UPSTREAM_ERROR (err=%v). "+
+			"A 4xx here would mean the create now reaches field validation, which is progress worth "+
+			"pinning: replace this branch with assertions on the validation verdict and update the "+
+			"account-partners section of docs/WIRE-FACTS.md", err)
+	}
+}

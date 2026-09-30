@@ -1267,7 +1267,12 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 	preview := isPreview(op)
 
 	if op.Summary != "" {
-		m.Comment = opDef.Name + " " + lowerFirst(cleanComment(stripPreviewPrefix(op.Summary, preview)))
+		// Both state prefixes come off before the sentence is built. Jamf
+		// prepends "Preview - " (v2192) and "Deprecated - " (v2267) to the
+		// summary, and the summary IS the godoc sentence — each state is
+		// emitted as its own paragraph below instead.
+		summary := stripDeprecatedPrefix(stripPreviewPrefix(op.Summary, preview), op.Deprecated)
+		m.Comment = opDef.Name + " " + lowerFirst(cleanComment(summary))
 	}
 
 	// The preview marker is its own godoc sentence rather than part of the

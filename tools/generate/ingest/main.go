@@ -92,7 +92,8 @@ type specRow struct {
 	dest string
 	dir  string
 	// title is a case-insensitive fragment of info.title that the archive
-	// member must carry. It is the executable half of "map by title, not by
+	// member must carry, and when several rows' fragments occur in one title
+	// the longest wins (see titleOwner). It is the executable half of "map by title, not by
 	// directory name": a renamed or swapped directory fails the run instead of
 	// silently replacing a spec with an unrelated API.
 	title string
@@ -116,25 +117,25 @@ type specRow struct {
 // and copying that one silently replaces the spec), and
 // securitycloud-uem-connect-api.yaml comes from uem-connect.
 var specs = []specRow{
-	{dest: "openapi-jpapi.yaml", dir: "jpapi", title: "Jamf Pro API"},
-	{dest: "Classic-openapi.yaml", dir: "capi", title: "Classic API"},
-	{dest: "blueprints-api.yaml", dir: "blueprints", title: "Blueprints API"},
-	{dest: "device-groups-api.yaml", dir: "device-groups", title: "Device Groups API"},
-	{dest: "device-inventory-api.yaml", dir: "devices", title: "Device Inventory API"},
-	{dest: "device-management-actions-api.yaml", dir: "device-management-action", title: "Device Management Actions API"},
-	{dest: "Declaration-reporting-openapi.yaml", dir: "declaration-reporting", title: "Declaration Reporting Service API"},
-	{dest: "jamf-compliance-benchmark-engine-api.yaml", dir: "compliance-benchmarks", title: "Compliance Benchmarks API"},
-	{dest: "securitycloud-dns-api.yaml", dir: "jsc-dns", title: "Security Cloud DNS API"},
-	{dest: "securitycloud-ztna-api.yaml", dir: "jsc-ztna", title: "ZTNA Public API"},
-	{dest: "securitycloud-categories-api.yaml", dir: "jsc-categories", title: "JSC Categories API"},
-	{dest: "securitycloud-uem-connect-api.yaml", dir: "uem-connect", title: "UEM Connect API"},
-	{dest: "securitycloud-enrollment-api.yaml", dir: "securitycloud-enrollment", title: "Security Cloud Enrollment API"},
-	{dest: "securitycloud-device-groups-api.yaml", dir: "securitycloud-devices", title: "Security Cloud Devices API"},
-	{dest: "ai-governance-api.yaml", dir: "ai-governance", title: "AI Governance Policies API"},
-	{dest: "audit-api.yaml", dir: "audit", title: "Audit API"},
-	{dest: "account-licensing-api.yaml", dir: "account-licensing", title: "Jamf Account Licensing API"},
-	{dest: "account-partners-api.yaml", dir: "account-partners", title: "Jamf Account Partners API"},
-	{dest: "account-sso-api.yaml", dir: "account-sso", title: "Jamf Account SSO API"},
+	{dest: "openapi-jpapi.yaml", dir: "jpapi", title: "Jamf Pro"},
+	{dest: "Classic-openapi.yaml", dir: "capi", title: "Jamf Pro Classic"},
+	{dest: "blueprints-api.yaml", dir: "blueprints", title: "Blueprints"},
+	{dest: "device-groups-api.yaml", dir: "device-groups", title: "Device Groups"},
+	{dest: "device-inventory-api.yaml", dir: "devices", title: "Device Inventory"},
+	{dest: "device-management-actions-api.yaml", dir: "device-management-action", title: "Device Management Actions"},
+	{dest: "Declaration-reporting-openapi.yaml", dir: "declaration-reporting", title: "Declaration Reporting Service"},
+	{dest: "jamf-compliance-benchmark-engine-api.yaml", dir: "compliance-benchmarks", title: "Compliance Benchmarks"},
+	{dest: "securitycloud-dns-api.yaml", dir: "jsc-dns", title: "Security Cloud DNS"},
+	{dest: "securitycloud-ztna-api.yaml", dir: "jsc-ztna", title: "ZTNA Public"},
+	{dest: "securitycloud-categories-api.yaml", dir: "jsc-categories", title: "JSC Categories"},
+	{dest: "securitycloud-uem-connect-api.yaml", dir: "uem-connect", title: "UEM Connect"},
+	{dest: "securitycloud-enrollment-api.yaml", dir: "securitycloud-enrollment", title: "Security Cloud Enrollment"},
+	{dest: "securitycloud-device-groups-api.yaml", dir: "securitycloud-devices", title: "Security Cloud Devices"},
+	{dest: "ai-governance-api.yaml", dir: "ai-governance", title: "AI Governance"},
+	{dest: "audit-api.yaml", dir: "audit", title: "Audit"},
+	{dest: "account-licensing-api.yaml", dir: "account-licensing", title: "Jamf Account Licensing"},
+	{dest: "account-partners-api.yaml", dir: "account-partners", title: "Jamf Account Partners"},
+	{dest: "account-sso-api.yaml", dir: "account-sso", title: "Jamf Account SSO"},
 }
 
 // knownUnmapped are external/ families the SDK deliberately does not carry.
@@ -143,6 +144,11 @@ var specs = []specRow{
 var knownUnmapped = map[string]string{
 	"users": "User Inventory API — prod-published with real privileges, but every path 404s; " +
 		"platform-users-directory is flag-gated to dev.",
+	"account-organization": "Jamf Account Organization API (environments and tenants) — first published at v2362, " +
+		"but the prod gateway does not mount /organization at all: every path answers the same plain-text " +
+		"404 page not found as a nonsense namespace, on an organization credential that reads " +
+		"/licensing/v1/licenses at 200 in the same invocation (2026-09-30). No x-required-privileges, no " +
+		"routes.yaml entry and no capability in the published permissions map either.",
 }
 
 // permissionFiles are the privilege oracle, copied alongside the specs. They
@@ -494,9 +500,9 @@ func ingest(a *archive, env, destDir string, selected map[string]bool, mf *manif
 		if err != nil {
 			return nil, nil, fmt.Errorf("family %q: %w", s.dir, err)
 		}
-		if !strings.Contains(strings.ToLower(title), strings.ToLower(s.title)) {
+		if owner := titleOwner(title); owner != s.dest {
 			return nil, nil, fmt.Errorf(
-				"family %q: info.title is %q, which does not contain %q.\n"+
+				"family %q: info.title is %q, which does not contain %q (or a longer row's fragment claims it).\n"+
 					"Either the archive renamed the directory (find the family by title and fix "+
 					"the provenance table, here and in CLAUDE.md) or this row now points at an "+
 					"unrelated API — copying it would silently replace %s",
@@ -553,6 +559,24 @@ func ingest(a *archive, env, destDir string, selected map[string]bool, mf *manif
 		rows = append(rows, r)
 	}
 	return rows, writes, nil
+}
+
+// titleOwner returns the dest of the row whose title fragment best matches
+// title: the longest fragment it contains, case-insensitively. Longest wins
+// because fragments nest — v2362 dropped the " API" suffix from every title,
+// leaving jpapi as "Jamf Pro" and capi as "Jamf Pro Classic", so plain
+// containment would let a capi spec sitting under the jpapi directory pass
+// the jpapi row's check. Empty when no fragment matches.
+func titleOwner(title string) string {
+	lt := strings.ToLower(title)
+	best, bestLen := "", 0
+	for _, s := range specs {
+		f := strings.ToLower(s.title)
+		if strings.Contains(lt, f) && len(f) > bestLen {
+			best, bestLen = s.dest, len(f)
+		}
+	}
+	return best
 }
 
 // summarize reads info.title, info.version and the path/operation counts.

@@ -789,6 +789,7 @@ const (
 	ConnectorConfigDeviceUnmanagedThreshold5  ConnectorConfigDeviceUnmanagedThreshold = 5
 	ConnectorConfigDeviceUnmanagedThreshold7  ConnectorConfigDeviceUnmanagedThreshold = 7
 	ConnectorConfigDeviceUnmanagedThreshold14 ConnectorConfigDeviceUnmanagedThreshold = 14
+	ConnectorConfigDeviceUnmanagedThreshold30 ConnectorConfigDeviceUnmanagedThreshold = 30
 )
 
 // ConnectorConfigDeviceUnmanagedThresholdValues returns every value the Jamf API accepts for ConnectorConfigDeviceUnmanagedThreshold,
@@ -805,6 +806,7 @@ func ConnectorConfigDeviceUnmanagedThresholdValues() []ConnectorConfigDeviceUnma
 		ConnectorConfigDeviceUnmanagedThreshold5,
 		ConnectorConfigDeviceUnmanagedThreshold7,
 		ConnectorConfigDeviceUnmanagedThreshold14,
+		ConnectorConfigDeviceUnmanagedThreshold30,
 	}
 }
 
@@ -1353,6 +1355,7 @@ const (
 	SyncSettingsDeviceUnmanagedThreshold5  SyncSettingsDeviceUnmanagedThreshold = 5
 	SyncSettingsDeviceUnmanagedThreshold7  SyncSettingsDeviceUnmanagedThreshold = 7
 	SyncSettingsDeviceUnmanagedThreshold14 SyncSettingsDeviceUnmanagedThreshold = 14
+	SyncSettingsDeviceUnmanagedThreshold30 SyncSettingsDeviceUnmanagedThreshold = 30
 )
 
 // SyncSettingsDeviceUnmanagedThresholdValues returns every value the Jamf API accepts for SyncSettingsDeviceUnmanagedThreshold,
@@ -1369,6 +1372,7 @@ func SyncSettingsDeviceUnmanagedThresholdValues() []SyncSettingsDeviceUnmanagedT
 		SyncSettingsDeviceUnmanagedThreshold5,
 		SyncSettingsDeviceUnmanagedThreshold7,
 		SyncSettingsDeviceUnmanagedThreshold14,
+		SyncSettingsDeviceUnmanagedThreshold30,
 	}
 }
 
