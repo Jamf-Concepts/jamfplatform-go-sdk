@@ -3867,7 +3867,7 @@ operation, where before there was only a document-level flag and prose — and
 prefixed all twelve summaries with `Preview - `. Since the summary becomes the
 method's godoc sentence, that prefix is the reason the generator now carries
 preview as its own doc line; mechanism in
-[CLAUDE.md](../CLAUDE.md#current-position-and-holds). It also deleted
+[INGEST-HISTORY.md](INGEST-HISTORY.md) (v2192). It also deleted
 `x-preview-owners: [ai-policy-builder-backend]`, an internal service name
 `api/ai_governance_policies_api.json` had been publishing.
 

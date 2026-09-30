@@ -26,7 +26,7 @@ import (
 // AI Governance is environment-scoped: X-Environment-Id is required: true and the
 // gateway accepts the header for this product. Note the namespace is
 // ai/governance/policies with slashes — every published spec says
-// `ai-governance`, which the gateway 404s. See CLAUDE.md.
+// `ai-governance`, which the gateway 404s. See docs/WIRE-FACTS.md.
 //
 // Everything asserted here was probed against a live EU environment on
 // 2026-08-30; where the server contradicts the spec the wire wins and the
@@ -798,7 +798,7 @@ func TestAcceptance_AiGovernancePolicyLifecycle(t *testing.T) {
 // The test cross-references the two APIs off existing environment state rather
 // than building a fixture, and FAILS when the endpoint starts working — that is
 // the point. When it does, delete the inversion, keep the assertion, and drop
-// the note from CLAUDE.md. Do not weaken it to a skip: a silently empty
+// the row from CLAUDE.md's disagreements table. Do not weaken it to a skip: a silently empty
 // response is exactly what went unnoticed until it was probed by hand.
 func TestAcceptance_AiGovernanceDeploymentReportsReferencingBlueprints(t *testing.T) {
 	c := accEnvClient(t)

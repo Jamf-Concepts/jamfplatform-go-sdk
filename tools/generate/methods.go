@@ -1456,7 +1456,7 @@ func buildMethod(doc *openapi3.T, spec SpecDef, opDef OperationDef, enumTypes ma
 		//
 		// This is deliberately an operation-level override and not a spec
 		// patch: the disagreement is about what the server does, so it is
-		// recorded where the wire evidence is cited (CLAUDE.md) and deleted in
+		// recorded where the wire evidence is cited (docs/WIRE-FACTS.md) and deleted in
 		// one line when the server or the spec changes. A patched schema would
 		// instead shadow the corrected declaration silently.
 		if elem, isSlice := strings.CutPrefix(opDef.ResponseType, "[]"); isSlice {

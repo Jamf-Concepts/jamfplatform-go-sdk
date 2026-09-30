@@ -75,7 +75,7 @@ func jscCleanupDelete(t *testing.T, label string, fn func() error) {
 // So the ID is the only usable member, and this asserts that emptiness on
 // purpose. It will fail the day the gateway stops varying the body by encoding,
 // which is the signal to flip it into a real href assertion and to drop the
-// caveat from CLAUDE.md.
+// row from CLAUDE.md's disagreements table.
 func assertCreateHrefEmpty(t *testing.T, href, what string) {
 	t.Helper()
 	if href != "" {

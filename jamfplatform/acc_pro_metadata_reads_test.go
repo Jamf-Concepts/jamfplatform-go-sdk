@@ -70,7 +70,7 @@ func TestAcceptance_Pro_MiscReadsV1(t *testing.T) {
 	// had a rule in the gateway's authorization policy, so it answered 403
 	// BAD_PERMISSIONS for every credential this suite has ever used. With the
 	// path gone from the spec the SDK no longer generates GetEnvironmentTypeV2,
-	// and there is nothing left to assert. See the GA cleanup notes in CLAUDE.md.
+	// and there is nothing left to assert. See "The GA withdrawal" in docs/WIRE-FACTS.md.
 
 	cloud, err := p.GetCloudInformationV1(ctx)
 	if err != nil {
