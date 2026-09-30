@@ -429,3 +429,30 @@ func stripPreviewPrefix(summary string, preview bool) string {
 	}
 	return previewSummaryPrefixRe.ReplaceAllString(summary, "")
 }
+
+// deprecatedSummaryPrefixRe matches the state prefix Jamf prepends to an
+// operation summary when the endpoint is deprecated — the exact counterpart of
+// previewSummaryPrefixRe, separators included. GitOps v2267 introduced it on
+// 22 jpapi and 4 capi summaries, and the summary is what becomes the method's
+// godoc sentence, so the prefix has to come off or every one of those methods
+// reads "GetActivationCode deprecated - finds the Jamf Pro activation code."
+var deprecatedSummaryPrefixRe = regexp.MustCompile(`^\s*Deprecated\s*[-–—:]\s*`)
+
+// stripDeprecatedPrefix removes that prefix, but only when the operation
+// actually declares deprecated: true. The gate is the structured field for the
+// same reason stripPreviewPrefix gates on the extension: a summary that
+// legitimately begins with the word — "Deprecated fields are omitted from this
+// report" — survives intact on an operation the spec never marked deprecated,
+// and the strip can never rewrite prose on the strength of one word.
+//
+// It deliberately does NOT touch the older inline forms 20 other capi
+// summaries carry — "Finds all patches (Deprecated - Please transition use
+// to …)". Those are mid-sentence prose, they predate the prefix convention,
+// and they render as valid godoc; only the leading state prefix breaks the
+// sentence.
+func stripDeprecatedPrefix(summary string, deprecated bool) string {
+	if !deprecated {
+		return summary
+	}
+	return deprecatedSummaryPrefixRe.ReplaceAllString(summary, "")
+}

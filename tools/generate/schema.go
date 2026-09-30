@@ -1114,8 +1114,14 @@ func hoistInlineObjectsInSchema(parentName string, schema *openapi3.Schema, doc 
 			return false
 		}
 		inlineObject := hasObjShape(v) || isRefUnion(v)
+		// An inline oneOf-of-refs as array items is hoisted like an inline
+		// object, so the element gets a name extractTypes can build a union
+		// from. Left inline it reaches schemaRefToGoType's default branch and
+		// the field becomes []any, with every variant emitted as a type no
+		// field references — blueprints' DeclarationsComponentConfiguration
+		// (v2362) was that shape, eleven declaration types behind []any.
 		inlineArrayOfObject := v.Type.Is("array") && v.Items != nil && v.Items.Ref == "" &&
-			hasObjShape(v.Items.Value)
+			(hasObjShape(v.Items.Value) || isInlineItemUnion(v.Items.Value))
 		if !inlineObject && !inlineArrayOfObject {
 			return ref
 		}
@@ -1762,6 +1768,21 @@ func extractTypes(doc *openapi3.T, allow map[string]*schemaUsage, format string)
 			continue
 		}
 
+		// A pure map — additionalProperties and no properties of its own — is
+		// a map alias. schemaToGoType would build a struct with no fields, and
+		// the template renders a field-less, enum-less type as `= string`, so
+		// blueprints' AppSettingsPermissionDefaultsMap (v2362) came out as a
+		// string that cannot decode the object the wire carries.
+		if len(schema.Properties) == 0 && schema.AdditionalProperties.Schema != nil && format != "xml" {
+			target := "map[string]" + schemaRefToGoType(schema.AdditionalProperties.Schema)
+			comment := fmt.Sprintf("%s is a map of %s.", name, target)
+			if schema.Description != "" {
+				comment = name + " " + lowerFirst(cleanComment(schema.Description))
+			}
+			types = append(types, GoType{Name: name, AliasTarget: target, Comment: comment})
+			continue
+		}
+
 		t := schemaToGoType(name, schema, usage.isRequest, format)
 		t.XMLName = xmlName
 		types = append(types, t)
@@ -2084,10 +2105,17 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 			return
 		}
 		byType[typeName] = len(gt.Discriminator.Variants)
+		// A content-addressed value ("com.apple.configuration.package") makes
+		// a field name that restates the reverse-DNS prefix on every variant;
+		// the schema name says the same thing and is already an identifier.
+		fieldName := exportedGoName(value)
+		if strings.Contains(value, ".") {
+			fieldName = typeName
+		}
 		gt.Discriminator.Variants = append(gt.Discriminator.Variants, GoDiscriminatorVariant{
 			Values:    []string{value},
 			TypeName:  typeName,
-			FieldName: exportedGoName(value),
+			FieldName: fieldName,
 		})
 	}
 	for _, mapKey := range sortedMapKeys(schema.Discriminator.Mapping) {
@@ -2111,15 +2139,22 @@ func schemaToDiscriminatorType(name string, schema *openapi3.Schema) GoType {
 
 // unionSchema reports the schema to build a discriminated union from, or nil
 // when this schema is not one. The declared discriminator wins; a missing one is
-// inferred. Content-addressed mappings ("com.jamf.ddm.*") are refused either
-// way — those keys are routing identifiers, not Go-safe type tags — and fall
-// through to normal struct generation.
+// inferred. Content-addressed mappings ("com.jamf.ddm.*") are refused on an
+// *envelope* — a schema with properties of its own — and fall through to
+// normal struct generation. That is blueprints' Component: identifier plus a
+// configuration the consumer decodes from json.RawMessage, a shape
+// terraform-provider-jamfplatform is built on and that must not flip to a
+// union. A declared discriminator on a *pure* union has no such fallback — with
+// no properties the struct it would fall to has no fields and renders as a
+// string alias — so there the dotted keys are accepted and the variant fields
+// are named after their schemas rather than the keys (see
+// schemaToDiscriminatorType). v2362's declaration items are the first case.
 func unionSchema(name string, schema *openapi3.Schema) *openapi3.Schema {
 	if schema == nil || len(schema.OneOf) == 0 {
 		return nil
 	}
 	if schema.Discriminator != nil {
-		if hasContentAddressedDiscriminator(schema) {
+		if hasContentAddressedDiscriminator(schema) && len(schema.Properties) > 0 {
 			return nil
 		}
 		return schema
@@ -2373,6 +2408,25 @@ func isRefUnion(s *openapi3.Schema) bool {
 	if (s.Type != nil && len(*s.Type) > 0) || len(s.Properties) > 0 ||
 		len(s.AllOf) > 0 || len(s.AnyOf) > 0 || len(s.Enum) > 0 ||
 		s.Discriminator != nil || s.AdditionalProperties.Schema != nil {
+		return false
+	}
+	for _, m := range s.OneOf {
+		if m == nil || m.Ref == "" {
+			return false
+		}
+	}
+	return true
+}
+
+// isInlineItemUnion reports whether an array's inline items are a oneOf over
+// named schemas and nothing else — with or without a discriminator, which is
+// the one sibling isRefUnion refuses. Hoisting such items gives the element a
+// name; extractTypes then decides between a discriminated union, a typed union
+// and a merge exactly as it would for a named component.
+func isInlineItemUnion(s *openapi3.Schema) bool {
+	if s == nil || len(s.OneOf) < 2 || len(s.Properties) > 0 ||
+		(s.Type != nil && len(*s.Type) > 0 && !s.Type.Is("object")) ||
+		len(s.AllOf) > 0 || len(s.AnyOf) > 0 || s.AdditionalProperties.Schema != nil {
 		return false
 	}
 	for _, m := range s.OneOf {
