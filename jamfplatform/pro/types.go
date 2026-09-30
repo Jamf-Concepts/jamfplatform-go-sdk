@@ -5959,61 +5959,6 @@ type ObjectHistoryV1 struct {
 	Username string  `json:"username"`
 }
 
-// OidcBrokerConfig The tenant's currently selected OIDC broker IdP configuration. Secret fields (clientSecret, privateKeyJwt) are never included in the response. The three enum-valued fields are always present but may be null — an unrecognized value from a newer authentication service is read as null rather than failing the response.
-type OidcBrokerConfig struct {
-	// A broker configuration carries ADMIN_SSO; an update preserves whatever is already stored rather than
-	// replacing it. The other values exist for non-broker IdP configurations.
-	// Allowed values: see the OidcBrokerConfigCapabilities constants.
-	Capabilities []string `json:"capabilities"`
-	// Read this before updating to determine whether an update changes the client authentication method,
-	// which requires supplying the new method's credential.
-	// Allowed values: see the OidcBrokerConfigClientAuthMethod constants.
-	ClientAuthMethod *string `json:"clientAuthMethod,omitempty"`
-	ClientID         string  `json:"clientId"`
-	// Allowed values: see the OidcBrokerConfigClientType constants.
-	ClientType   *string    `json:"clientType,omitempty"`
-	CreatedAt    *time.Time `json:"createdAt,omitempty"`
-	DiscoveryURL string     `json:"discoveryUrl"`
-	Enabled      bool       `json:"enabled"`
-	ID           string     `json:"id"`
-	// Allowed values: see the OidcBrokerConfigProductUserMapping constants.
-	ProductUserMapping   *string    `json:"productUserMapping,omitempty"`
-	ProductUsernameClaim string     `json:"productUsernameClaim"`
-	RedirectUris         []string   `json:"redirectUris"`
-	Scopes               []string   `json:"scopes"`
-	UpdatedAt            *time.Time `json:"updatedAt,omitempty"`
-}
-
-// OidcBrokerConfigUpdate Full-replacement update of the tenant's broker IdP configuration. The config to update is the tenant's stored broker selection; it is not part of this body. Every non-secret field is replaced with the value sent here, so all of them must be supplied on every update; only the secret fields are kept when omitted — except when this request changes clientAuthMethod, which requires the new method's credential to be supplied. The clientType (always CONFIDENTIAL) is set by Jamf Pro, and the capabilities and redirect URIs are carried over from the stored configuration unchanged; none of the three can be supplied here.
-type OidcBrokerConfigUpdate struct {
-	// Selects which credential the authentication service stores and which it clears — the credential
-	// belonging to the other method is discarded. Changing this value therefore requires the new method's
-	// credential in the same request.
-	// Allowed values: see the OidcBrokerConfigUpdateClientAuthMethod constants.
-	ClientAuthMethod string `json:"clientAuthMethod"`
-	ClientID         string `json:"clientId"`
-	// Omit to keep the currently stored secret; supply to rotate it. Required when this request changes
-	// clientAuthMethod to CLIENT_SECRET, or when clientAuthMethod is CLIENT_SECRET and no secret is
-	// currently stored.
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
-	// can supply a value on update.
-	ClientSecret *string `json:"clientSecret,omitempty"`
-	DiscoveryURL string  `json:"discoveryUrl"`
-	// Required. The authentication service replaces this value on every update, so omitting it would
-	// silently re-enable a disabled configuration.
-	Enabled bool `json:"enabled"`
-	// Omit to keep the currently stored key; supply to rotate it. Required when this request changes
-	// clientAuthMethod to PRIVATE_KEY_JWT, or when clientAuthMethod is PRIVATE_KEY_JWT and no key is
-	// currently stored.
-	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
-	// can supply a value on update.
-	PrivateKeyJwt *string `json:"privateKeyJwt,omitempty"`
-	// Allowed values: see the OidcBrokerConfigUpdateProductUserMapping constants.
-	ProductUserMapping   string   `json:"productUserMapping"`
-	ProductUsernameClaim *string  `json:"productUsernameClaim,omitempty"`
-	Scopes               []string `json:"scopes"`
-}
-
 // OidcDirectIdpLoginSkipURL represents a oidc direct idp login skip u r l.
 type OidcDirectIdpLoginSkipURL struct {
 	// Direct IdP login URL to skip unified login page.

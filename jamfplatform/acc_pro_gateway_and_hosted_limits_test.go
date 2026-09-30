@@ -267,29 +267,33 @@ func TestAcceptance_Pro_SendMacOsManagedSoftwareUpdatesV1SupersededByPlans(t *te
 	}
 }
 
-// The three operations v2154 (Jamf Pro API 11.32.0) added are published and
-// unrouted. The gateway's authorization policy carried no allow rule for any of
-// them on 2026-09-10 — its Pro dismiss-notifications policy covered only the
-// `{type}/{id}` variant, and its Pro SSO-settings policy had a rule for every
-// other `/v3/sso/*` sibling but not `oidc-broker-config` — and a policy change
-// adding authz rules for the three new 11.32 endpoints is open with that same
-// reading in its own body. So the SDK reaches them and the gateway
-// does not, which the tests below pin.
+// Of the three operations v2154 (Jamf Pro API 11.32.0) added, all three were
+// published and unrouted, and ONE is left to pin. The gateway's authorization
+// policy carried no allow rule for any of them on 2026-09-10 — its Pro
+// dismiss-notifications policy covered only the `{type}/{id}` variant, and its
+// Pro SSO-settings policy had a rule for every other `/v3/sso/*` sibling but
+// not `oidc-broker-config` — and a policy change adding authz rules for the
+// three was open with that same reading in its own body.
 //
-// Wire-classified 2026-09-10 against eu.api.jamfcloud.com under environment
-// scope, with `GET /pro/v1/jamf-pro-version` at 200 and a bogus path in the
-// same namespace at 403 BAD_PERMISSIONS as controls in the same invocation, and
-// each 403 reproduced on a second round. The credential is NOT short of either
-// capability, which is what makes this a routing gap rather than a grant:
-// `GET /pro/v3/sso/dependencies` (sso-settings:read) answers 200, and the
-// routed item-level `DELETE /pro/v1/notifications/{type}/{id}`
-// (dismiss-notifications:execute) answers 204.
+// That change never merged, and v2267 resolved two of the three in the other
+// direction: `GET` and `PUT /v3/sso/oidc-broker-config` were WITHDRAWN from the
+// published spec — from `external/`, `internal/stage` AND `internal/dev`, so a
+// genuine source withdrawal rather than the publishing filter — and from the
+// same bundle's `_permissions/routes.yaml`. The SDK followed, so
+// GetSsoOidcBrokerConfigV3 and UpdateSsoOidcBrokerConfigV3 no longer exist and
+// the two tests that pinned them are gone with the methods. Re-confirmed
+// unrouted on the wire at v2267 before the withdrawal was taken (2026-09-19,
+// 403 BAD_PERMISSIONS 2/2 on an 11.32.0 tenant, with
+// `GET /pro/v3/sso/dependencies` — same sso-settings:read — at 200 and a bogus
+// path in the same namespace at 403 as controls in the same invocation), so
+// removing them cost no reachable capability.
 //
-// Two of the three are writes against shared tenant state, and a pin issues its
-// request BEFORE it can inspect the refusal — so the mutation happens the moment
-// the pending rule deploys, not when the assertion runs. Each of those two is
-// therefore behind its own opt-in gate, and only the harmless
-// `GET /v3/sso/oidc-broker-config` pin runs unconditionally.
+// `DELETE /v1/notifications` survives in the spec and is still unrouted: the
+// policy's only `/v1/notifications` rules on origin/main remain `GET` on the
+// collection and `DELETE` on `{type}/{id}`. The pin below is what reports the
+// rule landing. It is gated because it issues its request BEFORE it can inspect
+// the refusal, so the mutation happens the moment the rule deploys, not when
+// the assertion runs.
 
 // TestAcceptance_Pro_DismissAllNotificationsUnroutedAtGateway pins
 // DELETE /v1/notifications.
@@ -315,70 +319,5 @@ func TestAcceptance_Pro_DismissAllNotificationsUnroutedAtGateway(t *testing.T) {
 	skipOnServerError(t, err)
 	if !gatewayUnrouted(t, "DismissAllNotificationsV1", err) {
 		t.Fatalf("DismissAllNotificationsV1 failed for an unexpected reason: %v", err)
-	}
-}
-
-// TestAcceptance_Pro_SsoOidcBrokerConfigUnroutedAtGateway pins
-// GET /v3/sso/oidc-broker-config.
-//
-// The read is ungated because it mutates nothing. The PUT that shares the same
-// missing rego rule is pinned separately, in
-// TestAcceptance_Pro_SsoOidcBrokerConfigUpdateUnroutedAtGateway, because it is a
-// write — the two will start routing together, so whichever of the pair runs
-// reports the rule landing.
-func TestAcceptance_Pro_SsoOidcBrokerConfigUnroutedAtGateway(t *testing.T) {
-	c := accClient(t)
-
-	_, err := pro.New(c).GetSsoOidcBrokerConfigV3(context.Background())
-	if err == nil {
-		t.Fatal("GetSsoOidcBrokerConfigV3 now answers — the gateway has started routing " +
-			"GET /pro/v3/sso/oidc-broker-config. Replace this test with real coverage: assert the " +
-			"returned OidcBrokerConfig, and that no secret field is populated (the spec says " +
-			"clientSecret and privateKeyJwt are never returned).")
-	}
-	skipOnServerError(t, err)
-	if !gatewayUnrouted(t, "GetSsoOidcBrokerConfigV3", err) {
-		t.Fatalf("GetSsoOidcBrokerConfigV3 failed for an unexpected reason: %v", err)
-	}
-}
-
-// TestAcceptance_Pro_SsoOidcBrokerConfigUpdateUnroutedAtGateway pins
-// PUT /v3/sso/oidc-broker-config.
-//
-// Gated, and it has to be. The operation is a FULL REPLACEMENT of a
-// tenant-level singleton — OidcBrokerConfigUpdate's own godoc says every
-// omitted non-secret field is discarded and that `enabled` is replaced on every
-// update — so the day the rule deploys, this probe's body becomes the tenant's
-// OIDC broker configuration, with SSO disabled. The read-current-and-send-it-
-// back form that TestAcceptance_Pro_CacheSettings_UpdateV1RefusedOnHostedTenant
-// uses is not available here either, because the GET is unrouted too and
-// returns no secrets even once it is routed.
-//
-// The body is still the spec's six required fields with enabled:false and a
-// throwaway client id, so that under the opt-in the test fails on the
-// unexpected success rather than on a partial write.
-func TestAcceptance_Pro_SsoOidcBrokerConfigUpdateUnroutedAtGateway(t *testing.T) {
-	requireWriteOptIn(t, "JAMFPLATFORM_ACC_PRO_SSO_WRITE_OK",
-		"a routed PUT replaces the shared tenant's whole OIDC broker configuration and disables it")
-	c := accClient(t)
-
-	err := pro.New(c).UpdateSsoOidcBrokerConfigV3(context.Background(), &pro.OidcBrokerConfigUpdate{
-		ClientAuthMethod:   "CLIENT_SECRET",
-		ClientID:           "sdk-acc-unrouted-probe",
-		DiscoveryURL:       "https://example.invalid/.well-known/openid-configuration",
-		Enabled:            false,
-		ProductUserMapping: "EMAIL",
-		Scopes:             []string{"openid"},
-	})
-	if err == nil {
-		t.Fatal("UpdateSsoOidcBrokerConfigV3 accepted a write — the gateway has started routing " +
-			"PUT /pro/v3/sso/oidc-broker-config AND this probe body was applied to the tenant's " +
-			"broker configuration. Check the tenant's SSO settings, then replace this test with " +
-			"coverage that reads the current config and round-trips it unchanged, still behind " +
-			"JAMFPLATFORM_ACC_PRO_SSO_WRITE_OK.")
-	}
-	skipOnServerError(t, err)
-	if !gatewayUnrouted(t, "UpdateSsoOidcBrokerConfigV3", err) {
-		t.Fatalf("UpdateSsoOidcBrokerConfigV3 failed for an unexpected reason: %v", err)
 	}
 }

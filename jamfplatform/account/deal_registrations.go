@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/jamf/jamfplatform-go-sdk/internal/client"
 )
@@ -28,4 +29,40 @@ func (c *Client) ListDealRegistrations(ctx context.Context) ([]DealRegistration,
 		return nil, fmt.Errorf("ListDealRegistrations: %w", err)
 	}
 	return results, nil
+}
+
+// CreateDealRegistration create Deal Registration.
+//
+// Required privileges: deal-registration:create.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
+func (c *Client) CreateDealRegistration(ctx context.Context, request *DealRegistrationCreate) (*DealRegistrationCreated, error) {
+	prefix := c.transport.APIPrefix("partners", "v1")
+	var result DealRegistrationCreated
+	endpoint := prefix + "/deal-registrations"
+	if err := c.transport.DoWithContentType(ctx, http.MethodPost, endpoint, request, "application/json", http.StatusCreated, &result); err != nil {
+		return nil, fmt.Errorf("CreateDealRegistration: %w", err)
+	}
+	return &result, nil
+}
+
+// GetDealRegistration get Deal Registration.
+//
+// Required privileges: deal-registration:read.
+// The published spec declares none for this operation; these are the
+// capabilities the gateway's own authorization policy enforces. See
+// Privileges in this package for the provenance.
+//
+// Parameters:
+//   - partnerRegistrationID: Identifier Jamf assigned to the deal registration, as returned in the `partnerRegistrationId` field
+//     of a deal registration.
+func (c *Client) GetDealRegistration(ctx context.Context, partnerRegistrationID string) (*DealRegistration, error) {
+	prefix := c.transport.APIPrefix("partners", "v1")
+	var result DealRegistration
+	endpoint := fmt.Sprintf("%s/deal-registrations/%s", prefix, url.PathEscape(partnerRegistrationID))
+	if err := c.transport.Do(ctx, http.MethodGet, endpoint, nil, &result); err != nil {
+		return nil, fmt.Errorf("GetDealRegistration(%s): %w", partnerRegistrationID, err)
+	}
+	return &result, nil
 }

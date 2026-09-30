@@ -812,3 +812,92 @@ func TestAcceptance_Blueprint_UIWrittenScalarsDecode(t *testing.T) {
 			"validates what it echoes, so a read can now carry a value no consumer can decode")
 	}
 }
+
+// TestAcceptance_Blueprint_DeclarationsComponentRoundTrip covers
+// com.jamf.ddm-strict ("All Declarations"), which v2362 gave a schema for the
+// first time. Two generator gaps sat behind it, both fixed with it: the
+// declarations array generated as []any, so none of the eleven declaration
+// types could be reached, and AppSettingsPermissionDefaultsMap generated as a
+// string alias that cannot decode the object it is. The write goes through the
+// typed union and the map on purpose, so both fixes are exercised end to end.
+//
+// The second half pins a limitation: the service accepts a declaration type
+// the spec's closed oneOf does not list, answering 201 and storing it verbatim
+// (wire-verified 2026-09-30). The union decodes it with Type set and every
+// variant nil. When the service starts refusing it, the create fails here and
+// that half should become an assertion of the refusal.
+func TestAcceptance_Blueprint_DeclarationsComponentRoundTrip(t *testing.T) {
+	groupID := requireSmartGroupFixture(t)
+	c := accEnvClient(t)
+
+	camera := "Allow"
+	perms := blueprints.AppSettingsPermissionDefaultsMap{
+		"com.example.scanner": {OrganizationJustification: "SDK acceptance test", Camera: &camera},
+	}
+	cfg := blueprints.DeclarationsComponentConfiguration{
+		Declarations: []blueprints.DeclarationsComponentConfigurationDeclarationsItem{
+			{
+				Type: blueprints.DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationPackage,
+				PackageDeclaration: &blueprints.PackageDeclaration{
+					Type:        blueprints.DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationPackage,
+					ChannelType: blueprints.DeclarationChannelTypeSystem,
+					Kind:        blueprints.PackageDeclarationKindConfiguration,
+					Payload:     blueprints.PackageDeclarationPayload{ManifestURL: "https://example.com/sdk-acc.plist"},
+				},
+			},
+			{
+				Type: blueprints.DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationAppSettings,
+				AppSettingsDeclaration: &blueprints.AppSettingsDeclaration{
+					Type:        blueprints.DeclarationsComponentConfigurationDeclarationsItemTypeComAppleConfigurationAppSettings,
+					ChannelType: blueprints.DeclarationChannelTypeSystem,
+					Kind:        blueprints.AppSettingsDeclarationKindConfiguration,
+					Payload: blueprints.AppSettingsDeclarationPayload{
+						Privacy: &blueprints.AppSettingsPrivacy{PermissionDefaults: &perms},
+					},
+				},
+			},
+		},
+	}
+
+	got := createTestBlueprint(t, c, "sdk-acc-ddm-strict-"+runSuffix(), groupID, makeStep("com.jamf.ddm-strict", cfg))
+	if len(got.Steps) != 1 || len(got.Steps[0].Components) != 1 {
+		t.Fatalf("expected one step carrying one component, got %+v", got.Steps)
+	}
+	comp := got.Steps[0].Components[0]
+	if comp.Identifier != "com.jamf.ddm-strict" {
+		t.Fatalf("component identifier = %q", comp.Identifier)
+	}
+	var back blueprints.DeclarationsComponentConfiguration
+	if err := json.Unmarshal(comp.Configuration, &back); err != nil {
+		t.Fatalf("decoding the read-back configuration: %v\nbody: %s", err, comp.Configuration)
+	}
+	if len(back.Declarations) != 2 {
+		t.Fatalf("read back %d declarations, want 2: %s", len(back.Declarations), comp.Configuration)
+	}
+	pkg := back.Declarations[0].PackageDeclaration
+	if pkg == nil || pkg.Payload.ManifestURL != "https://example.com/sdk-acc.plist" {
+		t.Errorf("package declaration did not round-trip: %+v", back.Declarations[0])
+	}
+	app := back.Declarations[1].AppSettingsDeclaration
+	if app == nil || app.Payload.Privacy == nil || app.Payload.Privacy.PermissionDefaults == nil {
+		t.Fatalf("app-settings declaration did not round-trip: %+v", back.Declarations[1])
+	}
+	entry, ok := (*app.Payload.Privacy.PermissionDefaults)["com.example.scanner"]
+	if !ok || entry.Camera == nil || *entry.Camera != "Allow" {
+		t.Errorf("PermissionDefaults did not round-trip as a map: %+v", *app.Payload.Privacy.PermissionDefaults)
+	}
+
+	// The limitation: an unlisted declaration type is accepted and stored.
+	const unlisted = `{"declarations":[{"type":"com.apple.configuration.sdk-acc-unlisted","channelType":"SYSTEM","kind":"CONFIGURATION","payload":{}}]}`
+	loose := createTestBlueprint(t, c, "sdk-acc-ddm-strict-unlisted-"+runSuffix(), groupID,
+		[]blueprints.BlueprintStep{{Name: new("Step 1"), Components: []blueprints.Component{
+			{Identifier: "com.jamf.ddm-strict", Configuration: json.RawMessage(unlisted)},
+		}}})
+	var lb blueprints.DeclarationsComponentConfiguration
+	if err := json.Unmarshal(loose.Steps[0].Components[0].Configuration, &lb); err != nil {
+		t.Fatalf("decoding the unlisted declaration: %v", err)
+	}
+	if len(lb.Declarations) != 1 || lb.Declarations[0].Type != "com.apple.configuration.sdk-acc-unlisted" {
+		t.Fatalf("unlisted declaration read back as %+v", lb.Declarations)
+	}
+}

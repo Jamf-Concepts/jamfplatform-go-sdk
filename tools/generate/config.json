@@ -363,8 +363,6 @@
       },
       "methodNotes": {
         "DismissAllNotificationsV1": "Published but not routed at the gateway: every call answers `403 BAD_PERMISSIONS`, whatever privileges the credential holds. The routed item-level `DELETE /v1/notifications/{type}/{id}` answers 204 for the same `dismiss-notifications:execute`, so the gap is the route and not the grant. Until it lands there is no bulk dismiss \u2014 enumerate with `ListNotificationsV1` and call `DeleteNotificationV1` per notification. `TestAcceptance_Pro_DismissAllNotificationsUnroutedAtGateway` fails the day the route appears, which is the notification to delete this note.",
-        "GetSsoOidcBrokerConfigV3": "Published but not routed at the gateway: every call answers `403 BAD_PERMISSIONS`, whatever privileges the credential holds. `GET /v3/sso/dependencies` requires the same `sso-settings:read` and answers 200, so the gap is the route and not the grant, and no OIDC broker configuration is readable through the gateway until it is fixed. `TestAcceptance_Pro_SsoOidcBrokerConfigUnroutedAtGateway` fails the day the route appears, which is the notification to delete this note.",
-        "UpdateSsoOidcBrokerConfigV3": "Published but not routed at the gateway: every call answers `403 BAD_PERMISSIONS`, whatever privileges the credential holds, and no write reaches the server. `GET /v3/sso/dependencies` requires the sibling `sso-settings:read` and answers 200, so the gap is the route and not the grant. `TestAcceptance_Pro_SsoOidcBrokerConfigUpdateUnroutedAtGateway` fails the day the route appears, which is the notification to delete this note.",
         "UpdateAccountPreferencesV3": "Requires Jamf Pro 11.32 or later. `AccountPreferencesV6.showDirectoryGroupUuidColumn` is declared required as of spec 11.32.0, so the SDK sends it on every call and cannot omit it; an 11.31 or earlier tenant rejects the whole request with `400 [INVALID_CONTENT] Unrecognized field showDirectoryGroupUuidColumn … not marked as ignorable`. Check the server with `GetJamfProVersionV1` first if the tenant version is not known. The read half, `GetAccountPreferencesV3`, is unaffected."
       },
       "specFile": "pro_api.json",
@@ -2950,15 +2948,6 @@
         {
           "op": "GET /v3/sso/metadata/download",
           "name": "DownloadSsoMetadataV3"
-        },
-        {
-          "op": "GET /v3/sso/oidc-broker-config",
-          "name": "GetSsoOidcBrokerConfigV3"
-        },
-        {
-          "op": "PUT /v3/sso/oidc-broker-config",
-          "name": "UpdateSsoOidcBrokerConfigV3",
-          "expectedStatus": 204
         },
         {
           "op": "GET /v1/cloud-distribution-point",
@@ -10620,6 +10609,12 @@
         "GET /v1/deal-registrations": [
           "deal-registration:read"
         ],
+        "GET /v1/deal-registrations/{partnerRegistrationId}": [
+          "deal-registration:read"
+        ],
+        "POST /v1/deal-registrations": [
+          "deal-registration:create"
+        ],
         "GET /v1/distributor/configuration": [
           "distributor-actions:read"
         ],
@@ -10644,6 +10639,14 @@
           "op": "GET /v1/deal-registrations",
           "name": "ListDealRegistrations",
           "unwrapResults": "[]DealRegistration"
+        },
+        {
+          "op": "POST /v1/deal-registrations",
+          "name": "CreateDealRegistration"
+        },
+        {
+          "op": "GET /v1/deal-registrations/{partnerRegistrationId}",
+          "name": "GetDealRegistration"
         },
         {
           "op": "GET /v1/distributor/configuration",

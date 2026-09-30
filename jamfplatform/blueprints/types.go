@@ -83,6 +83,93 @@ type ApiError struct {
 	TraceID string `json:"traceId"`
 }
 
+// AppSettingsAllowed Allow/deny lists for which apps and binaries can run. > **Validation rule:** Each entry in `AllowedBinaries` requires either `CDHash` or > `TeamID`. Each entry in `DeniedBinaries` requires `CDHash`, `TeamID`, or `SigningID`.
+type AppSettingsAllowed struct {
+	// Bundle IDs the device may show or launch. Not supported on macOS.
+	AllowedApps *[]string `json:"AllowedApps,omitempty"`
+	// Binaries allowed to run. macOS only.
+	AllowedBinaries *[]AppSettingsBinaryIdentifier `json:"AllowedBinaries,omitempty"`
+	// If `true`, implicitly allows managed apps when `AllowedBinaries` is present. macOS only.
+	AlwaysAllowManagedApps *bool `json:"AlwaysAllowManagedApps,omitempty"`
+	// Bundle IDs the device may not show or launch. Not supported on macOS.
+	DeniedApps *[]string `json:"DeniedApps,omitempty"`
+	// Binaries denied from running. macOS only.
+	DeniedBinaries *[]AppSettingsBinaryIdentifier `json:"DeniedBinaries,omitempty"`
+}
+
+// AppSettingsBinaryIdentifier Identifies a binary by code-signing attributes.
+type AppSettingsBinaryIdentifier struct {
+	// 40-character code directory hash of the binary.
+	CDHash *string `json:"CDHash,omitempty"`
+	// File system path prefix to match binaries.
+	PathPrefix *string `json:"PathPrefix,omitempty"`
+	// Code signature signing identifier of the binary.
+	SigningID *string `json:"SigningID,omitempty"`
+	// Code signing state to match.
+	// Allowed values: see the AppSettingsBinaryIdentifierSigningState constants.
+	SigningState *string `json:"SigningState,omitempty"`
+	// Code signature team identifier. Use `*APPLE*` for Apple binaries with no team identifier.
+	TeamID *string `json:"TeamID,omitempty"`
+}
+
+// AppSettingsDeclaration Configures app allow/deny lists and app privacy permission defaults.
+type AppSettingsDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the AppSettingsDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the App Settings declaration.
+	Payload AppSettingsDeclarationPayload `json:"payload"`
+	// Allowed values: see the AppSettingsDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// AppSettingsDeclarationPayload Payload fields for the App Settings declaration.
+type AppSettingsDeclarationPayload struct {
+	// Allow/deny lists for which apps and binaries can run.
+	// > **Validation rule:** Each entry in `AllowedBinaries` requires either `CDHash` or > `TeamID`. Each
+	// entry in `DeniedBinaries` requires `CDHash`, `TeamID`, or `SigningID`.
+	Allowed *AppSettingsAllowed `json:"Allowed,omitempty"`
+	// App privacy permission defaults. Not supported on tvOS/visionOS/watchOS.
+	Privacy *AppSettingsPrivacy `json:"Privacy,omitempty"`
+}
+
+// AppSettingsPermissionDefaults App privacy permission defaults for one app identifier.
+type AppSettingsPermissionDefaults struct {
+	// Not supported on iOS.
+	// Allowed values: see the AppSettingsPermissionDefaultsAccessibility constants.
+	Accessibility *string `json:"Accessibility,omitempty"`
+	// Allowed values: see the AppSettingsPermissionDefaultsBluetooth constants.
+	Bluetooth *string `json:"Bluetooth,omitempty"`
+	// Allowed values: see the AppSettingsPermissionDefaultsCamera constants.
+	Camera *string `json:"Camera,omitempty"`
+	// Allowed values: see the AppSettingsPermissionDefaultsDictation constants.
+	Dictation *string `json:"Dictation,omitempty"`
+	// Allowed values: see the AppSettingsPermissionDefaultsLocalNetwork constants.
+	LocalNetwork *string `json:"LocalNetwork,omitempty"`
+	// Allowed values: see the AppSettingsPermissionDefaultsLocation constants.
+	Location *string `json:"Location,omitempty"`
+	// Not supported on macOS.
+	// Allowed values: see the AppSettingsPermissionDefaultsLocationAccuracy constants.
+	LocationAccuracy *string `json:"LocationAccuracy,omitempty"`
+	// Allowed values: see the AppSettingsPermissionDefaultsMicrophone constants.
+	Microphone *string `json:"Microphone,omitempty"`
+	// Text shown to the user explaining why the organization requires these defaults.
+	OrganizationJustification string `json:"OrganizationJustification"`
+}
+
+// AppSettingsPermissionDefaultsMap maps an app identifier (bundle ID on iOS; a composed `Bundle-ID {Designated-Requirement}` identifier on macOS) to a permission-defaults object.
+type AppSettingsPermissionDefaultsMap = map[string]AppSettingsPermissionDefaults
+
+// AppSettingsPrivacy App privacy permission defaults. Not supported on tvOS/visionOS/watchOS.
+type AppSettingsPrivacy struct {
+	// Maps an app identifier (bundle ID on iOS; a composed `Bundle-ID {Designated-Requirement}` identifier
+	// on macOS) to a permission-defaults object.
+	PermissionDefaults *AppSettingsPermissionDefaultsMap `json:"PermissionDefaults,omitempty"`
+}
+
 // AudioAccessorySettingsComponent represents a audio accessory settings component.
 type AudioAccessorySettingsComponent struct {
 	// Audio accessory settings configuration.
@@ -399,6 +486,97 @@ type ConfigurationProfileContentItem struct {
 	PayloadType string `json:"payloadType"`
 }
 
+// ContentCachingDeclaration Configures the built-in Content Caching service. macOS only.
+type ContentCachingDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the ContentCachingDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Content Caching declaration.
+	Payload ContentCachingDeclarationPayload `json:"payload"`
+	// Allowed values: see the ContentCachingDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// ContentCachingDeclarationPayload Payload fields for the Content Caching declaration.
+type ContentCachingDeclarationPayload struct {
+	// If `true`, the system may purge cached content when disk space is low.
+	AllowCacheDelete *bool `json:"AllowCacheDelete,omitempty"`
+	// Caches the user's iCloud data. At least one of `AllowPersonalCaching`/`AllowSharedCaching` must be
+	// `true`.
+	AllowPersonalCaching *bool `json:"AllowPersonalCaching,omitempty"`
+	// Caches non-iCloud content such as apps and software updates.
+	AllowSharedCaching *bool `json:"AllowSharedCaching,omitempty"`
+	// Automatically activates Content Caching when possible.
+	AutoActivation *bool `json:"AutoActivation,omitempty"`
+	// Automatically enables Internet connection sharing for tethered caching.
+	AutoEnableTetheredCaching *bool `json:"AutoEnableTetheredCaching,omitempty"`
+	// Maximum disk space in bytes for the cache. `0` is unlimited.
+	CacheLimit *int `json:"CacheLimit,omitempty"`
+	// Directory used to store cached content. Must end with `/Library/Application
+	// Support/Apple/AssetCache/Data`.
+	DataPath *string `json:"DataPath,omitempty"`
+	// Reporting interval in seconds for the status item. `0` disables it; any other value must be between
+	// 300 and 86400.
+	DeclarativeStatusInterval *int `json:"DeclarativeStatusInterval,omitempty"`
+	// If `true`, disables Content Caching entirely.
+	DenyActivation *bool `json:"DenyActivation,omitempty"`
+	// If `true`, disables tethered caching.
+	DenyTetheredCaching *bool `json:"DenyTetheredCaching,omitempty"`
+	// Shows exceptional conditions as system notifications.
+	DisplayAlerts *bool `json:"DisplayAlerts,omitempty"`
+	// Prevents sleep while Content Caching is on.
+	KeepAwake *bool `json:"KeepAwake,omitempty"`
+	// Client IP ranges to serve.
+	ListenRanges *[]ContentCachingIpRange `json:"ListenRanges,omitempty"`
+	// Restricts serving to `ListenRanges` only.
+	ListenRangesOnly *bool `json:"ListenRangesOnly,omitempty"`
+	// Serves clients in the union of `ListenRanges`, `PeerListenRanges`, and `Parents`.
+	ListenWithPeersAndParents *bool `json:"ListenWithPeersAndParents,omitempty"`
+	// Restricts serving to the local subnet, ignoring `ListenRanges`.
+	LocalSubnetsOnly *bool `json:"LocalSubnetsOnly,omitempty"`
+	// Logs client IP and port.
+	LogClientIdentity *bool `json:"LogClientIdentity,omitempty"`
+	// Reporting interval in seconds for management statistics.
+	ManagementReportingInterval *int `json:"ManagementReportingInterval,omitempty"`
+	// How the `ManagementStatusTarget` HTTPS connection is secured.
+	// Allowed values: see the ContentCachingDeclarationPayloadManagementSecurityConfig constants.
+	ManagementSecurityConfig *string `json:"ManagementSecurityConfig,omitempty"`
+	// Asset declaration identifier for the certificate used to verify `ManagementStatusTarget`.
+	ManagementStatusCertificateReference *string `json:"ManagementStatusCertificateReference,omitempty"`
+	// URL the cache PUTs management statistics to.
+	ManagementStatusTarget *string `json:"ManagementStatusTarget,omitempty"`
+	// Policy for choosing among multiple parents.
+	// Allowed values: see the ContentCachingDeclarationPayloadParentSelectionPolicy constants.
+	ParentSelectionPolicy *string `json:"ParentSelectionPolicy,omitempty"`
+	// IP addresses of upstream content caches to use instead of Apple directly.
+	Parents *[]string `json:"Parents,omitempty"`
+	// Peer IP ranges this cache queries for content.
+	PeerFilterRanges *[]ContentCachingIpRange `json:"PeerFilterRanges,omitempty"`
+	// Peer IP ranges this cache responds to.
+	PeerListenRanges *[]ContentCachingIpRange `json:"PeerListenRanges,omitempty"`
+	// Restricts peering to the local subnet.
+	PeerLocalSubnetsOnly *bool `json:"PeerLocalSubnetsOnly,omitempty"`
+	// Maximum disk space in bytes for personal (iCloud) content. `0` uses `CacheLimit`.
+	PersonalCacheLimit *int `json:"PersonalCacheLimit,omitempty"`
+	// TCP port for upload/download requests. `0` picks a random port.
+	Port *int `json:"Port,omitempty"`
+	// Public IP ranges cloud servers use to match clients to caches.
+	PublicRanges *[]ContentCachingIpRange `json:"PublicRanges,omitempty"`
+}
+
+// ContentCachingIpRange A range of IP addresses.
+type ContentCachingIpRange struct {
+	// The first IP address in the range.
+	First string `json:"first"`
+	// The last IP address in the range.
+	Last string `json:"last"`
+	// Allowed values: see the ContentCachingIpRangeType constants.
+	Type *string `json:"type,omitempty"`
+}
+
 // CreateBlueprintRequest represents a create blueprint request.
 type CreateBlueprintRequest struct {
 	// Description of the blueprint.
@@ -522,6 +700,140 @@ type CustomRegex struct {
 	Regex *string `json:"Regex,omitempty"`
 }
 
+// DeclarationsComponent Blueprint component for one or more supported Apple declarations.
+type DeclarationsComponent struct {
+	// Configuration wrapper for one or more declarations.
+	// ### Example.
+	// ```json { "identifier": "com.jamf.ddm-strict", "configuration": { "declarations": [ { "type":
+	// "com.apple.configuration.app.managed", "channelType": "SYSTEM", "kind": "CONFIGURATION", "payload":
+	// { "AppStoreID": "361285480", "InstallBehavior": { "Install": "Required", "License": { "Assignment":
+	// "Device" } } } } ] } } ```.
+	Configuration DeclarationsComponentConfiguration `json:"configuration"`
+	// ## Supported declarations.
+	// | Item | Type identifier | Supported OS |
+	// |---|---|---|
+	// | Managed App | `com.apple.configuration.app.managed` | macOS 26.0+ |
+	// | App Settings | `com.apple.configuration.app.settings` | iOS 27.0+, macOS 27.0+, tvOS 27.0+, visionOS 27.0+ |
+	// | Content Caching | `com.apple.configuration.content-cache.settings` | macOS 27.0+ |
+	// | External Intelligence Settings | `com.apple.configuration.external-intelligence.settings` | iOS 26.4+, macOS 26.4+, visionOS 26.4+ |
+	// | Intelligence Settings | `com.apple.configuration.intelligence.settings` | iOS 26.4+, macOS 26.4+, visionOS 26.4+ |
+	// | Keyboard Settings | `com.apple.configuration.keyboard.settings` | iOS 26.4+, macOS 26.4+ |
+	// | Package | `com.apple.configuration.package` | macOS 26.0+ |
+	// | Screen Sharing Connection | `com.apple.configuration.screensharing.connection` | macOS 14.0+ |
+	// | Screen Sharing Connection Group | `com.apple.configuration.screensharing.connection.group` | macOS 14.0+ |
+	// | Screen Sharing Host Settings | `com.apple.configuration.screensharing.host.settings` | macOS 14.0+ |
+	// | Siri Settings | `com.apple.configuration.siri.settings` | iOS 26.4+, macOS 26.4+, tvOS 27.0+, visionOS 26.4+, watchOS 26.4+ |
+	// A single component can contain multiple declarations, of different supported types, in its
+	// `declarations` array. Each array entry is one of the items above, identified by its own `type`
+	// field.
+	// Apple publishes the full specification for each of these at
+	// [apple/device-management/declarative/declarations/configurations](https://github.com/apple/device-management/tree/release/declarative/declarations/configurations).
+	// Allowed values: see the DeclarationsComponentIdentifier constants.
+	Identifier string `json:"identifier"`
+}
+
+// DeclarationsComponentConfiguration Configuration wrapper for one or more declarations. ### Example ```json { "identifier": "com.jamf.ddm-strict", "configuration": { "declarations": [ { "type": "com.apple.configuration.app.managed", "channelType": "SYSTEM", "kind": "CONFIGURATION", "payload": { "AppStoreID": "361285480", "InstallBehavior": { "Install": "Required", "License": { "Assignment": "Device" } } } } ] } } ```.
+type DeclarationsComponentConfiguration struct {
+	// An array of declaration items, each identified by its own `type`.
+	Declarations []DeclarationsComponentConfigurationDeclarationsItem `json:"declarations"`
+}
+
+// DeclarationsComponentConfigurationDeclarationsItem is a polymorphic response keyed by type. Exactly one variant pointer is populated after unmarshaling.
+type DeclarationsComponentConfigurationDeclarationsItem struct {
+	// Allowed values: see the DeclarationsComponentConfigurationDeclarationsItemType constants.
+	Type                                    string                                   `json:"type"`
+	ManagedAppDeclaration                   *ManagedAppDeclaration                   `json:"-"`
+	AppSettingsDeclaration                  *AppSettingsDeclaration                  `json:"-"`
+	ContentCachingDeclaration               *ContentCachingDeclaration               `json:"-"`
+	ExternalIntelligenceSettingsDeclaration *ExternalIntelligenceSettingsDeclaration `json:"-"`
+	IntelligenceSettingsDeclaration         *IntelligenceSettingsDeclaration         `json:"-"`
+	KeyboardSettingsDeclaration             *KeyboardSettingsDeclaration             `json:"-"`
+	PackageDeclaration                      *PackageDeclaration                      `json:"-"`
+	ScreenSharingConnectionDeclaration      *ScreenSharingConnectionDeclaration      `json:"-"`
+	ScreenSharingConnectionGroupDeclaration *ScreenSharingConnectionGroupDeclaration `json:"-"`
+	ScreenSharingHostSettingsDeclaration    *ScreenSharingHostSettingsDeclaration    `json:"-"`
+	SiriSettingsDeclaration                 *SiriSettingsDeclaration                 `json:"-"`
+}
+
+// UnmarshalJSON dispatches the payload to the variant matching the
+// type discriminator. Unknown values leave the variant
+// pointers nil but preserve the discriminator string.
+func (m *DeclarationsComponentConfigurationDeclarationsItem) UnmarshalJSON(data []byte) error {
+	var d struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal(data, &d); err != nil {
+		return err
+	}
+	m.Type = d.Type
+	switch d.Type {
+	case "com.apple.configuration.app.managed":
+		m.ManagedAppDeclaration = new(ManagedAppDeclaration)
+		return json.Unmarshal(data, m.ManagedAppDeclaration)
+	case "com.apple.configuration.app.settings":
+		m.AppSettingsDeclaration = new(AppSettingsDeclaration)
+		return json.Unmarshal(data, m.AppSettingsDeclaration)
+	case "com.apple.configuration.content-cache.settings":
+		m.ContentCachingDeclaration = new(ContentCachingDeclaration)
+		return json.Unmarshal(data, m.ContentCachingDeclaration)
+	case "com.apple.configuration.external-intelligence.settings":
+		m.ExternalIntelligenceSettingsDeclaration = new(ExternalIntelligenceSettingsDeclaration)
+		return json.Unmarshal(data, m.ExternalIntelligenceSettingsDeclaration)
+	case "com.apple.configuration.intelligence.settings":
+		m.IntelligenceSettingsDeclaration = new(IntelligenceSettingsDeclaration)
+		return json.Unmarshal(data, m.IntelligenceSettingsDeclaration)
+	case "com.apple.configuration.keyboard.settings":
+		m.KeyboardSettingsDeclaration = new(KeyboardSettingsDeclaration)
+		return json.Unmarshal(data, m.KeyboardSettingsDeclaration)
+	case "com.apple.configuration.package":
+		m.PackageDeclaration = new(PackageDeclaration)
+		return json.Unmarshal(data, m.PackageDeclaration)
+	case "com.apple.configuration.screensharing.connection":
+		m.ScreenSharingConnectionDeclaration = new(ScreenSharingConnectionDeclaration)
+		return json.Unmarshal(data, m.ScreenSharingConnectionDeclaration)
+	case "com.apple.configuration.screensharing.connection.group":
+		m.ScreenSharingConnectionGroupDeclaration = new(ScreenSharingConnectionGroupDeclaration)
+		return json.Unmarshal(data, m.ScreenSharingConnectionGroupDeclaration)
+	case "com.apple.configuration.screensharing.host.settings":
+		m.ScreenSharingHostSettingsDeclaration = new(ScreenSharingHostSettingsDeclaration)
+		return json.Unmarshal(data, m.ScreenSharingHostSettingsDeclaration)
+	case "com.apple.configuration.siri.settings":
+		m.SiriSettingsDeclaration = new(SiriSettingsDeclaration)
+		return json.Unmarshal(data, m.SiriSettingsDeclaration)
+	}
+	return nil
+}
+
+// MarshalJSON emits the active variant's JSON. If the matching variant
+// pointer is nil, emits a minimal object carrying only the discriminator.
+func (m DeclarationsComponentConfigurationDeclarationsItem) MarshalJSON() ([]byte, error) {
+	switch m.Type {
+	case "com.apple.configuration.app.managed":
+		return json.Marshal(m.ManagedAppDeclaration)
+	case "com.apple.configuration.app.settings":
+		return json.Marshal(m.AppSettingsDeclaration)
+	case "com.apple.configuration.content-cache.settings":
+		return json.Marshal(m.ContentCachingDeclaration)
+	case "com.apple.configuration.external-intelligence.settings":
+		return json.Marshal(m.ExternalIntelligenceSettingsDeclaration)
+	case "com.apple.configuration.intelligence.settings":
+		return json.Marshal(m.IntelligenceSettingsDeclaration)
+	case "com.apple.configuration.keyboard.settings":
+		return json.Marshal(m.KeyboardSettingsDeclaration)
+	case "com.apple.configuration.package":
+		return json.Marshal(m.PackageDeclaration)
+	case "com.apple.configuration.screensharing.connection":
+		return json.Marshal(m.ScreenSharingConnectionDeclaration)
+	case "com.apple.configuration.screensharing.connection.group":
+		return json.Marshal(m.ScreenSharingConnectionGroupDeclaration)
+	case "com.apple.configuration.screensharing.host.settings":
+		return json.Marshal(m.ScreenSharingHostSettingsDeclaration)
+	case "com.apple.configuration.siri.settings":
+		return json.Marshal(m.SiriSettingsDeclaration)
+	}
+	return json.Marshal(map[string]string{"type": m.Type})
+}
+
 // Deferrals represents a deferrals.
 type Deferrals struct {
 	CombinedPeriodInDays *OptionalPeriodInDays `json:"CombinedPeriodInDays,omitempty"`
@@ -587,6 +899,30 @@ type Error struct {
 	ID *string `json:"id,omitempty"`
 }
 
+// ExternalIntelligenceSettingsDeclaration Configures External Intelligence Integrations settings.
+type ExternalIntelligenceSettingsDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the ExternalIntelligenceSettingsDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the External Intelligence Settings declaration.
+	Payload ExternalIntelligenceSettingsDeclarationPayload `json:"payload"`
+	// Allowed values: see the ExternalIntelligenceSettingsDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// ExternalIntelligenceSettingsDeclarationPayload Payload fields for the External Intelligence Settings declaration.
+type ExternalIntelligenceSettingsDeclarationPayload struct {
+	// If `false`, disables sign-in for external intelligence integrations.
+	AllowSignIn *bool `json:"AllowSignIn,omitempty"`
+	// Restricts external intelligence to the given workspace ID (currently limited to one element).
+	AllowedWorkspaceIDs *[]string `json:"AllowedWorkspaceIDs,omitempty"`
+	// If `false`, disables external intelligence integrations.
+	Enabled *bool `json:"Enabled,omitempty"`
+}
+
 // FailedAttemptsResetInMinutes represents a failed attempts reset in minutes.
 type FailedAttemptsResetInMinutes struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
@@ -616,6 +952,108 @@ type InputModes struct {
 	RPN bool `json:"RPN"`
 	// Configures whether unit conversions are enabled.
 	UnitConversion bool `json:"UnitConversion"`
+}
+
+// IntelligenceSettingsApps Per-app Intelligence feature toggles.
+type IntelligenceSettingsApps struct {
+	// Calendar and Reminders Intelligence feature toggles. Requires iOS/macOS/visionOS 27.0+.
+	Calendar *IntelligenceSettingsAppsCalendar `json:"Calendar,omitempty"`
+	// Mail Intelligence feature toggles.
+	Mail *IntelligenceSettingsAppsMail `json:"Mail,omitempty"`
+	// Not supported on visionOS.
+	Notes *IntelligenceSettingsAppsNotes `json:"Notes,omitempty"`
+	// Safari Intelligence feature toggles.
+	Safari *IntelligenceSettingsAppsSafari `json:"Safari,omitempty"`
+}
+
+// IntelligenceSettingsAppsCalendar Calendar and Reminders Intelligence feature toggles. Requires iOS/macOS/visionOS 27.0+.
+type IntelligenceSettingsAppsCalendar struct {
+	AllowNaturalLanguageEditing *bool `json:"AllowNaturalLanguageEditing,omitempty"`
+}
+
+// IntelligenceSettingsAppsMail Mail Intelligence feature toggles.
+type IntelligenceSettingsAppsMail struct {
+	AllowSmartReplies *bool `json:"AllowSmartReplies,omitempty"`
+	AllowSummary      *bool `json:"AllowSummary,omitempty"`
+}
+
+// IntelligenceSettingsAppsNotes Not supported on visionOS.
+type IntelligenceSettingsAppsNotes struct {
+	AllowTranscription        *bool `json:"AllowTranscription,omitempty"`
+	AllowTranscriptionSummary *bool `json:"AllowTranscriptionSummary,omitempty"`
+}
+
+// IntelligenceSettingsAppsSafari Safari Intelligence feature toggles.
+type IntelligenceSettingsAppsSafari struct {
+	AllowSummary *bool `json:"AllowSummary,omitempty"`
+}
+
+// IntelligenceSettingsDeclaration Configures Apple Intelligence settings.
+type IntelligenceSettingsDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the IntelligenceSettingsDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Intelligence Settings declaration.
+	Payload IntelligenceSettingsDeclarationPayload `json:"payload"`
+	// Allowed values: see the IntelligenceSettingsDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// IntelligenceSettingsDeclarationPayload Payload fields for the Intelligence Settings declaration.
+type IntelligenceSettingsDeclarationPayload struct {
+	AllowAppleIntelligenceReport *bool `json:"AllowAppleIntelligenceReport,omitempty"`
+	AllowGenmoji                 *bool `json:"AllowGenmoji,omitempty"`
+	AllowImagePlayground         *bool `json:"AllowImagePlayground,omitempty"`
+	// Not supported on macOS.
+	AllowImageWand *bool `json:"AllowImageWand,omitempty"`
+	// Not supported on macOS/visionOS.
+	AllowPersonalizedHandwritingResults *bool `json:"AllowPersonalizedHandwritingResults,omitempty"`
+	// Not supported on visionOS. Requires iOS/macOS 27.0+.
+	AllowVisualIntelligence *bool `json:"AllowVisualIntelligence,omitempty"`
+	// Not supported on macOS/visionOS. Deprecated on iOS 27.0+ in favor of `AllowVisualIntelligence`.
+	AllowVisualIntelligenceSummary *bool `json:"AllowVisualIntelligenceSummary,omitempty"`
+	AllowWritingTools              *bool `json:"AllowWritingTools,omitempty"`
+	// Per-app Intelligence feature toggles.
+	Apps *IntelligenceSettingsApps `json:"Apps,omitempty"`
+	// If `true`, forces on-device-only dictation.
+	ForceOnDeviceOnlyDictation *bool `json:"ForceOnDeviceOnlyDictation,omitempty"`
+	// Not supported on macOS/visionOS. If `true`, forces on-device-only translation.
+	ForceOnDeviceOnlyTranslation *bool `json:"ForceOnDeviceOnlyTranslation,omitempty"`
+}
+
+// KeyboardSettingsDeclaration Configures keyboard settings.
+type KeyboardSettingsDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the KeyboardSettingsDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Keyboard Settings declaration.
+	Payload KeyboardSettingsDeclarationPayload `json:"payload"`
+	// Allowed values: see the KeyboardSettingsDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// KeyboardSettingsDeclarationPayload Payload fields for the Keyboard Settings declaration.
+type KeyboardSettingsDeclarationPayload struct {
+	// Not supported on macOS.
+	AllowAutoCorrection   *bool `json:"AllowAutoCorrection,omitempty"`
+	AllowDefinitionLookup *bool `json:"AllowDefinitionLookup,omitempty"`
+	AllowDictation        *bool `json:"AllowDictation,omitempty"`
+	// Also supported by `math.settings`.
+	AllowMathKeyboardSuggestions *bool `json:"AllowMathKeyboardSuggestions,omitempty"`
+	// Not supported on macOS.
+	AllowPredictiveText *bool `json:"AllowPredictiveText,omitempty"`
+	// Not supported on macOS.
+	AllowSlideToType *bool `json:"AllowSlideToType,omitempty"`
+	// Not supported on macOS.
+	AllowSpellCheck *bool `json:"AllowSpellCheck,omitempty"`
+	// Not supported on macOS.
+	AllowTextReplacement *bool `json:"AllowTextReplacement,omitempty"`
 }
 
 // ManagedAppAttributes Fine-grained app behavior settings. All fields are optional. **iOS 18.1+ note:** `Hideable` and `Lockable` require iOS 18.1 or later. When `Lockable` is `false`, `Hideable` is required and must also be `false`.
@@ -694,10 +1132,75 @@ type ManagedAppComponent struct {
 	Identifier string `json:"identifier"`
 }
 
+// ManagedAppConfig App or extension config data and credentials. Requires macOS 27.0+.
+type ManagedAppConfig struct {
+	// Certificates to provide to the app or extension. Each entry pairs a certificate asset reference with
+	// an identifier the app uses to look the certificate up.
+	Certificates *[]ManagedAppCredentialConfig `json:"Certificates,omitempty"`
+	// Identifier of an asset declaration containing a reference to the app or extension config data. The
+	// asset must be of type `com.apple.asset.data`, the referenced data must be a property list file, and
+	// the asset's `ContentType` must match the data type.
+	DataAssetReference *string `json:"DataAssetReference,omitempty"`
+	// Identities to provide to the app or extension. Each entry pairs an identity asset reference with an
+	// identifier the app uses to look the identity up.
+	Identities *[]ManagedAppCredentialConfig `json:"Identities,omitempty"`
+	// Passwords to provide to the app or extension. Each entry pairs a password asset reference with an
+	// identifier the app uses to look the password up.
+	Passwords *[]ManagedAppCredentialConfig `json:"Passwords,omitempty"`
+}
+
 // ManagedAppConfiguration Configuration for one or more volume purchasing apps. ### Example — single required app ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required", "AutomaticAppUpdates": "AlwaysOn" } ] } ``` ### Example — app with attributes (iOS 18.1+) ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required", "AllowDownloadsOverCellular": "AlwaysOff", "AutomaticAppUpdates": "AlwaysOn", "IncludeInBackup": true, "Attributes": { "Hideable": true, "Lockable": true, "AssociatedDomains": ["corp.example.com"], "AssociatedDomainsEnableDirectDownloads": false } } ] } ``` ### Example — multiple apps in one component ```json { "apps": [ { "AssetId": "019a8082-19ba-794c-91f4-2cd5a02b0c72", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Excel", "Install": "Required" }, { "AssetId": "12345678-0000-0000-0000-000000000001", "AppAndBookTokenId": "099a8082-ae9d-70be-b377-84e4ba7459c4", "AppId": "com.microsoft.Word", "Install": "Optional", "AutomaticAppUpdates": "StoreSettings" } ] } ```.
 type ManagedAppConfiguration struct {
 	// One or more volume purchasing app configurations to include in this component.
 	Apps []ManagedAppEntry `json:"apps"`
+}
+
+// ManagedAppCredentialConfig A credential asset reference and the identifier the app looks it up by.
+type ManagedAppCredentialConfig struct {
+	// Identifier of the asset declaration containing the credential.
+	AssetReference string `json:"AssetReference"`
+	// The identifier the app or extension uses to fetch this credential through the `ManagedApp`
+	// framework. App developers define these values.
+	Identifier string `json:"Identifier"`
+}
+
+// ManagedAppDeclaration Manages an app installed by other means (App Store, a manifest URL, or a package). For volume purchasing (VPP) apps, use the `com.jamf.ddm.app-managed` component instead.
+type ManagedAppDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the ManagedAppDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Managed App declaration.
+	// > **Validation rule:** One of `AppStoreID`, `BundleID`, or `AppComposedIdentifier` is required.
+	Payload ManagedAppDeclarationPayload `json:"payload"`
+	// Allowed values: see the ManagedAppDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// ManagedAppDeclarationPayload Payload fields for the Managed App declaration. > **Validation rule:** One of `AppStoreID`, `BundleID`, or `AppComposedIdentifier` is required.
+type ManagedAppDeclarationPayload struct {
+	// Identifies an existing app to take over management of, formatted `Bundle-ID` or `Bundle-ID
+	// (Team-ID)`.
+	AppComposedIdentifier *string `json:"AppComposedIdentifier,omitempty"`
+	// App or extension config data and credentials. Requires macOS 27.0+.
+	AppConfig *ManagedAppConfig `json:"AppConfig,omitempty"`
+	// App Store ID of the app. One of `AppStoreID`, `BundleID`, or `AppComposedIdentifier` is required.
+	AppStoreID *string `json:"AppStoreID,omitempty"`
+	// Bundle ID of an App Store app.
+	BundleID *string `json:"BundleID,omitempty"`
+	// Maps an extension composed identifier (`Bundle-ID` or `Bundle-ID (Team-ID)`) to its config.
+	ExtensionConfigs *ManagedAppExtensionConfigs `json:"ExtensionConfigs,omitempty"`
+	// Describes how and when to install the app.
+	InstallBehavior *ManagedAppInstallBehavior `json:"InstallBehavior,omitempty"`
+	// Identifier of an asset declaration providing app config data via the MDMv1 behavior. Requires macOS
+	// 27.0+.
+	LegacyAppConfigAssetReference *string `json:"LegacyAppConfigAssetReference,omitempty"`
+	// Specifies how the device updates the app.
+	UpdateBehavior *ManagedAppUpdateBehavior `json:"UpdateBehavior,omitempty"`
+	// If `true`, installs an iOS/iPadOS App Store app on Apple silicon Macs.
+	IOSApp *bool `json:"iOSApp,omitempty"`
 }
 
 // ManagedAppEntry Configuration for a single volume purchasing app.
@@ -723,6 +1226,34 @@ type ManagedAppEntry struct {
 	// Whether the app must be installed on devices in scope.
 	// Allowed values: see the ManagedAppEntryInstall constants.
 	Install *string `json:"Install,omitempty"`
+}
+
+// ManagedAppExtensionConfigs maps an extension composed identifier (`Bundle-ID` or `Bundle-ID (Team-ID)`) to its config.
+type ManagedAppExtensionConfigs = map[string]ManagedAppConfig
+
+// ManagedAppInstallBehavior Describes how and when to install the app.
+type ManagedAppInstallBehavior struct {
+	// Whether the app remains on the device at all times.
+	// Allowed values: see the ManagedAppInstallBehaviorInstall constants.
+	Install *string `json:"Install,omitempty"`
+	// The app's license.
+	License *ManagedAppLicense `json:"License,omitempty"`
+	// App Store external version identifier (EVID) to install.
+	Version *int `json:"Version,omitempty"`
+}
+
+// ManagedAppLicense The app's license.
+type ManagedAppLicense struct {
+	// License type for an App Store app.
+	// Allowed values: see the ManagedAppLicenseAssignment constants.
+	Assignment *string `json:"Assignment,omitempty"`
+}
+
+// ManagedAppUpdateBehavior Specifies how the device updates the app.
+type ManagedAppUpdateBehavior struct {
+	// Whether the device automatically updates the app.
+	// Allowed values: see the ManagedAppUpdateBehaviorAutomaticAppUpdates constants.
+	AutomaticAppUpdates string `json:"AutomaticAppUpdates"`
 }
 
 // ManagedExtension represents a managed extension.
@@ -863,6 +1394,42 @@ type OptionallyEnabled struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
+}
+
+// PackageDeclaration Installs a package (apps, fonts, documents, or other items) on macOS. Apps a package installs are not automatically managed; use the Managed App declaration for that.
+type PackageDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the PackageDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Package declaration.
+	Payload PackageDeclarationPayload `json:"payload"`
+	// Allowed values: see the PackageDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// PackageDeclarationPayload Payload fields for the Package declaration.
+type PackageDeclarationPayload struct {
+	// Describes how and when to install the package.
+	InstallBehavior *PackageInstallBehavior `json:"InstallBehavior,omitempty"`
+	// URL of the manifest document for the package (`.pkg`) to install.
+	ManifestURL string `json:"ManifestURL"`
+	// macOS 27.0+.
+	UninstallBehavior *PackageUninstallBehavior `json:"UninstallBehavior,omitempty"`
+}
+
+// PackageInstallBehavior Describes how and when to install the package.
+type PackageInstallBehavior struct {
+	// Allowed values: see the PackageInstallBehaviorInstall constants.
+	Install *string `json:"Install,omitempty"`
+}
+
+// PackageUninstallBehavior macOS 27.0+.
+type PackageUninstallBehavior struct {
+	// If `true`, removes the files the package installed when the configuration is removed.
+	Remove *bool `json:"Remove,omitempty"`
 }
 
 // PagedResponseBlueprintOverview represents a paged response blueprint overview.
@@ -1047,6 +1614,125 @@ type ScientificMode struct {
 	// Write-only. Servers MUST NOT return this field in responses; the SDK preserves it only so the caller
 	// can supply a value on update.
 	Included *bool `json:"Included,omitempty"`
+}
+
+// ScreenSharingConnectionDeclaration Configures a connection to a screen-sharing host. macOS only.
+type ScreenSharingConnectionDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the ScreenSharingConnectionDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Screen Sharing Connection declaration.
+	Payload ScreenSharingConnectionDeclarationPayload `json:"payload"`
+	// Allowed values: see the ScreenSharingConnectionDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// ScreenSharingConnectionDeclarationPayload Payload fields for the Screen Sharing Connection declaration.
+type ScreenSharingConnectionDeclarationPayload struct {
+	// Asset declaration identifier of type `com.apple.asset.credential.userpassword` providing
+	// authentication credentials.
+	AuthenticationCredentialsAssetReference *string `json:"AuthenticationCredentialsAssetReference,omitempty"`
+	// Unique identifier for this connection when it is a member of a connection group.
+	ConnectionUUID string `json:"ConnectionUUID"`
+	// Display configuration for a screen-sharing connection.
+	DisplayConfiguration ScreenSharingDisplayConfiguration `json:"DisplayConfiguration"`
+	// The name of the connection.
+	DisplayName string `json:"DisplayName"`
+	// Host name or IP address of the screen-sharing host.
+	HostName string `json:"HostName"`
+	// TCP port to initiate the connection on.
+	Port *int `json:"Port,omitempty"`
+}
+
+// ScreenSharingConnectionGroupDeclaration Groups multiple Screen Sharing Connection declarations together. macOS only.
+type ScreenSharingConnectionGroupDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the ScreenSharingConnectionGroupDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Screen Sharing Connection Group declaration.
+	Payload ScreenSharingConnectionGroupDeclarationPayload `json:"payload"`
+	// Allowed values: see the ScreenSharingConnectionGroupDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// ScreenSharingConnectionGroupDeclarationPayload Payload fields for the Screen Sharing Connection Group declaration.
+type ScreenSharingConnectionGroupDeclarationPayload struct {
+	// Unique identifier for this connection group.
+	ConnectionGroupUUID string `json:"ConnectionGroupUUID"`
+	// The name of the connection group.
+	GroupName string `json:"GroupName"`
+	// `ConnectionUUID` values of Screen Sharing Connection declarations that belong to this group.
+	Members []string `json:"Members"`
+}
+
+// ScreenSharingDisplayConfiguration Display configuration for a screen-sharing connection.
+type ScreenSharingDisplayConfiguration struct {
+	// Number of virtual displays to create.
+	// Allowed values: see the ScreenSharingDisplayConfigurationDisplayType constants.
+	DisplayType string `json:"DisplayType"`
+}
+
+// ScreenSharingHostSettingsDeclaration Restricts how a device behaves as a screen-sharing host. macOS only.
+type ScreenSharingHostSettingsDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the ScreenSharingHostSettingsDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Screen Sharing Host Settings declaration.
+	Payload ScreenSharingHostSettingsDeclarationPayload `json:"payload"`
+	// Allowed values: see the ScreenSharingHostSettingsDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// ScreenSharingHostSettingsDeclarationPayload Payload fields for the Screen Sharing Host Settings declaration.
+type ScreenSharingHostSettingsDeclarationPayload struct {
+	// Maximum virtual displays to make available to clients.
+	MaximumVirtualDisplays *int `json:"MaximumVirtualDisplays,omitempty"`
+	// Initial UDP port for the host connection. Screen sharing always establishes its first connection on
+	// TCP port 5900.
+	PortBase                          *int  `json:"PortBase,omitempty"`
+	PreventCopyFilesFromHost          *bool `json:"PreventCopyFilesFromHost,omitempty"`
+	PreventCopyFilesToHost            *bool `json:"PreventCopyFilesToHost,omitempty"`
+	PreventHighPerformanceConnections *bool `json:"PreventHighPerformanceConnections,omitempty"`
+}
+
+// SiriSettingsDeclaration Configures Siri settings.
+type SiriSettingsDeclaration struct {
+	// The channel to which the declaration applies: - `SYSTEM` — applies to the system (device) channel
+	// - `USER` — applies to the user channel.
+	ChannelType DeclarationChannelType `json:"channelType"`
+	// All declarations in this component are `com.apple.configuration.*` types.
+	// Allowed values: see the SiriSettingsDeclarationKind constants.
+	Kind string `json:"kind"`
+	// Payload fields for the Siri Settings declaration.
+	Payload SiriSettingsDeclarationPayload `json:"payload"`
+	// Allowed values: see the SiriSettingsDeclarationType constants.
+	Type string `json:"type"`
+}
+
+// SiriSettingsDeclarationPayload Payload fields for the Siri Settings declaration.
+type SiriSettingsDeclarationPayload struct {
+	// Not supported on tvOS/watchOS. Requires iOS/macOS/visionOS 27.0+. If `false`, disables Siri AI
+	// features.
+	AllowSiriAI *bool `json:"AllowSiriAI,omitempty"`
+	// Not supported on macOS/tvOS/visionOS.
+	AllowUserGeneratedContent *bool `json:"AllowUserGeneratedContent,omitempty"`
+	// Not supported on macOS/tvOS/visionOS.
+	AllowWhileLocked *bool `json:"AllowWhileLocked,omitempty"`
+	// Not supported on watchOS. If `false`, disables Siri.
+	Enabled *bool `json:"Enabled,omitempty"`
+	// Not supported on tvOS/visionOS/watchOS.
+	ForceProfanityFilter *bool `json:"ForceProfanityFilter,omitempty"`
+	// Not supported on tvOS/watchOS. Requires iOS/macOS/visionOS 27.0+.
+	ForceReduceSensitiveContent *bool `json:"ForceReduceSensitiveContent,omitempty"`
 }
 
 // SoftwareUpdateSettingsComponent represents a software update settings component.

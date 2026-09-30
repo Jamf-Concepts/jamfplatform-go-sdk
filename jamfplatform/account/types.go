@@ -125,6 +125,59 @@ type DealRegistrationAddress struct {
 	StateProvince *string `json:"stateProvince,omitempty"`
 }
 
+// DealRegistrationCreate A new deal registration to submit against a prospective end customer. The partner organization is resolved from the access token, so it does not appear in the body.
+type DealRegistrationCreate struct {
+	// Free-form notes about the opportunity.
+	AdditionalNotes *string `json:"additionalNotes,omitempty"`
+	// Additional support the partner is requesting from Jamf for the opportunity.
+	AdditionalSupports *[]string `json:"additionalSupports,omitempty"`
+	// Address of the prospective end customer.
+	Address *DealRegistrationAddress `json:"address,omitempty"`
+	// Whether the prospective end customer has approved budget for the purchase.
+	BudgetApproved *bool `json:"budgetApproved,omitempty"`
+	// Market segment of the prospective end customer.
+	BusinessType *BusinessType `json:"businessType,omitempty"`
+	// Estimated device count for the opportunity, as a range.
+	DeviceCntRange *string `json:"deviceCntRange,omitempty"`
+	// Email address of the contact at the prospective end customer.
+	Email *string `json:"email,omitempty"`
+	// Number of employees or students at the prospective end customer organization.
+	EmployeeStudentCnt *int `json:"employeeStudentCnt,omitempty"`
+	// Date the partner expects the opportunity to close, as submitted.
+	ExpectedCloseDate *string `json:"expectedCloseDate,omitempty"`
+	// Given name of the contact at the prospective end customer.
+	FirstName *string `json:"firstName,omitempty"`
+	// Job title of the contact at the prospective end customer.
+	JobTitle *string `json:"jobTitle,omitempty"`
+	// Family name of the contact at the prospective end customer.
+	LastName *string `json:"lastName,omitempty"`
+	// Whether the prospective end customer is new to Jamf rather than an existing customer.
+	NewCustomer *bool `json:"newCustomer,omitempty"`
+	// Whether the opportunity introduces a Jamf product line the customer does not already own.
+	NewProductLine *bool `json:"newProductLine,omitempty"`
+	// Name of the prospective end customer organization.
+	OrganizationName *string `json:"organizationName,omitempty"`
+	// Telephone number of the contact.
+	Phone *string `json:"phone,omitempty"`
+	// Identifier of the primary distributor for the opportunity.
+	PrimaryDistributorAccountID *string `json:"primaryDistributorAccountId,omitempty"`
+	// Jamf products the prospective end customer is interested in.
+	ProductInterests *[]string `json:"productInterests,omitempty"`
+	// Identifier of the secondary distributor for the opportunity, if any.
+	SecondaryDistributorAccountID *string `json:"secondaryDistributorAccountId,omitempty"`
+	// Website of the prospective end customer organization.
+	Website *string `json:"website,omitempty"`
+}
+
+// DealRegistrationCreated A reference to a newly created deal registration.
+type DealRegistrationCreated struct {
+	// URL of the newly created deal registration.
+	Href string `json:"href"`
+	// Identifier Jamf assigned to the new deal registration; the same value as its
+	// `partnerRegistrationId`.
+	ID string `json:"id"`
+}
+
 // DealRegistrationList The deal registrations submitted by the partner organization.
 type DealRegistrationList struct {
 	// The deal registrations submitted by the partner organization.
