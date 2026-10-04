@@ -1753,21 +1753,24 @@ which is why the transport no longer has a default for a PATCH body.** The
 transport used to send `application/merge-patch+json` for a PATCH with no type
 named, and every generic PATCH to the Platform device endpoints failed. All 26
 generated PATCH operations were sent `{}`, against a bogus identifier where the
-path takes one, under both types:
+path takes one, under both types. The four `securitycloud` and the
+`aigovernance` operations were probed the same day from a second environment
+that has a Security Cloud tenant and the AI Governance capability, each beside a
+`200` list control and a `text/plain` request as a third type:
 
 | server behaviour | operations | agrees with the spec |
 |---|---|---|
-| merge-patch only — JSON is `415` | `UpdateBlueprint`, `UpdateDigicertTrustLifecycleManagerV1`, `UpdateVolumePurchasingLocationV1`, `UpdatePatchSoftwareTitleConfigurationV3`, `UpdateAdcsSettingsV1` | all five |
+| merge-patch only — JSON is `415` | `UpdateBlueprint`, `UpdateDigicertTrustLifecycleManagerV1`, `UpdateVolumePurchasingLocationV1`, `UpdatePatchSoftwareTitleConfigurationV3`, `UpdateAdcsSettingsV1`, `UpdateZtnaAppV1`, `UpdateZtnaGatewayV1`, `UpdateZtnaGroupedGatewayV1`, `UpdateDnsZoneV1` | all nine |
 | JSON only — merge-patch is `415` | `UpdateVenafiV1` | yes |
 | JSON only — merge-patch is `400 BAD_REQUEST` "malformed or the content type is not supported" | `UpdateDevice`, `UpdateDeviceGroup`, `UpdateDeviceGroupMembers` | all three |
-| both reach the service | the other ten `pro` operations | no conflict |
-| not reached | the four `securitycloud` ones (`404 TENANT_NOT_FOUND` precedes the type check on an environment without a Security Cloud tenant), `UpdateDistributorConfiguration`, `aigovernance` `UpdatePolicy` (credential lacks the capability) | unverified |
+| both reach the service | the other ten `pro` operations; `aigovernance` `UpdatePolicy` (both reach body validation, `400 VALIDATION_FAILED`, while `text/plain` is `415`, so the type is checked) | no conflict |
+| not reached | `UpdateDistributorConfiguration` — needs an organization credential | unverified |
 
 The Platform device rows are the ones a reported consumer hit — `400` for every
 body, `204` for the same body as JSON (traceId
 `3402e53b10de8a3658771b26596bfab7`), and the SDK's typed methods were never
 affected because they pass the spec's type. Defaulting to JSON instead would
-break the five merge-only rows the same way, so a PATCH body without a type is
+break the nine merge-only rows the same way, so a PATCH body without a type is
 refused before anything is sent. Every generated method names its type; only a
 caller of the generic transport sees the refusal.
 
