@@ -1700,6 +1700,33 @@ do not reshape a multipart body or escape plist content to placate a WAF.
 
 ---
 
+## PATCH content types (2026-10-04)
+
+**Every PATCH content type the specs declare is the one the server enforces,
+which is why the transport no longer has a default for a PATCH body.** The
+transport used to send `application/merge-patch+json` for a PATCH with no type
+named, and every generic PATCH to the Platform device endpoints failed. All 26
+generated PATCH operations were sent `{}`, against a bogus identifier where the
+path takes one, under both types:
+
+| server behaviour | operations | agrees with the spec |
+|---|---|---|
+| merge-patch only — JSON is `415` | `UpdateBlueprint`, `UpdateDigicertTrustLifecycleManagerV1`, `UpdateVolumePurchasingLocationV1`, `UpdatePatchSoftwareTitleConfigurationV3`, `UpdateAdcsSettingsV1` | all five |
+| JSON only — merge-patch is `415` | `UpdateVenafiV1` | yes |
+| JSON only — merge-patch is `400 BAD_REQUEST` "malformed or the content type is not supported" | `UpdateDevice`, `UpdateDeviceGroup`, `UpdateDeviceGroupMembers` | all three |
+| both reach the service | the other ten `pro` operations | no conflict |
+| not reached | the four `securitycloud` ones (`404 TENANT_NOT_FOUND` precedes the type check on an environment without a Security Cloud tenant), `UpdateDistributorConfiguration`, `aigovernance` `UpdatePolicy` (credential lacks the capability) | unverified |
+
+The Platform device rows are the ones a reported consumer hit — `400` for every
+body, `204` for the same body as JSON (traceId
+`3402e53b10de8a3658771b26596bfab7`), and the SDK's typed methods were never
+affected because they pass the spec's type. Defaulting to JSON instead would
+break the five merge-only rows the same way, so a PATCH body without a type is
+refused before anything is sent. Every generated method names its type; only a
+caller of the generic transport sees the refusal.
+
+---
+
 ## Pagination
 
 `ListAllPages` computes each page's offset by multiplying the *requested* page

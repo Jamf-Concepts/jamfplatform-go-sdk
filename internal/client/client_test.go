@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 )
@@ -167,20 +169,52 @@ func TestDoWithContentType(t *testing.T) {
 	}
 }
 
-func TestDo_PatchDefaultContentType(t *testing.T) {
+// A PATCH body without a content type is refused before it is sent, because
+// either default is wrong for part of the API: the transport used to assume
+// merge-patch, and every generic PATCH to the devices and device-groups
+// endpoints, which declare application/json, failed with a 400.
+func TestDo_PatchWithoutContentTypeIsRefused(t *testing.T) {
 	c, _, mux := newTestClient(t)
+	called := false
 	mux.HandleFunc("/api/patch-default", func(w http.ResponseWriter, r *http.Request) {
-		ct := r.Header.Get("Content-Type")
-		if ct != "application/merge-patch+json" {
-			t.Errorf("Content-Type = %q, want application/merge-patch+json", ct)
-		}
+		called = true
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	err := c.DoExpect(context.Background(), http.MethodPatch, "/api/patch-default",
-		map[string]string{"name": "x"}, http.StatusNoContent, nil)
-	if err != nil {
-		t.Fatal(err)
+	for name, body := range map[string]any{
+		"marshalled": map[string]string{"name": "x"},
+		"raw bytes":  []byte(`{"name":"x"}`),
+	} {
+		err := c.DoExpect(context.Background(), http.MethodPatch, "/api/patch-default",
+			body, http.StatusNoContent, nil)
+		if err == nil || !strings.Contains(err.Error(), "needs an explicit Content-Type") {
+			t.Errorf("%s: err = %v, want the explicit Content-Type refusal", name, err)
+		}
+	}
+	if called {
+		t.Error("a refused PATCH reached the server")
+	}
+}
+
+// The refusal is about the body's media type, so a PATCH with no body, and a
+// PATCH that names its type, both still go out.
+func TestDo_PatchWithoutBodyOrWithContentTypeIsSent(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	var got []string
+	mux.HandleFunc("/api/patch-sent", func(w http.ResponseWriter, r *http.Request) {
+		got = append(got, r.Header.Get("Content-Type"))
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	if err := c.DoExpect(context.Background(), http.MethodPatch, "/api/patch-sent", nil, http.StatusNoContent, nil); err != nil {
+		t.Fatalf("no body: %v", err)
+	}
+	if err := c.DoWithContentType(context.Background(), http.MethodPatch, "/api/patch-sent",
+		map[string]string{"name": "x"}, "application/merge-patch+json", http.StatusNoContent, nil); err != nil {
+		t.Fatalf("merge-patch: %v", err)
+	}
+	if want := []string{"", "application/merge-patch+json"}; !slices.Equal(got, want) {
+		t.Errorf("Content-Types = %q, want %q", got, want)
 	}
 }
 

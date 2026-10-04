@@ -154,6 +154,15 @@ Transport entry points: `Do(ctx, method, path, body, result)` expects 200;
 Content-Type; `DoWithOptions(..., client.RequestOptions{…}, result)` is the
 general form and the **only one that can carry request headers**.
 
+**A PATCH body has no default Content-Type; the transport refuses one sent
+without a type**, before any request goes out. The gateway's endpoints split
+between `application/json` and `application/merge-patch+json` and each enforces
+its own, so either default breaks half of them — the old merge-patch default
+made every generic PATCH to `devices` and `device-groups` a 400. Every spec's
+declared type was wire-checked correct, and every generated method passes it, so
+only a generic-transport caller can reach the refusal. Evidence:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#patch-content-types-2026-10-04).
+
 `RequestOptions` exists because the per-request dimensions are independent —
 expected status, Content-Type, extra headers, retry opt-out — so a wrapper per
 combination doubles the surface each time one is added. The named methods above
