@@ -281,6 +281,13 @@ func (c *Client) ListStaticMobileDeviceGroupsV2(ctx context.Context, sort []stri
 //
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
+//
+// The server requires `Assignments` and `SiteID`, which the spec declares optional. Without
+// `Assignments` the request fails with a bare `500` whose `errors` array is empty; without `SiteID`,
+// or with it empty, it fails with `403 INVALID_PRIVILEGE` on field `siteId`, which is not a privilege
+// problem. Send an empty slice and `"-1"` (no site) when neither applies.
+// `TestAcceptance_Pro_StaticMobileDeviceGroupV2RequiresAssignmentsAndSiteID` fails the day the server
+// accepts the omission.
 func (c *Client) CreateStaticMobileDeviceGroupV2(ctx context.Context, request *StaticGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result HrefResponse
@@ -335,6 +342,14 @@ func (c *Client) DeleteStaticMobileDeviceGroupV2(ctx context.Context, id string)
 //
 // Parameters:
 //   - id: instance id of static-group.
+//
+// The server requires `Assignments` and `SiteID` on every patch, which the spec declares optional:
+// without `Assignments` the request fails with a bare `500`, and without `SiteID` with `400
+// INVALID_FIELD` "Cannot parse null string". `Assignments` is incremental: each entry adds (`Selected`
+// true) or removes (`Selected` false) one device, and an empty slice leaves the members unchanged, so
+// it is the safe value when only the name or description changes.
+// `TestAcceptance_Pro_StaticMobileDeviceGroupV2RequiresAssignmentsAndSiteID` fails the day either
+// behaviour changes.
 func (c *Client) PatchStaticMobileDeviceGroupV2(ctx context.Context, id string, request *StaticGroupAssignment) (*StaticGroupAssignment, error) {
 	prefix := c.transport.APIPrefix("pro", "v2")
 	var result StaticGroupAssignment

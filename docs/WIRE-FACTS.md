@@ -377,8 +377,8 @@ membership is modelled as a read on the title, not a delete on it.
 
 ### Server bugs worth reporting
 
-- `POST .../pro/v3/computer-groups/static-groups` 500s if `assignments` is
-  omitted despite being optional in the spec; pass `assignments: []`.
+- The static-group writes 500 without fields their spec calls optional — see
+  [the next section](#static-group-writes-need-fields-the-spec-calls-optional-2026-10-04).
 - `POST /v2/mdm/commands` with `{}` answered **500 with an empty `errors` array**,
   while `{"clientData":[],"commandData":{}}` correctly answered `400 INVALID_FIELD`.
   (Recorded before the path was withdrawn.)
@@ -387,6 +387,52 @@ membership is modelled as a read on the title, not a delete on it.
   `TestAcceptance_Pro_IconV1` swallows it through a skip-on-server-error branch —
   contrary to the never-tolerate-real-errors rule — and because a 500 on a GET is
   retryable the test spends ~153 s in the retry loop first.
+
+### Static-group writes need fields the spec calls optional (2026-10-04)
+
+`StaticComputerGroupAssignment` and `StaticGroupAssignment` declare only the
+name required, so the SDK carries `assignments` and `siteId` as omitempty
+pointers. The server refuses every body without them. Jamf Pro 11.32, through
+the EU gateway and environment-scoped, each refusal beside an accepted control
+in the same invocation (`{name, assignments: []}` → 201;
+`{groupName, siteId: "-1", assignments: []}` → 201):
+
+| operation | body | answer |
+|---|---|---|
+| `POST /v3/computer-groups/static-groups` | `{name}`, `{name, siteId}`, `{name, assignments: null}` | `500`, `errors: []` |
+| `PUT /v3/computer-groups/static-groups/{id}` | `{name}` | `500`, `errors: []` |
+| `POST /v2/mobile-device-groups/static-groups` | `{groupName}`, `{groupName, siteId}` | `500`, `errors: []` |
+| same | `{groupName, assignments: []}`, or `siteId: ""` | `403 INVALID_PRIVILEGE`, field `siteId` |
+| `PATCH /v2/mobile-device-groups/static-groups/{id}` | without `assignments`, or description only | `500`, `errors: []` |
+| same | without `siteId` | `400 INVALID_FIELD` "Cannot parse null string" |
+| same | without `groupName` | `400 INVALID_FORMAT`, field `groupName` |
+
+**The spec is followed anyway, because the local repair would not repair
+anything.** Marking the fields required drops `omitempty`, and then a caller
+who leaves them unset sends `assignments: null` and `siteId: ""` — the two rows
+above that fail identically. It would only help a caller who already sets the
+field. The cost is carried in the four methods' `methodNotes` instead, and
+`TestAcceptance_Pro_StaticComputerGroupV3RequiresAssignments` and
+`TestAcceptance_Pro_StaticMobileDeviceGroupV2RequiresAssignmentsAndSiteID`
+assert every refusal, so either fails the day the server changes. The defect to
+report is the server's: a missing field should be a 400 that names it, or
+absence should mean "keep what is there".
+
+**The two member-list semantics are opposites.**
+
+- The computer `PUT` **replaces**: a group of `[84,106,107]` written with
+  `["117"]` became `[117]`, and `[]` emptied it. The `GET` returns no members
+  and Jamf Pro has no static computer membership endpoint, so Classic
+  `GET /computergroups/id/{id}` is the only read-back. `ApplyStaticComputerGroupV3`
+  takes the same path, so an apply that omits `Assignments` 500s and one that
+  sends `[]` empties the group.
+- The mobile `PATCH` is **incremental**: `{mobileDeviceId, selected: true}` adds,
+  `selected: false` removes, `[]` leaves `[64,65]` as it was.
+  `ApplyStaticMobileDeviceGroupV2` pre-fetches the membership into the body,
+  which is why it does not hit the 500.
+
+The `PUT` response echoes `siteId: null` for a group the `GET` reports at
+`"-1"`.
 
 ### The remaining 38 jpapi paths (whitelisted 2026-08-31)
 

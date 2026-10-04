@@ -527,6 +527,7 @@ recorded**, unless noted.
 | `pro` `GET /v1/dss-declarations/{id}` | routed, `500` for every identifier | `TestAcceptance_Pro_DssDeclarationsBrokenForEveryIdentifier` |
 | `pro` `GET /v1/mdm/commands` | both parameters together is `500`; neither is `400` with empty `errors` | `TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV1` |
 | `pro` `PUT /v1/cache-settings` | refused on any hosted tenant | `TestAcceptance_Pro_CacheSettings_UpdateV1RefusedOnHostedTenant` |
+| `pro` static-group writes | `assignments` (and `siteId` for mobile) declared optional, refused when absent with a bare `500` or a misleading `403`; spec followed, cost in `methodNotes` — see [WIRE-FACTS](docs/WIRE-FACTS.md#static-group-writes-need-fields-the-spec-calls-optional-2026-10-04) | `TestAcceptance_Pro_StaticComputerGroupV3RequiresAssignments`, `TestAcceptance_Pro_StaticMobileDeviceGroupV2RequiresAssignmentsAndSiteID` |
 | `proclassic` `/activationcode` | deprecated with **no successor** anywhere — ships a `// Deprecated:` marker deliberately (see Hard rules) | `TestAcceptance_Classic_GetActivationCode` |
 | `proclassic` `GET /patches/name/{name}` | `500` for every name | `TestAcceptance_Classic_PatchByName` |
 | `proclassic` `POST`/`PUT /patches/id/{id}` | refused whatever the body | `TestAcceptance_Classic_PatchByIDWrites` |
