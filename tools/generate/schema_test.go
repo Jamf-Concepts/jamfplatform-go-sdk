@@ -710,7 +710,7 @@ func TestApplyPropertyRenamesReachesEveryExampleLocation(t *testing.T) {
 		"response header example": func(ex, foreign map[string]any) *openapi3.T {
 			header := func(v map[string]any) openapi3.Headers {
 				return openapi3.Headers{"X-Thing": {Value: &openapi3.Header{
-					Parameter: openapi3.Parameter{Example: v},
+					Example: v,
 				}}}
 			}
 			resp := openapi3.NewResponse()
@@ -722,8 +722,8 @@ func TestApplyPropertyRenamesReachesEveryExampleLocation(t *testing.T) {
 		"component header example": func(ex, foreign map[string]any) *openapi3.T {
 			doc := docWithResponse(openapi3.NewResponse(), openapi3.NewResponse())
 			doc.Components.Headers = openapi3.Headers{
-				"X-Thing": {Value: &openapi3.Header{Parameter: openapi3.Parameter{Example: ex}}},
-				"X-Other": {Value: &openapi3.Header{Parameter: openapi3.Parameter{Example: foreign}}},
+				"X-Thing": {Value: &openapi3.Header{Example: ex}},
+				"X-Other": {Value: &openapi3.Header{Example: foreign}},
 			}
 			return doc
 		},
