@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestNewClient_DefaultUserAgent(t *testing.T) {
@@ -167,5 +168,27 @@ func TestScopeIsReadableByConsumers(t *testing.T) {
 				t.Errorf("TenantID() = %q disagrees with Scope() id %q", c.transport.TenantID(), id)
 			}
 		})
+	}
+}
+
+// The public option must reach the transport it configures. Entering through
+// NewClient is the point: the transport-level tests cannot catch a plumbing gap
+// between the exported option and the internal one.
+func TestWithResponseHeaderTimeout_ReachesTheTransport(t *testing.T) {
+	slow := func(t *testing.T, opts ...Option) error {
+		t.Helper()
+		c, mux := testServerWithOpts(t, opts...)
+		mux.HandleFunc("/api/slow", func(w http.ResponseWriter, _ *http.Request) {
+			time.Sleep(400 * time.Millisecond)
+			w.WriteHeader(http.StatusOK)
+		})
+		return c.Transport().Do(context.Background(), http.MethodGet, "/api/slow", nil, nil)
+	}
+
+	if err := slow(t); err != nil {
+		t.Fatalf("with no option a 400ms response must succeed, got %v", err)
+	}
+	if err := slow(t, WithResponseHeaderTimeout(100*time.Millisecond)); err == nil {
+		t.Error("WithResponseHeaderTimeout(100ms) did not bound a 400ms response")
 	}
 }

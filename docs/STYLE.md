@@ -1583,6 +1583,51 @@ of one.
 `TestDoMultipart_*AfterSend*` tests pin it, and fail under the old always-retry
 answer.
 
+### Request lifetime belongs to the caller's context
+
+The SDK sets **no `http.Client.Timeout` and no default `ResponseHeaderTimeout`**.
+Both are wall-clock bounds that fire whatever context the caller passed, so both
+override it: a Terraform `timeouts { update = "10m" }` on a smart group that takes
+90s to answer was cut off client-side at the SDK's 60s, and the cut-off was then
+retried. A request's lifetime is the context's, and every consumer is expected to
+pass one with a deadline.
+
+`WithResponseHeaderTimeout(d)` is the opt-in for a caller that wants one flat
+ceiling. It is applied to the SDK's own `*http.Transport` after every option has
+run (so option order does not matter and `SetUserAgent` re-applies it), it is a
+logged no-op under `WithHTTPClient` because that transport is the caller's, and
+`d <= 0` means none. It is a poor fit for package uploads, which share the
+transport and can legitimately take a long time to answer after the body.
+
+What stands in for a default header timeout as the guard against a dead path is
+the **HTTP/2 health check** on the tuned transport (`http2PingAfter` /
+`http2PingTimeout`, 30s + 15s). It notices a connection that has gone silent after
+a request was sent in ~45s, against ~5 minutes for TCP keepalive, and it cannot
+interrupt a slow response, because the peer answers a PING whatever its handler is
+doing — which no header timeout can promise. The gateway negotiates h2 on every
+namespace and answers the pings (see WIRE-FACTS). HTTP/1.1 has no equivalent; a
+fallback connection, such as one behind a TLS-inspecting proxy, has the dialer's
+keepalive only.
+
+**The OAuth token refresh is the one request the caller's context cannot
+reach.** A refresh triggered by an API call runs on a context captured when the
+client was built, so a caller's deadline neither starts nor interrupts it, and
+`reuseTokenSource` holds a mutex across it, so every concurrent call queues behind
+a stalled one. With no default header timeout it is bounded by the edge's own
+timeout and the h2 health check, not by an SDK timer. That is a judgement, not an
+oversight: the edge cuts a silent origin off, the health check catches a dead path,
+and a stalled refresh was 2×60s before this (x/oauth2 retries the other
+client-authentication style on any error). **If it ever proves insufficient, the
+fix is a second `*http.Transport` carrying a `ResponseHeaderTimeout`, selected by
+the token URL beneath the header wrapper — not `Client.Timeout` on the base
+client**, because `oauth2.NewClient` copies `Timeout` onto the API client it
+returns and that would cap every call and upload.
+
+`TestTunedTransport_*`, `TestWithResponseHeaderTimeout_*` and
+`TestResponseHeaderTimeout_NotSetByDefault` pin it; the health-check test uses the
+real tuned transport with only the two durations shortened, and fails if h2 is
+silently not negotiated.
+
 ---
 
 ## Acceptance tests

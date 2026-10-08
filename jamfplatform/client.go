@@ -69,6 +69,9 @@ func NewClient(baseURL, clientID, clientSecret string, opts ...Option) *Client {
 	if cfg.retryPolicySet {
 		transportOpts = append(transportOpts, client.WithRetryPolicy(cfg.retryWaitMin, cfg.retryWaitMax, cfg.retryMax))
 	}
+	if cfg.responseHeaderTimeout > 0 {
+		transportOpts = append(transportOpts, client.WithResponseHeaderTimeout(cfg.responseHeaderTimeout))
+	}
 
 	transport := client.NewTransportWithUserAgent(baseURL, clientID, clientSecret, cfg.userAgent, transportOpts...)
 	if cfg.logger != nil {
@@ -162,6 +165,8 @@ type clientConfig struct {
 	retryWaitMax   time.Duration
 	retryMax       int
 	retryPolicySet bool
+
+	responseHeaderTimeout time.Duration
 }
 
 // Option configures a Client.
@@ -377,5 +382,32 @@ func WithRetryPolicy(waitMin, waitMax time.Duration, maxRetries int) Option {
 		cfg.retryWaitMax = waitMax
 		cfg.retryMax = maxRetries
 		cfg.retryPolicySet = true
+	}
+}
+
+// WithResponseHeaderTimeout bounds how long the client waits for the server to
+// start answering once a request has been fully written. It is opt-in: with no
+// option the SDK sets no such bound, and the context passed to each call is the
+// only request deadline. That is deliberate — a bound that fires regardless of
+// the context overrides it, so a Terraform `timeouts { update = "10m" }` on an
+// endpoint that takes two minutes to answer would be cut off client-side. Bound
+// calls with a context deadline.
+//
+// Use this only for a flat ceiling on every request. It applies to the OAuth2
+// token exchange and to package uploads too, and an upload is a poor fit: the
+// server can legitimately take a long time to answer after it has received the
+// body.
+//
+// A request that times out this way after it was sent is returned after one
+// attempt, whatever its method. The retry policy deliberately does not retry it,
+// since doing so would multiply the bound you just chose by the attempt count.
+//
+// A value <= 0 means no bound, which is also the default. It has no effect with
+// WithHTTPClient: that client's transport replaces the SDK's, and its timeouts
+// are yours to set. The option logs when that happens rather than ignoring you
+// silently.
+func WithResponseHeaderTimeout(d time.Duration) Option {
+	return func(cfg *clientConfig) {
+		cfg.responseHeaderTimeout = d
 	}
 }

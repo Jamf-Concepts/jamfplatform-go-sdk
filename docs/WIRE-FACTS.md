@@ -4450,6 +4450,40 @@ one.
 
 ## Transport details established by probing
 
+- **HTTP/2 end to end on the client side, for every namespace, in every region
+  (2026-10-08).** `us`, `eu` and `apac` all negotiate `h2` by ALPN. One client
+  sent the token exchange and then `pro`, `proclassic`, `devices`, `blueprints`,
+  `securitycloud` and `audit` (environment credential), `licensing`, `partners` and
+  `sso` (organization credential) and a nonsense namespace on each — 13 requests
+  in all — and each credential's client held **one connection** for all of them,
+  every response `HTTP/2.0`, whatever the status. The version is a
+  property of the TLS connection to the edge, not of the path, so there is no
+  namespace that behaves differently. The control in the same run, forcing
+  HTTP/1.1, reported `HTTP/1.1`, so the detector can see the difference. No
+  `alt-svc` is advertised, so there is nothing for an h3-capable client to move to.
+  **This is the first hop only**: CloudFront to the gateway to the service may be
+  HTTP/1.1, and an h2 PING is answered by the edge, not the origin.
+- **The gateway answers h2 PINGs.** With `SendPingTimeout` and `PingTimeout` at 1s
+  and a 6s idle gap — several pings — the connection survived and the next request
+  reused it; an unanswered ping closes it. The no-ping control behaved the same, so
+  the edge does not drop an idle connection inside that window.
+- **The token endpoint and the API sit behind the same CloudFront distribution**
+  (`via: … (CloudFront)`, `x-amz-cf-id` on both, and on a nonsense namespace). The
+  token route is proxied by the gateway to the identity service with no per-route
+  timeout in the gateway's API definitions; its global default is not in them.
+- **A stalled token endpoint is not bounded by the caller's context.** With a 1s
+  caller deadline and `/auth/token` held open, a call returned after 2m0s: two
+  attempts at the then-default 60s header timeout, because x/oauth2 retries the other
+  client-authentication style on any error. With the default removed the same stall
+  tracked the server's, an 8s hold returning after 8s. See
+  [STYLE.md](STYLE.md#request-lifetime-belongs-to-the-callers-context).
+- **Reported, not reproduced: the edge answers 504 after 90s.** One field report
+  from a downstream CLI: a 2000-row computer-inventory page fetched with curl and a
+  10-minute client timeout returned a CloudFront HTML 504 at 90s, while a 1000-row
+  page took 45s and succeeded. Consistent with a raised CloudFront origin-response
+  timeout and with the gateway's own `hard_timeouts` above; not measured here
+  because producing a >90s response needs a tenant large enough to do it.
+
 - **Credentials in the base URL's userinfo (`https://user:pass@host/path`) never
   reach the wire.** `net/http` applies `URL.User` as Basic only when
   `Authorization` is empty, and both the token exchange and API calls already
