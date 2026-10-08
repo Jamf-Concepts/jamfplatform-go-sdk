@@ -1810,55 +1810,6 @@ func TestAcceptance_SecurityCloudUemConnectSyncSettingsValidation(t *testing.T) 
 	t.Logf("in-enum refreshRateMinutes on a nonexistent configId: 404, resolution reached (%v)", err)
 }
 
-// TestAcceptance_SecurityCloudUemConnectThreshold30AheadOfServer pins a
-// spec-ahead-of-server value, and it is a limitation: it should fail the day
-// the server catches up.
-//
-// v2362 added 30 to deviceUnmanagedThreshold's enum, so the SDK now carries
-// SyncSettingsDeviceUnmanagedThreshold30. The server still refuses it —
-// "Invalid deviceUnmanagedThreshold: 30. Allowed values: 0, 1, 3, 5, 7, 14",
-// deterministic 2/2 on 2026-09-30 — while 14 passes validation and reaches the
-// 404 on the same bogus configId. The ordering is the one the test above pins,
-// so this needs no connector.
-//
-// When 30 starts answering 404 here, the server has caught up: delete this
-// test, and let the validation test above carry the enum.
-func TestAcceptance_SecurityCloudUemConnectThreshold30AheadOfServer(t *testing.T) {
-	sc := accSecurityCloudClient(t)
-	ctx := context.Background()
-	const bogusID = "bogus000000000000000000"
-
-	body := func(threshold securitycloud.SyncSettingsDeviceUnmanagedThreshold) *securitycloud.SyncSettings {
-		v := int(threshold)
-		return &securitycloud.SyncSettings{
-			Vendor:                   securitycloud.SyncSettingsVendorJamfPro,
-			AutoDeviceDeletion:       securitycloud.SyncSettingsAutoDeviceDeletionDeletedOrRetired,
-			DeviceFieldMappings:      securitycloud.DeviceFieldMappings{},
-			DeviceUnmanagedThreshold: &v,
-		}
-	}
-
-	// Control: a value the server has always accepted passes validation.
-	err := sc.UpdateUemConnectorSyncSettingsV1(ctx, bogusID, body(securitycloud.SyncSettingsDeviceUnmanagedThreshold14))
-	var apiErr *jamfplatform.APIResponseError
-	if !errors.As(err, &apiErr) || !apiErr.HasStatus(404) {
-		t.Fatalf("control: threshold 14 on a nonexistent configId returned %v, want 404 — without it the "+
-			"assertion below proves nothing", err)
-	}
-
-	err = sc.UpdateUemConnectorSyncSettingsV1(ctx, bogusID, body(securitycloud.SyncSettingsDeviceUnmanagedThreshold30))
-	if !errors.As(err, &apiErr) {
-		t.Fatalf("threshold 30 gave a non-API error: %v", err)
-	}
-	if apiErr.HasStatus(404) {
-		t.Fatalf("threshold 30 now passes validation (404 on the bogus configId): the server has caught up "+
-			"with v2362's enum. Delete this test and record the date in docs/WIRE-FACTS.md. (%v)", err)
-	}
-	if !apiErr.HasStatus(422) || !strings.Contains(apiErr.Error(), "Invalid deviceUnmanagedThreshold: 30") {
-		t.Fatalf("threshold 30 returned %v, want 422 naming deviceUnmanagedThreshold", err)
-	}
-}
-
 // TestAcceptance_SecurityCloudUemConnectVendorMismatch pins v2005's
 // `422 VENDOR_MISMATCH`: the body `vendor` must equal the connector's stored
 // vendor, it selects which vendor-specific fields apply rather than which

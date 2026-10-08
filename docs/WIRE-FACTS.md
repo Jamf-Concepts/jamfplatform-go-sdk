@@ -3159,6 +3159,11 @@ covered as calls, not as outcomes.
 
 ### v2362's `deviceUnmanagedThreshold: 30` is ahead of the server (2026-09-30)
 
+**Resolved 2026-10-08.** CI's acceptance run answered `404 NOT_FOUND` for `30` on
+the bogus `configId`, with `14` as the control in the same invocation — validation
+now passes it. The pin test was deleted; `…SyncSettingsValidation` carries the
+enum. The table below is the 2026-09-30 record.
+
 JSC environment credential, `GET /securitycloud/uem-connect/v1/connectors` at
 200 and a bogus uem-connect path at `403 BAD_PERMISSIONS` as controls in the
 same invocation. `PUT …/connectors/00000000-0000-0000-0000-000000000000/sync-settings`
@@ -3175,6 +3180,16 @@ lists the v1958 set. `deviceFieldMappings` must be an object: `[]` is
 `422 "The request body could not be read"`, which masks every field check.
 
 ## Jamf Account (`account`) — organization scope
+
+### The distributor fault changed shape: `400` became `500` (2026-10-08)
+
+CI acceptance run, organization credential: `GET /partners/v1/distributor/configuration`
+and `POST /partners/v1/distributor/validate-purchase-order` both answer
+`500 [UPSTREAM_ERROR] The request could not be completed` — no Skyway attribution,
+status raised from 400. The surface is still dead, so `isSkywayScopeFault` now also
+matches a 500 carrying `UPSTREAM_ERROR`. The quote and purchase-order reads were
+not reached (the tests stop at the first probe) and are unverified in this form.
+This is the same body the deal-registration `500` carries.
 
 ### Both holds lifted: the server dropped `License.type` and renamed `authZeroRegion` to `region` (2026-09-14)
 

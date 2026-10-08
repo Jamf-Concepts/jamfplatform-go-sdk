@@ -523,10 +523,9 @@ recorded**, unless noted.
 | `proclassic` `POST`/`PUT /patches/id/{id}` | refused whatever the body | `TestAcceptance_Classic_PatchByIDWrites` |
 | v1942's 146 withdrawn operations | still served on the wire; SDK deliberately stricter | — (see [WIRE-FACTS](docs/WIRE-FACTS.md#v1942-dropped-146-deprecated-operations-from-the-specs-every-one-is-live-2026-09-01)) |
 | `blueprints` `com.jamf.ddm-strict` | closed declaration `oneOf` in the spec, open on the wire | `TestAcceptance_Blueprint_DeclarationsComponentRoundTrip` |
-| `securitycloud` uem-connect `deviceUnmanagedThreshold: 30` | declared, refused with `422` | `TestAcceptance_SecurityCloudUemConnectThreshold30AheadOfServer` |
 | `securitycloud` uem-connect `Accept` | `application/xml` answers 200 with XML against a JSON-only claim | `TestAcceptance_SecurityCloudUemConnectAcceptNegotiation` |
 | `account` deal-registration item + create | deterministic `500 UPSTREAM_ERROR` | `TestAcceptance_AccountDealRegistrationItemAndCreate` |
-| `account` distributor surface | `400 UPSTREAM_ERROR` "… via Skyway distributor service" | `TestAcceptance_AccountDistributorReads` |
+| `account` distributor surface | `400 UPSTREAM_ERROR` "… via Skyway distributor service"; `500 UPSTREAM_ERROR` since 2026-10-08 | `TestAcceptance_AccountDistributorReads` |
 | `account` privileges | stripped from the published specs by the pipeline; supplied by `config.requiredPrivileges` (see Packages) | `TestAccountRegistryPrivilegesComeFromGatewayPolicy` |
 | `aigovernance` | every 2xx carries `Jamf-Preview: true`, invisible to the generated surface | `TestAcceptance_AiGovernancePreviewHeader` |
 | `aigovernance` `GetPolicyDeployment` | reports 0 blueprints for policies that blueprints reference | `TestAcceptance_AiGovernanceDeploymentReportsReferencingBlueprints` |
