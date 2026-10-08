@@ -330,6 +330,8 @@ func unwrapTuned(t *testing.T, rt http.RoundTripper) *http.Transport {
 			rt = v.base
 		case *sendTrackingTransport:
 			rt = v.base
+		case *protocolTransport:
+			rt = v.h2
 		case *http.Transport:
 			return v
 		default:

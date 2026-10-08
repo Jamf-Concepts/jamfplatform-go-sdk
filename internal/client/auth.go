@@ -6,6 +6,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
@@ -92,6 +93,51 @@ func newTunedTransport() *http.Transport {
 		WriteBufferSize: 1 << 20,
 		ReadBufferSize:  1 << 16,
 	}
+}
+
+// newHTTP1Transport returns the tuned transport with HTTP/2 switched off. It
+// carries multipart uploads, which are measurably worse over HTTP/2 on this
+// gateway: CloudFront advertises a 64 KiB per-stream window, so a single h2
+// upload is capped at 64 KiB per round trip (about 4 MiB/s at 13 ms), while
+// HTTP/1.1 is limited only by the uplink (about 10 MiB/s on the same link).
+// A non-nil, empty TLSNextProto is what stops net/http enabling HTTP/2 by itself;
+// ForceAttemptHTTP2 alone does not, because a custom dialer is configured.
+func newHTTP1Transport() *http.Transport {
+	t := newTunedTransport()
+	t.ForceAttemptHTTP2 = false
+	t.HTTP2 = nil
+	t.TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{}
+	return t
+}
+
+type http1Key struct{}
+
+// withHTTP1 marks ctx so protocolTransport sends the request over HTTP/1.1.
+func withHTTP1(ctx context.Context) context.Context {
+	return context.WithValue(ctx, http1Key{}, true)
+}
+
+func wantsHTTP1(ctx context.Context) bool {
+	v, _ := ctx.Value(http1Key{}).(bool)
+	return v
+}
+
+// protocolTransport chooses between the SDK's HTTP/2-capable and HTTP/1.1-only
+// transports per request. It is per request rather than per client because the
+// same authenticated client carries every call: swapping uploadClient's transport
+// would drag the no-retry JSON writes that share it onto HTTP/1.1 as well, and
+// the token exchange, which carries no marker, must keep multiplexing on h2.
+type protocolTransport struct {
+	h2, h1 http.RoundTripper
+}
+
+// RoundTrip routes a marked request to the HTTP/1.1 transport and everything
+// else to the HTTP/2-capable one.
+func (t *protocolTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if wantsHTTP1(req.Context()) {
+		return t.h1.RoundTrip(req)
+	}
+	return t.h2.RoundTrip(req)
 }
 
 // userAgentTransport wraps an http.RoundTripper to add a User-Agent header to all requests.
@@ -193,15 +239,17 @@ func newCookieJar() *cookiejar.Jar {
 // underlying Transport bounds each network phase individually.
 //
 // tuned is returned so WithResponseHeaderTimeout can reach the *http.Transport
-// at the bottom of the chain; it is not otherwise needed once the chain is built.
-func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttle *requestThrottle) (oauthClient *http.Client, baseClient *http.Client, tuned *http.Transport) {
+// values at the bottom of the chain (the HTTP/2-capable one and its HTTP/1.1
+// twin for multipart); it is not otherwise needed once the chain is built.
+func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttle *requestThrottle) (oauthClient *http.Client, baseClient *http.Client, tuned []*http.Transport) {
 	jar := newCookieJar()
 	base := &http.Client{Jar: jar}
 
-	// The send tracker goes directly above the *http.Transport so the trace it
+	// The send tracker goes directly above the transports so the trace it
 	// attaches is on the request that is actually written; see sendTrackingTransport.
-	tuned = newTunedTransport()
-	var rt http.RoundTripper = &sendTrackingTransport{base: tuned}
+	h2, h1 := newTunedTransport(), newHTTP1Transport()
+	tuned = []*http.Transport{h2, h1}
+	var rt http.RoundTripper = &sendTrackingTransport{base: &protocolTransport{h2: h2, h1: h1}}
 	if throttle != nil {
 		rt = &throttleTransport{base: rt, throttle: throttle}
 	}

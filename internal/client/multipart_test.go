@@ -6,10 +6,16 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/http/httptest"
+	"os"
+	"slices"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -73,81 +79,178 @@ func TestDoMultipart_FileUpload(t *testing.T) {
 	_ = srv
 }
 
-// TestDoMultipart_PrecomputedContentLength verifies that when Content is an
-// io.Seeker (here: bytes.Reader) the transport sets Content-Length exactly
-// and avoids chunked transfer encoding — the primary perf/compat property
-// for big package uploads.
-func TestDoMultipart_PrecomputedContentLength(t *testing.T) {
-	c, _, mux := newTestClient(t)
-
-	var gotCL int64
-	var gotTE string
-	var gotBodyLen int64
-	mux.HandleFunc("/api/up", func(w http.ResponseWriter, r *http.Request) {
-		gotCL = r.ContentLength
-		gotTE = strings.Join(r.TransferEncoding, ",")
-		n, _ := io.Copy(io.Discard, r.Body)
-		gotBodyLen = n
-		w.WriteHeader(http.StatusCreated)
-	})
-
-	payload := strings.Repeat("A", 4096)
-	err := c.DoMultipart(context.Background(), http.MethodPost, "/api/up", []MultipartField{
-		{Name: "file", Filename: "x.bin", Content: bytes.NewReader([]byte(payload))},
-	}, http.StatusCreated, nil)
+// Every multipart request is sent chunked, with no declared Content-Length,
+// whatever the reader is. A declared length lowered the ceiling of a large
+// upload on the gateway (1.43 GiB over HTTP/1.1 was refused near 1.04 GiB with
+// one and uploaded whole without), and there is deliberately no size threshold
+// or opt-out, so a seekable file, an *os.File and a plain reader must all take
+// the same path.
+func TestDoMultipart_NeverDeclaresContentLength(t *testing.T) {
+	file, err := os.CreateTemp(t.TempDir(), "up-*.bin")
 	if err != nil {
-		t.Fatalf("DoMultipart: %v", err)
+		t.Fatal(err)
 	}
-	if gotCL <= 0 {
-		t.Errorf("ContentLength = %d, want > 0 (precomputed for seekable reader)", gotCL)
+	payload := strings.Repeat("A", 4096)
+	if _, err := file.WriteString(payload); err != nil {
+		t.Fatal(err)
 	}
-	if gotTE == "chunked" {
-		t.Errorf("TransferEncoding = chunked, want identity (Content-Length should be set)")
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		t.Fatal(err)
 	}
-	if gotCL != gotBodyLen {
-		t.Errorf("ContentLength header %d != actual body bytes %d", gotCL, gotBodyLen)
+	t.Cleanup(func() { _ = file.Close() })
+
+	readers := map[string]func() io.Reader{
+		"bytes.Reader (seekable)": func() io.Reader { return bytes.NewReader([]byte(payload)) },
+		"*os.File":                func() io.Reader { _, _ = file.Seek(0, io.SeekStart); return file },
+		"plain io.Reader":         func() io.Reader { return unseekableReader{r: strings.NewReader(payload)} },
+	}
+	for name, mk := range readers {
+		t.Run(name, func(t *testing.T) {
+			c, _, mux := newTestClient(t)
+			var gotCL int64
+			var gotTE []string
+			var gotBody int64
+			var gotProto string
+			mux.HandleFunc("/api/up", func(w http.ResponseWriter, r *http.Request) {
+				gotCL, gotTE, gotProto = r.ContentLength, r.TransferEncoding, r.Proto
+				gotBody, _ = io.Copy(io.Discard, r.Body)
+				w.WriteHeader(http.StatusCreated)
+			})
+
+			err := c.DoMultipart(context.Background(), http.MethodPost, "/api/up", []MultipartField{
+				{Name: "file", Filename: "x.bin", Content: mk()},
+			}, http.StatusCreated, nil)
+			if err != nil {
+				t.Fatalf("DoMultipart: %v", err)
+			}
+			if gotCL != -1 {
+				t.Errorf("server saw ContentLength = %d, want -1 (no declared length)", gotCL)
+			}
+			if !slices.Equal(gotTE, []string{"chunked"}) {
+				t.Errorf("TransferEncoding = %v, want [chunked]", gotTE)
+			}
+			if gotProto != "HTTP/1.1" {
+				t.Errorf("Proto = %q, want HTTP/1.1", gotProto)
+			}
+			if gotBody < int64(len(payload)) {
+				t.Errorf("server read %d body bytes, want at least the %d-byte payload", gotBody, len(payload))
+			}
+		})
 	}
 }
 
 // unseekableReader is an io.Reader that deliberately does not implement
-// io.Seeker — used to assert the chunked-fallback path.
+// io.Seeker — used to assert the not-rewindable path.
 type unseekableReader struct{ r io.Reader }
 
 func (u unseekableReader) Read(p []byte) (int, error) { return u.r.Read(p) }
 
-func TestDoMultipart_ChunkedFallbackWhenSizeUnknown(t *testing.T) {
-	c, _, mux := newTestClient(t)
-
-	var gotCL int64
-	var gotChunked bool
-	var gotBodyLen int64
-	mux.HandleFunc("/api/up2", func(w http.ResponseWriter, r *http.Request) {
-		gotCL = r.ContentLength
-		for _, te := range r.TransferEncoding {
-			if te == "chunked" {
-				gotChunked = true
-			}
-		}
-		n, _ := io.Copy(io.Discard, r.Body)
-		gotBodyLen = n
+// The point of the protocol split: on a server that speaks HTTP/2, JSON calls
+// and the token exchange keep multiplexing on h2 while a multipart upload goes
+// over HTTP/1.1. A no-retry JSON write shares uploadClient with multipart and
+// must stay on h2 too, which is why the choice is per request and not a swap of
+// that client's transport.
+func TestDoMultipart_UsesHTTP1WhileEverythingElseUsesHTTP2(t *testing.T) {
+	var mu sync.Mutex
+	protos := map[string]string{}
+	record := func(key string, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		protos[key] = r.Proto
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/auth/token", func(w http.ResponseWriter, r *http.Request) {
+		record("token", r)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token":"t","token_type":"bearer","expires_in":3600}`))
+	})
+	mux.HandleFunc("/api/json", func(w http.ResponseWriter, r *http.Request) {
+		record(r.Method+" json", r)
+		_, _ = w.Write([]byte(`{}`))
+	})
+	mux.HandleFunc("/api/up", func(w http.ResponseWriter, r *http.Request) {
+		record("multipart", r)
+		_, _ = io.Copy(io.Discard, r.Body)
 		w.WriteHeader(http.StatusCreated)
 	})
+	srv := httptest.NewUnstartedServer(mux)
+	srv.EnableHTTP2 = true
+	srv.StartTLS()
+	t.Cleanup(srv.Close)
 
-	payload := strings.Repeat("B", 1024)
-	err := c.DoMultipart(context.Background(), http.MethodPost, "/api/up2", []MultipartField{
-		{Name: "file", Filename: "y.bin", Content: unseekableReader{r: strings.NewReader(payload)}},
-	}, http.StatusCreated, nil)
-	if err != nil {
+	c := NewTransportWithUserAgent(srv.URL, "id", "secret", "ua/1", WithMinRequestInterval(0))
+	pool := x509.NewCertPool()
+	pool.AddCert(srv.Certificate())
+	if len(c.tuned) != 2 {
+		t.Fatalf("tuned transports = %d, want the HTTP/2-capable one and its HTTP/1.1 twin", len(c.tuned))
+	}
+	for _, tr := range c.tuned {
+		tr.TLSClientConfig = &tls.Config{RootCAs: pool}
+	}
+
+	ctx := context.Background()
+	if err := c.Do(ctx, http.MethodGet, "/api/json", nil, nil); err != nil {
+		t.Fatalf("GET: %v", err)
+	}
+	if err := c.DoWithContentTypeNoRetry(ctx, http.MethodPut, "/api/json", map[string]string{"k": "v"}, "application/json", http.StatusOK, nil); err != nil {
+		t.Fatalf("no-retry PUT: %v", err)
+	}
+	if err := c.DoMultipart(ctx, http.MethodPost, "/api/up", []MultipartField{
+		{Name: "file", Filename: "x.bin", Content: bytes.NewReader([]byte("payload"))},
+	}, http.StatusCreated, nil); err != nil {
+		t.Fatalf("multipart: %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+	want := map[string]string{
+		"token":     "HTTP/2.0",
+		"GET json":  "HTTP/2.0",
+		"PUT json":  "HTTP/2.0",
+		"multipart": "HTTP/1.1",
+	}
+	for k, w := range want {
+		if protos[k] != w {
+			t.Errorf("%s over %q, want %q (all: %v)", k, protos[k], w, protos)
+		}
+	}
+}
+
+func TestNewHTTP1Transport_DisablesHTTP2ButKeepsTheTuning(t *testing.T) {
+	t.Parallel()
+
+	h1, h2 := newHTTP1Transport(), newTunedTransport()
+	if h1.ForceAttemptHTTP2 || h1.HTTP2 != nil {
+		t.Errorf("HTTP/2 still requested: ForceAttemptHTTP2=%v HTTP2=%v", h1.ForceAttemptHTTP2, h1.HTTP2)
+	}
+	if h1.TLSNextProto == nil || len(h1.TLSNextProto) != 0 {
+		t.Errorf("TLSNextProto = %v, want a non-nil empty map (the only thing that stops net/http enabling h2 itself)", h1.TLSNextProto)
+	}
+	if h1.WriteBufferSize != h2.WriteBufferSize || h1.MaxIdleConnsPerHost != h2.MaxIdleConnsPerHost || h1.DialContext == nil || h1.Proxy == nil {
+		t.Error("the HTTP/1.1 twin lost the tuned transport's buffers, pool ceiling, dialer or proxy support")
+	}
+}
+
+// A client supplied through WithHTTPClient keeps its own transport, and so its
+// own protocol; the framing still applies to it.
+func TestDoMultipart_CallerSuppliedClientStillGetsNoContentLength(t *testing.T) {
+	srv, mux := newTestServer(t)
+	var gotCL int64
+	mux.HandleFunc("/api/up", func(w http.ResponseWriter, r *http.Request) {
+		gotCL = r.ContentLength
+		_, _ = io.Copy(io.Discard, r.Body)
+		w.WriteHeader(http.StatusCreated)
+	})
+	c := NewTransportWithUserAgent(srv.URL, "id", "secret", "ua/1",
+		WithHTTPClient(&http.Client{Transport: &http.Transport{}}), WithMinRequestInterval(0))
+
+	if err := c.DoMultipart(context.Background(), http.MethodPost, "/api/up", []MultipartField{
+		{Name: "file", Filename: "x.bin", Content: bytes.NewReader([]byte("payload"))},
+	}, http.StatusCreated, nil); err != nil {
 		t.Fatalf("DoMultipart: %v", err)
 	}
-	if gotCL != -1 && gotCL != 0 {
-		t.Errorf("ContentLength = %d, want unset (non-seekable reader → chunked)", gotCL)
-	}
-	if !gotChunked {
-		t.Errorf("expected Transfer-Encoding: chunked when size is unknown")
-	}
-	if gotBodyLen == 0 {
-		t.Errorf("server read 0 body bytes, expected streamed content")
+	if gotCL != -1 {
+		t.Errorf("ContentLength = %d, want -1", gotCL)
 	}
 }
 

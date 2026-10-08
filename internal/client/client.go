@@ -53,7 +53,7 @@ type Transport struct {
 	httpClient      *http.Client // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
 	uploadClient    *http.Client // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
 	baseClient      *http.Client
-	tuned           *http.Transport // the SDK's own transport under baseClient; nil once a caller-supplied client replaced it
+	tuned           []*http.Transport // the SDK's own transports under baseClient (HTTP/2-capable, then HTTP/1.1 for multipart); nil once a caller-supplied client replaced them
 	oauthConfig     *clientcredentials.Config
 	logger          Logger
 	userAgent       string
@@ -132,11 +132,13 @@ func (c *Transport) applyResponseHeaderTimeout() {
 	if c.responseHeaderTimeout <= 0 {
 		return
 	}
-	if c.tuned == nil {
+	if len(c.tuned) == 0 {
 		log.Printf("jamfplatform: WithResponseHeaderTimeout: ignored — a caller-supplied HTTP client replaced the SDK's transport, so its timeouts are the caller's to set")
 		return
 	}
-	c.tuned.ResponseHeaderTimeout = c.responseHeaderTimeout
+	for _, t := range c.tuned {
+		t.ResponseHeaderTimeout = c.responseHeaderTimeout
+	}
 }
 
 // WithHeaders sets additional HTTP headers sent on every request this client

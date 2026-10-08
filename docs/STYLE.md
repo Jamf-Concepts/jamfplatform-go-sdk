@@ -1623,6 +1623,54 @@ the token URL beneath the header wrapper — not `Client.Timeout` on the base
 client**, because `oauth2.NewClient` copies `Timeout` onto the API client it
 returns and that would cap every call and upload.
 
+### Multipart uploads: HTTP/1.1, no declared length, no threshold, no opt-out
+
+Every `DoMultipart` request — all eleven file-body methods, not only package
+upload — goes over **HTTP/1.1 with `Transfer-Encoding: chunked` and no
+`Content-Length`**, whatever the reader is. `sendMultipart` sets
+`ContentLength = -1` and marks the context; `protocolTransport`, installed at the
+bottom of the SDK-built chain, sends a marked request to `newHTTP1Transport()` and
+everything else to the HTTP/2-capable transport.
+
+Both halves were measured against the GA gateway, and neither is general best
+practice. A declared length is normally the better default: it lets a server
+refuse an oversize body up front, gives progress and ETA, and is understood by
+every intermediary. This is a workaround for how this gateway behaves, which is
+why the rationale is recorded here and should be revisited if it changes.
+
+- **HTTP/1.1.** CloudFront advertises `SETTINGS_INITIAL_WINDOW_SIZE=65536`, so one
+  h2 upload is capped at 64 KiB per round trip: about 4 MiB/s at 13 ms, against
+  about 10 MiB/s over HTTP/1.1 on the same uplink (curl and Go alike). The client
+  cannot raise the server's window, and the penalty grows with RTT.
+- **No declared length.** On one tenant over HTTP/1.1, the same 1.43 GiB file was
+  refused with a 502 at about 1.04 GiB when the length was declared (Go and curl
+  agree) and uploaded whole, with matching SHA3-512, SHA-256 and MD5, when it was
+  not. Over h2 a declared length failed from 375 MiB up on two tenants.
+- **It raises the ceiling and does not remove it.** A 2 GiB file still fails
+  mid-body on both tenants tried, and the ceiling without a declared length varies
+  by tenant and by run (the first tenant mostly died near 1.36 GiB). Uploads are
+  not resumable: a failure means starting again from byte zero.
+
+Decisions that look like omissions:
+
+- **No size threshold, because the gateway may be fixed.** Gating on size would
+  encode today's ceiling; sending the same way always stays correct either way.
+- **No opt-out.** The only reason to want HTTP/2 here is that something upstream
+  rejects chunked bodies, which no consumer has reported; if one does, answer
+  `411 Length Required` with a retry that declares the length rather than adding a
+  knob. Not built, because nothing yet needs it.
+- **The route is per request, not a swap of `uploadClient`'s transport**, because
+  that client also carries the no-retry JSON writes, which must stay on h2, and the
+  token exchange carries no marker.
+- **A client supplied with `WithHTTPClient` keeps its own transport and so its own
+  protocol**; only the framing applies to it. The SDK cannot force HTTP/1.1 onto a
+  transport it does not own.
+- **`WithResponseHeaderTimeout` applies to both transports.**
+
+`TestDoMultipart_NeverDeclaresContentLength` and
+`TestDoMultipart_UsesHTTP1WhileEverythingElseUsesHTTP2` pin it; the second runs
+against a TLS server that speaks h2 and records the protocol each request used.
+
 `TestTunedTransport_*`, `TestWithResponseHeaderTimeout_*` and
 `TestResponseHeaderTimeout_NotSetByDefault` pin it; the health-check test uses the
 real tuned transport with only the two durations shortened, and fails if h2 is
