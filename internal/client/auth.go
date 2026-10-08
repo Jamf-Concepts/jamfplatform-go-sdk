@@ -176,7 +176,9 @@ func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttl
 	jar := newCookieJar()
 	base := &http.Client{Jar: jar}
 
-	var rt http.RoundTripper = newTunedTransport()
+	// The send tracker goes directly above the *http.Transport so the trace it
+	// attaches is on the request that is actually written; see sendTrackingTransport.
+	var rt http.RoundTripper = &sendTrackingTransport{base: newTunedTransport()}
 	if throttle != nil {
 		rt = &throttleTransport{base: rt, throttle: throttle}
 	}
@@ -193,15 +195,20 @@ func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttl
 
 // wrapWithOAuth2 wraps a base HTTP client with OAuth2 token management,
 // preserving the base client's cookie jar on the outer client. When throttle
-// is non-nil, the base client's transport is wrapped so the request-spacing
-// gate covers both API calls and token fetches on a caller-supplied client.
+// is non-nil the client is being adopted from the caller, and its transport is
+// wrapped twice: with the request-spacing gate, so it covers both API calls and
+// token fetches, and with the send tracker, so the retry policy can tell a
+// request that never left from one the server may have acted on. A caller's own
+// transport would otherwise be the one place retries still replay a write after
+// a connection reset. Both wrappers are added exactly once, because the
+// header-transport rebuild passes a nil throttle.
 func wrapWithOAuth2(config *clientcredentials.Config, base *http.Client, throttle *requestThrottle) *http.Client {
 	if throttle != nil {
 		rt := base.Transport
 		if rt == nil {
 			rt = http.DefaultTransport
 		}
-		base.Transport = &throttleTransport{base: rt, throttle: throttle}
+		base.Transport = &throttleTransport{base: &sendTrackingTransport{base: rt}, throttle: throttle}
 	}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
 	outer := oauth2.NewClient(ctx, &annotatingTokenSource{source: config.TokenSource(ctx)})

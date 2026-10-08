@@ -69,15 +69,17 @@ func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields
 	var resp *http.Response
 	var err error
 	for attempt := 0; ; attempt++ {
-		resp, err = c.sendMultipart(ctx, method, fullURL, fields)
+		attemptCtx, sent := withSendState(ctx, method)
+		resp, err = c.sendMultipart(attemptCtx, method, fullURL, fields)
 
 		retryable := false
 		switch {
 		case err != nil:
-			// A network-level failure happens before anything reaches the
-			// server, so it's always safe to retry regardless of method —
-			// same reasoning as jamfCheckRetry's resp == nil branch.
-			retryable = true
+			// Same rule as jamfCheckRetry's resp == nil branch: free to retry
+			// while the request never finished being written, so a connection
+			// dropped mid-upload starts over, but not after — a POST whose body
+			// was fully sent and then lost its connection may have been applied.
+			retryable = retryableTransportError(sent, err)
 		case isRetryableWriteStatus(method, resp.StatusCode):
 			retryable = true
 		}

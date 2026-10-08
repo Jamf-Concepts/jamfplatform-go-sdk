@@ -1536,6 +1536,55 @@ target pointers. Per-family dialects are in
 
 ---
 
+## Timeouts and retries
+
+### A write is not replayed once it was sent
+
+`jamfCheckRetry` retries a transport error — one with no response at all — only
+while the request never finished being written. After that it retries an
+idempotent method (GET, HEAD, PUT, DELETE) and nothing else, and it never retries
+a timeout.
+
+`retryablehttp.DefaultRetryPolicy` retries every such error on every method, on the
+premise that nothing reached the server. That is true of a refused connection and
+false of a connection reset after the write, an EOF before the response, a GOAWAY,
+a failed h2 ping or a response-header timeout, so a POST could be created twice. The
+two rules are different in kind. Idempotency decides what may be replayed after a
+send. The timeout rule is not about idempotency: a timeout after the send is the
+caller's own decision to stop waiting, or a gateway's, and retrying it multiplies
+that bound by the attempt count — five recomputations of one smart group instead
+of one.
+
+- **The state is in the context, not the error.** `sendState` is seeded into the
+  request context by `doRequestFull` and by each `DoMultipart` attempt, and
+  `sendTrackingTransport` sets it from httptrace's `WroteRequest`. An error is the
+  wrong carrier because `http.Client` replaces a transport error with its own
+  `timeoutError` when `Client.Timeout` fires, dropping anything wrapped inside it,
+  and a caller-supplied client sets that timeout. The retry policy is handed the
+  context, which survives every layer.
+- **"Sent" means `WroteRequest` with a nil error.** A failed write is a request the
+  server never received in full — a short `Content-Length` body is rejected and a
+  chunked one without its last chunk is malformed — so a package upload cut at 90%
+  is still retried, which is the failure retrying exists for.
+- **The flag is per attempt.** The tracker clears it as each attempt starts; a retry
+  that fails before sending is not judged by the attempt before it.
+- **Coverage.** The tracker sits directly above the `*http.Transport` for the SDK's
+  own client and is added around a caller-supplied transport in `wrapWithOAuth2`,
+  next to the throttle, so `WithHTTPClient` callers get the same rule. A request with
+  no `sendState` — a token exchange, a raw request on `Transport.HTTPClient` — is
+  answered "retry", the behaviour before tracking existed, rather than silently
+  disabling retries for a path the tracker does not cover.
+- **One known race, in the safe direction.** `WroteRequest` runs when the write
+  returns, microseconds before the read side can report a reset. A reset that won
+  that race would be classed as unsent and retried — the old behaviour, not a new
+  failure. The tests sleep 50ms after draining the body to stay clear of it.
+
+`TestRetryAfterSend_*`, `TestRetryBeforeSend_PostIsStillRetried` and the two
+`TestDoMultipart_*AfterSend*` tests pin it, and fail under the old always-retry
+answer.
+
+---
+
 ## Acceptance tests
 
 Every new generated method **must** get an acceptance test in

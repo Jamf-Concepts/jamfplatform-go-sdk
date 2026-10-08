@@ -4431,6 +4431,13 @@ work. A retry re-queues a recomputation that is probably still running, and
 because each attempt can burn 180s of upstream work before Tyk cuts it, an
 exhausted sequence is ~15 minutes of wall clock.
 
+**A transport-level timeout on this path is no longer retried; a 504 *response* still
+is.** Since send tracking (see [STYLE.md](STYLE.md#a-write-is-not-replayed-once-it-was-sent))
+a request that was written in full and then timed out with no response is surfaced
+after one attempt, for PUT as for POST. The 504 the gateway itself answers is a
+status, not a transport error, and `isRetryableWriteStatus` still retries it on PUT,
+so the amplification below survives for that case.
+
 **This is the one endpoint the 2026-08-31 backoff change does not help.** That
 change shortened the *waits* (1+2+4+8 = 15s); it did not shorten the attempts.
 Not flagged `noRetry`, because the retry is correct and a genuine transient 504

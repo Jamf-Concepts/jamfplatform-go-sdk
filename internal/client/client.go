@@ -737,7 +737,10 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 		bodyReader = bytes.NewReader(requestBodyBytes)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
+	// Seeded after the request is logged and before it is built, so the retry
+	// policy can see whether an attempt was fully written; see sendState.
+	reqCtx, _ := withSendState(ctx, method)
+	req, err := http.NewRequestWithContext(reqCtx, method, fullURL, bodyReader)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to create request: %w", err)
 	}
