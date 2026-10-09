@@ -53,6 +53,7 @@ type Transport struct {
 	httpClient      *http.Client // retry.StandardClient() — used by execute() for all JSON/XML Do* calls
 	uploadClient    *http.Client // authed + paced, NOT retry-wrapped — used directly by multipart.go; see retry.go's newRetryClient doc
 	baseClient      *http.Client
+	tuned           []*http.Transport // the SDK's own transports under baseClient (HTTP/2-capable, then HTTP/1.1 for multipart); nil once a caller-supplied client replaced them
 	oauthConfig     *clientcredentials.Config
 	logger          Logger
 	userAgent       string
@@ -64,6 +65,12 @@ type Transport struct {
 	extraHeaders    http.Header           // caller-supplied headers, applied to token exchange and API calls alike
 	authHeaderName  string                // when set, the OAuth2 bearer moves from Authorization to this header
 	retry           *retryablehttp.Client // backs httpClient; mutating retry.HTTPClient (see SetHTTPClient/SetUserAgent) updates httpClient's behavior in place
+
+	// responseHeaderTimeout is the opt-in bound from WithResponseHeaderTimeout;
+	// zero, the default, means none. It is kept here rather than written straight
+	// to the transport so it applies whatever order the options arrive in and
+	// survives SetUserAgent rebuilding the transport.
+	responseHeaderTimeout time.Duration
 }
 
 // PaginatedResponseRepresentation captures pagination metadata shared by multiple endpoints.
@@ -87,9 +94,50 @@ func WithHTTPClient(httpClient *http.Client) Option {
 				httpClient.Jar = newCookieJar()
 			}
 			c.baseClient = httpClient
+			c.tuned = nil
 			c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
 			c.retry.HTTPClient = c.uploadClient
 		}
+	}
+}
+
+// WithResponseHeaderTimeout bounds how long the SDK's transport waits for the
+// server to start answering once a request has been fully written. It is opt-in:
+// by default there is no such bound and the caller's context is the only request
+// deadline, which is what lets a Terraform `timeouts` block or a CLI --timeout
+// actually govern a slow endpoint.
+//
+// The timeout fires regardless of the context and is not retried — a request
+// that timed out after it was sent is surfaced after one attempt, for every
+// method, because retrying would multiply the bound the caller just chose.
+//
+// It applies to every request on the SDK's own transport: the OAuth2 token
+// exchange, and package uploads, where the server may legitimately take a long
+// time to answer after receiving the body. A context deadline on the individual
+// call is the better tool for those; this is for a caller that wants one flat
+// ceiling.
+//
+// A value <= 0 means no bound. It has no effect with WithHTTPClient, whose
+// transport is the caller's to configure, and says so in the log.
+func WithResponseHeaderTimeout(d time.Duration) Option {
+	return func(c *Transport) {
+		c.responseHeaderTimeout = d
+	}
+}
+
+// applyResponseHeaderTimeout writes the opt-in header timeout to the SDK's own
+// transport. It runs after every option, so WithHTTPClient replacing the
+// transport is known by then, and again after SetUserAgent builds a new one.
+func (c *Transport) applyResponseHeaderTimeout() {
+	if c.responseHeaderTimeout <= 0 {
+		return
+	}
+	if len(c.tuned) == 0 {
+		log.Printf("jamfplatform: WithResponseHeaderTimeout: ignored — a caller-supplied HTTP client replaced the SDK's transport, so its timeouts are the caller's to set")
+		return
+	}
+	for _, t := range c.tuned {
+		t.ResponseHeaderTimeout = c.responseHeaderTimeout
 	}
 }
 
@@ -281,7 +329,7 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 	}
 
 	throttle := newRequestThrottle(defaultMinRequestInterval)
-	uploadClient, baseClient := newOAuth2Client(oauthConfig, userAgent, throttle)
+	uploadClient, baseClient, tuned := newOAuth2Client(oauthConfig, userAgent, throttle)
 	retry := newRetryClient(uploadClient)
 
 	c := &Transport{
@@ -289,6 +337,7 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 		uploadClient: uploadClient,
 		httpClient:   retry.StandardClient(),
 		baseClient:   baseClient,
+		tuned:        tuned,
 		oauthConfig:  oauthConfig,
 		userAgent:    userAgent,
 		throttle:     throttle,
@@ -303,6 +352,7 @@ func NewTransportWithUserAgent(baseURL, clientID, clientSecret, userAgent string
 	for _, opt := range opts {
 		opt(c)
 	}
+	c.applyResponseHeaderTimeout()
 	c.installHeaderTransport()
 	if c.tokenCache != nil {
 		c.uploadClient = newCachingOAuth2Client(c.oauthConfig, c.baseClient, c.tokenCache, c.cacheKey)
@@ -502,6 +552,7 @@ func (c *Transport) HTTPClient() *http.Client {
 // relocation would silently stop being applied.
 func (c *Transport) SetHTTPClient(httpClient *http.Client) {
 	c.baseClient = httpClient
+	c.tuned = nil
 	c.uploadClient = wrapWithOAuth2(c.oauthConfig, httpClient, c.throttle)
 	c.retry.HTTPClient = c.uploadClient
 	c.installHeaderTransport()
@@ -515,7 +566,8 @@ func (c *Transport) SetLogger(logger Logger) {
 // SetUserAgent sets the User-Agent header value used for token and API requests.
 func (c *Transport) SetUserAgent(ua string) {
 	c.userAgent = ua
-	c.uploadClient, c.baseClient = newOAuth2Client(c.oauthConfig, ua, c.throttle)
+	c.uploadClient, c.baseClient, c.tuned = newOAuth2Client(c.oauthConfig, ua, c.throttle)
+	c.applyResponseHeaderTimeout()
 	c.retry.HTTPClient = c.uploadClient
 	c.installHeaderTransport()
 }
@@ -737,7 +789,10 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 		bodyReader = bytes.NewReader(requestBodyBytes)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
+	// Seeded after the request is logged and before it is built, so the retry
+	// policy can see whether an attempt was fully written; see sendState.
+	reqCtx, _ := withSendState(ctx, method)
+	req, err := http.NewRequestWithContext(reqCtx, method, fullURL, bodyReader)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to create request: %w", err)
 	}

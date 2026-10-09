@@ -726,10 +726,10 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoN
 // {{ .Comment }}
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
-// implements io.Seeker) so the SDK can precompute an exact
-// Content-Length and retry once on a 429/Retry-After. A plain
-// io.Reader is accepted too but the upload falls back to chunked
-// transfer encoding and is not retried on 429.
+// implements io.Seeker) so the SDK can rewind the file and retry on a
+// 429/Retry-After. A plain io.Reader is accepted too but is not retried.
+// Whatever the reader, the upload is sent over HTTP/1.1 with chunked
+// transfer encoding and no declared Content-Length.
 {{- if .ResponseType }}
 func (c *Client) {{ .Name }}(ctx context.Context{{ range .PathParams }}, {{ .GoName }} string{{ end }}{{ range .MultipartFields }}{{ if .IsFile }}, {{ .GoName }}Filename string, {{ .GoName }} io.Reader{{ else }}, {{ .GoName }} {{ .Type }}{{ end }}{{ end }}) (*{{ .ResponseType }}, error) {
 	prefix := c.transport.APIPrefix("{{ .Namespace }}", "{{ .Version }}")
