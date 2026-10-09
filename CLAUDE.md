@@ -300,7 +300,9 @@ Every consumer is expected to pass a context with a deadline.
 — every `DoMultipart` method, unconditionally. CloudFront's 64 KiB per-stream h2
 window caps an h2 upload near 4 MiB/s, and a declared length lowered the ceiling
 of a large upload on this gateway; it is a measured workaround, not best practice,
-so revisit it if the gateway changes. Rationale, the decisions that look like
+and not a claim that very large uploads are safe, so revisit it if the gateway
+changes. Transport-error retries of an upload are bounded at one, since each
+re-sends the whole file. Rationale, the decisions that look like
 omissions (no threshold, no opt-out), and the `WithHTTPClient` limitation are in
 [docs/STYLE.md](docs/STYLE.md#multipart-uploads-http11-no-declared-length-no-threshold-no-opt-out).
 

@@ -349,6 +349,34 @@ func TestDoMultipart_NoRetryOn500ForPost(t *testing.T) {
 	}
 }
 
+// A transport error mid-upload re-sends the whole file, so it is retried once
+// and no more, however many attempts retryMax allows for status-driven retries.
+func TestDoMultipart_TransportErrorRetriedOnce(t *testing.T) {
+	c, _, mux := newTestClient(t)
+	shrinkRetryWaits(c, 2*time.Millisecond, 5*time.Millisecond)
+
+	var calls atomic.Int32
+	mux.HandleFunc("/api/drop", func(w http.ResponseWriter, _ *http.Request) {
+		calls.Add(1)
+		conn, _, err := w.(http.Hijacker).Hijack()
+		if err == nil {
+			_ = conn.Close()
+		}
+	})
+
+	// PUT, so a drop after the body was written is still retryable and the
+	// count measures the bound rather than the idempotency rule.
+	err := c.DoMultipart(context.Background(), http.MethodPut, "/api/drop", []MultipartField{
+		{Name: "file", Filename: "x.bin", Content: bytes.NewReader([]byte("payload"))},
+	}, http.StatusOK, nil)
+	if err == nil {
+		t.Fatal("DoMultipart succeeded against a server that drops every connection")
+	}
+	if got := calls.Load(); got != 2 {
+		t.Errorf("server saw %d requests, want 2 (one send, one retry)", got)
+	}
+}
+
 // TestDoMultipart_NoRetryWhenNotRewindable verifies a retryable status
 // (500 on an idempotent method) is NOT retried when Content can't be seeked
 // back to the start — matches the doc comment: the caller must re-invoke

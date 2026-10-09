@@ -99,6 +99,22 @@ func TestWithResponseHeaderTimeout_NonPositiveMeansNone(t *testing.T) {
 	}
 }
 
+// Multipart uploads ride the HTTP/1.1 twin, so the bound has to reach it too or
+// an upload would wait on response headers forever while everything else is capped.
+func TestWithResponseHeaderTimeout_CoversTheHTTP1Transport(t *testing.T) {
+	t.Parallel()
+
+	c := NewTransportWithUserAgent("https://example.invalid", "id", "secret", "ua/1", WithResponseHeaderTimeout(7*time.Second))
+	if len(c.tuned) != 2 {
+		t.Fatalf("tuned transports = %d, want 2", len(c.tuned))
+	}
+	for i, tr := range c.tuned {
+		if tr.ResponseHeaderTimeout != 7*time.Second {
+			t.Errorf("tuned[%d].ResponseHeaderTimeout = %v, want 7s", i, tr.ResponseHeaderTimeout)
+		}
+	}
+}
+
 // SetUserAgent builds a new transport; the opt-in bound must come with it, or a
 // caller who set one silently loses it the moment they change the user agent.
 func TestWithResponseHeaderTimeout_SurvivesSetUserAgent(t *testing.T) {

@@ -1650,11 +1650,21 @@ why the rationale is recorded here and should be revisited if it changes.
   mid-body on both tenants tried, and the ceiling without a declared length varies
   by tenant and by run (the first tenant mostly died near 1.36 GiB). Uploads are
   not resumable: a failure means starting again from byte zero.
+- **This is not a statement that very large uploads are safe.** The gateway
+  is not sized for very large request bodies, so the framing buys throughput
+  and headroom, not a licence to send multi-gigabyte bodies.
+  Callers that can bound package size should.
 
 Decisions that look like omissions:
 
-- **No size threshold, because the gateway may be fixed.** Gating on size would
-  encode today's ceiling; sending the same way always stays correct either way.
+- **No size threshold, because the point where the gateway refuses varies.** It
+  differs by tenant and by run, so any cut-off would encode one observation as a
+  rule. Sending every upload the same way is correct wherever that point falls.
+- **Transport-error retries are bounded at one** (`maxMultipartTransportRetries`),
+  where status-driven retries (429, and 5xx on idempotent methods) still run to
+  `retryMax`. A retry re-sends the whole file, so repeating a very large body
+  four times is a lot of extra traffic for the gateway to take. One retry still
+  covers the common case, a stale keep-alive connection or a brief network drop.
 - **No opt-out.** The only reason to want HTTP/2 here is that something upstream
   rejects chunked bodies, which no consumer has reported; if one does, answer
   `411 Length Required` with a retry that declares the length rather than adding a

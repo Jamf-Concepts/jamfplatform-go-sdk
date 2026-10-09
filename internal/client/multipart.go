@@ -22,6 +22,11 @@ import (
 // default 32 KiB — fewer syscalls when pushing multi-GB package uploads.
 const multipartCopyBuf = 1 << 20
 
+// maxMultipartTransportRetries bounds how many times DoMultipart re-sends a
+// body after a transport error. Status-driven retries (429, and 5xx for
+// idempotent methods) still run to retryMax.
+const maxMultipartTransportRetries = 1
+
 // MultipartField represents one part of a multipart/form-data request body.
 // Exactly one of Filename (file upload) or Value (text field) must be set.
 //
@@ -66,6 +71,7 @@ func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields
 
 	var resp *http.Response
 	var err error
+	transportRetries := 0
 	for attempt := 0; ; attempt++ {
 		attemptCtx, sent := withSendState(ctx, method)
 		resp, err = c.sendMultipart(attemptCtx, method, fullURL, fields)
@@ -77,7 +83,14 @@ func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields
 			// while the request never finished being written, so a connection
 			// dropped mid-upload starts over, but not after — a POST whose body
 			// was fully sent and then lost its connection may have been applied.
-			retryable = retryableTransportError(sent, err)
+			//
+			// Bounded at maxMultipartTransportRetries, though, because each
+			// retry re-sends the whole file, and repeating a very large body up
+			// to retryMax times is a lot of extra traffic for the gateway to take.
+			retryable = retryableTransportError(sent, err) && transportRetries < maxMultipartTransportRetries
+			if retryable {
+				transportRetries++
+			}
 		case isRetryableWriteStatus(method, resp.StatusCode):
 			retryable = true
 		}
@@ -125,9 +138,10 @@ func (c *Transport) sendMultipart(ctx context.Context, method, fullURL string, f
 	//     declared (curl and Go agreed) and uploaded whole, hashes matching, when
 	//     it was not. A declared length also caps uploads near 375 MiB over h2.
 	//
-	// The gateway still refuses some very large bodies whatever the framing, so
-	// this raises the ceiling and does not remove it. It is unconditional rather
-	// than size-gated so that it stays correct if the gateway is fixed.
+	// This is a throughput and ceiling measure, not a statement that very large
+	// uploads are safe: very large request bodies are demanding on the gateway,
+	// and it may still refuse some mid-stream whatever the framing. There is no size threshold because the point where it refuses
+	// varies by tenant and by run, so no number would be right to encode.
 	// Marking the context is what routes this request to the HTTP/1.1 transport;
 	// a client supplied through WithHTTPClient keeps its own transport and so
 	// its own protocol, and only the framing applies to it.
