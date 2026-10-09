@@ -377,8 +377,8 @@ membership is modelled as a read on the title, not a delete on it.
 
 ### Server bugs worth reporting
 
-- `POST .../pro/v3/computer-groups/static-groups` 500s if `assignments` is
-  omitted despite being optional in the spec; pass `assignments: []`.
+- The static-group writes 500 without fields their spec calls optional — see
+  [the next section](#static-group-writes-need-fields-the-spec-calls-optional-2026-10-04).
 - `POST /v2/mdm/commands` with `{}` answered **500 with an empty `errors` array**,
   while `{"clientData":[],"commandData":{}}` correctly answered `400 INVALID_FIELD`.
   (Recorded before the path was withdrawn.)
@@ -387,6 +387,52 @@ membership is modelled as a read on the title, not a delete on it.
   `TestAcceptance_Pro_IconV1` swallows it through a skip-on-server-error branch —
   contrary to the never-tolerate-real-errors rule — and because a 500 on a GET is
   retryable the test spends ~153 s in the retry loop first.
+
+### Static-group writes need fields the spec calls optional (2026-10-04)
+
+`StaticComputerGroupAssignment` and `StaticGroupAssignment` declare only the
+name required, so the SDK carries `assignments` and `siteId` as omitempty
+pointers. The server refuses every body without them. Jamf Pro 11.32, through
+the EU gateway and environment-scoped, each refusal beside an accepted control
+in the same invocation (`{name, assignments: []}` → 201;
+`{groupName, siteId: "-1", assignments: []}` → 201):
+
+| operation | body | answer |
+|---|---|---|
+| `POST /v3/computer-groups/static-groups` | `{name}`, `{name, siteId}`, `{name, assignments: null}` | `500`, `errors: []` |
+| `PUT /v3/computer-groups/static-groups/{id}` | `{name}` | `500`, `errors: []` |
+| `POST /v2/mobile-device-groups/static-groups` | `{groupName}`, `{groupName, siteId}` | `500`, `errors: []` |
+| same | `{groupName, assignments: []}`, or `siteId: ""` | `403 INVALID_PRIVILEGE`, field `siteId` |
+| `PATCH /v2/mobile-device-groups/static-groups/{id}` | without `assignments`, or description only | `500`, `errors: []` |
+| same | without `siteId` | `400 INVALID_FIELD` "Cannot parse null string" |
+| same | without `groupName` | `400 INVALID_FORMAT`, field `groupName` |
+
+**The spec is followed anyway, because the local repair would not repair
+anything.** Marking the fields required drops `omitempty`, and then a caller
+who leaves them unset sends `assignments: null` and `siteId: ""` — the two rows
+above that fail identically. It would only help a caller who already sets the
+field. The cost is carried in the four methods' `methodNotes` instead, and
+`TestAcceptance_Pro_StaticComputerGroupV3RequiresAssignments` and
+`TestAcceptance_Pro_StaticMobileDeviceGroupV2RequiresAssignmentsAndSiteID`
+assert every refusal, so either fails the day the server changes. The defect to
+report is the server's: a missing field should be a 400 that names it, or
+absence should mean "keep what is there".
+
+**The two member-list semantics are opposites.**
+
+- The computer `PUT` **replaces**: a group of `[84,106,107]` written with
+  `["117"]` became `[117]`, and `[]` emptied it. The `GET` returns no members
+  and Jamf Pro has no static computer membership endpoint, so Classic
+  `GET /computergroups/id/{id}` is the only read-back. `ApplyStaticComputerGroupV3`
+  takes the same path, so an apply that omits `Assignments` 500s and one that
+  sends `[]` empties the group.
+- The mobile `PATCH` is **incremental**: `{mobileDeviceId, selected: true}` adds,
+  `selected: false` removes, `[]` leaves `[64,65]` as it was.
+  `ApplyStaticMobileDeviceGroupV2` pre-fetches the membership into the body,
+  which is why it does not hit the 500.
+
+The `PUT` response echoes `siteId: null` for a group the `GET` reports at
+`"-1"`.
 
 ### The remaining 38 jpapi paths (whitelisted 2026-08-31)
 
@@ -1697,6 +1743,36 @@ line-break and reserved-character matrices). That last row mattered most: Classi
 is XML end-to-end across 617 operations, so a live rule would have taken out most
 of the SDK's write surface. **No SDK change was needed and none should be added** —
 do not reshape a multipart body or escape plist content to placate a WAF.
+
+---
+
+## PATCH content types (2026-10-04)
+
+**Every PATCH content type the specs declare is the one the server enforces,
+which is why the transport no longer has a default for a PATCH body.** The
+transport used to send `application/merge-patch+json` for a PATCH with no type
+named, and every generic PATCH to the Platform device endpoints failed. All 28
+generated PATCH operations were sent `{}`, against a bogus identifier where the
+path takes one, under both types. The four `securitycloud` and the
+`aigovernance` operations were probed the same day from a second environment
+that has a Security Cloud tenant and the AI Governance capability, and
+`UpdateDistributorConfiguration` with an organization credential, each beside a
+`200` read control and a `text/plain` request as a third type:
+
+| server behaviour | operations | agrees with the spec |
+|---|---|---|
+| merge-patch only — JSON is `415` | `UpdateBlueprint`, `UpdateDigicertTrustLifecycleManagerV1`, `UpdateVolumePurchasingLocationV1`, `UpdatePatchSoftwareTitleConfigurationV3`, `UpdateAdcsSettingsV1`, `UpdateZtnaAppV1`, `UpdateZtnaGatewayV1`, `UpdateZtnaGroupedGatewayV1`, `UpdateDnsZoneV1` | all nine |
+| JSON only — merge-patch is `415` | `UpdateVenafiV1` | yes |
+| JSON only — merge-patch is `400 BAD_REQUEST` "malformed or the content type is not supported" | `UpdateDevice`, `UpdateDeviceGroup`, `UpdateDeviceGroupMembers` | all three |
+| both reach the service | the other ten `pro` operations; `aigovernance` `UpdatePolicy` (both reach body validation, `400 VALIDATION_FAILED`); `account` `UpdateDistributorConfiguration` (both reach the upstream call and get its `400 UPSTREAM_ERROR`). For the last two `text/plain` is `415`, so the type is checked | no conflict |
+
+The Platform device rows are the ones a reported consumer hit — `400` for every
+body, `204` for the same body as JSON (traceId
+`3402e53b10de8a3658771b26596bfab7`), and the SDK's typed methods were never
+affected because they pass the spec's type. Defaulting to JSON instead would
+break the nine merge-only rows the same way, so a PATCH body without a type is
+refused before anything is sent. Every generated method names its type; only a
+caller of the generic transport sees the refusal.
 
 ---
 

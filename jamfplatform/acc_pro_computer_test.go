@@ -132,7 +132,6 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 		Assignments: &assignments,
 	}, false)
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("CreateStaticComputerGroupV3: %v", err)
 	}
 	if created.ID == "" {
@@ -143,7 +142,6 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 
 	got, err := p.GetStaticComputerGroupV3(ctx, created.ID)
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("GetStaticComputerGroupV3(%s): %v", created.ID, err)
 	}
 	if got.Name != name {
@@ -159,12 +157,10 @@ func TestAcceptance_Pro_Computer_StaticGroupCRUD(t *testing.T) {
 		Assignments: &assignments,
 	}
 	if _, err := p.UpdateStaticComputerGroupV3(ctx, created.ID, update); err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("UpdateStaticComputerGroupV3(%s): %v", created.ID, err)
 	}
 
 	if err := p.DeleteStaticComputerGroupV3(ctx, created.ID); err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("DeleteStaticComputerGroupV3(%s): %v", created.ID, err)
 	}
 

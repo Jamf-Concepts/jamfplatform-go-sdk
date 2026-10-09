@@ -327,7 +327,6 @@ func TestAcceptance_Pro_Mobile_StaticGroupCRUD(t *testing.T) {
 		SiteID:           &siteID,
 	}, false)
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("CreateStaticMobileDeviceGroupV2: %v", err)
 	}
 	if created.ID == "" {
@@ -338,7 +337,6 @@ func TestAcceptance_Pro_Mobile_StaticGroupCRUD(t *testing.T) {
 
 	got, err := p.GetStaticMobileDeviceGroupV2(ctx, created.ID)
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("GetStaticMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 	if got.GroupName != name {
@@ -353,19 +351,16 @@ func TestAcceptance_Pro_Mobile_StaticGroupCRUD(t *testing.T) {
 		SiteID:           &siteID,
 	}
 	if _, err := p.PatchStaticMobileDeviceGroupV2(ctx, created.ID, patch); err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("PatchStaticMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 
 	members, err := p.ListStaticMobileDeviceGroupMembershipV2(ctx, created.ID, nil, "")
 	if err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("ListStaticMobileDeviceGroupMembershipV2(%s): %v", created.ID, err)
 	}
 	t.Logf("Static mobile group %s has %d members", created.ID, len(members))
 
 	if err := p.DeleteStaticMobileDeviceGroupV2(ctx, created.ID); err != nil {
-		skipOnServerError(t, err)
 		t.Fatalf("DeleteStaticMobileDeviceGroupV2(%s): %v", created.ID, err)
 	}
 }

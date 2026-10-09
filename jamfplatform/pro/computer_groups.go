@@ -203,6 +203,11 @@ func (c *Client) ListStaticComputerGroupsV3(ctx context.Context, sort []string, 
 //
 // Parameters:
 //   - platform: Optional. Return platform identifiers instead of internal identifiers when set to true.
+//
+// The server requires `Assignments`, which the spec declares optional: a request without it, or with
+// it null, fails with a bare `500` whose `errors` array is empty. Send an empty slice for a group with
+// no members. `TestAcceptance_Pro_StaticComputerGroupV3RequiresAssignments` fails the day the server
+// accepts the omission, which is the notification to delete this note.
 func (c *Client) CreateStaticComputerGroupV3(ctx context.Context, request *StaticComputerGroupAssignment, platform bool) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result HrefResponse
@@ -242,6 +247,14 @@ func (c *Client) GetStaticComputerGroupV3(ctx context.Context, id string) (*Stat
 //
 // Parameters:
 //   - id: instance id of a static computer group.
+//
+// The server requires `Assignments`, which the spec declares optional: a request without it fails with
+// a bare `500` whose `errors` array is empty. `Assignments` replaces the whole member list, so an
+// empty slice removes every member. `GetStaticComputerGroupV3` does not return members and Jamf Pro
+// has no static computer membership endpoint, so to keep the current members, read them first from
+// Classic with `proclassic.GetComputerGroupByID`. `ApplyStaticComputerGroupV3`'s update path calls
+// this method and replaces the same way. `TestAcceptance_Pro_StaticComputerGroupV3RequiresAssignments`
+// fails the day either behaviour changes.
 func (c *Client) UpdateStaticComputerGroupV3(ctx context.Context, id string, request *StaticComputerGroupAssignment) (*StaticComputerGroupAssignment, error) {
 	prefix := c.transport.APIPrefix("pro", "v3")
 	var result StaticComputerGroupAssignment

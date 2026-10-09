@@ -560,6 +560,10 @@ func (c *Transport) Do(ctx context.Context, method, path string, body, result an
 }
 
 // DoExpect performs an authenticated API request expecting the given HTTP status.
+//
+// A body is sent as application/json (application/xml on Classic paths), except
+// a PATCH body, which has no default and returns an error before any request is
+// made: name its type with DoWithContentType or DoWithOptions.
 func (c *Transport) DoExpect(ctx context.Context, method, path string, body any, expectedStatus int, result any) error {
 	return c.execute(ctx, method, path, body, "", nil, expectedStatus, result, c.httpClient)
 }
@@ -693,6 +697,19 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 
 	classic := isClassicPath(fullURL)
 
+	// A PATCH body has no safe default media type: the gateway's endpoints
+	// split between application/json and application/merge-patch+json, and
+	// each enforces its own (wire-verified 2026-10-04 — devices and
+	// device-groups 400 on merge-patch, blueprints and four Pro endpoints 415
+	// on JSON). This used to default to merge-patch, which made every generic
+	// PATCH to a JSON endpoint fail; defaulting to JSON breaks the other half
+	// the same way. The spec declares the type per operation, and every
+	// generated method passes it, so a caller with no type is the one case
+	// that has to be refused rather than guessed.
+	if method == http.MethodPatch && body != nil && contentType == "" && !classic {
+		return nil, false, fmt.Errorf("jamfplatform: PATCH %s needs an explicit Content-Type: endpoints differ between application/json and application/merge-patch+json, so pass the one the operation's spec declares via DoWithContentType or DoWithOptions", endpoint)
+	}
+
 	if body != nil {
 		// Raw byte bodies (e.g. Classic XML assembled by the caller) bypass
 		// codec selection — send verbatim.
@@ -741,8 +758,6 @@ func (c *Transport) doRequestFull(ctx context.Context, method, endpoint string, 
 			req.Header.Set("Content-Type", contentType)
 		} else if classic {
 			req.Header.Set("Content-Type", "application/xml")
-		} else if method == http.MethodPatch {
-			req.Header.Set("Content-Type", "application/merge-patch+json")
 		} else {
 			req.Header.Set("Content-Type", "application/json")
 		}

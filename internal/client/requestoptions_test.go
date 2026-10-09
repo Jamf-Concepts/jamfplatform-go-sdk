@@ -42,7 +42,7 @@ func TestDoWithOptions_CarriesEveryDimension(t *testing.T) {
 		t.Errorf("If-Match = %q, want %q", v, "7")
 	}
 	if v := got.Header.Get("Content-Type"); v != "application/json" {
-		t.Errorf("Content-Type = %q, want %q — a PATCH would otherwise default to application/merge-patch+json", v, "application/json")
+		t.Errorf("Content-Type = %q, want %q — the declared type must reach the wire unchanged", v, "application/json")
 	}
 	// The scope header must survive: doRequestFull applies extraHeaders after
 	// setScopeHeader, so this is the assertion that a caller-supplied header

@@ -377,7 +377,7 @@ func assertAccountPreferencesRejectsUUIDColumn(t *testing.T, c *jamfplatform.Cli
 
 	body := maps.Clone(current)
 	body["showDirectoryGroupUuidColumn"] = false
-	err := tr.Do(ctx, http.MethodPatch, endpoint, body, nil)
+	err := tr.DoWithContentType(ctx, http.MethodPatch, endpoint, body, "application/json", http.StatusNoContent, nil)
 	if err == nil {
 		t.Fatal("PATCH /pro/v3/account-preferences accepted showDirectoryGroupUuidColumn on a " +
 			"pre-11.32 server. The whole matrix has rolled forward: delete this function and " +

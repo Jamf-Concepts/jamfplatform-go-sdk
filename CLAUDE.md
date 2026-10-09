@@ -154,6 +154,15 @@ Transport entry points: `Do(ctx, method, path, body, result)` expects 200;
 Content-Type; `DoWithOptions(..., client.RequestOptions{…}, result)` is the
 general form and the **only one that can carry request headers**.
 
+**A PATCH body has no default Content-Type; the transport refuses one sent
+without a type**, before any request goes out. The gateway's endpoints split
+between `application/json` and `application/merge-patch+json` and each enforces
+its own, so either default breaks half of them — the old merge-patch default
+made every generic PATCH to `devices` and `device-groups` a 400. Every spec's
+declared type was wire-checked correct, and every generated method passes it, so
+only a generic-transport caller can reach the refusal. Evidence:
+[WIRE-FACTS.md](docs/WIRE-FACTS.md#patch-content-types-2026-10-04).
+
 `RequestOptions` exists because the per-request dimensions are independent —
 expected status, Content-Type, extra headers, retry opt-out — so a wrapper per
 combination doubles the surface each time one is added. The named methods above
@@ -518,6 +527,7 @@ recorded**, unless noted.
 | `pro` `GET /v1/dss-declarations/{id}` | routed, `500` for every identifier | `TestAcceptance_Pro_DssDeclarationsBrokenForEveryIdentifier` |
 | `pro` `GET /v1/mdm/commands` | both parameters together is `500`; neither is `400` with empty `errors` | `TestAcceptance_Pro_MdmUpdates_ListMdmCommandsV1` |
 | `pro` `PUT /v1/cache-settings` | refused on any hosted tenant | `TestAcceptance_Pro_CacheSettings_UpdateV1RefusedOnHostedTenant` |
+| `pro` static-group writes | `assignments` (and `siteId` for mobile) declared optional, refused when absent with a bare `500` or a misleading `403`; spec followed, cost in `methodNotes` — see [WIRE-FACTS](docs/WIRE-FACTS.md#static-group-writes-need-fields-the-spec-calls-optional-2026-10-04) | `TestAcceptance_Pro_StaticComputerGroupV3RequiresAssignments`, `TestAcceptance_Pro_StaticMobileDeviceGroupV2RequiresAssignmentsAndSiteID` |
 | `proclassic` `/activationcode` | deprecated with **no successor** anywhere — ships a `// Deprecated:` marker deliberately (see Hard rules) | `TestAcceptance_Classic_GetActivationCode` |
 | `proclassic` `GET /patches/name/{name}` | `500` for every name | `TestAcceptance_Classic_PatchByName` |
 | `proclassic` `POST`/`PUT /patches/id/{id}` | refused whatever the body | `TestAcceptance_Classic_PatchByIDWrites` |
