@@ -1,6 +1,6 @@
 module github.com/jamf/jamfplatform-go-sdk
 
-go 1.27.1
+go 1.27.2
 
 require (
 	github.com/hashicorp/go-retryablehttp v0.7.8
