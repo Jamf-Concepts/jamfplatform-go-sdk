@@ -45,8 +45,8 @@ Go and moves one line of every `api/*.json`. Stripping titles and prose leaves
   invocation. Taken anyway, per the rule that the spec wins and a hold is not
   worth one constant: `SyncSettingsDeviceUnmanagedThreshold30` exists and a
   caller sending it gets that 422. Pinned by
-  `TestAcceptance_SecurityCloudUemConnectThreshold30AheadOfServer`, which fails
-  the day `30` reaches the 404.
+  `TestAcceptance_SecurityCloudUemConnectThreshold30AheadOfServer`, which failed
+  the day `30` reached the 404 (2026-10-08) and was deleted.
 - **`jsc-ztna` rewrote the gateway-create rules in prose** — exactly one of
   `dedicatedIps.enabled: true` or `ipsec`, `ipsec` requiring at least one
   `availabilityZones` address, the `field` attribution that tells the three

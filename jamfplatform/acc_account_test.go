@@ -96,6 +96,9 @@ func TestAcceptance_AccountReads(t *testing.T) {
 //     `[UPSTREAM_ERROR] Failed to <verb> ... via Skyway distributor service`,
 //     wire-verified identical on two different organization credentials, which
 //     rules out a per-credential grant problem.
+//   - As of 2026-10-08, the same envelope with the attribution dropped and the
+//     status raised: `500 [UPSTREAM_ERROR] The request could not be completed`,
+//     seen on GetDistributorConfiguration and ValidateDistributorPurchaseOrder.
 //
 // Matched on the fault text rather than the status code alone: a 400 from these
 // endpoints could equally be a real validation verdict, which must not be
@@ -108,11 +111,17 @@ func isSkywayScopeFault(err error) bool {
 	if !errors.As(err, &apiErr) {
 		return false
 	}
-	if !apiErr.HasStatus(400) {
-		return false
+	switch {
+	case apiErr.HasStatus(400):
+		return strings.Contains(apiErr.Body, "skyway-use2-product") ||
+			strings.Contains(apiErr.Body, "Skyway distributor service")
+	case apiErr.HasStatus(500):
+		// As of 2026-10-08 the unattributed form: the same dead upstream, with the
+		// Skyway text dropped. A 500 is never a validation verdict, so matching it
+		// swallows nothing.
+		return strings.Contains(apiErr.Body, "UPSTREAM_ERROR")
 	}
-	return strings.Contains(apiErr.Body, "skyway-use2-product") ||
-		strings.Contains(apiErr.Body, "Skyway distributor service")
+	return false
 }
 
 const skywayFaultReport = "the Jamf Account partners backend cannot reach Skyway, so every distributor endpoint answers 400 (%s). " +
