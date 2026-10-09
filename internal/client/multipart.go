@@ -12,7 +12,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -23,15 +22,19 @@ import (
 // default 32 KiB — fewer syscalls when pushing multi-GB package uploads.
 const multipartCopyBuf = 1 << 20
 
+// maxMultipartTransportRetries bounds how many times DoMultipart re-sends a
+// body after a transport error. Status-driven retries (429, and 5xx for
+// idempotent methods) still run to retryMax.
+const maxMultipartTransportRetries = 1
+
 // MultipartField represents one part of a multipart/form-data request body.
 // Exactly one of Filename (file upload) or Value (text field) must be set.
 //
 // For file parts, Content is consumed once and streamed directly to the
-// network — no in-memory buffering of the whole body. If Content is a
-// *os.File or an io.Seeker whose size can be determined, the transport
-// precomputes an exact Content-Length header (avoiding chunked transfer
-// encoding, which some proxies handle poorly). Otherwise the body is sent
-// chunked.
+// network — no in-memory buffering of the whole body. The body is always sent
+// over HTTP/1.1 with chunked transfer encoding and no declared Content-Length,
+// whatever Content is; an io.Seeker only makes the upload retryable, because it
+// can be rewound and streamed again. See sendMultipart for why.
 type MultipartField struct {
 	Name     string    // form field name
 	Filename string    // if non-empty, part is a file upload with this filename
@@ -68,16 +71,26 @@ func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields
 
 	var resp *http.Response
 	var err error
+	transportRetries := 0
 	for attempt := 0; ; attempt++ {
-		resp, err = c.sendMultipart(ctx, method, fullURL, fields)
+		attemptCtx, sent := withSendState(ctx, method)
+		resp, err = c.sendMultipart(attemptCtx, method, fullURL, fields)
 
 		retryable := false
 		switch {
 		case err != nil:
-			// A network-level failure happens before anything reaches the
-			// server, so it's always safe to retry regardless of method —
-			// same reasoning as jamfCheckRetry's resp == nil branch.
-			retryable = true
+			// Same rule as jamfCheckRetry's resp == nil branch: free to retry
+			// while the request never finished being written, so a connection
+			// dropped mid-upload starts over, but not after — a POST whose body
+			// was fully sent and then lost its connection may have been applied.
+			//
+			// Bounded at maxMultipartTransportRetries, though, because each
+			// retry re-sends the whole file, and repeating a very large body up
+			// to retryMax times is a lot of extra traffic for the gateway to take.
+			retryable = retryableTransportError(sent, err) && transportRetries < maxMultipartTransportRetries
+			if retryable {
+				transportRetries++
+			}
 		case isRetryableWriteStatus(method, resp.StatusCode):
 			retryable = true
 		}
@@ -113,11 +126,26 @@ func (c *Transport) DoMultipart(ctx context.Context, method, path string, fields
 func (c *Transport) sendMultipart(ctx context.Context, method, fullURL string, fields []MultipartField) (*http.Response, error) {
 	boundary := randomBoundary()
 
-	// Compute exact Content-Length when every file part has a known size;
-	// otherwise fall back to chunked transfer encoding. Known Content-Length
-	// avoids chunked (some proxies/CDPs handle it poorly) and lets servers
-	// enforce upload size limits up front instead of after partial transfer.
-	contentLen, canPrecompute := multipartContentLength(fields, boundary)
+	// Every multipart request goes out over HTTP/1.1 and chunked, with no
+	// declared Content-Length, on purpose and with no threshold or opt-out.
+	// Measured against the GA gateway, both choices help a large upload:
+	//
+	//   - HTTP/1.1: CloudFront advertises a 64 KiB per-stream HTTP/2 window, so a
+	//     single h2 upload tops out at 64 KiB per round trip — about 4 MiB/s at
+	//     13 ms — where HTTP/1.1 runs at the uplink, about 10 MiB/s here.
+	//   - No Content-Length: the same 1.43 GiB file over HTTP/1.1 on the same
+	//     tenant was refused with a 502 at about 1.04 GiB when the length was
+	//     declared (curl and Go agreed) and uploaded whole, hashes matching, when
+	//     it was not. A declared length also caps uploads near 375 MiB over h2.
+	//
+	// This is a throughput and ceiling measure, not a statement that very large
+	// uploads are safe: very large request bodies are demanding on the gateway,
+	// and it may still refuse some mid-stream whatever the framing. There is no size threshold because the point where it refuses
+	// varies by tenant and by run, so no number would be right to encode.
+	// Marking the context is what routes this request to the HTTP/1.1 transport;
+	// a client supplied through WithHTTPClient keeps its own transport and so
+	// its own protocol, and only the framing applies to it.
+	ctx = withHTTP1(ctx)
 
 	pr, pw := io.Pipe()
 	go func() {
@@ -131,9 +159,10 @@ func (c *Transport) sendMultipart(ctx context.Context, method, fullURL string, f
 	}
 	c.setScopeHeader(req)
 	req.Header.Set("Content-Type", "multipart/form-data; boundary="+boundary)
-	if canPrecompute {
-		req.ContentLength = contentLen
-	}
+	// -1 declares the length unknown, so net/http chunks the body without
+	// probing it first (a zero length with a non-nil body makes it wait up to
+	// 200ms for a first byte to decide).
+	req.ContentLength = -1
 
 	if c.logger != nil {
 		c.logger.LogRequest(ctx, method, fullURL, []byte("<multipart body>"))
@@ -258,88 +287,6 @@ func filePartHeader(name, filename string) textproto.MIMEHeader {
 	return h
 }
 
-// multipartContentLength computes the exact byte length of the multipart
-// body produced by writeMultipart. Returns ok=false if any file part's
-// Content size cannot be determined (non-seekable io.Reader). In that case
-// the caller should send with chunked transfer encoding.
-//
-// Implementation: drive a multipart.Writer against a byte-counting sink so
-// boundary/header/CRLF bytes are measured exactly as they will be written
-// on the real pass, then add each file part's known content size. Must use
-// the same boundary as the real write.
-func multipartContentLength(fields []MultipartField, boundary string) (int64, bool) {
-	sizes := make([]int64, len(fields))
-	for i, f := range fields {
-		if f.Filename == "" {
-			continue
-		}
-		n, ok := readerSize(f.Content)
-		if !ok {
-			return 0, false
-		}
-		sizes[i] = n
-	}
-
-	cw := &countingWriter{}
-	mw := multipart.NewWriter(cw)
-	if err := mw.SetBoundary(boundary); err != nil {
-		return 0, false
-	}
-	for i, f := range fields {
-		if f.Filename != "" {
-			if _, err := mw.CreatePart(filePartHeader(f.Name, f.Filename)); err != nil {
-				return 0, false
-			}
-			cw.n += sizes[i]
-		} else {
-			if err := mw.WriteField(f.Name, f.Value); err != nil {
-				return 0, false
-			}
-		}
-	}
-	if err := mw.Close(); err != nil {
-		return 0, false
-	}
-	return cw.n, true
-}
-
-// readerSize reports the number of bytes remaining in r, if knowable without
-// consuming the reader. Nil Content counts as zero bytes. Supported shapes:
-//   - nil
-//   - *os.File: Stat size minus current offset
-//   - io.Seeker: seek-to-end / restore (covers bytes.Reader, strings.Reader)
-func readerSize(r io.Reader) (int64, bool) {
-	if r == nil {
-		return 0, true
-	}
-	if f, ok := r.(*os.File); ok {
-		st, err := f.Stat()
-		if err != nil {
-			return 0, false
-		}
-		cur, err := f.Seek(0, io.SeekCurrent)
-		if err != nil {
-			return 0, false
-		}
-		return st.Size() - cur, true
-	}
-	if s, ok := r.(io.Seeker); ok {
-		cur, err := s.Seek(0, io.SeekCurrent)
-		if err != nil {
-			return 0, false
-		}
-		end, err := s.Seek(0, io.SeekEnd)
-		if err != nil {
-			return 0, false
-		}
-		if _, err := s.Seek(cur, io.SeekStart); err != nil {
-			return 0, false
-		}
-		return end - cur, true
-	}
-	return 0, false
-}
-
 // multipartRewindable reports whether every file part's Content can be
 // seeked back to its start — required for a safe 429 retry.
 func multipartRewindable(fields []MultipartField) bool {
@@ -370,15 +317,6 @@ func rewindMultipart(fields []MultipartField) error {
 		}
 	}
 	return nil
-}
-
-// countingWriter records the number of bytes written to it without keeping
-// the payload. Used to size a multipart body without buffering it.
-type countingWriter struct{ n int64 }
-
-func (c *countingWriter) Write(p []byte) (int, error) {
-	c.n += int64(len(p))
-	return len(p), nil
 }
 
 // randomBoundary matches stdlib multipart.Writer's default boundary style

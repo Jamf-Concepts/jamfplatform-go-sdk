@@ -128,10 +128,10 @@ func (c *Client) DeletePackageV1(ctx context.Context, id string) error {
 //   - id: instance id of package.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
-// implements io.Seeker) so the SDK can precompute an exact
-// Content-Length and retry once on a 429/Retry-After. A plain
-// io.Reader is accepted too but the upload falls back to chunked
-// transfer encoding and is not retried on 429.
+// implements io.Seeker) so the SDK can rewind the file and retry on a
+// 429/Retry-After. A plain io.Reader is accepted too but is not retried.
+// Whatever the reader, the upload is sent over HTTP/1.1 with chunked
+// transfer encoding and no declared Content-Length.
 func (c *Client) UploadPackageV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*HrefResponse, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result HrefResponse
@@ -310,10 +310,10 @@ func (c *Client) ExportPackageHistoryV1(ctx context.Context, id string, request 
 //   - id: Id of the package the manifest should be assigned to.
 //
 // For file parts, pass an *os.File or *bytes.Reader (anything that
-// implements io.Seeker) so the SDK can precompute an exact
-// Content-Length and retry once on a 429/Retry-After. A plain
-// io.Reader is accepted too but the upload falls back to chunked
-// transfer encoding and is not retried on 429.
+// implements io.Seeker) so the SDK can rewind the file and retry on a
+// 429/Retry-After. A plain io.Reader is accepted too but is not retried.
+// Whatever the reader, the upload is sent over HTTP/1.1 with chunked
+// transfer encoding and no declared Content-Length.
 func (c *Client) UploadPackageManifestV1(ctx context.Context, id string, fileFilename string, file io.Reader) (*Package, error) {
 	prefix := c.transport.APIPrefix("pro", "v1")
 	var result Package

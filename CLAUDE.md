@@ -286,6 +286,35 @@ may require one — but headers *replace* rather than merge and `http.Client` wr
 the jar's `Cookie` before the transport chain runs, so a caller-supplied `Cookie`
 displaces Jamf Cloud's sticky-session pin. The godoc says so.
 
+### Request lifetime and retries
+
+**The SDK sets no `http.Client.Timeout` and no default `ResponseHeaderTimeout`;
+the caller's context is the request deadline.** Both would fire whatever context
+was passed and so override it — a Terraform `update = "10m"` was cut off at 60s.
+`WithResponseHeaderTimeout` is the opt-in for a flat ceiling, a logged no-op under
+`WithHTTPClient`. The guard against a silently dead connection is an HTTP/2 health
+check on the tuned transport (30s + 15s), which cannot interrupt a slow response.
+Every consumer is expected to pass a context with a deadline.
+
+**Multipart uploads go over HTTP/1.1, chunked, with no declared `Content-Length`**
+— every `DoMultipart` method, unconditionally. CloudFront's 64 KiB per-stream h2
+window caps an h2 upload near 4 MiB/s, and a declared length lowered the ceiling
+of a large upload on this gateway; it is a measured workaround, not best practice,
+and not a claim that very large uploads are safe, so revisit it if the gateway
+changes. Transport-error retries of an upload are bounded at one, since each
+re-sends the whole file. Rationale, the decisions that look like
+omissions (no threshold, no opt-out), and the `WithHTTPClient` limitation are in
+[docs/STYLE.md](docs/STYLE.md#multipart-uploads-http11-no-declared-length-no-threshold-no-opt-out).
+
+**A transport error is retried freely only while the request never finished being
+written.** After that, only an idempotent method (GET/HEAD/PUT/DELETE) and never a
+timeout, because `retryablehttp`'s default would replay a POST after a connection
+reset the server had already acted on. The state travels in the request context
+(`sendState`), not the error, so it survives `http.Client.Timeout` replacing the
+error. Mechanism, the one known race, and the OAuth refresh — the one call the
+context cannot reach — are in
+[docs/STYLE.md](docs/STYLE.md#timeouts-and-retries).
+
 ---
 
 ## Pagination

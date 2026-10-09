@@ -74,23 +74,38 @@ func isRetryableWriteStatus(method string, status int) bool {
 		return false
 	}
 	if status == 0 || status >= 500 {
-		switch method {
-		case http.MethodGet, http.MethodDelete, http.MethodPut, http.MethodHead:
-			return true
-		default:
-			return false
-		}
+		return isIdempotentMethod(method)
 	}
 	return false
+}
+
+// isIdempotentMethod reports whether method is one the transport treats as safe
+// to send twice: GET, HEAD, PUT and DELETE. See isRetryableWriteStatus for the
+// carve-out PUT needs and for why POST and PATCH are not here.
+func isIdempotentMethod(method string) bool {
+	switch method {
+	case http.MethodGet, http.MethodDelete, http.MethodPut, http.MethodHead:
+		return true
+	default:
+		return false
+	}
 }
 
 // jamfCheckRetry extends retryablehttp.DefaultRetryPolicy with the
 // method-awareness it doesn't have: DefaultRetryPolicy alone would retry a
 // 500 on a POST just as readily as one on a GET. See isRetryableWriteStatus
-// for the policy. DefaultRetryPolicy already handles the connection-error
-// case (resp == nil, err != nil) correctly on its own — those are always
-// safe to retry regardless of method, since nothing reached the server —
-// so this only adds a check when a response actually came back.
+// for the policy.
+//
+// A transport error with no response needs the same care, and DefaultRetryPolicy
+// does not give it. It retries any such error that is not a redirect, scheme,
+// header or certificate failure, on every method, on the premise that nothing
+// reached the server. That holds for a refused connection or a failed dial. It
+// does not hold for a connection reset after the request was written, an EOF
+// before the response, a GOAWAY, a failed h2 health-check ping, or a response
+// header timeout: the server may have committed the write, and a retried POST
+// creates a second object. So an error with no response is retried freely only
+// if the request never finished being written, and after that only for an
+// idempotent method and never for a timeout — see retryableTransportError.
 //
 // Deliberately does NOT extend this to endpoint-specific 4xx semantics
 // (e.g. a classic API's misleading "400" on an accepted-async delete, or a
@@ -102,8 +117,11 @@ func isRetryableWriteStatus(method string, status int) bool {
 // reasoning that removed the SDK's old blanket 4xx retry.
 func jamfCheckRetry(ctx context.Context, resp *http.Response, err error) (bool, error) {
 	shouldRetry, checkErr := retryablehttp.DefaultRetryPolicy(ctx, resp, err)
-	if !shouldRetry || checkErr != nil || resp == nil {
+	if !shouldRetry || checkErr != nil {
 		return shouldRetry, checkErr
+	}
+	if resp == nil {
+		return retryableTransportError(sendStateFrom(ctx), err), nil
 	}
 	return isRetryableWriteStatus(resp.Request.Method, resp.StatusCode), nil
 }

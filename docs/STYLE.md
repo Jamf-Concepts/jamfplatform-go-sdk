@@ -1536,6 +1536,158 @@ target pointers. Per-family dialects are in
 
 ---
 
+## Timeouts and retries
+
+### A write is not replayed once it was sent
+
+`jamfCheckRetry` retries a transport error — one with no response at all — only
+while the request never finished being written. After that it retries an
+idempotent method (GET, HEAD, PUT, DELETE) and nothing else, and it never retries
+a timeout.
+
+`retryablehttp.DefaultRetryPolicy` retries every such error on every method, on the
+premise that nothing reached the server. That is true of a refused connection and
+false of a connection reset after the write, an EOF before the response, a GOAWAY,
+a failed h2 ping or a response-header timeout, so a POST could be created twice. The
+two rules are different in kind. Idempotency decides what may be replayed after a
+send. The timeout rule is not about idempotency: a timeout after the send is the
+caller's own decision to stop waiting, or a gateway's, and retrying it multiplies
+that bound by the attempt count — five recomputations of one smart group instead
+of one.
+
+- **The state is in the context, not the error.** `sendState` is seeded into the
+  request context by `doRequestFull` and by each `DoMultipart` attempt, and
+  `sendTrackingTransport` sets it from httptrace's `WroteRequest`. An error is the
+  wrong carrier because `http.Client` replaces a transport error with its own
+  `timeoutError` when `Client.Timeout` fires, dropping anything wrapped inside it,
+  and a caller-supplied client sets that timeout. The retry policy is handed the
+  context, which survives every layer.
+- **"Sent" means `WroteRequest` with a nil error.** A failed write is a request the
+  server never received in full — a short `Content-Length` body is rejected and a
+  chunked one without its last chunk is malformed — so a package upload cut at 90%
+  is still retried, which is the failure retrying exists for.
+- **The flag is per attempt.** The tracker clears it as each attempt starts; a retry
+  that fails before sending is not judged by the attempt before it.
+- **Coverage.** The tracker sits directly above the `*http.Transport` for the SDK's
+  own client and is added around a caller-supplied transport in `wrapWithOAuth2`,
+  next to the throttle, so `WithHTTPClient` callers get the same rule. A request with
+  no `sendState` — a token exchange, a raw request on `Transport.HTTPClient` — is
+  answered "retry", the behaviour before tracking existed, rather than silently
+  disabling retries for a path the tracker does not cover.
+- **One known race, in the safe direction.** `WroteRequest` runs when the write
+  returns, microseconds before the read side can report a reset. A reset that won
+  that race would be classed as unsent and retried — the old behaviour, not a new
+  failure. The tests sleep 50ms after draining the body to stay clear of it.
+
+`TestRetryAfterSend_*`, `TestRetryBeforeSend_PostIsStillRetried` and the two
+`TestDoMultipart_*AfterSend*` tests pin it, and fail under the old always-retry
+answer.
+
+### Request lifetime belongs to the caller's context
+
+The SDK sets **no `http.Client.Timeout` and no default `ResponseHeaderTimeout`**.
+Both are wall-clock bounds that fire whatever context the caller passed, so both
+override it: a Terraform `timeouts { update = "10m" }` on a smart group that takes
+90s to answer was cut off client-side at the SDK's 60s, and the cut-off was then
+retried. A request's lifetime is the context's, and every consumer is expected to
+pass one with a deadline.
+
+`WithResponseHeaderTimeout(d)` is the opt-in for a caller that wants one flat
+ceiling. It is applied to the SDK's own `*http.Transport` after every option has
+run (so option order does not matter and `SetUserAgent` re-applies it), it is a
+logged no-op under `WithHTTPClient` because that transport is the caller's, and
+`d <= 0` means none. It is a poor fit for package uploads, which share the
+transport and can legitimately take a long time to answer after the body.
+
+What stands in for a default header timeout as the guard against a dead path is
+the **HTTP/2 health check** on the tuned transport (`http2PingAfter` /
+`http2PingTimeout`, 30s + 15s). It notices a connection that has gone silent after
+a request was sent in ~45s, against ~5 minutes for TCP keepalive, and it cannot
+interrupt a slow response, because the peer answers a PING whatever its handler is
+doing — which no header timeout can promise. The gateway negotiates h2 on every
+namespace and answers the pings (see WIRE-FACTS). HTTP/1.1 has no equivalent; a
+fallback connection, such as one behind a TLS-inspecting proxy, has the dialer's
+keepalive only.
+
+**The OAuth token refresh is the one request the caller's context cannot
+reach.** A refresh triggered by an API call runs on a context captured when the
+client was built, so a caller's deadline neither starts nor interrupts it, and
+`reuseTokenSource` holds a mutex across it, so every concurrent call queues behind
+a stalled one. With no default header timeout it is bounded by the edge's own
+timeout and the h2 health check, not by an SDK timer. That is a judgement, not an
+oversight: the edge cuts a silent origin off, the health check catches a dead path,
+and a stalled refresh was 2×60s before this (x/oauth2 retries the other
+client-authentication style on any error). **If it ever proves insufficient, the
+fix is a second `*http.Transport` carrying a `ResponseHeaderTimeout`, selected by
+the token URL beneath the header wrapper — not `Client.Timeout` on the base
+client**, because `oauth2.NewClient` copies `Timeout` onto the API client it
+returns and that would cap every call and upload.
+
+### Multipart uploads: HTTP/1.1, no declared length, no threshold, no opt-out
+
+Every `DoMultipart` request — all eleven file-body methods, not only package
+upload — goes over **HTTP/1.1 with `Transfer-Encoding: chunked` and no
+`Content-Length`**, whatever the reader is. `sendMultipart` sets
+`ContentLength = -1` and marks the context; `protocolTransport`, installed at the
+bottom of the SDK-built chain, sends a marked request to `newHTTP1Transport()` and
+everything else to the HTTP/2-capable transport.
+
+Both halves were measured against the GA gateway, and neither is general best
+practice. A declared length is normally the better default: it lets a server
+refuse an oversize body up front, gives progress and ETA, and is understood by
+every intermediary. This is a workaround for how this gateway behaves, which is
+why the rationale is recorded here and should be revisited if it changes.
+
+- **HTTP/1.1.** CloudFront advertises `SETTINGS_INITIAL_WINDOW_SIZE=65536`, so one
+  h2 upload is capped at 64 KiB per round trip: about 4 MiB/s at 13 ms, against
+  about 10 MiB/s over HTTP/1.1 on the same uplink (curl and Go alike). The client
+  cannot raise the server's window, and the penalty grows with RTT.
+- **No declared length.** On one tenant over HTTP/1.1, the same 1.43 GiB file was
+  refused with a 502 at about 1.04 GiB when the length was declared (Go and curl
+  agree) and uploaded whole, with matching SHA3-512, SHA-256 and MD5, when it was
+  not. Over h2 a declared length failed from 375 MiB up on two tenants.
+- **It raises the ceiling and does not remove it.** A 2 GiB file still fails
+  mid-body on both tenants tried, and the ceiling without a declared length varies
+  by tenant and by run (the first tenant mostly died near 1.36 GiB). Uploads are
+  not resumable: a failure means starting again from byte zero.
+- **This is not a statement that very large uploads are safe.** The gateway
+  is not sized for very large request bodies, so the framing buys throughput
+  and headroom, not a licence to send multi-gigabyte bodies.
+  Callers that can bound package size should.
+
+Decisions that look like omissions:
+
+- **No size threshold, because the point where the gateway refuses varies.** It
+  differs by tenant and by run, so any cut-off would encode one observation as a
+  rule. Sending every upload the same way is correct wherever that point falls.
+- **Transport-error retries are bounded at one** (`maxMultipartTransportRetries`),
+  where status-driven retries (429, and 5xx on idempotent methods) still run to
+  `retryMax`. A retry re-sends the whole file, so repeating a very large body
+  four times is a lot of extra traffic for the gateway to take. One retry still
+  covers the common case, a stale keep-alive connection or a brief network drop.
+- **No opt-out.** The only reason to want HTTP/2 here is that something upstream
+  rejects chunked bodies, which no consumer has reported; if one does, answer
+  `411 Length Required` with a retry that declares the length rather than adding a
+  knob. Not built, because nothing yet needs it.
+- **The route is per request, not a swap of `uploadClient`'s transport**, because
+  that client also carries the no-retry JSON writes, which must stay on h2, and the
+  token exchange carries no marker.
+- **A client supplied with `WithHTTPClient` keeps its own transport and so its own
+  protocol**; only the framing applies to it. The SDK cannot force HTTP/1.1 onto a
+  transport it does not own.
+- **`WithResponseHeaderTimeout` applies to both transports.**
+
+`TestDoMultipart_NeverDeclaresContentLength` and
+`TestDoMultipart_UsesHTTP1WhileEverythingElseUsesHTTP2` pin it; the second runs
+against a TLS server that speaks h2 and records the protocol each request used.
+
+`TestTunedTransport_*`, `TestWithResponseHeaderTimeout_*` and
+`TestResponseHeaderTimeout_NotSetByDefault` pin it; the health-check test uses the
+real tuned transport with only the two durations shortened, and fails if h2 is
+silently not negotiated.
+
+---
+
 ## Acceptance tests
 
 Every new generated method **must** get an acceptance test in

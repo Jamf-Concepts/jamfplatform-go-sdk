@@ -6,6 +6,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
@@ -25,25 +26,41 @@ import (
 // deadlines (e.g. Terraform's `timeouts { create = "45m" }` block). Body
 // transfer time is bounded solely by the caller's ctx; these phase
 // timeouts exist to fail fast on dead networks, not healthy long transfers.
+//
+// There is deliberately no default ResponseHeaderTimeout either, for the same
+// reason: it is a wall-clock bound on the server's time to first byte that
+// fires regardless of the caller's context, so a Terraform `update = "10m"` on
+// a smart group that takes 90s to answer was cut off at the SDK's 60s. Callers
+// who want one opt in with WithResponseHeaderTimeout. What replaces it as the
+// guard against a connection that has gone silent is the HTTP/2 health check
+// below, which detects a dead connection without penalising a slow response.
 const (
 	// dialTimeout bounds TCP connection establishment. 10s is generous
 	// for well-connected cloud endpoints but catches blackholed hosts.
 	dialTimeout = 10 * time.Second
 	// tlsHandshakeTimeout bounds the TLS handshake after dial.
 	tlsHandshakeTimeout = 10 * time.Second
-	// responseHeaderTimeout bounds server time-to-first-byte after the
-	// full request body has been written. Uploads that legitimately take
-	// hours are unaffected; only servers that accept the body then hang
-	// are killed.
-	responseHeaderTimeout = 60 * time.Second
 	// idleConnTimeout bounds how long a pooled idle connection lives.
 	idleConnTimeout = 90 * time.Second
+	// http2PingAfter is how long an HTTP/2 connection may receive nothing
+	// before the client sends a PING, and http2PingTimeout how long it waits
+	// for the answer before closing the connection and failing what is in
+	// flight on it. This is what notices a path that has silently died after
+	// a request was sent — a dropped NAT mapping, a wedged middlebox — in
+	// ~45s rather than waiting on TCP keepalive's ~5 minutes. It costs a slow
+	// request nothing: the peer answers a PING whatever its handler is doing,
+	// so a response that takes ten minutes is not interrupted, which a header
+	// timeout could not promise. The gateway answers them (wire-verified).
+	// HTTP/1.1 has no equivalent, so a fallback connection relies on the
+	// dialer's keepalive alone.
+	http2PingAfter   = 30 * time.Second
+	http2PingTimeout = 15 * time.Second
 	// maxIdleConnsPerHost governs how many pooled HTTP/1.1 connections
 	// per host the SDK may keep warm. Go's default is 2, which
 	// serializes terraform-style parallel operations
 	// (`-parallelism=10`) at the pool. 10 matches default TF
-	// parallelism. HTTP/2 (which apigw.jamf.com supports) multiplexes
-	// on a single connection, so this ceiling only binds on the
+	// parallelism. HTTP/2 (which the gateway negotiates on every namespace)
+	// multiplexes on a single connection, so this ceiling only binds on the
 	// HTTP/1.1 fallback path.
 	maxIdleConnsPerHost = 10
 )
@@ -66,13 +83,61 @@ func newTunedTransport() *http.Transport {
 		IdleConnTimeout:       idleConnTimeout,
 		TLSHandshakeTimeout:   tlsHandshakeTimeout,
 		ExpectContinueTimeout: 1 * time.Second,
-		ResponseHeaderTimeout: responseHeaderTimeout,
+		HTTP2: &http.HTTP2Config{
+			SendPingTimeout: http2PingAfter,
+			PingTimeout:     http2PingTimeout,
+		},
 		// Larger socket buffers reduce syscalls on big bodies. Package
 		// upload is the driver — 1 MiB write buffer pairs with the 1 MiB
 		// io.CopyBuffer in multipart.go.
 		WriteBufferSize: 1 << 20,
 		ReadBufferSize:  1 << 16,
 	}
+}
+
+// newHTTP1Transport returns the tuned transport with HTTP/2 switched off. It
+// carries multipart uploads, which are measurably worse over HTTP/2 on this
+// gateway: CloudFront advertises a 64 KiB per-stream window, so a single h2
+// upload is capped at 64 KiB per round trip (about 4 MiB/s at 13 ms), while
+// HTTP/1.1 is limited only by the uplink (about 10 MiB/s on the same link).
+// A non-nil, empty TLSNextProto is what stops net/http enabling HTTP/2 by itself;
+// ForceAttemptHTTP2 alone does not, because a custom dialer is configured.
+func newHTTP1Transport() *http.Transport {
+	t := newTunedTransport()
+	t.ForceAttemptHTTP2 = false
+	t.HTTP2 = nil
+	t.TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{}
+	return t
+}
+
+type http1Key struct{}
+
+// withHTTP1 marks ctx so protocolTransport sends the request over HTTP/1.1.
+func withHTTP1(ctx context.Context) context.Context {
+	return context.WithValue(ctx, http1Key{}, true)
+}
+
+func wantsHTTP1(ctx context.Context) bool {
+	v, _ := ctx.Value(http1Key{}).(bool)
+	return v
+}
+
+// protocolTransport chooses between the SDK's HTTP/2-capable and HTTP/1.1-only
+// transports per request. It is per request rather than per client because the
+// same authenticated client carries every call: swapping uploadClient's transport
+// would drag the no-retry JSON writes that share it onto HTTP/1.1 as well, and
+// the token exchange, which carries no marker, must keep multiplexing on h2.
+type protocolTransport struct {
+	h2, h1 http.RoundTripper
+}
+
+// RoundTrip routes a marked request to the HTTP/1.1 transport and everything
+// else to the HTTP/2-capable one.
+func (t *protocolTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if wantsHTTP1(req.Context()) {
+		return t.h1.RoundTrip(req)
+	}
+	return t.h2.RoundTrip(req)
 }
 
 // userAgentTransport wraps an http.RoundTripper to add a User-Agent header to all requests.
@@ -172,11 +237,19 @@ func newCookieJar() *cookiejar.Jar {
 // token fetch (e.g. load-balancer session cookies) also apply to API calls.
 // No Client.Timeout is set — callers bound request lifetime via ctx; the
 // underlying Transport bounds each network phase individually.
-func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttle *requestThrottle) (oauthClient *http.Client, baseClient *http.Client) {
+//
+// tuned is returned so WithResponseHeaderTimeout can reach the *http.Transport
+// values at the bottom of the chain (the HTTP/2-capable one and its HTTP/1.1
+// twin for multipart); it is not otherwise needed once the chain is built.
+func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttle *requestThrottle) (oauthClient *http.Client, baseClient *http.Client, tuned []*http.Transport) {
 	jar := newCookieJar()
 	base := &http.Client{Jar: jar}
 
-	var rt http.RoundTripper = newTunedTransport()
+	// The send tracker goes directly above the transports so the trace it
+	// attaches is on the request that is actually written; see sendTrackingTransport.
+	h2, h1 := newTunedTransport(), newHTTP1Transport()
+	tuned = []*http.Transport{h2, h1}
+	var rt http.RoundTripper = &sendTrackingTransport{base: &protocolTransport{h2: h2, h1: h1}}
 	if throttle != nil {
 		rt = &throttleTransport{base: rt, throttle: throttle}
 	}
@@ -188,20 +261,25 @@ func newOAuth2Client(config *clientcredentials.Config, userAgent string, throttl
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
 	outer := oauth2.NewClient(ctx, &annotatingTokenSource{source: config.TokenSource(ctx)})
 	outer.Jar = jar
-	return outer, base
+	return outer, base, tuned
 }
 
 // wrapWithOAuth2 wraps a base HTTP client with OAuth2 token management,
 // preserving the base client's cookie jar on the outer client. When throttle
-// is non-nil, the base client's transport is wrapped so the request-spacing
-// gate covers both API calls and token fetches on a caller-supplied client.
+// is non-nil the client is being adopted from the caller, and its transport is
+// wrapped twice: with the request-spacing gate, so it covers both API calls and
+// token fetches, and with the send tracker, so the retry policy can tell a
+// request that never left from one the server may have acted on. A caller's own
+// transport would otherwise be the one place retries still replay a write after
+// a connection reset. Both wrappers are added exactly once, because the
+// header-transport rebuild passes a nil throttle.
 func wrapWithOAuth2(config *clientcredentials.Config, base *http.Client, throttle *requestThrottle) *http.Client {
 	if throttle != nil {
 		rt := base.Transport
 		if rt == nil {
 			rt = http.DefaultTransport
 		}
-		base.Transport = &throttleTransport{base: rt, throttle: throttle}
+		base.Transport = &throttleTransport{base: &sendTrackingTransport{base: rt}, throttle: throttle}
 	}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, base)
 	outer := oauth2.NewClient(ctx, &annotatingTokenSource{source: config.TokenSource(ctx)})
