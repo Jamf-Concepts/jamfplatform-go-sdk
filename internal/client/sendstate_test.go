@@ -142,7 +142,11 @@ func TestRetryAfterSend_NonIdempotentMethodsAreNotReplayed(t *testing.T) {
 				dropAfterReading(w, r)
 			})
 
-			err := c.Do(context.Background(), method, "/api/write", map[string]string{"k": "v"}, nil)
+			// A PATCH body has no default Content-Type and is refused before
+			// sending, which would pass the count check below for the wrong
+			// reason; state the type so the request is actually written.
+			err := c.DoWithContentType(context.Background(), method, "/api/write",
+				map[string]string{"k": "v"}, "application/json", http.StatusOK, nil)
 			if err == nil {
 				t.Fatal("expected a transport error")
 			}
